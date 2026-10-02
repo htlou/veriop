@@ -1,0 +1,235 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::default::Default
+#[diagnostic_item("Default")]
+pub trait Default<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn default;
+    non-dyn-compatible
+}
+
+// Full name: core::default::{impl Default for bool}::default
+pub fn default() -> bool
+= <opaque>
+
+// Full name: core::default::{impl Default for bool}
+impl "impl_Default_for_bool" Default for bool {
+    proof ImpliedClause0: (bool: Sized) = {built_in impl Sized for bool}
+    fn default = default
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: std::io::stdio::_print
+pub fn _print<'_0>(_1: Arguments<'_0>)
+= <opaque>
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::Left
+trait Left<Self, T>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    vtable: test_crate::Left::{vtable}<T>
+}
+
+// Full name: test_crate::Right
+trait Right<Self, T>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    vtable: test_crate::Right::{vtable}<T>
+}
+
+// Full name: test_crate::Join
+trait Join<Self, U>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (U: Sized)
+    fn test;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Join<U> for T}::test
+fn test<T, U>()
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: (T: Left<U>),
+    TraitClause3: (T: Right<U>),
+    TraitClause4: (U: Default),
+    TraitClause5: (U: Debug),
+{
+    let _0: (); // return
+    let _1: (); // anonymous local
+    let _2: Arguments<'1>; // anonymous local
+    let args_3: (&'4 U,); // local
+    let _4: &'5 U; // anonymous local
+    let _5: U; // anonymous local
+    let args_6: [Argument<'14>; 1usize]; // local
+    let _7: Argument<'18>; // anonymous local
+    let _8: &'19 U; // anonymous local
+    let _9: &'21 [u8; 4usize]; // anonymous local
+    let _10: &'22 [u8; 4usize]; // anonymous local
+    let _11: &'28 [Argument<'29>; 1usize]; // anonymous local
+    let _12: &'33 [Argument<'34>; 1usize]; // anonymous local
+    let _13: [u8; 4usize]; // anonymous local
+    let _14: &'45 [u8; 4usize]; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    storage_live(_2)
+    storage_live(args_3)
+    storage_live(_4)
+    storage_live(_5)
+    _5 = TraitClause4::default()
+    ↳⚡ unwind_continue
+    _4 = &_5
+    args_3 = (move _4,)
+    storage_dead(_4)
+    fake_read(args_3)
+    storage_live(args_6)
+    storage_live(_7)
+    storage_live(_8)
+    _8 = &(*args_3._0)
+    _7 = new_debug<'40, '42, U>[TraitClause1, TraitClause5](move _8)
+    ↳⚡ conditional_drop[{built_in impl Destruct for U}::drop_glue<'43>] _5
+        ↳⚡ storage_dead(_14)
+            storage_dead(_13)
+            unwind_terminate
+        unwind_continue
+    storage_dead(_8)
+    args_6 = [move _7]
+    storage_dead(_7)
+    fake_read(args_6)
+    storage_live(_9)
+    storage_live(_10)
+    storage_live(_13)
+    _13 = [const 192u8, const 1u8, const 10u8, const 0u8]
+    storage_live(_14)
+    _14 = &_13
+    _10 = move _14
+    _9 = &(*_10)
+    storage_live(_11)
+    storage_live(_12)
+    _12 = &args_6
+    _11 = &(*_12)
+    _2 = new<'50, 4usize, 1usize>(move _9, move _11)
+    ↳⚡ conditional_drop[{built_in impl Destruct for U}::drop_glue<'43>] _5
+        ↳⚡ storage_dead(_14)
+            storage_dead(_13)
+            unwind_terminate
+        unwind_continue
+    storage_dead(_12)
+    storage_dead(_11)
+    storage_dead(_10)
+    storage_dead(_9)
+    _1 = _print<'52>(move _2)
+    ↳⚡ conditional_drop[{built_in impl Destruct for U}::drop_glue<'43>] _5
+        ↳⚡ storage_dead(_14)
+            storage_dead(_13)
+            unwind_terminate
+        unwind_continue
+    storage_dead(_2)
+    storage_dead(args_6)
+    conditional_drop[{built_in impl Destruct for U}::drop_glue<'53>] _5
+    ↳⚡ unwind_continue
+    storage_dead(_5)
+    storage_dead(args_3)
+    storage_dead(_1)
+    _0 = ()
+    storage_dead(_14)
+    storage_dead(_13)
+    return
+}
+
+// Full name: test_crate::{impl Join<U> for T}
+impl<T, U> "impl_Join_for_T" Join<U> for T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: (T: Left<U>),
+    TraitClause3: (T: Right<U>),
+    TraitClause4: (U: Default),
+    TraitClause5: (U: Debug),
+{
+    proof ImpliedClause0: (T: MetaSized) = TraitClause0::ImpliedClause0
+    proof ImpliedClause1: (U: Sized) = TraitClause1
+    fn test = test<T, U>[TraitClause0, TraitClause1, TraitClause2, TraitClause3, TraitClause4, TraitClause5]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Left<U> for T}
+impl<T, U> "impl_Left_for_T" Left<U> for T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: (U: Default),
+    TraitClause3: (U: Debug),
+{
+    proof ImpliedClause0: (T: MetaSized) = TraitClause0::ImpliedClause0
+    proof ImpliedClause1: (U: Sized) = TraitClause1
+    vtable: lazy
+}
+
+// Full name: test_crate::{impl Right<U> for T}
+impl<T, U> "impl_Right_for_T" Right<U> for T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: (U: Default),
+    TraitClause3: (U: Debug),
+{
+    proof ImpliedClause0: (T: MetaSized) = TraitClause0::ImpliedClause0
+    proof ImpliedClause1: (U: Sized) = TraitClause1
+    vtable: lazy
+}
+
+// Full name: test_crate::try_it
+fn try_it<T>()
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Default),
+    TraitClause2: (T: Debug),
+    TraitClause3: (T: Left<bool>),
+    TraitClause4: (T: Right<()>),
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = test<T, bool>[TraitClause0, {built_in impl Sized for bool}, TraitClause3, impl_Right_for_T<T, bool>[TraitClause0, {built_in impl Sized for bool}, impl_Default_for_bool, {impl#10}], impl_Default_for_bool, {impl#10}]()
+    ↳⚡ unwind_continue
+    return
+}
+
+
+

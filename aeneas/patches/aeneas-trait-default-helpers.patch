@@ -1,0 +1,79 @@
+diff --git a/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean b/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean
+index cd82fa8e..6060e8d8 100644
+--- a/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean
++++ b/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean
+@@ -2,6 +2,7 @@ module
+ public import Lean.Elab.PreDefinition.Basic
+ public meta import Lean.Elab.DefView
+ public meta import Lean.Elab.PreDefinition.Basic
++public meta import Lean.Meta.RecExt
+ public section
+ 
+ /-!
+@@ -58,8 +59,8 @@ command resolves this circularity at elaboration time by:
+ 
+ 1. Letting the body reference the name being defined (via a temporary local
+    variable, using `withAuxDecl`).
+-2. After elaboration, **unfolding** every `@[trait_default]`-marked function call,
+-   exposing the field projections (e.g., `self.N`).
++2. After elaboration, **unfolding** every `@[trait_default]`-marked function call
++   and non-recursive helpers receiving self, exposing field projections (e.g., `self.N`).
+ 3. **Substituting** those projections with the already-resolved field values.
+ 4. Repeating until every field is free of the self-reference.
+ 
+@@ -98,7 +99,8 @@ Given a structure with fields `f₁, …, fₙ` and a constructor application
+ 1. **Partition** fields into *resolved* (no self-reference) and *unresolved*.
+ 2. **Loop** (at most `n + 1` iterations):
+    a. For each unresolved field value `vᵢ`:
+-      - **Unfold** all `@[trait_default]` calls (`unfoldTraitDefaults`).
++      - **Unfold** all `@[trait_default]` calls and non-recursive helpers receiving self
++        (`unfoldTraitDefaults`).
+       - **Substitute** projections of the self-reference with resolved values
+         (`substituteProjections`).
+    b. If `vᵢ` no longer mentions the self-reference, mark it resolved.
+@@ -148,7 +150,8 @@ meta def exprContainsFVar (e : Expr) (fvarId : FVarId) : Bool :=
+     | _ => false
+ 
+ /-- Recursively unfold every `@[trait_default]`-marked constant application in `e`,
+-    beta-reducing after each unfolding step.
++    beta-reducing after each unfolding step. Also unfold non-recursive helpers
++    that receive the self-reference directly, exposing their field projections.
+ 
+     Uses `TransparencyMode.all` so that `@[irreducible]` definitions are also unfolded —
+     this is needed because some generated default implementations are marked as irreducible.
+@@ -159,16 +162,23 @@ meta def exprContainsFVar (e : Expr) (fvarId : FVarId) : Bool :=
+     Any `@[trait_default]` constant whose body is *not* available for unfolding — which,
+     under the module system, happens when the definition is not marked `@[expose]` — is
+     returned in the second component, so that callers can report an actionable error. -/
+-meta partial def unfoldTraitDefaults (e : Expr) : MetaM (Expr × Std.HashSet Name) := do
++meta partial def unfoldTraitDefaults (e : Expr) (selfFvarId : FVarId) :
++    MetaM (Expr × Std.HashSet Name) := do
+   let env ← getEnv
+   let go : StateT (Std.HashSet Name) MetaM Expr :=
+     Core.transform e (pre := fun e => do
+       let fn := e.getAppFn
+       if let .const name _ := fn then
+-        if traitDefaultAttr.hasTag env name then
++        let isDefault := traitDefaultAttr.hasTag env name
++        let receivesSelf := e.getAppArgs.any fun arg =>
++          let fn := arg.consumeMData.getAppFn
++          fn.isFVar && fn.fvarId! == selfFvarId
++        let isHelper := receivesSelf && (env.getProjectionFnInfo? name).isNone &&
++          !(← isRecursiveDefinition name)
++        if isDefault || isHelper then
+           if let some e' ← withTransparency .all <| unfoldDefinition? e then
+             return .visit e'.headBeta
+-          else
++          else if isDefault then
+             modify (·.insert name)
+       return .continue)
+   go.run ∅
+@@ -296,7 +306,7 @@ meta def resolveStructFields (value : Expr) (selfFvarId : FVarId) (type : Expr)
+     let mut stillUnresolved : Array Nat := #[]
+     for i in unresolved do
+       let fieldVal := fieldValues[i]!
+-      let (fieldVal', fieldBlocked) ← unfoldTraitDefaults fieldVal
++      let (fieldVal', fieldBlocked) ← unfoldTraitDefaults fieldVal selfFvarId
+       blocked := blocked.insertMany fieldBlocked
+       let fieldVal' ← substituteProjections fieldVal' selfFvarId structName resolved
+       if !exprContainsFVar fieldVal' selfFvarId then

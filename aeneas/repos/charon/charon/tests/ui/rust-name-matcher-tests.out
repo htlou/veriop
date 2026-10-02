@@ -1,0 +1,277 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (type_error("removed allocator parameter"): Sized),
+
+struct str {
+  _0: [u8],
+}
+
+// Full name: test_crate::foo::bar
+#[pattern::fail("test_crate::foo::bar::_")]
+#[pattern::pass("test_crate::foo::bar")]
+#[pattern::pass("test_crate::foo::_")]
+#[pattern::pass("test_crate::foo")]
+#[pattern::pass("test_crate")]
+#[pattern::pass("test_crate::_")]
+#[pattern::pass("test_crate::_::bar")]
+#[pattern::fail("test_crate::_::lsdkfjs")]
+#[pattern::pass("crate::foo::bar")]
+#[pattern::fail("foo::bar")]
+fn bar()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::Trait
+#[pattern::pass("test_crate::Trait")]
+#[pattern::fail("test_crate::Trait<_>")]
+#[pattern::pass("test_crate::Trait<_, _>")]
+trait Trait<Self, T>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    #[pattern::pass("test_crate::Trait::method")]
+    #[pattern::pass("test_crate::Trait<_>::method")]
+    fn method<U, TraitClause0_1: (U: Sized)>;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait<Option<T>[TraitClause0]> for Box<T>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}]}::method
+#[pattern::pass("test_crate::{impl test_crate::Trait<_> for _}::method")]
+#[pattern::pass("{impl test_crate::Trait<_> for _}::method")]
+#[pattern::pass("test_crate::{impl test_crate::Trait<_> for _}::_")]
+#[pattern::pass("test_crate::{impl test_crate::Trait<_> for _}")]
+#[pattern::pass("test_crate::{impl test_crate::Trait<_, _>}"::method)]
+#[pattern::fail("test_crate::Trait<_>::method")]
+fn impl_Trait_Option_for_Box_Global::method<T, U>()
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::{impl Trait<Option<T>[TraitClause0]> for Box<T>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}]}
+impl<T> "impl_Trait_Option_for_Box_Global" Trait<Option<T>[TraitClause0]> for Box<T>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}]
+where
+    TraitClause0: (T: Sized),
+{
+    proof ImpliedClause0: (Box<T>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}]: MetaSized) = {built_in impl MetaSized for Box<T>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}]}
+    proof ImpliedClause1: (Option<T>[TraitClause0]: Sized) = {built_in impl Sized for Option<T>[TraitClause0]}
+    fn method<U, TraitClause0_1: (U: Sized)> = impl_Trait_Option_for_Box_Global::method<T, U>[TraitClause0, TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait<T> for [T]}::method
+fn impl_Trait_for_slice::method<T, U>()
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::{impl Trait<T> for [T]}
+impl<T> "impl_Trait_for_slice" Trait<T> for [T]
+where
+    TraitClause0: (T: Sized),
+{
+    proof ImpliedClause0: ([T]: MetaSized) = {built_in impl MetaSized for [T]}
+    proof ImpliedClause1: (T: Sized) = TraitClause0
+    fn method<U, TraitClause0_1: (U: Sized)> = impl_Trait_for_slice::method<T, U>[TraitClause0, TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait<T> for &'_0 [T]}::method
+fn {impl Trait<T> for &'_0 [T]}::method<'_0, T, U>()
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::{impl Trait<T> for &'_0 [T]}
+impl<'_0, T> Trait<T> for &'_0 [T]
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+{
+    proof ImpliedClause0: (&'_0 [T]: MetaSized) = {built_in impl MetaSized for &'_0 [T]}
+    proof ImpliedClause1: (T: Sized) = TraitClause0
+    fn method<U, TraitClause0_1: (U: Sized)> = {impl Trait<T> for &'_0 [T]}::method<'_0, T, U>[TraitClause0, TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait<bool> for usize}::method
+fn impl_Trait_bool_for_usize::method<U>()
+where
+    TraitClause0: (U: Sized),
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::{impl Trait<bool> for usize}
+impl "impl_Trait_bool_for_usize" Trait<bool> for usize {
+    proof ImpliedClause0: (usize: MetaSized) = {built_in impl MetaSized for usize}
+    proof ImpliedClause1: (bool: Sized) = {built_in impl Sized for bool}
+    fn method<U, TraitClause0_1: (U: Sized)> = impl_Trait_bool_for_usize::method<U>[TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::Generic
+struct Generic<T>
+where
+    TraitClause0: (T: Sized),
+{
+  value: T,
+}
+
+// Full name: test_crate::{Generic<T>[TraitClause0]}::new
+#[pattern::pass("test_crate::_::new")]
+#[pattern::pass("_::_::new")]
+fn new<T>(value: T) -> Generic<T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+{
+    let _0: Generic<T>[TraitClause0]; // return
+    let value: T; // arg #1
+    let _2: T; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = move value
+    _0 = Generic { value: move _2 }
+    conditional_drop[{built_in impl Destruct for T}::drop_glue<'0>] _2
+    ↳⚡ conditional_drop[{built_in impl Destruct for T}::drop_glue<'2>] value
+        ↳⚡ unwind_terminate
+        unwind_continue
+    storage_dead(_2)
+    conditional_drop[{built_in impl Destruct for T}::drop_glue<'1>] value
+    ↳⚡ unwind_continue
+    return
+}
+
+#[pattern::pass("test_crate::_::get")]
+fn test_crate::{Generic<T>[TraitClause0]}::get<'_0, T>(self: &'_0 Generic<T>[TraitClause0]) -> &'_0 T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+{
+    let _0: &'1 T; // return
+    let self: &'3 Generic<T>[TraitClause0]; // arg #1
+    let _2: &'4 T; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = &(*self).value
+    _0 = &(*_2)
+    storage_dead(_2)
+    return
+}
+
+// Full name: test_crate::use_generic
+#[pattern::pass("test_crate::use_generic")]
+fn use_generic()
+{
+    let _0: (); // return
+    let _int_generic: Generic<i32>[{built_in impl Sized for i32}]; // local
+    let _str_generic: Generic<&'8 str>[{built_in impl Sized for &'8 str}]; // local
+    let _3: &'13 i32; // anonymous local
+    let _4: &'15 Generic<i32>[{built_in impl Sized for i32}]; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_int_generic)
+    _int_generic = new<i32>[{built_in impl Sized for i32}](const 42i32)
+    ↳⚡ unwind_continue
+    fake_read(_int_generic)
+    storage_live(_str_generic)
+    _str_generic = new<&'17 str>[{built_in impl Sized for &'17 str}](const "hello")
+    ↳⚡ unwind_continue
+    fake_read(_str_generic)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = &_int_generic
+    _3 = test_crate::{Generic<T>[TraitClause0]}::get<'26, i32>[{built_in impl Sized for i32}](move _4)
+    ↳⚡ unwind_continue
+    storage_dead(_4)
+    storage_dead(_3)
+    _0 = ()
+    storage_dead(_str_generic)
+    storage_dead(_int_generic)
+    return
+}
+
+
+

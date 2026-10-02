@@ -1,0 +1,96 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: test_crate::Trait
+trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    type Type
+    where
+        TraitClause0_1: (Self: Copy),
+        proof ImpliedClause0: (Self::Type[TraitClause0_1]: Sized);
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait for ()}
+impl "impl_Trait_for_unit" Trait for () {
+    proof ImpliedClause0: ((): Sized) = {built_in impl Sized for ()}
+    type Type = ()
+    where
+        TraitClause0_1: ((): Copy),
+        proof ImpliedClause0: ((): Sized) = TraitClause0_1::ImpliedClause1::ImpliedClause0;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::foo
+fn foo<'_0, T>(_1: &'_0 TraitClause1::Type[TraitClause2])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Trait),
+    TraitClause2: (T: Copy),
+    TypeOutlives0: TraitClause1::Type[TraitClause2]: '_0,
+    TypeOutlives1: T: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 TraitClause1::Type[TraitClause2]; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let _1: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = ()
+    set_type(typeof(_1) <= ())
+    storage_dead(_1)
+    _0 = ()
+    return
+}
+
+
+

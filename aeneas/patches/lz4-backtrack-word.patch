@@ -1,0 +1,28 @@
+diff --git a/src/block/compress.rs b/src/block/compress.rs
+index aebb97b..309912f 100644
+--- a/src/block/compress.rs
++++ b/src/block/compress.rs
+@@ -258,10 +258,19 @@ fn backtrack_match(
+     source: &[u8],
+     candidate: &mut usize,
+ ) {
+-    // Note: Even if iterator version of this loop has less branches inside the loop it has more
+-    // branches before the loop. That in practice seems to make it slower than the while version
+-    // bellow. TODO: It should be possible remove all bounds checks, since we are walking
+-    // backwards
++    while *candidate >= 8 && *cur > literal_start && *cur - literal_start >= 8 {
++        let left = u64::from_le_bytes(input[*cur - 8..*cur].try_into().unwrap());
++        let right = u64::from_le_bytes(source[*candidate - 8..*candidate].try_into().unwrap());
++        let diff = left ^ right;
++        if diff != 0 {
++            let matched = (diff.leading_zeros() / 8) as usize;
++            *cur -= matched;
++            *candidate -= matched;
++            return;
++        }
++        *cur -= 8;
++        *candidate -= 8;
++    }
+     while *candidate > 0 && *cur > literal_start && input[*cur - 1] == source[*candidate - 1] {
+         *cur -= 1;
+         *candidate -= 1;

@@ -1,0 +1,203 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::HasAssoc
+trait HasAssoc<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Output: Sized)
+    type Output
+    vtable: test_crate::HasAssoc::{vtable}<Self::Output>
+}
+
+// Full name: test_crate::Direct
+struct Direct<T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: HasAssoc),
+{
+  _0: T,
+}
+
+// Full name: test_crate::Direct::{impl Destruct for Direct<T>[TraitClause0, TraitClause1]}::drop_glue
+unsafe fn impl_Destruct_for_Direct::drop_glue<'_0, T>(_1: &'_0 mut Direct<T>[TraitClause0, TraitClause1])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: HasAssoc),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 mut Direct<T>[TraitClause0, TraitClause1]; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    drop[{built_in impl Destruct for T}::drop_glue<'2>] (*_1)._0
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::BaseWithAssoc
+trait BaseWithAssoc<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Item: Sized)
+    type Item
+    vtable: test_crate::BaseWithAssoc::{vtable}<Self::Item>
+}
+
+// Full name: test_crate::DerivedNoAssoc
+trait DerivedNoAssoc<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: BaseWithAssoc)
+    vtable: test_crate::DerivedNoAssoc::{vtable}<Self::ImpliedClause1::Item>
+}
+
+// Full name: test_crate::Transitive
+struct Transitive<T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: DerivedNoAssoc),
+{
+  _0: T,
+}
+
+// Full name: test_crate::Transitive::{impl Destruct for Transitive<T>[TraitClause0, TraitClause1]}::drop_glue
+unsafe fn impl_Destruct_for_Transitive::drop_glue<'_0, T>(_1: &'_0 mut Transitive<T>[TraitClause0, TraitClause1])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: DerivedNoAssoc),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 mut Transitive<T>[TraitClause0, TraitClause1]; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    drop[{built_in impl Destruct for T}::drop_glue<'2>] (*_1)._0
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::MarkerParent
+trait MarkerParent<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    vtable: test_crate::MarkerParent::{vtable}
+}
+
+// Full name: test_crate::MarkerChild
+trait MarkerChild<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: MarkerParent)
+    vtable: test_crate::MarkerChild::{vtable}
+}
+
+// Full name: test_crate::Marker
+struct Marker<T> {
+  _0: T,
+}
+
+// Full name: test_crate::Marker::{impl Destruct for Marker<T>}::drop_glue
+unsafe fn impl_Destruct_for_Marker::drop_glue<'_0, T>(_1: &'_0 mut Marker<T>)
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: MarkerChild),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 mut Marker<T>; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    drop[{built_in impl Destruct for T}::drop_glue<'2>] (*_1)._0
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::use_all
+fn use_all<T, U, V>(_x: Direct<T>[TraitClause0, TraitClause3], _y: Transitive<U>[TraitClause1, TraitClause4], _z: Marker<V>)
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: (V: Sized),
+    TraitClause3: (T: HasAssoc),
+    TraitClause4: (U: DerivedNoAssoc),
+    TraitClause5: (V: MarkerChild),
+{
+    let _0: (); // return
+    let _x: Direct<T>[TraitClause0, TraitClause3]; // arg #1
+    let _y: Transitive<U>[TraitClause1, TraitClause4]; // arg #2
+    let _z: Marker<V>; // arg #3
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    conditional_drop[impl_Destruct_for_Marker::drop_glue<'0, V>[TraitClause2, TraitClause5]] _z
+    ↳⚡ conditional_drop[impl_Destruct_for_Transitive::drop_glue<'2, U>[TraitClause1, TraitClause4]] _y
+        ↳⚡ storage_dead(_z)
+            storage_dead(_y)
+            storage_dead(_x)
+            unwind_terminate
+        conditional_drop[impl_Destruct_for_Direct::drop_glue<'4, T>[TraitClause0, TraitClause3]] _x
+        ↳⚡ storage_dead(_z)
+            storage_dead(_y)
+            storage_dead(_x)
+            unwind_terminate
+        storage_dead(_z)
+        storage_dead(_y)
+        storage_dead(_x)
+        unwind_continue
+    conditional_drop[impl_Destruct_for_Transitive::drop_glue<'1, U>[TraitClause1, TraitClause4]] _y
+    ↳⚡ conditional_drop[impl_Destruct_for_Direct::drop_glue<'4, T>[TraitClause0, TraitClause3]] _x
+        ↳⚡ storage_dead(_z)
+            storage_dead(_y)
+            storage_dead(_x)
+            unwind_terminate
+        storage_dead(_z)
+        storage_dead(_y)
+        storage_dead(_x)
+        unwind_continue
+    conditional_drop[impl_Destruct_for_Direct::drop_glue<'3, T>[TraitClause0, TraitClause3]] _x
+    ↳⚡ storage_dead(_z)
+        storage_dead(_y)
+        storage_dead(_x)
+        unwind_continue
+    storage_dead(_z)
+    storage_dead(_y)
+    storage_dead(_x)
+    return
+}
+
+
+

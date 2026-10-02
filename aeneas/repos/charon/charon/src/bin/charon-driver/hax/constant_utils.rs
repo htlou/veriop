@@ -1,0 +1,130 @@
+use crate::hax::prelude::*;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConstantInt {
+    Int(i128, IntTy),
+    Uint(u128, UintTy),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConstantLiteral {
+    Bool(bool),
+    Char(char),
+    Float(String, FloatTy),
+    Int(ConstantInt),
+    PtrNoProvenance(u128),
+    Str(String),
+    ByteStr(Vec<u8>),
+}
+
+sinto_reexport!(rustc_abi::VariantIdx);
+
+/// Describe the kind of a variant
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VariantKind {
+    Struct,
+    Union,
+    Enum { index: VariantIdx },
+}
+
+/// The subset of expressions that corresponds to constants.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConstantExprKind {
+    Literal(ConstantLiteral),
+    // Adts (structs, enums, unions) or closures.
+    Adt {
+        kind: VariantKind,
+        fields: Vec<ConstantFieldExpr>,
+    },
+    Array {
+        fields: Vec<ConstantExpr>,
+    },
+    Tuple {
+        fields: Vec<ConstantExpr>,
+    },
+    /// A top-level or associated constant.
+    ///
+    /// Remark: constants *can* have generic parameters.
+    /// Example:
+    /// ```text
+    /// struct V<const N: usize, T> {
+    ///   x: [T; N],
+    /// }
+    ///
+    /// impl<const N: usize, T> V<N, T> {
+    ///   const LEN: usize = N; // This has generics <N, T>
+    /// }
+    ///
+    /// impl Foo for Bar {
+    ///   const C : usize = 32; // <-
+    /// }
+    /// ```
+    ///
+    /// If `options.inline_anon_consts` is `false`, this is also used for inline const blocks and
+    /// advanced const generics expressions.
+    NamedGlobal(ItemRef),
+    /// A shared reference to a static variable.
+    Borrow(ConstantExpr, Option<UnsizingMetadata>),
+    /// A raw borrow (`*const` or `*mut`).
+    RawBorrow {
+        mutability: Mutability,
+        arg: ConstantExpr,
+        metadata: Option<UnsizingMetadata>,
+    },
+    ConstRef {
+        id: ParamConst,
+    },
+    /// A function definition, corresponding to a particular item. This is a ZST, unlike `FnPtr`.
+    FnDef(ItemRef),
+    /// A function pointer. This is an actual pointer to that function.
+    FnPtr(ItemRef),
+    /// A blob of memory containing the byte representation of the value. This can occur when
+    /// evaluating MIR constants (e.g. unions). Interpreting this back to a structured value
+    /// is left as an exercice to the consumer.
+    Memory(Vec<ConstantByte>),
+    Todo(String),
+}
+
+/// A byte of an evaluated constant, in the MiniRust sense.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConstantByte {
+    /// An uninitialized byte (e.g. padding, or the bytes of a union not covered by the active
+    /// field).
+    Uninit,
+    /// A concrete byte value.
+    Value(u8),
+    /// A byte that is part of a pointer with provenance. The `u8` is the offset of this byte
+    /// within the pointer.
+    Provenance(ConstantByteProvenance, u8),
+}
+
+/// What a pointer byte in an evaluated constant points to.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConstantByteProvenance {
+    /// A pointer to a static.
+    Global(ItemRef),
+    /// A pointer to a function.
+    Function(ItemRef),
+    /// A pointer to a stateless closure's function, coerced to a function pointer.
+    ClosureAsFn(ClosureArgs),
+    /// A pointer to anything else (an anonymous allocation, a vtable...).
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConstantFieldExpr {
+    pub field: DefId,
+    pub value: ConstantExpr,
+}
+
+/// Rustc has different representation for constants: one for MIR
+/// ([`rustc_middle::mir::Const`]), one for the type system
+/// ([`rustc_middle::ty::ConstKind`]). For simplicity hax maps those
+/// two construct to one same `ConstantExpr` type.
+pub type ConstantExpr = Decorated<ConstantExprKind>;
+
+// For ConstantKind we merge all the cases (Ty, Val, Unevaluated) into one
+pub type ConstantKind = ConstantExpr;
+
+pub use self::uneval::*;
+mod uneval;

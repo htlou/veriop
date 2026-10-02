@@ -1,0 +1,26 @@
+diff --git a/charon-ml/src/Substitute.ml b/charon-ml/src/Substitute.ml
+index 53ba7b8f..b246cb84 100644
+--- a/charon-ml/src/Substitute.ml
++++ b/charon-ml/src/Substitute.ml
+@@ -545,7 +545,7 @@ let fuse_binders (substitutor : subst -> 'a -> 'a)
+      the outer binder. *)
+   let shift_region_varid varid =
+     RegionId.of_int
+-      (RegionId.to_int varid + List.length outer_params.regions_outlive)
++      (RegionId.to_int varid + List.length outer_params.regions)
+   in
+   let shift_ty_varid varid =
+     TypeVarId.of_int (TypeVarId.to_int varid + List.length outer_params.types)
+diff --git a/charon-ml/tests/dune b/charon-ml/tests/dune
+index 03930bbd..4a453859 100644
+--- a/charon-ml/tests/dune
++++ b/charon-ml/tests/dune
+@@ -5,3 +5,8 @@
+  (deps
+   (glob_files_rec ../../charon/tests/ui/*))
+  (libraries charon re str unix))
++
++(test
++ (name Test_Substitute)
++ (modules Test_Substitute)
++ (libraries charon))

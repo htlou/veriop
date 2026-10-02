@@ -1,0 +1,160 @@
+# Final LLBC before serialization:
+
+// Full name: core::array::TryFromSliceError
+pub opaque type TryFromSliceError
+
+// Full name: core::array::{impl Debug for TryFromSliceError}
+impl "impl_Debug_for_TryFromSliceError" Debug for TryFromSliceError {
+    vtable: unknown // the vtable struct of the trait is excluded
+}
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+// Full name: core::result::Result
+#[diagnostic_item("Result")]
+pub enum Result<T, E>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+{
+  Ok { _0: T },
+  Err { _0: E },
+}
+
+// Full name: core::convert::TryFrom
+#[diagnostic_item("TryFrom")]
+pub trait TryFrom<Self, T>
+{
+    proof ImpliedClause0: (Self: Sized)
+    proof ImpliedClause1: (T: Sized)
+    proof ImpliedClause2: (Self::Error: Sized)
+    type Error
+    fn try_from;
+    non-dyn-compatible
+}
+
+// Full name: core::array::{impl TryFrom<&'_0 [T]> for [T; N]}::try_from
+pub fn try_from<'_0, T, const N : usize>(_1: &'_0 [T]) -> Result<[T; N], TryFromSliceError>[{built_in impl Sized for [T; N]}, {built_in impl Sized for TryFromSliceError}]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: core::array::{impl TryFrom<&'_0 [T]> for [T; N]}
+impl<'_0, T, const N : usize> "impl_TryFrom_for_array" TryFrom<&'_0 [T]> for [T; N]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+    TypeOutlives0: T: '_0,
+{
+    proof ImpliedClause0: ([T; N]: Sized) = {built_in impl Sized for [T; N]}
+    proof ImpliedClause1: (&'_0 [T]: Sized) = {built_in impl Sized for &'_0 [T]}
+    proof ImpliedClause2: (TryFromSliceError: Sized) = {built_in impl Sized for TryFromSliceError}
+    type Error = TryFromSliceError
+    fn try_from = try_from<'_0, T, N>[TraitClause0, TraitClause1]
+    non-dyn-compatible
+}
+
+// Full name: core::clone::impls::{impl Clone for u8}::clone
+pub fn clone<'_0>(_1: &'_0 u8) -> u8
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for u8}
+impl "impl_Clone_for_u8" Clone for u8 {
+    proof ImpliedClause0: (u8: Sized) = {built_in impl Sized for u8}
+    fn clone<'_0_1> = clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::convert::{impl TryInto<U> for T}::try_into
+pub fn try_into<T, U>(_1: T) -> Result<U, TraitClause2::Error>[TraitClause1, TraitClause2::ImpliedClause2]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: (U: TryFrom<T>),
+= <opaque>
+
+// Full name: core::marker::{impl Copy for u8}
+impl "impl_Copy_for_u8" Copy for u8 {
+    proof ImpliedClause0: (u8: MetaSized) = {built_in impl MetaSized for u8}
+    proof ImpliedClause1: (u8: Clone) = impl_Clone_for_u8
+    non-dyn-compatible
+}
+
+// Full name: core::result::{Result<T, E>[TraitClause0, TraitClause1]}::unwrap
+#[track_caller]
+pub fn unwrap<T, E>(_1: Result<T, E>[TraitClause0, TraitClause1]) -> T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+    TraitClause2: (E: Debug),
+= <opaque>
+
+struct () {}
+
+// Full name: test_crate::trait_error
+pub fn trait_error<'_0>(s: &'_0 [u8])
+{
+    let _0: (); // return
+    let s: &'1 [u8]; // arg #1
+    let _array: [u8; 4usize]; // local
+    let _3: Result<[u8; 4usize], TryFromSliceError>[{built_in impl Sized for [u8; 4usize]}, {built_in impl Sized for TryFromSliceError}]; // anonymous local
+    let _4: &'2 [u8]; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_array)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = &(*s) with_metadata(copy s.metadata)
+    _3 = try_into<&'4 [u8], [u8; 4usize]>[{built_in impl Sized for &'4 [u8]}, {built_in impl Sized for [u8; 4usize]}, impl_TryFrom_for_array<'4, u8, 4usize>[{built_in impl Sized for u8}, impl_Copy_for_u8]](move _4)
+    ↳⚡ storage_dead(s)
+        unwind_continue
+    storage_dead(_4)
+    _array = unwrap<[u8; 4usize], TryFromSliceError>[{built_in impl Sized for [u8; 4usize]}, {built_in impl Sized for TryFromSliceError}, impl_Debug_for_TryFromSliceError](move _3)
+    ↳⚡ storage_dead(s)
+        unwind_continue
+    storage_dead(_3)
+    fake_read(_array)
+    set_type(typeof(_array) == [u8; 4usize])
+    _0 = ()
+    storage_dead(_array)
+    storage_dead(s)
+    return
+}
+
+
+

@@ -1,0 +1,54 @@
+.PHONY: all
+all: build
+
+.PHONY: build
+build: format
+	CARGO_PROFILE_RELEASE_DEBUG=true cargo build --release
+
+.PHONY: format
+format:
+	cargo fmt
+
+.PHONY: test
+test: test-noclippy
+	$(MAKE) clippy
+
+# Generate some of the AST code automatically from the rust definitions.
+.PHONY: generate-asts
+generate-asts:
+	cargo build --release && cargo run --release --bin generate-asts
+	$(MAKE) format
+	cd ../charon-ml && $(MAKE) format 2> /dev/null
+
+.PHONY: test-noclippy
+test-noclippy:
+	cargo test
+
+.PHONY: clippy
+clippy:
+	cargo clippy --all-targets --fix --allow-dirty
+
+.PHONY: test-popular-crates
+test-popular-crates:
+	cargo test --release --features popular-crates-test --test popular-crates -- --test-threads 4
+
+.PHONY: bench-popular-crates
+bench-popular-crates:
+	cargo test --release --features popular-crates-test --test bench-popular-crates -- --nocapture
+
+# Build the doc.
+# For some reason, I don't manage to build all the packages in one command.
+.PHONY: doc
+doc:
+	cargo doc --no-deps -p macros --document-private-items
+	cargo doc --no-deps --document-private-items
+
+.PHONY: clean-generated
+clean-generated:
+	find tests -name '*.llbc' -delete
+	find tests -name '*.ullbc' -delete
+	find tests -name '*.postcard' -delete
+
+.PHONY: clean
+clean: clean-generated
+	rm -rf target

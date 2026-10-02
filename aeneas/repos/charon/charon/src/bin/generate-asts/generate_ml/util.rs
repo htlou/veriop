@@ -1,0 +1,205 @@
+use charon_lib::ast::*;
+use convert_case::{Case, Casing};
+use itertools::Itertools;
+use std::collections::{HashMap, HashSet};
+
+use super::GenerateCtx;
+
+pub fn make_ocaml_ident(name: &str) -> String {
+    let leading_underscores = name.len() - name.trim_start_matches('_').len();
+    let mut name = "_".repeat(leading_underscores) + &name.to_case(Case::Snake);
+    if matches!(
+        &*name,
+        "assert"
+            | "bool"
+            | "char"
+            | "end"
+            | "float"
+            | "fun"
+            | "function"
+            | "include"
+            | "let"
+            | "method"
+            | "open"
+            | "rec"
+            | "struct"
+            | "to"
+            | "type"
+            | "virtual"
+    ) {
+        name += "_";
+    }
+    name
+}
+
+impl<'a> GenerateCtx<'a> {
+    pub fn id_from_name(&self, name: &str) -> TypeDeclId {
+        self.name_to_type
+            .get(name)
+            .unwrap_or_else(|| panic!("Name not found: `{name}`"))
+            .def_id
+    }
+
+    /// List the (recursive) children of this type.
+    pub fn children_of(&self, name: &str) -> HashSet<TypeDeclId> {
+        let start_id = self.id_from_name(name);
+        self.children_of_inner(vec![start_id], |_| true)
+    }
+
+    /// List the (recursive) children of these types.
+    pub fn children_of_many(&self, names: &[&str]) -> HashSet<TypeDeclId> {
+        self.children_of_inner(
+            names.iter().map(|name| self.id_from_name(name)).collect(),
+            |_| true,
+        )
+    }
+
+    pub fn children_of_inner(
+        &self,
+        ty: Vec<TypeDeclId>,
+        explore: impl Fn(TypeDeclId) -> bool,
+    ) -> HashSet<TypeDeclId> {
+        let mut children = HashSet::new();
+        let mut stack = ty.to_vec();
+        while let Some(id) = stack.pop() {
+            if !children.contains(&id)
+                && explore(id)
+                && self
+                    .crate_data
+                    .type_decls
+                    .get(id)
+                    .is_some_and(|decl| decl.item_meta.is_local)
+            {
+                children.insert(id);
+                if let Some(contained) = self.type_tree.get(&id) {
+                    stack.extend(contained);
+                }
+            }
+        }
+        children
+    }
+
+    /// Returns the OCaml identifier corresponding to this type,
+    /// and the generated module name + short module name associated to it if
+    /// they exist.
+    pub fn type_to_ocaml_ident_raw(&self, td: &TypeDecl) -> (String, Option<(String, String)>) {
+        let name = td
+            .item_meta
+            .attr_info
+            .rename
+            .as_deref()
+            .unwrap_or(td.item_meta.name.short_str().unwrap());
+        let module = self.ambiguous_types.get(&td.def_id);
+        (make_ocaml_ident(name), module.cloned())
+    }
+
+    pub fn type_to_ocaml_ident(&self, td: &TypeDecl) -> String {
+        let (name, module) = self.type_to_ocaml_ident_raw(td);
+        match module {
+            Some((module, _)) if self.current_module.as_ref().is_none_or(|m| m != &module) => {
+                format!("{module}.{name}")
+            }
+            _ => name,
+        }
+    }
+
+    /// For a type that refers to an ADT, return the name of that ADT.
+    pub fn type_to_rust_name(&self, ty: &Ty) -> Option<&str> {
+        let index_ty = ty.as_adt()?.id;
+        self.crate_data.item_name(index_ty).short_str()
+    }
+
+    /// Converts a type to the appropriate ocaml name. In case of generics, this provides appropriate
+    /// parameters.
+    pub fn type_to_ocaml_name(&self, ty: &Ty) -> String {
+        match ty.kind() {
+            TyKind::Scalar(ScalarTy::Bool) => "bool".to_string(),
+            TyKind::Scalar(ScalarTy::Char) => "char_value".to_string(),
+            TyKind::Scalar(ScalarTy::Integer(IntegerTy::Signed(int_ty))) => match int_ty {
+                // Even though OCaml ints are only 63 bits, only scalars with their 128 bits should be able to become too large
+                IntTy::I128 => "big_int".to_string(),
+                _ => "int".to_string(),
+            },
+            TyKind::Scalar(ScalarTy::Integer(IntegerTy::Unsigned(uint_ty))) => match uint_ty {
+                // Even though OCaml ints are only 63 bits, only scalars with their 128 bits should be able to become too large
+                UIntTy::U128 => "big_int".to_string(),
+                _ => "int".to_string(),
+            },
+            TyKind::Scalar(ScalarTy::Float(_)) => "float_of_json".to_string(),
+            TyKind::Adt(tref) => {
+                let mut args = tref
+                    .generics
+                    .types
+                    .iter()
+                    .map(|ty| self.type_to_ocaml_name(ty))
+                    .map(|name| {
+                        if !name.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                            format!("({name})")
+                        } else {
+                            name
+                        }
+                    })
+                    .collect_vec();
+                match tref.as_builtin() {
+                    None => {
+                        let mut base_ty =
+                            if let Some(tdecl) = self.crate_data.type_decls.get(tref.id) {
+                                self.type_to_ocaml_ident(tdecl)
+                            } else {
+                                let name = self.crate_data.item_name(tref.id);
+                                eprintln!(
+                                    "Warning: type {} missing from llbc",
+                                    name.debug_repr(self.crate_data)
+                                );
+                                name.short_str().unwrap().to_lowercase()
+                            };
+                        if base_ty == "vec" {
+                            base_ty = "list".to_string();
+                        }
+                        if base_ty == "ustr" {
+                            base_ty = "string".to_string();
+                        }
+                        // We hide this from OCaml
+                        if base_ty == "with_cached_type_info" {
+                            return args.remove(0);
+                        }
+                        if base_ty == "indexed_map" {
+                            let index_name = args.remove(0); // Remove the index generic param
+                            base_ty = format!("{index_name}_map");
+                        }
+                        if base_ty == "index_vec" {
+                            base_ty = "list".to_string();
+                            args.remove(0); // Remove the index generic param
+                        }
+                        if base_ty == "index_map" {
+                            // That's the `indexmap::IndexMap` case. Translate as a list of pairs.
+                            base_ty = "list".to_string();
+                            args = vec![format!("( {} * {} )", args[0], args[1])]
+                        }
+                        let args = match args.as_slice() {
+                            [] => String::new(),
+                            [arg] => format!("{arg} "),
+                            args => format!("({})", args.iter().join(",")),
+                        };
+                        format!("{args}{base_ty}")
+                    }
+                    Some(BuiltinAdt::Box) => args[0].clone(),
+                    Some(BuiltinAdt::Tuple) => args.iter().join("*"),
+                    _ => unimplemented!("{ty:?}"),
+                }
+            }
+            TyKind::TypeVar(DeBruijnVar::Free(id) | DeBruijnVar::Bound(_, id)) => format!("'a{id}"),
+            _ => unimplemented!("{ty:?}"),
+        }
+    }
+
+    pub fn names_to_type_id_map(&self, data: &[(&str, &str)]) -> HashMap<TypeDeclId, String> {
+        data.iter()
+            .map(|(name, def)| (self.id_from_name(name), def.to_string()))
+            .collect()
+    }
+
+    pub fn names_to_type_id_set(&self, data: &[&str]) -> HashSet<TypeDeclId> {
+        data.iter().map(|name| self.id_from_name(name)).collect()
+    }
+}

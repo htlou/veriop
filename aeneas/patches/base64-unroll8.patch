@@ -1,0 +1,64 @@
+diff --git a/src/engine/general_purpose/mod.rs b/src/engine/general_purpose/mod.rs
+index 802d76b..2310f78 100644
+--- a/src/engine/general_purpose/mod.rs
++++ b/src/engine/general_purpose/mod.rs
+@@ -155,7 +155,7 @@ fn encode_scalar_tail(
+     mut input_index: usize,
+     mut output_index: usize,
+ ) -> usize {
+-    const BLOCKS_PER_FAST_LOOP: usize = 4;
++    const BLOCKS_PER_FAST_LOOP: usize = 8;
+     const LOW_SIX_BITS: u64 = 0x3F;
+ 
+     // we read 8 bytes at a time (u64) but only actually consume 6 of those bytes. Thus, we need
+@@ -221,6 +221,50 @@ fn encode_scalar_tail(
+             output_chunk[30] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+             output_chunk[31] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+ 
++            let input_u64 = read_u64(&input_chunk[24..]);
++
++            output_chunk[32] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++            output_chunk[33] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++            output_chunk[34] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++            output_chunk[35] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++            output_chunk[36] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++            output_chunk[37] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++            output_chunk[38] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++            output_chunk[39] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++            let input_u64 = read_u64(&input_chunk[30..]);
++
++            output_chunk[40] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++            output_chunk[41] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++            output_chunk[42] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++            output_chunk[43] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++            output_chunk[44] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++            output_chunk[45] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++            output_chunk[46] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++            output_chunk[47] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++            let input_u64 = read_u64(&input_chunk[36..]);
++
++            output_chunk[48] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++            output_chunk[49] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++            output_chunk[50] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++            output_chunk[51] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++            output_chunk[52] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++            output_chunk[53] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++            output_chunk[54] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++            output_chunk[55] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++            let input_u64 = read_u64(&input_chunk[42..]);
++
++            output_chunk[56] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++            output_chunk[57] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++            output_chunk[58] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++            output_chunk[59] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++            output_chunk[60] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++            output_chunk[61] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++            output_chunk[62] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++            output_chunk[63] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
+             output_index += BLOCKS_PER_FAST_LOOP * 8;
+             input_index += BLOCKS_PER_FAST_LOOP * 6;
+         }

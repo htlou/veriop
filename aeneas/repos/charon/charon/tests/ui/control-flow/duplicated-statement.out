@@ -1,0 +1,117 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::slice::index::{impl SliceIndex<[T]> for usize}::index
+pub fn impl_SliceIndex_slice_for_usize::index<'_0, T>(_1: usize, _2: &'_0 [T]) -> &'_0 T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+struct () {}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+// Full name: test_crate::rej_sample
+fn rej_sample<'_0>(a: &'_0 [u8]) -> usize
+{
+    let _0: usize; // return
+    let a: &'1 [u8]; // arg #1
+    let sampled: usize; // local
+    let _3: bool; // anonymous local
+    let _4: u8; // anonymous local
+    let _5: usize; // anonymous local
+    let _6: bool; // anonymous local
+    let _7: u8; // anonymous local
+    let _8: usize; // anonymous local
+    let _9: usize; // anonymous local
+    let _10: usize; // anonymous local
+    let _11: &'_ [u8]; // anonymous local
+    let _12: &'_ u8; // anonymous local
+    let _13: &'_ [u8]; // anonymous local
+    let _14: &'_ u8; // anonymous local
+
+    storage_live(_0)
+    storage_live(_9)
+    storage_live(_10)
+    storage_live(sampled)
+    sampled = const 0usize
+    fake_read(sampled)
+    storage_live(_3)
+    storage_live(_4)
+    storage_live(_5)
+    _5 = const 0usize
+    storage_live(_13)
+    _13 = &(*a) with_metadata(copy a.metadata)
+    storage_live(_14)
+    _14 = impl_SliceIndex_slice_for_usize::index<'_, u8>[{built_in impl Sized for u8}](copy _5, move _13)
+    ↳⚡ undefined_behavior
+    _4 = copy (*_14)
+    _3 = move _4 < const 42u8
+    if move _3 {
+        storage_dead(_5)
+        storage_dead(_4)
+        storage_live(_6)
+        storage_live(_7)
+        storage_live(_8)
+        _8 = const 1usize
+        storage_live(_11)
+        _11 = &(*a) with_metadata(copy a.metadata)
+        storage_live(_12)
+        _12 = impl_SliceIndex_slice_for_usize::index<'_, u8>[{built_in impl Sized for u8}](copy _8, move _11)
+        ↳⚡ undefined_behavior
+        _7 = copy (*_12)
+        _6 = move _7 < const 16u8
+        if move _6 {
+            storage_dead(_8)
+            storage_dead(_7)
+            _9 = copy sampled panic.+ const 100usize
+            sampled = move _9
+        } else {
+            storage_dead(_8)
+            storage_dead(_7)
+            // This statement is duplicated.
+            _10 = copy sampled panic.+ const 101usize
+            sampled = move _10
+        }
+    } else {
+        storage_dead(_5)
+        storage_dead(_4)
+        _10 = copy sampled panic.+ const 101usize
+        sampled = move _10
+    }
+    storage_dead(_6)
+    storage_dead(_3)
+    _0 = copy sampled
+    storage_dead(sampled)
+    storage_dead(_10)
+    storage_dead(_9)
+    storage_dead(a)
+    storage_dead(_14)
+    storage_dead(_13)
+    storage_dead(_12)
+    storage_dead(_11)
+    return
+}
+
+
+

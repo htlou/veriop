@@ -1,0 +1,176 @@
+//! Trait elaboration: given a trait reference, we track which impl and/or local clauses caused it to be true.
+#![feature(rustc_private)]
+#![allow(
+    clippy::derivable_impls,
+    clippy::len_without_is_empty,
+    clippy::new_without_default,
+    clippy::should_implement_trait
+)]
+
+extern crate rustc_arena;
+extern crate rustc_attr_ir;
+extern crate rustc_data_structures;
+extern crate rustc_hir;
+extern crate rustc_infer;
+extern crate rustc_middle;
+extern crate rustc_span;
+extern crate rustc_trait_selection;
+extern crate rustc_type_ir;
+
+mod ctx;
+mod elaboration;
+mod item_ref;
+mod predicates;
+mod utils;
+
+pub use ctx::*;
+pub use elaboration::*;
+pub use item_ref::*;
+pub use predicates::*;
+pub use utils::*;
+
+use rustc_data_structures::intern::Interned;
+use rustc_hir::def_id::DefId;
+use rustc_middle::ty;
+use rustc_type_ir::lang_items::SolverTraitLangItem;
+use std::hash::Hash;
+use std::ops::Deref;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DestructData<'tcx> {
+    /// A drop that does nothing, e.g. for scalars and pointers.
+    Noop,
+    /// An implicit `Destruct` local clause, if the `resolve_destruct_bounds` option is `false`. If
+    /// that option is `true`, we'll add `Destruct` bounds to every type param, and use that to
+    /// resolve `Destruct` impls of generics. If it's `false`, we use this variant to indicate that
+    /// the clause comes from a generic or associated type.
+    Implicit,
+    /// The `drop_in_place` is known and non-trivial.
+    Glue {
+        /// The type we're generating glue for.
+        ty: ty::Ty<'tcx>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BuiltinTraitData<'tcx> {
+    /// A virtual `Destruct` implementation.
+    /// `Destruct` is implemented automatically for all types. For our purposes, we chose to attach
+    /// the information about `drop_in_place` to that trait. This data tells us what kind of
+    /// `drop_in_place` the target type has.
+    Destruct(DestructData<'tcx>),
+    /// A trait alias.
+    Alias,
+    /// An auto-trait.
+    Auto,
+    /// Some other builtin trait.
+    Other(SolverTraitLangItem),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ImpliedPredicate<'tcx, Id: ItemId = DefId> {
+    AssocItem {
+        item: ItemRef<'tcx, Id>,
+        /// The index of this predicate among the trait predicates returned by `ItemPredicates::Implied`.
+        index: usize,
+    },
+    Parent {
+        /// The index of this predicate among the trait predicates returned by `ItemPredicates::Implied`.
+        index: usize,
+    },
+}
+
+/// A predicate bound by a dyn type, together with the extra trait proof needed to translate an
+/// associated type constraint.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DynPredicate<'tcx, Id: ItemId = DefId> {
+    /// The predicate with the dyn binder's fresh type parameter as `Self`.
+    pub predicate: ItemPredicate<'tcx, Id>,
+    /// The proof for the trait whose associated type is constrained, if this is a projection.
+    pub projection_trait_proof: Option<TraitProof<'tcx, Id>>,
+}
+
+/// A representation of `exists<T: Trait1 + Trait2>(value)`: we create a fresh type parameter and
+/// the appropriate trait clauses. The contained value may refer to both.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DynBinder<'tcx, T, Id: ItemId = DefId> {
+    /// The fresh type parameter used as `Self` in the predicates below.
+    pub existential_ty: ty::ParamTy,
+    /// The clauses that define the trait object.
+    pub predicates: Vec<DynPredicate<'tcx, Id>>,
+    /// The value inside the binder.
+    pub val: T,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TraitProofKind<'tcx, Id: ItemId = DefId> {
+    /// A concrete `impl Trait for Type {}` item.
+    Concrete(ItemRef<'tcx, Id>),
+    /// A context-bound clause like `where T: Trait`.
+    LocalBound(ItemPredicateId<Id>),
+    /// The automatic clause `Self: Trait` present inside a `impl Trait for Type {}` item.
+    SelfProof,
+    /// `dyn Trait` is a wrapped value with a virtual table for trait
+    /// `Trait`.  In other words, a value `dyn Trait` is a dependent
+    /// triple that gathers a type τ, a value of type τ and an
+    /// instance of type `Trait`.
+    /// `dyn Trait` implements `Trait` using a built-in implementation; this refers to that
+    /// built-in implementation.
+    /// The proof describes how to prove the current predicate in the context of the `dyn Trait`
+    /// self type, e.g. for `<dyn Trait as Supertrait>`.
+    Dyn(DynBinder<'tcx, TraitProof<'tcx, Id>, Id>),
+    /// A built-in trait whose implementation is computed by the compiler, such as `FnMut`. This
+    /// morally points to an invisible `impl` block; as such it contains the information we may
+    /// need from one.
+    Builtin {
+        /// Extra data for the given trait.
+        trait_data: BuiltinTraitData<'tcx>,
+        /// The trait proofs required to satisfy the implied predicates on the trait declaration.
+        /// E.g. since `FnMut: FnOnce`, a built-in `T: FnMut` impl would have a proof for
+        /// `T: FnOnce`.
+        proofs: Vec<TraitProof<'tcx, Id>>,
+        /// The values of the associated types for this trait.
+        types: Vec<(DefId, ty::Ty<'tcx>, Vec<TraitProof<'tcx, Id>>)>,
+    },
+    /// A predicate implied by `base` by following `path`.
+    Derived {
+        base: TraitProof<'tcx, Id>,
+        path: ImpliedPredicate<'tcx, Id>,
+    },
+    /// An error happened while elaborating traits.
+    Error(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TraitProofContents<'tcx, Id: ItemId = DefId> {
+    /// The trait predicate this is a proof for.
+    pub pred: ty::PolyTraitRef<'tcx>,
+    /// The proof.
+    pub kind: TraitProofKind<'tcx, Id>,
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct TraitProof<'tcx, Id: ItemId = DefId> {
+    contents: Interned<'tcx, TraitProofContents<'tcx, Id>>,
+}
+
+impl<'tcx, Id: ItemId> TraitProof<'tcx, Id> {
+    pub fn contents(&self) -> &TraitProofContents<'tcx, Id> {
+        &self.contents
+    }
+}
+
+impl<'tcx, Id: ItemId> Copy for TraitProof<'tcx, Id> {}
+
+impl<'tcx, Id: ItemId> Clone for TraitProof<'tcx, Id> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<'tcx, Id: ItemId> Deref for TraitProof<'tcx, Id> {
+    type Target = TraitProofContents<'tcx, Id>;
+    fn deref(&self) -> &Self::Target {
+        &self.contents
+    }
+}

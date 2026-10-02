@@ -1,0 +1,211 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::clone::impls::{impl Clone for u8}::clone
+pub fn clone<'_0>(_1: &'_0 u8) -> u8
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for u8}
+impl "impl_Clone_for_u8" Clone for u8 {
+    proof ImpliedClause0: (u8: Sized) = {built_in impl Sized for u8}
+    fn clone<'_0_1> = clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::PartialEq
+#[lang_item(PartialEq)]
+#[diagnostic_item("PartialEq")]
+pub trait PartialEq<Self, Rhs>
+{
+    fn eq<'_0_1, '_1_1>;
+    vtable: core::cmp::PartialEq::{vtable}<Rhs>
+}
+
+// Full name: core::cmp::impls::{impl PartialEq<bool> for bool}::eq
+pub fn eq<'_0, '_1>(_1: &'_0 bool, _2: &'_1 bool) -> bool
+= <opaque>
+
+// Full name: core::cmp::impls::{impl PartialEq<bool> for bool}
+impl "impl_PartialEq_bool_for_bool" PartialEq<bool> for bool {
+    fn eq<'_0_1, '_1_1> = eq<'_0_1, '_1_1>
+    vtable: lazy
+}
+
+// Full name: core::default::Default
+#[diagnostic_item("Default")]
+pub trait Default<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn default;
+    non-dyn-compatible
+}
+
+// Full name: core::default::{impl Default for bool}::default
+pub fn impl_Default_for_bool::default() -> bool
+= <opaque>
+
+// Full name: core::default::{impl Default for bool}
+impl "impl_Default_for_bool" Default for bool {
+    proof ImpliedClause0: (bool: Sized) = {built_in impl Sized for bool}
+    fn default = impl_Default_for_bool::default
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: alloc::string::String
+#[lang_item(String)]
+pub opaque type String
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+// Full name: test_crate::Struct
+struct Struct<A>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+}
+
+// Full name: test_crate::{impl Default for Struct<A>[TraitClause0]}::default
+#[inline(hint)]
+pub fn impl_Default_for_Struct::default<A>() -> Struct<A>[TraitClause0]
+where
+    TraitClause0: (A: Sized),
+    TraitClause1: (A: Default),
+{
+    let _0: Struct<A>[TraitClause0]; // return
+    let _1: A; // anonymous local
+
+    storage_live(_0)
+    storage_live(_1)
+    _1 = TraitClause1::default()
+    ↳⚡ unwind_continue
+    _0 = Struct { _0: move _1 }
+    conditional_drop[{built_in impl Destruct for A}::drop_glue<'0>] _1
+    ↳⚡ unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::{impl Default for Struct<A>[TraitClause0]}
+impl<A> "impl_Default_for_Struct" Default for Struct<A>[TraitClause0]
+where
+    TraitClause0: (A: Sized),
+    TraitClause1: (A: Default),
+{
+    proof ImpliedClause0: (Struct<A>[TraitClause0]: Sized) = {built_in impl Sized for Struct<A>[TraitClause0]}
+    fn default = impl_Default_for_Struct::default<A>[TraitClause0, TraitClause1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::Trait
+trait Trait<Self, B, Self_Item>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (B: Sized)
+    proof ImpliedClause2: (Self_Item: Sized)
+    fn method<C, TraitClause0_1: (C: Sized)>;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait<B, (A, B)> for Struct<A>[TraitClause0]}::method
+fn method<A, B, C>()
+where
+    TraitClause0: (A: Sized),
+    TraitClause1: (B: Sized),
+    TraitClause2: (A: Clone),
+    TraitClause3: (B: PartialEq<bool>),
+    TraitClause4: (C: Sized),
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::{impl Trait<B, (A, B)> for Struct<A>[TraitClause0]}
+impl<A, B> "impl_Trait_for_Struct" Trait<B, (A, B)> for Struct<A>[TraitClause0]
+where
+    TraitClause0: (A: Sized),
+    TraitClause1: (B: Sized),
+    TraitClause2: (A: Clone),
+    TraitClause3: (B: PartialEq<bool>),
+{
+    proof ImpliedClause0: (Struct<A>[TraitClause0]: MetaSized) = {built_in impl MetaSized for Struct<A>[TraitClause0]}
+    proof ImpliedClause1: (B: Sized) = TraitClause1
+    proof ImpliedClause2: ((A, B): Sized) = {built_in impl Sized for (A, B)}
+    fn method<C, TraitClause0_1: (C: Sized)> = method<A, B, C>[TraitClause0, TraitClause1, TraitClause2, TraitClause3, TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let _x: (u8, bool); // local
+    let _y: Struct<bool>[{built_in impl Sized for bool}]; // local
+    let _3: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_x)
+    _x = (const 0u8, const false)
+    fake_read(_x)
+    set_type(typeof(_x) == (u8, bool))
+    storage_live(_y)
+    _y = impl_Default_for_Struct::default<bool>[{built_in impl Sized for bool}, impl_Default_for_bool]()
+    ↳⚡ unwind_continue
+    fake_read(_y)
+    set_type(typeof(_y) == Struct<bool>[{built_in impl Sized for bool}])
+    storage_live(_3)
+    _3 = method<u8, bool, String>[{built_in impl Sized for u8}, {built_in impl Sized for bool}, impl_Clone_for_u8, impl_PartialEq_bool_for_bool, {built_in impl Sized for String}]()
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    _0 = ()
+    storage_dead(_y)
+    storage_dead(_x)
+    return
+}
+
+
+

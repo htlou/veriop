@@ -1,0 +1,161 @@
+# Final LLBC before serialization:
+
+opaque type core::any::Any::{vtable}
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::any::TypeId
+#[lang_item(TypeId)]
+pub opaque type TypeId
+
+// Full name: core::any::Any
+#[diagnostic_item("Any")]
+pub trait Any<Self>
+where
+    TypeOutlives0: Self: 'static,
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn type_id<'_0_1>;
+    vtable: core::any::Any::{vtable}
+}
+
+// Full name: core::marker::Send
+#[diagnostic_item("Send")]
+pub unsafe trait Send<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Tuple
+#[fundamental]
+#[lang_item(Tuple)]
+pub trait Tuple<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::ops::function::FnOnce
+#[fundamental]
+#[lang_item(FnOnce)]
+pub trait FnOnce<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Args: Sized)
+    proof ImpliedClause2: (Args: Tuple)
+    proof ImpliedClause3: (Self::Output: Sized)
+    type Output
+    fn call_once;
+    vtable: core::ops::function::FnOnce::{vtable}<Args, Self::Output>
+}
+
+// Full name: core::panic::unwind_safe::UnwindSafe
+#[diagnostic_item("unwind_safe_trait")]
+pub trait UnwindSafe<Self>
+
+// Full name: core::result::Result
+#[diagnostic_item("Result")]
+pub enum Result<T, E>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+{
+  Ok { _0: T },
+  Err { _0: E },
+}
+
+struct () {}
+
+// Full name: core::result::Result::{impl Destruct for Result<T, E>[TraitClause0, TraitClause1]}::drop_glue
+unsafe fn drop_glue<'_0, T, E>(_1: &'_0 mut Result<T, E>[TraitClause0, TraitClause1])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+    TypeOutlives0: T: '_0,
+    TypeOutlives1: E: '_0,
+= <opaque>
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (type_error("removed allocator parameter"): Sized),
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: std::panic::catch_unwind
+pub fn catch_unwind<F, R>(_1: F) -> Result<R, Box<(dyn Any + Send + 'static)>[{built_in impl MetaSized for (dyn Any + Send + 'static)}, {built_in impl Sized for Global}]>[TraitClause1, {built_in impl Sized for Box<(dyn Any + Send + 'static)>[{built_in impl MetaSized for (dyn Any + Send + 'static)}, {built_in impl Sized for Global}]}]
+where
+    TraitClause0: (F: Sized),
+    TraitClause1: (R: Sized),
+    TraitClause2: (F: FnOnce<()>),
+    TraitClause3: (F: UnwindSafe),
+    TypeConstraint0: TraitClause2::Output = R,
+= <opaque>
+
+// Full name: test_crate::main::{closure}
+struct {closure} {}
+
+// Full name: test_crate::main::{impl FnOnce<()> for {closure}}::call_once
+fn call_once(_1: {closure}, tupled_args: ())
+{
+    let _0: (); // return
+    let _1: {closure}; // arg #1
+    let tupled_args: (); // arg #2
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::main::{impl FnOnce<()> for {closure}}
+impl "impl_FnOnce_unit_for_closure" FnOnce<()> for {closure} {
+    proof ImpliedClause0: ({closure}: MetaSized) = {built_in impl MetaSized for {closure}}
+    proof ImpliedClause1: ((): Sized) = {built_in impl Sized for ()}
+    proof ImpliedClause2: ((): Tuple) = {built_in impl Tuple for ()}
+    proof ImpliedClause3: ((): Sized) = {built_in impl Sized for ()}
+    type Output = ()
+    fn call_once = call_once
+    vtable: lazy
+}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let _1: Result<(), Box<(dyn Any + Send + '36)>[{built_in impl MetaSized for (dyn Any + Send + '38)}, {built_in impl Sized for Global}]>[{built_in impl Sized for ()}, {built_in impl Sized for Box<(dyn Any + Send + '45)>[{built_in impl MetaSized for (dyn Any + Send + '47)}, {built_in impl Sized for Global}]}]; // anonymous local
+    let _2: {closure}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    storage_live(_2)
+    _2 = {closure} {  }
+    _1 = catch_unwind<{closure}, ()>[{built_in impl Sized for {closure}}, {built_in impl Sized for ()}, impl_FnOnce_unit_for_closure, {built_in impl UnwindSafe for {closure}}](move _2)
+    ↳⚡ unwind_continue
+    storage_dead(_2)
+    conditional_drop[drop_glue<'126, (), Box<(dyn Any + Send + '96)>[{built_in impl MetaSized for (dyn Any + Send + '98)}, {built_in impl Sized for Global}]>[{built_in impl Sized for ()}, {built_in impl Sized for Box<(dyn Any + Send + '96)>[{built_in impl MetaSized for (dyn Any + Send + '98)}, {built_in impl Sized for Global}]}]] _1
+    ↳⚡ unwind_continue
+    storage_dead(_1)
+    _0 = ()
+    return
+}
+
+
+

@@ -1,0 +1,162 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::make_early
+fn make_early<'a, T>(_1: fn(&'a T))
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: (); // return
+    let _1: fn(&'2 T); // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(_1)
+    return
+}
+
+struct test_crate::main::{closure#1} {}
+
+// Full name: test_crate::main::{impl Fn<(&'_0 u16,)> for test_crate::main::{closure#1}}::call
+fn {impl Fn<(&'_0 u16,)> for test_crate::main::{closure#1}}::call<'_0, '_1>(_1: &'_1 test_crate::main::{closure#1}, tupled_args: (&'_0 u16,))
+{
+    let _0: (); // return
+    let _1: &'1 test_crate::main::{closure#1}; // arg #1
+    let tupled_args: (&'_0 u16,); // arg #2
+    let _3: &'3 u16; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    _0 = ()
+    _3 = move tupled_args._0
+    _0 = ()
+    storage_dead(_3)
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::main::{impl FnMut<(&'_0 u16,)> for test_crate::main::{closure#1}}::call_mut
+fn {impl FnMut<(&'_0 u16,)> for test_crate::main::{closure#1}}::call_mut<'_0, '_1>(state: &'_1 mut test_crate::main::{closure#1}, args: (&'_0 u16,))
+{
+    let _0: (); // return
+    let state: &'_1 mut test_crate::main::{closure#1}; // arg #1
+    let args: (&'_0 u16,); // arg #2
+    let _3: &'0 test_crate::main::{closure#1}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_3)
+    _3 = &(*state)
+    _0 = {impl Fn<(&'_0 u16,)> for test_crate::main::{closure#1}}::call<'_0, '2>(move _3, move args)
+    ↳⚡ storage_dead(_3)
+        storage_dead(args)
+        storage_dead(state)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(args)
+    storage_dead(state)
+    return
+}
+
+// Full name: test_crate::main::{impl FnOnce<(&'_0 u16,)> for test_crate::main::{closure#1}}::call_once
+fn {impl FnOnce<(&'_0 u16,)> for test_crate::main::{closure#1}}::call_once<'_0>(_1: test_crate::main::{closure#1}, _2: (&'_0 u16,))
+{
+    let _0: (); // return
+    let _1: test_crate::main::{closure#1}; // arg #1
+    let _2: (&'2 u16,); // arg #2
+    let _3: &'4 mut test_crate::main::{closure#1}; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    _0 = ()
+    _3 = &mut _1
+    _0 = {impl FnMut<(&'_0 u16,)> for test_crate::main::{closure#1}}::call_mut<'_0, '9>(move _3, move _2)
+    ↳⚡ storage_dead(_3)
+        storage_dead(_2)
+        storage_dead(_1)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::main::{closure#1}::{as_fn}
+fn {as_fn}<'_0>(arg1: &'_0 u16)
+{
+    let _0: (); // return
+    let arg1: &'_0 u16; // arg #1
+    let args: (&'_0 u16,); // local
+    let state: test_crate::main::{closure#1}; // local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(args)
+    storage_live(state)
+    args = (move arg1,)
+    state = test_crate::main::{closure#1} {  }
+    _0 = {impl FnOnce<(&'_0 u16,)> for test_crate::main::{closure#1}}::call_once<'_0>(move state, move args)
+    ↳⚡ storage_dead(state)
+        storage_dead(args)
+        storage_dead(arg1)
+        unwind_continue
+    storage_dead(state)
+    storage_dead(args)
+    storage_dead(arg1)
+    return
+}
+
+struct test_crate::main::{closure} {}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let _1: test_crate::main::{closure}; // anonymous local
+    let _2: (); // anonymous local
+    let _3: fn(&'2 u16); // anonymous local
+    let _4: test_crate::main::{closure#1}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = test_crate::main::{closure} {  }
+    storage_dead(_1)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = test_crate::main::{closure#1} {  }
+    _3 = cast<for<'_0_1> {as_fn}<'_0_1>, fn(&'3 u16)>(const {as_fn}<'5>)
+    storage_dead(_4)
+    _2 = make_early<'7, u16>[{built_in impl Sized for u16}](move _3)
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    _0 = ()
+    return
+}
+
+
+

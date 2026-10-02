@@ -1,0 +1,48 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: test_crate::Foo
+union Foo {
+  one: u64,
+  two: [u32; 2usize],
+}
+
+// Full name: test_crate::use_union
+fn use_union()
+{
+    let _0: (); // return
+    let one: Foo; // local
+    let _two: [u32; 2usize]; // local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(one)
+    one = Foo { one: const 42u64 }
+    fake_read(one)
+    one.one = const 43u64
+    storage_live(_two)
+    _two = copy one.two
+    fake_read(_two)
+    _0 = ()
+    storage_dead(_two)
+    storage_dead(one)
+    return
+}
+
+
+

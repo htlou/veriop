@@ -1,0 +1,35 @@
+diff --git a/src/block/compress.rs b/src/block/compress.rs
+index aebb97b..9a2fbe5 100644
+--- a/src/block/compress.rs
++++ b/src/block/compress.rs
+@@ -112,21 +112,20 @@ fn count_same_bytes(input: &[u8], cur: &mut usize, source: &[u8], candidate: usi
+     let cand_slice = &source[candidate..];
+ 
+     let mut num = 0;
+-    for (block1, block2) in cur_slice
+-        .chunks_exact(USIZE_SIZE)
+-        .zip(cand_slice.chunks_exact(USIZE_SIZE))
+-    {
+-        let input_block = usize::from_ne_bytes(block1.try_into().unwrap());
+-        let match_block = usize::from_ne_bytes(block2.try_into().unwrap());
+-
+-        if input_block == match_block {
+-            num += USIZE_SIZE;
+-        } else {
++    let mut left = cur_slice;
++    let mut right = cand_slice;
++    while left.len() >= USIZE_SIZE && right.len() >= USIZE_SIZE {
++        let input_block = usize::from_ne_bytes(left[..USIZE_SIZE].try_into().unwrap());
++        let match_block = usize::from_ne_bytes(right[..USIZE_SIZE].try_into().unwrap());
++        if input_block != match_block {
+             let diff = input_block ^ match_block;
+             num += (diff.to_le().trailing_zeros() / 8) as usize;
+             *cur += num;
+             return num;
+         }
++        num += USIZE_SIZE;
++        left = &left[USIZE_SIZE..];
++        right = &right[USIZE_SIZE..];
+     }
+ 
+     // If we're here we may have 1 to 7 bytes left to check close to the end of input

@@ -1,0 +1,44 @@
+module
+public import AeneasMeta.Async.Async
+public import AeneasMeta.Simp
+public meta import AeneasMeta.Utils
+public meta import AeneasMeta.Async.Async
+public meta import AeneasMeta.Simp.Simp
+public import Lean
+
+/-! We're putting the tactics used in the tests in a file different from the tests themselves because
+  running tactics from the current file waits on compilation of all definitions.
+  See https://github.com/AeneasVerif/aeneas/pull/561#event-18412506656
+ -/
+
+namespace Aeneas.Async.Test
+
+open Lean Elab Tactic Utils
+
+/- Solve the goal by splitting the conjunctions.
+Note that `scalarTac` does quite a few things, so it tends to be expensive (in the example below,
+looking at the trace for the synchronous case, it requires ~0.016s for every subgoal).
+-/
+meta def trySyncOmega : TacticM Unit := do
+  withTraceNode `ScalarTac (fun _ => pure "repeatTac") (repeatTac splitConjTarget)
+  allGoals (Tactic.Omega.omegaTactic {})
+
+scoped syntax "sync_solve_omega" : tactic
+scoped elab "sync_solve_omega" : tactic => do trySyncOmega
+
+meta def tryAsyncOmega : TacticM Unit := do
+  withTraceNode `ScalarTac (fun _ => pure "repeatTac") (repeatTac splitConjTarget)
+  allGoalsAsync (Tactic.Omega.omegaTactic {})
+
+scoped syntax "async_solve_omega" : tactic
+scoped elab "async_solve_omega" : tactic => do tryAsyncOmega
+
+meta def tryAsyncSimp : TacticM Unit := do
+  withTraceNode `ScalarTac (fun _ => pure "repeatTac") (repeatTac splitConjTarget)
+  allGoalsAsync (do
+    let _ ← Simp.simpAt false {} {} (.targets #[] true)) (prio := .max)
+
+scoped syntax "async_solve_simp" : tactic
+scoped elab "async_solve_simp" : tactic => do tryAsyncSimp
+
+namespace Aeneas.Async.Test

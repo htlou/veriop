@@ -1,0 +1,486 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::borrow::Borrow
+#[diagnostic_item("Borrow")]
+pub trait Borrow<Self, Borrowed>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Borrowed: MetaSized)
+    fn borrow<'_0_1>;
+    vtable: core::borrow::Borrow::{vtable}<Borrowed>
+}
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::clone::impls::{impl Clone for &'_0 T}::clone
+#[diagnostic_item("noop_method_clone")]
+pub fn {impl Clone for &'_0 T}::clone<'_0, '_1, T>(_1: &'_1 &'_0 T) -> &'_0 T
+where
+    TypeOutlives0: T: '_0,
+    RegionOutlives0: '_0: '_1,
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for &'_0 T}
+impl<'_0, T> Clone for &'_0 T
+where
+    TypeOutlives0: T: '_0,
+{
+    proof ImpliedClause0: (&'_0 T: Sized) = {built_in impl Sized for &'_0 T}
+    fn clone<'_0_1> = {impl Clone for &'_0 T}::clone<'_0, '_0_1, T>
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::{impl Copy for &'_0 T}
+impl<'_0, T> Copy for &'_0 T
+where
+    TypeOutlives0: T: '_0,
+{
+    proof ImpliedClause0: (&'_0 T: MetaSized) = {built_in impl MetaSized for &'_0 T}
+    proof ImpliedClause1: (&'_0 T: Clone) = {impl Clone for &'_0 T}<'_, T>
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: core::option::{impl Clone for Option<T>[TraitClause0]}::clone
+pub fn impl_Clone_for_Option::clone<'_0, T>(_1: &'_0 Option<T>[TraitClause0]) -> Option<T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Clone),
+    TraitClause2: (T: Destruct),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: core::option::{impl Clone for Option<T>[TraitClause0]}
+impl<T> "impl_Clone_for_Option" Clone for Option<T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Clone),
+    TraitClause2: (T: Destruct),
+{
+    proof ImpliedClause0: (Option<T>[TraitClause0]: Sized) = {built_in impl Sized for Option<T>[TraitClause0]}
+    fn clone<'_0_1> = impl_Clone_for_Option::clone<'_0_1, T>[TraitClause0, TraitClause1, TraitClause2]
+    non-dyn-compatible
+}
+
+// Full name: core::option::{impl Copy for Option<T>[TraitClause0]}
+impl<T> "impl_Copy_for_Option" Copy for Option<T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+{
+    proof ImpliedClause0: (Option<T>[TraitClause0]: MetaSized) = {built_in impl MetaSized for Option<T>[TraitClause0]}
+    proof ImpliedClause1: (Option<T>[TraitClause0]: Clone) = impl_Clone_for_Option<T>[TraitClause0, TraitClause1::ImpliedClause1, {built_in impl Destruct for T}]
+    non-dyn-compatible
+}
+
+// Full name: alloc::borrow::ToOwned
+#[diagnostic_item("ToOwned")]
+pub trait ToOwned<Self, Self_Owned>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self_Owned: Sized)
+    proof ImpliedClause2: (Self_Owned: Borrow<Self>)
+    fn to_owned<'_0_1>;
+    non-dyn-compatible
+}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+trait test_crate::Foo<'a, Self, Self_Item>
+where
+    TypeOutlives0: Self_Item: 'a,
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Copy)
+    proof ImpliedClause2: (Self_Item: Sized)
+    proof ImpliedClause3: (Self_Item: Clone)
+    fn use_item_required;
+    fn use_item_provided<Clause0_Item, TraitClause0_1: (Self_Item: test_crate::Foo<'a, Clause0_Item>)> = test_crate::Foo::use_item_provided<'a, Self, Self_Item, Clause0_Item>[Self, TraitClause0_1]
+    non-dyn-compatible
+}
+
+fn test_crate::Foo::use_item_provided<'a, Self, Clause0_Item, Clause1_Item>(x: Clause0_Item) -> Clause0_Item
+where
+    TraitClause0: (Self: test_crate::Foo<'a, Clause0_Item>),
+    TraitClause1: (Clause0_Item: test_crate::Foo<'a, Clause1_Item>),
+{
+    let _0: Clause0_Item; // return
+    let x: Clause0_Item; // arg #1
+
+    storage_live(_0)
+    _0 = copy x
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::{impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}::use_item_required
+fn {impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}::use_item_required<'a, T>(x: Option<&'a T>[{built_in impl Sized for &'a T}]) -> Option<&'a T>[{built_in impl Sized for &'a T}]
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: Option<&'8 T>[{built_in impl Sized for &'8 T}]; // return
+    let x: Option<&'12 T>[{built_in impl Sized for &'12 T}]; // arg #1
+
+    storage_live(_0)
+    _0 = copy x
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::{impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}::use_item_provided
+fn {impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}::use_item_provided<'a, T, Clause1_Item>(x: Option<&'a T>[{built_in impl Sized for &'a T}]) -> Option<&'a T>[{built_in impl Sized for &'a T}]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (Option<&'a T>[{built_in impl Sized for &'a T}]: test_crate::Foo<'a, Clause1_Item>),
+    TypeOutlives0: T: 'a,
+{
+    let _0: Option<&'a T>[{built_in impl Sized for &'a T}]; // return
+    let x: Option<&'a T>[{built_in impl Sized for &'a T}]; // arg #1
+
+    storage_live(_0)
+    _0 = copy x
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::{impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}
+impl<'a, T> test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    proof ImpliedClause0: (&'a T: MetaSized) = {built_in impl MetaSized for &'a T}
+    proof ImpliedClause1: (&'a T: Copy) = {impl Copy for &'_0 T}<'_, T>
+    proof ImpliedClause2: (Option<&'a T>[{built_in impl Sized for &'a T}]: Sized) = {built_in impl Sized for Option<&'a T>[{built_in impl Sized for &'a T}]}
+    proof ImpliedClause3: (Option<&'a T>[{built_in impl Sized for &'a T}]: Clone) = impl_Clone_for_Option<&'_ T>[{built_in impl Sized for &'_ T}, {impl Clone for &'_0 T}<'_, T>, {built_in impl Destruct for &'_ T}]
+    fn use_item_required = {impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}::use_item_required<'a, T>[TraitClause0]
+    fn use_item_provided<Clause0_Item, TraitClause0_1: (Option<&'a T>[{built_in impl Sized for &'a T}]: test_crate::Foo<'a, Clause0_Item>)> = {impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}::use_item_provided<'a, T, Clause0_Item>[TraitClause0, TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl test_crate::Foo<'a, T> for Option<T>[TraitClause0]}::use_item_required
+fn impl_Foo_for_Option::use_item_required<'a, T>(x: T) -> T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+    TypeOutlives0: T: 'a,
+{
+    let _0: T; // return
+    let x: T; // arg #1
+
+    storage_live(_0)
+    _0 = copy x
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::{impl test_crate::Foo<'a, T> for Option<T>[TraitClause0]}::use_item_provided
+fn impl_Foo_for_Option::use_item_provided<'a, T, Clause2_Item>(x: T) -> T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+    TraitClause2: (T: test_crate::Foo<'a, Clause2_Item>),
+    TypeOutlives0: T: 'a,
+{
+    let _0: T; // return
+    let x: T; // arg #1
+
+    storage_live(_0)
+    _0 = copy x
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::{impl test_crate::Foo<'a, T> for Option<T>[TraitClause0]}
+impl<'a, T> "impl_Foo_for_Option" test_crate::Foo<'a, T> for Option<T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+    TypeOutlives0: T: 'a,
+{
+    proof ImpliedClause0: (Option<T>[TraitClause0]: MetaSized) = {built_in impl MetaSized for Option<T>[TraitClause0]}
+    proof ImpliedClause1: (Option<T>[TraitClause0]: Copy) = impl_Copy_for_Option<T>[TraitClause0, TraitClause1]
+    proof ImpliedClause2: (T: Sized) = TraitClause0
+    proof ImpliedClause3: (T: Clone) = TraitClause1::ImpliedClause1
+    fn use_item_required = impl_Foo_for_Option::use_item_required<'a, T>[TraitClause0, TraitClause1]
+    fn use_item_provided<Clause0_Item, TraitClause0_1: (T: test_crate::Foo<'a, Clause0_Item>)> = impl_Foo_for_Option::use_item_provided<'a, T, Clause0_Item>[TraitClause0, TraitClause1, TraitClause0_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::external_use_item
+fn external_use_item<'a, T, Clause1_Item, Clause2_Item>(x: Clause1_Item) -> Clause1_Item
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: test_crate::Foo<'a, Clause1_Item>),
+    TraitClause2: (Clause1_Item: test_crate::Foo<'a, Clause2_Item>),
+{
+    let _0: Clause1_Item; // return
+    let x: Clause1_Item; // arg #1
+    let _2: &'5 Clause1_Item; // anonymous local
+    let _3: Clause1_Item; // anonymous local
+    let _4: Clause1_Item; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = copy x
+    _3 = TraitClause1::use_item_provided<Clause2_Item>[TraitClause2](move _4)
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    _2 = &_3
+    storage_dead(_4)
+    _0 = TraitClause2::ImpliedClause1::ImpliedClause1::clone<'17>(move _2)
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    storage_dead(_2)
+    storage_dead(_3)
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::call_fn
+fn call_fn()
+{
+    let _0: (); // return
+    let _1: Option<&'8 bool>[{built_in impl Sized for &'8 bool}]; // anonymous local
+    let _2: Option<&'12 bool>[{built_in impl Sized for &'12 bool}]; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    storage_live(_2)
+    _2 = Option::None {  }
+    _1 = external_use_item<'25, &'25 bool, Option<&'25 bool>[{built_in impl Sized for &'25 bool}], &'25 bool>[{built_in impl Sized for &'25 bool}, {impl test_crate::Foo<'a, Option<&'a T>[{built_in impl Sized for &'a T}]> for &'a T}<'25, bool>[{built_in impl Sized for bool}], impl_Foo_for_Option<'25, &'25 bool>[{built_in impl Sized for &'25 bool}, {impl Copy for &'_0 T}<'25, bool>]](move _2)
+    ↳⚡ unwind_continue
+    storage_dead(_2)
+    storage_dead(_1)
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::type_equality
+fn type_equality<'a, I, J, Clause2_Item>(x: Clause2_Item) -> Clause2_Item
+where
+    TraitClause0: (I: Sized),
+    TraitClause1: (J: Sized),
+    TraitClause2: (I: test_crate::Foo<'a, Clause2_Item>),
+    TraitClause3: (J: test_crate::Foo<'a, Clause2_Item>),
+{
+    let _0: Clause2_Item; // return
+    let x: Clause2_Item; // arg #1
+
+    storage_live(_0)
+    _0 = move x
+    conditional_drop[{built_in impl Destruct for Clause2_Item}::drop_glue<'5>] x
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    storage_dead(x)
+    return
+}
+
+trait test_crate::loopy::Bar<Self, Self_BarTy>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self_BarTy: Sized)
+    vtable: test_crate::loopy::Bar::{vtable}<Self_BarTy>
+}
+
+// Full name: test_crate::loopy::{impl test_crate::loopy::Bar<bool> for ()}
+impl "impl_Bar_for_unit" test_crate::loopy::Bar<bool> for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: (bool: Sized) = {built_in impl Sized for bool}
+    vtable: lazy
+}
+
+trait test_crate::loopy::Foo<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::FooTy: Sized)
+    proof ImpliedClause2: (Self::FooTy: test_crate::loopy::Foo)
+    proof ImpliedClause3: (Self::FooTy: test_crate::loopy::Bar<Self::Self_Clause3_BarTy>)
+    type FooTy
+    type Self_Clause3_BarTy
+    vtable: test_crate::loopy::Foo::{vtable}<Self::FooTy>
+}
+
+// Full name: test_crate::loopy::{impl test_crate::loopy::Foo for ()}
+impl "impl_Foo_for_unit" test_crate::loopy::Foo for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: ((): Sized) = {built_in impl Sized for ()}
+    proof ImpliedClause2: ((): test_crate::loopy::Foo) = impl_Foo_for_unit
+    proof ImpliedClause3: ((): test_crate::loopy::Bar<bool>) = impl_Bar_for_unit
+    type FooTy = ()
+    type Self_Clause3_BarTy = bool
+    vtable: lazy
+}
+
+// Full name: test_crate::loopy::Baz
+trait Baz<Self, T>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    proof ImpliedClause2: (T: Baz<T>)
+    proof ImpliedClause3: (T: test_crate::loopy::Bar<Self::Self_Clause3_BarTy>)
+    proof ImpliedClause4: (Self::BazTy: Sized)
+    type BazTy
+    type Self_Clause3_BarTy
+    vtable: test_crate::loopy::Baz::{vtable}<T, Self::BazTy>
+}
+
+// Full name: test_crate::loopy::{impl Baz<()> for ()}
+impl "impl_Baz_unit_for_unit" Baz<()> for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: ((): Sized) = {built_in impl Sized for ()}
+    proof ImpliedClause2: ((): Baz<()>) = impl_Baz_unit_for_unit
+    proof ImpliedClause3: ((): test_crate::loopy::Bar<bool>) = impl_Bar_for_unit
+    proof ImpliedClause4: (usize: Sized) = {built_in impl Sized for usize}
+    type BazTy = usize
+    type Self_Clause3_BarTy = bool
+    vtable: lazy
+}
+
+trait test_crate::loopy_with_generics::Bar<'a, Self, T, U, Self_BarTy>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    proof ImpliedClause2: (U: Sized)
+    proof ImpliedClause3: (Self_BarTy: Sized)
+    vtable: test_crate::loopy_with_generics::Bar::{vtable}<'a, T, U, Self_BarTy>
+}
+
+// Full name: test_crate::loopy_with_generics::{impl test_crate::loopy_with_generics::Bar<'a, u8, T, &'a T> for ()}
+impl<'a, T> "impl_Bar_u8_for_unit" test_crate::loopy_with_generics::Bar<'a, u8, T, &'a T> for ()
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: (u8: Sized) = {built_in impl Sized for u8}
+    proof ImpliedClause2: (T: Sized) = TraitClause0
+    proof ImpliedClause3: (&'a T: Sized) = {built_in impl Sized for &'a T}
+    vtable: lazy
+}
+
+trait test_crate::loopy_with_generics::Foo<'b, Self, T>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    proof ImpliedClause2: (Self::FooTy: Sized)
+    proof ImpliedClause3: (Self::FooTy: test_crate::loopy_with_generics::Foo<'b, T>)
+    proof ImpliedClause4: (Self::FooTy: test_crate::loopy_with_generics::Bar<'b, u8, Option<T>[Self::ImpliedClause1], Self::Self_Clause4_BarTy>)
+    type FooTy
+    type Self_Clause4_BarTy
+    vtable: test_crate::loopy_with_generics::Foo::{vtable}<'b, T, Self::FooTy>
+}
+
+// Full name: test_crate::loopy_with_generics::{impl test_crate::loopy_with_generics::Foo<'static, u16> for ()}
+impl "impl_Foo_u16_for_unit" test_crate::loopy_with_generics::Foo<'static, u16> for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: (u16: Sized) = {built_in impl Sized for u16}
+    proof ImpliedClause2: ((): Sized) = {built_in impl Sized for ()}
+    proof ImpliedClause3: ((): test_crate::loopy_with_generics::Foo<'static, u16>) = impl_Foo_u16_for_unit
+    proof ImpliedClause4: ((): test_crate::loopy_with_generics::Bar<'static, u8, Option<u16>[{built_in impl Sized for u16}], &'_ Option<u16>[{built_in impl Sized for u16}]>) = impl_Bar_u8_for_unit<'_, Option<u16>[{built_in impl Sized for u16}]>[{built_in impl Sized for Option<u16>[{built_in impl Sized for u16}]}]
+    type FooTy = ()
+    type Self_Clause4_BarTy = &'_ Option<u16>[{built_in impl Sized for u16}]
+    vtable: lazy
+}
+
+// Full name: test_crate::cow::Cow
+enum Cow<'a, B, Clause1_Owned>
+where
+    TraitClause0: (B: MetaSized),
+    TraitClause1: (B: ToOwned<Clause1_Owned>),
+    TypeOutlives0: B: 'a,
+    TypeOutlives1: B: 'a,
+{
+  Borrowed { _0: &'a B },
+  Owned { _0: Clause1_Owned },
+}
+
+trait test_crate::params::Foo<'a, Self, T, Self_X, Self_Item>
+where
+    TypeOutlives0: T: 'a,
+    TypeOutlives1: Self_X: 'a,
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    proof ImpliedClause2: (Self_X: Sized)
+    proof ImpliedClause3: (Self_Item: Sized)
+    vtable: test_crate::params::Foo::{vtable}<'a, T, Self_X, Self_Item>
+}
+
+// Full name: test_crate::params::{impl test_crate::params::Foo<'a, Option<T>[TraitClause0], &'a (), &'a (Option<T>[TraitClause0], &'a ())> for ()}
+impl<'a, T> "impl_Foo_Option_for_unit" test_crate::params::Foo<'a, Option<T>[TraitClause0], &'a (), &'a (Option<T>[TraitClause0], &'a ())> for ()
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: (Option<T>[TraitClause0]: Sized) = {built_in impl Sized for Option<T>[TraitClause0]}
+    proof ImpliedClause2: (&'a (): Sized) = {built_in impl Sized for &'a ()}
+    proof ImpliedClause3: (&'a (Option<T>[TraitClause0], &'a ()): Sized) = impl_Foo_Option_for_unit<'a, T>[TraitClause0]::ImpliedClause3
+    vtable: lazy
+}
+
+
+

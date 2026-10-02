@@ -1,0 +1,185 @@
+# Final LLBC before serialization:
+
+opaque type core::cmp::PartialEq::{vtable}<Rhs>
+
+// Full name: core::cmp::PartialEq
+#[lang_item(PartialEq)]
+#[diagnostic_item("PartialEq")]
+pub trait PartialEq<Self, Rhs>
+{
+    fn eq<'_0_1, '_1_1>;
+    vtable: core::cmp::PartialEq::{vtable}<Rhs>
+}
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Tuple
+#[fundamental]
+#[lang_item(Tuple)]
+pub trait Tuple<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+opaque type core::ops::function::Fn::{vtable}<Args, Ty0>
+
+// Full name: core::ops::function::FnOnce
+#[fundamental]
+#[lang_item(FnOnce)]
+pub trait FnOnce<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Args: Sized)
+    proof ImpliedClause2: (Args: Tuple)
+    proof ImpliedClause3: (Self::Output: Sized)
+    type Output
+    fn call_once;
+    vtable: core::ops::function::FnOnce::{vtable}<Args, Self::Output>
+}
+
+// Full name: core::ops::function::FnMut
+#[fundamental]
+#[lang_item(FnMut)]
+pub trait FnMut<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: FnOnce<Args>)
+    proof ImpliedClause2: (Args: Sized)
+    proof ImpliedClause3: (Args: Tuple)
+    fn call_mut<'_0_1>;
+    vtable: core::ops::function::FnMut::{vtable}<Args, Self::ImpliedClause1::Output>
+}
+
+// Full name: core::ops::function::Fn
+#[fundamental]
+#[lang_item(Fn)]
+pub trait Fn<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: FnMut<Args>)
+    proof ImpliedClause2: (Args: Sized)
+    proof ImpliedClause3: (Args: Tuple)
+    fn call<'_0_1>;
+    vtable: core::ops::function::Fn::{vtable}<Args, Self::ImpliedClause1::ImpliedClause1::Output>
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (type_error("removed allocator parameter"): Sized),
+
+// Full name: alloc::string::String
+#[lang_item(String)]
+pub opaque type String
+
+// Full name: alloc::string::{impl ToString for T}::to_string
+pub fn to_string<'_0, T>(_1: &'_0 T) -> String
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (T: Display),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+struct () {}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::construct
+#[charon::opaque]
+fn construct<T>(_1: T) -> Box<(dyn Display + 'static)>[{built_in impl MetaSized for (dyn Display + 'static)}, {built_in impl Sized for Global}]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Display),
+    TypeOutlives0: T: 'static,
+= <opaque>
+
+// Full name: test_crate::destruct
+fn destruct<'_0>(x: &'_0 (dyn Display + '_0)) -> String
+{
+    let _0: String; // return
+    let x: &'3 (dyn Display + '4); // arg #1
+    let _2: &'5 (dyn Display + '6); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = &(*x) with_metadata(copy x.metadata)
+    _0 = to_string<'17, (dyn Display + '9)>[{built_in impl MetaSized for (dyn Display + '11)}, Display<(dyn Display + '15)>](move _2)
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    storage_dead(_2)
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::combine
+#[charon::opaque]
+fn combine()
+= <opaque>
+
+// Full name: test_crate::foo
+fn foo<'_0, '_1, T>(_1: &'_0 (dyn for<'a> Fn<(&'a T,), ImpliedClause1::ImpliedClause1::Output = T> + 'static), _2: &'_1 (dyn PartialEq<Option<T>[TraitClause0]> + '_1))
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+    TypeOutlives1: T: '_1,
+{
+    let _0: (); // return
+    let _1: &'7 (dyn for<'a> Fn<(&'a T,), ImpliedClause1::ImpliedClause1::Output = T> + '8); // arg #1
+    let _2: &'13 (dyn PartialEq<Option<T>[TraitClause0]> + '14); // arg #2
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(_2)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::bar
+fn bar<'_0>(_1: &'_0 (dyn for<'_0_2> Fn<(&'_0_2 (dyn Display + '_0_2),), ImpliedClause1::ImpliedClause1::Output = ()> + '_0))
+{
+    let _0: (); // return
+    let _1: &'12 (dyn for<'_0_2> Fn<(&'_0_2 (dyn Display + '_0_2),), ImpliedClause1::ImpliedClause1::Output = ()> + '13); // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(_1)
+    return
+}
+
+
+

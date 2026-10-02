@@ -1,0 +1,82 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::slice::index::{impl SliceIndex<[T]> for usize}::index
+pub fn impl_SliceIndex_slice_for_usize::index<'_0, T>(_1: usize, _2: &'_0 [T]) -> &'_0 T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: core::slice::index::{impl SliceIndex<[T]> for usize}::index_mut
+pub fn impl_SliceIndex_slice_for_usize::index_mut<'_0, T>(_1: usize, _2: &'_0 mut [T]) -> &'_0 mut T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+struct () {}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+// Full name: test_crate::incr
+pub fn incr<'_0>(s: &'_0 mut [u32])
+{
+    let _0: (); // return
+    let s: &'1 mut [u32]; // arg #1
+    let _2: usize; // anonymous local
+    let _3: u32; // anonymous local
+    let _4: &'_ [u32]; // anonymous local
+    let _5: &'_ u32; // anonymous local
+    let _6: &'_ mut [u32]; // anonymous local
+    let _7: &'_ mut u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    _0 = ()
+    storage_live(_2)
+    _2 = const 0usize
+    storage_live(_4)
+    _4 = &(*s) with_metadata(copy s.metadata)
+    storage_live(_5)
+    _5 = impl_SliceIndex_slice_for_usize::index<'_, u32>[{built_in impl Sized for u32}](copy _2, move _4)
+    ↳⚡ undefined_behavior
+    _3 = copy (*_5) panic.+ const 1u32
+    storage_live(_6)
+    _6 = &mut (*s) with_metadata(copy s.metadata)
+    storage_live(_7)
+    _7 = impl_SliceIndex_slice_for_usize::index_mut<'_, u32>[{built_in impl Sized for u32}](copy _2, move _6)
+    ↳⚡ undefined_behavior
+    (*_7) = move _3
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(_3)
+    storage_dead(s)
+    storage_dead(_7)
+    storage_dead(_6)
+    storage_dead(_5)
+    storage_dead(_4)
+    return
+}
+
+
+

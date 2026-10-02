@@ -1,0 +1,133 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Tuple
+#[fundamental]
+#[lang_item(Tuple)]
+pub trait Tuple<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::ops::function::FnOnce
+#[fundamental]
+#[lang_item(FnOnce)]
+pub trait FnOnce<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Args: Sized)
+    proof ImpliedClause2: (Args: Tuple)
+    proof ImpliedClause3: (Self::Output: Sized)
+    type Output
+    fn call_once;
+    vtable: core::ops::function::FnOnce::{vtable}<Args, Self::Output>
+}
+
+// Full name: core::ops::function::FnMut
+#[fundamental]
+#[lang_item(FnMut)]
+pub trait FnMut<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: FnOnce<Args>)
+    proof ImpliedClause2: (Args: Sized)
+    proof ImpliedClause3: (Args: Tuple)
+    fn call_mut<'_0_1>;
+    vtable: core::ops::function::FnMut::{vtable}<Args, Self::ImpliedClause1::Output>
+}
+
+struct () {}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::Iterator
+trait Iterator<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Item: Sized)
+    type Item
+    fn rposition<'_0_1, P, TraitClause0_1: (P: Sized), TraitClause1_1: (P: FnMut<(Self::Item,)>), TraitClause2_1: (Self: DoubleEndedIterator), TypeConstraint0: TraitClause1_1::ImpliedClause1::Output = ()>;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::DoubleEndedIterator
+trait DoubleEndedIterator<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Iterator)
+    non-dyn-compatible
+}
+
+// Full name: test_crate::Iter
+struct Iter<'a, T>
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+  _0: &'a T,
+}
+
+// Full name: test_crate::{impl Iterator for Iter<'a, T>[TraitClause0]}::rposition
+fn rposition<'a, '_1, T, P>(self: &'_1 mut Iter<'a, T>[TraitClause0])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (P: Sized),
+    TraitClause2: (P: FnMut<(TraitClause3::ImpliedClause1::Item,)>),
+    TraitClause3: (Iter<'a, T>[TraitClause0]: DoubleEndedIterator),
+    TypeOutlives0: T: 'a,
+    TypeOutlives1: T: '_1,
+    RegionOutlives0: 'a: '_1,
+    TypeConstraint0: TraitClause2::ImpliedClause1::Output = (),
+{
+    let _0: (); // return
+    let self: &'3 mut Iter<'4, T>[TraitClause0]; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl Iterator for Iter<'a, T>[TraitClause0]}
+impl<'a, T> "impl_Iterator_for_Iter" Iterator for Iter<'a, T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    proof ImpliedClause0: (Iter<'a, T>[TraitClause0]: MetaSized) = {built_in impl MetaSized for Iter<'a, T>[TraitClause0]}
+    proof ImpliedClause1: (&'a T: Sized) = {built_in impl Sized for &'a T}
+    type Item = &'a T
+    fn rposition<'_0_1, P, TraitClause0_1: (P: Sized), TraitClause1_1: (P: FnMut<(TraitClause2_1::ImpliedClause1::Item,)>), TraitClause2_1: (Iter<'a, T>[TraitClause0]: DoubleEndedIterator), TypeConstraint0: TraitClause1_1::ImpliedClause1::Output = ()> = rposition<'a, '_0_1, T, P>[TraitClause0, TraitClause0_1, TraitClause1_1, TraitClause2_1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl DoubleEndedIterator for Iter<'a, T>[TraitClause0]}
+impl<'a, T> "impl_DoubleEndedIterator_for_Iter" DoubleEndedIterator for Iter<'a, T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    proof ImpliedClause0: (Iter<'a, T>[TraitClause0]: MetaSized) = {built_in impl MetaSized for Iter<'a, T>[TraitClause0]}
+    proof ImpliedClause1: (Iter<'a, T>[TraitClause0]: Iterator) = impl_Iterator_for_Iter<'_, T>[TraitClause0]
+    non-dyn-compatible
+}
+
+
+

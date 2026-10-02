@@ -1,0 +1,99 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: core::iter::traits::iterator::Iterator
+#[lang_item(Iterator)]
+#[diagnostic_item("Iterator")]
+pub trait Iterator<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Item: Sized)
+    type Item
+    fn next<'_0_1>;
+    vtable: core::iter::traits::iterator::Iterator::{vtable}<Self::Item>
+}
+
+struct () {}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::Trait
+pub trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::AssocType: Sized)
+    type AssocType
+    vtable: test_crate::Trait::{vtable}<Self::AssocType>
+}
+
+// Full name: test_crate::Alias
+pub type Alias<T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Trait),
+    TraitClause2: (TraitClause1::AssocType: Sized), = Option<TraitClause1::AssocType>[TraitClause2]
+
+// Full name: test_crate::C
+pub trait C<Self, T>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    vtable: test_crate::C::{vtable}<T>
+}
+
+// Full name: test_crate::S
+pub struct S<I, F>
+where
+    TraitClause0: (I: Sized),
+    TraitClause1: (F: Sized),
+    TraitClause2: (I: Iterator),
+    TraitClause3: (F: C<TraitClause2::Item>),
+{
+  _0: I,
+  _1: F,
+}
+
+// Full name: test_crate::S2
+pub type S2<I, F>
+where
+    TraitClause0: (I: Sized),
+    TraitClause1: (F: Sized),
+    TraitClause2: (I: Iterator),
+    TraitClause3: (F: C<TraitClause2::Item>), = S<I, F>[TraitClause0, TraitClause1, TraitClause2, TraitClause3]
+
+
+

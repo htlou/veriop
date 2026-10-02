@@ -1,0 +1,105 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+struct () {}
+
+struct test_crate::f::{closure}<'_0, T>
+where
+    TypeOutlives0: T: '_0,
+{
+  _0: &'_0 T,
+}
+
+// Full name: test_crate::f
+fn f<'_0, T>(x: &'_0 T)
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let x: &'1 T; // arg #1
+    let _c: test_crate::f::{closure}<'3, T>; // local
+    let _3: &'4 T; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_c)
+    storage_live(_3)
+    _3 = &(*x)
+    _c = test_crate::f::{closure} { _0: move _3 }
+    storage_dead(_3)
+    fake_read(_c)
+    _0 = ()
+    storage_dead(_c)
+    storage_dead(x)
+    return
+}
+
+struct test_crate::g::{closure}<'_0, T>
+where
+    TypeOutlives0: T: '_0,
+{
+  _0: &'_0 T,
+}
+
+// Full name: test_crate::g
+fn g<T>(x: T)
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Copy),
+{
+    let _0: (); // return
+    let x: T; // arg #1
+    let _c: test_crate::g::{closure}<'1, T>; // local
+    let _3: &'3 T; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_c)
+    storage_live(_3)
+    _3 = &x
+    _c = test_crate::g::{closure} { _0: move _3 }
+    storage_dead(_3)
+    fake_read(_c)
+    _0 = ()
+    storage_dead(_c)
+    storage_dead(x)
+    return
+}
+
+
+

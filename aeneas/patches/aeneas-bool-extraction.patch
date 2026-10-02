@@ -1,0 +1,27 @@
+diff --git a/src/extract/Extract.ml b/src/extract/Extract.ml
+index de0a81f6..320b7e0b 100644
+--- a/src/extract/Extract.ml
++++ b/src/extract/Extract.ml
+@@ -1361,6 +1361,9 @@ and extract_lets (span : Meta.span) (ctx : extraction_ctx) (fmt : F.formatter)
+               F.pp_print_string fmt "let";
+               F.pp_print_space fmt ());
+             let ctx = extract_tpat span ctx fmt ~is_let:true ~inside:false lv in
++            (* Comparisons elaborate to Prop without an expected Bool type. *)
++            if backend () = Lean && lv.ty = TLiteral TBool then
++              F.pp_print_string fmt " : Bool";
+             F.pp_print_space fmt ();
+             let eq =
+               match backend () with
+diff --git a/src/extract/ExtractBase.ml b/src/extract/ExtractBase.ml
+index 30ab2204..1ae91610 100644
+--- a/src/extract/ExtractBase.ml
++++ b/src/extract/ExtractBase.ml
+@@ -928,7 +928,7 @@ let unop_name (unop : unop) : string =
+           | Some int_ty -> int_name int_ty ^ "_not")
+       | Lean -> begin
+           match ty with
+-          | None -> "¬"
++          | None -> "!"
+           | Some _ -> "~~~"
+         end
+       | Coq -> if Option.is_none ty then "negb" else "scalar_not"

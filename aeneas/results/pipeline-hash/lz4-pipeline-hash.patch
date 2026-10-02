@@ -1,0 +1,30 @@
+diff --git a/src/block/compress.rs b/src/block/compress.rs
+index aebb97b..fe14d0a 100644
+--- a/src/block/compress.rs
++++ b/src/block/compress.rs
+@@ -369,6 +369,11 @@ pub(crate) fn compress_internal<T: HashTable, const USE_DICT: bool, S: Sink>(
+         let mut non_match_count = 1 << INCREASE_STEPSIZE_BITSHIFT;
+         // The number of bytes before our cursor, where the duplicate starts.
+         let mut next_cur = cur;
++        if cur > end_pos_check {
++            handle_last_literals(output, input, literal_start);
++            return Ok(output.pos() - output_start_pos);
++        }
++        let mut next_hash = T::get_hash_at(input, cur);
+ 
+         // In this loop we search for duplicates via the hashtable. 4bytes or 8bytes are hashed and
+         // compared.
+@@ -390,7 +395,12 @@ pub(crate) fn compress_internal<T: HashTable, const USE_DICT: bool, S: Sink>(
+             // (`dict_bitshift`) to fit them in the table
+ 
+             // [Bounds Check]: Can be elided due to `end_pos_check` above
+-            let hash = T::get_hash_at(input, cur);
++            let hash = next_hash;
++            // This read is independent of the current dictionary lookup.
++            // A hash beyond the search limit is never consumed.
++            if next_cur <= end_pos_check {
++                next_hash = T::get_hash_at(input, next_cur);
++            }
+             candidate = dict.get_at(hash);
+             dict.put_at(hash, cur + input_stream_offset);
+ 

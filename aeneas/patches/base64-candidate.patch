@@ -1,0 +1,21 @@
+diff --git a/src/engine/general_purpose/mod.rs b/src/engine/general_purpose/mod.rs
+index 802d76b..c3b54f9 100644
+--- a/src/engine/general_purpose/mod.rs
++++ b/src/engine/general_purpose/mod.rs
+@@ -148,6 +148,7 @@ pub(crate) fn encode_helper(
+ 
+ /// Scalar encode of `input[input_index..]` into `output[output_index..]`, resuming from a 3-byte
+ /// group boundary. Returns the total number of output bytes written.
++#[inline(always)]
+ fn encode_scalar_tail(
+     encode_table: &[u8; 64],
+     input: &[u8],
+@@ -162,7 +163,7 @@ fn encode_scalar_tail(
+     // 2 trailing bytes to be available to read..
+     let last_fast_index = input.len().saturating_sub(BLOCKS_PER_FAST_LOOP * 6 + 2);
+ 
+-    if last_fast_index > 0 {
++    if 0 < last_fast_index {
+         while input_index <= last_fast_index {
+             // Major performance wins from letting the optimizer do the bounds check once, mostly
+             // on the output side

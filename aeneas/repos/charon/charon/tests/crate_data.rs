@@ -1,0 +1,1023 @@
+use charon_lib::ast::from_rustc;
+use charon_lib::formatter::IntoFormatter;
+use charon_lib::llbc_ast::*;
+use charon_lib::pretty::FmtWithCtx;
+use itertools::Itertools;
+use std::collections::HashMap;
+
+mod util;
+use util::*;
+
+fn translate(code: impl std::fmt::Display) -> anyhow::Result<TranslatedCrate> {
+    util::translate_rust_text(code)
+}
+
+/// The type declarations written by the user, in order. Every crate also declares the types Rust
+/// treats specially -- tuples, starting with `()` -- which these tests aren't about.
+fn user_type_decls(crate_data: &TranslatedCrate) -> Vec<&TypeDecl> {
+    crate_data
+        .type_decls
+        .iter()
+        .filter(|decl| decl.src.is_normal())
+        .collect()
+}
+
+/// A general item, with information shared by all items.
+struct Item<'c> {
+    name_str: String,
+    // Not a ref because we do a little hack.
+    generics: GenericParams,
+    kind: ItemRef<'c>,
+}
+
+/// Get all the items for this crate.
+fn items_by_name<'c>(crate_data: &'c TranslatedCrate) -> HashMap<String, Item<'c>> {
+    crate_data
+        .all_items()
+        .map(|item| {
+            let mut generics = item.generic_params().clone();
+            if let ItemRef::TraitDecl(tdecl) = &item {
+                // We do a little hack.
+                assert!(generics.trait_clauses.is_empty());
+                generics.trait_clauses = tdecl.implied_clauses.clone();
+            }
+            Item {
+                name_str: item.item_meta().name.debug_repr(crate_data),
+                generics,
+                kind: item,
+            }
+        })
+        .map(|item| (item.name_str.clone(), item))
+        .collect()
+}
+
+#[test]
+fn type_decl() -> anyhow::Result<()> {
+    let crate_data = translate(
+        "
+        struct Struct;
+        fn main() {}
+        ",
+    )?;
+    let type_decls = user_type_decls(&crate_data);
+    assert_eq!(
+        type_decls[0].item_meta.name.debug_repr(&crate_data),
+        "test_crate::Struct"
+    );
+    Ok(())
+}
+
+#[test]
+fn marker_traits() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"//@ charon-arg=--monomorphize
+        //@ charon-arg=--start-from=crate::main
+        use std::cell::Cell;
+        use std::marker::PhantomPinned;
+
+        struct Everything;
+        struct NotSendOrSync(*const ());
+        struct NotSyncOrFreeze(Cell<u8>);
+        struct NotUnpin(PhantomPinned);
+        struct NotSized([u8]);
+
+        fn main() {
+            let _ = Everything;
+            let _ = NotSendOrSync(std::ptr::null());
+            let _ = NotSyncOrFreeze(Cell::new(0));
+            let _ = NotUnpin(PhantomPinned);
+            let _: Option<&NotSized> = None;
+        }
+        "#,
+    )?;
+    let fmt = crate_data.into_fmt();
+    let marker_traits: HashMap<String, ImplementsMarkerTraits> = user_type_decls(&crate_data)
+        .into_iter()
+        .map(|decl| {
+            let name = decl.item_meta.name.with_ctx(&fmt).to_string();
+            (
+                name.clone(),
+                decl.marker_traits
+                    .as_deref()
+                    .copied()
+                    .unwrap_or_else(|| panic!("missing marker traits for {name}")),
+            )
+        })
+        .collect();
+
+    let all = ImplementsMarkerTraits {
+        is_sized: true,
+        is_send: true,
+        is_sync: true,
+        is_freeze: true,
+        is_unpin: true,
+    };
+    assert_eq!(marker_traits["test_crate::Everything"], all);
+    assert_eq!(
+        marker_traits["test_crate::NotSendOrSync"],
+        ImplementsMarkerTraits {
+            is_send: false,
+            is_sync: false,
+            ..all
+        }
+    );
+    assert_eq!(
+        marker_traits["test_crate::NotSyncOrFreeze"],
+        ImplementsMarkerTraits {
+            is_sync: false,
+            is_freeze: false,
+            ..all
+        }
+    );
+    assert_eq!(
+        marker_traits["test_crate::NotUnpin"],
+        ImplementsMarkerTraits {
+            is_unpin: false,
+            ..all
+        }
+    );
+    assert_eq!(
+        marker_traits["test_crate::NotSized"],
+        ImplementsMarkerTraits {
+            is_sized: false,
+            ..all
+        }
+    );
+    Ok(())
+}
+
+#[test]
+fn generic_parameter_variance() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        use std::marker::PhantomData;
+
+        struct Covariant<'a, T>(&'a T);
+        struct Invariant<'a, T>(&'a mut T);
+        struct Contravariant<'a, T>(PhantomData<fn(&'a T)>);
+        trait NoVarianceInformation<'a, T> {}
+        fn late_bound(x: &u8, y: &mut &u8) {}
+        fn nested<'a>(_: for<'b> fn(&'a u8, &'b u8)) {}
+        "#,
+    )?;
+    let items = items_by_name(&crate_data);
+
+    let variance = |item_name: &str| {
+        let generics = &items[item_name].generics;
+        (
+            generics
+                .regions
+                .iter()
+                .map(|param| param.variance)
+                .collect_vec(),
+            generics
+                .types
+                .iter()
+                .map(|param| param.variance)
+                .collect_vec(),
+        )
+    };
+
+    assert_eq!(
+        variance("test_crate::Covariant"),
+        (vec![Variance::Covariant], vec![Variance::Covariant])
+    );
+    assert_eq!(
+        variance("test_crate::Invariant"),
+        (vec![Variance::Covariant], vec![Variance::Invariant])
+    );
+    assert_eq!(
+        variance("test_crate::Contravariant"),
+        (vec![Variance::Contravariant], vec![Variance::Contravariant])
+    );
+    assert_eq!(
+        variance("test_crate::NoVarianceInformation"),
+        (
+            vec![Variance::Unknown],
+            vec![Variance::Unknown, Variance::Unknown]
+        )
+    );
+    assert_eq!(
+        variance("test_crate::late_bound"),
+        (
+            vec![
+                Variance::Covariant,
+                Variance::Covariant,
+                Variance::Invariant
+            ],
+            vec![]
+        )
+    );
+    assert_eq!(
+        variance("test_crate::nested"),
+        (vec![Variance::Contravariant], vec![])
+    );
+    let nested = items["test_crate::nested"].kind.as_fun().unwrap();
+    let TyKind::FnPtr(signature) = nested.signature.inputs[0].kind() else {
+        panic!("expected a function pointer")
+    };
+    assert_eq!(
+        signature.regions[RegionId::ZERO].variance,
+        Variance::Covariant
+    );
+    Ok(())
+}
+
+#[test]
+fn file_name() -> anyhow::Result<()> {
+    let crate_data = translate(
+        "
+        type Foo = Option<()>;
+        ",
+    )?;
+    let type_decls = user_type_decls(&crate_data);
+    assert_eq!(
+        type_decls[0].item_meta.name.debug_repr(&crate_data),
+        "test_crate::Foo"
+    );
+    assert_eq!(
+        type_decls[1].item_meta.name.debug_repr(&crate_data),
+        "core::option::Option"
+    );
+    let file_id = type_decls[1].item_meta.span.data().file_id;
+    let file = &crate_data.files[file_id];
+    assert_eq!(file.name.to_string(), "/rustc/library/core/src/option.rs");
+    Ok(())
+}
+
+#[test]
+fn spans() -> anyhow::Result<()> {
+    let crate_data = translate(
+        "//@ charon-args=--reconstruct-fallible-operations
+        pub fn sum(s: &[u32]) -> u32 {
+            let mut sum = 0;
+            let mut i = 0;
+            while i < s.len() {
+                sum += s[i];
+                i += 1;
+            }
+            sum
+        }
+        ",
+    )?;
+    let function = &crate_data.fun_decls[0];
+    // Span of the whole function.
+    assert_eq!(repr_span(function.item_meta.span), "3:8-11:9");
+
+    let body = &function.body.as_structured().unwrap();
+    // Span of the function body
+    assert_eq!(repr_span(body.body.span), "4:16-11:9");
+
+    let sum_var = &body.locals.locals[2];
+    assert_eq!(sum_var.name.as_deref(), Some("sum"));
+    assert_eq!(repr_span(sum_var.span), "4:16-4:23");
+
+    let the_loop = body
+        .body
+        .statements
+        .iter()
+        .find(|st| st.kind.is_loop())
+        .unwrap();
+    assert_eq!(repr_span(the_loop.span), "6:12-9:13");
+
+    Ok(())
+}
+
+#[test]
+fn predicate_origins() -> anyhow::Result<()> {
+    use PredicateOrigin::*;
+    let crate_data = translate(
+        "
+        fn top_level_function<T: Clone>() where T: Default {}
+
+        #[derive(Clone)]
+        struct Struct<T: Clone> where T: Default { x: T }
+
+        type TypeAlias<T: Clone> where T: Default = Struct<T>;
+
+        impl<T: Clone> Struct<T> where T: Default {
+            fn inherent_method<U: From<T>>() where T: From<U> {}
+        }
+
+        trait Trait<T: Copy>: Clone where T: Default {
+            type AssocType: Default;
+            fn trait_method<U: From<T>>() where T: From<U>;
+        }
+
+        impl<T: Copy> Trait<T> for Struct<T> where T: Default {
+            type AssocType = ();
+            fn trait_method<U: From<T>>() where T: From<U> {}
+        }
+        ",
+    )?;
+    let expected_function_clause_origins: Vec<(&str, Vec<_>)> = vec![
+        (
+            "test_crate::top_level_function",
+            vec![
+                (WhereClauseOnFn, "Sized"),
+                (WhereClauseOnFn, "Clone"),
+                (WhereClauseOnFn, "Default"),
+            ],
+        ),
+        (
+            "test_crate::Struct",
+            vec![
+                (WhereClauseOnType, "Sized"),
+                (WhereClauseOnType, "Clone"),
+                (WhereClauseOnType, "Default"),
+            ],
+        ),
+        (
+            "test_crate::TypeAlias",
+            vec![
+                (WhereClauseOnType, "Sized"),
+                (WhereClauseOnType, "Clone"),
+                (WhereClauseOnType, "Default"),
+            ],
+        ),
+        (
+            "test_crate::<inherent impl>::inherent_method",
+            vec![
+                (WhereClauseOnImpl, "Sized"),
+                (WhereClauseOnImpl, "Clone"),
+                (WhereClauseOnImpl, "Default"),
+                (WhereClauseOnFn, "Sized"),
+                (WhereClauseOnFn, "From"),
+                (WhereClauseOnFn, "From"),
+            ],
+        ),
+        (
+            "test_crate::Trait",
+            vec![
+                (WhereClauseOnTrait, "MetaSized"),
+                (WhereClauseOnTrait, "Clone"),
+                (WhereClauseOnTrait, "Sized"),
+                (WhereClauseOnTrait, "Copy"),
+                (WhereClauseOnTrait, "Default"),
+                (TraitItem(AssocTypeId::ZERO), "Sized"),
+                (TraitItem(AssocTypeId::ZERO), "Default"),
+            ],
+        ),
+        (
+            "test_crate::<impl Trait for ??>",
+            vec![
+                (WhereClauseOnImpl, "Sized"),
+                (WhereClauseOnImpl, "Copy"),
+                (WhereClauseOnImpl, "Default"),
+            ],
+        ),
+        (
+            "test_crate::<impl Trait for ??>::trait_method",
+            vec![
+                (WhereClauseOnImpl, "Sized"),
+                (WhereClauseOnImpl, "Copy"),
+                (WhereClauseOnImpl, "Default"),
+                (WhereClauseOnFn, "Sized"),
+                (WhereClauseOnFn, "From"),
+                (WhereClauseOnFn, "From"),
+            ],
+        ),
+    ];
+    let items_by_name = items_by_name(&crate_data);
+    for (item_name, origins) in expected_function_clause_origins {
+        let Some(item) = items_by_name.get(item_name) else {
+            let keys = items_by_name
+                .keys()
+                .sorted()
+                .map(|k| format!("- `{k}`"))
+                .join("\n");
+            panic!("Item `{item_name}` not found. Available items: \n{keys}")
+        };
+        let clauses = &item.generics.trait_clauses;
+        assert_eq!(origins.len(), clauses.len(), "failed for {item_name}");
+        for (clause, (expected_origin, expected_trait_name)) in clauses.iter().zip(origins) {
+            let trait_decl = &crate_data[clause.trait_.skip_binder.id];
+            let trait_name = trait_decl.item_meta.name.short_str().unwrap();
+            assert_eq!(trait_name, expected_trait_name, "failed for {item_name}");
+            assert_eq!(&clause.origin, &expected_origin, "failed for {item_name}");
+        }
+    }
+
+    // The trait method declaration is not a standalone item anymore, but its
+    // method-level clauses are still stored in the method binder.
+    let trait_decl = &items_by_name["test_crate::Trait"]
+        .kind
+        .as_trait_decl()
+        .unwrap();
+    let method = &trait_decl.methods[TraitMethodId::ZERO];
+    assert_eq!(method.skip_binder.name.0.to_string(), "trait_method");
+    let origins = vec![
+        (WhereClauseOnFn, "Sized"),
+        (WhereClauseOnFn, "From"),
+        (WhereClauseOnFn, "From"),
+    ];
+    let clauses = &method.params.trait_clauses;
+    assert_eq!(origins.len(), clauses.len(), "failed for trait_method");
+    for (clause, (expected_origin, expected_trait_name)) in clauses.iter().zip(origins) {
+        let trait_decl = &crate_data[clause.trait_.skip_binder.id];
+        let trait_name = trait_decl.item_meta.name.short_str().unwrap();
+        assert_eq!(trait_name, expected_trait_name, "failed for trait_method");
+        assert_eq!(&clause.origin, &expected_origin, "failed for trait_method");
+    }
+
+    Ok(())
+}
+
+#[test]
+fn attributes() -> anyhow::Result<()> {
+    // Use the `clippy::` prefix because it's ignored by rustc.
+    let unknown_attrs = |item_meta: &ItemMeta| {
+        item_meta
+            .attr_info
+            .attributes
+            .iter()
+            .filter_map(|a| a.as_unknown())
+            .map(|a| a.to_string())
+            .collect_vec()
+    };
+    let crate_data = translate(
+        r#"
+        #![feature(stmt_expr_attributes)]
+
+        #[clippy::foo]
+        #[clippy::foo(arg)]
+        #[clippy::foo = "arg"]
+        struct Struct;
+
+        #[non_exhaustive]
+        enum Enum {}
+
+        #[clippy::foo]
+        trait Trait {}
+
+        #[clippy::foo]
+        impl Trait for Struct {}
+
+        #[clippy::foo]
+        const FOO: () = ();
+
+        #[clippy::foo]
+        static BAR: () = ();
+
+        #[inline(never)]
+        /// This is a doc comment.
+        fn main() {
+            // Attribute on a closure.
+            let _f = #[inline(always)] || 42;
+        }
+        "#,
+    )?;
+    let type_decls = user_type_decls(&crate_data);
+    assert_eq!(
+        unknown_attrs(&type_decls[0].item_meta),
+        vec!["clippy::foo", "clippy::foo(arg)", "clippy::foo(\"arg\")"]
+    );
+    assert!(unknown_attrs(&type_decls[1].item_meta).is_empty());
+    assert_eq!(
+        unknown_attrs(&crate_data.trait_decls[0].item_meta),
+        vec!["clippy::foo"]
+    );
+    assert_eq!(
+        unknown_attrs(&crate_data.trait_impls[0].item_meta),
+        vec!["clippy::foo"]
+    );
+    assert_eq!(
+        unknown_attrs(&crate_data.global_decls[0].item_meta),
+        vec!["clippy::foo"]
+    );
+    assert_eq!(
+        unknown_attrs(&crate_data.global_decls[1].item_meta),
+        vec!["clippy::foo"]
+    );
+    assert!(unknown_attrs(&crate_data.fun_decls[0].item_meta).is_empty());
+    assert_eq!(
+        crate_data.fun_decls[0].item_meta.attr_info.inline,
+        Some(InlineAttr::Never)
+    );
+    let attrs = &crate_data.fun_decls[0].item_meta.attr_info.attributes;
+    assert!(attrs.contains(&Attribute::DocComment(" This is a doc comment.".to_owned())));
+    assert!(attrs.iter().any(|attr| matches!(
+        attr,
+        Attribute::Builtin(from_rustc::AttributeKind::Inline(
+            from_rustc::InlineAttr::Never,
+            _
+        ))
+    )));
+    // Check that the `inline` attribute on closures gets picked up.
+    let any_inline_always = crate_data
+        .fun_decls
+        .iter()
+        .any(|decl| matches!(decl.item_meta.attr_info.inline, Some(InlineAttr::Always)));
+    assert!(any_inline_always);
+    Ok(())
+}
+
+#[test]
+fn visibility() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        pub struct Pub;
+        struct Priv;
+
+        mod private {
+            pub struct PubInPriv;
+        }
+        "#,
+    )?;
+    let type_decls = user_type_decls(&crate_data);
+    assert_eq!(
+        type_decls[0].item_meta.name.debug_repr(&crate_data),
+        "test_crate::Pub"
+    );
+    assert!(type_decls[0].item_meta.attr_info.public);
+    assert_eq!(
+        type_decls[1].item_meta.name.debug_repr(&crate_data),
+        "test_crate::Priv"
+    );
+    assert!(!type_decls[1].item_meta.attr_info.public);
+    // Note how we think `PubInPriv` is public. It kind of is but there is no path to it. This is
+    // probably fine.
+    assert_eq!(
+        type_decls[2].item_meta.name.debug_repr(&crate_data),
+        "test_crate::private::PubInPriv"
+    );
+    assert!(type_decls[2].item_meta.attr_info.public);
+    Ok(())
+}
+
+#[test]
+fn discriminants() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        enum Foo {
+            Variant1,
+            Variant2,
+        }
+        #[repr(u32)]
+        enum Bar {
+            Variant1 = 3,
+            Variant2 = 42,
+        }
+        "#,
+    )?;
+    let type_decls = user_type_decls(&crate_data);
+    fn get_enum_discriminants(ty: &TypeDecl) -> Vec<IntegerValue> {
+        ty.kind
+            .as_enum()
+            .unwrap()
+            .iter()
+            .map(|v| v.discriminant)
+            .collect()
+    }
+    assert_eq!(
+        get_enum_discriminants(type_decls[0]),
+        vec![
+            IntegerValue::Signed(IntTy::Isize, 0),
+            IntegerValue::Signed(IntTy::Isize, 1)
+        ]
+    );
+    assert_eq!(
+        get_enum_discriminants(type_decls[1]),
+        vec![
+            IntegerValue::Unsigned(UIntTy::U32, 3),
+            IntegerValue::Unsigned(UIntTy::U32, 42)
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn rename_attribute() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        #![feature(register_tool)]
+        #![register_tool(charon)]
+        #![register_tool(aeneas)]
+
+        #[charon::rename("BoolTest")]
+        pub trait BoolTrait {
+            #[charon::rename("AsSoCtY")]
+            type AssocTy;
+
+            #[charon::rename("konst")]
+            const ASSOC_CONST: u32 = 42;
+
+            // Required method
+            #[charon::rename("getTest")]
+            fn get_bool(&self) -> bool;
+
+            // Provided method
+            #[charon::rename("retTest")]
+            fn ret_true(&self) -> bool {
+                true
+            }
+        }
+
+        #[charon::rename("BoolImpl")]
+        impl BoolTrait for bool {
+            type AssocTy = ();
+
+            fn get_bool(&self) -> bool {
+                *self
+            }
+        }
+
+        #[charon::rename("BoolFn")]
+        fn test_bool_trait<T>(x: bool) -> bool {
+            x.get_bool() && x.ret_true()
+        }
+
+        #[charon::rename("TypeTest")]
+        type Test = i32;
+
+        #[charon::rename("VariantsTest")]
+        #[charon::variants_prefix("Simple")]
+        #[charon::variants_suffix("_")]
+        enum SimpleEnum {
+            #[charon::rename("Variant1")]
+            FirstVariant,
+            SecondVariant,
+            ThirdVariant,
+        }
+
+        #[charon::rename("StructTest")]
+        struct Foo {
+            #[charon::rename("FieldTest")]
+            field1: u32,
+        }
+
+        #[charon::rename("Const_Test")]
+        const C: u32 = 100 + 10 + 1;
+
+        #[aeneas::rename("_TypeAeneas36")]
+        type Test2 = u32;
+        "#,
+    )?;
+    let type_decls = user_type_decls(&crate_data);
+
+    assert_eq!(
+        crate_data.trait_decls[0]
+            .item_meta
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("BoolTest")
+    );
+
+    assert_eq!(
+        crate_data.trait_decls[0].types[0]
+            .skip_binder
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("AsSoCtY")
+    );
+
+    assert_eq!(
+        crate_data.trait_decls[0].consts[0]
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("konst")
+    );
+
+    assert_eq!(
+        crate_data.trait_decls[0].methods[0]
+            .skip_binder
+            .item_meta
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("getTest")
+    );
+
+    let fun_renames = crate_data
+        .fun_decls
+        .iter()
+        .filter_map(|fun| fun.item_meta.attr_info.rename.as_deref())
+        .sorted()
+        .collect_vec();
+    assert_eq!(fun_renames, ["BoolFn", "Const_Test", "konst", "retTest"]);
+
+    assert_eq!(
+        crate_data.trait_impls[0]
+            .item_meta
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("BoolImpl")
+    );
+
+    assert_eq!(
+        type_decls[0].item_meta.attr_info.rename.as_deref(),
+        Some("TypeTest")
+    );
+
+    assert_eq!(
+        type_decls[1].item_meta.attr_info.rename.as_deref(),
+        Some("VariantsTest")
+    );
+
+    assert_eq!(
+        type_decls[1].kind.as_enum().unwrap()[0].renamed_name(),
+        "Variant1"
+    );
+    assert_eq!(
+        type_decls[1].kind.as_enum().unwrap()[1].renamed_name(),
+        "SimpleSecondVariant_"
+    );
+
+    assert_eq!(
+        type_decls[2].item_meta.attr_info.rename.as_deref(),
+        Some("StructTest")
+    );
+
+    assert_eq!(
+        crate_data.global_decls[0]
+            .item_meta
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("Const_Test")
+    );
+
+    assert_eq!(
+        type_decls[3].item_meta.attr_info.rename.as_deref(),
+        Some("_TypeAeneas36")
+    );
+
+    assert_eq!(
+        type_decls[2].kind.as_struct().unwrap()[0]
+            .attr_info
+            .rename
+            .as_deref(),
+        Some("FieldTest")
+    );
+    Ok(())
+}
+
+#[test]
+fn declaration_groups() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"//@ charon-arg=--reconstruct-panic-calls
+        fn foo() {
+            panic!()
+        }
+        trait Foo {
+            const FOO: usize = 42;
+        }
+        impl Foo for () {}
+        "#,
+    )?;
+
+    // There are 4 function items: `foo`, the initializer of `Trait::FOO`, and two dependencies of
+    // the panic call.
+    assert_eq!(crate_data.fun_decls.iter().count(), 4);
+    let initializer = crate_data
+        .fun_decls
+        .iter()
+        .find_map(|fun| match &fun.src {
+            FunSource::GlobalInitializer(global) => Some(global),
+            _ => None,
+        })
+        .unwrap();
+    let global = &crate_data.global_decls[initializer.id];
+    assert_eq!(
+        initializer.generics.as_ref(),
+        &global.generics.identity_args()
+    );
+    assert!(matches!(global.src, GlobalSource::TraitDefault { .. }));
+
+    let decl_groups = crate_data.ordered_decls.unwrap();
+    // One of the groups is the declaration of `()`, which every crate has.
+    assert_eq!(decl_groups.len(), 9);
+
+    Ok(())
+}
+
+#[test]
+fn adt_constructor_source() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        struct TupleStruct(u32);
+        enum Enum {
+            Variant(u32),
+        }
+
+        fn constructor_refs() {
+            let _: fn(u32) -> TupleStruct = TupleStruct;
+            let _: fn(u32) -> Enum = Enum::Variant;
+        }
+        "#,
+    )?;
+
+    let constructor_names = crate_data
+        .fun_decls
+        .iter()
+        .filter(|fun| matches!(fun.src, FunSource::AdtConstructor))
+        .map(|fun| fun.item_meta.name.debug_repr(&crate_data))
+        .collect_vec();
+    assert_eq!(
+        constructor_names,
+        ["test_crate::TupleStruct", "test_crate::Enum::Variant"]
+    );
+
+    Ok(())
+}
+
+#[test]
+fn source_text() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        fn foo() {
+            panic!()
+        }
+        mod bar {
+            fn baz( x : usize )  ->() { 
+            let _ = x;
+                } fn quux () {}
+        }
+        struct Foo { x: usize }
+        trait Trait {
+            fn method() {}
+        }
+        impl Trait for () {}
+        "#,
+    )?;
+
+    let sources = crate_data
+        .all_items()
+        .filter_map(|i| i.item_meta().source_text.as_ref())
+        .collect_vec();
+    assert_eq!(sources[0], "struct Foo { x: usize }");
+    assert_eq!(
+        sources[1],
+        "trait Trait {\n            fn method() {}\n        }"
+    );
+    assert_eq!(sources[2], "impl Trait for () {}");
+    assert_eq!(sources[3], "fn foo() {\n            panic!()\n        }");
+    assert_eq!(
+        sources[4],
+        "fn baz( x : usize )  ->() { \n            let _ = x;\n                }"
+    );
+    assert_eq!(sources[5], "fn quux () {}");
+    Ok(())
+}
+
+#[test]
+fn known_trait_method_call() -> anyhow::Result<()> {
+    let crate_data = translate(
+        r#"
+        #[derive(Default)]
+        struct Struct;
+        fn use_default() -> Struct {
+            Struct::default()
+        }
+        "#,
+    )?;
+    let function = &crate_data.fun_decls[0];
+    assert_eq!(
+        function.item_meta.name.debug_repr(&crate_data),
+        "test_crate::use_default"
+    );
+    let body = &function.body.as_structured().unwrap().body;
+    let call = body
+        .statements
+        .iter()
+        .find_map(|stmt| match &stmt.kind {
+            StatementKind::Call { call, .. } => Some(call),
+            _ => None,
+        })
+        .unwrap();
+    let FnOperand::Regular(fn_ptr) = &call.func else {
+        panic!()
+    };
+    // Assert that this call referes to the method directly, without using a trait ref.
+    let FnPtrKind::Fun(id) = fn_ptr.kind.as_ref() else {
+        panic!()
+    };
+    // This is the function that gets called.
+    let function = &crate_data.fun_decls[*id];
+    assert_eq!(
+        function.item_meta.name.debug_repr(&crate_data),
+        "test_crate::<impl Default for ??>::default"
+    );
+    let FunSource::TraitImpl { .. } = &function.src else {
+        panic!()
+    };
+    Ok(())
+}
+
+#[test]
+fn target_dispatch_source() -> anyhow::Result<()> {
+    let crate_data = translate(
+        "//@ charon-args=--targets=x86_64-apple-darwin,i686-unknown-linux-gnu
+        #[cfg(target_pointer_width = \"64\")]
+        pub fn platform_val() -> u32 { 64 }
+
+        #[cfg(target_pointer_width = \"32\")]
+        pub fn platform_val() -> u32 { 32 }
+        ",
+    )?;
+
+    // Find the dispatcher (the facade with a TargetDispatch body).
+    let real_dispatcher = crate_data
+        .fun_decls
+        .iter()
+        .find(|f| matches!(f.body, Body::TargetDispatch(_)))
+        .expect("should have a TargetDispatch facade");
+    let Body::TargetDispatch(dispatch_map) = &real_dispatcher.body else {
+        unreachable!()
+    };
+
+    // Each target in the dispatch map should point to a function with
+    // `FunSource::TargetDependent` whose `dispatcher` points back to the facade.
+    for (_target, fun_ref) in dispatch_map {
+        let target_fun = &crate_data.fun_decls[fun_ref.id];
+        let FunSource::TargetDependent { dispatcher } = &target_fun.src else {
+            panic!("expected TargetDependent source, got {:?}", target_fun.src)
+        };
+        assert_eq!(dispatcher.id, real_dispatcher.def_id);
+    }
+    Ok(())
+}
+
+#[test]
+fn issue_1184_target_dispatch_unbound_item_generics() -> anyhow::Result<()> {
+    let crate_data = translate(
+        "//@ charon-args=--preset=aeneas --targets=x86_64-unknown-linux-gnu,i686-unknown-linux-gnu
+        pub struct Foo<T>(core::marker::PhantomData<T>);
+
+        impl<T> Foo<T> {
+            pub fn bar() -> usize {
+                #[cfg(target_pointer_width = \"64\")]
+                { 64 }
+                #[cfg(target_pointer_width = \"32\")]
+                { 32 }
+            }
+        }
+        ",
+    )?;
+
+    let real_dispatcher = crate_data
+        .fun_decls
+        .iter()
+        .find(|f| matches!(f.body, Body::TargetDispatch(_)))
+        .expect("should have a TargetDispatch facade");
+    let Body::TargetDispatch(dispatch_map) = &real_dispatcher.body else {
+        unreachable!()
+    };
+
+    fn assert_single_free_type_arg(generics: &GenericArgs) {
+        let ty = generics
+            .types
+            .iter()
+            .exactly_one()
+            .expect("expected one type argument");
+        assert!(matches!(ty.kind(), TyKind::TypeVar(DeBruijnVar::Free(_))));
+    }
+
+    for (_target, fun_ref) in dispatch_map {
+        assert_single_free_type_arg(fun_ref.generics.as_ref());
+        let target_fun = &crate_data.fun_decls[fun_ref.id];
+        let FunSource::TargetDependent { dispatcher } = &target_fun.src else {
+            panic!("expected TargetDependent source, got {:?}", target_fun.src)
+        };
+        assert_single_free_type_arg(dispatcher.generics.as_ref());
+    }
+    Ok(())
+}
+
+#[test]
+fn multiple_deserialize() -> anyhow::Result<()> {
+    // Test that deserializing deduplicated values from two different invocations of Charon works
+    // correctly. This is non-obvious because `HashConsId`s will overlap between two invocations,
+    // yet the deserialization side-table is not reset between deserializations. It's however ok
+    // because the second deserialization simply overrides the `HashConsId -> HashCons<T>` mapping
+    // from the first one. This all breaks down if someone tries to deserialize a sub-value of the
+    // whole crate of course.
+    let krate1 = translate(
+        "
+        fn foo(_: bool) {}
+        fn bar(_: bool) {}
+        ",
+    )?;
+    let krate2 = translate(
+        "
+        fn foo(_: u32) {}
+        fn bar(_: u32) {}
+        ",
+    )?;
+    let ty1_1 = krate1.fun_decls[0].signature.inputs[0].clone();
+    let ty1_2 = krate1.fun_decls[1].signature.inputs[0].clone();
+    let ty2_1 = krate2.fun_decls[0].signature.inputs[0].clone();
+    let ty2_2 = krate2.fun_decls[1].signature.inputs[0].clone();
+    assert_eq!(ty1_1.kind().as_scalar(), Some(&ScalarTy::Bool));
+    assert_eq!(ty1_2, ty1_1);
+    assert_eq!(
+        ty2_1.kind().as_scalar(),
+        Some(&ScalarTy::Integer(IntegerTy::Unsigned(UIntTy::U32)))
+    );
+    assert_eq!(ty2_2, ty2_1);
+    Ok(())
+}

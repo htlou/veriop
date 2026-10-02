@@ -1,0 +1,5 @@
+import Base64ApiPartialRef.Base64ApiPartialRef
+import Base64ApiPartialOpt.Base64ApiPartialOpt
+set_option pp.proofs false
+#print Base64ApiPartialRef.engine.general_purpose.encode_scalar_tail_loop0.mutual
+#print Base64ApiPartialOpt.engine.general_purpose.encode_scalar_tail_loop0.mutual

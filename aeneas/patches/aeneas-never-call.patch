@@ -1,0 +1,18 @@
+diff --git a/src/interp/InterpStatements.ml b/src/interp/InterpStatements.ml
+index 8cc6f8d5..d6bce31b 100644
+--- a/src/interp/InterpStatements.ml
++++ b/src/interp/InterpStatements.ml
+@@ -1548,7 +1548,12 @@ and eval_function_call_symbolic_from_inst_sig (config : config)
+    * by giving {!Unit} to the continuation, because we place us in the case
+    * where we haven't panicked. Of course, the translation needs to take the
+    * panic case into account... *)
+-  ([ (ctx, Unit) ], cc_singleton __FILE__ __LINE__ span cc)
++  if inst_sg.output = TNever then
++    (* Charon omits the successor of a call returning [!]. Keep the call in
++       the trace (it may panic or diverge), but do not explore a return path.
++       The continuation after a successful return is unreachable. *)
++    ([], cf_empty __FILE__ __LINE__ span (cc SA.Panic))
++  else ([ (ctx, Unit) ], cc_singleton __FILE__ __LINE__ span cc)
+ 
+ (** Evaluate a statement seen as a function body *)
+ and eval_function_body (config : config) (body : block) : stl_cm_fun =

@@ -1,0 +1,161 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+struct str {
+  _0: [u8],
+}
+
+// Full name: test_crate::choose
+fn choose<'a, T>(b: bool, x: &'a mut T, y: &'a mut T) -> &'a mut T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: &'1 mut T; // return
+    let b: bool; // arg #1
+    let x: &'2 mut T; // arg #2
+    let y: &'3 mut T; // arg #3
+    let _4: &'4 mut T; // anonymous local
+    let _5: &'5 mut T; // anonymous local
+    let _6: bool; // anonymous local
+    let _7: &'6 mut T; // anonymous local
+
+    storage_live(_0)
+    storage_live(_4)
+    storage_live(_5)
+    storage_live(_6)
+    _6 = copy b
+    if move _6 {
+        storage_live(_7)
+        _7 = &mut (*x)
+        _5 = &mut (*_7)
+        storage_dead(_7)
+    } else {
+        _5 = &mut (*y)
+    }
+    _4 = &mut (*_5)
+    storage_dead(_6)
+    _0 = &mut (*_4)
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_dead(y)
+    storage_dead(x)
+    storage_dead(b)
+    return
+}
+
+// Full name: test_crate::choose_test
+pub fn choose_test()
+{
+    let _0: (); // return
+    let x: i32; // local
+    let y: i32; // local
+    let z: &'1 mut i32; // local
+    let _4: &'2 mut i32; // anonymous local
+    let _5: &'3 mut i32; // anonymous local
+    let _6: &'4 mut i32; // anonymous local
+    let _7: &'5 mut i32; // anonymous local
+    let _8: i32; // anonymous local
+    let _9: bool; // anonymous local
+    let _10: i32; // anonymous local
+    let _11: bool; // anonymous local
+    let _12: i32; // anonymous local
+    let _13: bool; // anonymous local
+    let _14: i32; // anonymous local
+    let _15: bool; // anonymous local
+    let _16: i32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_8)
+    _0 = ()
+    storage_live(x)
+    x = const 0i32
+    fake_read(x)
+    storage_live(y)
+    y = const 0i32
+    fake_read(y)
+    storage_live(z)
+    storage_live(_4)
+    storage_live(_5)
+    _5 = &mut x
+    _4 = &two-phase-mut (*_5)
+    storage_live(_6)
+    storage_live(_7)
+    _7 = &mut y
+    _6 = &two-phase-mut (*_7)
+    z = choose<'7, i32>[{built_in impl Sized for i32}](const true, move _4, move _6)
+    ↳⚡ storage_dead(_8)
+        unwind_continue
+    storage_dead(_6)
+    storage_dead(_4)
+    fake_read(z)
+    storage_dead(_7)
+    storage_dead(_5)
+    _8 = copy (*z) panic.+ const 1i32
+    (*z) = move _8
+    storage_live(_9)
+    storage_live(_10)
+    _10 = copy (*z)
+    _9 = move _10 == const 1i32
+    assert(move _9 == true) else panic(core::panicking::panic)
+    ↳⚡ unwind_continue
+    storage_dead(_10)
+    storage_dead(_9)
+    storage_live(_11)
+    storage_live(_12)
+    // drop(z)
+    _12 = copy x
+    _11 = move _12 == const 1i32
+    assert(move _11 == true) else panic(core::panicking::panic)
+    ↳⚡ unwind_continue
+    storage_dead(_12)
+    storage_dead(_11)
+    storage_live(_13)
+    storage_live(_14)
+    _14 = copy y
+    _13 = move _14 == const 0i32
+    assert(move _13 == true) else panic(core::panicking::panic)
+    ↳⚡ unwind_continue
+    storage_dead(_14)
+    storage_dead(_13)
+    storage_live(_15)
+    storage_live(_16)
+    _16 = copy (*z)
+    _15 = move _16 == const 1i32
+    assert(move _15 == true) else panic(core::panicking::panic)
+    ↳⚡ unwind_continue
+    storage_dead(_16)
+    storage_dead(_15)
+    _0 = ()
+    storage_dead(z)
+    storage_dead(y)
+    storage_dead(x)
+    storage_dead(_8)
+    return
+}
+
+
+

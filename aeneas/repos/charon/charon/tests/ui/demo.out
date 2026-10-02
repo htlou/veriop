@@ -1,0 +1,625 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (type_error("removed allocator parameter"): Sized),
+
+struct () {}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+struct str {
+  _0: [u8],
+}
+
+// Full name: test_crate::choose
+pub fn choose<'a, T>(b: bool, x: &'a mut T, y: &'a mut T) -> &'a mut T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: &'1 mut T; // return
+    let b: bool; // arg #1
+    let x: &'2 mut T; // arg #2
+    let y: &'3 mut T; // arg #3
+    let _4: &'4 mut T; // anonymous local
+    let _5: &'5 mut T; // anonymous local
+    let _6: bool; // anonymous local
+    let _7: &'6 mut T; // anonymous local
+
+    storage_live(_0)
+    storage_live(_4)
+    storage_live(_5)
+    storage_live(_6)
+    _6 = copy b
+    if move _6 {
+        storage_live(_7)
+        _7 = &mut (*x)
+        _5 = &mut (*_7)
+        storage_dead(_7)
+    } else {
+        _5 = &mut (*y)
+    }
+    _4 = &mut (*_5)
+    storage_dead(_6)
+    _0 = &mut (*_4)
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_dead(y)
+    storage_dead(x)
+    storage_dead(b)
+    return
+}
+
+// Full name: test_crate::mul2_add1
+pub fn mul2_add1(x: u32) -> u32
+{
+    let _0: u32; // return
+    let x: u32; // arg #1
+    let _2: u32; // anonymous local
+    let _3: u32; // anonymous local
+    let _4: u32; // anonymous local
+    let _5: u32; // anonymous local
+    let _6: u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_5)
+    storage_live(_6)
+    storage_live(_2)
+    storage_live(_3)
+    _3 = copy x
+    storage_live(_4)
+    _4 = copy x
+    _5 = copy _3 panic.+ copy _4
+    _2 = move _5
+    storage_dead(_4)
+    storage_dead(_3)
+    _6 = copy _2 panic.+ const 1u32
+    _0 = move _6
+    storage_dead(_2)
+    storage_dead(_6)
+    storage_dead(_5)
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::use_mul2_add1
+pub fn use_mul2_add1(x: u32, y: u32) -> u32
+{
+    let _0: u32; // return
+    let x: u32; // arg #1
+    let y: u32; // arg #2
+    let _3: u32; // anonymous local
+    let _4: u32; // anonymous local
+    let _5: u32; // anonymous local
+    let _6: u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_6)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = copy x
+    _3 = mul2_add1(move _4)
+    ↳⚡ storage_dead(_6)
+        storage_dead(y)
+        storage_dead(x)
+        unwind_continue
+    storage_dead(_4)
+    storage_live(_5)
+    _5 = copy y
+    _6 = copy _3 panic.+ copy _5
+    _0 = move _6
+    storage_dead(_5)
+    storage_dead(_3)
+    storage_dead(_6)
+    storage_dead(y)
+    storage_dead(x)
+    return
+}
+
+pub fn test_crate::incr<'a>(x: &'a mut u32)
+{
+    let _0: (); // return
+    let x: &'1 mut u32; // arg #1
+    let _2: u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _0 = ()
+    _2 = copy (*x) panic.+ const 1u32
+    (*x) = move _2
+    _0 = ()
+    storage_dead(_2)
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::use_incr
+pub fn use_incr()
+{
+    let _0: (); // return
+    let x: u32; // local
+    let _2: (); // anonymous local
+    let _3: &'1 mut u32; // anonymous local
+    let _4: &'2 mut u32; // anonymous local
+    let _5: (); // anonymous local
+    let _6: &'3 mut u32; // anonymous local
+    let _7: &'4 mut u32; // anonymous local
+    let _8: (); // anonymous local
+    let _9: &'5 mut u32; // anonymous local
+    let _10: &'6 mut u32; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(x)
+    x = const 0u32
+    fake_read(x)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = &mut x
+    _3 = &two-phase-mut (*_4)
+    _2 = test_crate::incr<'8>(move _3)
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    storage_dead(_4)
+    storage_dead(_2)
+    storage_live(_5)
+    storage_live(_6)
+    storage_live(_7)
+    _7 = &mut x
+    _6 = &two-phase-mut (*_7)
+    _5 = test_crate::incr<'10>(move _6)
+    ↳⚡ unwind_continue
+    storage_dead(_6)
+    storage_dead(_7)
+    storage_dead(_5)
+    storage_live(_8)
+    storage_live(_9)
+    storage_live(_10)
+    _10 = &mut x
+    _9 = &two-phase-mut (*_10)
+    _8 = test_crate::incr<'12>(move _9)
+    ↳⚡ unwind_continue
+    storage_dead(_9)
+    storage_dead(_10)
+    storage_dead(_8)
+    _0 = ()
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::CList
+pub enum CList<T>
+where
+    TraitClause0: (T: Sized),
+{
+  CCons { _0: T, _1: Box<CList<T>[TraitClause0]>[{built_in impl MetaSized for CList<T>[TraitClause0]}, {built_in impl Sized for Global}] },
+  CNil,
+}
+
+// Full name: test_crate::list_nth
+pub fn list_nth<'a, T>(l: &'a CList<T>[TraitClause0], i: u32) -> &'a T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: &'1 T; // return
+    let l: &'3 CList<T>[TraitClause0]; // arg #1
+    let i: u32; // arg #2
+    let x: &'4 T; // local
+    let tl: &'6 Box<CList<T>[TraitClause0]>[{built_in impl MetaSized for CList<T>[TraitClause0]}, {built_in impl Sized for Global}]; // local
+    let _5: bool; // anonymous local
+    let _6: u32; // anonymous local
+    let _7: &'7 T; // anonymous local
+    let _8: &'8 CList<T>[TraitClause0]; // anonymous local
+    let _9: u32; // anonymous local
+    let _10: u32; // anonymous local
+    let _11: u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_11)
+    match (*l) {
+        CList::CCons => {
+        },
+        CList::CNil => {
+            panic(core::panicking::panic)
+            ↳⚡ storage_dead(_11)
+                storage_dead(i)
+                storage_dead(l)
+                unwind_continue
+        },
+    }
+    storage_live(x)
+    x = &((*l) as variant CList::CCons)._0
+    storage_live(tl)
+    tl = &((*l) as variant CList::CCons)._1
+    storage_live(_5)
+    storage_live(_6)
+    _6 = copy i
+    _5 = move _6 == const 0u32
+    if move _5 {
+    } else {
+        storage_dead(_6)
+        storage_live(_7)
+        storage_live(_8)
+        _8 = &(*(*tl))
+        storage_live(_9)
+        storage_live(_10)
+        _10 = copy i
+        _11 = copy _10 panic.- const 1u32
+        _9 = move _11
+        storage_dead(_10)
+        _7 = list_nth<'12, T>[TraitClause0](move _8, move _9)
+        ↳⚡ storage_dead(_11)
+            storage_dead(i)
+            storage_dead(l)
+            unwind_continue
+        _0 = &(*_7)
+        storage_dead(_9)
+        storage_dead(_8)
+        storage_dead(_7)
+        storage_dead(_5)
+        storage_dead(tl)
+        storage_dead(x)
+        storage_dead(_11)
+        storage_dead(i)
+        storage_dead(l)
+        return
+    }
+    storage_dead(_6)
+    _0 = &(*x)
+    storage_dead(_5)
+    storage_dead(tl)
+    storage_dead(x)
+    storage_dead(_11)
+    storage_dead(i)
+    storage_dead(l)
+    return
+}
+
+// Full name: test_crate::list_nth_mut
+pub fn list_nth_mut<'a, T>(l: &'a mut CList<T>[TraitClause0], i: u32) -> &'a mut T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: &'1 mut T; // return
+    let l: &'3 mut CList<T>[TraitClause0]; // arg #1
+    let i: u32; // arg #2
+    let _3: &'4 mut T; // anonymous local
+    let _4: &'5 mut T; // anonymous local
+    let x: &'6 mut T; // local
+    let tl: &'8 mut Box<CList<T>[TraitClause0]>[{built_in impl MetaSized for CList<T>[TraitClause0]}, {built_in impl Sized for Global}]; // local
+    let _7: &'9 mut T; // anonymous local
+    let _8: &'10 mut T; // anonymous local
+    let _9: bool; // anonymous local
+    let _10: u32; // anonymous local
+    let _11: &'11 mut T; // anonymous local
+    let _12: &'12 mut T; // anonymous local
+    let _13: &'13 mut CList<T>[TraitClause0]; // anonymous local
+    let _14: u32; // anonymous local
+    let _15: u32; // anonymous local
+    let _16: u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_16)
+    storage_live(_3)
+    storage_live(_4)
+    match (*l) {
+        CList::CCons => {
+        },
+        CList::CNil => {
+            panic(core::panicking::panic)
+            ↳⚡ storage_dead(_16)
+                storage_dead(i)
+                storage_dead(l)
+                unwind_continue
+        },
+    }
+    storage_live(x)
+    x = &mut ((*l) as variant CList::CCons)._0
+    storage_live(tl)
+    tl = &mut ((*l) as variant CList::CCons)._1
+    storage_live(_7)
+    storage_live(_8)
+    storage_live(_9)
+    storage_live(_10)
+    _10 = copy i
+    _9 = move _10 == const 0u32
+    if move _9 {
+        storage_dead(_10)
+        storage_live(_11)
+        _11 = &mut (*x)
+        _8 = &mut (*_11)
+        storage_dead(_11)
+    } else {
+        storage_dead(_10)
+        storage_live(_12)
+        storage_live(_13)
+        _13 = &two-phase-mut (*(*tl))
+        storage_live(_14)
+        storage_live(_15)
+        _15 = copy i
+        _16 = copy _15 panic.- const 1u32
+        _14 = move _16
+        storage_dead(_15)
+        _12 = list_nth_mut<'17, T>[TraitClause0](move _13, move _14)
+        ↳⚡ storage_dead(_16)
+            storage_dead(i)
+            storage_dead(l)
+            unwind_continue
+        _8 = &mut (*_12)
+        storage_dead(_14)
+        storage_dead(_13)
+        storage_dead(_12)
+    }
+    _7 = &mut (*_8)
+    storage_dead(_9)
+    _4 = &mut (*_7)
+    storage_dead(_8)
+    storage_dead(_7)
+    storage_dead(tl)
+    storage_dead(x)
+    _3 = &mut (*_4)
+    _0 = &mut (*_3)
+    storage_dead(_4)
+    storage_dead(_3)
+    storage_dead(_16)
+    storage_dead(i)
+    storage_dead(l)
+    return
+}
+
+// Full name: test_crate::list_nth_mut1
+pub fn list_nth_mut1<'a, T>(l: &'a mut CList<T>[TraitClause0], i: u32) -> &'a mut T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: &'1 mut T; // return
+    let l: &'3 mut CList<T>[TraitClause0]; // arg #1
+    let i: u32; // arg #2
+    let x: &'4 mut T; // local
+    let tl: &'6 mut Box<CList<T>[TraitClause0]>[{built_in impl MetaSized for CList<T>[TraitClause0]}, {built_in impl Sized for Global}]; // local
+    let _5: bool; // anonymous local
+    let _6: u32; // anonymous local
+    let _7: u32; // anonymous local
+    let _8: &'7 mut CList<T>[TraitClause0]; // anonymous local
+
+    storage_live(_0)
+    storage_live(_7)
+    loop {
+        match (*l) {
+            CList::CCons => {
+                storage_live(x)
+                x = &mut ((*l) as variant CList::CCons)._0
+                storage_live(tl)
+                tl = &mut ((*l) as variant CList::CCons)._1
+                storage_live(_5)
+                storage_live(_6)
+                _6 = copy i
+                _5 = move _6 == const 0u32
+                if move _5 {
+                    storage_dead(_6)
+                    _0 = &mut (*x)
+                    storage_dead(_5)
+                    storage_dead(tl)
+                    storage_dead(x)
+                    storage_dead(_7)
+                    storage_dead(i)
+                    storage_dead(l)
+                    return
+                } else {
+                }
+                storage_dead(_6)
+                storage_dead(_5)
+                _7 = copy i panic.- const 1u32
+                i = move _7
+                storage_live(_8)
+                _8 = &mut (*(*tl))
+                l = move _8
+                storage_dead(_8)
+                storage_dead(tl)
+                storage_dead(x)
+                continue 0
+            },
+            _ => {
+                break 0
+            },
+        }
+    }
+    panic(core::panicking::panic)
+    ↳⚡ storage_dead(_7)
+        storage_dead(i)
+        storage_dead(l)
+        unwind_continue
+}
+
+// Full name: test_crate::i32_id
+pub fn i32_id(i: i32) -> i32
+{
+    let _0: i32; // return
+    let i: i32; // arg #1
+    let _2: bool; // anonymous local
+    let _3: i32; // anonymous local
+    let _4: i32; // anonymous local
+    let _5: i32; // anonymous local
+    let _6: i32; // anonymous local
+    let _7: i32; // anonymous local
+    let _8: i32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_7)
+    storage_live(_8)
+    storage_live(_2)
+    storage_live(_3)
+    _3 = copy i
+    _2 = move _3 == const 0i32
+    if move _2 {
+    } else {
+        storage_dead(_3)
+        storage_live(_4)
+        storage_live(_5)
+        storage_live(_6)
+        _6 = copy i
+        _7 = copy _6 panic.- const 1i32
+        _5 = move _7
+        storage_dead(_6)
+        _4 = i32_id(move _5)
+        ↳⚡ storage_dead(_8)
+            storage_dead(_7)
+            storage_dead(i)
+            unwind_continue
+        storage_dead(_5)
+        _8 = copy _4 panic.+ const 1i32
+        _0 = move _8
+        storage_dead(_4)
+        storage_dead(_2)
+        storage_dead(_8)
+        storage_dead(_7)
+        storage_dead(i)
+        return
+    }
+    storage_dead(_3)
+    _0 = const 0i32
+    storage_dead(_2)
+    storage_dead(_8)
+    storage_dead(_7)
+    storage_dead(i)
+    return
+}
+
+// Full name: test_crate::list_tail
+pub fn list_tail<'a, T>(l: &'a mut CList<T>[TraitClause0]) -> &'a mut CList<T>[TraitClause0]
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+    let _0: &'1 mut CList<T>[TraitClause0]; // return
+    let l: &'2 mut CList<T>[TraitClause0]; // arg #1
+    let _2: &'3 mut CList<T>[TraitClause0]; // anonymous local
+    let _3: &'4 mut CList<T>[TraitClause0]; // anonymous local
+    let tl: &'6 mut Box<CList<T>[TraitClause0]>[{built_in impl MetaSized for CList<T>[TraitClause0]}, {built_in impl Sized for Global}]; // local
+    let _5: &'7 mut CList<T>[TraitClause0]; // anonymous local
+    let _6: &'8 mut CList<T>[TraitClause0]; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    match (*l) {
+        CList::CCons => {
+            storage_live(tl)
+            tl = &mut ((*l) as variant CList::CCons)._1
+            storage_live(_5)
+            storage_live(_6)
+            _6 = &two-phase-mut (*(*tl))
+            _5 = list_tail<'10, T>[TraitClause0](move _6)
+            ↳⚡ storage_dead(l)
+                unwind_continue
+            _3 = &mut (*_5)
+            storage_dead(_6)
+            storage_dead(_5)
+            storage_dead(tl)
+        },
+        CList::CNil => {
+            _3 = move l
+        },
+    }
+    _2 = &mut (*_3)
+    _0 = &mut (*_2)
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(l)
+    return
+}
+
+// Full name: test_crate::Counter
+pub trait Counter<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn incr<'_0_1>;
+    vtable: test_crate::Counter::{vtable}
+}
+
+// Full name: test_crate::{impl Counter for usize}::incr
+pub fn impl_Counter_for_usize::incr<'_0>(self: &'_0 mut usize) -> usize
+{
+    let _0: usize; // return
+    let self: &'1 mut usize; // arg #1
+    let x: usize; // local
+    let _3: usize; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    storage_live(x)
+    x = copy (*self)
+    fake_read(x)
+    _3 = copy (*self) panic.+ const 1usize
+    (*self) = move _3
+    _0 = copy x
+    storage_dead(x)
+    storage_dead(_3)
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl Counter for usize}
+impl "impl_Counter_for_usize" Counter for usize {
+    proof ImpliedClause0: (usize: MetaSized) = {built_in impl MetaSized for usize}
+    fn incr<'_0_1> = impl_Counter_for_usize::incr<'_0_1>
+    vtable: lazy
+}
+
+// Full name: test_crate::use_counter
+pub fn use_counter<'a, T>(cnt: &'a mut T) -> usize
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Counter),
+    TypeOutlives0: T: 'a,
+{
+    let _0: usize; // return
+    let cnt: &'1 mut T; // arg #1
+    let _2: &'2 mut T; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = &two-phase-mut (*cnt)
+    _0 = TraitClause1::incr<'3>(move _2)
+    ↳⚡ storage_dead(cnt)
+        unwind_continue
+    storage_dead(_2)
+    storage_dead(cnt)
+    return
+}
+
+
+

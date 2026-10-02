@@ -1,0 +1,207 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Tuple
+#[fundamental]
+#[lang_item(Tuple)]
+pub trait Tuple<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::ops::function::FnOnce
+#[fundamental]
+#[lang_item(FnOnce)]
+pub trait FnOnce<Self, Args, Self_Output>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Args: Sized)
+    proof ImpliedClause2: (Args: Tuple)
+    proof ImpliedClause3: (Self_Output: Sized)
+    fn call_once;
+    vtable: core::ops::function::FnOnce::{vtable}<Args, Self_Output>
+}
+
+// Full name: core::ops::function::FnMut
+#[fundamental]
+#[lang_item(FnMut)]
+pub trait FnMut<Self, Args, Self_Clause1_Output>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: FnOnce<Args, Self_Clause1_Output>)
+    proof ImpliedClause2: (Args: Sized)
+    proof ImpliedClause3: (Args: Tuple)
+    fn call_mut<'_0_1>;
+    vtable: core::ops::function::FnMut::{vtable}<Args, Self_Clause1_Output>
+}
+
+// Full name: core::ops::function::Fn
+#[fundamental]
+#[lang_item(Fn)]
+pub trait Fn<Self, Args, Self_Clause1_Clause1_Output>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: FnMut<Args, Self_Clause1_Clause1_Output>)
+    proof ImpliedClause2: (Args: Sized)
+    proof ImpliedClause3: (Args: Tuple)
+    fn call<'_0_1>;
+    vtable: core::ops::function::Fn::{vtable}<Args, Self_Clause1_Clause1_Output>
+}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::flabada
+pub fn flabada<'a>(x: &'a ()) -> &'a ()
+{
+    let _0: &'1 (); // return
+    let x: &'2 (); // arg #1
+
+    storage_live(_0)
+    _0 = copy x
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::{impl Fn<(&'a (),), &'a ()> for for<'a> flabada<'a>}::call
+pub fn {impl Fn<(&'a (),), &'a ()> for for<'a> flabada<'a>}::call<'a, '_1>(state: &'_1 for<'a> flabada<'a>, args: (&'a (),)) -> &'a ()
+{
+    let _0: &'a (); // return
+    let state: &'_1 for<'a> flabada<'a>; // arg #1
+    let args: (&'a (),); // arg #2
+
+    storage_live(_0)
+    _0 = flabada<'a>(move args._0)
+    ↳⚡ storage_dead(args)
+        storage_dead(state)
+        unwind_continue
+    storage_dead(args)
+    storage_dead(state)
+    return
+}
+
+// Full name: test_crate::{impl FnMut<(&'a (),), &'a ()> for for<'a> flabada<'a>}::call_mut
+pub fn call_mut<'a, '_1>(state: &'_1 mut for<'a> flabada<'a>, args: (&'a (),)) -> &'a ()
+{
+    let _0: &'a (); // return
+    let state: &'_1 mut for<'a> flabada<'a>; // arg #1
+    let args: (&'a (),); // arg #2
+
+    storage_live(_0)
+    _0 = flabada<'a>(move args._0)
+    ↳⚡ storage_dead(args)
+        storage_dead(state)
+        unwind_continue
+    storage_dead(args)
+    storage_dead(state)
+    return
+}
+
+// Full name: test_crate::{impl FnOnce<(&'a (),), &'a ()> for for<'a> flabada<'a>}::call_once
+pub fn call_once<'a>(state: for<'a> flabada<'a>, args: (&'a (),)) -> &'a ()
+{
+    let _0: &'a (); // return
+    let state: for<'a> flabada<'a>; // arg #1
+    let args: (&'a (),); // arg #2
+
+    storage_live(_0)
+    _0 = flabada<'a>(move args._0)
+    ↳⚡ storage_dead(args)
+        storage_dead(state)
+        unwind_continue
+    storage_dead(args)
+    storage_dead(state)
+    return
+}
+
+// Full name: test_crate::{impl FnOnce<(&'a (),), &'a ()> for for<'a> flabada<'a>}
+impl<'a> FnOnce<(&'a (),), &'a ()> for for<'a> flabada<'a> {
+    proof ImpliedClause0: (for<'a> flabada<'a>: MetaSized) = {built_in impl MetaSized for for<'a> flabada<'a>}
+    proof ImpliedClause1: ((&'a (),): Sized) = {built_in impl Sized for (&'a (),)}
+    proof ImpliedClause2: ((&'a (),): Tuple) = {built_in impl Tuple for (&'a (),)}
+    proof ImpliedClause3: (&'a (): Sized) = {built_in impl Sized for &'a ()}
+    fn call_once = call_once<'a>
+    vtable: lazy
+}
+
+// Full name: test_crate::{impl FnMut<(&'a (),), &'a ()> for for<'a> flabada<'a>}
+impl<'a> FnMut<(&'a (),), &'a ()> for for<'a> flabada<'a> {
+    proof ImpliedClause0: (for<'a> flabada<'a>: MetaSized) = {built_in impl MetaSized for for<'a> flabada<'a>}
+    proof ImpliedClause1: (for<'a> flabada<'a>: FnOnce<(&'a (),), &'a ()>) = {impl FnOnce<(&'a (),), &'a ()> for for<'a> flabada<'a>}<'a>
+    proof ImpliedClause2: ((&'a (),): Sized) = {built_in impl Sized for (&'a (),)}
+    proof ImpliedClause3: ((&'a (),): Tuple) = {built_in impl Tuple for (&'a (),)}
+    fn call_mut<'_0_1> = call_mut<'a, '_0_1>
+    vtable: lazy
+}
+
+// Full name: test_crate::{impl Fn<(&'a (),), &'a ()> for for<'a> flabada<'a>}
+impl<'a> Fn<(&'a (),), &'a ()> for for<'a> flabada<'a> {
+    proof ImpliedClause0: (for<'a> flabada<'a>: MetaSized) = {built_in impl MetaSized for for<'a> flabada<'a>}
+    proof ImpliedClause1: (for<'a> flabada<'a>: FnMut<(&'a (),), &'a ()>) = {impl FnMut<(&'a (),), &'a ()> for for<'a> flabada<'a>}<'a>
+    proof ImpliedClause2: ((&'a (),): Sized) = {built_in impl Sized for (&'a (),)}
+    proof ImpliedClause3: ((&'a (),): Tuple) = {built_in impl Tuple for (&'a (),)}
+    fn call<'_0_1> = {impl Fn<(&'a (),), &'a ()> for for<'a> flabada<'a>}::call<'a, '_0_1>
+    vtable: lazy
+}
+
+pub fn test_crate::call<'b, F>(_1: F)
+where
+    TraitClause0: (F: Sized),
+    TraitClause1: (F: Fn<(&'b (),), &'b ()>),
+{
+    let _0: (); // return
+    let _1: F; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    conditional_drop[{built_in impl Destruct for F}::drop_glue<'0>] _1
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::flibidi
+pub fn flibidi()
+{
+    let _0: (); // return
+    let _1: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = test_crate::call<'0, for<'a> flabada<'a>>[{built_in impl Sized for for<'a> flabada<'a>}, {impl Fn<(&'a (),), &'a ()> for for<'a> flabada<'a>}<'0>](const flabada<'12>)
+    ↳⚡ unwind_continue
+    storage_dead(_1)
+    _0 = ()
+    return
+}
+
+
+

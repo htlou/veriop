@@ -1,0 +1,83 @@
+name: Rust
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup nightly Rust Toolchain
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: nightly
+        # 'rust-src' component is needed for fuzzing with `--sanitizer=memory`
+        components: rust-src
+    - uses: actions/checkout@v3
+    - name: Install fmt
+      run: rustup component add rustfmt
+    - name: Ensure no_std compiles
+      run: cargo build --no-default-features
+    - name: Ensure no_std compiles for safe-decode
+      run: cargo build --no-default-features --features safe-decode
+    - name: Ensure no_std compiles for safe-encode
+      run: cargo build --no-default-features --features safe-encode
+    - name: Ensure no_std compiles for safe-encode and safe-decode
+      run: cargo build --no-default-features --features safe-encode --features safe-decode
+    - name: Ensure no_std compiles with alloc
+      run: cargo build --no-default-features --features alloc
+    - name: Ensure no_std compiles with alloc for safe-encode and safe-decode
+      run: cargo build --no-default-features --features alloc --features safe-encode --features safe-decode
+    - name: Build
+      run: cargo build --verbose
+    - name: Check Formatting
+      run: cargo +nightly fmt --all -- --check
+    - name: Run tests
+      run: cargo test
+    - name: Run tests with nightly
+      run: cargo +nightly test --features nightly
+    - name: Run tests safe-encode
+      run: cargo test --features safe-encode
+    - name: Run tests safe-decode
+      run: cargo test --features safe-decode
+    - name: Run tests --no-default-features with frame
+      run: cargo test --no-default-features --features frame
+    - name: Run tests --no-default-features with frame, with nightly features
+      run: cargo +nightly test --no-default-features --features frame --features nightly
+    - name: Run tests unsafe with checked-decode and frame
+      run: cargo test --no-default-features --features frame
+    - name: Run tests without alloc
+      run: cargo test --no-default-features --test no_alloc
+    - name: Run tests without alloc for safe-encode and safe-decode
+      run: cargo test --no-default-features --features safe-encode --features safe-decode --test no_alloc
+    - name: Install cargo fuzz
+      run: cargo install cargo-fuzz
+    - name: Run fuzz tests (safe)
+      run: for fuzz_test in `cargo fuzz list`; do cargo +nightly fuzz run $fuzz_test -- -max_total_time=30 || exit 1; done
+    - name: Run fuzz tests (unsafe)
+      run: for fuzz_test in `cargo fuzz list`; do cargo +nightly fuzz run $fuzz_test --no-default-features -- -max_total_time=30 || exit 1; done
+    - name: Run decompress fuzz test (unsafe; memory sanitizer)
+      # Only run this single test because this fuzz target is where invalid memory access might occur
+      # (uses decompress functions which create uninitialized `Vec`); running all fuzz tests with MemorySanitizer
+      # might make them less effective due to the slowdown from the sanitizer
+      # Have to run with `--dev` because otherwise memory access might be optimized away
+      # Note that the stack traces reported by MemorySanitizer here are not readable;
+      # that would require llvm-symbolizer, see https://clang.llvm.org/docs/MemorySanitizer.html#report-symbolization
+      # But setting up llvm-symbolizer here might not be worth it; can do that locally when reproducing the issue
+      run: cargo +nightly fuzz run fuzz_decomp_corrupt_block --no-default-features --sanitizer=memory --dev -- -max_total_time=30
+
+  semver:
+    name: semver
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v2
+        with:
+          rust-toolchain: ${{ env.rust_stable }}
+          release-type: minor

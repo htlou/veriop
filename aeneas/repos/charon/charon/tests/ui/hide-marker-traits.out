@@ -1,0 +1,49 @@
+# Final LLBC before serialization:
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::Idx
+trait Idx<Self>
+
+// Full name: test_crate::IndexVec
+pub struct IndexVec<I>
+where
+    TraitClause0: (I: Idx),
+{
+  i: I,
+}
+
+// Full name: test_crate::Vector
+pub struct Vector<I>
+where
+    TraitClause0: (I: Idx),
+{
+  vector: IndexVec<I>[TraitClause0],
+}
+
+// Full name: test_crate::foo
+fn foo<T>(_x: T)
+{
+    let _0: (); // return
+    let _x: T; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    conditional_drop[{built_in impl Destruct for T}::drop_glue<'0>] _x
+    ↳⚡ storage_dead(_x)
+        unwind_continue
+    storage_dead(_x)
+    return
+}
+
+
+

@@ -1,0 +1,90 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+// Full name: core::option::Option::<u8>
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option::<u8> {
+  None,
+  Some { _0: u8 },
+}
+
+// Full name: core::option::{impl Clone for Option::<u8>}
+impl Clone for Option::<u8> {
+    proof ImpliedClause0: (Option::<u8>: Sized) = {built_in impl Sized for Option::<u8>}
+    non-dyn-compatible
+}
+
+// Full name: core::option::{impl Copy for Option::<u8>}
+impl Copy for Option::<u8> {
+    proof ImpliedClause0: (Option::<u8>: MetaSized) = {built_in impl MetaSized for Option::<u8>}
+    proof ImpliedClause1: (Option::<u8>: Clone) = {impl Clone for Option::<u8>}
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: test_crate::init_option
+fn init_option()
+{
+    let _0: (); // return
+    let a: [Option::<u8>; 6usize]; // local
+    let _2: Option::<u8>; // anonymous local
+    let b: Option::<u8>; // local
+    let _4: usize; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(a)
+    storage_live(_2)
+    _2 = Option::<u8>::Some { _0: const 4u8 }
+    a = [move _2; 6usize]
+    storage_dead(_2)
+    fake_read(a)
+    storage_live(b)
+    storage_live(_4)
+    _4 = const 0usize
+    fake_read(a)
+    b = copy a[copy _4]
+    fake_read(b)
+    storage_dead(_4)
+    _0 = ()
+    storage_dead(b)
+    storage_dead(a)
+    return
+}
+
+
+

@@ -1,0 +1,395 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::array::{[T; N]}::as_slice
+pub fn as_slice<'_0, T, const N : usize>(_1: &'_0 [T; N]) -> &'_0 [T]
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+struct () {}
+
+// Full name: core::ptr::const_ptr::{*const T}::addr
+pub fn addr<T>(_1: *const T) -> usize
+= <opaque>
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: core::num::{usize}::overflowing_add_signed
+pub fn overflowing_add_signed(_1: usize, _2: isize) -> (usize, bool)
+= <opaque>
+
+// Full name: core::num::{isize}::checked_mul
+pub fn checked_mul(_1: isize, _2: isize) -> Option<isize>[{built_in impl Sized for isize}]
+= <opaque>
+
+// Full name: core::ptr::const_ptr::{*const T}::offset::runtime_offset_nowrap::runtime
+fn runtime(this: *const (), count: isize, size: usize) -> bool
+{
+    let _0: bool; // return
+    let this: *const (); // arg #1
+    let count: isize; // arg #2
+    let size: usize; // arg #3
+    let byte_offset: isize; // local
+    let _5: Option<isize>[{built_in impl Sized for isize}]; // anonymous local
+    let _6: isize; // anonymous local
+    let _7: isize; // anonymous local
+    let _8: usize; // anonymous local
+    let overflow: bool; // local
+    let _10: (usize, bool); // anonymous local
+    let _11: usize; // anonymous local
+    let _12: *const (); // anonymous local
+    let _13: isize; // anonymous local
+    let _14: bool; // anonymous local
+
+    storage_live(_0)
+    storage_live(_5)
+    storage_live(_6)
+    _6 = copy count
+    storage_live(_7)
+    storage_live(_8)
+    _8 = copy size
+    _7 = cast<usize, isize>(move _8)
+    storage_dead(_8)
+    _5 = checked_mul(move _6, move _7)
+    ↳⚡ storage_dead(size)
+        storage_dead(count)
+        storage_dead(this)
+        unwind_continue
+    storage_dead(_7)
+    storage_dead(_6)
+    match _5 {
+        Option::Some => {
+        },
+        _ => {
+            storage_dead(_5)
+            _0 = const false
+            storage_dead(size)
+            storage_dead(count)
+            storage_dead(this)
+            return
+        },
+    }
+    storage_live(byte_offset)
+    byte_offset = copy (_5 as variant Option::Some)._0
+    storage_dead(_5)
+    storage_live(_10)
+    storage_live(_11)
+    storage_live(_12)
+    _12 = copy this
+    _11 = addr<()>(move _12)
+    ↳⚡ storage_dead(size)
+        storage_dead(count)
+        storage_dead(this)
+        unwind_continue
+    storage_dead(_12)
+    storage_live(_13)
+    _13 = copy byte_offset
+    _10 = overflowing_add_signed(move _11, move _13)
+    ↳⚡ storage_dead(size)
+        storage_dead(count)
+        storage_dead(this)
+        unwind_continue
+    storage_dead(_13)
+    storage_dead(_11)
+    storage_live(overflow)
+    overflow = copy _10._1
+    storage_dead(_10)
+    storage_live(_14)
+    _14 = copy overflow
+    _0 = ~(move _14)
+    storage_dead(_14)
+    storage_dead(overflow)
+    storage_dead(byte_offset)
+    storage_dead(size)
+    storage_dead(count)
+    storage_dead(this)
+    return
+}
+
+// Full name: core::mem::size_of
+#[diagnostic_item("mem_size_of")]
+pub fn size_of<T>() -> usize
+where
+    TraitClause0: (T: Sized),
+= <opaque>
+
+// Full name: core::panicking::panic_nounwind_fmt
+#[track_caller]
+pub fn panic_nounwind_fmt<'_0>(_1: Arguments<'_0>, _2: bool) -> !
+= <opaque>
+
+// Full name: core::ub_checks::check_language_ub
+fn check_language_ub() -> bool
+= <opaque>
+
+struct str {
+  _0: [u8],
+}
+
+struct (_, _, _)<A, B, C>
+where
+    TraitClause0: (A: Sized),
+    TraitClause1: (B: Sized),
+{
+  _0: A,
+  _1: B,
+  _2: C,
+}
+
+// Full name: core::ptr::const_ptr::{*const T}::offset::runtime_offset_nowrap
+fn runtime_offset_nowrap(this: *const (), count: isize, size: usize) -> bool
+{
+    let _0: bool; // return
+    let this: *const (); // arg #1
+    let count: isize; // arg #2
+    let size: usize; // arg #3
+    let _4: (*const (), isize, usize); // anonymous local
+    let _5: *const (); // anonymous local
+    let _6: isize; // anonymous local
+    let _7: usize; // anonymous local
+
+    storage_live(_0)
+    storage_live(_4)
+    storage_live(_5)
+    _5 = copy this
+    storage_live(_6)
+    _6 = copy count
+    storage_live(_7)
+    _7 = copy size
+    _4 = (move _5, move _6, move _7)
+    storage_dead(_7)
+    storage_dead(_6)
+    storage_dead(_5)
+    _0 = runtime(move _4._0, move _4._1, move _4._2)
+    ↳⚡ storage_dead(size)
+        storage_dead(count)
+        storage_dead(this)
+        unwind_continue
+    storage_dead(_4)
+    storage_dead(size)
+    storage_dead(count)
+    storage_dead(this)
+    return
+}
+
+// Full name: core::ptr::const_ptr::{*const T}::offset::precondition_check
+#[track_caller]
+fn precondition_check(this: *const (), count: isize, size: usize)
+{
+    let _0: (); // return
+    let this: *const (); // arg #1
+    let count: isize; // arg #2
+    let size: usize; // arg #3
+    let _4: bool; // anonymous local
+    let _5: *const (); // anonymous local
+    let _6: isize; // anonymous local
+    let _7: usize; // anonymous local
+    let msg: &'1 str; // local
+    let _9: !; // anonymous local
+    let _10: Arguments<'3>; // anonymous local
+    let _11: &'4 str; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_4)
+    storage_live(_5)
+    _5 = copy this
+    storage_live(_6)
+    _6 = copy count
+    storage_live(_7)
+    _7 = copy size
+    _4 = runtime_offset_nowrap(move _5, move _6, move _7)
+    ↳⚡ storage_dead(_10)
+        storage_dead(_9)
+        storage_dead(msg)
+        storage_dead(size)
+        storage_dead(count)
+        storage_dead(this)
+        unwind_terminate
+    if move _4 {
+    } else {
+        storage_dead(_7)
+        storage_dead(_6)
+        storage_dead(_5)
+        storage_live(msg)
+        msg = const "unsafe precondition(s) violated: ptr::offset requires the address calculation to not overflow\n\nThis indicates a bug in the program. This Undefined Behavior check is optional, and cannot be relied on for safety."
+        storage_live(_9)
+        storage_live(_10)
+        storage_live(_11)
+        _11 = &(*msg) with_metadata(copy msg.metadata)
+        _10 = from_str<'6>(move _11)
+        ↳⚡ storage_dead(_10)
+            storage_dead(_9)
+            storage_dead(msg)
+            storage_dead(size)
+            storage_dead(count)
+            storage_dead(this)
+            unwind_terminate
+        storage_dead(_11)
+        _9 = panic_nounwind_fmt<'8>(move _10, const false)
+        ↳⚡ undefined_behavior
+    }
+    storage_dead(_7)
+    storage_dead(_6)
+    storage_dead(_5)
+    _0 = ()
+    storage_dead(_4)
+    storage_dead(_10)
+    storage_dead(_9)
+    storage_dead(msg)
+    storage_dead(size)
+    storage_dead(count)
+    storage_dead(this)
+    return
+}
+
+// Full name: core::ptr::const_ptr::{*const T}::offset
+#[track_caller]
+pub unsafe fn offset<T>(self: *const T, count: isize) -> *const T
+where
+    TraitClause0: (T: Sized),
+{
+    let _0: *const T; // return
+    let self: *const T; // arg #1
+    let count: isize; // arg #2
+    let _3: bool; // anonymous local
+    let _4: (); // anonymous local
+    let _5: *const (); // anonymous local
+    let _6: *const T; // anonymous local
+    let _7: isize; // anonymous local
+    let _8: usize; // anonymous local
+    let _9: *const T; // anonymous local
+    let _10: isize; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    _3 = check_language_ub()
+    ↳⚡ storage_dead(count)
+        storage_dead(self)
+        unwind_continue
+    if move _3 {
+        storage_live(_4)
+        storage_live(_5)
+        storage_live(_6)
+        _6 = copy self
+        _5 = cast<*const T, *const ()>(move _6)
+        storage_dead(_6)
+        storage_live(_7)
+        _7 = copy count
+        storage_live(_8)
+        _8 = size_of<T>[TraitClause0]()
+        ↳⚡ storage_dead(count)
+            storage_dead(self)
+            unwind_continue
+        _4 = precondition_check(move _5, move _7, move _8)
+        ↳⚡ undefined_behavior
+        storage_dead(_8)
+        storage_dead(_7)
+        storage_dead(_5)
+        storage_dead(_4)
+    } else {
+    }
+    storage_dead(_3)
+    storage_live(_9)
+    _9 = copy self
+    storage_live(_10)
+    _10 = copy count
+    _0 = move _9 offset move _10
+    storage_dead(_10)
+    storage_dead(_9)
+    storage_dead(count)
+    storage_dead(self)
+    return
+}
+
+// Full name: core::slice::{[T]}::as_ptr
+pub fn as_ptr<'_0, T>(_1: &'_0 [T]) -> *const T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let s: [i32; 2usize]; // local
+    let ptr: *const i32; // local
+    let _3: &'1 [i32]; // anonymous local
+    let _4: &'3 [i32; 2usize]; // anonymous local
+    let _5: bool; // anonymous local
+    let _6: i32; // anonymous local
+    let _7: *const i32; // anonymous local
+    let _8: *const i32; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(s)
+    s = [const 11i32, const 42i32]
+    fake_read(s)
+    storage_live(ptr)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = &s
+    _3 = as_slice<'_, i32, 2usize>[{built_in impl Sized for i32}](move _4)
+    ↳⚡ undefined_behavior
+    storage_dead(_4)
+    ptr = as_ptr<'6, i32>[{built_in impl Sized for i32}](move _3)
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    fake_read(ptr)
+    storage_live(_5)
+    storage_live(_6)
+    storage_live(_7)
+    storage_live(_8)
+    _8 = copy ptr
+    _7 = offset<i32>[{built_in impl Sized for i32}](move _8, const 1isize)
+    ↳⚡ unwind_continue
+    storage_dead(_8)
+    _6 = copy (*_7)
+    _5 = move _6 == const 42i32
+    assert(move _5 == true) else panic(core::panicking::panic)
+    ↳⚡ unwind_continue
+    storage_dead(_6)
+    storage_dead(_7)
+    storage_dead(_5)
+    _0 = ()
+    storage_dead(ptr)
+    storage_dead(s)
+    return
+}
+
+
+

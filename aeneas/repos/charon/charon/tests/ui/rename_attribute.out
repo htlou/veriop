@@ -1,0 +1,174 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+// Full name: test_crate::BoolTrait
+#[charon::rename("BoolTest")]
+pub trait BoolTrait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    #[charon::rename("getTest")]
+    fn get_bool<'_0_1>;
+    #[charon::rename("retTest")]
+    fn ret_true<'_0_1> = test_crate::BoolTrait::ret_true<'_0_1, Self>[Self]
+    vtable: test_crate::BoolTrait::{vtable}
+}
+
+#[charon::rename("retTest")]
+pub fn test_crate::BoolTrait::ret_true<'_0, Self>(self: &'_0 Self) -> bool
+where
+    TraitClause0: (Self: BoolTrait),
+    TypeOutlives0: Self: '_0,
+{
+    let _0: bool; // return
+    let self: &'1 Self; // arg #1
+
+    storage_live(_0)
+    _0 = const true
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl BoolTrait for bool}::get_bool
+pub fn get_bool<'_0>(self: &'_0 bool) -> bool
+{
+    let _0: bool; // return
+    let self: &'1 bool; // arg #1
+
+    storage_live(_0)
+    _0 = copy (*self)
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl BoolTrait for bool}::ret_true
+#[charon::rename("retTest")]
+pub fn impl_BoolTrait_for_bool::ret_true<'_0>(self: &'_0 bool) -> bool
+{
+    let _0: bool; // return
+    let self: &'1 bool; // arg #1
+
+    storage_live(_0)
+    _0 = const true
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl BoolTrait for bool}
+impl "impl_BoolTrait_for_bool" BoolTrait for bool {
+    proof ImpliedClause0: (bool: MetaSized) = {built_in impl MetaSized for bool}
+    fn get_bool<'_0_1> = get_bool<'_0_1>
+    fn ret_true<'_0_1> = impl_BoolTrait_for_bool::ret_true<'_0_1>
+    vtable: lazy
+}
+
+// Full name: test_crate::test_bool_trait
+#[charon::rename("BoolFn")]
+pub fn test_bool_trait<T>(x: bool) -> bool
+where
+    TraitClause0: (T: Sized),
+{
+    let _0: bool; // return
+    let x: bool; // arg #1
+    let _2: bool; // anonymous local
+    let _3: &'1 bool; // anonymous local
+    let _4: &'2 bool; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    _3 = &x
+    _2 = get_bool<'4>(move _3)
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    if move _2 {
+    } else {
+        storage_dead(_3)
+        _0 = const false
+        storage_dead(_2)
+        storage_dead(x)
+        return
+    }
+    storage_dead(_3)
+    storage_live(_4)
+    _4 = &x
+    _0 = impl_BoolTrait_for_bool::ret_true<'6>(move _4)
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    storage_dead(_4)
+    storage_dead(_2)
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::Test
+#[charon::rename("TypeTest")]
+type Test = i32
+
+// Full name: test_crate::SimpleEnum
+#[charon::rename("VariantsTest")]
+enum SimpleEnum {
+  FirstVariant,
+  SecondVariant,
+  ThirdVariant,
+}
+
+// Full name: test_crate::Foo
+#[charon::rename("StructTest")]
+struct Foo {
+  field1: u32,
+}
+
+// Full name: test_crate::C
+#[charon::rename("Const_Test")]
+fn C() -> u32
+{
+    let _0: u32; // return
+    let _1: u32; // anonymous local
+    let _2: u32; // anonymous local
+    let _3: u32; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_1)
+    _2 = const 100u32 panic.+ const 10u32
+    _1 = move _2
+    _3 = copy _1 panic.+ const 1u32
+    _0 = move _3
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::C
+#[charon::rename("Const_Test")]
+const C: u32 = C()
+
+// Full name: test_crate::Test2
+#[charon::rename("_TypeAeneas36")]
+type Test2 = u32
+
+
+

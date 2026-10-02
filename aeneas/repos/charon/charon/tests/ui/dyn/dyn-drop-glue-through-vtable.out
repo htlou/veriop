@@ -1,0 +1,175 @@
+# Final LLBC before serialization:
+
+// Full name: core::alloc::layout::Layout
+#[lang_item(AllocLayout)]
+pub opaque type Layout
+
+// Full name: core::alloc::AllocError
+pub struct AllocError {}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+opaque type core::marker::MetaSized::{vtable}
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::result::Result
+#[diagnostic_item("Result")]
+pub enum Result<T, E>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+    TraitClause2: (T: Destruct),
+    TraitClause3: (E: Destruct),
+{
+  Ok { _0: T },
+  Err { _0: E },
+}
+
+// Full name: core::ptr::non_null::NonNull
+#[lang_item(NonNull)]
+pub opaque type NonNull<T>
+where
+    TraitClause0: (T: Destruct),
+
+// Full name: core::alloc::Allocator
+pub unsafe trait Allocator<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Destruct)
+    fn allocate<'_0_1>;
+    fn deallocate<'_0_1>;
+    vtable: core::alloc::Allocator::{vtable}
+}
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: alloc::alloc::{impl Allocator for Global}::deallocate
+#[track_caller]
+pub unsafe fn deallocate<'_0>(_1: &'_0 Global, _2: NonNull<u8>[{built_in impl Destruct for u8}], _3: Layout)
+= <opaque>
+
+// Full name: alloc::alloc::{impl Allocator for Global}::allocate
+#[track_caller]
+pub fn allocate<'_0>(_1: &'_0 Global, _2: Layout) -> Result<NonNull<[u8]>[{built_in impl Destruct for [u8]}], AllocError>[{built_in impl Sized for NonNull<[u8]>[{built_in impl Destruct for [u8]}]}, {built_in impl Sized for AllocError}, {built_in impl Destruct for NonNull<[u8]>[{built_in impl Destruct for [u8]}]}, {built_in impl Destruct for AllocError}]
+= <opaque>
+
+// Full name: alloc::alloc::{impl Allocator for Global}
+unsafe impl "impl_Allocator_for_Global" Allocator for Global {
+    proof ImpliedClause0: (Global: MetaSized) = {built_in impl MetaSized for Global}
+    proof ImpliedClause1: (Global: Destruct) = {built_in impl Destruct for Global}
+    fn allocate<'_0_1> = allocate<'_0_1>
+    fn deallocate<'_0_1> = deallocate<'_0_1>
+    vtable: lazy
+}
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T, A>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (A: Sized),
+    TraitClause2: (A: Allocator),
+    TraitClause3: (T: Destruct),
+    TraitClause4: (A: Destruct),
+
+// Full name: alloc::boxed::Box::{impl Destruct for Box<T, A>[TraitClause0, TraitClause1, TraitClause2, TraitClause3, TraitClause4]}::drop_glue
+unsafe fn impl_Destruct_for_Box::drop_glue<'_0, T, A>(_1: &'_0 mut Box<T, A>[TraitClause0, TraitClause1, TraitClause2, TraitClause3, TraitClause4])
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (A: Sized),
+    TraitClause2: (A: Allocator),
+    TraitClause3: (T: Destruct),
+    TraitClause4: (A: Destruct),
+    TypeOutlives0: T: '_0,
+    TypeOutlives1: A: '_0,
+= <opaque>
+
+struct test_crate::T::{vtable} {
+  size: usize,
+  align: usize,
+  drop: unsafe fn<'_0_1>(&'_0_1 mut (dyn T)),
+  super_trait_0: &'static core::marker::MetaSized::{vtable},
+}
+
+// Full name: test_crate::T
+trait T<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Destruct)
+    vtable: test_crate::T::{vtable}
+}
+
+// Full name: test_crate::A
+struct A {
+  _0: (dyn T + 'static),
+}
+
+// Full name: test_crate::A::{impl Destruct for A}::drop_glue
+unsafe fn impl_Destruct_for_A::drop_glue<'_0>(_1: &'_0 mut A)
+{
+    let _0: (); // return
+    let _1: &'1 mut A; // arg #1
+    let drop_arg: &'_ mut (dyn T + '6); // local
+    let drop_ret: (); // local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(drop_arg)
+    drop_arg = &mut (*_1)._0 with_metadata(copy _1.metadata)
+    storage_live(drop_ret)
+    drop_ret = (copy (*drop_arg.metadata).drop)(move drop_arg)
+    ↳⚡ unwind_continue
+    return
+}
+
+// Full name: test_crate::A::{impl Destruct for A}
+impl "impl_Destruct_for_A" Destruct for A {
+    fn drop_glue<'_0_1> = impl_Destruct_for_A::drop_glue<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: test_crate::f
+fn f(_1: Box<A, Global>[{built_in impl MetaSized for A}, {built_in impl Sized for Global}, impl_Allocator_for_Global, impl_Destruct_for_A, {built_in impl Destruct for Global}])
+{
+    let _0: (); // return
+    let _1: Box<A, Global>[{built_in impl MetaSized for A}, {built_in impl Sized for Global}, impl_Allocator_for_Global, impl_Destruct_for_A, {built_in impl Destruct for Global}]; // arg #1
+    let drop_arg: &'_ mut Box<A, Global>[{built_in impl MetaSized for A}, {built_in impl Sized for Global}, impl_Allocator_for_Global, impl_Destruct_for_A, {built_in impl Destruct for Global}]; // local
+    let drop_ret: (); // local
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_live(drop_arg)
+    drop_arg = &mut _1
+    storage_live(drop_ret)
+    drop_ret = impl_Destruct_for_Box::drop_glue<'0, A, Global>[{built_in impl MetaSized for A}, {built_in impl Sized for Global}, impl_Allocator_for_Global, impl_Destruct_for_A, {built_in impl Destruct for Global}](move drop_arg)
+    ↳⚡ unwind_continue
+    return
+}
+
+
+
