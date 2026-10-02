@@ -1,0 +1,212 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: core::iter::traits::iterator::Iterator
+#[lang_item(Iterator)]
+#[diagnostic_item("Iterator")]
+pub trait Iterator<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Item: Sized)
+    type Item
+    fn next<'_0_1>;
+    vtable: core::iter::traits::iterator::Iterator::{vtable}<Self::Item>
+}
+
+// Full name: core::iter::traits::collect::IntoIterator
+#[diagnostic_item("IntoIterator")]
+pub trait IntoIterator<Self>
+where
+    TypeConstraint0: Self::ImpliedClause3::Item = Self::Item,
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Item: Sized)
+    proof ImpliedClause2: (Self::IntoIter: Sized)
+    proof ImpliedClause3: (Self::IntoIter: Iterator)
+    type Item
+    type IntoIter
+    fn into_iter;
+    vtable: core::iter::traits::collect::IntoIterator::{vtable}<Self::Item, Self::IntoIter>
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Tuple
+#[fundamental]
+#[lang_item(Tuple)]
+pub trait Tuple<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::ops::function::FnOnce
+#[fundamental]
+#[lang_item(FnOnce)]
+pub trait FnOnce<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Args: Sized)
+    proof ImpliedClause2: (Args: Tuple)
+    proof ImpliedClause3: (Self::Output: Sized)
+    type Output
+    fn call_once;
+    vtable: core::ops::function::FnOnce::{vtable}<Args, Self::Output>
+}
+
+// Full name: core::ops::function::FnMut
+#[fundamental]
+#[lang_item(FnMut)]
+pub trait FnMut<Self, Args>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: FnOnce<Args>)
+    proof ImpliedClause2: (Args: Sized)
+    proof ImpliedClause3: (Args: Tuple)
+    fn call_mut<'_0_1>;
+    vtable: core::ops::function::FnMut::{vtable}<Args, Self::ImpliedClause1::Output>
+}
+
+// Full name: core::result::Result
+#[diagnostic_item("Result")]
+pub enum Result<T, E>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+{
+  Ok { _0: T },
+  Err { _0: E },
+}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+// Full name: test_crate::foo
+fn foo<F>(_f: F)
+where
+    TraitClause0: (F: Sized),
+    TraitClause1: for<'a> (F: FnMut<(&'a (),)>),
+    TypeConstraint0: for<'a> TraitClause1::ImpliedClause1::Output = (),
+{
+    let _0: (); // return
+    let _f: F; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    conditional_drop[{built_in impl Destruct for F}::drop_glue<'0>] _f
+    ↳⚡ storage_dead(_f)
+        unwind_continue
+    storage_dead(_f)
+    return
+}
+
+// Full name: test_crate::bar
+fn bar<'b, T>()
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'b,
+    TypeOutlives1: for<'a> &'b T: 'a,
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::f
+pub fn f<'a>(_1: &'a ()) -> Option<(&'a u8,)>[{built_in impl Sized for (&'a u8,)}]
+{
+    let _0: Option<(&'12 u8,)>[{built_in impl Sized for (&'12 u8,)}]; // return
+    let _1: &'17 (); // arg #1
+
+    storage_live(_0)
+    _0 = Option::None {  }
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::Trait
+pub trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    vtable: test_crate::Trait::{vtable}
+}
+
+// Full name: test_crate::{impl Trait for Result<T, U>[TraitClause0, TraitClause1]}
+impl<T, U> "impl_Trait_for_Result" Trait for Result<T, U>[TraitClause0, TraitClause1]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (U: Sized),
+    TraitClause2: for<'a> (&'a Result<T, U>[TraitClause0, TraitClause1]: IntoIterator),
+    TraitClause3: for<'a> (TraitClause2::Item: Copy),
+{
+    proof ImpliedClause0: (Result<T, U>[TraitClause0, TraitClause1]: MetaSized) = {built_in impl MetaSized for Result<T, U>[TraitClause0, TraitClause1]}
+    vtable: lazy
+}
+
+
+

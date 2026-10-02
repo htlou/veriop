@@ -1,0 +1,55 @@
+diff --git a/src/sink.rs b/src/sink.rs
+index 063b942..5e17757 100644
+--- a/src/sink.rs
++++ b/src/sink.rs
+@@ -192,8 +192,19 @@ impl Sink for SliceSink<'_> {
+     #[cfg_attr(feature = "nightly", optimize(size))] // to avoid loop unrolling
+     fn extend_from_within_overlapping(&mut self, start: usize, num_bytes: usize) {
+         let offset = self.pos - start;
+-        for i in start + offset..start + offset + num_bytes {
+-            self.output[i] = self.output[i - offset];
++        if offset != 0 && num_bytes >= 32 {
++            // Each copy extends the available repeating prefix, doubling it until done.
++            let mut copied = 0;
++            while copied < num_bytes {
++                let available = offset + copied;
++                let count = available.min(num_bytes - copied);
++                self.output.copy_within(start..start + count, self.pos + copied);
++                copied += count;
++            }
++        } else {
++            for i in start + offset..start + offset + num_bytes {
++                self.output[i] = self.output[i - offset];
++            }
+         }
+         self.pos += num_bytes;
+     }
+@@ -344,3 +355,28 @@ mod tests {
+         assert_eq!(sink.capacity(), 5);
+     }
+ }
++
++#[cfg(all(test, feature = "safe-decode"))]
++mod overlap_copy_tests {
++    use super::{Sink, SliceSink};
++
++    #[test]
++    fn overlap_matches_bytewise_copy() {
++        for pos in 0..65 {
++            for start in 0..=pos {
++                for count in 0..257 {
++                    let mut expected: Vec<u8> = (0..pos + count + 17)
++                        .map(|i| (i * 37 + 11) as u8).collect();
++                    let mut actual = expected.clone();
++                    for i in pos..pos + count {
++                        expected[i] = expected[i - (pos - start)];
++                    }
++                    let mut sink = SliceSink::new(&mut actual, pos);
++                    sink.extend_from_within_overlapping(start, count);
++                    assert_eq!(sink.pos(), pos + count);
++                    assert_eq!(actual, expected, "pos={pos}, start={start}, count={count}");
++                }
++            }
++        }
++    }
++}

@@ -1,0 +1,114 @@
+# Final LLBC before serialization:
+
+// Full name: test_crate::NotCopy
+struct NotCopy {}
+
+struct () {}
+
+// Full name: core::mem::drop::<NotCopy>
+#[diagnostic_item("mem_drop")]
+pub fn drop::<NotCopy>(_1: NotCopy)
+= <opaque>
+
+struct (_,)::<u8> {
+  _0: u8,
+}
+
+struct (_, _)::<u8, bool> {
+  _0: u8,
+  _1: bool,
+}
+
+// Full name: test_crate::main::{closure}
+struct {closure} {
+  _0: NotCopy,
+}
+
+// Full name: test_crate::main::{impl FnOnce<(u8,)> for {closure}}::call_once
+fn call_once(_1: {closure}, tupled_args: (u8,)) -> u8
+{
+    let _0: u8; // return
+    let _1: {closure}; // arg #1
+    let tupled_args: (u8,); // arg #2
+    let x: u8; // local
+    let _4: (); // anonymous local
+    let _5: NotCopy; // anonymous local
+    let _6: u8; // anonymous local
+    let _7: u8; // anonymous local
+
+    storage_live(_0)
+    storage_live(x)
+    storage_live(_7)
+    x = move tupled_args._0
+    storage_live(_4)
+    storage_live(_5)
+    _5 = move _1._0
+    _4 = drop::<NotCopy>(move _5)
+    ↳⚡ storage_dead(_7)
+        storage_dead(x)
+        storage_dead(tupled_args)
+        storage_dead(_1)
+        unwind_continue
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_live(_6)
+    _6 = copy x
+    _7 = copy _6 panic.+ const 1u8
+    _0 = move _7
+    storage_dead(_6)
+    storage_dead(_7)
+    storage_dead(x)
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::apply_to_zero_once::<{closure}>
+fn apply_to_zero_once::<{closure}>(f: {closure}) -> u8
+{
+    let _0: u8; // return
+    let f: {closure}; // arg #1
+    let _2: {closure}; // anonymous local
+    let _3: (u8,); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = move f
+    storage_live(_3)
+    _3 = (const 0u8,)
+    _0 = call_once(move _2, move _3)
+    ↳⚡ storage_dead(f)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(f)
+    return
+}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let z: NotCopy; // local
+    let _2: u8; // anonymous local
+    let _3: {closure}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(z)
+    z = NotCopy {  }
+    fake_read(z)
+    storage_live(_2)
+    storage_live(_3)
+    _3 = {closure} { _0: move z }
+    _2 = apply_to_zero_once::<{closure}>(move _3)
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(z)
+    return
+}
+
+
+

@@ -1,0 +1,48 @@
+
+----------------------------------------
+define i64 @prefix(i64 %data, i64 %key) {
+#0:
+  %mixed = xor i64 %data, %key
+  %result = bswap i64 %mixed
+  assume_welldefined i64 %result
+  ret i64 %result
+}
+=>
+define i64 @prefix(i64 %data, i64 %key) {
+#0:
+  %mixed = xor i64 %data, %key
+  %check = bswap i64 %mixed
+  assume_welldefined i64 %check
+  %d = bswap i64 %data
+  %k = bswap i64 %key
+  %wrong = xor i64 %d, %k
+  %result = xor i64 %wrong, 1
+  ret i64 %result
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 %data = #x0000000000000000 (0)
+i64 %key = #x0000000000000000 (0)
+
+Source:
+i64 %mixed = #x0000000000000000 (0)
+i64 %result = #x0000000000000000 (0)
+
+Target:
+i64 %mixed = #x0000000000000000 (0)
+i64 %check = #x0000000000000000 (0)
+i64 %d = #x0000000000000000 (0)
+i64 %k = #x0000000000000000 (0)
+i64 %wrong = #x0000000000000000 (0)
+i64 %result = #x0000000000000001 (1)
+Source value: #x0000000000000000 (0)
+Target value: #x0000000000000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

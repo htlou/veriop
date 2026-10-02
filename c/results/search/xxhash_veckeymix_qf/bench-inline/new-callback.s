@@ -1,0 +1,94 @@
+
+/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_veckeymix_qf/bench-inline/new:     file format elf64-x86-64
+
+
+Disassembly of section .init:
+
+Disassembly of section .plt:
+
+Disassembly of section .plt.got:
+
+Disassembly of section .text:
+
+0000000000001650 <hash>:
+    1650:	48 83 fe 09          	cmp    $0x9,%rsi
+    1654:	72 53                	jb     16a9 <hash+0x59>
+    1656:	48 b8 b9 39 42 ea 7b 	movabs $0x6782737bea4239b9,%rax
+    165d:	73 82 67 
+    1660:	48 33 07             	xor    (%rdi),%rax
+    1663:	48 ba 3a 52 96 09 3b 	movabs $0xaf56bc3b0996523a,%rdx
+    166a:	bc 56 af 
+    166d:	48 33 54 37 f8       	xor    -0x8(%rdi,%rsi,1),%rdx
+    1672:	c4 e2 f3 f6 f8       	mulx   %rax,%rcx,%rdi
+    1677:	48 01 d6             	add    %rdx,%rsi
+    167a:	48 0f c8             	bswap  %rax
+    167d:	48 01 c6             	add    %rax,%rsi
+    1680:	48 31 cf             	xor    %rcx,%rdi
+    1683:	48 01 f7             	add    %rsi,%rdi
+    1686:	48 89 f8             	mov    %rdi,%rax
+    1689:	48 c1 e8 25          	shr    $0x25,%rax
+    168d:	48 31 f8             	xor    %rdi,%rax
+    1690:	48 b9 f9 79 37 9e 91 	movabs $0x165667919e3779f9,%rcx
+    1697:	67 56 16 
+    169a:	48 0f af c8          	imul   %rax,%rcx
+    169e:	48 89 c8             	mov    %rcx,%rax
+    16a1:	48 c1 e8 20          	shr    $0x20,%rax
+    16a5:	48 31 c8             	xor    %rcx,%rax
+    16a8:	c3                   	ret    
+    16a9:	48 83 fe 04          	cmp    $0x4,%rsi
+    16ad:	72 6e                	jb     171d <hash+0xcd>
+    16af:	8b 07                	mov    (%rdi),%eax
+    16b1:	8b 4c 37 fc          	mov    -0x4(%rdi,%rsi,1),%ecx
+    16b5:	c5 f9 6e c1          	vmovd  %ecx,%xmm0
+    16b9:	c4 e3 79 22 c0 01    	vpinsrd $0x1,%eax,%xmm0,%xmm0
+    16bf:	c4 e3 79 22 c9 02    	vpinsrd $0x2,%ecx,%xmm0,%xmm1
+    16c5:	c4 e3 71 22 c8 03    	vpinsrd $0x3,%eax,%xmm1,%xmm1
+    16cb:	62 f2 f5 08 15 0d 3b 	vprolvq 0x193b(%rip),%xmm1,%xmm1        # 3010 <_IO_stdin_used+0x10>
+    16d2:	19 00 00 
+    16d5:	c5 f9 70 d1 ee       	vpshufd $0xee,%xmm1,%xmm2
+    16da:	62 f3 f5 08 25 d0 96 	vpternlogq $0x96,%xmm0,%xmm1,%xmm2
+    16e1:	c4 e1 f9 7e d0       	vmovq  %xmm2,%rax
+    16e6:	48 b9 ca 64 c2 05 d4 	movabs $0x18bad3d405c264ca,%rcx
+    16ed:	d3 ba 18 
+    16f0:	48 31 c1             	xor    %rax,%rcx
+    16f3:	48 b8 25 df 98 1e 65 	movabs $0x9fb21c651e98df25,%rax
+    16fa:	1c b2 9f 
+    16fd:	48 0f af c8          	imul   %rax,%rcx
+    1701:	48 89 ca             	mov    %rcx,%rdx
+    1704:	48 c1 ea 23          	shr    $0x23,%rdx
+    1708:	48 01 f2             	add    %rsi,%rdx
+    170b:	48 31 ca             	xor    %rcx,%rdx
+    170e:	48 0f af d0          	imul   %rax,%rdx
+    1712:	48 89 d0             	mov    %rdx,%rax
+    1715:	48 c1 e8 1c          	shr    $0x1c,%rax
+    1719:	48 31 d0             	xor    %rdx,%rax
+    171c:	c3                   	ret    
+    171d:	48 85 f6             	test   %rsi,%rsi
+    1720:	74 53                	je     1775 <hash+0x125>
+    1722:	0f b6 07             	movzbl (%rdi),%eax
+    1725:	48 89 f1             	mov    %rsi,%rcx
+    1728:	48 d1 e9             	shr    %rcx
+    172b:	0f b6 54 37 ff       	movzbl -0x1(%rdi,%rsi,1),%edx
+    1730:	c1 e0 10             	shl    $0x10,%eax
+    1733:	0f b6 0c 0f          	movzbl (%rdi,%rcx,1),%ecx
+    1737:	c1 e1 18             	shl    $0x18,%ecx
+    173a:	09 c1                	or     %eax,%ecx
+    173c:	48 09 d1             	or     %rdx,%rcx
+    173f:	48 c1 e6 08          	shl    $0x8,%rsi
+    1743:	48 09 ce             	or     %rcx,%rsi
+    1746:	b8 9b 5a 27 87       	mov    $0x87275a9b,%eax
+    174b:	48 31 f0             	xor    %rsi,%rax
+    174e:	48 b9 4f eb d4 27 3d 	movabs $0xc2b2ae3d27d4eb4f,%rcx
+    1755:	ae b2 c2 
+    1758:	48 0f af c8          	imul   %rax,%rcx
+    175c:	48 89 c8             	mov    %rcx,%rax
+    175f:	48 c1 e8 1d          	shr    $0x1d,%rax
+    1763:	48 31 c8             	xor    %rcx,%rax
+    1766:	48 b9 f9 79 37 9e b1 	movabs $0x165667b19e3779f9,%rcx
+    176d:	67 56 16 
+    1770:	e9 25 ff ff ff       	jmp    169a <hash+0x4a>
+    1775:	48 b8 c2 94 d3 38 05 	movabs $0x2d06800538d394c2,%rax
+    177c:	80 06 2d 
+    177f:	c3                   	ret    
+
+Disassembly of section .fini:

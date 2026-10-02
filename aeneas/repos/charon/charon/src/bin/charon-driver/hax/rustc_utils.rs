@@ -1,0 +1,582 @@
+use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
+
+use rustc_hir::def::DefKind as RDefKind;
+use rustc_middle::infer::canonical::{CanonicalVarKinds, CanonicalVarValues};
+use rustc_middle::ty::relate::{
+    Relate, RelateResult, TypeRelation, relate_args_with_variances, structurally_relate_consts,
+    structurally_relate_tys,
+};
+use rustc_middle::{mir, ty};
+use rustc_span::kw;
+
+use crate::hax::prelude::*;
+
+/// Structurally pairs a canonicalized type with its inferred type to recover the values rustc
+/// replaced with canonical variables. Inference regions are deliberately erased instead.
+pub fn match_canonical_var_values<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    var_kinds: CanonicalVarKinds<'tcx>,
+    canonical_ty: ty::Ty<'tcx>,
+    inferred_ty: ty::Ty<'tcx>,
+) -> Option<CanonicalVarValues<'tcx>> {
+    let values = var_kinds
+        .iter()
+        .map(|kind| match kind {
+            ty::CanonicalVarKind::Region(_) => Some(tcx.lifetimes.re_erased.into()),
+            _ => None,
+        })
+        .collect();
+    let mut matcher = CanonicalVarMatcher { tcx, values };
+    matcher.relate(canonical_ty, inferred_ty).ok()?;
+
+    // A canonical type variable may be equated to an earlier canonical root without occurring
+    // independently in the canonicalized type.
+    for (index, kind) in var_kinds.iter().enumerate() {
+        if matcher.values[index].is_none()
+            && let ty::CanonicalVarKind::Ty { sub_root, .. } = kind
+        {
+            matcher.values[index] = matcher.values[sub_root.as_usize()];
+        }
+    }
+    let values = matcher.values.into_iter().collect::<Option<Vec<_>>>()?;
+    Some(CanonicalVarValues {
+        var_values: tcx.mk_args(&values),
+    })
+}
+
+struct CanonicalVarMatcher<'tcx> {
+    tcx: ty::TyCtxt<'tcx>,
+    values: Vec<Option<ty::GenericArg<'tcx>>>,
+}
+
+impl<'tcx> CanonicalVarMatcher<'tcx> {
+    fn record<T>(
+        &mut self,
+        var: ty::BoundVar,
+        value: ty::GenericArg<'tcx>,
+        result: T,
+    ) -> RelateResult<'tcx, T> {
+        let slot = &mut self.values[var.as_usize()];
+        if slot.is_some_and(|old| old != value) {
+            Err(ty::error::TypeError::Mismatch)
+        } else {
+            *slot = Some(value);
+            Ok(result)
+        }
+    }
+}
+
+impl<'tcx> TypeRelation<ty::TyCtxt<'tcx>> for CanonicalVarMatcher<'tcx> {
+    fn cx(&self) -> ty::TyCtxt<'tcx> {
+        self.tcx
+    }
+
+    fn relate_ty_args(
+        &mut self,
+        a_ty: ty::Ty<'tcx>,
+        _: ty::Ty<'tcx>,
+        _: rustc_hir::def_id::DefId,
+        a_args: ty::GenericArgsRef<'tcx>,
+        b_args: ty::GenericArgsRef<'tcx>,
+        _: impl FnOnce(ty::GenericArgsRef<'tcx>) -> ty::Ty<'tcx>,
+    ) -> RelateResult<'tcx, ty::Ty<'tcx>> {
+        ty::relate::relate_args_invariantly(self, a_args, b_args)?;
+        Ok(a_ty)
+    }
+
+    fn relate_with_variance<T: Relate<ty::TyCtxt<'tcx>>>(
+        &mut self,
+        _: ty::Variance,
+        _: ty::VarianceDiagInfo<ty::TyCtxt<'tcx>>,
+        a: T,
+        b: T,
+    ) -> RelateResult<'tcx, T> {
+        self.relate(a, b)
+    }
+
+    fn tys(&mut self, a: ty::Ty<'tcx>, b: ty::Ty<'tcx>) -> RelateResult<'tcx, ty::Ty<'tcx>> {
+        if let ty::Bound(ty::BoundVarIndexKind::Canonical, bound) = *a.kind() {
+            self.record(bound.var, b.into(), a)
+        } else {
+            structurally_relate_tys(self, a, b)
+        }
+    }
+
+    fn regions(
+        &mut self,
+        a: ty::Region<'tcx>,
+        _: ty::Region<'tcx>,
+    ) -> RelateResult<'tcx, ty::Region<'tcx>> {
+        Ok(a)
+    }
+
+    fn consts(
+        &mut self,
+        a: ty::Const<'tcx>,
+        b: ty::Const<'tcx>,
+    ) -> RelateResult<'tcx, ty::Const<'tcx>> {
+        if let ty::ConstKind::Bound(ty::BoundVarIndexKind::Canonical, bound) = a.kind() {
+            self.record(bound.var, b.into(), a)
+        } else {
+            structurally_relate_consts(self, a, b)
+        }
+    }
+
+    fn binders<T>(
+        &mut self,
+        a: ty::Binder<'tcx, T>,
+        b: ty::Binder<'tcx, T>,
+    ) -> RelateResult<'tcx, ty::Binder<'tcx, T>>
+    where
+        T: Relate<ty::TyCtxt<'tcx>>,
+    {
+        self.relate(a.skip_binder(), b.skip_binder())?;
+        Ok(a)
+    }
+}
+
+/// Computes the variance of each region bound by `sig`.
+///
+/// This follows rustc's `FunctionalVariances` helper from the `impl_trait_overcaptures` lint.
+pub fn fn_sig_bound_region_variances<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    sig: ty::PolyFnSig<'tcx>,
+) -> HashMap<ty::BoundVar, ty::Variance> {
+    struct FunctionalVariances<'tcx> {
+        tcx: ty::TyCtxt<'tcx>,
+        variances: HashMap<ty::BoundVar, ty::Variance>,
+        ambient_variance: ty::Variance,
+        target_binder: ty::DebruijnIndex,
+    }
+
+    impl<'tcx> TypeRelation<ty::TyCtxt<'tcx>> for FunctionalVariances<'tcx> {
+        fn cx(&self) -> ty::TyCtxt<'tcx> {
+            self.tcx
+        }
+
+        fn relate_ty_args(
+            &mut self,
+            a_ty: ty::Ty<'tcx>,
+            _: ty::Ty<'tcx>,
+            def_id: rustc_hir::def_id::DefId,
+            a_args: ty::GenericArgsRef<'tcx>,
+            b_args: ty::GenericArgsRef<'tcx>,
+            _: impl FnOnce(ty::GenericArgsRef<'tcx>) -> ty::Ty<'tcx>,
+        ) -> RelateResult<'tcx, ty::Ty<'tcx>> {
+            relate_args_with_variances(self, self.tcx.variances_of(def_id), a_args, b_args)?;
+            Ok(a_ty)
+        }
+
+        fn relate_with_variance<T: Relate<ty::TyCtxt<'tcx>>>(
+            &mut self,
+            variance: ty::Variance,
+            _: ty::VarianceDiagInfo<ty::TyCtxt<'tcx>>,
+            a: T,
+            b: T,
+        ) -> RelateResult<'tcx, T> {
+            let old_variance = self.ambient_variance;
+            self.ambient_variance = self.ambient_variance.xform(variance);
+            let result = self.relate(a, b);
+            self.ambient_variance = old_variance;
+            result
+        }
+
+        fn tys(&mut self, a: ty::Ty<'tcx>, b: ty::Ty<'tcx>) -> RelateResult<'tcx, ty::Ty<'tcx>> {
+            structurally_relate_tys(self, a, b)
+        }
+
+        fn regions(
+            &mut self,
+            a: ty::Region<'tcx>,
+            _: ty::Region<'tcx>,
+        ) -> RelateResult<'tcx, ty::Region<'tcx>> {
+            if let ty::ReBound(ty::BoundVarIndexKind::Bound(binder), ty::BoundRegion { var, .. }) =
+                a.kind()
+                && binder == self.target_binder
+            {
+                self.variances
+                    .entry(var)
+                    .and_modify(|old| *old = unify_variances(*old, self.ambient_variance))
+                    .or_insert(self.ambient_variance);
+            }
+            Ok(a)
+        }
+
+        fn consts(
+            &mut self,
+            a: ty::Const<'tcx>,
+            b: ty::Const<'tcx>,
+        ) -> RelateResult<'tcx, ty::Const<'tcx>> {
+            structurally_relate_consts(self, a, b)
+        }
+
+        fn binders<T>(
+            &mut self,
+            a: ty::Binder<'tcx, T>,
+            b: ty::Binder<'tcx, T>,
+        ) -> RelateResult<'tcx, ty::Binder<'tcx, T>>
+        where
+            T: Relate<ty::TyCtxt<'tcx>>,
+        {
+            let old_target_binder = self.target_binder;
+            self.target_binder = self.target_binder.shifted_in(1);
+            let result = self.relate(a.skip_binder(), b.skip_binder());
+            self.target_binder = old_target_binder;
+            result?;
+            Ok(a)
+        }
+    }
+
+    fn unify_variances(a: ty::Variance, b: ty::Variance) -> ty::Variance {
+        match (a, b) {
+            (ty::Bivariant, other) | (other, ty::Bivariant) => other,
+            (ty::Invariant, _) | (_, ty::Invariant) => ty::Invariant,
+            (ty::Contravariant, ty::Covariant) | (ty::Covariant, ty::Contravariant) => {
+                ty::Invariant
+            }
+            (ty::Contravariant, ty::Contravariant) => ty::Contravariant,
+            (ty::Covariant, ty::Covariant) => ty::Covariant,
+        }
+    }
+
+    let mut relation = FunctionalVariances {
+        tcx,
+        variances: HashMap::default(),
+        // `Relate for FnSig` makes inputs contravariant. We are computing the variance of the
+        // signature's own bound parameters, so cancel that outer function-type variance. Nested
+        // function types still introduce their own contravariance as usual.
+        ambient_variance: ty::Contravariant,
+        target_binder: ty::INNERMOST,
+    };
+    relation
+        .relate(sig.skip_binder(), sig.skip_binder())
+        .expect("a signature must relate to itself");
+
+    // A bound region that does not occur in the signature is bivariant.
+    for (index, var) in sig.bound_vars().iter().enumerate() {
+        if matches!(var, ty::BoundVariableKind::Region(_)) {
+            relation
+                .variances
+                .entry(ty::BoundVar::from_usize(index))
+                .or_insert(ty::Bivariant);
+        }
+    }
+    relation.variances
+}
+
+pub fn inst_binder<'tcx, T>(
+    tcx: ty::TyCtxt<'tcx>,
+    typing_env: ty::TypingEnv<'tcx>,
+    args: Option<ty::GenericArgsRef<'tcx>>,
+    x: ty::EarlyBinder<'tcx, T>,
+) -> T
+where
+    T: ty::TypeFoldable<ty::TyCtxt<'tcx>> + Clone,
+{
+    match args {
+        None => x.instantiate_identity().skip_normalization(),
+        Some(args) => normalize(tcx, typing_env, x.instantiate(tcx, args)),
+    }
+}
+
+pub fn substitute<'tcx, T>(
+    tcx: ty::TyCtxt<'tcx>,
+    typing_env: ty::TypingEnv<'tcx>,
+    args: Option<ty::GenericArgsRef<'tcx>>,
+    x: T,
+) -> T
+where
+    T: ty::TypeFoldable<ty::TyCtxt<'tcx>>,
+{
+    inst_binder(tcx, typing_env, args, ty::EarlyBinder::bind(tcx, x))
+}
+
+/// Make a new `ParamEnv` from a list of clauses.
+pub fn param_env_from_clauses<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    predicates: impl Iterator<Item = ty::Clause<'tcx>>,
+) -> ty::ParamEnv<'tcx> {
+    let cause = rustc_trait_selection::traits::ObligationCause::dummy();
+    let param_env = ty::ParamEnv::new(tcx, predicates);
+    rustc_trait_selection::traits::normalize_param_env_or_error(tcx, param_env, cause)
+}
+
+#[extension_traits::extension(pub trait SubstBinder)]
+impl<'tcx, T: ty::TypeFoldable<ty::TyCtxt<'tcx>>> ty::Binder<'tcx, T> {
+    fn subst(
+        self,
+        tcx: ty::TyCtxt<'tcx>,
+        generics: &[ty::GenericArg<'tcx>],
+    ) -> ty::Binder<'tcx, T> {
+        ty::EarlyBinder::bind(tcx, self)
+            .instantiate(tcx, generics)
+            .skip_normalization()
+    }
+}
+
+/// Whether the item can have generic parameters.
+pub(crate) fn can_have_generics<'tcx>(tcx: ty::TyCtxt<'tcx>, def_id: RDefId) -> bool {
+    use RDefKind::*;
+    !matches!(
+        get_def_kind(tcx, def_id),
+        ConstParam
+            | ExternCrate
+            | ForeignMod
+            | GlobalAsm
+            | LifetimeParam
+            | Macro(..)
+            | Mod
+            | TyParam
+            | Use
+    )
+}
+
+pub(crate) fn get_variant_kind<'s, S: UnderOwnerState<'s>>(
+    adt_def: &ty::AdtDef<'s>,
+    variant_index: rustc_abi::VariantIdx,
+    _s: &S,
+) -> VariantKind {
+    if adt_def.is_struct() {
+        VariantKind::Struct
+    } else if adt_def.is_union() {
+        VariantKind::Union
+    } else {
+        let index = variant_index;
+        VariantKind::Enum { index }
+    }
+}
+
+/// Gets the children of a module.
+pub fn get_mod_children<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    def_id: RDefId,
+) -> Vec<(Option<rustc_span::Ident>, RDefId)> {
+    match def_id.as_local() {
+        Some(ldid) => match tcx.hir_node_by_def_id(ldid) {
+            rustc_hir::Node::Crate(m)
+            | rustc_hir::Node::Item(&rustc_hir::Item {
+                kind: rustc_hir::ItemKind::Mod(_, m),
+                ..
+            }) => m
+                .item_ids
+                .iter()
+                .map(|&item_id| {
+                    let opt_ident = tcx.hir_item(item_id).kind.ident();
+                    let def_id = item_id.owner_id.to_def_id();
+                    (opt_ident, def_id)
+                })
+                .collect(),
+            node => panic!("DefKind::Module is an unexpected node: {node:?}"),
+        },
+        None => tcx
+            .module_children(def_id)
+            .iter()
+            .filter_map(|child| Some((Some(child.ident), child.res.opt_def_id()?)))
+            .collect(),
+    }
+}
+
+/// Gets the children of an `extern` block. Empty if the block is not defined in the current crate.
+pub fn get_foreign_mod_children<'tcx>(tcx: ty::TyCtxt<'tcx>, def_id: RDefId) -> Vec<RDefId> {
+    match def_id.as_local() {
+        Some(ldid) => tcx
+            .hir_node_by_def_id(ldid)
+            .expect_item()
+            .expect_foreign_mod()
+            .1
+            .iter()
+            .map(|foreign_item_ref| foreign_item_ref.owner_id.to_def_id())
+            .collect(),
+        None => vec![],
+    }
+}
+
+/// The signature of a method impl may be a subtype of the one expected from the trait decl, as in
+/// the example below. For correctness, we must be able to map from the method generics declared in
+/// the trait to the actual method generics. Because this would require type inference, we instead
+/// simply return the declared signature. This will cause issues if it is possible to use such a
+/// more-specific implementation with its more-specific type, but we have a few other issues with
+/// lifetime-generic function pointers anyway so this is unlikely to cause problems.
+///
+/// ```ignore
+/// trait MyCompare<Other>: Sized {
+///     fn compare(self, other: Other) -> bool;
+/// }
+/// impl<'a> MyCompare<&'a ()> for &'a () {
+///     // This implementation is more general because it works for non-`'a` refs. Note that only
+///     // late-bound vars may differ in this way.
+///     // `<&'a () as MyCompare<&'a ()>>::compare` has type `fn<'b>(&'a (), &'b ()) -> bool`,
+///     // but type `fn(&'a (), &'a ()) -> bool` was expected from the trait declaration.
+///     fn compare<'b>(self, _other: &'b ()) -> bool {
+///         true
+///     }
+/// }
+/// ```
+pub fn get_method_sig<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    typing_env: ty::TypingEnv<'tcx>,
+    def_id: RDefId,
+    method_args: Option<ty::GenericArgsRef<'tcx>>,
+) -> ty::PolyFnSig<'tcx> {
+    let real_sig = inst_binder(tcx, typing_env, method_args, tcx.fn_sig(def_id));
+    let item = tcx.associated_item(def_id);
+    let ty::AssocContainer::TraitImpl(Ok(decl_method_id)) = item.container else {
+        return real_sig;
+    };
+    let declared_sig = tcx.fn_sig(decl_method_id);
+
+    let impl_def_id = item.container_id(tcx);
+    let method_args =
+        method_args.unwrap_or_else(|| ty::GenericArgs::identity_for_item(tcx, def_id));
+    // The trait predicate that is implemented by the surrounding impl block.
+    let implemented_trait_ref = tcx
+        .impl_trait_ref(impl_def_id)
+        .instantiate(tcx, method_args);
+    let implemented_trait_ref = normalize(tcx, typing_env, implemented_trait_ref);
+    // Construct arguments for the declared method generics in the context of the implemented
+    // method generics.
+    let decl_args = method_args.rebase_onto(tcx, impl_def_id, implemented_trait_ref.args);
+    let sig = declared_sig.instantiate(tcx, decl_args);
+    let sig = normalize(tcx, typing_env, sig);
+
+    if let container_named_lts = tcx
+        .generics_of(impl_def_id)
+        .own_params
+        .iter()
+        .filter(|p| matches!(p.kind, ty::GenericParamDefKind::Lifetime))
+        .filter(|p| p.name != kw::UnderscoreLifetime)
+        .map(|p| p.name)
+        .collect::<HashSet<_>>()
+        && sig
+            .bound_vars()
+            .iter()
+            .map(|v| v.expect_region())
+            .filter_map(|v| v.get_name(tcx))
+            .any(|lt| container_named_lts.contains(&lt))
+    {
+        // Avoids using the same lifetime name twice in the same scope (once in impl parameters,
+        // second in the method declaration late-bound vars).
+        tcx.anonymize_bound_vars(sig)
+    } else {
+        sig
+    }
+}
+
+/// Generates a list of `<trait_ref>::Ty` type aliases for each non-gat associated type of the
+/// given trait and its parents, in a specific order.
+pub fn assoc_tys_for_trait<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    typing_env: ty::TypingEnv<'tcx>,
+    tref: ty::TraitRef<'tcx>,
+) -> Vec<ty::AliasTy<'tcx>> {
+    fn gather_assoc_tys<'tcx>(
+        tcx: ty::TyCtxt<'tcx>,
+        typing_env: ty::TypingEnv<'tcx>,
+        assoc_tys: &mut Vec<ty::AliasTy<'tcx>>,
+        tref: ty::TraitRef<'tcx>,
+    ) {
+        assoc_tys.extend(
+            tcx.associated_items(tref.def_id)
+                .in_definition_order()
+                .filter(|assoc| matches!(assoc.kind, ty::AssocKind::Type { .. }))
+                .filter(|assoc| {
+                    tcx.generics_of(assoc.def_id).own_params.is_empty()
+                        && tcx.clauses_of(assoc.def_id).clauses.is_empty()
+                })
+                .map(|assoc| {
+                    let alias_ty = ty::AliasTyKind::Projection {
+                        def_id: assoc.def_id,
+                    };
+                    ty::AliasTy::new(tcx, alias_ty, tref.args)
+                }),
+        );
+        for clause in tcx
+            .explicit_super_clauses_of(tref.def_id)
+            .map_bound(|clauses| clauses.iter().map(|(clause, _span)| *clause))
+            .iter_instantiated(tcx, tref.args)
+        {
+            if let Some(pred) = clause.as_trait_clause() {
+                let tref = erase_and_norm(tcx, typing_env, pred.map(|b| b.skip_binder().trait_ref));
+                gather_assoc_tys(tcx, typing_env, assoc_tys, tref);
+            }
+        }
+    }
+    let mut ret = vec![];
+    gather_assoc_tys(tcx, typing_env, &mut ret, tref);
+    ret
+}
+
+/// Generates a `dyn Trait<Args.., Ty = <Self as Trait>::Ty..>` type for the given trait ref.
+pub fn dyn_self_ty<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    typing_env: ty::TypingEnv<'tcx>,
+    tref: ty::TraitRef<'tcx>,
+) -> Option<ty::Ty<'tcx>> {
+    let re_erased = tcx.lifetimes.re_erased;
+    if !tcx.is_dyn_compatible(tref.def_id) {
+        return None;
+    }
+
+    // The main `Trait<Args>` predicate.
+    let main_pred = ty::Binder::dummy(ty::ExistentialPredicate::Trait(
+        ty::ExistentialTraitRef::erase_self_ty(tcx, tref),
+    ));
+
+    let ty_constraints = assoc_tys_for_trait(tcx, typing_env, tref)
+        .into_iter()
+        .map(|alias_ty| {
+            let proj = ty::ProjectionClause {
+                projection_term: alias_ty.into(),
+                term: ty::Ty::new_alias(tcx, ty::IsRigid::No, alias_ty).into(),
+            };
+            let proj = ty::ExistentialProjection::erase_self_ty(tcx, proj);
+            ty::Binder::dummy(ty::ExistentialPredicate::Projection(proj))
+        });
+
+    let preds = {
+        // Stable sort predicates to prevent platform-specific ordering issues
+        let mut preds: Vec<_> = [main_pred].into_iter().chain(ty_constraints).collect();
+        preds.sort_by(|a, b| {
+            use rustc_middle::ty::ExistentialPredicateStableCmpExt;
+            a.skip_binder().stable_cmp(tcx, &b.skip_binder())
+        });
+        tcx.mk_poly_existential_predicates(&preds)
+    };
+    let ty = tcx.mk_ty_from_kind(ty::Dynamic(preds, re_erased));
+    let ty = normalize(tcx, typing_env, ty::Unnormalized::new_wip(ty));
+    Some(ty)
+}
+
+pub fn closure_once_shim<'tcx>(
+    tcx: ty::TyCtxt<'tcx>,
+    closure_ty: ty::Ty<'tcx>,
+) -> Option<mir::Body<'tcx>> {
+    let ty::Closure(def_id, args) = closure_ty.kind() else {
+        unreachable!()
+    };
+    let instance = match args.as_closure().kind() {
+        ty::ClosureKind::Fn | ty::ClosureKind::FnMut => {
+            ty::Instance::fn_once_adapter_instance(tcx, *def_id, args)
+        }
+        ty::ClosureKind::FnOnce => return None,
+    };
+    let mir = tcx.instance_mir(instance.def).clone();
+    let mir = ty::EarlyBinder::bind(tcx, mir)
+        .instantiate(tcx, instance.args)
+        .skip_normalization();
+    Some(mir)
+}
+
+pub fn drop_glue_shim<'tcx>(
+    s: &impl UnderOwnerState<'tcx>,
+    def_id: &DefId,
+    instantiate: Option<ty::GenericArgsRef<'tcx>>,
+) -> mir::Body<'tcx> {
+    let tcx = s.base().tcx;
+    let drop_glue = tcx.require_lang_item(rustc_attr_ir::LangItem::DropGlue, rustc_span::DUMMY_SP);
+    let ty = inst_binder(tcx, s.typing_env(), instantiate, def_id.type_of(s));
+    let mut body = rustc_mir_transform::build_drop_shim(tcx, drop_glue, Some(ty), s.typing_env());
+    // Set the mir phase so that charon knows the contained drops are precise.
+    body.phase = mir::MirPhase::Runtime(mir::RuntimePhase::Optimized);
+    body
+}

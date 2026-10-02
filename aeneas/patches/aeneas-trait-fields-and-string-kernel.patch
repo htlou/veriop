@@ -1,0 +1,37 @@
+diff --git a/src/extract/ExtractTypes.ml b/src/extract/ExtractTypes.ml
+index 983e0ccb..2b4442b2 100644
+--- a/src/extract/ExtractTypes.ml
++++ b/src/extract/ExtractTypes.ml
+@@ -22,6 +22,8 @@ let extract_str (_span : Meta.span) (fmt : F.formatter) ~(inside : bool)
+   F.pp_print_string fmt "toStr";
+   F.pp_print_space fmt ();
+   F.pp_print_string fmt s;
++  if backend () = Lean then
++    F.pp_print_string fmt " (by simp only [U32.max, U32.numBits]; decide)";
+   if inside then F.pp_print_string fmt ")"
+ 
+ (** Format a constant value.
+@@ -372,7 +374,22 @@ let rec extract_ty (span : Meta.span) (ctx : extraction_ctx) (fmt : F.formatter)
+               if print_paren then F.pp_print_string fmt "(";
+               (* TODO: for now, only the opaque *functions* are extracted in the
+                  opaque module. The opaque *types* are builtin. *)
+-              F.pp_print_string fmt (ctx_get_type (Some span) type_id ctx);
++              let name = ctx_get_type (Some span) type_id ctx in
++              let name =
++                match (backend (), ctx.trait_decl_id, type_id) with
++                | Lean, Some _, TAdtId id
++                  when (match TypeDeclId.Map.find_opt id ctx.trans_types with
++                       | Some { builtin_info = None; _ } -> true
++                       | _ -> false) ->
++                    (* Earlier trait fields can shadow a module prefix, e.g.
++                       [encode] before a field returning [encode.Error]. *)
++                    let namespace =
++                      Option.value !Config.namespace ~default:ctx.crate.name
++                    in
++                    "_root_." ^ namespace ^ "." ^ name
++                | _ -> name
++              in
++              F.pp_print_string fmt name;
+               (* We might need to:
+                  - filter the type arguments, if the type is builtin (for instance,
+                    we filter the global allocator type argument for `Vec`).

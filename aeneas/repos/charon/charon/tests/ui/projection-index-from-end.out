@@ -1,0 +1,90 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::slice::index::{impl SliceIndex<[T]> for usize}::index
+pub fn impl_SliceIndex_slice_for_usize::index<'_0, T>(_1: usize, _2: &'_0 [T]) -> &'_0 T
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+struct () {}
+
+// Full name: test_crate::slice_pattern_end
+fn slice_pattern_end<'_0>(x: &'_0 [()])
+{
+    let _0: (); // return
+    let x: &'1 [()]; // arg #1
+    let _2: usize; // anonymous local
+    let _3: usize; // anonymous local
+    let _4: usize; // anonymous local
+    let _5: bool; // anonymous local
+    let _named: &'3 (); // local
+    let _7: &'_ [()]; // anonymous local
+    let _8: usize; // anonymous local
+    let _9: usize; // anonymous local
+    let _10: &'_ (); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_4)
+    storage_live(_5)
+    _0 = ()
+    _3 = copy x.metadata
+    _2 = move _3
+    _4 = const 1usize
+    _5 = move _2 >= move _4
+    if move _5 {
+    } else {
+        _0 = ()
+        storage_dead(_5)
+        storage_dead(_4)
+        storage_dead(_3)
+        storage_dead(_2)
+        storage_dead(x)
+        storage_dead(_10)
+        storage_dead(_9)
+        storage_dead(_7)
+        return
+    }
+    storage_live(_named)
+    storage_live(_7)
+    _7 = &(*x) with_metadata(copy x.metadata)
+    storage_live(_8)
+    _8 = len((*x))
+    storage_live(_9)
+    _9 = copy _8 ub.- const 1usize
+    storage_dead(_8)
+    storage_live(_10)
+    _10 = impl_SliceIndex_slice_for_usize::index<'_, ()>[{built_in impl Sized for ()}](copy _9, move _7)
+    ↳⚡ undefined_behavior
+    _named = &(*_10)
+    _0 = ()
+    storage_dead(_named)
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(x)
+    storage_dead(_10)
+    storage_dead(_9)
+    storage_dead(_7)
+    return
+}
+
+
+

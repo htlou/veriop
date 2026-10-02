@@ -1,0 +1,64 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+struct () {}
+
+// Full name: test_crate::Trait
+pub trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn method<'_0_1> = test_crate::Trait::method<'_0_1, Self>
+    vtable: test_crate::Trait::{vtable}
+}
+
+// Full name: test_crate::Trait::method::{closure}
+struct {closure}<Self> {}
+
+pub fn test_crate::Trait::method<'_0, Self>(self: &'_0 Self)
+where
+    TypeOutlives0: Self: '_0,
+{
+    let _0: (); // return
+    let self: &'1 Self; // arg #1
+    let _2: {closure}<Self>; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_2)
+    _2 = {closure} {  }
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl Trait for ()}::method
+pub fn impl_Trait_for_unit::method<'_0>(self: &'_0 ())
+{
+    let _0: (); // return
+    let self: &'1 (); // arg #1
+    let _2: {closure}<()>; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_2)
+    _2 = {closure} {  }
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl Trait for ()}
+impl "impl_Trait_for_unit" Trait for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    fn method<'_0_1> = impl_Trait_for_unit::method<'_0_1>
+    vtable: lazy
+}
+
+
+

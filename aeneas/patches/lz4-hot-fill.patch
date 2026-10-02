@@ -1,0 +1,14 @@
+diff --git a/src/block/decompress_safe.rs b/src/block/decompress_safe.rs
+index d102e0d..d276d08 100644
+--- a/src/block/decompress_safe.rs
++++ b/src/block/decompress_safe.rs
+@@ -170,6 +170,9 @@ pub(crate) fn decompress_internal<const USE_DICT: bool, S: Sink>(
+             }
+             if offset >= match_length {
+                 output.extend_from_within(start, 18, match_length);
++            } else if offset == 1 {
++                let value = output.byte_at(start);
++                output.extend_with_fill(value, match_length);
+             } else {
+                 output.extend_from_within_overlapping(start, match_length)
+             }

@@ -1,0 +1,278 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::PartialEq
+#[lang_item(PartialEq)]
+#[diagnostic_item("PartialEq")]
+pub trait PartialEq<Self, Rhs>
+{
+    fn eq<'_0_1, '_1_1>;
+    vtable: core::cmp::PartialEq::{vtable}<Rhs>
+}
+
+// Full name: core::cmp::Eq
+#[diagnostic_item("Eq")]
+pub trait Eq<Self>
+{
+    proof ImpliedClause0: (Self: PartialEq<Self>)
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::Ordering
+#[lang_item(OrderingEnum)]
+pub enum Ordering {
+  Less,
+  Equal,
+  Greater,
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: core::cmp::PartialOrd
+#[lang_item(PartialOrd)]
+#[diagnostic_item("PartialOrd")]
+pub trait PartialOrd<Self, Rhs>
+{
+    proof ImpliedClause0: (Self: PartialEq<Rhs>)
+    fn partial_cmp<'_0_1, '_1_1>;
+    vtable: core::cmp::PartialOrd::{vtable}<Rhs>
+}
+
+// Full name: core::cmp::Ord
+#[diagnostic_item("Ord")]
+pub trait Ord<Self>
+{
+    proof ImpliedClause0: (Self: Eq)
+    proof ImpliedClause1: (Self: PartialOrd<Self>)
+    fn cmp<'_0_1, '_1_1>;
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::cmp::impls::{impl PartialEq<()> for ()}::eq
+pub fn eq<'_0, '_1>(_1: &'_0 (), _2: &'_1 ()) -> bool
+= <opaque>
+
+// Full name: core::cmp::impls::{impl PartialEq<()> for ()}
+impl "impl_PartialEq_unit_for_unit" PartialEq<()> for () {
+    fn eq<'_0_1, '_1_1> = eq<'_0_1, '_1_1>
+    vtable: lazy
+}
+
+// Full name: core::cmp::impls::{impl Eq for ()}
+impl "impl_Eq_for_unit" Eq for () {
+    proof ImpliedClause0: ((): PartialEq<()>) = impl_PartialEq_unit_for_unit
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::impls::{impl PartialOrd<()> for ()}::partial_cmp
+pub fn partial_cmp<'_0, '_1>(_1: &'_0 (), _2: &'_1 ()) -> Option<Ordering>[{built_in impl Sized for Ordering}]
+= <opaque>
+
+// Full name: core::cmp::impls::{impl PartialOrd<()> for ()}
+impl "impl_PartialOrd_unit_for_unit" PartialOrd<()> for () {
+    proof ImpliedClause0: ((): PartialEq<()>) = impl_PartialEq_unit_for_unit
+    fn partial_cmp<'_0_1, '_1_1> = partial_cmp<'_0_1, '_1_1>
+    vtable: lazy
+}
+
+// Full name: core::cmp::impls::{impl Ord for ()}::cmp
+pub fn cmp<'_0, '_1>(_1: &'_0 (), _2: &'_1 ()) -> Ordering
+= <opaque>
+
+// Full name: core::cmp::impls::{impl Ord for ()}
+impl "impl_Ord_for_unit" Ord for () {
+    proof ImpliedClause0: ((): Eq) = impl_Eq_for_unit
+    proof ImpliedClause1: ((): PartialOrd<()>) = impl_PartialOrd_unit_for_unit
+    fn cmp<'_0_1, '_1_1> = cmp<'_0_1, '_1_1>
+    non-dyn-compatible
+}
+
+// Full name: core::hash::Hasher
+pub trait Hasher<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn finish<'_0_1>;
+    fn write<'_0_1, '_1_1>;
+    vtable: core::hash::Hasher::{vtable}
+}
+
+// Full name: core::hash::Hash
+#[diagnostic_item("Hash")]
+pub trait Hash<Self>
+{
+    fn hash<'_0_1, '_1_1, H, TraitClause0_1: (H: Sized), TraitClause1_1: (H: Hasher)>;
+    non-dyn-compatible
+}
+
+// Full name: core::hash::impls::{impl Hash for ()}::hash
+pub fn hash<'_0, '_1, H>(_1: &'_0 (), _2: &'_1 mut H)
+where
+    TraitClause0: (H: Sized),
+    TraitClause1: (H: Hasher),
+    TypeOutlives0: H: '_1,
+= <opaque>
+
+// Full name: core::hash::impls::{impl Hash for ()}
+impl "impl_Hash_for_unit" Hash for () {
+    fn hash<'_0_1, '_1_1, H, TraitClause0_1: (H: Sized), TraitClause1_1: (H: Hasher)> = hash<'_0_1, '_1_1, H>[TraitClause0_1, TraitClause1_1]
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Send
+#[diagnostic_item("Send")]
+pub unsafe trait Send<Self>
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Sync
+#[lang_item(Sync)]
+#[diagnostic_item("Sync")]
+pub unsafe trait Sync<Self>
+
+// Full name: core::marker::Freeze
+#[lang_item(Freeze)]
+pub unsafe trait Freeze<Self>
+
+// Full name: core::marker::Unpin
+#[lang_item(Unpin)]
+pub trait Unpin<Self>
+
+// Full name: core::ptr::metadata::Pointee
+#[lang_item(PointeeTrait)]
+pub trait Pointee<Self>
+{
+    proof ImpliedClause0: (Self::Metadata: Sized)
+    proof ImpliedClause1: (Self::Metadata: Debug)
+    proof ImpliedClause2: (Self::Metadata: Copy)
+    proof ImpliedClause3: (Self::Metadata: Send)
+    proof ImpliedClause4: (Self::Metadata: Sync)
+    proof ImpliedClause5: (Self::Metadata: Ord)
+    proof ImpliedClause6: (Self::Metadata: Hash)
+    proof ImpliedClause7: (Self::Metadata: Unpin)
+    proof ImpliedClause8: (Self::Metadata: Freeze)
+    type Metadata
+    non-dyn-compatible
+}
+
+// Full name: core::ptr::metadata::Thin
+pub trait Thin<Self>
+where
+    TypeConstraint0: Self::ImpliedClause0::Metadata = (),
+{
+    proof ImpliedClause0: (Self: Pointee)
+    non-dyn-compatible
+}
+
+// Full name: core::ptr::metadata::Thin::{impl Thin for Self}
+impl<Self> "impl_Thin_for_T" Thin for Self
+where
+    TraitClause0: (Self: Pointee),
+    TypeConstraint0: TraitClause0::Metadata = (),
+{
+    proof ImpliedClause0: (Self: Pointee) = TraitClause0
+    vtable: unknown // vtables of trait alias impls are not supported
+}
+
+// Full name: core::ptr::metadata::from_raw_parts
+pub fn from_raw_parts<T, T1>(_1: *const T1, _2: {built_in impl Pointee for T}::Metadata) -> *const T
+where
+    TraitClause0: (T1: Sized),
+    TraitClause1: (T1: Thin),
+= <opaque>
+
+// Full name: core::ptr::without_provenance
+#[diagnostic_item("ptr_without_provenance")]
+pub fn without_provenance<T>(_1: usize) -> *const T
+where
+    TraitClause0: (T: Sized),
+= <opaque>
+
+// Full name: core::ptr::null
+#[diagnostic_item("ptr_null")]
+pub fn null<T>() -> *const T
+where
+    TraitClause0: (T: Thin),
+{
+    let _0: *const T; // return
+    let _1: *const (); // anonymous local
+    let _2: (); // anonymous local
+
+    storage_live(_0)
+    storage_live(_1)
+    _1 = without_provenance<()>[{built_in impl Sized for ()}](const 0usize)
+    ↳⚡ unwind_continue
+    storage_live(_2)
+    _2 = ()
+    _0 = from_raw_parts<T, ()>[{built_in impl Sized for ()}, impl_Thin_for_T<()>[{built_in impl Pointee for () where Metadata  = ()}]](move _1, move _2)
+    ↳⚡ unwind_continue
+    storage_dead(_2)
+    storage_dead(_1)
+    return
+}
+
+struct str {
+  _0: [u8],
+}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let ptr: *const (); // local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(ptr)
+    ptr = null<()>[impl_Thin_for_T<()>[{built_in impl Pointee for () where Metadata  = ()}]]()
+    ↳⚡ unwind_continue
+    fake_read(ptr)
+    set_type(typeof(ptr) == *const ())
+    _0 = ()
+    storage_dead(ptr)
+    return
+}
+
+
+

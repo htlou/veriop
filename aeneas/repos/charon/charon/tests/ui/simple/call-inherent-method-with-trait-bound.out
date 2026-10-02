@@ -1,0 +1,184 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: test_crate::Trait
+pub trait Trait<Self, Self_Type>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self_Type: Sized)
+    vtable: test_crate::Trait::{vtable}<Self_Type>
+}
+
+// Full name: test_crate::{impl Trait<()> for ()}
+impl "impl_Trait_for_unit" Trait<()> for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    proof ImpliedClause1: ((): Sized) = {built_in impl Sized for ()}
+    vtable: lazy
+}
+
+// Full name: test_crate::HashMap
+pub struct HashMap<S>
+where
+    TraitClause0: (S: Sized),
+{
+  _0: S,
+}
+
+// Full name: test_crate::HashMap::{impl Destruct for HashMap<S>[TraitClause0]}::drop_glue
+unsafe fn drop_glue<'_0, S>(_1: &'_0 mut HashMap<S>[TraitClause0])
+where
+    TraitClause0: (S: Sized),
+    TypeOutlives0: S: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 mut HashMap<S>[TraitClause0]; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    drop[{built_in impl Destruct for S}::drop_glue<'2>] (*_1)._0
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+pub fn test_crate::{HashMap<S>[TraitClause0]}::get<S, Q, Clause2_Type>(_x: HashMap<S>[TraitClause0], _k: Q)
+where
+    TraitClause0: (S: Sized),
+    TraitClause1: (Q: Sized),
+    TraitClause2: (Q: Trait<Clause2_Type>),
+{
+    let _0: (); // return
+    let _x: HashMap<S>[TraitClause0]; // arg #1
+    let _k: Q; // arg #2
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    conditional_drop[{built_in impl Destruct for Q}::drop_glue<'0>] _k
+    ↳⚡ conditional_drop[drop_glue<'2, S>[TraitClause0]] _x
+        ↳⚡ storage_dead(_k)
+            storage_dead(_x)
+            unwind_terminate
+        storage_dead(_k)
+        storage_dead(_x)
+        unwind_continue
+    conditional_drop[drop_glue<'1, S>[TraitClause0]] _x
+    ↳⚡ storage_dead(_k)
+        storage_dead(_x)
+        unwind_continue
+    storage_dead(_k)
+    storage_dead(_x)
+    return
+}
+
+// Full name: test_crate::top_level_get
+pub fn top_level_get<S, Q, Clause2_Type>(_x: HashMap<S>[TraitClause0], _k: Q)
+where
+    TraitClause0: (S: Sized),
+    TraitClause1: (Q: Sized),
+    TraitClause2: (Q: Trait<Clause2_Type>),
+{
+    let _0: (); // return
+    let _x: HashMap<S>[TraitClause0]; // arg #1
+    let _k: Q; // arg #2
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    conditional_drop[{built_in impl Destruct for Q}::drop_glue<'0>] _k
+    ↳⚡ conditional_drop[drop_glue<'2, S>[TraitClause0]] _x
+        ↳⚡ storage_dead(_k)
+            storage_dead(_x)
+            unwind_terminate
+        storage_dead(_k)
+        storage_dead(_x)
+        unwind_continue
+    conditional_drop[drop_glue<'1, S>[TraitClause0]] _x
+    ↳⚡ storage_dead(_k)
+        storage_dead(_x)
+        unwind_continue
+    storage_dead(_k)
+    storage_dead(_x)
+    return
+}
+
+// Full name: test_crate::test1
+pub fn test1(map: HashMap<()>[{built_in impl Sized for ()}])
+{
+    let _0: (); // return
+    let map: HashMap<()>[{built_in impl Sized for ()}]; // arg #1
+    let _2: (); // anonymous local
+    let _3: HashMap<()>[{built_in impl Sized for ()}]; // anonymous local
+    let _4: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_2)
+    storage_live(_3)
+    _3 = move map
+    storage_live(_4)
+    _4 = ()
+    _2 = top_level_get<(), (), ()>[{built_in impl Sized for ()}, {built_in impl Sized for ()}, impl_Trait_for_unit](move _3, move _4)
+    ↳⚡ storage_dead(map)
+        unwind_continue
+    storage_dead(_4)
+    storage_dead(_3)
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(map)
+    return
+}
+
+// Full name: test_crate::test2
+pub fn test2(map: HashMap<()>[{built_in impl Sized for ()}])
+{
+    let _0: (); // return
+    let map: HashMap<()>[{built_in impl Sized for ()}]; // arg #1
+    let _2: (); // anonymous local
+    let _3: HashMap<()>[{built_in impl Sized for ()}]; // anonymous local
+    let _4: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_2)
+    storage_live(_3)
+    _3 = move map
+    storage_live(_4)
+    _4 = ()
+    _2 = test_crate::{HashMap<S>[TraitClause0]}::get<(), (), ()>[{built_in impl Sized for ()}, {built_in impl Sized for ()}, impl_Trait_for_unit](move _3, move _4)
+    ↳⚡ storage_dead(map)
+        unwind_continue
+    storage_dead(_4)
+    storage_dead(_3)
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(map)
+    return
+}
+
+
+

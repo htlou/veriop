@@ -1,0 +1,61 @@
+
+----------------------------------------
+define i64 @src(i8 %idx) {
+#0:
+  %bounded = and i8 %idx, 3
+  %v = extractelement <4 x i64> { 4, 20, 300, 7000 }, i8 %bounded
+  ret i64 %v
+}
+=>
+@table = constant 32 bytes, align 16
+
+define i64 @tgt(i8 %idx) {
+init:
+  store [4 x i64] { 4, 20, 300, 7000 }, ptr @table, align 16
+  br label %#0
+
+#0:
+  %bounded = and i8 %idx, 3
+  %stable = freeze i8 %bounded
+  %safe = and i8 %stable, 3
+  %wide = zext i8 %safe to i64
+  %p = gep inbounds ptr @table, 32 x i64 0, 8 x i64 %wide
+  %v = load i64, ptr %p, align 8
+  %marker = and i8 %bounded, 0
+  %marker64 = zext i8 %marker to i64
+  %result = xor i64 %v, %marker64
+  ret i64 %result
+}
+Transformation seems to be correct!
+
+Reverse transformation doesn't verify!
+
+ERROR: Target's return value is more undefined
+
+Example:
+i8 %idx = undef
+
+Source:
+  >> Jump to %#0
+i8 %bounded = #x03 (3)	[based on undef]
+i8 %stable = #x03 (3)	[based on undef]
+i8 %safe = #x03 (3)	[based on undef]
+i64 %wide = #x0000000000000003 (3)	[based on undef]
+ptr %p = pointer(non-local, block_id=0, offset=24) / Address=#x7ffffffffffffff8	[based on undef]
+i64 %v = #x0000000000001b58 (7000)	[based on undef]
+i8 %marker = #x00 (0)
+i64 %marker64 = #x0000000000000000 (0)
+i64 %result = #x0000000000001b58 (7000)	[based on undef]
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 32	align: 16	alloc type: 0	alive: true	address: 9223372036854775776	const
+
+Target:
+  >> Jump to %#0
+i8 %bounded = #x00 (0)
+i64 %v = #x0000000000000004 (4)
+Source value: #x0000000000001b58 (7000)	[based on undef]
+Target value: #x0000000000000004 (4)
+

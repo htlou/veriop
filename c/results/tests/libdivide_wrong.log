@@ -1,0 +1,111 @@
+
+----------------------------------------
+define i32 @target_u32(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i32 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i32 noundef %#0 to i64
+  %#11 = zext i32 noundef %#1 to i64
+  %#12 = mul nuw i64 %#11, %#10
+  %#13 = lshr i64 %#12, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = lshr i32 %#14, %#15
+  br label %#8
+
+#6:
+  %#19 = sub i32 noundef %#0, %#14
+  %#20 = lshr i32 %#19, 1
+  %#21 = add i32 %#20, %#14
+  %#22 = and i32 %#15, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext nneg i8 noundef zeroext %#2 to i32
+  %#25 = lshr i32 noundef %#0, %#24
+  br label %#8
+
+#8:
+  %#26 = phi i32 [ %#25, %#7 ], [ %#23, %#6 ], [ %#18, %#5 ]
+  ret i32 %#26
+}
+=>
+define i32 @target_u32(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i32 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i32 noundef %#0 to i64
+  %#11 = zext i32 noundef %#1 to i64
+  %#12 = mul nuw i64 %#11, %#10
+  %#13 = lshr i64 %#12, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = lshr i32 %#14, %#15
+  br label %#8
+
+#6:
+  %#19 = sub i32 noundef %#0, %#14
+  %#20 = lshr i32 %#19, 1
+  %#21 = add i32 %#20, %#14
+  %#22 = and i32 %#15, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext nneg i8 noundef zeroext %#2 to i32
+  %#25 = lshr i32 noundef %#0, %#24
+  br label %#8
+
+#8:
+  %#26 = phi i32 [ %#25, %#7 ], [ %#23, %#6 ], [ %#18, %#5 ]
+  %#27 = xor i32 %#26, 1
+  ret i32 %#27
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i32 noundef %#1 = #x00000000 (0)
+i8 noundef zeroext %#2 = #x00 (0)
+
+Source:
+i1 %#9 = #x1 (1)
+  >> Jump to %#7
+i32 %#24 = #x00000000 (0)
+i32 %#25 = #x00000000 (0)
+  >> Jump to %#8
+i32 %#26 = #x00000000 (0)
+
+Target:
+i1 %#9 = #x1 (1)
+  >> Jump to %#7
+i32 %#24 = #x00000000 (0)
+i32 %#25 = #x00000000 (0)
+  >> Jump to %#8
+i32 %#26 = #x00000000 (0)
+i32 %#27 = #x00000001 (1)
+Source value: #x00000000 (0)
+Target value: #x00000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

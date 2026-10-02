@@ -1,0 +1,183 @@
+diff --git a/src/encode.rs b/src/encode.rs
+index c20d3fd..3316e73 100644
+--- a/src/encode.rs
++++ b/src/encode.rs
+@@ -65,6 +65,7 @@ pub fn encode_engine_slice<E: Engine, T: AsRef<[u8]>>(
+ /// `output` must be of size `encoded_size`.
+ ///
+ /// All bytes in `output` will be written to since it is exactly the size of the output.
++#[inline(always)]
+ pub(crate) fn encode_with_padding<E: Engine + ?Sized>(
+     input: &[u8],
+     output: &mut [u8],
+diff --git a/src/engine/general_purpose/mod.rs b/src/engine/general_purpose/mod.rs
+index 802d76b..73a428f 100644
+--- a/src/engine/general_purpose/mod.rs
++++ b/src/engine/general_purpose/mod.rs
+@@ -82,6 +82,7 @@ impl super::Engine for GeneralPurpose {
+     type Config = GeneralPurposeConfig;
+     type DecodeEstimate = GeneralPurposeEstimate;
+ 
++    #[inline(always)]
+     fn internal_encode(&self, input: &[u8], output: &mut [u8]) -> usize {
+         encode_helper(&self.encode_table, input, output, |_, _| (0, 0))
+     }
+@@ -123,7 +124,7 @@ impl super::Engine for GeneralPurpose {
+ /// must consume whole 3-byte groups: `input_consumed % 3 == 0`, `output_written == input_consumed /
+ /// 3 * 4`, both in bounds, and only those `output_written` bytes are written. `(0, 0)` (pure scalar)
+ /// is always valid.
+-#[inline]
++#[inline(always)]
+ pub(crate) fn encode_helper(
+     encode_table: &[u8; 64],
+     input: &[u8],
+@@ -146,8 +147,20 @@ pub(crate) fn encode_helper(
+     encode_scalar_tail(encode_table, input, output, input_index, output_index)
+ }
+ 
++// Each caller masks its input to six bits.
++#[inline(always)]
++fn encode_standard(value: u8) -> u8 {
++    let mut ascii = value + 65;
++    ascii += if value > 25 { 6 } else { 0 };
++    ascii -= if value > 51 { 75 } else { 0 };
++    ascii -= if value > 61 { 15 } else { 0 };
++    ascii += if value > 62 { 3 } else { 0 };
++    ascii
++}
++
+ /// Scalar encode of `input[input_index..]` into `output[output_index..]`, resuming from a 3-byte
+ /// group boundary. Returns the total number of output bytes written.
++#[inline(always)]
+ fn encode_scalar_tail(
+     encode_table: &[u8; 64],
+     input: &[u8],
+@@ -158,6 +171,10 @@ fn encode_scalar_tail(
+     const BLOCKS_PER_FAST_LOOP: usize = 4;
+     const LOW_SIX_BITS: u64 = 0x3F;
+ 
++    const STANDARD_ALPHABET: [u8; 64] =
++        *b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
++    let use_standard = input.len() >= 26 && *encode_table == STANDARD_ALPHABET;
++
+     // we read 8 bytes at a time (u64) but only actually consume 6 of those bytes. Thus, we need
+     // 2 trailing bytes to be available to read..
+     let last_fast_index = input.len().saturating_sub(BLOCKS_PER_FAST_LOOP * 6 + 2);
+@@ -177,49 +194,62 @@ fn encode_scalar_tail(
+             // Plus, single-digit percentage performance differences might well be quite different
+             // on different hardware.
+ 
+-            let input_u64 = read_u64(&input_chunk[0..]);
+-
+-            output_chunk[0] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[1] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[2] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[3] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[4] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[5] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[6] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[7] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+-
+-            let input_u64 = read_u64(&input_chunk[6..]);
+-
+-            output_chunk[8] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[9] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[10] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[11] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[12] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[13] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[14] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[15] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+-
+-            let input_u64 = read_u64(&input_chunk[12..]);
+-
+-            output_chunk[16] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[17] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[18] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[19] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[20] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[21] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[22] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[23] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+-
+-            let input_u64 = read_u64(&input_chunk[18..]);
+-
+-            output_chunk[24] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[25] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[26] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[27] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[28] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[29] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[30] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[31] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++            if use_standard {
++                for block in 0..8 {
++                    let a = input_chunk[block * 3];
++                    let b = input_chunk[block * 3 + 1];
++                    let c = input_chunk[block * 3 + 2];
++                    output_chunk[block * 4] = encode_standard(a >> 2);
++                    output_chunk[block * 4 + 1] = encode_standard(((a << 4) | (b >> 4)) & 63);
++                    output_chunk[block * 4 + 2] = encode_standard(((b << 2) | (c >> 6)) & 63);
++                    output_chunk[block * 4 + 3] = encode_standard(c & 63);
++                }
++            } else {
++                let input_u64 = read_u64(&input_chunk[0..]);
++
++                output_chunk[0] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[1] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[2] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[3] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[4] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[5] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[6] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[7] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++                let input_u64 = read_u64(&input_chunk[6..]);
++
++                output_chunk[8] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[9] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[10] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[11] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[12] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[13] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[14] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[15] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++                let input_u64 = read_u64(&input_chunk[12..]);
++
++                output_chunk[16] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[17] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[18] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[19] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[20] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[21] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[22] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[23] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++                let input_u64 = read_u64(&input_chunk[18..]);
++
++                output_chunk[24] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[25] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[26] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[27] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[28] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[29] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[30] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[31] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++
++            }
+ 
+             output_index += BLOCKS_PER_FAST_LOOP * 8;
+             input_index += BLOCKS_PER_FAST_LOOP * 6;
+diff --git a/src/engine/mod.rs b/src/engine/mod.rs
+index a7c2776..60ef97d 100644
+--- a/src/engine/mod.rs
++++ b/src/engine/mod.rs
+@@ -229,6 +229,7 @@ pub trait Engine: Send + Sync {
+         input: T,
+         output_buf: &mut [u8],
+     ) -> Result<usize, EncodeSliceError> {
++        #[inline(always)]
+         fn inner<E>(
+             engine: &E,
+             input_bytes: &[u8],

@@ -1,0 +1,61 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+struct str {
+  _0: [u8],
+}
+
+// Full name: test_crate::my_panic
+fn my_panic(_x: u32) -> !
+{
+    let _0: !; // return
+    let _x: u32; // arg #1
+
+    storage_live(_0)
+    panic(core::panicking::panic)
+    ↳⚡ storage_dead(_x)
+        unwind_continue
+}
+
+// Full name: test_crate::do_something_else
+fn do_something_else()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::call_my_panic
+fn call_my_panic()
+{
+    let _0: (); // return
+    let _1: !; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = my_panic(const 0u32)
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+}
+
+
+

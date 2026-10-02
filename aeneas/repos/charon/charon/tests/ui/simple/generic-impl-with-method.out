@@ -1,0 +1,54 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: test_crate::Trait
+pub trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn method<'_0_1>;
+    vtable: test_crate::Trait::{vtable}
+}
+
+// Full name: test_crate::{impl Trait for T}::method
+pub fn method<'_0, T>(self: &'_0 T)
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let self: &'1 T; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl Trait for T}
+impl<T> "impl_Trait_for_T" Trait for T
+where
+    TraitClause0: (T: Sized),
+{
+    proof ImpliedClause0: (T: MetaSized) = TraitClause0::ImpliedClause0
+    fn method<'_0_1> = method<'_0_1, T>[TraitClause0]
+    vtable: lazy
+}
+
+
+

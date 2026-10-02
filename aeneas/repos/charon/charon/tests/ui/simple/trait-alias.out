@@ -1,0 +1,175 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: test_crate::Trait
+trait Trait<Self, T, Self_Item>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (T: Sized)
+    proof ImpliedClause2: (Self_Item: Sized)
+    vtable: test_crate::Trait::{vtable}<T, Self_Item>
+}
+
+// Full name: test_crate::Struct
+struct Struct {}
+
+// Full name: test_crate::{impl Clone for Struct}::clone
+#[inline(hint)]
+pub fn clone<'_0>(self: &'_0 Struct) -> Struct
+{
+    let _0: Struct; // return
+    let self: &'1 Struct; // arg #1
+
+    storage_live(_0)
+    _0 = Struct {  }
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::{impl Clone for Struct}
+impl "impl_Clone_for_Struct" Clone for Struct {
+    proof ImpliedClause0: (Struct: Sized) = {built_in impl Sized for Struct}
+    fn clone<'_0_1> = clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: test_crate::{impl Trait<T, u32> for Struct}
+impl<T> "impl_Trait_for_Struct" Trait<T, u32> for Struct
+where
+    TraitClause0: (T: Sized),
+{
+    proof ImpliedClause0: (Struct: MetaSized) = {built_in impl MetaSized for Struct}
+    proof ImpliedClause1: (T: Sized) = TraitClause0
+    proof ImpliedClause2: (u32: Sized) = {built_in impl Sized for u32}
+    vtable: lazy
+}
+
+// Full name: test_crate::Alias
+trait Alias<Self, U>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Trait<Option<U>[Self::ImpliedClause3], u32>)
+    proof ImpliedClause2: (Self: Clone)
+    proof ImpliedClause3: (U: Sized)
+    non-dyn-compatible
+}
+
+// Full name: test_crate::Alias::{impl Alias<U> for Self}
+impl<Self, U> "impl_Alias_for_T" Alias<U> for Self
+where
+    TraitClause0: (Self: MetaSized),
+    TraitClause1: (Self: Trait<Option<U>[TraitClause3], u32>),
+    TraitClause2: (Self: Clone),
+    TraitClause3: (U: Sized),
+{
+    proof ImpliedClause0: (Self: MetaSized) = TraitClause0
+    proof ImpliedClause1: (Self: Trait<Option<U>[TraitClause3], u32>) = TraitClause1
+    proof ImpliedClause2: (Self: Clone) = TraitClause2
+    proof ImpliedClause3: (U: Sized) = TraitClause3
+    vtable: unknown // vtables of trait alias impls are not supported
+}
+
+// Full name: test_crate::takes_alias
+fn takes_alias<T>(x: T)
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Alias<()>),
+{
+    let _0: (); // return
+    let x: T; // arg #1
+    let _2: T; // anonymous local
+    let _3: &'1 T; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_2)
+    storage_live(_3)
+    _3 = &x
+    _2 = TraitClause1::ImpliedClause2::clone<'2>(move _3)
+    ↳⚡ conditional_drop[{built_in impl Destruct for T}::drop_glue<'3>] x
+        ↳⚡ storage_dead(x)
+            unwind_terminate
+        storage_dead(x)
+        unwind_continue
+    storage_dead(_3)
+    conditional_drop[{built_in impl Destruct for T}::drop_glue<'4>] _2
+    ↳⚡ conditional_drop[{built_in impl Destruct for T}::drop_glue<'3>] x
+        ↳⚡ storage_dead(x)
+            unwind_terminate
+        storage_dead(x)
+        unwind_continue
+    storage_dead(_2)
+    _0 = ()
+    conditional_drop[{built_in impl Destruct for T}::drop_glue<'5>] x
+    ↳⚡ storage_dead(x)
+        unwind_continue
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::use_alias
+fn use_alias()
+{
+    let _0: (); // return
+    let _1: (); // anonymous local
+    let _2: Struct; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    storage_live(_2)
+    _2 = Struct {  }
+    _1 = takes_alias<Struct>[{built_in impl Sized for Struct}, impl_Alias_for_T<Struct, ()>[{built_in impl MetaSized for Struct}, impl_Trait_for_Struct<Option<()>[{built_in impl Sized for ()}]>[{built_in impl Sized for Option<()>[{built_in impl Sized for ()}]}], impl_Clone_for_Struct, {built_in impl Sized for ()}]](move _2)
+    ↳⚡ unwind_continue
+    storage_dead(_2)
+    storage_dead(_1)
+    _0 = ()
+    return
+}
+
+
+

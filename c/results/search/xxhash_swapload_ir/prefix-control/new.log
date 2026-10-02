@@ -1,0 +1,29 @@
+
+----------------------------------------
+define i64 @prefix(i64 %data, i64 %key) {
+#0:
+  %mixed = xor i64 %data, %key
+  %result = bswap i64 %mixed
+  assume_welldefined i64 %result
+  ret i64 %result
+}
+=>
+define i64 @prefix(i64 %data, i64 %key) {
+#0:
+  %mixed = xor i64 %data, %key
+  %check = bswap i64 %mixed
+  assume_welldefined i64 %check
+  %d = bswap i64 %data
+  %k = bswap i64 %key
+  %result = xor i64 %d, %k
+  ret i64 %result
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

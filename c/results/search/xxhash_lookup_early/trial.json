@@ -1,0 +1,65 @@
+{
+  "name": "xxhash_lookup_early",
+  "accepted": false,
+  "functions": [
+    "target_0to16",
+    "target_1to3"
+  ],
+  "source_trial": "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_vectable_fusedswitch120",
+  "build": [
+    [
+      "clang",
+      "-O3",
+      "-march=x86-64-v3",
+      "-fno-strict-aliasing",
+      "-fno-vectorize",
+      "-fno-slp-vectorize",
+      "-I",
+      "/srv/home/hantaolou/code/veriop/alive2/repos/xxHash",
+      "-S",
+      "-emit-llvm",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/xxhash_lookup_early.c",
+      "-o",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/dispatcher.ll"
+    ],
+    [
+      "llvm-link",
+      "-S",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/dispatcher.ll",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/lookup.ll",
+      "-o",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/linked.ll"
+    ],
+    [
+      "opt",
+      "-S",
+      "-passes=forceattrs,always-inline,globaldce,verify",
+      "-force-attribute=target_1to3:alwaysinline",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/linked.ll",
+      "-o",
+      "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/new.ll"
+    ]
+  ],
+  "proof": [
+    "/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv",
+    "--bidirectional",
+    "--always-verify",
+    "--fail-src-ub",
+    "--smt-to=15000",
+    "--time-verify",
+    "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/old.ll",
+    "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_lookup_early/new.ll"
+  ],
+  "checker_sha256": "66689971f678366f269c47886d525ced6ae1a2f7711f025ddc4985bb1754e870",
+  "sha256": {
+    "linked.ll": "eb6e2e5a6664b82d4ecd8c4bcbbed2242ff67d6ed9ee3364352cef6d029e24e6",
+    "dispatcher.ll": "c8fd6d84e1e58c3b03fc39086e1105a4cf4d0ed0441dd144625e6420fead217d",
+    "proof.log": "6afa4e1c4bdda1f0b3b00747012f9b1a0861e394a19f64d35b9457aeb4a70b54",
+    "try-lookup-dispatch.py": "3e9148eab2ed3d17426511f73e86740b4a802f21610d0f90ff7e005e4f8acb8f",
+    "xxhash_lookup_early.c": "81e83e097896231eb933e392ef8a2db8d314e87f7568c9e81b1a3e8ea8bf5873",
+    "lookup.ll": "62b3bab87763309b21927e05a1890e8d7579220f122ecaeca0b01aa5774a2900",
+    "old.ll": "ed4be22ee397b8522841e09a80d4e79420879c935c75cc92d14ed8c002f0dec5",
+    "lookup-source.ll": "baa50c173dd5deec4546f142419469a3dba877677942e6f4b09e9f69c7818c3e",
+    "new.ll": "ca64d8649f0953ddee23692ad372e0e8486e2c8a5c7afe63f79f9a228e54e756"
+  }
+}

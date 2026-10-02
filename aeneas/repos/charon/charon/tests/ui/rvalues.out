@@ -1,0 +1,568 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::array::repeat
+pub fn repeat<T, const N : usize>(_1: T) -> [T; N]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Clone),
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for u32}::clone
+pub fn clone<'_0>(_1: &'_0 u32) -> u32
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for u32}
+impl "impl_Clone_for_u32" Clone for u32 {
+    proof ImpliedClause0: (u32: Sized) = {built_in impl Sized for u32}
+    fn clone<'_0_1> = clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::mem::size_of
+#[diagnostic_item("mem_size_of")]
+pub fn size_of<T>() -> usize
+where
+    TraitClause0: (T: Sized),
+= <opaque>
+
+// Full name: core::mem::align_of
+#[diagnostic_item("mem_align_of")]
+pub fn align_of<T>() -> usize
+where
+    TraitClause0: (T: Sized),
+= <opaque>
+
+// Full name: core::f32::{f32}::MAX
+pub fn MAX() -> f32
+= <opaque>
+
+struct () {}
+
+// Full name: core::f32::{f32}::MAX
+pub const MAX: f32 = MAX()
+
+// Full name: core::f64::{f64}::MIN
+pub fn MIN() -> f64
+= <opaque>
+
+// Full name: core::f64::{f64}::MIN
+pub const MIN: f64 = MIN()
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+struct (_,)<A> {
+  _0: A,
+}
+
+// Full name: test_crate::addr_of
+fn addr_of()
+{
+    let _0: (); // return
+    let x: u32; // local
+    let _2: *const u32; // anonymous local
+    let _3: &'1 u32; // anonymous local
+    let _4: *const u32; // anonymous local
+    let _5: *mut u32; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(x)
+    x = const 0u32
+    fake_read(x)
+    storage_live(_2)
+    storage_live(_3)
+    _3 = &x
+    _2 = &raw const (*_3)
+    set_type(typeof(_2) <= *const u32)
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_live(_4)
+    _4 = &raw const x
+    set_type(typeof(_4) <= *const u32)
+    storage_dead(_4)
+    storage_live(_5)
+    _5 = &raw mut x
+    set_type(typeof(_5) <= *mut u32)
+    storage_dead(_5)
+    _0 = ()
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::literal_casts
+fn literal_casts()
+{
+    let _0: (); // return
+    let _1: u8; // anonymous local
+    let _2: u64; // anonymous local
+    let _3: f64; // anonymous local
+    let _4: u64; // anonymous local
+    let _5: f64; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = cast<u64, u8>(const 0u64)
+    storage_dead(_1)
+    storage_live(_2)
+    _2 = cast<u8, u64>(const 0u8)
+    storage_dead(_2)
+    storage_live(_3)
+    _3 = cast<u64, f64>(const 0u64)
+    storage_dead(_3)
+    storage_live(_4)
+    _4 = cast<f64, u64>(copy MIN)
+    storage_dead(_4)
+    storage_live(_5)
+    _5 = cast<f32, f64>(copy MAX)
+    storage_dead(_5)
+    _0 = ()
+    return
+}
+
+fn test_crate::ptr_casts::foo()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::ptr_casts
+fn ptr_casts()
+{
+    let _0: (); // return
+    let array_ptr: *const [u32; 64usize]; // local
+    let _2: &'1 [u32; 64usize]; // anonymous local
+    let _3: *const u32; // anonymous local
+    let _4: *const [u32; 64usize]; // anonymous local
+    let x_5: u8; // local
+    let x_6: *const u8; // local
+    let _7: &'3 u8; // anonymous local
+    let _8: *const u8; // anonymous local
+    let _9: *const u8; // anonymous local
+    let _10: *mut u8; // anonymous local
+    let _11: *const u8; // anonymous local
+    let _12: usize; // anonymous local
+    let _13: *const u8; // anonymous local
+    let _14: *const u8; // anonymous local
+    let _15: *const u8; // anonymous local
+    let _16: fn(); // anonymous local
+    let _17: &'4 [u32; 64usize]; // anonymous local
+    let _18: &'5 [u32; 64usize]; // anonymous local
+    let _19: &'6 [u32; 64usize]; // anonymous local
+    let _20: [u32; 64usize]; // anonymous local
+
+    storage_live(_18)
+    storage_live(_19)
+    storage_live(_20)
+    _20 = repeat<u32, 64usize>[{built_in impl Sized for u32}, impl_Clone_for_u32](const 0u32)
+    ↳⚡ undefined_behavior
+    _19 = &_20
+    _18 = move _19
+    storage_live(_0)
+    storage_live(_17)
+    _0 = ()
+    storage_live(array_ptr)
+    storage_live(_2)
+    _17 = move _18
+    _2 = &(*_17)
+    array_ptr = &raw const (*_2)
+    fake_read(array_ptr)
+    set_type(typeof(array_ptr) == *const [u32; 64usize])
+    storage_dead(_2)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = copy array_ptr
+    _3 = cast<*const [u32; 64usize], *const u32>(move _4)
+    storage_dead(_4)
+    storage_dead(_3)
+    storage_live(x_5)
+    x_5 = const 0u8
+    fake_read(x_5)
+    storage_live(x_6)
+    storage_live(_7)
+    _7 = &x_5
+    x_6 = &raw const (*_7)
+    fake_read(x_6)
+    set_type(typeof(x_6) == *const u8)
+    storage_dead(_7)
+    storage_live(_8)
+    storage_live(_9)
+    storage_live(_10)
+    storage_live(_11)
+    _11 = copy x_6
+    _10 = cast<*const u8, *mut u8>(move _11)
+    _9 = cast<*mut u8, *const u8>(move _10)
+    storage_dead(_11)
+    storage_dead(_10)
+    _8 = cast<*const u8, *const u8>(move _9)
+    storage_dead(_9)
+    storage_dead(_8)
+    storage_live(_12)
+    storage_live(_13)
+    _13 = copy x_6
+    _12 = cast_expose<*const u8, usize>(move _13)
+    storage_dead(_13)
+    storage_dead(_12)
+    storage_live(_14)
+    _14 = cast_with_exposed<usize, *const u8>(const 0usize)
+    storage_dead(_14)
+    storage_live(_15)
+    storage_live(_16)
+    _16 = cast<test_crate::ptr_casts::foo, fn()>(const test_crate::ptr_casts::foo)
+    _15 = cast<fn(), *const u8>(move _16)
+    storage_dead(_16)
+    storage_dead(_15)
+    _0 = ()
+    storage_dead(x_6)
+    storage_dead(x_5)
+    storage_dead(array_ptr)
+    storage_dead(_17)
+    storage_dead(_20)
+    storage_dead(_19)
+    storage_dead(_18)
+    return
+}
+
+// Full name: test_crate::fn_casts::{closure}
+struct {closure} {}
+
+// Full name: test_crate::fn_casts::{impl Fn<(u8,)> for {closure}}::call
+fn call<'_0>(_1: &'_0 {closure}, tupled_args: (u8,))
+{
+    let _0: (); // return
+    let _1: &'1 {closure}; // arg #1
+    let tupled_args: (u8,); // arg #2
+    let _3: u8; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    _0 = ()
+    _3 = move tupled_args._0
+    _0 = ()
+    storage_dead(_3)
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::fn_casts::{impl FnMut<(u8,)> for {closure}}::call_mut
+fn call_mut<'_0>(state: &'_0 mut {closure}, args: (u8,))
+{
+    let _0: (); // return
+    let state: &'_0 mut {closure}; // arg #1
+    let args: (u8,); // arg #2
+    let _3: &'0 {closure}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_3)
+    _3 = &(*state)
+    _0 = call<'2>(move _3, move args)
+    ↳⚡ storage_dead(_3)
+        storage_dead(args)
+        storage_dead(state)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(args)
+    storage_dead(state)
+    return
+}
+
+// Full name: test_crate::fn_casts::{impl FnOnce<(u8,)> for {closure}}::call_once
+fn call_once(_1: {closure}, _2: (u8,))
+{
+    let _0: (); // return
+    let _1: {closure}; // arg #1
+    let _2: (u8,); // arg #2
+    let _3: &'1 mut {closure}; // anonymous local
+
+    storage_live(_0)
+    storage_live(_3)
+    _0 = ()
+    _3 = &mut _1
+    _0 = call_mut<'2>(move _3, move _2)
+    ↳⚡ storage_dead(_3)
+        storage_dead(_2)
+        storage_dead(_1)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::fn_casts::{closure}::{as_fn}
+fn {as_fn}(arg1: u8)
+{
+    let _0: (); // return
+    let arg1: u8; // arg #1
+    let args: (u8,); // local
+    let state: {closure}; // local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(args)
+    storage_live(state)
+    args = (move arg1,)
+    state = {closure} {  }
+    _0 = call_once(move state, move args)
+    ↳⚡ storage_dead(state)
+        storage_dead(args)
+        storage_dead(arg1)
+        unwind_continue
+    storage_dead(state)
+    storage_dead(args)
+    storage_dead(arg1)
+    return
+}
+
+// Full name: test_crate::fn_casts::bar
+unsafe fn bar()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+fn test_crate::fn_casts::foo()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::fn_casts
+fn fn_casts()
+{
+    let _0: (); // return
+    let _1: fn(); // anonymous local
+    let _2: unsafe fn(); // anonymous local
+    let closure: {closure}; // local
+    let _4: fn(u8); // anonymous local
+    let _5: {closure}; // anonymous local
+    let _6: unsafe fn(u8); // anonymous local
+    let _7: {closure}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = cast<test_crate::fn_casts::foo, fn()>(const test_crate::fn_casts::foo)
+    storage_dead(_1)
+    storage_live(_2)
+    _2 = cast<bar, unsafe fn()>(const bar)
+    storage_dead(_2)
+    storage_live(closure)
+    closure = {closure} {  }
+    fake_read(closure)
+    storage_live(_4)
+    storage_live(_5)
+    _5 = copy closure
+    _4 = cast<{as_fn}, fn(u8)>(const {as_fn})
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_live(_6)
+    storage_live(_7)
+    _7 = copy closure
+    _6 = cast<{as_fn}, unsafe fn(u8)>(const {as_fn})
+    storage_dead(_7)
+    storage_dead(_6)
+    _0 = ()
+    storage_dead(closure)
+    return
+}
+
+// Full name: test_crate::STEAL
+fn STEAL() -> [(); 1usize]
+{
+    let _0: [(); 1usize]; // return
+    let _1: (); // anonymous local
+
+    storage_live(_0)
+    storage_live(_1)
+    _1 = ()
+    _0 = repeat<(), 1usize>[{built_in impl Sized for ()}, {built_in impl Clone for ()}](move _1)
+    ↳⚡ undefined_behavior
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::STEAL
+static STEAL: [(); 1usize] = STEAL()
+
+// Full name: test_crate::transmute
+fn transmute(x: [u32; 2usize]) -> u64
+{
+    let _0: u64; // return
+    let x: [u32; 2usize]; // arg #1
+    let _2: [u32; 2usize]; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    // When optimized, this becomes a built-in cast. Otherwise this is just a call to `transmute`.
+    _2 = copy x
+    _0 = transmute<[u32; 2usize], u64>(move _2)
+    storage_dead(_2)
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::STEAL2
+fn STEAL2() -> [(); 13usize]
+{
+    let _0: [(); 13usize]; // return
+    let _1: (); // anonymous local
+
+    storage_live(_0)
+    storage_live(_1)
+    _1 = ()
+    _0 = repeat<(), 13usize>[{built_in impl Sized for ()}, {built_in impl Clone for ()}](move _1)
+    ↳⚡ undefined_behavior
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::STEAL2
+static STEAL2: [(); 13usize] = STEAL2()
+
+// Full name: test_crate::nullary_ops::Struct
+struct Struct<T>
+where
+    TraitClause0: (T: Sized),
+{
+  a: u8,
+  b: T,
+}
+
+// Full name: test_crate::nullary_ops
+fn nullary_ops<T>() -> usize
+where
+    TraitClause0: (T: Sized),
+{
+    let _0: usize; // return
+    let size: usize; // local
+    let align: usize; // local
+    let ub: bool; // local
+    let offset: usize; // local
+    let _5: usize; // anonymous local
+    let _6: usize; // anonymous local
+    let _7: usize; // anonymous local
+    let _8: usize; // anonymous local
+    let _9: usize; // anonymous local
+    let _10: usize; // anonymous local
+    let _11: bool; // anonymous local
+    let _12: usize; // anonymous local
+    let _13: usize; // anonymous local
+    let _14: usize; // anonymous local
+    let _15: bool; // anonymous local
+    let _16: usize; // anonymous local
+    let _17: usize; // anonymous local
+
+    storage_live(_0)
+    storage_live(_9)
+    storage_live(_12)
+    storage_live(_14)
+    storage_live(size)
+    size = size_of<T>[TraitClause0]()
+    ↳⚡ storage_dead(_15)
+        storage_dead(_14)
+        storage_dead(_12)
+        storage_dead(_9)
+        unwind_continue
+    storage_live(align)
+    align = align_of<T>[TraitClause0]()
+    ↳⚡ storage_dead(_15)
+        storage_dead(_14)
+        storage_dead(_12)
+        storage_dead(_9)
+        unwind_continue
+    storage_live(_16)
+    storage_live(_17)
+    // This is `const (false)` in the MIR we get, but `true` in const evaluation.
+    _17 = const offset_of(Struct<T>[TraitClause0].b)
+    _16 = move _17
+    storage_live(ub)
+    storage_live(_15)
+    _15 = ub_checks
+    ub = move _15
+    storage_live(offset)
+    offset = move _16
+    storage_live(_5)
+    storage_live(_6)
+    storage_live(_7)
+    _7 = copy size
+    storage_live(_8)
+    _8 = copy align
+    _9 = copy _7 panic.+ copy _8
+    _6 = move _9
+    storage_dead(_8)
+    storage_dead(_7)
+    storage_live(_10)
+    storage_live(_11)
+    _11 = copy ub
+    _10 = cast<bool, usize>(move _11)
+    storage_dead(_11)
+    _12 = copy _6 panic.+ copy _10
+    _5 = move _12
+    storage_dead(_10)
+    storage_dead(_6)
+    storage_live(_13)
+    _13 = copy offset
+    _14 = copy _5 panic.+ copy _13
+    _0 = move _14
+    storage_dead(_13)
+    storage_dead(_5)
+    storage_dead(offset)
+    storage_dead(ub)
+    storage_dead(align)
+    storage_dead(size)
+    storage_dead(_15)
+    storage_dead(_14)
+    storage_dead(_12)
+    storage_dead(_9)
+    storage_dead(_17)
+    storage_dead(_16)
+    return
+}
+
+
+

@@ -1,0 +1,32 @@
+
+----------------------------------------
+define i64 @src(i8 %idx) {
+#0:
+  %bounded = and i8 %idx, 3
+  %v = extractelement <4 x i64> { 4, 20, 300, 7000 }, i8 %bounded
+  ret i64 %v
+}
+=>
+@table = constant 32 bytes, align 16
+
+define i64 @tgt(i8 %idx) {
+init:
+  store [4 x i64] { 4, 20, 300, 7000 }, ptr @table, align 16
+  br label %#0
+
+#0:
+  %bounded = and i8 %idx, 3
+  %stable = freeze i8 %bounded
+  %safe = and i8 %stable, 3
+  %wide = zext i8 %safe to i64
+  %p = gep inbounds ptr @table, 32 x i64 0, 8 x i64 %wide
+  %v = load i64, ptr %p, align 8
+  %same = icmp eq i8 %bounded, %stable
+  %fallback = extractelement <4 x i64> { 4, 20, 300, 7000 }, i8 %bounded
+  %result = select i1 %same, i64 %v, i64 %fallback
+  ret i64 %result
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

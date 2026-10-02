@@ -1,0 +1,30 @@
+{
+  "stages": {
+    "old": [
+      "mov -0x4(%rdi,%rsi,1),%eax",
+      "mov (%rdi),%ecx",
+      "shl $0x20,%rcx",
+      "or %rax,%rcx",
+      "movabs $0xc73ab174c5ecd5a2,%rax",
+      "xor %rcx,%rax",
+      "rorx $0xf,%rax,%rcx",
+      "rorx $0x28,%rax,%rdx",
+      "xor %rcx,%rdx",
+      "xor %rax,%rdx"
+    ],
+    "new": [
+      "vmovd -0x4(%rdi,%rsi,1),%xmm0",
+      "vpinsrd $0x1,(%rdi),%xmm0,%xmm0",
+      "vpbroadcastq %xmm0,%xmm0",
+      "vpxorq 0x1946(%rip){1to2},%xmm0,%xmm0 # ADDR <_IO_stdin_used+0x10>",
+      "vprolvq 0x194c(%rip),%xmm0,%xmm1 # ADDR <_IO_stdin_used+0x20>",
+      "vpshufd $0xee,%xmm1,%xmm2",
+      "vpternlogq $0x96,%xmm1,%xmm0,%xmm2",
+      "vmovq %xmm2,%rax"
+    ]
+  },
+  "original_instructions": 10,
+  "candidate_instructions": 8,
+  "unchanged_long_path_prefix_instructions": 21,
+  "scope": "Instruction counts and unchanged prefix; not a performance bound."
+}

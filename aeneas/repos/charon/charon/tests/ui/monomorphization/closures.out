@@ -1,0 +1,270 @@
+# Final LLBC before serialization:
+
+// Full name: test_crate::Thing
+struct Thing {}
+
+struct () {}
+
+// Full name: core::mem::drop::<Thing>
+#[diagnostic_item("mem_drop")]
+pub fn drop::<Thing>(_1: Thing)
+= <opaque>
+
+struct (_,)::<u8> {
+  _0: u8,
+}
+
+struct (_, _)::<u8, bool> {
+  _0: u8,
+  _1: bool,
+}
+
+struct test_crate::main::{closure}<'_0> {
+  _0: &'_0 u8,
+}
+
+// Full name: test_crate::main::{impl Fn<(u8,)> for test_crate::main::{closure}<'_0>}::call
+fn call<'_0, '_1>(_1: &'_1 test_crate::main::{closure}<'_0>, tupled_args: (u8,)) -> u8
+where
+    RegionOutlives0: '_0: '_1,
+{
+    let _0: u8; // return
+    let _1: &'1 test_crate::main::{closure}<'_0>; // arg #1
+    let tupled_args: (u8,); // arg #2
+    let x: u8; // local
+    let _4: u8; // anonymous local
+    let _5: u8; // anonymous local
+    let _6: u8; // anonymous local
+
+    storage_live(_0)
+    storage_live(x)
+    storage_live(_6)
+    x = move tupled_args._0
+    storage_live(_4)
+    _4 = copy x
+    storage_live(_5)
+    _5 = copy (*(*_1)._0)
+    _6 = copy _4 panic.+ copy _5
+    _0 = move _6
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_dead(_6)
+    storage_dead(x)
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::apply_to_zero::<test_crate::main::{closure}<'_>>
+fn apply_to_zero::<test_crate::main::{closure}<'_>>(f: test_crate::main::{closure}<'_>) -> u8
+{
+    let _0: u8; // return
+    let f: test_crate::main::{closure}<'0>; // arg #1
+    let _2: &'3 test_crate::main::{closure}<'4>; // anonymous local
+    let _3: (u8,); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = &f
+    storage_live(_3)
+    _3 = (const 0u8,)
+    _0 = call<'5, '7>(move _2, move _3)
+    ↳⚡ storage_dead(f)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(f)
+    return
+}
+
+struct test_crate::main::{closure#1}<'_0> {
+  _0: &'_0 mut u8,
+}
+
+// Full name: test_crate::main::{impl FnMut<(u8,)> for test_crate::main::{closure#1}<'_0>}::call_mut
+fn call_mut<'_0, '_1>(_1: &'_1 mut test_crate::main::{closure#1}<'_0>, tupled_args: (u8,)) -> u8
+where
+    RegionOutlives0: '_0: '_1,
+{
+    let _0: u8; // return
+    let _1: &'1 mut test_crate::main::{closure#1}<'_0>; // arg #1
+    let tupled_args: (u8,); // arg #2
+    let x: u8; // local
+    let _4: u8; // anonymous local
+    let _5: u8; // anonymous local
+    let _6: u8; // anonymous local
+    let _7: u8; // anonymous local
+
+    storage_live(_0)
+    storage_live(x)
+    storage_live(_4)
+    storage_live(_7)
+    x = move tupled_args._0
+    _4 = copy (*(*_1)._0) panic.+ const 1u8
+    (*(*_1)._0) = move _4
+    storage_live(_5)
+    _5 = copy x
+    storage_live(_6)
+    _6 = copy (*(*_1)._0)
+    _7 = copy _5 panic.+ copy _6
+    _0 = move _7
+    storage_dead(_6)
+    storage_dead(_5)
+    storage_dead(_7)
+    storage_dead(_4)
+    storage_dead(x)
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::apply_to_zero_mut::<test_crate::main::{closure#1}<'_>>
+fn apply_to_zero_mut::<test_crate::main::{closure#1}<'_>>(f: test_crate::main::{closure#1}<'_>) -> u8
+{
+    let _0: u8; // return
+    let f: test_crate::main::{closure#1}<'0>; // arg #1
+    let _2: &'3 mut test_crate::main::{closure#1}<'4>; // anonymous local
+    let _3: (u8,); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = &mut f
+    storage_live(_3)
+    _3 = (const 0u8,)
+    _0 = call_mut<'5, '7>(move _2, move _3)
+    ↳⚡ storage_dead(f)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(f)
+    return
+}
+
+struct test_crate::main::{closure#2} {
+  _0: Thing,
+}
+
+// Full name: test_crate::main::{impl FnOnce<(u8,)> for test_crate::main::{closure#2}}::call_once
+fn call_once(_1: test_crate::main::{closure#2}, tupled_args: (u8,)) -> u8
+{
+    let _0: u8; // return
+    let _1: test_crate::main::{closure#2}; // arg #1
+    let tupled_args: (u8,); // arg #2
+    let x: u8; // local
+    let _4: (); // anonymous local
+    let _5: Thing; // anonymous local
+    let _6: u8; // anonymous local
+    let _7: u8; // anonymous local
+
+    storage_live(_0)
+    storage_live(x)
+    storage_live(_7)
+    x = move tupled_args._0
+    storage_live(_4)
+    storage_live(_5)
+    _5 = move _1._0
+    _4 = drop::<Thing>(move _5)
+    ↳⚡ storage_dead(_7)
+        storage_dead(x)
+        storage_dead(tupled_args)
+        storage_dead(_1)
+        unwind_continue
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_live(_6)
+    _6 = copy x
+    _7 = copy _6 panic.+ const 1u8
+    _0 = move _7
+    storage_dead(_6)
+    storage_dead(_7)
+    storage_dead(x)
+    storage_dead(tupled_args)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::apply_to_zero_once::<test_crate::main::{closure#2}>
+fn apply_to_zero_once::<test_crate::main::{closure#2}>(f: test_crate::main::{closure#2}) -> u8
+{
+    let _0: u8; // return
+    let f: test_crate::main::{closure#2}; // arg #1
+    let _2: test_crate::main::{closure#2}; // anonymous local
+    let _3: (u8,); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _2 = move f
+    storage_live(_3)
+    _3 = (const 0u8,)
+    _0 = call_once(move _2, move _3)
+    ↳⚡ storage_dead(f)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(f)
+    return
+}
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+    let z_1: u8; // local
+    let _2: u8; // anonymous local
+    let _3: test_crate::main::{closure}<'1>; // anonymous local
+    let _4: &'3 u8; // anonymous local
+    let z_5: u8; // local
+    let _6: u8; // anonymous local
+    let _7: test_crate::main::{closure#1}<'5>; // anonymous local
+    let _8: &'7 mut u8; // anonymous local
+    let z_9: Thing; // local
+    let _10: u8; // anonymous local
+    let _11: test_crate::main::{closure#2}; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(z_1)
+    z_1 = const 1u8
+    fake_read(z_1)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_4)
+    _4 = &z_1
+    _3 = test_crate::main::{closure} { _0: move _4 }
+    storage_dead(_4)
+    _2 = apply_to_zero::<test_crate::main::{closure}<'_>>(move _3)
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_live(z_5)
+    z_5 = const 3u8
+    fake_read(z_5)
+    storage_live(_6)
+    storage_live(_7)
+    storage_live(_8)
+    _8 = &mut z_5
+    _7 = test_crate::main::{closure#1} { _0: move _8 }
+    storage_dead(_8)
+    _6 = apply_to_zero_mut::<test_crate::main::{closure#1}<'_>>(move _7)
+    ↳⚡ unwind_continue
+    storage_dead(_7)
+    storage_dead(_6)
+    storage_live(z_9)
+    z_9 = Thing {  }
+    fake_read(z_9)
+    storage_live(_10)
+    storage_live(_11)
+    _11 = test_crate::main::{closure#2} { _0: move z_9 }
+    _10 = apply_to_zero_once::<test_crate::main::{closure#2}>(move _11)
+    ↳⚡ unwind_continue
+    storage_dead(_11)
+    storage_dead(_10)
+    _0 = ()
+    storage_dead(z_9)
+    storage_dead(z_5)
+    storage_dead(z_1)
+    return
+}
+
+
+

@@ -1,0 +1,95 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::mem::maybe_uninit::MaybeUninit
+#[lang_item(MaybeUninit)]
+pub opaque type MaybeUninit<T>
+where
+    TraitClause0: (T: Sized),
+
+struct () {}
+
+static test_crate::{promoted_const}: MaybeUninit<[u8; 1usize]>[{built_in impl Sized for [u8; 1usize]}] = RawMemory(0x01)
+
+static test_crate::{promoted_const#1}: MaybeUninit<[u8; 2usize]>[{built_in impl Sized for [u8; 2usize]}] = RawMemory(0x02, 0x00)
+
+static test_crate::{promoted_const#2}: MaybeUninit<[u8; 4usize]>[{built_in impl Sized for [u8; 4usize]}] = RawMemory(0x03, 0x00, 0x00, 0x00)
+
+static test_crate::{promoted_const#3}: MaybeUninit<[u8; 8usize]>[{built_in impl Sized for [u8; 8usize]}] = RawMemory(0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+
+static test_crate::{promoted_const#4}: MaybeUninit<[u8; 16usize]>[{built_in impl Sized for [u8; 16usize]}] = RawMemory(0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+
+static test_crate::{promoted_const#5}: MaybeUninit<[u8; 12usize]>[{built_in impl Sized for [u8; 12usize]}] = RawMemory(0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00)
+
+static test_crate::{promoted_const#6}: MaybeUninit<[u8; 12usize]>[{built_in impl Sized for [u8; 12usize]}] = RawMemory(0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00)
+
+static test_crate::{promoted_const#7}: MaybeUninit<[u8; 16usize]>[{built_in impl Sized for [u8; 16usize]}] = RawMemory(0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, --, --, --, --, --, --, --)
+
+// Full name: test_crate::S
+struct S {
+  a: u8,
+  b: u64,
+}
+
+// Full name: test_crate::U8
+static U8: &'static u8 = &test_crate::{promoted_const}
+
+// Full name: test_crate::U16
+static U16: &'static u16 = &test_crate::{promoted_const#1}
+
+// Full name: test_crate::U32
+static U32: &'static u32 = &test_crate::{promoted_const#2}
+
+// Full name: test_crate::U64
+static U64: &'static u64 = &test_crate::{promoted_const#3}
+
+// Full name: test_crate::U128
+static U128: &'static u128 = &test_crate::{promoted_const#4}
+
+// Full name: test_crate::ARR
+static ARR: &'static [u32; 3usize] = &test_crate::{promoted_const#5}
+
+// Full name: test_crate::SLICE
+static SLICE: &'static [u32] = &test_crate::{promoted_const#6} with_metadata(3usize)
+
+// Full name: test_crate::STRUCT
+static STRUCT: &'static S = &test_crate::{promoted_const#7}
+
+// Full name: test_crate::INNER
+static INNER: &'static u64 = &2u64
+
+// Full name: test_crate::main
+fn main()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _ = U8
+    _ = U16
+    _ = U32
+    _ = U64
+    _ = U128
+    _ = ARR
+    _ = SLICE
+    _ = STRUCT
+    _ = INNER
+    _0 = ()
+    return
+}
+
+
+

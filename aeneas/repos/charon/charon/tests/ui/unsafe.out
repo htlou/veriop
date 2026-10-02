@@ -1,0 +1,359 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::PartialEq
+#[lang_item(PartialEq)]
+#[diagnostic_item("PartialEq")]
+pub trait PartialEq<Self, Rhs>
+{
+    fn eq<'_0_1, '_1_1>;
+    vtable: core::cmp::PartialEq::{vtable}<Rhs>
+}
+
+// Full name: core::cmp::Eq
+#[diagnostic_item("Eq")]
+pub trait Eq<Self>
+{
+    proof ImpliedClause0: (Self: PartialEq<Self>)
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::Ordering
+#[lang_item(OrderingEnum)]
+pub enum Ordering {
+  Less,
+  Equal,
+  Greater,
+}
+
+// Full name: core::option::Option
+#[lang_item(Option)]
+#[diagnostic_item("Option")]
+pub enum Option<T>
+where
+    TraitClause0: (T: Sized),
+{
+  None,
+  Some { _0: T },
+}
+
+// Full name: core::cmp::PartialOrd
+#[lang_item(PartialOrd)]
+#[diagnostic_item("PartialOrd")]
+pub trait PartialOrd<Self, Rhs>
+{
+    proof ImpliedClause0: (Self: PartialEq<Rhs>)
+    fn partial_cmp<'_0_1, '_1_1>;
+    vtable: core::cmp::PartialOrd::{vtable}<Rhs>
+}
+
+// Full name: core::cmp::Ord
+#[diagnostic_item("Ord")]
+pub trait Ord<Self>
+{
+    proof ImpliedClause0: (Self: Eq)
+    proof ImpliedClause1: (Self: PartialOrd<Self>)
+    fn cmp<'_0_1, '_1_1>;
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: core::cmp::impls::{impl PartialEq<()> for ()}::eq
+pub fn eq<'_0, '_1>(_1: &'_0 (), _2: &'_1 ()) -> bool
+= <opaque>
+
+// Full name: core::cmp::impls::{impl PartialEq<()> for ()}
+impl "impl_PartialEq_unit_for_unit" PartialEq<()> for () {
+    fn eq<'_0_1, '_1_1> = eq<'_0_1, '_1_1>
+    vtable: lazy
+}
+
+// Full name: core::cmp::impls::{impl Eq for ()}
+impl "impl_Eq_for_unit" Eq for () {
+    proof ImpliedClause0: ((): PartialEq<()>) = impl_PartialEq_unit_for_unit
+    non-dyn-compatible
+}
+
+// Full name: core::cmp::impls::{impl PartialOrd<()> for ()}::partial_cmp
+pub fn partial_cmp<'_0, '_1>(_1: &'_0 (), _2: &'_1 ()) -> Option<Ordering>[{built_in impl Sized for Ordering}]
+= <opaque>
+
+// Full name: core::cmp::impls::{impl PartialOrd<()> for ()}
+impl "impl_PartialOrd_unit_for_unit" PartialOrd<()> for () {
+    proof ImpliedClause0: ((): PartialEq<()>) = impl_PartialEq_unit_for_unit
+    fn partial_cmp<'_0_1, '_1_1> = partial_cmp<'_0_1, '_1_1>
+    vtable: lazy
+}
+
+// Full name: core::cmp::impls::{impl Ord for ()}::cmp
+pub fn cmp<'_0, '_1>(_1: &'_0 (), _2: &'_1 ()) -> Ordering
+= <opaque>
+
+// Full name: core::cmp::impls::{impl Ord for ()}
+impl "impl_Ord_for_unit" Ord for () {
+    proof ImpliedClause0: ((): Eq) = impl_Eq_for_unit
+    proof ImpliedClause1: ((): PartialOrd<()>) = impl_PartialOrd_unit_for_unit
+    fn cmp<'_0_1, '_1_1> = cmp<'_0_1, '_1_1>
+    non-dyn-compatible
+}
+
+// Full name: core::hash::Hasher
+pub trait Hasher<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn finish<'_0_1>;
+    fn write<'_0_1, '_1_1>;
+    vtable: core::hash::Hasher::{vtable}
+}
+
+// Full name: core::hash::Hash
+#[diagnostic_item("Hash")]
+pub trait Hash<Self>
+{
+    fn hash<'_0_1, '_1_1, H, TraitClause0_1: (H: Sized), TraitClause1_1: (H: Hasher)>;
+    non-dyn-compatible
+}
+
+// Full name: core::hash::impls::{impl Hash for ()}::hash
+pub fn hash<'_0, '_1, H>(_1: &'_0 (), _2: &'_1 mut H)
+where
+    TraitClause0: (H: Sized),
+    TraitClause1: (H: Hasher),
+    TypeOutlives0: H: '_1,
+= <opaque>
+
+// Full name: core::hash::impls::{impl Hash for ()}
+impl "impl_Hash_for_unit" Hash for () {
+    fn hash<'_0_1, '_1_1, H, TraitClause0_1: (H: Sized), TraitClause1_1: (H: Hasher)> = hash<'_0_1, '_1_1, H>[TraitClause0_1, TraitClause1_1]
+    non-dyn-compatible
+}
+
+#[rustc_intrinsic]
+pub unsafe fn core::intrinsics::assume(b_1: bool)
+= <intrinsic:assume>
+
+// Full name: core::marker::Send
+#[diagnostic_item("Send")]
+pub unsafe trait Send<Self>
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::Sync
+#[lang_item(Sync)]
+#[diagnostic_item("Sync")]
+pub unsafe trait Sync<Self>
+
+// Full name: core::marker::Freeze
+#[lang_item(Freeze)]
+pub unsafe trait Freeze<Self>
+
+// Full name: core::marker::Unpin
+#[lang_item(Unpin)]
+pub trait Unpin<Self>
+
+// Full name: core::ptr::const_ptr::{*const T}::read
+#[track_caller]
+pub unsafe fn read<T>(_1: *const T) -> T
+where
+    TraitClause0: (T: Sized),
+= <opaque>
+
+// Full name: core::ptr::metadata::Pointee
+#[lang_item(PointeeTrait)]
+pub trait Pointee<Self>
+{
+    proof ImpliedClause0: (Self::Metadata: Sized)
+    proof ImpliedClause1: (Self::Metadata: Debug)
+    proof ImpliedClause2: (Self::Metadata: Copy)
+    proof ImpliedClause3: (Self::Metadata: Send)
+    proof ImpliedClause4: (Self::Metadata: Sync)
+    proof ImpliedClause5: (Self::Metadata: Ord)
+    proof ImpliedClause6: (Self::Metadata: Hash)
+    proof ImpliedClause7: (Self::Metadata: Unpin)
+    proof ImpliedClause8: (Self::Metadata: Freeze)
+    type Metadata
+    non-dyn-compatible
+}
+
+// Full name: core::ptr::null
+#[diagnostic_item("ptr_null")]
+pub fn null<T>() -> *const T
+where
+    TraitClause0: (T: Thin),
+= <opaque>
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+
+struct str {
+  _0: [u8],
+}
+
+// Full name: test_crate::call_unsafe_fn
+fn call_unsafe_fn()
+{
+    let _0: (); // return
+    let x: *const u32; // local
+    let _2: u32; // anonymous local
+    let _3: *const u32; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(x)
+    x = null<u32>[{impl#7}<u32>[{built_in impl Pointee for u32 where Metadata  = ()}]]()
+    ↳⚡ unwind_continue
+    fake_read(x)
+    set_type(typeof(x) == *const u32)
+    storage_live(_2)
+    storage_live(_3)
+    _3 = copy x
+    _2 = read<u32>[{built_in impl Sized for u32}](move _3)
+    ↳⚡ unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::deref_raw_ptr
+fn deref_raw_ptr()
+{
+    let _0: (); // return
+    let x: *const u32; // local
+    let _2: u32; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(x)
+    x = null<u32>[{impl#7}<u32>[{built_in impl Pointee for u32 where Metadata  = ()}]]()
+    ↳⚡ unwind_continue
+    fake_read(x)
+    set_type(typeof(x) == *const u32)
+    storage_live(_2)
+    _2 = copy (*x)
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(x)
+    return
+}
+
+// Full name: test_crate::Trait
+unsafe trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    vtable: test_crate::Trait::{vtable}
+}
+
+// Full name: test_crate::{impl Trait for ()}
+unsafe impl "impl_Trait_for_unit" Trait for () {
+    proof ImpliedClause0: ((): MetaSized) = {built_in impl MetaSized for ()}
+    vtable: lazy
+}
+
+// Full name: test_crate::COUNTER
+fn COUNTER() -> usize
+{
+    let _0: usize; // return
+
+    storage_live(_0)
+    _0 = const 0usize
+    return
+}
+
+// Full name: test_crate::COUNTER
+static mut COUNTER: usize = COUNTER()
+
+// Full name: test_crate::access_mutable_static
+fn access_mutable_static()
+{
+    let _0: (); // return
+    let _1: usize; // anonymous local
+
+    storage_live(_0)
+    storage_live(_1)
+    _0 = ()
+    _1 = copy COUNTER panic.+ const 1usize
+    COUNTER = move _1
+    _0 = ()
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::Foo
+union Foo {
+  one: u64,
+  two: [u32; 2usize],
+}
+
+// Full name: test_crate::access_union_field
+fn access_union_field()
+{
+    let _0: (); // return
+    let one: Foo; // local
+    let _two: [u32; 2usize]; // local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(one)
+    one = Foo { one: const 42u64 }
+    fake_read(one)
+    storage_live(_two)
+    _two = copy one.two
+    fake_read(_two)
+    _0 = ()
+    storage_dead(_two)
+    storage_dead(one)
+    return
+}
+
+fn test_crate::assume()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = core::intrinsics::assume(const true)
+    ↳⚡ unwind_continue
+    return
+}
+
+
+

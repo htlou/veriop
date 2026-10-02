@@ -1,0 +1,47 @@
+diff --git a/src/sink.rs b/src/sink.rs
+index 063b942..64f0046 100644
+--- a/src/sink.rs
++++ b/src/sink.rs
+@@ -192,8 +192,11 @@ impl Sink for SliceSink<'_> {
+     #[cfg_attr(feature = "nightly", optimize(size))] // to avoid loop unrolling
+     fn extend_from_within_overlapping(&mut self, start: usize, num_bytes: usize) {
+         let offset = self.pos - start;
+-        for i in start + offset..start + offset + num_bytes {
+-            self.output[i] = self.output[i - offset];
++        if num_bytes != 0 {
++            let output = &mut self.output[start..self.pos + num_bytes];
++            for i in offset..output.len() {
++                output[i] = output[i - offset];
++            }
+         }
+         self.pos += num_bytes;
+     }
+@@ -344,3 +347,28 @@ mod tests {
+         assert_eq!(sink.capacity(), 5);
+     }
+ }
++
++#[cfg(all(test, feature = "safe-decode"))]
++mod overlap_copy_tests {
++    use super::{Sink, SliceSink};
++
++    #[test]
++    fn overlap_matches_bytewise_copy() {
++        for pos in 0..65 {
++            for start in 0..=pos {
++                for count in 0..257 {
++                    let mut expected: Vec<u8> = (0..pos + count + 17)
++                        .map(|i| (i * 37 + 11) as u8).collect();
++                    let mut actual = expected.clone();
++                    for i in pos..pos + count {
++                        expected[i] = expected[i - (pos - start)];
++                    }
++                    let mut sink = SliceSink::new(&mut actual, pos);
++                    sink.extend_from_within_overlapping(start, count);
++                    assert_eq!(sink.pos(), pos + count);
++                    assert_eq!(actual, expected, "pos={pos}, start={start}, count={count}");
++                }
++            }
++        }
++    }
++}

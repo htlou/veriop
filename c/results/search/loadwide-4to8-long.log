@@ -1,0 +1,111 @@
+
+----------------------------------------
+define i64 @target_4to8(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#4:
+  %#5 = icmp samesign ugt i64 noundef %#1, 3
+  assume i1 %#5
+  %#6 = icmp ult i64 noundef %#1, 9
+  assume i1 %#6
+  %#7 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#7
+  %#8 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#8
+  %#9 = trunc i64 noundef %#3 to i32
+  %#10 = bswap i32 %#9
+  assume_welldefined i32 %#10
+  %#11 = zext i32 %#10 to i64
+  %#12 = shl nuw i64 %#11, 32
+  %#13 = xor i64 %#12, noundef %#3
+  %#14 = load i32, ptr nowrite noundef %#0, align 1
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#16 = gep inbounds ptr %#15, 1 x i64 -4
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 8
+  %#19 = load i64, ptr %#18, align 1
+  %#20 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 16
+  %#21 = load i64, ptr %#20, align 1
+  %#22 = xor i64 %#21, %#19
+  %#23 = sub i64 %#22, %#13
+  %#24 = zext i32 %#17 to i64
+  %#25 = zext i32 %#14 to i64
+  %#26 = shl nuw i64 %#25, 32
+  %#27 = or disjoint i64 %#26, %#24
+  %#28 = xor i64 %#23, %#27
+  %#29 = fshl i64 %#28, i64 %#28, i64 49
+  %#30 = fshl i64 %#28, i64 %#28, i64 24
+  %#31 = xor i64 %#29, %#30
+  %#32 = xor i64 %#31, %#28
+  %#33 = mul i64 %#32, -6939452855193903323
+  %#34 = lshr i64 %#33, 35
+  %#35 = add nsw nuw i64 %#34, noundef %#1
+  %#36 = xor i64 %#35, %#33
+  %#37 = mul i64 %#36, -6939452855193903323
+  %#38 = lshr i64 %#37, 28
+  %#39 = xor i64 %#38, %#37
+  ret i64 %#39
+}
+=>
+define i64 @target_4to8(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#4:
+  %#8 = icmp samesign ugt i64 noundef %#1, 3
+  assume i1 %#8
+  %#9 = icmp ult i64 noundef %#1, 9
+  assume i1 %#9
+  %#10 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#10
+  %#11 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#11
+  %#12 = icmp eq i64 noundef %#1, 8
+  br i1 %#12, label %#6, label %#5
+
+#5:
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#14 = gep inbounds ptr %#13, 1 x i64 -4
+  %#15 = load i32, ptr %#14, align 1
+  %#16 = zext i32 %#15 to i64
+  %#17 = load i32, ptr nowrite noundef %#0, align 1
+  %#18 = zext i32 %#17 to i64
+  %#19 = shl nuw i64 %#18, 32
+  %#20 = or disjoint i64 %#19, %#16
+  br label %#7
+
+#6:
+  %#21 = load i64, ptr nowrite noundef %#0, align 1
+  %#22 = fshl i64 %#21, i64 %#21, i64 32
+  br label %#7
+
+#7:
+  %#23 = phi i64 [ %#22, %#6 ], [ %#20, %#5 ]
+  %#24 = trunc i64 noundef %#3 to i32
+  %#25 = bswap i32 %#24
+  assume_welldefined i32 %#25
+  %#26 = zext i32 %#25 to i64
+  %#27 = shl nuw i64 %#26, 32
+  %#28 = xor i64 %#27, noundef %#3
+  %#29 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 8
+  %#30 = load i64, ptr %#29, align 1
+  %#31 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 16
+  %#32 = load i64, ptr %#31, align 1
+  %#33 = xor i64 %#32, %#30
+  %#34 = sub i64 %#33, %#28
+  %#35 = xor i64 %#34, %#23
+  %#36 = fshl i64 %#35, i64 %#35, i64 49
+  %#37 = fshl i64 %#35, i64 %#35, i64 24
+  %#38 = xor i64 %#36, %#37
+  %#39 = xor i64 %#38, %#35
+  %#40 = mul i64 %#39, -6939452855193903323
+  %#41 = lshr i64 %#40, 35
+  %#42 = add nsw nuw i64 %#41, noundef %#1
+  %#43 = xor i64 %#42, %#40
+  %#44 = mul i64 %#43, -6939452855193903323
+  %#45 = lshr i64 %#44, 28
+  %#46 = xor i64 %#45, %#44
+  ret i64 %#46
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

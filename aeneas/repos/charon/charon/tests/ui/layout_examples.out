@@ -1,0 +1,1442 @@
+# Final LLBC before serialization:
+
+// Full name: core::alloc::layout::Layout
+#[lang_item(AllocLayout)]
+pub opaque type Layout
+// layout:
+//     size: 16usize,
+//     align: 8usize,
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//         @Variant0: {
+//             offset of 0: 8,
+//             offset of 1: 0,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: core::alloc::AllocError
+pub struct AllocError {}
+// layout:
+//     size: 0usize (guaranteed: at_least(0usize)),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+struct () {}
+// layout:
+//     size: 0usize (guaranteed: at_least(0usize)),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::result::Result
+#[diagnostic_item("Result")]
+pub enum Result<T, E>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (E: Sized),
+{
+  Ok { _0: T },
+  Err { _0: E },
+}
+// layout:
+//     size: ? (guaranteed: at_least(align_to(max((offset_of(Result<T, E>[TraitClause0, TraitClause1].Ok._0) + size_of::<T>()), (offset_of(Result<T, E>[TraitClause0, TraitClause1].Err._0) + size_of::<E>())), max(align_of::<T>(), align_of::<E>())))),
+//     align: ? (guaranteed: at_least(max(align_of::<T>(), align_of::<E>()))),
+//     discriminator: none,
+//     inhabited: (if_inhabited(T) || if_inhabited(E)),
+//     variants: [
+//         Ok: {
+//             offset of _0: ? (guaranteed: aligned(align_of::<T>())),
+//             inhabited: if_inhabited(T),
+//             tagger: [],
+//         },
+//         Err: {
+//             offset of _0: ? (guaranteed: aligned(align_of::<E>())),
+//             inhabited: if_inhabited(E),
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: core::ptr::non_null::NonNull
+#[lang_item(NonNull)]
+pub opaque type NonNull<T>
+// layout: none
+
+// Full name: core::alloc::Allocator
+pub unsafe trait Allocator<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    fn allocate<'_0_1>;
+    fn deallocate<'_0_1>;
+    vtable: core::alloc::Allocator::{vtable}
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::clone::impls::{impl Clone for u32}::clone
+pub fn impl_Clone_for_u32::clone<'_0>(_1: &'_0 u32) -> u32
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for u32}
+impl "impl_Clone_for_u32" Clone for u32 {
+    proof ImpliedClause0: (u32: Sized) = {built_in impl Sized for u32}
+    fn clone<'_0_1> = impl_Clone_for_u32::clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::clone::impls::{impl Clone for i32}::clone
+pub fn impl_Clone_for_i32::clone<'_0>(_1: &'_0 i32) -> i32
+= <opaque>
+
+// Full name: core::clone::impls::{impl Clone for i32}
+impl "impl_Clone_for_i32" Clone for i32 {
+    proof ImpliedClause0: (i32: Sized) = {built_in impl Sized for i32}
+    fn clone<'_0_1> = impl_Clone_for_i32::clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::fmt::Error
+pub struct Error {}
+// layout:
+//     size: 0usize (guaranteed: at_least(0usize)),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: core::fmt::Formatter
+#[diagnostic_item("Formatter")]
+pub opaque type Formatter<mut 'a>
+where
+    RegionOutlives0: 'a: 'a,
+// layout:
+//     size: 24usize,
+//     align: 8usize,
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//         @Variant0: {
+//             offset of 0: 16,
+//             offset of 1: 0,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+opaque type core::fmt::Debug::{vtable}
+// layout: none
+
+// Full name: core::fmt::Debug
+#[diagnostic_item("Debug")]
+pub trait Debug<Self>
+{
+    fn fmt<'_0_1, '_1_1, '_2_1>;
+    vtable: core::fmt::Debug::{vtable}
+}
+
+// Full name: core::marker::Copy
+#[lang_item(Copy)]
+#[diagnostic_item("Copy")]
+pub trait Copy<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Clone)
+    non-dyn-compatible
+}
+
+// Full name: core::marker::{impl Copy for u32}
+impl "impl_Copy_for_u32" Copy for u32 {
+    proof ImpliedClause0: (u32: MetaSized) = {built_in impl MetaSized for u32}
+    proof ImpliedClause1: (u32: Clone) = impl_Clone_for_u32
+    non-dyn-compatible
+}
+
+// Full name: core::marker::{impl Copy for i32}
+impl "impl_Copy_for_i32" Copy for i32 {
+    proof ImpliedClause0: (i32: MetaSized) = {built_in impl MetaSized for i32}
+    proof ImpliedClause1: (i32: Clone) = impl_Clone_for_i32
+    non-dyn-compatible
+}
+
+// Full name: core::num::niche_types::NonZeroU32Inner
+pub opaque type NonZeroU32Inner
+// layout:
+//     size: 4usize,
+//     align: 4usize,
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//         @Variant0: {
+//             offset of 0: 0,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust, transparent),
+
+// Full name: core::num::niche_types::{impl Clone for NonZeroU32Inner}::clone
+pub fn impl_Clone_for_NonZeroU32Inner::clone<'_0>(_1: &'_0 NonZeroU32Inner) -> NonZeroU32Inner
+= <opaque>
+
+// Full name: core::num::niche_types::{impl Clone for NonZeroU32Inner}
+impl "impl_Clone_for_NonZeroU32Inner" Clone for NonZeroU32Inner {
+    proof ImpliedClause0: (NonZeroU32Inner: Sized) = {built_in impl Sized for NonZeroU32Inner}
+    fn clone<'_0_1> = impl_Clone_for_NonZeroU32Inner::clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::num::niche_types::NonZeroI32Inner
+pub opaque type NonZeroI32Inner
+// layout:
+//     size: 4usize,
+//     align: 4usize,
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//         @Variant0: {
+//             offset of 0: 0,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust, transparent),
+
+// Full name: core::num::niche_types::{impl Clone for NonZeroI32Inner}::clone
+pub fn impl_Clone_for_NonZeroI32Inner::clone<'_0>(_1: &'_0 NonZeroI32Inner) -> NonZeroI32Inner
+= <opaque>
+
+// Full name: core::num::niche_types::{impl Clone for NonZeroI32Inner}
+impl "impl_Clone_for_NonZeroI32Inner" Clone for NonZeroI32Inner {
+    proof ImpliedClause0: (NonZeroI32Inner: Sized) = {built_in impl Sized for NonZeroI32Inner}
+    fn clone<'_0_1> = impl_Clone_for_NonZeroI32Inner::clone<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: core::num::niche_types::{impl Copy for NonZeroU32Inner}
+impl "impl_Copy_for_NonZeroU32Inner" Copy for NonZeroU32Inner {
+    proof ImpliedClause0: (NonZeroU32Inner: MetaSized) = {built_in impl MetaSized for NonZeroU32Inner}
+    proof ImpliedClause1: (NonZeroU32Inner: Clone) = impl_Clone_for_NonZeroU32Inner
+    non-dyn-compatible
+}
+
+// Full name: core::num::niche_types::{impl Copy for NonZeroI32Inner}
+impl "impl_Copy_for_NonZeroI32Inner" Copy for NonZeroI32Inner {
+    proof ImpliedClause0: (NonZeroI32Inner: MetaSized) = {built_in impl MetaSized for NonZeroI32Inner}
+    proof ImpliedClause1: (NonZeroI32Inner: Clone) = impl_Clone_for_NonZeroI32Inner
+    non-dyn-compatible
+}
+
+// Full name: core::num::nonzero::ZeroablePrimitive
+pub unsafe trait ZeroablePrimitive<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    proof ImpliedClause1: (Self: Copy)
+    proof ImpliedClause2: (Self::NonZeroInner: Sized)
+    proof ImpliedClause3: (Self::NonZeroInner: Copy)
+    type NonZeroInner
+    non-dyn-compatible
+}
+
+// Full name: core::num::nonzero::{impl ZeroablePrimitive for u32}
+unsafe impl "impl_ZeroablePrimitive_for_u32" ZeroablePrimitive for u32 {
+    proof ImpliedClause0: (u32: Sized) = {built_in impl Sized for u32}
+    proof ImpliedClause1: (u32: Copy) = impl_Copy_for_u32
+    proof ImpliedClause2: (NonZeroU32Inner: Sized) = {built_in impl Sized for NonZeroU32Inner}
+    proof ImpliedClause3: (NonZeroU32Inner: Copy) = impl_Copy_for_NonZeroU32Inner
+    type NonZeroInner = NonZeroU32Inner
+    non-dyn-compatible
+}
+
+// Full name: core::num::nonzero::{impl ZeroablePrimitive for i32}
+unsafe impl "impl_ZeroablePrimitive_for_i32" ZeroablePrimitive for i32 {
+    proof ImpliedClause0: (i32: Sized) = {built_in impl Sized for i32}
+    proof ImpliedClause1: (i32: Copy) = impl_Copy_for_i32
+    proof ImpliedClause2: (NonZeroI32Inner: Sized) = {built_in impl Sized for NonZeroI32Inner}
+    proof ImpliedClause3: (NonZeroI32Inner: Copy) = impl_Copy_for_NonZeroI32Inner
+    type NonZeroInner = NonZeroI32Inner
+    non-dyn-compatible
+}
+
+// Full name: core::num::nonzero::NonZero
+#[diagnostic_item("NonZero")]
+pub opaque type NonZero<T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: ZeroablePrimitive),
+// layout: none
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+// layout:
+//     size: 0usize (guaranteed: at_least(0usize)),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: alloc::alloc::{impl Allocator for Global}::deallocate
+#[track_caller]
+pub unsafe fn deallocate<'_0>(_1: &'_0 Global, _2: NonNull<u8>, _3: Layout)
+= <opaque>
+
+// Full name: alloc::alloc::{impl Allocator for Global}::allocate
+#[track_caller]
+pub fn allocate<'_0>(_1: &'_0 Global, _2: Layout) -> Result<NonNull<[u8]>, AllocError>[{built_in impl Sized for NonNull<[u8]>}, {built_in impl Sized for AllocError}]
+= <opaque>
+
+// Full name: alloc::alloc::{impl Allocator for Global}
+unsafe impl "impl_Allocator_for_Global" Allocator for Global {
+    proof ImpliedClause0: (Global: MetaSized) = {built_in impl MetaSized for Global}
+    fn allocate<'_0_1> = allocate<'_0_1>
+    fn deallocate<'_0_1> = deallocate<'_0_1>
+    vtable: lazy
+}
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T, A>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (A: Sized),
+    TraitClause2: (A: Allocator),
+// layout: none
+
+// Full name: alloc::string::String
+#[lang_item(String)]
+pub opaque type String
+// layout:
+//     size: 24usize,
+//     align: 8usize,
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//         @Variant0: {
+//             offset of 0: 0,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+struct (_, _)<A, B>
+where
+    TraitClause0: (A: Sized),
+{
+  _0: A,
+  _1: B,
+}
+// layout:
+//     size: ? (guaranteed: at_least(align_to(max((offset_of((_, _)<A, B>[TraitClause0]._0) + size_of::<A>()), (offset_of((_, _)<A, B>[TraitClause0]._1) + size_of::<B>())), max(align_of::<A>(), align_of::<B>())))),
+//     align: ? (guaranteed: at_least(max(align_of::<A>(), align_of::<B>()))),
+//     discriminator: none,
+//     inhabited: (if_inhabited(A) && if_inhabited(B)),
+//     variants: [
+//         _: {
+//             offset of _0: ? (guaranteed: aligned(align_of::<A>())),
+//             offset of _1: ? (guaranteed: aligned(align_of::<B>())),
+//             inhabited: (if_inhabited(A) && if_inhabited(B)),
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+struct str {
+  _0: [u8],
+}
+// layout:
+//     size: slice_length (guaranteed: at_least(align_to((offset_of(str._0) + size_of::<[u8]>()), align_of::<[u8]>()))),
+//     align: 1usize (guaranteed: at_least(align_of::<[u8]>())),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::SimpleStruct
+struct SimpleStruct {
+  x: u32,
+  y: u32,
+  z: u32,
+}
+// layout:
+//     size: 12usize (guaranteed: at_least(align_to(max((offset_of(SimpleStruct.x) + size_of::<u32>()), (offset_of(SimpleStruct.y) + size_of::<u32>()), (offset_of(SimpleStruct.z) + size_of::<u32>())), max(align_of::<u32>(), align_of::<u32>(), align_of::<u32>())))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<u32>(), align_of::<u32>(), align_of::<u32>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<u32>())),
+//             offset of y: 4 (guaranteed: aligned(align_of::<u32>())),
+//             offset of z: 8 (guaranteed: aligned(align_of::<u32>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::GenericStruct
+struct GenericStruct<T>
+where
+    TraitClause0: (T: Sized),
+{
+  a: usize,
+  b: T,
+}
+// layout:
+//     size: ? (guaranteed: at_least(align_to(max((offset_of(GenericStruct<T>[TraitClause0].a) + size_of::<usize>()), (offset_of(GenericStruct<T>[TraitClause0].b) + size_of::<T>())), max(align_of::<usize>(), align_of::<T>())))),
+//     align: ? (guaranteed: at_least(max(align_of::<usize>(), align_of::<T>()))),
+//     discriminator: none,
+//     inhabited: if_inhabited(T),
+//     variants: [
+//         _: {
+//             offset of a: ? (guaranteed: aligned(align_of::<usize>())),
+//             offset of b: ? (guaranteed: aligned(align_of::<T>())),
+//             inhabited: if_inhabited(T),
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::UnsizedStruct
+struct UnsizedStruct {
+  x: usize,
+  y: [usize],
+}
+// layout:
+//     size: (8usize + (slice_length * 8usize)) (guaranteed: at_least(align_to(max((offset_of(UnsizedStruct.x) + size_of::<usize>()), (offset_of(UnsizedStruct.y) + size_of::<[usize]>())), max(align_of::<usize>(), align_of::<[usize]>())))),
+//     align: 8usize (guaranteed: at_least(max(align_of::<usize>(), align_of::<[usize]>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<usize>())),
+//             offset of y: 8 (guaranteed: aligned(align_of::<[usize]>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::UnsizedDyn
+struct UnsizedDyn {
+  x: u8,
+  y: (dyn Debug + 'static),
+}
+// layout:
+//     size: align_to((1usize + dyn_size), max(dyn_align, 1usize)) (guaranteed: at_least(align_to(max((offset_of(UnsizedDyn.x) + size_of::<u8>()), (offset_of(UnsizedDyn.y) + dyn_size)), max(align_of::<u8>(), dyn_align)))),
+//     align: max(dyn_align, 1usize) (guaranteed: at_least(max(align_of::<u8>(), dyn_align))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<u8>())),
+//             offset of y: 1 (guaranteed: aligned(align_of::<(dyn Debug + 'static)>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NestedUnsized
+struct NestedUnsized {
+  x: u16,
+  y: UnsizedStruct,
+}
+// layout:
+//     size: (16usize + (slice_length * 8usize)) (guaranteed: at_least(align_to(max((offset_of(NestedUnsized.x) + size_of::<u16>()), (offset_of(NestedUnsized.y) + size_of::<UnsizedStruct>())), max(align_of::<u16>(), align_of::<UnsizedStruct>())))),
+//     align: 8usize (guaranteed: at_least(max(align_of::<u16>(), align_of::<UnsizedStruct>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<u16>())),
+//             offset of y: 8 (guaranteed: aligned(align_of::<UnsizedStruct>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::PackedUnsized
+struct PackedUnsized {
+  x: u8,
+  y: [u32],
+}
+// layout:
+//     size: (2usize + (slice_length * 4usize)) (guaranteed: at_least(align_to(max((offset_of(PackedUnsized.x) + size_of::<u8>()), (offset_of(PackedUnsized.y) + size_of::<[u32]>())), max(min(align_of::<u8>(), 2usize), min(align_of::<[u32]>(), 2usize))))),
+//     align: 2usize (guaranteed: at_least(max(min(align_of::<u8>(), 2usize), min(align_of::<[u32]>(), 2usize)))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(min(align_of::<u8>(), 2usize))),
+//             offset of y: 2 (guaranteed: aligned(min(align_of::<[u32]>(), 2usize))),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust, packed(2)),
+
+// Full name: test_crate::SimpleEnum
+enum SimpleEnum {
+  Var1,
+  Other,
+}
+// layout:
+//     size: 1usize (guaranteed: at_least(0usize)),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: read at offset 0 { 0u8 => Var1, 1u8 => Other, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         Var1: {
+//             inhabited: true,
+//             tagger: [0 := 0u8],
+//         },
+//         Other: {
+//             inhabited: true,
+//             tagger: [0 := 1u8],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::SimpleAdt
+enum SimpleAdt {
+  EmptyVar,
+  StructVar { x: usize, y: usize },
+  TupleVar { _0: u32, _1: u32 },
+}
+// layout:
+//     size: 24usize (guaranteed: at_least(align_to(max((offset_of(SimpleAdt.StructVar.x) + size_of::<usize>()), (offset_of(SimpleAdt.StructVar.y) + size_of::<usize>()), (offset_of(SimpleAdt.TupleVar._0) + size_of::<u32>()), (offset_of(SimpleAdt.TupleVar._1) + size_of::<u32>())), max(align_of::<usize>(), align_of::<usize>(), align_of::<u32>(), align_of::<u32>())))),
+//     align: 8usize (guaranteed: at_least(max(align_of::<usize>(), align_of::<usize>(), align_of::<u32>(), align_of::<u32>()))),
+//     discriminator: read at offset 0 { 0u32 => EmptyVar, 1u32 => StructVar, 2u32 => TupleVar, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         EmptyVar: {
+//             inhabited: true,
+//             tagger: [0 := 0u32],
+//         },
+//         StructVar: {
+//             offset of x: 8 (guaranteed: aligned(align_of::<usize>())),
+//             offset of y: 16 (guaranteed: aligned(align_of::<usize>())),
+//             inhabited: true,
+//             tagger: [0 := 1u32],
+//         },
+//         TupleVar: {
+//             offset of _0: 4 (guaranteed: aligned(align_of::<u32>())),
+//             offset of _1: 8 (guaranteed: aligned(align_of::<u32>())),
+//             inhabited: true,
+//             tagger: [0 := 2u32],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NicheAdt
+enum NicheAdt {
+  None,
+  Some { _0: NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32] },
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to((offset_of(NicheAdt.Some._0) + size_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>()), align_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>()))),
+//     align: 4usize (guaranteed: at_least(align_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>())),
+//     discriminator: read at offset 0 { 0u32 => None, _ => Some },
+//     inhabited: true,
+//     variants: [
+//         None: {
+//             inhabited: true,
+//             tagger: [0 := 0u32],
+//         },
+//         Some: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NicheAdtSigned
+enum NicheAdtSigned {
+  None,
+  Some { _0: NonZero<i32>[{built_in impl Sized for i32}, impl_ZeroablePrimitive_for_i32] },
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to((offset_of(NicheAdtSigned.Some._0) + size_of::<NonZero<i32>[{built_in impl Sized for i32}, impl_ZeroablePrimitive_for_i32]>()), align_of::<NonZero<i32>[{built_in impl Sized for i32}, impl_ZeroablePrimitive_for_i32]>()))),
+//     align: 4usize (guaranteed: at_least(align_of::<NonZero<i32>[{built_in impl Sized for i32}, impl_ZeroablePrimitive_for_i32]>())),
+//     discriminator: read at offset 0 { 0i32 => None, _ => Some },
+//     inhabited: true,
+//     variants: [
+//         None: {
+//             inhabited: true,
+//             tagger: [0 := 0i32],
+//         },
+//         Some: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<NonZero<i32>[{built_in impl Sized for i32}, impl_ZeroablePrimitive_for_i32]>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NicheAdtChar
+enum NicheAdtChar {
+  None,
+  Some { _0: char },
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to((offset_of(NicheAdtChar.Some._0) + size_of::<char>()), align_of::<char>()))),
+//     align: 4usize (guaranteed: at_least(align_of::<char>())),
+//     discriminator: read at offset 0 { 1114112u32..=4294967294u32 => invalid, 4294967295u32 => None, _ => Some },
+//     inhabited: true,
+//     variants: [
+//         None: {
+//             inhabited: true,
+//             tagger: [0 := 4294967295u32],
+//         },
+//         Some: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<char>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::IsAZST
+struct IsAZST {}
+// layout:
+//     size: 0usize (guaranteed: at_least(0usize)),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::GenericWithKnownLayout
+struct GenericWithKnownLayout<T>
+where
+    TraitClause0: (T: Sized),
+{
+  x: usize,
+  y: Box<T, Global>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}, impl_Allocator_for_Global],
+}
+// layout:
+//     size: 16usize (guaranteed: at_least(align_to(max((offset_of(GenericWithKnownLayout<T>[TraitClause0].x) + size_of::<usize>()), (offset_of(GenericWithKnownLayout<T>[TraitClause0].y) + size_of::<Box<T, Global>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}, impl_Allocator_for_Global]>())), max(align_of::<usize>(), align_of::<Box<T, Global>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}, impl_Allocator_for_Global]>())))),
+//     align: 8usize (guaranteed: at_least(max(align_of::<usize>(), align_of::<Box<T, Global>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}, impl_Allocator_for_Global]>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 8 (guaranteed: aligned(align_of::<usize>())),
+//             offset of y: 0 (guaranteed: aligned(align_of::<Box<T, Global>[TraitClause0::ImpliedClause0, {built_in impl Sized for Global}, impl_Allocator_for_Global]>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::Reordered
+struct Reordered {
+  x: u8,
+  y: u32,
+  z: u8,
+}
+// layout:
+//     size: 8usize (guaranteed: at_least(align_to(max((offset_of(Reordered.x) + size_of::<u8>()), (offset_of(Reordered.y) + size_of::<u32>()), (offset_of(Reordered.z) + size_of::<u8>())), max(align_of::<u8>(), align_of::<u32>(), align_of::<u8>())))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<u8>(), align_of::<u32>(), align_of::<u8>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 4 (guaranteed: aligned(align_of::<u8>())),
+//             offset of y: 0 (guaranteed: aligned(align_of::<u32>())),
+//             offset of z: 5 (guaranteed: aligned(align_of::<u8>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NotReordered
+struct NotReordered {
+  x: u8,
+  y: u32,
+  z: u8,
+}
+// layout:
+//     size: 12usize (guaranteed: align_to((offset_of(NotReordered.z) + size_of::<u8>()), max(align_of::<u8>(), align_of::<u32>(), align_of::<u8>()))),
+//     align: 4usize (guaranteed: max(align_of::<u8>(), align_of::<u32>(), align_of::<u8>())),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: 0usize),
+//             offset of y: 4 (guaranteed: repr_c_after(0)),
+//             offset of z: 8 (guaranteed: repr_c_after(1)),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(C),
+
+// Full name: test_crate::Packed
+struct Packed {
+  x: u8,
+  y: u32,
+  z: u8,
+}
+// layout:
+//     size: 6usize (guaranteed: at_least(align_to(max((offset_of(Packed.x) + size_of::<u8>()), (offset_of(Packed.y) + size_of::<u32>()), (offset_of(Packed.z) + size_of::<u8>())), max(min(align_of::<u8>(), 1usize), min(align_of::<u32>(), 1usize), min(align_of::<u8>(), 1usize))))),
+//     align: 1usize (guaranteed: at_least(max(min(align_of::<u8>(), 1usize), min(align_of::<u32>(), 1usize), min(align_of::<u8>(), 1usize)))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(min(align_of::<u8>(), 1usize))),
+//             offset of y: 1 (guaranteed: aligned(min(align_of::<u32>(), 1usize))),
+//             offset of z: 5 (guaranteed: aligned(min(align_of::<u8>(), 1usize))),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust, packed(1)),
+
+// Full name: test_crate::UninhabitedVariant
+enum UninhabitedVariant {
+  A { _0: ! },
+  B { _0: u32 },
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to(max(offset_of(UninhabitedVariant.A._0), (offset_of(UninhabitedVariant.B._0) + size_of::<u32>())), max(align_of::<u32>(), 1usize)))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<u32>(), 1usize))),
+//     discriminator: B,
+//     inhabited: true,
+//     variants: [
+//         A: none,
+//         B: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<u32>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::UninhabitedVariant2
+enum UninhabitedVariant2 {
+  A { _0: !, _1: u32 },
+  B { _0: u32 },
+}
+// layout:
+//     size: 8usize (guaranteed: at_least(align_to(max(offset_of(UninhabitedVariant2.A._0), (offset_of(UninhabitedVariant2.A._1) + size_of::<u32>()), (offset_of(UninhabitedVariant2.B._0) + size_of::<u32>())), max(align_of::<u32>(), align_of::<u32>(), 1usize)))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<u32>(), align_of::<u32>(), 1usize))),
+//     discriminator: read at offset 0 { 1u32 => B, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 4 (guaranteed: aligned(align_of::<!>())),
+//             offset of _1: 4 (guaranteed: aligned(align_of::<u32>())),
+//             inhabited: false,
+//             tagger: [],
+//         },
+//         B: {
+//             offset of _0: 4 (guaranteed: aligned(align_of::<u32>())),
+//             inhabited: true,
+//             tagger: [0 := 1u32],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::UninhabitedVariantWithFields
+enum UninhabitedVariantWithFields {
+  Bar,
+  Baz { x: u32, y: !, z: u32 },
+}
+// layout:
+//     size: 12usize (guaranteed: at_least(align_to(max((offset_of(UninhabitedVariantWithFields.Baz.x) + size_of::<u32>()), offset_of(UninhabitedVariantWithFields.Baz.y), (offset_of(UninhabitedVariantWithFields.Baz.z) + size_of::<u32>())), max(align_of::<u32>(), align_of::<u32>(), 1usize)))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<u32>(), align_of::<u32>(), 1usize))),
+//     discriminator: read at offset 0 { 0u32 => Bar, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         Bar: {
+//             inhabited: true,
+//             tagger: [0 := 0u32],
+//         },
+//         Baz: {
+//             offset of x: 4 (guaranteed: aligned(align_of::<u32>())),
+//             offset of y: 4 (guaranteed: aligned(align_of::<!>())),
+//             offset of z: 8 (guaranteed: aligned(align_of::<u32>())),
+//             inhabited: false,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::Uninhabited
+struct Uninhabited {
+  _0: !,
+}
+// layout:
+//     size: 0usize (guaranteed: at_least(offset_of(Uninhabited._0))),
+//     align: 1usize (guaranteed: at_least(1usize)),
+//     discriminator: _,
+//     inhabited: false,
+//     variants: [
+//         _: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<!>())),
+//             inhabited: false,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::DiscriminantInNicheOfField
+enum DiscriminantInNicheOfField<'a, T>
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+  None,
+  Some { _0: (usize, &'a T) },
+}
+// layout:
+//     size: 16usize (guaranteed: at_least(align_to((offset_of(DiscriminantInNicheOfField<'a, T>[TraitClause0].Some._0) + size_of::<(usize, &'a T)>()), align_of::<(usize, &'a T)>()))),
+//     align: 8usize (guaranteed: at_least(align_of::<(usize, &'a T)>())),
+//     discriminator: read at offset 8 { 0isize => None, _ => Some },
+//     inhabited: true,
+//     variants: [
+//         None: {
+//             inhabited: true,
+//             tagger: [8 := 0isize],
+//         },
+//         Some: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<(usize, &'a T)>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::MaybeUninitInt
+union MaybeUninitInt {
+  x: u32,
+  y: (),
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to(max((offset_of(MaybeUninitInt.x) + size_of::<u32>()), (offset_of(MaybeUninitInt.y) + size_of::<()>())), max(align_of::<u32>(), align_of::<()>())))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<u32>(), align_of::<()>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<u32>())),
+//             offset of y: 0 (guaranteed: aligned(align_of::<()>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::PackIntsUnion
+union PackIntsUnion {
+  x: (u32, u32),
+  y: u64,
+}
+// layout:
+//     size: 8usize (guaranteed: at_least(align_to(max((offset_of(PackIntsUnion.x) + size_of::<(u32, u32)>()), (offset_of(PackIntsUnion.y) + size_of::<u64>())), max(align_of::<(u32, u32)>(), align_of::<u64>())))),
+//     align: 8usize (guaranteed: at_least(max(align_of::<(u32, u32)>(), align_of::<u64>()))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<(u32, u32)>())),
+//             offset of y: 0 (guaranteed: aligned(align_of::<u64>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NonZeroNiche
+enum NonZeroNiche {
+  A { _0: char },
+  B,
+  C,
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to((offset_of(NonZeroNiche.A._0) + size_of::<char>()), align_of::<char>()))),
+//     align: 4usize (guaranteed: at_least(align_of::<char>())),
+//     discriminator: read at offset 0 { 1114112u32 => B, 1114113u32 => C, 1114114u32..=4294967295u32 => invalid, _ => A },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<char>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//         B: {
+//             inhabited: true,
+//             tagger: [0 := 1114112u32],
+//         },
+//         C: {
+//             inhabited: true,
+//             tagger: [0 := 1114113u32],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::ArbitraryDiscriminants
+enum ArbitraryDiscriminants {
+  A { _0: String },
+  B { _0: u32 },
+  C,
+}
+// layout:
+//     size: 32usize (guaranteed: align_to(max(size_of::<i32>(), (offset_of(ArbitraryDiscriminants.A._0) + size_of::<String>()), (offset_of(ArbitraryDiscriminants.B._0) + size_of::<u32>())), max(align_of::<i32>(), align_of::<String>(), align_of::<u32>()))),
+//     align: 8usize (guaranteed: max(align_of::<i32>(), align_of::<String>(), align_of::<u32>())),
+//     discriminator: read at offset 0 { 12i32 => A, 43i32 => B, 123456i32 => C, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 8 (guaranteed: repr_c_after_tag),
+//             inhabited: true,
+//             tagger: [0 := 12i32],
+//         },
+//         B: {
+//             offset of _0: 4 (guaranteed: repr_c_after_tag),
+//             inhabited: true,
+//             tagger: [0 := 43i32],
+//         },
+//         C: {
+//             inhabited: true,
+//             tagger: [0 := 123456i32],
+//         },
+//     ],
+//     repr(Rust, discriminant i32),
+
+// Full name: test_crate::MyOrder
+enum MyOrder {
+  Less,
+  Equal,
+  Greater,
+}
+// layout:
+//     size: 1usize (guaranteed: size_of::<i8>()),
+//     align: 1usize (guaranteed: align_of::<i8>()),
+//     discriminator: read at offset 0 { -1i8 => Less, 0i8 => Equal, 1i8 => Greater, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         Less: {
+//             inhabited: true,
+//             tagger: [0 := -1i8],
+//         },
+//         Equal: {
+//             inhabited: true,
+//             tagger: [0 := 0i8],
+//         },
+//         Greater: {
+//             inhabited: true,
+//             tagger: [0 := 1i8],
+//         },
+//     ],
+//     repr(Rust, discriminant i8),
+
+// Full name: test_crate::WithNicheAndUninhabited
+enum WithNicheAndUninhabited {
+  First,
+  Second { _0: ! },
+  Third { _0: NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32] },
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to(max(offset_of(WithNicheAndUninhabited.Second._0), (offset_of(WithNicheAndUninhabited.Third._0) + size_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>())), max(align_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>(), 1usize)))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>(), 1usize))),
+//     discriminator: read at offset 0 { 0u32 => First, _ => Third },
+//     inhabited: true,
+//     variants: [
+//         First: {
+//             inhabited: true,
+//             tagger: [0 := 0u32],
+//         },
+//         Second: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<!>())),
+//             inhabited: false,
+//             tagger: [],
+//         },
+//         Third: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<NonZero<u32>[{built_in impl Sized for u32}, impl_ZeroablePrimitive_for_u32]>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::GenericUnsized
+enum GenericUnsized<'a, T>
+where
+    TraitClause0: (T: MetaSized),
+    TypeOutlives0: T: 'a,
+{
+  First,
+  Second { _0: &'a T },
+}
+// layout:
+//     size: ? (guaranteed: at_least(align_to((offset_of(GenericUnsized<'a, T>[TraitClause0].Second._0) + size_of::<&'a T>()), align_of::<&'a T>()))),
+//     align: ? (guaranteed: at_least(align_of::<&'a T>())),
+//     discriminator: none,
+//     inhabited: true,
+//     variants: [
+//         First: {
+//             inhabited: true,
+//             tagger: [],
+//         },
+//         Second: {
+//             offset of _0: ? (guaranteed: aligned(align_of::<&'a T>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::GenericButFixedSize
+enum GenericButFixedSize<'a, T>
+where
+    TraitClause0: (T: Sized),
+    TypeOutlives0: T: 'a,
+{
+  First,
+  Second { _0: &'a T },
+}
+// layout:
+//     size: 8usize (guaranteed: at_least(align_to((offset_of(GenericButFixedSize<'a, T>[TraitClause0].Second._0) + size_of::<&'a T>()), align_of::<&'a T>()))),
+//     align: 8usize (guaranteed: at_least(align_of::<&'a T>())),
+//     discriminator: read at offset 0 { 0isize => First, _ => Second },
+//     inhabited: true,
+//     variants: [
+//         First: {
+//             inhabited: true,
+//             tagger: [0 := 0isize],
+//         },
+//         Second: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<&'a T>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::MaxBitsDiscr
+enum MaxBitsDiscr {
+  First,
+  Second,
+}
+// layout:
+//     size: 16usize (guaranteed: size_of::<u128>()),
+//     align: 16usize (guaranteed: align_of::<u128>()),
+//     discriminator: read at offset 0 { 42u128 => First, 18446744073709551615u128 => Second, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         First: {
+//             inhabited: true,
+//             tagger: [0 := 42u128],
+//         },
+//         Second: {
+//             inhabited: true,
+//             tagger: [0 := 18446744073709551615u128],
+//         },
+//     ],
+//     repr(Rust, discriminant u128),
+
+// Full name: test_crate::SingleVariantButNonZero
+type SingleVariantButNonZero = Result<!, ()>[{built_in impl Sized for !}, {built_in impl Sized for ()}]
+// layout:
+//     size: 0usize (guaranteed: size_of::<Result<!, ()>[{built_in impl Sized for !}, {built_in impl Sized for ()}]>()),
+//     align: 1usize (guaranteed: align_of::<Result<!, ()>[{built_in impl Sized for !}, {built_in impl Sized for ()}]>()),
+//     discriminator: Err,
+//     inhabited: true,
+//     variants: [
+//         Ok: none,
+//         Err: {
+//             offset of _0: 0,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NonAdtAlias
+type NonAdtAlias<T>
+where
+    TraitClause0: (T: Sized), = T
+// layout:
+//     size: ? (guaranteed: size_of::<T>()),
+//     align: ? (guaranteed: align_of::<T>()),
+//     discriminator: none,
+//     inhabited: if_inhabited(T),
+//     variants: [
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::Tuple
+type Tuple = (u32, u32)
+// layout:
+//     size: 8usize (guaranteed: size_of::<(u32, u32)>()),
+//     align: 4usize (guaranteed: align_of::<(u32, u32)>()),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of _0: 0,
+//             offset of _1: 4,
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::Usize
+type Usize = usize
+// layout:
+//     size: 8usize (guaranteed: size_of::<usize>()),
+//     align: 8usize (guaranteed: align_of::<usize>()),
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::Str
+type Str = str
+// layout:
+//     size: slice_length (guaranteed: size_of::<str>()),
+//     align: 1usize (guaranteed: align_of::<str>()),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::Ref
+type Ref<'a> = &'a mut u32
+// layout:
+//     size: 8usize (guaranteed: size_of::<&'a mut u32>()),
+//     align: 8usize (guaranteed: align_of::<&'a mut u32>()),
+//     discriminator: @Variant0,
+//     inhabited: true,
+//     variants: [
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::HasInvalidDiscr
+enum HasInvalidDiscr {
+  Var1,
+  Var2 { _0: bool },
+  Var3,
+}
+// layout:
+//     size: 1usize (guaranteed: at_least(align_to((offset_of(HasInvalidDiscr.Var2._0) + size_of::<bool>()), align_of::<bool>()))),
+//     align: 1usize (guaranteed: at_least(align_of::<bool>())),
+//     discriminator: read at offset 0 { 2u8 => Var1, 3u8 => invalid, 4u8 => Var3, 5u8..=255u8 => invalid, _ => Var2 },
+//     inhabited: true,
+//     variants: [
+//         Var1: {
+//             inhabited: true,
+//             tagger: [0 := 2u8],
+//         },
+//         Var2: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<bool>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//         Var3: {
+//             inhabited: true,
+//             tagger: [0 := 4u8],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::NicheInSignedRepr
+enum NicheInSignedRepr {
+  A { _0: MyOrder },
+  B,
+}
+// layout:
+//     size: 1usize (guaranteed: at_least(align_to((offset_of(NicheInSignedRepr.A._0) + size_of::<MyOrder>()), align_of::<MyOrder>()))),
+//     align: 1usize (guaranteed: at_least(align_of::<MyOrder>())),
+//     discriminator: read at offset 0 { -128i8..=-3i8 => invalid, -2i8 => B, 2i8..=127i8 => invalid, _ => A },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<MyOrder>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//         B: {
+//             inhabited: true,
+//             tagger: [0 := -2i8],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::BigWithChar
+struct BigWithChar {
+  a: u64,
+  c: char,
+}
+// layout:
+//     size: 16usize (guaranteed: align_to((offset_of(BigWithChar.c) + size_of::<char>()), max(align_of::<u64>(), align_of::<char>()))),
+//     align: 8usize (guaranteed: max(align_of::<u64>(), align_of::<char>())),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of a: 0 (guaranteed: 0usize),
+//             offset of c: 8 (guaranteed: repr_c_after(0)),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(C),
+
+// Full name: test_crate::UninhabitedAtNicheEdge
+enum UninhabitedAtNicheEdge {
+  A { _0: u32, _1: ! },
+  B,
+  C { _0: BigWithChar },
+}
+// layout:
+//     size: 16usize (guaranteed: at_least(align_to(max((offset_of(UninhabitedAtNicheEdge.A._0) + size_of::<u32>()), offset_of(UninhabitedAtNicheEdge.A._1), (offset_of(UninhabitedAtNicheEdge.C._0) + size_of::<BigWithChar>())), max(align_of::<u32>(), align_of::<BigWithChar>(), 1usize)))),
+//     align: 8usize (guaranteed: at_least(max(align_of::<u32>(), align_of::<BigWithChar>(), 1usize))),
+//     discriminator: read at offset 8 { 1114112u32 => invalid, 1114113u32 => B, 1114114u32..=4294967295u32 => invalid, _ => C },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<u32>())),
+//             offset of _1: 4 (guaranteed: aligned(align_of::<!>())),
+//             inhabited: false,
+//             tagger: [],
+//         },
+//         B: {
+//             inhabited: true,
+//             tagger: [8 := 1114113u32],
+//         },
+//         C: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<BigWithChar>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::UninhabitedUntagged
+enum UninhabitedUntagged {
+  A { _0: char, _1: ! },
+  B,
+}
+// layout:
+//     size: 4usize (guaranteed: at_least(align_to(max((offset_of(UninhabitedUntagged.A._0) + size_of::<char>()), offset_of(UninhabitedUntagged.A._1)), max(align_of::<char>(), 1usize)))),
+//     align: 4usize (guaranteed: at_least(max(align_of::<char>(), 1usize))),
+//     discriminator: read at offset 0 { 1114112u32..=4294967294u32 => invalid, 4294967295u32 => B, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<char>())),
+//             offset of _1: 4 (guaranteed: aligned(align_of::<!>())),
+//             inhabited: false,
+//             tagger: [],
+//         },
+//         B: {
+//             inhabited: true,
+//             tagger: [0 := 4294967295u32],
+//         },
+//     ],
+//     repr(Rust),
+
+// Full name: test_crate::PolyReprC
+struct PolyReprC<T>
+where
+    TraitClause0: (T: Sized),
+{
+  hd: usize,
+  tl: T,
+}
+// layout:
+//     size: ? (guaranteed: align_to((offset_of(PolyReprC<T>[TraitClause0].tl) + size_of::<T>()), max(align_of::<usize>(), align_of::<T>()))),
+//     align: ? (guaranteed: max(align_of::<usize>(), align_of::<T>())),
+//     discriminator: none,
+//     inhabited: if_inhabited(T),
+//     variants: [
+//         _: {
+//             offset of hd: ? (guaranteed: 0usize),
+//             offset of tl: ? (guaranteed: repr_c_after(0)),
+//             inhabited: if_inhabited(T),
+//             tagger: [],
+//         },
+//     ],
+//     repr(C),
+
+// Full name: test_crate::Transparent
+struct Transparent {
+  _0: u32,
+  _1: (),
+}
+// layout:
+//     size: 4usize (guaranteed: max(size_of::<u32>(), size_of::<()>())),
+//     align: 4usize (guaranteed: max(align_of::<u32>(), align_of::<()>())),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of _0: 0 (guaranteed: aligned(align_of::<u32>())),
+//             offset of _1: 4 (guaranteed: aligned(align_of::<()>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust, transparent),
+
+// Full name: test_crate::Aligned
+struct Aligned {
+  x: u8,
+}
+// layout:
+//     size: 16usize (guaranteed: at_least(align_to((offset_of(Aligned.x) + size_of::<u8>()), max(align_of::<u8>(), 16usize)))),
+//     align: 16usize (guaranteed: at_least(max(align_of::<u8>(), 16usize))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: aligned(align_of::<u8>())),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(Rust, align(16)),
+
+// Full name: test_crate::PackedReprC
+struct PackedReprC {
+  x: u8,
+  y: u32,
+}
+// layout:
+//     size: 6usize (guaranteed: align_to((offset_of(PackedReprC.y) + size_of::<u32>()), max(min(align_of::<u8>(), 2usize), min(align_of::<u32>(), 2usize)))),
+//     align: 2usize (guaranteed: max(min(align_of::<u8>(), 2usize), min(align_of::<u32>(), 2usize))),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: 0usize),
+//             offset of y: 2 (guaranteed: repr_c_after(0)),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(C, packed(2)),
+
+// Full name: test_crate::ReprCUnion
+union ReprCUnion {
+  x: u8,
+  y: u32,
+}
+// layout:
+//     size: 4usize (guaranteed: align_to(max(size_of::<u8>(), size_of::<u32>()), max(align_of::<u8>(), align_of::<u32>()))),
+//     align: 4usize (guaranteed: max(align_of::<u8>(), align_of::<u32>())),
+//     discriminator: _,
+//     inhabited: true,
+//     variants: [
+//         _: {
+//             offset of x: 0 (guaranteed: 0usize),
+//             offset of y: 0 (guaranteed: 0usize),
+//             inhabited: true,
+//             tagger: [],
+//         },
+//     ],
+//     repr(C),
+
+// Full name: test_crate::ReprCEnum
+enum ReprCEnum {
+  A { _0: u8 },
+  B { _0: u64 },
+  C,
+}
+// layout:
+//     size: 16usize (guaranteed: align_to(max(size_of::<i32>(), (offset_of(ReprCEnum.A._0) + size_of::<u8>()), (offset_of(ReprCEnum.B._0) + size_of::<u64>())), max(align_of::<i32>(), align_of::<u8>(), align_of::<u64>()))),
+//     align: 8usize (guaranteed: max(align_of::<i32>(), align_of::<u8>(), align_of::<u64>())),
+//     discriminator: read at offset 0 { 0u32 => A, 1u32 => B, 2u32 => C, _ => invalid },
+//     inhabited: true,
+//     variants: [
+//         A: {
+//             offset of _0: 8 (guaranteed: align_to(size_of::<i32>(), max(align_of::<u8>(), align_of::<u64>()))),
+//             inhabited: true,
+//             tagger: [0 := 0u32],
+//         },
+//         B: {
+//             offset of _0: 8 (guaranteed: align_to(size_of::<i32>(), max(align_of::<u8>(), align_of::<u64>()))),
+//             inhabited: true,
+//             tagger: [0 := 1u32],
+//         },
+//         C: {
+//             inhabited: true,
+//             tagger: [0 := 2u32],
+//         },
+//     ],
+//     repr(C),
+
+
+

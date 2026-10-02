@@ -1,0 +1,139 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::borrow::Borrow
+#[diagnostic_item("Borrow")]
+pub trait Borrow<Self, Borrowed>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Borrowed: MetaSized)
+    fn borrow<'_0_1>;
+    vtable: core::borrow::Borrow::{vtable}<Borrowed>
+}
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::clone::Clone
+#[lang_item(Clone)]
+#[diagnostic_item("Clone")]
+pub trait Clone<Self>
+{
+    proof ImpliedClause0: (Self: Sized)
+    fn clone<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: alloc::borrow::ToOwned
+#[diagnostic_item("ToOwned")]
+pub trait ToOwned<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Owned: Sized)
+    proof ImpliedClause2: (Self::Owned: Borrow<Self>)
+    type Owned
+    fn to_owned<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: alloc::borrow::Cow
+#[diagnostic_item("Cow")]
+pub enum Cow<'a, B>
+where
+    TraitClause0: (B: MetaSized),
+    TraitClause1: (B: ToOwned),
+    TypeOutlives0: B: 'a,
+    TypeOutlives1: B: 'a,
+{
+  Borrowed { _0: &'a B },
+  Owned { _0: TraitClause1::Owned },
+}
+
+// Full name: alloc::vec::Vec
+#[diagnostic_item("Vec")]
+pub opaque type Vec<T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (type_error("removed allocator parameter"): Sized),
+
+// Full name: alloc::slice::{impl Borrow<[T]> for Vec<T>[TraitClause0, TraitClause1]}::borrow
+pub fn borrow<'_0, T, A>(_1: &'_0 Vec<T>[TraitClause0, TraitClause1]) -> &'_0 [T]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (A: Sized),
+    TypeOutlives0: T: '_0,
+    TypeOutlives1: A: '_0,
+= <opaque>
+
+// Full name: alloc::slice::{impl Borrow<[T]> for Vec<T>[TraitClause0, TraitClause1]}
+impl<T, A> "impl_Borrow_slice_for_Vec" Borrow<[T]> for Vec<T>[TraitClause0, TraitClause1]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (A: Sized),
+{
+    proof ImpliedClause0: (Vec<T>[TraitClause0, TraitClause1]: MetaSized) = {built_in impl MetaSized for Vec<T>[TraitClause0, TraitClause1]}
+    proof ImpliedClause1: ([T]: MetaSized) = {built_in impl MetaSized for [T]}
+    fn borrow<'_0_1> = borrow<'_0_1, T, A>[TraitClause0, TraitClause1]
+    vtable: lazy
+}
+
+// Full name: alloc::slice::{impl ToOwned for [T]}::to_owned
+pub fn to_owned<'_0, T>(_1: &'_0 [T]) -> Vec<T>[TraitClause0, {built_in impl Sized for Global}]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Clone),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: alloc::slice::{impl ToOwned for [T]}
+impl<T> "impl_ToOwned_for_slice" ToOwned for [T]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Clone),
+{
+    proof ImpliedClause0: ([T]: MetaSized) = {built_in impl MetaSized for [T]}
+    proof ImpliedClause1: (Vec<T>[TraitClause0, {built_in impl Sized for Global}]: Sized) = {built_in impl Sized for Vec<T>[TraitClause0, {built_in impl Sized for Global}]}
+    proof ImpliedClause2: (Vec<T>[TraitClause0, {built_in impl Sized for Global}]: Borrow<[T]>) = impl_Borrow_slice_for_Vec<T, Global>[TraitClause0, {built_in impl Sized for Global}]
+    type Owned = Vec<T>[TraitClause0, {built_in impl Sized for Global}]
+    fn to_owned<'_0_1> = to_owned<'_0_1, T>[TraitClause0, TraitClause1]
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: type_alias::Usize
+pub type Usize = usize
+
+// Full name: type_alias::Generic
+pub type Generic<'a, T>
+where
+    TraitClause0: (T: Sized), = &'a T
+
+// Full name: type_alias::Generic2
+pub type Generic2<'a, T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Clone), = Cow<'a, [T]>[{built_in impl MetaSized for [T]}, impl_ToOwned_for_slice<T>[TraitClause0, TraitClause1]]
+
+// Full name: type_alias::GenericWithoutBound
+pub type GenericWithoutBound<'a, T>
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: ([T]: ToOwned), = Cow<'a, [T]>[{built_in impl MetaSized for [T]}, TraitClause1]
+
+
+

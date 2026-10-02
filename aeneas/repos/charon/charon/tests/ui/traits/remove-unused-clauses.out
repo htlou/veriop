@@ -1,0 +1,137 @@
+# Final LLBC before serialization:
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+struct () {}
+
+// Full name: test_crate::Trait
+trait Trait<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    vtable: test_crate::Trait::{vtable}
+}
+
+// Full name: test_crate::callee
+fn callee<T>()
+{
+    let _0: (); // return
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::caller
+pub fn caller<T>()
+{
+    let _0: (); // return
+    let _1: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = callee<T>()
+    ↳⚡ unwind_continue
+    storage_dead(_1)
+    _0 = ()
+    return
+}
+
+// Full name: test_crate::recursive
+pub fn recursive<T>()
+{
+    let _0: (); // return
+    let _1: bool; // anonymous local
+    let _2: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = const false
+    if move _1 {
+    } else {
+        _0 = ()
+        storage_dead(_1)
+        return
+    }
+    storage_live(_2)
+    _2 = recursive<T>()
+    ↳⚡ unwind_continue
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::swap_recursive
+pub fn swap_recursive<T, U>()
+{
+    let _0: (); // return
+    let _1: bool; // anonymous local
+    let _2: (); // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = const false
+    if move _1 {
+    } else {
+        _0 = ()
+        storage_dead(_1)
+        return
+    }
+    storage_live(_2)
+    _2 = swap_recursive<U, T>()
+    ↳⚡ unwind_continue
+    storage_dead(_2)
+    _0 = ()
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::HasAssoc
+trait HasAssoc<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self::Assoc: Sized)
+    type Assoc
+    vtable: test_crate::HasAssoc::{vtable}<Self::Assoc>
+}
+
+// Full name: test_crate::clause_dep
+pub fn clause_dep<T>()
+{
+    let _0: (); // return
+    let _1: bool; // anonymous local
+
+    storage_live(_0)
+    _0 = ()
+    storage_live(_1)
+    _1 = const false
+    if move _1 {
+    } else {
+        _0 = ()
+        storage_dead(_1)
+        return
+    }
+    _0 = clause_dep<T>()
+    ↳⚡ unwind_continue
+    storage_dead(_1)
+    return
+}
+
+
+

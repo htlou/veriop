@@ -1,0 +1,141 @@
+diff --git a/src/engine/general_purpose/mod.rs b/src/engine/general_purpose/mod.rs
+index 802d76b..3c9a97b 100644
+--- a/src/engine/general_purpose/mod.rs
++++ b/src/engine/general_purpose/mod.rs
+@@ -158,6 +158,19 @@ fn encode_scalar_tail(
+     const BLOCKS_PER_FAST_LOOP: usize = 4;
+     const LOW_SIX_BITS: u64 = 0x3F;
+ 
++    const STANDARD_ALPHABET: [u8; 64] =
++        *b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
++    static PAIRS: [[u8; 2]; 4096] = {
++        let mut pairs = [[0; 2]; 4096];
++        let mut i = 0;
++        while i < 4096 {
++            pairs[i] = [STANDARD_ALPHABET[i >> 6], STANDARD_ALPHABET[i & 63]];
++            i += 1;
++        }
++        pairs
++    };
++    let use_pairs = input.len() >= 128 && *encode_table == STANDARD_ALPHABET;
++
+     // we read 8 bytes at a time (u64) but only actually consume 6 of those bytes. Thus, we need
+     // 2 trailing bytes to be available to read..
+     let last_fast_index = input.len().saturating_sub(BLOCKS_PER_FAST_LOOP * 6 + 2);
+@@ -177,49 +190,73 @@ fn encode_scalar_tail(
+             // Plus, single-digit percentage performance differences might well be quite different
+             // on different hardware.
+ 
+-            let input_u64 = read_u64(&input_chunk[0..]);
+-
+-            output_chunk[0] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[1] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[2] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[3] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[4] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[5] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[6] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[7] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+-
+-            let input_u64 = read_u64(&input_chunk[6..]);
+-
+-            output_chunk[8] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[9] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[10] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[11] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[12] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[13] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[14] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[15] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+-
+-            let input_u64 = read_u64(&input_chunk[12..]);
+-
+-            output_chunk[16] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[17] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[18] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[19] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[20] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[21] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[22] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[23] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
+-
+-            let input_u64 = read_u64(&input_chunk[18..]);
+-
+-            output_chunk[24] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
+-            output_chunk[25] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
+-            output_chunk[26] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
+-            output_chunk[27] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
+-            output_chunk[28] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
+-            output_chunk[29] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
+-            output_chunk[30] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
+-            output_chunk[31] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++            if use_pairs {
++                let word = read_u64(&input_chunk[0..]);
++                output_chunk[0..2].copy_from_slice(&PAIRS[((word >> 52) & 0xFFF) as usize]);
++                output_chunk[2..4].copy_from_slice(&PAIRS[((word >> 40) & 0xFFF) as usize]);
++                output_chunk[4..6].copy_from_slice(&PAIRS[((word >> 28) & 0xFFF) as usize]);
++                output_chunk[6..8].copy_from_slice(&PAIRS[((word >> 16) & 0xFFF) as usize]);
++                let word = read_u64(&input_chunk[6..]);
++                output_chunk[8..10].copy_from_slice(&PAIRS[((word >> 52) & 0xFFF) as usize]);
++                output_chunk[10..12].copy_from_slice(&PAIRS[((word >> 40) & 0xFFF) as usize]);
++                output_chunk[12..14].copy_from_slice(&PAIRS[((word >> 28) & 0xFFF) as usize]);
++                output_chunk[14..16].copy_from_slice(&PAIRS[((word >> 16) & 0xFFF) as usize]);
++                let word = read_u64(&input_chunk[12..]);
++                output_chunk[16..18].copy_from_slice(&PAIRS[((word >> 52) & 0xFFF) as usize]);
++                output_chunk[18..20].copy_from_slice(&PAIRS[((word >> 40) & 0xFFF) as usize]);
++                output_chunk[20..22].copy_from_slice(&PAIRS[((word >> 28) & 0xFFF) as usize]);
++                output_chunk[22..24].copy_from_slice(&PAIRS[((word >> 16) & 0xFFF) as usize]);
++                let word = read_u64(&input_chunk[18..]);
++                output_chunk[24..26].copy_from_slice(&PAIRS[((word >> 52) & 0xFFF) as usize]);
++                output_chunk[26..28].copy_from_slice(&PAIRS[((word >> 40) & 0xFFF) as usize]);
++                output_chunk[28..30].copy_from_slice(&PAIRS[((word >> 28) & 0xFFF) as usize]);
++                output_chunk[30..32].copy_from_slice(&PAIRS[((word >> 16) & 0xFFF) as usize]);
++            } else {
++                let input_u64 = read_u64(&input_chunk[0..]);
++    
++                output_chunk[0] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[1] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[2] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[3] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[4] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[5] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[6] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[7] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++    
++                let input_u64 = read_u64(&input_chunk[6..]);
++    
++                output_chunk[8] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[9] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[10] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[11] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[12] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[13] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[14] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[15] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++    
++                let input_u64 = read_u64(&input_chunk[12..]);
++    
++                output_chunk[16] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[17] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[18] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[19] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[20] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[21] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[22] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[23] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++    
++                let input_u64 = read_u64(&input_chunk[18..]);
++    
++                output_chunk[24] = encode_table[((input_u64 >> 58) & LOW_SIX_BITS) as usize];
++                output_chunk[25] = encode_table[((input_u64 >> 52) & LOW_SIX_BITS) as usize];
++                output_chunk[26] = encode_table[((input_u64 >> 46) & LOW_SIX_BITS) as usize];
++                output_chunk[27] = encode_table[((input_u64 >> 40) & LOW_SIX_BITS) as usize];
++                output_chunk[28] = encode_table[((input_u64 >> 34) & LOW_SIX_BITS) as usize];
++                output_chunk[29] = encode_table[((input_u64 >> 28) & LOW_SIX_BITS) as usize];
++                output_chunk[30] = encode_table[((input_u64 >> 22) & LOW_SIX_BITS) as usize];
++                output_chunk[31] = encode_table[((input_u64 >> 16) & LOW_SIX_BITS) as usize];
++    
++            }
+ 
+             output_index += BLOCKS_PER_FAST_LOOP * 8;
+             input_index += BLOCKS_PER_FAST_LOOP * 6;

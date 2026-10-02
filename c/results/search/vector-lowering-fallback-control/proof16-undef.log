@@ -1,0 +1,56 @@
+
+----------------------------------------
+define i64 @src(i8 %idx) {
+#0:
+  %bounded = and i8 %idx, 15
+  %v = extractelement <16 x i64> { -4302098779834749733, -2220562881957146901, -3894436733716799489, 1433843135270481901, 8336770163655280242, -7881803417479397662, -2941004127381733739, 5502495245947142431, -2572398748971526355, -2436064182340099334, 4055606894390288348, 5350621376133947991, 2765702133756617546, -8493270429887581760, -1160504230424452080, 5291143887273806931 }, i8 %bounded
+  ret i64 %v
+}
+=>
+@table = constant 128 bytes, align 16
+
+define i64 @tgt(i8 %idx) {
+init:
+  store [16 x i64] { -4302098779834749733, -2220562881957146901, -3894436733716799489, 1433843135270481901, 8336770163655280242, -7881803417479397662, -2941004127381733739, 5502495245947142431, -2572398748971526355, -2436064182340099334, 4055606894390288348, 5350621376133947991, 2765702133756617546, -8493270429887581760, -1160504230424452080, 5291143887273806931 }, ptr @table, align 16
+  br label %#0
+
+#0:
+  %bounded = and i8 %idx, 15
+  %stable = freeze i8 %bounded
+  %safe = and i8 %stable, 15
+  %wide = zext i8 %safe to i64
+  %p = gep inbounds ptr @table, 128 x i64 0, 8 x i64 %wide
+  %v = load i64, ptr %p, align 8
+  %same = icmp eq i8 %bounded, %stable
+  %result = select i1 %same, i64 %v, i64 undef
+  ret i64 %result
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i8 %idx = undef
+
+Source:
+i8 %bounded = #x03 (3)	[based on undef]
+i64 %v = #x13e608bc156defed (1433843135270481901)	[based on undef]
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 128	align: 16	alloc type: 0	alive: true	address: 9223372036854775680	const
+
+Target:
+  >> Jump to %#0
+i8 %bounded = #x01 (1)
+i8 %stable = #x01 (1)
+i8 %safe = #x01 (1)
+i64 %wide = #x0000000000000001 (1)
+ptr %p = pointer(non-local, block_id=0, offset=8) / Address=#x7fffffffffffff88
+i64 %v = #xe12ef9d2eb86ceeb (16226181191752404715, -2220562881957146901)
+i1 %same = #x0 (0)
+i64 %result = #x0000000000000000 (0)
+Source value: #x13e608bc156defed (1433843135270481901)	[based on undef]
+Target value: #x0000000000000000 (0)
+

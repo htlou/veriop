@@ -1,0 +1,371 @@
+# Final LLBC before serialization:
+
+struct () {}
+
+// Full name: core::marker::Destruct
+#[lang_item(Destruct)]
+pub trait Destruct<Self>
+{
+    fn drop_glue<'_0_1>;
+    non-dyn-compatible
+}
+
+// Full name: core::marker::MetaSized
+#[fundamental]
+#[lang_item(MetaSized)]
+pub trait MetaSized<Self>
+
+// Full name: core::marker::Sized
+#[fundamental]
+#[lang_item(Sized)]
+pub trait Sized<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    non-dyn-compatible
+}
+
+// Full name: core::array::{[T; N]}::as_mut_slice
+pub fn as_mut_slice<'_0, T, const N : usize>(_1: &'_0 mut [T; N]) -> &'_0 mut [T]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Destruct),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: core::ops::drop::Drop
+#[lang_item(Drop)]
+pub trait Drop<Self>
+{
+    proof ImpliedClause0: (Self: MetaSized)
+    proof ImpliedClause1: (Self: Destruct)
+    fn drop<'_0_1> = core::ops::drop::Drop::drop<'_0_1, Self>[Self]
+    vtable: core::ops::drop::Drop::{vtable}
+}
+
+pub fn core::ops::drop::Drop::drop<'_0, Self>(_1: &'_0 mut Self)
+where
+    TraitClause0: (Self: Drop),
+    TypeOutlives0: Self: '_0,
+= <opaque>
+
+// Full name: core::ptr::drop_glue
+#[lang_item(DropGlue)]
+unsafe fn drop_glue<'_0, T>(_1: &'_0 mut T)
+where
+    TraitClause0: (T: Destruct),
+    TraitClause1: (T: Destruct),
+    TypeOutlives0: T: '_0,
+{
+    let ret: (); // return
+    let _1: &'_0 mut T; // arg #1
+
+    storage_live(ret)
+    ret = ()
+    drop[TraitClause0::drop_glue<'0>] (*_1)
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: core::slice::index::{impl SliceIndex<[T]> for usize}::index_mut
+pub fn impl_SliceIndex_slice_for_usize::index_mut<'_0, T>(_1: usize, _2: &'_0 mut [T]) -> &'_0 mut T
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Destruct),
+    TypeOutlives0: T: '_0,
+= <opaque>
+
+// Full name: alloc::alloc::Global
+#[lang_item(GlobalAlloc)]
+pub struct Global {}
+
+// Full name: alloc::boxed::Box
+#[fundamental]
+#[lang_item(OwnedBox)]
+pub opaque type Box<T>
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (type_error("removed allocator parameter"): Sized),
+    TraitClause2: (T: Destruct),
+    TraitClause3: (type_error("removed allocator parameter"): Destruct),
+
+// Full name: alloc::boxed::Box::{impl Destruct for Box<T>[TraitClause0, TraitClause1, TraitClause2, TraitClause3]}::drop_glue
+unsafe fn impl_Destruct_for_Box::drop_glue<'_0, T, A>(_1: &'_0 mut Box<T>[TraitClause0, TraitClause1, TraitClause2, TraitClause3])
+where
+    TraitClause0: (T: MetaSized),
+    TraitClause1: (A: Sized),
+    TraitClause2: (T: Destruct),
+    TraitClause3: (A: Destruct),
+    TypeOutlives0: T: '_0,
+    TypeOutlives1: A: '_0,
+= <opaque>
+
+// Full name: {impl Destruct for [T]}::drop_glue
+unsafe fn impl_Destruct_for_slice::drop_glue<'_0, T>(_1: &'_0 mut [T])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Destruct),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 mut [T]; // arg #1
+    let _2: usize; // anonymous local
+    let _3: usize; // anonymous local
+    let _4: *mut T; // anonymous local
+    let _5: bool; // anonymous local
+    let _6: *mut T; // anonymous local
+    let _7: bool; // anonymous local
+    let _8: &'_ mut [T]; // anonymous local
+    let _9: &'_ mut T; // anonymous local
+    let _10: &'_ mut [T]; // anonymous local
+    let _11: &'_ mut T; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    storage_live(_4)
+    storage_live(_5)
+    storage_live(_6)
+    storage_live(_7)
+    _0 = ()
+    _2 = copy _1.metadata
+    _3 = const 0usize
+    loop {
+        _7 = copy _3 == copy _2
+        if move _7 {
+            break 0
+        } else {
+            storage_live(_10)
+            _10 = &mut (*_1) with_metadata(copy _1.metadata)
+            storage_live(_11)
+            _11 = impl_SliceIndex_slice_for_usize::index_mut<'_, T>[TraitClause0, {built_in impl Destruct for T}](copy _3, move _10)
+            ↳⚡ undefined_behavior
+            _6 = &raw mut (*_11)
+            _3 = move _3 wrap.+ const 1usize
+            drop[TraitClause1::drop_glue<'2>] (*_6)
+            ↳⚡ loop {
+                    _5 = copy _3 == copy _2
+                    if move _5 {
+                        break 0
+                    } else {
+                        storage_live(_8)
+                        _8 = &mut (*_1) with_metadata(copy _1.metadata)
+                        storage_live(_9)
+                        _9 = impl_SliceIndex_slice_for_usize::index_mut<'_, T>[TraitClause0, {built_in impl Destruct for T}](copy _3, move _8)
+                        ↳⚡ undefined_behavior
+                        _4 = &raw mut (*_9)
+                        _3 = move _3 wrap.+ const 1usize
+                        drop[TraitClause1::drop_glue<'3>] (*_4)
+                        ↳⚡ storage_dead(_7)
+                            storage_dead(_6)
+                            storage_dead(_5)
+                            storage_dead(_4)
+                            storage_dead(_3)
+                            storage_dead(_2)
+                            storage_dead(_1)
+                            storage_dead(_11)
+                            storage_dead(_10)
+                            storage_dead(_9)
+                            storage_dead(_8)
+                            unwind_terminate
+                        continue 0
+                    }
+                }
+                storage_dead(_7)
+                storage_dead(_6)
+                storage_dead(_5)
+                storage_dead(_4)
+                storage_dead(_3)
+                storage_dead(_2)
+                storage_dead(_1)
+                unwind_continue
+            continue 0
+        }
+    }
+    storage_dead(_7)
+    storage_dead(_6)
+    storage_dead(_5)
+    storage_dead(_4)
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(_1)
+    storage_dead(_11)
+    storage_dead(_10)
+    storage_dead(_9)
+    storage_dead(_8)
+    return
+}
+
+// Full name: {impl Destruct for [T]}
+impl<T> "impl_Destruct_for_slice" Destruct for [T]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Destruct),
+{
+    fn drop_glue<'_0_1> = impl_Destruct_for_slice::drop_glue<'_0_1, T>[TraitClause0, TraitClause1]
+    non-dyn-compatible
+}
+
+// Full name: {impl Destruct for [T; N]}::drop_glue
+unsafe fn impl_Destruct_for_array::drop_glue<'_0, T, const N : usize>(_1: &'_0 mut [T; N])
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Destruct),
+    TypeOutlives0: T: '_0,
+{
+    let _0: (); // return
+    let _1: &'1 mut [T; N]; // arg #1
+    let _2: &'3 mut [T]; // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    _0 = ()
+    _2 = as_mut_slice<'_, T, N>[TraitClause0, {built_in impl Destruct for T}](move _1)
+    ↳⚡ undefined_behavior
+    _0 = drop_glue<'6, [T]>[impl_Destruct_for_slice<T>[TraitClause0, TraitClause1], impl_Destruct_for_slice<T>[TraitClause0, TraitClause1]](move _2)
+    ↳⚡ storage_dead(_2)
+        storage_dead(_1)
+        unwind_continue
+    storage_dead(_2)
+    storage_dead(_1)
+    return
+}
+
+// Full name: {impl Destruct for [T; N]}
+impl<T, const N : usize> "impl_Destruct_for_array" Destruct for [T; N]
+where
+    TraitClause0: (T: Sized),
+    TraitClause1: (T: Destruct),
+{
+    fn drop_glue<'_0_1> = impl_Destruct_for_array::drop_glue<'_0_1, T, N>[TraitClause0, TraitClause1]
+    non-dyn-compatible
+}
+
+// Full name: test_crate::B
+struct B {
+  x: Box<u32>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}],
+  y: Box<u32>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}],
+}
+
+// Full name: test_crate::A
+struct A {
+  x: Box<u32>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}],
+  b: B,
+}
+
+// Full name: test_crate::{impl Drop for B}::drop
+pub fn impl_Drop_for_B::drop<'_0>(self: &'_0 mut B)
+{
+    let _0: (); // return
+    let self: &'1 mut B; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    storage_dead(self)
+    return
+}
+
+// Full name: test_crate::B::{impl Destruct for B}::drop_glue
+unsafe fn impl_Destruct_for_B::drop_glue<'_0>(_1: &'_0 mut B)
+{
+    let _0: (); // return
+    let _1: &'1 mut B; // arg #1
+    let _2: &'2 mut B; // anonymous local
+    let _3: (); // anonymous local
+
+    storage_live(_0)
+    storage_live(_2)
+    storage_live(_3)
+    _0 = ()
+    _2 = &mut (*_1)
+    _3 = impl_Drop_for_B::drop<'4>(move _2)
+    ↳⚡ drop[impl_Destruct_for_Box::drop_glue<'5, u32, Global>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}]] (*_1).x
+        ↳⚡ storage_dead(_3)
+            storage_dead(_2)
+            storage_dead(_1)
+            unwind_terminate
+        drop[impl_Destruct_for_Box::drop_glue<'7, u32, Global>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}]] (*_1).y
+        ↳⚡ storage_dead(_3)
+            storage_dead(_2)
+            storage_dead(_1)
+            unwind_terminate
+        storage_dead(_3)
+        storage_dead(_2)
+        storage_dead(_1)
+        unwind_continue
+    drop[impl_Destruct_for_Box::drop_glue<'6, u32, Global>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}]] (*_1).x
+    ↳⚡ drop[impl_Destruct_for_Box::drop_glue<'7, u32, Global>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}]] (*_1).y
+        ↳⚡ storage_dead(_3)
+            storage_dead(_2)
+            storage_dead(_1)
+            unwind_terminate
+        storage_dead(_3)
+        storage_dead(_2)
+        storage_dead(_1)
+        unwind_continue
+    drop[impl_Destruct_for_Box::drop_glue<'8, u32, Global>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}]] (*_1).y
+    ↳⚡ storage_dead(_3)
+        storage_dead(_2)
+        storage_dead(_1)
+        unwind_continue
+    storage_dead(_3)
+    storage_dead(_2)
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::A::{impl Destruct for A}::drop_glue
+unsafe fn impl_Destruct_for_A::drop_glue<'_0>(_1: &'_0 mut A)
+{
+    let _0: (); // return
+    let _1: &'1 mut A; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    drop[impl_Destruct_for_Box::drop_glue<'2, u32, Global>[{built_in impl MetaSized for u32}, {built_in impl Sized for Global}, {built_in impl Destruct for u32}, {built_in impl Destruct for Global}]] (*_1).x
+    ↳⚡ drop[impl_Destruct_for_B::drop_glue<'4>] (*_1).b
+        ↳⚡ storage_dead(_1)
+            unwind_terminate
+        storage_dead(_1)
+        unwind_continue
+    drop[impl_Destruct_for_B::drop_glue<'3>] (*_1).b
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::B::{impl Destruct for B}
+impl "impl_Destruct_for_B" Destruct for B {
+    fn drop_glue<'_0_1> = impl_Destruct_for_B::drop_glue<'_0_1>
+    non-dyn-compatible
+}
+
+// Full name: test_crate::takes_a
+fn takes_a(_1: A)
+{
+    let _0: (); // return
+    let _1: A; // arg #1
+
+    storage_live(_0)
+    _0 = ()
+    _0 = ()
+    drop[impl_Destruct_for_A::drop_glue<'0>] _1
+    ↳⚡ storage_dead(_1)
+        unwind_continue
+    storage_dead(_1)
+    return
+}
+
+// Full name: test_crate::{impl Drop for B}
+impl "impl_Drop_for_B" Drop for B {
+    proof ImpliedClause0: (B: MetaSized) = {built_in impl MetaSized for B}
+    proof ImpliedClause1: (B: Destruct) = impl_Destruct_for_B
+    fn drop<'_0_1> = impl_Drop_for_B::drop<'_0_1>
+    vtable: lazy
+}
+
+
+
