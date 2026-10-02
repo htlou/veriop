@@ -1,0 +1,50 @@
+--- a/libdivide.h
++++ b/libdivide.h
+@@ -1003,19 +1003,10 @@
+ }
+ 
+ static LIBDIVIDE_INLINE uint32_t libdivide_u32_do_raw(uint32_t numer, uint32_t magic, uint8_t more) {
+-    if (!magic) {
+-        return numer >> more;
+-    } else {
+-        uint32_t q = libdivide_mullhi_u32(numer, magic);
+-        if (more & LIBDIVIDE_ADD_MARKER) {
+-            uint32_t t = ((numer - q) >> 1) + q;
+-            return t >> (more & LIBDIVIDE_32_SHIFT_MASK);
+-        } else {
+-            // All upper bits are 0,
+-            // don't need to mask them off.
+-            return q >> more;
+-        }
+-    }
++    if (!magic) return numer >> more;
++    uint32_t q = libdivide_mullhi_u32(numer, magic);
++    q += (more & LIBDIVIDE_ADD_MARKER) ? (numer - q) >> 1 : 0;
++    return q >> ((more & LIBDIVIDE_ADD_MARKER) ? more & LIBDIVIDE_32_SHIFT_MASK : more);
+ }
+ 
+ static LIBDIVIDE_INLINE uint32_t libdivide_u32_do(uint32_t numer, const struct libdivide_u32_t *denom) {
+@@ -1166,19 +1157,10 @@
+ }
+ 
+ static LIBDIVIDE_INLINE uint64_t libdivide_u64_do_raw(uint64_t numer, uint64_t magic, uint8_t more) {
+-   if (!magic) {
+-        return numer >> more;
+-    } else {
+-        uint64_t q = libdivide_mullhi_u64(numer, magic);
+-        if (more & LIBDIVIDE_ADD_MARKER) {
+-            uint64_t t = ((numer - q) >> 1) + q;
+-            return t >> (more & LIBDIVIDE_64_SHIFT_MASK);
+-        } else {
+-            // All upper bits are 0,
+-            // don't need to mask them off.
+-            return q >> more;
+-        }
+-    }
++    if (!magic) return numer >> more;
++    uint64_t q = libdivide_mullhi_u64(numer, magic);
++    q += (more & LIBDIVIDE_ADD_MARKER) ? (numer - q) >> 1 : 0;
++    return q >> ((more & LIBDIVIDE_ADD_MARKER) ? more & LIBDIVIDE_64_SHIFT_MASK : more);
+ }
+ 
+ static LIBDIVIDE_INLINE uint64_t libdivide_u64_do(uint64_t numer, const struct libdivide_u64_t *denom) {

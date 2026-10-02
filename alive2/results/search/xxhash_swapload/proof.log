@@ -1,0 +1,669 @@
+
+----------------------------------------
+define i64 @target_9to16(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#4:
+  %#5 = icmp samesign ugt i64 noundef %#1, 8
+  assume i1 %#5
+  %#6 = icmp ult i64 noundef %#1, 17
+  assume i1 %#6
+  %#7 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#7
+  %#8 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#8
+  %#9 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 24
+  %#10 = load i64, ptr %#9, align 1
+  %#11 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#12 = load i64, ptr %#11, align 1
+  %#13 = xor i64 %#12, %#10
+  %#14 = add i64 %#13, noundef %#3
+  %#15 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 40
+  %#16 = load i64, ptr %#15, align 1
+  %#17 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 48
+  %#18 = load i64, ptr %#17, align 1
+  %#19 = xor i64 %#18, %#16
+  %#20 = sub i64 %#19, noundef %#3
+  %#21 = load i64, ptr nowrite noundef %#0, align 1
+  %#22 = xor i64 %#21, %#14
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#24 = gep inbounds ptr %#23, 1 x i64 -8
+  %#25 = load i64, ptr %#24, align 1
+  %#26 = xor i64 %#25, %#20
+  %#27 = bswap i64 %#22
+  assume_welldefined i64 %#27
+  %#28 = add i64 %#27, noundef %#1
+  %#29 = add i64 %#28, %#26
+  %#30 = zext i64 %#22 to i128
+  %#31 = zext i64 %#26 to i128
+  %#32 = mul nuw i128 %#31, %#30
+  %#33 = lshr i128 %#32, 64
+  %#34 = xor i128 %#33, %#32
+  %#35 = trunc i128 %#34 to i64
+  %#36 = add i64 %#29, %#35
+  %#37 = lshr i64 %#36, 37
+  %#38 = xor i64 %#37, %#36
+  %#39 = mul i64 %#38, 1609587791953885689
+  %#40 = lshr i64 %#39, 32
+  %#41 = xor i64 %#40, %#39
+  ret i64 %#41
+}
+=>
+define i64 @target_9to16(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#4:
+  %#5 = icmp samesign ugt i64 noundef %#1, 8
+  assume i1 %#5
+  %#6 = icmp ult i64 noundef %#1, 17
+  assume i1 %#6
+  %#7 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#7
+  %#8 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#8
+  %#9 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 24
+  %#10 = load i64, ptr %#9, align 1
+  %#11 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#12 = load i64, ptr %#11, align 1
+  %#13 = xor i64 %#12, %#10
+  %#14 = add i64 %#13, noundef %#3
+  %#15 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 40
+  %#16 = load i64, ptr %#15, align 1
+  %#17 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 48
+  %#18 = load i64, ptr %#17, align 1
+  %#19 = xor i64 %#18, %#16
+  %#20 = sub i64 %#19, noundef %#3
+  %#21 = load i64, ptr nowrite noundef %#0, align 1
+  %#22 = xor i64 %#21, %#14
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#24 = gep inbounds ptr %#23, 1 x i64 -8
+  %#25 = load i64, ptr %#24, align 1
+  %#26 = xor i64 %#25, %#20
+  %#27 = bswap i64 %#22
+  %#28 = add i64 %#27, noundef %#1
+  %#29 = add i64 %#28, %#26
+  %#30 = zext i64 %#22 to i128
+  %#31 = zext i64 %#26 to i128
+  %#32 = mul nuw i128 %#31, %#30
+  %#33 = lshr i128 %#32, 64
+  %#34 = xor i128 %#33, %#32
+  %#35 = trunc i128 %#34 to i64
+  %#36 = add i64 %#29, %#35
+  %#37 = lshr i64 %#36, 37
+  %#38 = xor i64 %#37, %#36
+  %#39 = mul i64 %#38, 1609587791953885689
+  %#40 = lshr i64 %#39, 32
+  %#41 = xor i64 %#40, %#39
+  ret i64 %#41
+}
+Transformation seems to be correct!
+
+Reverse transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x0000000000000003
+i64 noundef %#1 = #x000000000000000a (10)
+ptr nowrite noundef %#2 = pointer(non-local, block_id=2, offset=196, attrs=3) / Address=#x00000000000000d2
+i64 noundef %#3 = #x0000000000000003 (3)
+
+Source:
+i1 %#5 = #x1 (1)
+i1 %#6 = #x1 (1)
+i1 %#7 = #x1 (1)
+i1 %#8 = #x1 (1)
+ptr %#9 = pointer(non-local, block_id=2, offset=220, attrs=3) / Address=#x00000000000000ea
+i64 %#10 = #x0000000000000000 (0)
+ptr %#11 = pointer(non-local, block_id=2, offset=228, attrs=3) / Address=#x00000000000000f2
+i64 %#12 = poison
+i64 %#13 = poison
+i64 %#14 = poison
+ptr %#15 = pointer(non-local, block_id=2, offset=236, attrs=3) / Address=#x00000000000000fa
+i64 %#16 = poison
+ptr %#17 = pointer(non-local, block_id=2, offset=244, attrs=3) / Address=#x0000000000000102
+i64 %#18 = poison
+i64 %#19 = poison
+i64 %#20 = poison
+i64 %#21 = #x0000000000000000 (0)
+i64 %#22 = poison
+ptr %#23 = pointer(non-local, block_id=1, offset=11, attrs=3) / Address=#x000000000000000d
+ptr %#24 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x0000000000000005
+i64 %#25 = poison
+i64 %#26 = poison
+i64 %#27 = poison
+i64 %#28 = poison
+i64 %#29 = poison
+i128 %#30 = poison
+i128 %#31 = poison
+i128 %#32 = poison
+i128 %#33 = poison
+i128 %#34 = poison
+i64 %#35 = poison
+i64 %#36 = poison
+i64 %#37 = poison
+i64 %#38 = poison
+i64 %#39 = poison
+i64 %#40 = poison
+i64 %#41 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 11	align: 1	alloc type: 0	alive: true	address: 2
+Contents:
+231: #x00
+6: #x00
+1: #x00
+223: #x00
+3: #x00
+221: #x00
+222: #x00
+225: #x00
+230: #x00
+228: #x00
+2: #x00
+233: #x00
+8: #x00
+235: #x00
+220: #x00
+224: #x00
+229: #x00
+5: #x00
+234: #x00
+7: #x00
+226: #x00
+4: #x00
+227: #x00
+*: poison
+
+Block 2 >	size: 253	align: 1	alloc type: 0	alive: true	address: 14
+Contents:
+231: #x00
+223: #x00
+221: #x00
+222: #x00
+225: #x00
+230: #x00
+228: #x00
+233: #x00
+235: #x00
+220: #x00
+229: #x00
+224: #x00
+234: #x00
+226: #x00
+227: #x00
+*: poison
+
+
+Target:
+i1 %#5 = #x1 (1)
+i1 %#6 = #x1 (1)
+i1 %#7 = #x1 (1)
+i1 %#8 = #x1 (1)
+ptr %#9 = pointer(non-local, block_id=2, offset=220, attrs=3) / Address=#x00000000000000ea
+i64 %#10 = #x0000000000000000 (0)
+ptr %#11 = pointer(non-local, block_id=2, offset=228, attrs=3) / Address=#x00000000000000f2
+i64 %#12 = poison
+i64 %#13 = poison
+i64 %#14 = poison
+ptr %#15 = pointer(non-local, block_id=2, offset=236, attrs=3) / Address=#x00000000000000fa
+i64 %#16 = poison
+ptr %#17 = pointer(non-local, block_id=2, offset=244, attrs=3) / Address=#x0000000000000102
+i64 %#18 = poison
+i64 %#19 = poison
+i64 %#20 = poison
+i64 %#21 = #x0000000000000000 (0)
+i64 %#22 = poison
+ptr %#23 = pointer(non-local, block_id=1, offset=11, attrs=3) / Address=#x000000000000000d
+ptr %#24 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x0000000000000005
+i64 %#25 = poison
+i64 %#26 = poison
+i64 %#27 = poison
+void = UB triggered!
+
+
+
+----------------------------------------
+define i64 @target_0to16(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#4:
+  %#12 = icmp ult i64 noundef %#1, 17
+  assume i1 %#12
+  %#13 = icmp samesign ugt i64 noundef %#1, 8
+  br i1 %#13, label %#10, label %#5
+
+#5:
+  %#14 = icmp samesign ugt i64 noundef %#1, 3
+  br i1 %#14, label %#6, label %#7
+
+#6:
+  %#15 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#15
+  %#16 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#16
+  %#17 = trunc i64 noundef %#3 to i32
+  %#18 = bswap i32 %#17
+  assume_welldefined i32 %#18
+  %#19 = zext i32 %#18 to i64
+  %#20 = shl nuw i64 %#19, 32
+  %#21 = xor i64 %#20, noundef %#3
+  %#22 = load i32, ptr nowrite noundef %#0, align 1
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#24 = gep inbounds ptr %#23, 1 x i64 -4
+  %#25 = load i32, ptr %#24, align 1
+  %#26 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 8
+  %#27 = load i64, ptr %#26, align 1
+  %#28 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 16
+  %#29 = load i64, ptr %#28, align 1
+  %#30 = xor i64 %#29, %#27
+  %#31 = sub i64 %#30, %#21
+  %#32 = zext i32 %#25 to i64
+  %#33 = zext i32 %#22 to i64
+  %#34 = shl nuw i64 %#33, 32
+  %#35 = or disjoint i64 %#34, %#32
+  %#36 = xor i64 %#31, %#35
+  %#37 = fshl i64 %#36, i64 %#36, i64 49
+  %#38 = fshl i64 %#36, i64 %#36, i64 24
+  %#39 = xor i64 %#37, %#38
+  %#40 = xor i64 %#39, %#36
+  %#41 = mul i64 %#40, -6939452855193903323
+  %#42 = lshr i64 %#41, 35
+  %#43 = add nsw nuw i64 %#42, noundef %#1
+  %#44 = xor i64 %#43, %#41
+  %#45 = mul i64 %#44, -6939452855193903323
+  %#46 = lshr i64 %#45, 28
+  %#47 = xor i64 %#46, %#45
+  br label %#11
+
+#7:
+  %#48 = icmp eq i64 noundef %#1, 0
+  br i1 %#48, label %#8, label %#9
+
+#8:
+  %#49 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 56
+  %#50 = load i64, ptr %#49, align 1
+  %#51 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 64
+  %#52 = load i64, ptr %#51, align 1
+  %#53 = xor i64 %#50, %#52
+  %#54 = xor i64 %#53, noundef %#3
+  %#55 = lshr i64 %#54, 33
+  %#56 = xor i64 %#55, %#54
+  %#57 = mul i64 %#56, -4417276706812531889
+  %#58 = lshr i64 %#57, 29
+  %#59 = xor i64 %#58, %#57
+  %#60 = mul i64 %#59, 1609587929392839161
+  %#61 = lshr i64 %#60, 32
+  %#62 = xor i64 %#61, %#60
+  br label %#11
+
+#9:
+  %#63 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#63
+  %#64 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#64
+  %#65 = load i8, ptr nowrite noundef %#0, align 1
+  %#66 = lshr i64 noundef %#1, 1
+  %#67 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#66
+  %#68 = load i8, ptr %#67, align 1
+  %#69 = gep ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#70 = gep ptr %#69, 1 x i64 -1
+  %#71 = load i8, ptr %#70, align 1
+  %#72 = zext i8 %#65 to i64
+  %#73 = shl nsw nuw i64 %#72, 16
+  %#74 = zext i8 %#68 to i64
+  %#75 = shl nsw nuw i64 %#74, 24
+  %#76 = or disjoint i64 %#75, %#73
+  %#77 = zext i8 %#71 to i64
+  %#78 = or disjoint i64 %#76, %#77
+  %#79 = shl nsw nuw i64 noundef %#1, 8
+  %#80 = or disjoint i64 %#78, %#79
+  %#81 = load i32, ptr nowrite noundef %#2, align 1
+  %#82 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 4
+  %#83 = load i32, ptr %#82, align 1
+  %#84 = xor i32 %#83, %#81
+  %#85 = zext i32 %#84 to i64
+  %#86 = add i64 noundef %#3, %#85
+  %#87 = xor i64 %#86, %#80
+  %#88 = lshr i64 %#87, 33
+  %#89 = xor i64 %#88, %#87
+  %#90 = mul i64 %#89, -4417276706812531889
+  %#91 = lshr i64 %#90, 29
+  %#92 = xor i64 %#91, %#90
+  %#93 = mul i64 %#92, 1609587929392839161
+  %#94 = lshr i64 %#93, 32
+  %#95 = xor i64 %#94, %#93
+  br label %#11
+
+#10:
+  %#96 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#96
+  %#97 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#97
+  %#98 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 24
+  %#99 = load i64, ptr %#98, align 1
+  %#100 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#101 = load i64, ptr %#100, align 1
+  %#102 = xor i64 %#101, %#99
+  %#103 = add i64 %#102, noundef %#3
+  %#104 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 40
+  %#105 = load i64, ptr %#104, align 1
+  %#106 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 48
+  %#107 = load i64, ptr %#106, align 1
+  %#108 = xor i64 %#107, %#105
+  %#109 = sub i64 %#108, noundef %#3
+  %#110 = load i64, ptr nowrite noundef %#0, align 1
+  %#111 = xor i64 %#110, %#103
+  %#112 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#113 = gep inbounds ptr %#112, 1 x i64 -8
+  %#114 = load i64, ptr %#113, align 1
+  %#115 = xor i64 %#114, %#109
+  %#116 = bswap i64 %#111
+  assume_welldefined i64 %#116
+  %#117 = add i64 %#116, noundef %#1
+  %#118 = add i64 %#117, %#115
+  %#119 = zext i64 %#111 to i128
+  %#120 = zext i64 %#115 to i128
+  %#121 = mul nuw i128 %#120, %#119
+  %#122 = lshr i128 %#121, 64
+  %#123 = xor i128 %#122, %#121
+  %#124 = trunc i128 %#123 to i64
+  %#125 = add i64 %#118, %#124
+  %#126 = lshr i64 %#125, 37
+  %#127 = xor i64 %#126, %#125
+  %#128 = mul i64 %#127, 1609587791953885689
+  %#129 = lshr i64 %#128, 32
+  %#130 = xor i64 %#129, %#128
+  br label %#11
+
+#11:
+  %#131 = phi i64 [ %#130, %#10 ], [ %#47, %#6 ], [ %#95, %#9 ], [ %#62, %#8 ]
+  ret i64 %#131
+}
+=>
+define i64 @target_0to16(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#4:
+  %#12 = icmp ult i64 noundef %#1, 17
+  assume i1 %#12
+  %#13 = icmp samesign ugt i64 noundef %#1, 8
+  br i1 %#13, label %#10, label %#5
+
+#5:
+  %#14 = icmp samesign ugt i64 noundef %#1, 3
+  br i1 %#14, label %#6, label %#7
+
+#6:
+  %#15 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#15
+  %#16 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#16
+  %#17 = trunc i64 noundef %#3 to i32
+  %#18 = bswap i32 %#17
+  assume_welldefined i32 %#18
+  %#19 = zext i32 %#18 to i64
+  %#20 = shl nuw i64 %#19, 32
+  %#21 = xor i64 %#20, noundef %#3
+  %#22 = load i32, ptr nowrite noundef %#0, align 1
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#24 = gep inbounds ptr %#23, 1 x i64 -4
+  %#25 = load i32, ptr %#24, align 1
+  %#26 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 8
+  %#27 = load i64, ptr %#26, align 1
+  %#28 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 16
+  %#29 = load i64, ptr %#28, align 1
+  %#30 = xor i64 %#29, %#27
+  %#31 = sub i64 %#30, %#21
+  %#32 = zext i32 %#25 to i64
+  %#33 = zext i32 %#22 to i64
+  %#34 = shl nuw i64 %#33, 32
+  %#35 = or disjoint i64 %#34, %#32
+  %#36 = xor i64 %#31, %#35
+  %#37 = fshl i64 %#36, i64 %#36, i64 49
+  %#38 = fshl i64 %#36, i64 %#36, i64 24
+  %#39 = xor i64 %#37, %#38
+  %#40 = xor i64 %#39, %#36
+  %#41 = mul i64 %#40, -6939452855193903323
+  %#42 = lshr i64 %#41, 35
+  %#43 = add nsw nuw i64 %#42, noundef %#1
+  %#44 = xor i64 %#43, %#41
+  %#45 = mul i64 %#44, -6939452855193903323
+  %#46 = lshr i64 %#45, 28
+  %#47 = xor i64 %#46, %#45
+  br label %#11
+
+#7:
+  %#48 = icmp eq i64 noundef %#1, 0
+  br i1 %#48, label %#8, label %#9
+
+#8:
+  %#49 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 56
+  %#50 = load i64, ptr %#49, align 1
+  %#51 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 64
+  %#52 = load i64, ptr %#51, align 1
+  %#53 = xor i64 %#50, %#52
+  %#54 = xor i64 %#53, noundef %#3
+  %#55 = lshr i64 %#54, 33
+  %#56 = xor i64 %#55, %#54
+  %#57 = mul i64 %#56, -4417276706812531889
+  %#58 = lshr i64 %#57, 29
+  %#59 = xor i64 %#58, %#57
+  %#60 = mul i64 %#59, 1609587929392839161
+  %#61 = lshr i64 %#60, 32
+  %#62 = xor i64 %#61, %#60
+  br label %#11
+
+#9:
+  %#63 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#63
+  %#64 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#64
+  %#65 = load i8, ptr nowrite noundef %#0, align 1
+  %#66 = lshr i64 noundef %#1, 1
+  %#67 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#66
+  %#68 = load i8, ptr %#67, align 1
+  %#69 = gep ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#70 = gep ptr %#69, 1 x i64 -1
+  %#71 = load i8, ptr %#70, align 1
+  %#72 = zext i8 %#65 to i64
+  %#73 = shl nsw nuw i64 %#72, 16
+  %#74 = zext i8 %#68 to i64
+  %#75 = shl nsw nuw i64 %#74, 24
+  %#76 = or disjoint i64 %#75, %#73
+  %#77 = zext i8 %#71 to i64
+  %#78 = or disjoint i64 %#76, %#77
+  %#79 = shl nsw nuw i64 noundef %#1, 8
+  %#80 = or disjoint i64 %#78, %#79
+  %#81 = load i32, ptr nowrite noundef %#2, align 1
+  %#82 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 4
+  %#83 = load i32, ptr %#82, align 1
+  %#84 = xor i32 %#83, %#81
+  %#85 = zext i32 %#84 to i64
+  %#86 = add i64 noundef %#3, %#85
+  %#87 = xor i64 %#86, %#80
+  %#88 = lshr i64 %#87, 33
+  %#89 = xor i64 %#88, %#87
+  %#90 = mul i64 %#89, -4417276706812531889
+  %#91 = lshr i64 %#90, 29
+  %#92 = xor i64 %#91, %#90
+  %#93 = mul i64 %#92, 1609587929392839161
+  %#94 = lshr i64 %#93, 32
+  %#95 = xor i64 %#94, %#93
+  br label %#11
+
+#10:
+  %#96 = icmp ne ptr nowrite noundef %#0, null
+  assume i1 %#96
+  %#97 = icmp ne ptr nowrite noundef %#2, null
+  assume i1 %#97
+  %#98 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 24
+  %#99 = load i64, ptr %#98, align 1
+  %#100 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#101 = load i64, ptr %#100, align 1
+  %#102 = xor i64 %#101, %#99
+  %#103 = add i64 %#102, noundef %#3
+  %#104 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 40
+  %#105 = load i64, ptr %#104, align 1
+  %#106 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 48
+  %#107 = load i64, ptr %#106, align 1
+  %#108 = xor i64 %#107, %#105
+  %#109 = sub i64 %#108, noundef %#3
+  %#110 = load i64, ptr nowrite noundef %#0, align 1
+  %#111 = xor i64 %#110, %#103
+  %#112 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#113 = gep inbounds ptr %#112, 1 x i64 -8
+  %#114 = load i64, ptr %#113, align 1
+  %#115 = xor i64 %#114, %#109
+  %#116 = bswap i64 %#111
+  %#117 = add i64 %#116, noundef %#1
+  %#118 = add i64 %#117, %#115
+  %#119 = zext i64 %#111 to i128
+  %#120 = zext i64 %#115 to i128
+  %#121 = mul nuw i128 %#120, %#119
+  %#122 = lshr i128 %#121, 64
+  %#123 = xor i128 %#122, %#121
+  %#124 = trunc i128 %#123 to i64
+  %#125 = add i64 %#118, %#124
+  %#126 = lshr i64 %#125, 37
+  %#127 = xor i64 %#126, %#125
+  %#128 = mul i64 %#127, 1609587791953885689
+  %#129 = lshr i64 %#128, 32
+  %#130 = xor i64 %#129, %#128
+  br label %#11
+
+#11:
+  %#131 = phi i64 [ %#130, %#10 ], [ %#47, %#6 ], [ %#95, %#9 ], [ %#62, %#8 ]
+  ret i64 %#131
+}
+Transformation seems to be correct!
+
+Reverse transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x0000000000000005
+i64 noundef %#1 = #x0000000000000009 (9)
+ptr nowrite noundef %#2 = pointer(non-local, block_id=2, offset=0, attrs=3) / Address=#x000000000000000e
+i64 noundef %#3 = #x0000000000000003 (3)
+
+Source:
+i1 %#12 = #x1 (1)
+i1 %#13 = #x1 (1)
+  >> Jump to %#10
+i1 %#96 = #x1 (1)
+i1 %#97 = #x1 (1)
+ptr %#98 = pointer(non-local, block_id=2, offset=24, attrs=3) / Address=#x0000000000000026
+i64 %#99 = poison
+ptr %#100 = pointer(non-local, block_id=2, offset=32, attrs=3) / Address=#x000000000000002e
+i64 %#101 = poison
+i64 %#102 = poison
+i64 %#103 = poison
+ptr %#104 = pointer(non-local, block_id=2, offset=40, attrs=3) / Address=#x0000000000000036
+i64 %#105 = poison
+ptr %#106 = pointer(non-local, block_id=2, offset=48, attrs=3) / Address=#x000000000000003e
+i64 %#107 = poison
+i64 %#108 = poison
+i64 %#109 = poison
+i64 %#110 = #x0000000000000000 (0)
+i64 %#111 = poison
+ptr %#112 = pointer(non-local, block_id=1, offset=10, attrs=3) / Address=#x000000000000000e
+ptr %#113 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x0000000000000006
+i64 %#114 = poison
+i64 %#115 = poison
+i64 %#116 = poison
+i64 %#117 = poison
+i64 %#118 = poison
+i128 %#119 = poison
+i128 %#120 = poison
+i128 %#121 = poison
+i128 %#122 = poison
+i128 %#123 = poison
+i64 %#124 = poison
+i64 %#125 = poison
+i64 %#126 = poison
+i64 %#127 = poison
+i64 %#128 = poison
+i64 %#129 = poison
+i64 %#130 = poison
+  >> Jump to %#11
+i64 %#131 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 10	align: 4	alloc type: 0	alive: true	address: 4
+Contents:
+32: #x00
+25: #x00
+4: #x00
+28: #x00
+24: #x00
+3: #x00
+2: #x00
+31: #x00
+8: #x00
+38: #x00
+27: #x00
+37: #x00
+26: #x00
+33: #x00
+35: #x00
+39: #x00
+5: #x00
+36: #x00
+30: #x00
+7: #x00
+29: #x00
+1: #x00
+34: #x00
+6: #x00
+*: poison
+
+Block 2 >	size: 56	align: 2	alloc type: 0	alive: true	address: 14
+Contents:
+32: #x00
+29: #x00
+28: #x00
+24: #x00
+31: #x00
+27: #x00
+33: #x00
+39: #x00
+36: #x00
+30: #x00
+34: #x00
+25: #x00
+*: poison
+
+
+Target:
+i1 %#12 = #x1 (1)
+i1 %#13 = #x1 (1)
+  >> Jump to %#10
+i1 %#96 = #x1 (1)
+i1 %#97 = #x1 (1)
+ptr %#98 = pointer(non-local, block_id=2, offset=24, attrs=3) / Address=#x0000000000000026
+i64 %#99 = poison
+ptr %#100 = pointer(non-local, block_id=2, offset=32, attrs=3) / Address=#x000000000000002e
+i64 %#101 = poison
+i64 %#102 = poison
+i64 %#103 = poison
+ptr %#104 = pointer(non-local, block_id=2, offset=40, attrs=3) / Address=#x0000000000000036
+i64 %#105 = poison
+ptr %#106 = pointer(non-local, block_id=2, offset=48, attrs=3) / Address=#x000000000000003e
+i64 %#107 = poison
+i64 %#108 = poison
+i64 %#109 = poison
+i64 %#110 = #x0000000000000000 (0)
+i64 %#111 = poison
+ptr %#112 = pointer(non-local, block_id=1, offset=10, attrs=3) / Address=#x000000000000000e
+ptr %#113 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x0000000000000006
+i64 %#114 = poison
+i64 %#115 = poison
+i64 %#116 = poison
+void = UB triggered!
+
+
+Summary:
+  2 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

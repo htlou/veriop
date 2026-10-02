@@ -1,0 +1,39 @@
+--- a/smt/solver.cpp
++++ b/smt/solver.cpp
+@@ -184,6 +184,14 @@
+ 
+   NamedTactic(const char *name) : Tactic(Z3_mk_tactic(ctx(), name)) {
+     this->name = name;
++    if (string_view(name) == "simplify") {
++      Z3_params params = Z3_mk_params(ctx());
++      Z3_params_inc_ref(ctx(), params);
++      for (auto *key : {"blast_select_store", "push_ite_bv", "bv_extract_prop", "bv_sort_ac"})
++        Z3_params_set_bool(ctx(), params, Z3_mk_string_symbol(ctx(), key), true);
++      set(Z3_tactic_using_params(ctx(), t, params));
++      Z3_params_dec_ref(ctx(), params);
++    }
+   }
+ 
+   TacticResult exec(const Goal &goal) const override {
+@@ -580,19 +588,8 @@
+ 
+ 
+ void solver_init() {
+-  tactic.emplace({
+-    "simplify",
+-    "propagate-values",
+-    "simplify",
+-    "elim-uncnstr",
+-    "qe-light",
+-    "simplify",
+-    "elim-uncnstr",
+-    "reduce-args",
+-    "qe-light",
+-    "simplify",
+-    "smt"
+-  });
++  tactic.emplace({"simplify"});
++  tactic->appendIf("is-qfaufbv", NamedTactic("qfaufbv"), NamedTactic("smt"));
+ #if 0
+   tactic->appendIf("is-qfbv",
+                    AndTactic({

@@ -1,0 +1,75 @@
+
+----------------------------------------
+define i64 @src(i64 %data, i64 %key) {
+#0:
+  %v28 = xor i64 %key, %data
+  %v29 = fshl i64 %v28, i64 %v28, i64 49
+  %v30 = fshl i64 %v28, i64 %v28, i64 24
+  %v31 = xor i64 %v29, %v30
+  %v32 = xor i64 %v31, %v28
+  ret i64 %v32
+}
+=>
+define i64 @tgt(i64 %data, i64 %key) {
+#0:
+  %v28 = xor i64 %key, %data
+  %v29 = fshl i64 %v28, i64 %v28, i64 49
+  %v30 = fshl i64 %v28, i64 %v28, i64 24
+  %v31 = xor i64 %v29, %v30
+  %v32 = xor i64 %v31, %v28
+  %km.data = freeze i64 %data
+  %km.key = freeze i64 %key
+  %km.data49 = fshl i64 %km.data, i64 %km.data, i64 48
+  %km.data24 = fshl i64 %km.data, i64 %km.data, i64 24
+  %km.data.rot = xor i64 %km.data49, %km.data24
+  %km.data.mix = xor i64 %km.data.rot, %km.data
+  %km.key49 = fshl i64 %km.key, i64 %km.key, i64 49
+  %km.key24 = fshl i64 %km.key, i64 %km.key, i64 24
+  %km.key.rot = xor i64 %km.key49, %km.key24
+  %km.key.mix = xor i64 %km.key.rot, %km.key
+  %km.fast = xor i64 %km.data.mix, %km.key.mix
+  %km.same.data = icmp eq i64 %data, %km.data
+  %km.same.key = icmp eq i64 %key, %km.key
+  %km.guard = and i1 %km.same.data, %km.same.key
+  %km.value = select i1 %km.guard, i64 %km.fast, i64 %v32
+  ret i64 %km.value
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 %data = #x0000000000000001 (1)
+i64 %key = #x0000000000000000 (0)
+
+Source:
+i64 %v28 = #x0000000000000001 (1)
+i64 %v29 = #x0002000000000000 (562949953421312)
+i64 %v30 = #x0000000001000000 (16777216)
+i64 %v31 = #x0002000001000000 (562949970198528)
+i64 %v32 = #x0002000001000001 (562949970198529)
+
+Target:
+i64 %v28 = #x0000000000000001 (1)
+i64 %v29 = #x0002000000000000 (562949953421312)
+i64 %v30 = #x0000000001000000 (16777216)
+i64 %v31 = #x0002000001000000 (562949970198528)
+i64 %v32 = #x0002000001000001 (562949970198529)
+i64 %km.data = #x0000000000000001 (1)
+i64 %km.key = #x0000000000000000 (0)
+i64 %km.data49 = #x0001000000000000 (281474976710656)
+i64 %km.data24 = #x0000000001000000 (16777216)
+i64 %km.data.rot = #x0001000001000000 (281474993487872)
+i64 %km.data.mix = #x0001000001000001 (281474993487873)
+i64 %km.key49 = #x0000000000000000 (0)
+i64 %km.key24 = #x0000000000000000 (0)
+i64 %km.key.rot = #x0000000000000000 (0)
+i64 %km.key.mix = #x0000000000000000 (0)
+i64 %km.fast = #x0001000001000001 (281474993487873)
+i1 %km.same.data = #x1 (1)
+i1 %km.same.key = #x1 (1)
+i1 %km.guard = #x1 (1)
+i64 %km.value = #x0001000001000001 (281474993487873)
+Source value: #x0002000001000001 (562949970198529)
+Target value: #x0001000001000001 (281474993487873)
+

@@ -1,0 +1,58 @@
+
+----------------------------------------
+define i64 @src(i8 %idx) {
+#0:
+  %bounded = and i8 %idx, 3
+  %v = extractelement <4 x i64> { 4, 20, 300, 7000 }, i8 %bounded
+  ret i64 %v
+}
+=>
+@table = constant 32 bytes, align 16
+
+define i64 @tgt(i8 %idx) {
+init:
+  store [4 x i64] { 5, 20, 300, 7000 }, ptr @table, align 16
+  br label %#0
+
+#0:
+  %bounded = and i8 %idx, 3
+  %stable = freeze i8 %bounded
+  %safe = and i8 %stable, 3
+  %wide = zext i8 %safe to i64
+  %p = gep inbounds ptr @table, 32 x i64 0, 8 x i64 %wide
+  %v = load i64, ptr %p, align 8
+  %same = icmp eq i8 %bounded, %stable
+  %fallback = extractelement <4 x i64> { 4, 20, 300, 7000 }, i8 %bounded
+  %result = select i1 %same, i64 %v, i64 %fallback
+  ret i64 %result
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i8 %idx = #x00 (0)
+
+Source:
+i8 %bounded = #x00 (0)
+i64 %v = #x0000000000000004 (4)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 32	align: 16	alloc type: 0	alive: true	address: 9223372036854775776	const
+
+Target:
+  >> Jump to %#0
+i8 %bounded = #x00 (0)
+i8 %stable = #x00 (0)
+i8 %safe = #x00 (0)
+i64 %wide = #x0000000000000000 (0)
+ptr %p = pointer(non-local, block_id=0, offset=0) / Address=#x7fffffffffffffe0
+i64 %v = #x0000000000000005 (5)
+i1 %same = #x1 (1)
+i64 %fallback = #x0000000000000004 (4)
+i64 %result = #x0000000000000005 (5)
+Source value: #x0000000000000004 (4)
+Target value: #x0000000000000005 (5)
+

@@ -1,0 +1,24 @@
+--- a/smt/solver.cpp
++++ b/smt/solver.cpp
+@@ -284,7 +284,20 @@
+   }
+ 
+   Z3_solver getSolver() const {
+-    return Z3_mk_solver_from_tactic(ctx(), tactics.t);
++    Z3_params params = Z3_mk_params(ctx());
++    Z3_params_inc_ref(ctx(), params);
++    for (auto *key : {"blast_select_store", "push_ite_bv", "bv_extract_prop", "bv_sort_ac"})
++      Z3_params_set_bool(ctx(), params, Z3_mk_string_symbol(ctx(), key), true);
++    Tactic simplify(Z3_mk_tactic(ctx(), "simplify"));
++    Tactic normalize(Z3_tactic_using_params(ctx(), simplify.t, params));
++    Z3_params_dec_ref(ctx(), params);
++    Tactic solve(Z3_mk_tactic(ctx(), "qfaufbv"));
++    Tactic decided(Z3_mk_tactic(ctx(), "fail-if-undecided"));
++    Tactic finish(Z3_tactic_and_then(ctx(), solve.t, decided.t));
++    Tactic fast(Z3_tactic_and_then(ctx(), normalize.t, finish.t));
++    Tactic limited(Z3_tactic_try_for(ctx(), fast.t, 1000));
++    Tactic portfolio(Z3_tactic_or_else(ctx(), limited.t, tactics.t));
++    return Z3_mk_solver_from_tactic(ctx(), portfolio.t);
+   }
+ 
+   friend class smt::Solver;

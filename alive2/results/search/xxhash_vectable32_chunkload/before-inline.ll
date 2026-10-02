@@ -1,0 +1,514 @@
+; ModuleID = '/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_vectable32/xxhash_vectable32.c'
+source_filename = "/srv/home/hantaolou/code/veriop/alive2/results/search/xxhash_vectable32/xxhash_vectable32.c"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+@lookup_0_0 = internal constant [16 x i64] [i64 -4302098779834749733, i64 -2220562881957146901, i64 -3894436733716799489, i64 1433843135270481901, i64 8336770163655280242, i64 -7881803417479397662, i64 -2941004127381733739, i64 5502495245947142431, i64 -2572398748971526355, i64 -2436064182340099334, i64 4055606894390288348, i64 5350621376133947991, i64 2765702133756617546, i64 -8493270429887581760, i64 -1160504230424452080, i64 5291143887273806931], align 8
+@lookup_0_1 = internal constant [16 x i64] [i64 -1568241370979223514, i64 -929432383683428675, i64 3673450842886451206, i64 -2478423014181009900, i64 3622887472839136718, i64 1246929574567274891, i64 -1152736325583170325, i64 -3324533442079829058, i64 -8942773601077194801, i64 2970022284838843195, i64 7362585856034407022, i64 -4392082282584759128, i64 5225411942735301638, i64 -5450523663638814413, i64 3547770832784427690, i64 362675829607944414], align 8
+@lookup_1_0 = internal constant [16 x i64] [i64 -282257845897087025, i64 6898188129916750362, i64 2844895380948538806, i64 7674606916920705344, i64 9214633253411488453, i64 6687772750457788192, i64 -4531365318336869402, i64 5344895949674194850, i64 -6675284198519149788, i64 2113974078481014280, i64 8777568547874204941, i64 -2169500560468987851, i64 3660690302424466814, i64 -2436525662347849866, i64 -6085909721859794221, i64 5134827694651168302], align 8
+@lookup_1_1 = internal constant [16 x i64] [i64 1838281907459330133, i64 7335560060985733464, i64 -318164364674882796, i64 8296998437054084336, i64 -2123147046896566209, i64 -2388148047314387342, i64 -5375991149494515187, i64 499566431179015674, i64 7372184217170234346, i64 2897285734473052776, i64 -6620125947798625332, i64 4279659918279867487, i64 4800416899009875996, i64 -5931816708875844411, i64 6774495193030674564, i64 -8398597170076423925], align 8
+@lookup_2_0 = internal constant [16 x i64] [i64 8529366458340265297, i64 -3398925928391953275, i64 8418202337400857587, i64 7020717050005586112, i64 -3761882330889119378, i64 -9149138593070727489, i64 8772769334003688095, i64 1743089132010364587, i64 3963873365795895589, i64 -4042618408496833961, i64 -3755880203185378672, i64 6190981343618133313, i64 8640948454356727894, i64 -681029911906337757, i64 1874492674255557078, i64 -461795147661551007], align 8
+@lookup_2_1 = internal constant [16 x i64] [i64 5084905583549711826, i64 4488332001360539422, i64 3063753645715674379, i64 -8515971706312224628, i64 2347651011283115188, i64 7862244273078811554, i64 4741579133146630013, i64 -814247142782119327, i64 8169000404195870007, i64 -9066049001627982408, i64 2833837677914226691, i64 6041807101686622375, i64 -163413725005337946, i64 -2403499172613604551, i64 -7986631214068388042, i64 4575667007673887251], align 8
+@lookup_3_0 = internal constant [16 x i64] [i64 -6871223553662405846, i64 -1817709641818812897, i64 6294355645245719615, i64 -8340629563394885605, i64 5041782483466037194, i64 -1880483337136747912, i64 3729356046086683290, i64 -6189662371905423721, i64 8090085636497697382, i64 3171146578797943502, i64 5619658110353354353, i64 -6259471935552714723, i64 -4607290929671566278, i64 -1112309911958824964, i64 -3771184802297902326, i64 -845068846880718549], align 8
+@lookup_3_1 = internal constant [16 x i64] [i64 -4746542111220524153, i64 -992931083124165738, i64 -4793174741866312907, i64 -2974112083446677997, i64 8503709266395068717, i64 1000067187423537442, i64 -647344187112945900, i64 -5985590712037982679, i64 -1517593895512126191, i64 2822446240451570149, i64 6100083767409290672, i64 -4452813043723281122, i64 -3260576076044403503, i64 -5133358930729682568, i64 -1723256135048217232, i64 3032053336604930433], align 8
+@lookup_4_0 = internal constant [16 x i64] [i64 7715946029497977153, i64 7756605422741824046, i64 6914152272366242186, i64 6619468546868266945, i64 8635048048508886888, i64 -8393880875905280995, i64 -6787559214576350429, i64 -2217171985210471049, i64 3604675824303396708, i64 -3512584283167155441, i64 2156514823987992107, i64 4907671418510825112, i64 8839569603083604159, i64 -6042468303600945730, i64 -3015502839406131913, i64 7156044269520408728], align 8
+@lookup_4_1 = internal constant [16 x i64] [i64 -1508413522767866676, i64 1604089566654333, i64 7878720862229920401, i64 -3403495536095635901, i64 4419032860939710275, i64 8309667868945161700, i64 8127699344777264475, i64 3172741449153456871, i64 -7819243355710516001, i64 -1517632861945409470, i64 -4231347299287732713, i64 7537847041743724411, i64 -8574195954494672605, i64 8276179821638363100, i64 -2521175872576789404, i64 -6787734742961095628], align 8
+@lookup_5_0 = internal constant [16 x i64] [i64 3141466977451366136, i64 6496874765145226399, i64 1397096103115942590, i64 -5230410147232611976, i64 -8713684776993538784, i64 4679852336830987527, i64 -4552607469369903036, i64 5281118663193865049, i64 -7809504173095293835, i64 -3494378936840174703, i64 -8283887544681711630, i64 -1982062835990977551, i64 7876639392340321016, i64 -776633854295803046, i64 -4449956841746897829, i64 6252822398696073730], align 8
+@lookup_5_1 = internal constant [16 x i64] [i64 3653197155308211081, i64 4184123583517128355, i64 2710647065067127392, i64 1364275973376659154, i64 5735683338271654244, i64 4788098542079513072, i64 2523649311648287430, i64 6226703245439355973, i64 4039168641094241130, i64 -4735310071515049160, i64 -7718157997211796903, i64 -7630434519632171097, i64 6401440615517674288, i64 -1540227857295215434, i64 -6492234107044435804, i64 1076237601080914835], align 8
+@lookup_6_0 = internal constant [16 x i64] [i64 371066729028084812, i64 2047781579520568252, i64 8981190644621376403, i64 -1270115072684319195, i64 -8955474670546817597, i64 1697060390969647966, i64 -1880780507307867236, i64 -5363681305219004548, i64 -1084662620876922617, i64 8607018531237843404, i64 -4794156784727077306, i64 6393061779462666445, i64 5666196083048816522, i64 6136724780979887393, i64 5191002144171421573, i64 3531887758758133993], align 8
+@lookup_6_1 = internal constant [16 x i64] [i64 -4418833195103958582, i64 399445177739474421, i64 -1947046474972200432, i64 -3252035828561191092, i64 8996305336856613012, i64 6917241246617268645, i64 7998926962047337531, i64 -8446620120025011510, i64 -5280387490099738130, i64 564548736115642456, i64 -8404415521806172981, i64 3717577419720655258, i64 -5089905126141548364, i64 7521440301808993825, i64 -8814061795361718509, i64 -2714087517662472993], align 8
+@lookup_7_0 = internal constant [16 x i64] [i64 2071800237030200399, i64 -4264588051788821739, i64 5286102316725614445, i64 699974702888830978, i64 -6198501953651059440, i64 5478601957838938672, i64 -8826379284296529914, i64 4117946310065826061, i64 2713743964583775612, i64 5235599403462674304, i64 -4570201113732268168, i64 888845016463753946, i64 -4356919662415120719, i64 2273280100835896876, i64 -3991362807574606833, i64 -4452897474114816089], align 8
+@lookup_7_1 = internal constant [16 x i64] [i64 -3778735031010307814, i64 4461224383070578004, i64 -2508687673012358854, i64 519458947206652749, i64 -8279674986227810403, i64 4384594615491221824, i64 2225088360167913052, i64 -7273095038674136419, i64 -3679179631877543767, i64 5569617102229150198, i64 -8233578011895567121, i64 -826440576334536596, i64 -4492853642420687956, i64 -2325365741171985389, i64 7789395919978777827, i64 -2973241909731272914], align 8
+
+; Function Attrs: alwaysinline mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_1to3(ptr noundef readonly %0, i64 noundef %1, ptr noundef readonly %2, i64 noundef %3) local_unnamed_addr #0 {
+  %5 = icmp ne i64 %1, 0
+  tail call void @llvm.assume(i1 %5)
+  %6 = icmp ult i64 %1, 4
+  tail call void @llvm.assume(i1 %6)
+  %7 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %7)
+  %8 = icmp ne ptr %2, null
+  tail call void @llvm.assume(i1 %8)
+  %9 = load i8, ptr %0, align 1
+  %10 = lshr i64 %1, 1
+  %11 = getelementptr inbounds nuw i8, ptr %0, i64 %10
+  %12 = load i8, ptr %11, align 1
+  %13 = getelementptr i8, ptr %0, i64 %1
+  %14 = getelementptr i8, ptr %13, i64 -1
+  %15 = load i8, ptr %14, align 1
+  %16 = zext i8 %9 to i64
+  %17 = shl nuw nsw i64 %16, 16
+  %18 = zext i8 %12 to i64
+  %19 = shl nuw nsw i64 %18, 24
+  %20 = or disjoint i64 %19, %17
+  %21 = zext i8 %15 to i64
+  %22 = or disjoint i64 %20, %21
+  %23 = shl nuw nsw i64 %1, 8
+  %24 = or disjoint i64 %22, %23
+  %25 = load i32, ptr %2, align 1
+  %26 = getelementptr inbounds nuw i8, ptr %2, i64 4
+  %27 = load i32, ptr %26, align 1
+  %28 = xor i32 %27, %25
+  %29 = zext i32 %28 to i64
+  %30 = add i64 %3, %29
+  %31 = xor i64 %30, %24
+  %32 = lshr i64 %31, 33
+  %33 = xor i64 %32, %31
+  %34 = mul i64 %33, -4417276706812531889
+  %35 = lshr i64 %34, 29
+  %36 = xor i64 %35, %34
+  %37 = mul i64 %36, 1609587929392839161
+  %38 = lshr i64 %37, 32
+  %39 = xor i64 %38, %37
+  %40 = icmp eq i64 %1, 1
+  br i1 %40, label %41, label %78
+
+41:                                               ; preds = %4
+  %42 = icmp eq i64 %30, 2267503259
+  %43 = zext i8 %9 to i32
+  %44 = and i32 %43, 31
+  %45 = call i64 @lookup_0(i32 %44)
+  %46 = lshr i32 %43, 5
+  %47 = icmp ult i8 %9, 32
+  %48 = select i1 %47, i64 %45, i64 0
+  %49 = call i64 @lookup_1(i32 %44)
+  %50 = icmp eq i32 %46, 1
+  %51 = select i1 %50, i64 %49, i64 0
+  %52 = or i64 %48, %51
+  %53 = call i64 @lookup_2(i32 %44)
+  %54 = icmp eq i32 %46, 2
+  %55 = select i1 %54, i64 %53, i64 0
+  %56 = or i64 %52, %55
+  %57 = call i64 @lookup_3(i32 %44)
+  %58 = icmp eq i32 %46, 3
+  %59 = select i1 %58, i64 %57, i64 0
+  %60 = or i64 %56, %59
+  %61 = call i64 @lookup_4(i32 %44)
+  %62 = icmp eq i32 %46, 4
+  %63 = select i1 %62, i64 %61, i64 0
+  %64 = or i64 %60, %63
+  %65 = call i64 @lookup_5(i32 %44)
+  %66 = icmp eq i32 %46, 5
+  %67 = select i1 %66, i64 %65, i64 0
+  %68 = or i64 %64, %67
+  %69 = call i64 @lookup_6(i32 %44)
+  %70 = icmp eq i32 %46, 6
+  %71 = select i1 %70, i64 %69, i64 0
+  %72 = or i64 %68, %71
+  %73 = call i64 @lookup_7(i32 %44)
+  %74 = icmp eq i32 %46, 7
+  %75 = select i1 %74, i64 %73, i64 0
+  %76 = or i64 %72, %75
+  %77 = select i1 %42, i64 %76, i64 %39
+  br label %78
+
+78:                                               ; preds = %4, %41
+  %79 = phi i64 [ %77, %41 ], [ %39, %4 ]
+  ret i64 %79
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: write)
+declare void @llvm.assume(i1 noundef) #1
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_0to16(ptr noundef readonly %0, i64 noundef %1, ptr noundef readonly %2, i64 noundef %3) local_unnamed_addr #2 {
+  %5 = icmp ult i64 %1, 17
+  tail call void @llvm.assume(i1 %5)
+  %6 = icmp samesign ugt i64 %1, 8
+  br i1 %6, label %7, label %43, !prof !5
+
+7:                                                ; preds = %4
+  %8 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %8)
+  %9 = icmp ne ptr %2, null
+  tail call void @llvm.assume(i1 %9)
+  %10 = getelementptr inbounds nuw i8, ptr %2, i64 24
+  %11 = load i64, ptr %10, align 1
+  %12 = getelementptr inbounds nuw i8, ptr %2, i64 32
+  %13 = load i64, ptr %12, align 1
+  %14 = xor i64 %13, %11
+  %15 = add i64 %14, %3
+  %16 = getelementptr inbounds nuw i8, ptr %2, i64 40
+  %17 = load i64, ptr %16, align 1
+  %18 = getelementptr inbounds nuw i8, ptr %2, i64 48
+  %19 = load i64, ptr %18, align 1
+  %20 = xor i64 %19, %17
+  %21 = sub i64 %20, %3
+  %22 = load i64, ptr %0, align 1
+  %23 = xor i64 %22, %15
+  %24 = getelementptr inbounds nuw i8, ptr %0, i64 %1
+  %25 = getelementptr inbounds i8, ptr %24, i64 -8
+  %26 = load i64, ptr %25, align 1
+  %27 = xor i64 %26, %21
+  %28 = tail call noundef i64 @llvm.bswap.i64(i64 %23)
+  %29 = add i64 %28, %1
+  %30 = add i64 %29, %27
+  %31 = zext i64 %23 to i128
+  %32 = zext i64 %27 to i128
+  %33 = mul nuw i128 %32, %31
+  %34 = lshr i128 %33, 64
+  %35 = xor i128 %34, %33
+  %36 = trunc i128 %35 to i64
+  %37 = add i64 %30, %36
+  %38 = lshr i64 %37, 37
+  %39 = xor i64 %38, %37
+  %40 = mul i64 %39, 1609587791953885689
+  %41 = lshr i64 %40, 32
+  %42 = xor i64 %41, %40
+  br label %168
+
+43:                                               ; preds = %4
+  %44 = icmp samesign ugt i64 %1, 3
+  br i1 %44, label %45, label %79, !prof !5
+
+45:                                               ; preds = %43
+  %46 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %46)
+  %47 = icmp ne ptr %2, null
+  tail call void @llvm.assume(i1 %47)
+  %48 = trunc i64 %3 to i32
+  %49 = tail call noundef i32 @llvm.bswap.i32(i32 %48)
+  %50 = zext i32 %49 to i64
+  %51 = shl nuw i64 %50, 32
+  %52 = xor i64 %51, %3
+  %53 = load i32, ptr %0, align 1
+  %54 = getelementptr inbounds nuw i8, ptr %0, i64 %1
+  %55 = getelementptr inbounds i8, ptr %54, i64 -4
+  %56 = load i32, ptr %55, align 1
+  %57 = getelementptr inbounds nuw i8, ptr %2, i64 8
+  %58 = load i64, ptr %57, align 1
+  %59 = getelementptr inbounds nuw i8, ptr %2, i64 16
+  %60 = load i64, ptr %59, align 1
+  %61 = xor i64 %60, %58
+  %62 = sub i64 %61, %52
+  %63 = zext i32 %56 to i64
+  %64 = zext i32 %53 to i64
+  %65 = shl nuw i64 %64, 32
+  %66 = or disjoint i64 %65, %63
+  %67 = xor i64 %62, %66
+  %68 = tail call i64 @llvm.fshl.i64(i64 %67, i64 %67, i64 49)
+  %69 = tail call i64 @llvm.fshl.i64(i64 %67, i64 %67, i64 24)
+  %70 = xor i64 %68, %69
+  %71 = xor i64 %70, %67
+  %72 = mul i64 %71, -6939452855193903323
+  %73 = lshr i64 %72, 35
+  %74 = add nuw nsw i64 %73, %1
+  %75 = xor i64 %74, %72
+  %76 = mul i64 %75, -6939452855193903323
+  %77 = lshr i64 %76, 28
+  %78 = xor i64 %77, %76
+  br label %168
+
+79:                                               ; preds = %43
+  %80 = icmp eq i64 %1, 0
+  br i1 %80, label %153, label %81
+
+81:                                               ; preds = %79
+  %82 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %82)
+  %83 = icmp ne ptr %2, null
+  tail call void @llvm.assume(i1 %83)
+  %84 = load i8, ptr %0, align 1
+  %85 = lshr i64 %1, 1
+  %86 = getelementptr inbounds nuw i8, ptr %0, i64 %85
+  %87 = load i8, ptr %86, align 1
+  %88 = getelementptr i8, ptr %0, i64 %1
+  %89 = getelementptr i8, ptr %88, i64 -1
+  %90 = load i8, ptr %89, align 1
+  %91 = zext i8 %84 to i64
+  %92 = shl nuw nsw i64 %91, 16
+  %93 = zext i8 %87 to i64
+  %94 = shl nuw nsw i64 %93, 24
+  %95 = or disjoint i64 %94, %92
+  %96 = zext i8 %90 to i64
+  %97 = or disjoint i64 %95, %96
+  %98 = shl nuw nsw i64 %1, 8
+  %99 = or disjoint i64 %97, %98
+  %100 = load i32, ptr %2, align 1
+  %101 = getelementptr inbounds nuw i8, ptr %2, i64 4
+  %102 = load i32, ptr %101, align 1
+  %103 = xor i32 %102, %100
+  %104 = zext i32 %103 to i64
+  %105 = add i64 %3, %104
+  %106 = xor i64 %105, %99
+  %107 = lshr i64 %106, 33
+  %108 = xor i64 %107, %106
+  %109 = mul i64 %108, -4417276706812531889
+  %110 = lshr i64 %109, 29
+  %111 = xor i64 %110, %109
+  %112 = mul i64 %111, 1609587929392839161
+  %113 = lshr i64 %112, 32
+  %114 = xor i64 %113, %112
+  %115 = icmp eq i64 %1, 1
+  br i1 %115, label %116, label %168
+
+116:                                              ; preds = %81
+  %117 = icmp eq i64 %105, 2267503259
+  %118 = zext i8 %84 to i32
+  %119 = and i32 %118, 31
+  %120 = call i64 @lookup_0(i32 %119)
+  %121 = lshr i32 %118, 5
+  %122 = icmp ult i8 %84, 32
+  %123 = select i1 %122, i64 %120, i64 0
+  %124 = call i64 @lookup_1(i32 %119)
+  %125 = icmp eq i32 %121, 1
+  %126 = select i1 %125, i64 %124, i64 0
+  %127 = or i64 %123, %126
+  %128 = call i64 @lookup_2(i32 %119)
+  %129 = icmp eq i32 %121, 2
+  %130 = select i1 %129, i64 %128, i64 0
+  %131 = or i64 %127, %130
+  %132 = call i64 @lookup_3(i32 %119)
+  %133 = icmp eq i32 %121, 3
+  %134 = select i1 %133, i64 %132, i64 0
+  %135 = or i64 %131, %134
+  %136 = call i64 @lookup_4(i32 %119)
+  %137 = icmp eq i32 %121, 4
+  %138 = select i1 %137, i64 %136, i64 0
+  %139 = or i64 %135, %138
+  %140 = call i64 @lookup_5(i32 %119)
+  %141 = icmp eq i32 %121, 5
+  %142 = select i1 %141, i64 %140, i64 0
+  %143 = or i64 %139, %142
+  %144 = call i64 @lookup_6(i32 %119)
+  %145 = icmp eq i32 %121, 6
+  %146 = select i1 %145, i64 %144, i64 0
+  %147 = or i64 %143, %146
+  %148 = call i64 @lookup_7(i32 %119)
+  %149 = icmp eq i32 %121, 7
+  %150 = select i1 %149, i64 %148, i64 0
+  %151 = or i64 %147, %150
+  %152 = select i1 %117, i64 %151, i64 %114
+  br label %168
+
+153:                                              ; preds = %79
+  %154 = getelementptr inbounds nuw i8, ptr %2, i64 56
+  %155 = load i64, ptr %154, align 1
+  %156 = getelementptr inbounds nuw i8, ptr %2, i64 64
+  %157 = load i64, ptr %156, align 1
+  %158 = xor i64 %155, %157
+  %159 = xor i64 %158, %3
+  %160 = lshr i64 %159, 33
+  %161 = xor i64 %160, %159
+  %162 = mul i64 %161, -4417276706812531889
+  %163 = lshr i64 %162, 29
+  %164 = xor i64 %163, %162
+  %165 = mul i64 %164, 1609587929392839161
+  %166 = lshr i64 %165, 32
+  %167 = xor i64 %166, %165
+  br label %168
+
+168:                                              ; preds = %116, %81, %153, %45, %7
+  %169 = phi i64 [ %42, %7 ], [ %78, %45 ], [ %167, %153 ], [ %152, %116 ], [ %114, %81 ]
+  ret i64 %169
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.fshl.i64(i64, i64, i64) #3
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.bswap.i64(i64) #4
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i32 @llvm.bswap.i32(i32) #4
+
+attributes #0 = { alwaysinline mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64-v3" "target-features"="+avx,+avx2,+bmi,+bmi2,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fxsr,+lzcnt,+mmx,+movbe,+popcnt,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" }
+attributes #1 = { mustprogress nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: write) }
+attributes #2 = { mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64-v3" "target-features"="+avx,+avx2,+bmi,+bmi2,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fxsr,+lzcnt,+mmx,+movbe,+popcnt,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" }
+attributes #3 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #4 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"PIE Level", i32 2}
+!3 = !{i32 7, !"uwtable", i32 2}
+!4 = !{!"Ubuntu clang version 20.1.8 (++20250708082409+6fb913d3e2ec-1~exp1~20250708202428.132)"}
+!5 = !{!"branch_weights", !"expected", i32 2000, i32 1}
+
+define internal i64 @lookup_0(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_0_0, %case0 ], [ @lookup_0_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 -4302098779834749733, i64 -2220562881957146901, i64 -3894436733716799489, i64 1433843135270481901, i64 8336770163655280242, i64 -7881803417479397662, i64 -2941004127381733739, i64 5502495245947142431, i64 -2572398748971526355, i64 -2436064182340099334, i64 4055606894390288348, i64 5350621376133947991, i64 2765702133756617546, i64 -8493270429887581760, i64 -1160504230424452080, i64 5291143887273806931, i64 -1568241370979223514, i64 -929432383683428675, i64 3673450842886451206, i64 -2478423014181009900, i64 3622887472839136718, i64 1246929574567274891, i64 -1152736325583170325, i64 -3324533442079829058, i64 -8942773601077194801, i64 2970022284838843195, i64 7362585856034407022, i64 -4392082282584759128, i64 5225411942735301638, i64 -5450523663638814413, i64 3547770832784427690, i64 362675829607944414>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_1(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_1_0, %case0 ], [ @lookup_1_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 -282257845897087025, i64 6898188129916750362, i64 2844895380948538806, i64 7674606916920705344, i64 9214633253411488453, i64 6687772750457788192, i64 -4531365318336869402, i64 5344895949674194850, i64 -6675284198519149788, i64 2113974078481014280, i64 8777568547874204941, i64 -2169500560468987851, i64 3660690302424466814, i64 -2436525662347849866, i64 -6085909721859794221, i64 5134827694651168302, i64 1838281907459330133, i64 7335560060985733464, i64 -318164364674882796, i64 8296998437054084336, i64 -2123147046896566209, i64 -2388148047314387342, i64 -5375991149494515187, i64 499566431179015674, i64 7372184217170234346, i64 2897285734473052776, i64 -6620125947798625332, i64 4279659918279867487, i64 4800416899009875996, i64 -5931816708875844411, i64 6774495193030674564, i64 -8398597170076423925>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_2(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_2_0, %case0 ], [ @lookup_2_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 8529366458340265297, i64 -3398925928391953275, i64 8418202337400857587, i64 7020717050005586112, i64 -3761882330889119378, i64 -9149138593070727489, i64 8772769334003688095, i64 1743089132010364587, i64 3963873365795895589, i64 -4042618408496833961, i64 -3755880203185378672, i64 6190981343618133313, i64 8640948454356727894, i64 -681029911906337757, i64 1874492674255557078, i64 -461795147661551007, i64 5084905583549711826, i64 4488332001360539422, i64 3063753645715674379, i64 -8515971706312224628, i64 2347651011283115188, i64 7862244273078811554, i64 4741579133146630013, i64 -814247142782119327, i64 8169000404195870007, i64 -9066049001627982408, i64 2833837677914226691, i64 6041807101686622375, i64 -163413725005337946, i64 -2403499172613604551, i64 -7986631214068388042, i64 4575667007673887251>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_3(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_3_0, %case0 ], [ @lookup_3_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 -6871223553662405846, i64 -1817709641818812897, i64 6294355645245719615, i64 -8340629563394885605, i64 5041782483466037194, i64 -1880483337136747912, i64 3729356046086683290, i64 -6189662371905423721, i64 8090085636497697382, i64 3171146578797943502, i64 5619658110353354353, i64 -6259471935552714723, i64 -4607290929671566278, i64 -1112309911958824964, i64 -3771184802297902326, i64 -845068846880718549, i64 -4746542111220524153, i64 -992931083124165738, i64 -4793174741866312907, i64 -2974112083446677997, i64 8503709266395068717, i64 1000067187423537442, i64 -647344187112945900, i64 -5985590712037982679, i64 -1517593895512126191, i64 2822446240451570149, i64 6100083767409290672, i64 -4452813043723281122, i64 -3260576076044403503, i64 -5133358930729682568, i64 -1723256135048217232, i64 3032053336604930433>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_4(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_4_0, %case0 ], [ @lookup_4_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 7715946029497977153, i64 7756605422741824046, i64 6914152272366242186, i64 6619468546868266945, i64 8635048048508886888, i64 -8393880875905280995, i64 -6787559214576350429, i64 -2217171985210471049, i64 3604675824303396708, i64 -3512584283167155441, i64 2156514823987992107, i64 4907671418510825112, i64 8839569603083604159, i64 -6042468303600945730, i64 -3015502839406131913, i64 7156044269520408728, i64 -1508413522767866676, i64 1604089566654333, i64 7878720862229920401, i64 -3403495536095635901, i64 4419032860939710275, i64 8309667868945161700, i64 8127699344777264475, i64 3172741449153456871, i64 -7819243355710516001, i64 -1517632861945409470, i64 -4231347299287732713, i64 7537847041743724411, i64 -8574195954494672605, i64 8276179821638363100, i64 -2521175872576789404, i64 -6787734742961095628>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_5(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_5_0, %case0 ], [ @lookup_5_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 3141466977451366136, i64 6496874765145226399, i64 1397096103115942590, i64 -5230410147232611976, i64 -8713684776993538784, i64 4679852336830987527, i64 -4552607469369903036, i64 5281118663193865049, i64 -7809504173095293835, i64 -3494378936840174703, i64 -8283887544681711630, i64 -1982062835990977551, i64 7876639392340321016, i64 -776633854295803046, i64 -4449956841746897829, i64 6252822398696073730, i64 3653197155308211081, i64 4184123583517128355, i64 2710647065067127392, i64 1364275973376659154, i64 5735683338271654244, i64 4788098542079513072, i64 2523649311648287430, i64 6226703245439355973, i64 4039168641094241130, i64 -4735310071515049160, i64 -7718157997211796903, i64 -7630434519632171097, i64 6401440615517674288, i64 -1540227857295215434, i64 -6492234107044435804, i64 1076237601080914835>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_6(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_6_0, %case0 ], [ @lookup_6_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 371066729028084812, i64 2047781579520568252, i64 8981190644621376403, i64 -1270115072684319195, i64 -8955474670546817597, i64 1697060390969647966, i64 -1880780507307867236, i64 -5363681305219004548, i64 -1084662620876922617, i64 8607018531237843404, i64 -4794156784727077306, i64 6393061779462666445, i64 5666196083048816522, i64 6136724780979887393, i64 5191002144171421573, i64 3531887758758133993, i64 -4418833195103958582, i64 399445177739474421, i64 -1947046474972200432, i64 -3252035828561191092, i64 8996305336856613012, i64 6917241246617268645, i64 7998926962047337531, i64 -8446620120025011510, i64 -5280387490099738130, i64 564548736115642456, i64 -8404415521806172981, i64 3717577419720655258, i64 -5089905126141548364, i64 7521440301808993825, i64 -8814061795361718509, i64 -2714087517662472993>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
+
+define internal i64 @lookup_7(i32 %idx) alwaysinline {
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 31
+  %low = and i32 %safe, 15
+  %wide = zext i32 %low to i64
+  %high = lshr i32 %safe, 4
+  switch i32 %high, label %case0 [
+    i32 1, label %case1
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+merge:
+  %base = phi ptr [ @lookup_7_0, %case0 ], [ @lookup_7_1, %case1 ]
+  %p = getelementptr inbounds [16 x i64], ptr %base, i64 0, i64 %wide
+  %value = load i64, ptr %p, align 8
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <32 x i64> <i64 2071800237030200399, i64 -4264588051788821739, i64 5286102316725614445, i64 699974702888830978, i64 -6198501953651059440, i64 5478601957838938672, i64 -8826379284296529914, i64 4117946310065826061, i64 2713743964583775612, i64 5235599403462674304, i64 -4570201113732268168, i64 888845016463753946, i64 -4356919662415120719, i64 2273280100835896876, i64 -3991362807574606833, i64 -4452897474114816089, i64 -3778735031010307814, i64 4461224383070578004, i64 -2508687673012358854, i64 519458947206652749, i64 -8279674986227810403, i64 4384594615491221824, i64 2225088360167913052, i64 -7273095038674136419, i64 -3679179631877543767, i64 5569617102229150198, i64 -8233578011895567121, i64 -826440576334536596, i64 -4492853642420687956, i64 -2325365741171985389, i64 7789395919978777827, i64 -2973241909731272914>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}

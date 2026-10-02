@@ -1,0 +1,47 @@
+{
+  "commands": [
+    [
+      "llvm-link",
+      "results/search/xxhash_lookup_remap/bench-inline/harness.ll",
+      "results/search/xxhash_lookup_remap/new.ll",
+      "-o",
+      "results/search/xxhash_lookup_keylen/canonicalization/retained.bc"
+    ],
+    [
+      "opt",
+      "-passes=internalize,globaldce,default<O3>",
+      "-internalize-public-api-list=main",
+      "results/search/xxhash_lookup_keylen/canonicalization/retained.bc",
+      "-o",
+      "results/search/xxhash_lookup_keylen/canonicalization/retained-inline.bc"
+    ],
+    [
+      "llvm-link",
+      "results/search/xxhash_lookup_remap/bench-inline/harness.ll",
+      "results/search/xxhash_lookup_keylen/new.ll",
+      "-o",
+      "results/search/xxhash_lookup_keylen/canonicalization/candidate.bc"
+    ],
+    [
+      "opt",
+      "-passes=internalize,globaldce,default<O3>",
+      "-internalize-public-api-list=main",
+      "results/search/xxhash_lookup_keylen/canonicalization/candidate.bc",
+      "-o",
+      "results/search/xxhash_lookup_keylen/canonicalization/candidate-inline.bc"
+    ],
+    [
+      "llvm-diff",
+      "results/search/xxhash_lookup_keylen/canonicalization/retained-inline.bc",
+      "results/search/xxhash_lookup_keylen/canonicalization/candidate-inline.bc",
+      "hash"
+    ]
+  ],
+  "returncode": 1,
+  "scope": "Compare only the default-key benchmark callback IR after matched inlining; no full-function equivalence or native acceptance follows.",
+  "inputs": {
+    "results/search/xxhash_lookup_remap/bench-inline/harness.ll": "84240dcb97b0ae86de4f9c9b1b761d8fcf4c5dc54de2b3945cc4ab0b715826fb",
+    "results/search/xxhash_lookup_remap/new.ll": "91fb74281df7b305631673464d7517b910b18a61aec7f75cc7f5567626889551",
+    "results/search/xxhash_lookup_keylen/new.ll": "84f711569bbf29e541570a9777581f7861c562bef8397bb280c62d49a08aecbf"
+  }
+}

@@ -1,0 +1,61 @@
+
+----------------------------------------
+define i4 @src(i4 noundef %a, i4 noundef %b) {
+#0:
+  %aw = zext i4 noundef %a to i8
+  %bw = zext i4 noundef %b to i8
+  %p = mul nuw i8 %aw, %bw
+  %lo = trunc i8 %p to i4
+  %hs = lshr i8 %p, 4
+  %hi = trunc i8 %hs to i4
+  %fold = xor i4 %lo, %hi
+  ret i4 %fold
+}
+=>
+define i4 @tgt(i4 noundef %a, i4 noundef %b) {
+#0:
+  %pair = umul_overflow i4 noundef %a, noundef %b
+  %lo = extractvalue {i4, i1} %pair, 0
+  %overflow = extractvalue {i4, i1} %pair, 1
+  %aw = zext i4 noundef %a to i8
+  %bw = zext i4 noundef %b to i8
+  %p = mul nuw i8 %aw, %bw
+  %hs = lshr i8 %p, 4
+  %hi = trunc i8 %hs to i4
+  %selected = select i1 %overflow, i4 %hi, i4 0
+  %fold = xor i4 %lo, %selected
+  %wrong = xor i4 %fold, 1
+  ret i4 %wrong
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i4 noundef %a = #x0 (0)
+i4 noundef %b = #x0 (0)
+
+Source:
+i8 %aw = #x00 (0)
+i8 %bw = #x00 (0)
+i8 %p = #x00 (0)
+i4 %lo = #x0 (0)
+i8 %hs = #x00 (0)
+i4 %hi = #x0 (0)
+i4 %fold = #x0 (0)
+
+Target:
+{i4, i1} %pair = { #x0 (0), #x0 (0) }
+i4 %lo = #x0 (0)
+i1 %overflow = #x0 (0)
+i8 %aw = #x00 (0)
+i8 %bw = #x00 (0)
+i8 %p = #x00 (0)
+i8 %hs = #x00 (0)
+i4 %hi = #x0 (0)
+i4 %selected = #x0 (0)
+i4 %fold = #x0 (0)
+i4 %wrong = #x1 (1)
+Source value: #x0 (0)
+Target value: #x1 (1)
+

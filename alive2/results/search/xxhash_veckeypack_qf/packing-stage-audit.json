@@ -1,0 +1,32 @@
+{
+  "stages": {
+    "old": [
+      "mov -0x4(%rdi,%rsi,1),%eax",
+      "mov (%rdi),%ecx",
+      "shl $0x20,%rcx",
+      "or %rax,%rcx",
+      "movabs $0xc73ab174c5ecd5a2,%rax",
+      "xor %rcx,%rax",
+      "rorx $0xf,%rax,%rcx",
+      "rorx $0x28,%rax,%rdx",
+      "xor %rcx,%rdx",
+      "xor %rax,%rdx"
+    ],
+    "new": [
+      "vmovd -0x4(%rdi,%rsi,1),%xmm0",
+      "vpinsrd $0x1,(%rdi),%xmm0,%xmm0",
+      "vpbroadcastq %xmm0,%xmm1",
+      "vprolvq 0x1946(%rip),%xmm1,%xmm1 # ADDR <_IO_stdin_used+0x10>",
+      "vpshufd $0xee,%xmm1,%xmm2",
+      "vpternlogq $0x96,%xmm0,%xmm1,%xmm2",
+      "vmovq %xmm2,%rax",
+      "movabs $0x18bad3d405c264ca,%rcx",
+      "xor %rax,%rcx"
+    ]
+  },
+  "instruction_counts": {
+    "old": 10,
+    "new": 9
+  },
+  "scope": "Packing/key-mixing stage instruction count, not a speedup claim."
+}

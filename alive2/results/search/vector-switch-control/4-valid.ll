@@ -1,0 +1,29 @@
+define i64 @src(i32 %input) {
+  %idx = and i32 %input, 3
+  %value = extractelement <4 x i64> <i64 -4302098779834749733, i64 -2220562881957146901, i64 -3894436733716799489, i64 1433843135270481901>, i32 %idx
+  ret i64 %value
+}
+define i64 @tgt(i32 %input) {
+  %idx = and i32 %input, 3
+  %stable = freeze i32 %idx
+  %safe = and i32 %stable, 3
+  switch i32 %safe, label %case0 [
+    i32 1, label %case1
+    i32 2, label %case2
+    i32 3, label %case3
+  ]
+case0:
+  br label %merge
+case1:
+  br label %merge
+case2:
+  br label %merge
+case3:
+  br label %merge
+merge:
+  %value = phi i64 [ -4302098779834749733, %case0 ], [ -2220562881957146901, %case1 ], [ -3894436733716799489, %case2 ], [ 1433843135270481901, %case3 ]
+  %same = icmp eq i32 %idx, %stable
+  %fallback = extractelement <4 x i64> <i64 -4302098779834749733, i64 -2220562881957146901, i64 -3894436733716799489, i64 1433843135270481901>, i32 %idx
+  %result = select i1 %same, i64 %value, i64 %fallback
+  ret i64 %result
+}
