@@ -1,0 +1,175 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/pre_nonnull_len5/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/pre_nonnull_len5/old.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#7 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#7, label %#6, label %#3
+
+#3:
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#9 = add i32 noundef %#1, 374761398
+  %#10 = load i32, ptr nowrite noundef %#0, align 4
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = gep ptr nowrite noundef %#0, 1 x i64 4
+  %#16 = icmp ult ptr %#15, %#8
+  br i1 %#16, label %#4, label %#5
+
+#4:
+  %#17 = load i8, ptr %#15, align 1
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#19, %#14
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  br label %#5
+
+#5:
+  %#23 = phi i32 [ %#14, %#3 ], [ %#22, %#4 ]
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  br label %#6
+
+#6:
+  %#32 = phi i32 [ %#31, %#5 ], [ 0, %#2 ]
+  ret i32 %#32
+}
+=>
+declare ptr @malloc(noundef i64) nofree noundef noalias willreturn alloc-family(malloc) allockind(alloc, uninitialized) allocsize(0) memory(inaccessiblemem: readwrite)
+declare void @free(noundef allocptr ptr) willreturn alloc-family(malloc) allockind(free) memory(argmem: readwrite, inaccessiblemem: readwrite)
+
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) willreturn {
+#2:
+  %#7 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#7, label %#6, label %#3
+
+#3:
+  %#8 = tail call ptr @malloc(noundef i64 56) nofree noundef nothrow noalias willreturn dereferenceable_or_null(56) alloc-family(malloc) allockind(alloc, uninitialized) allocsize(0) memory(inaccessiblemem: readwrite)
+  store i32 noundef %#1, ptr %#8, align 8
+  %#9 = add i32 noundef %#1, 606290984
+  %#10 = gep inbounds nuw ptr %#8, 1 x i64 4
+  store i32 %#9, ptr %#10, align 4
+  %#11 = add i32 noundef %#1, 2246822519
+  %#12 = gep inbounds nuw ptr %#8, 1 x i64 8
+  store i32 %#11, ptr %#12, align 8
+  %#13 = gep inbounds nuw ptr %#8, 1 x i64 12
+  store i32 noundef %#1, ptr %#13, align 4
+  %#14 = add i32 noundef %#1, 1640531535
+  %#15 = gep inbounds nuw ptr %#8, 1 x i64 16
+  store i32 %#14, ptr %#15, align 8
+  %#16 = gep inbounds nuw ptr %#8, 1 x i64 24
+  %#17 = gep inbounds nuw ptr %#8, 1 x i64 48
+  store i32 0, ptr %#17, align 8
+  store i64 5, ptr %#16, align 8
+  %#18 = gep inbounds nuw ptr %#8, 1 x i64 32
+  tail memcpy ptr %#18 align 8, ptr nowrite noundef %#0 align 1, i64 5
+  %#19 = add i32 noundef %#1, 374761398
+  %#20 = load i32, ptr %#18, align 8
+  %#21 = mul i32 %#20, 3266489917
+  %#22 = add i32 %#21, %#19
+  %#23 = fshl i32 %#22, i32 %#22, i32 17
+  %#24 = mul i32 %#23, 668265263
+  %#25 = gep ptr %#8, 1 x i64 37
+  %#26 = gep nuw ptr %#8, 1 x i64 36
+  %#27 = icmp ult ptr %#26, %#25
+  br i1 %#27, label %#4, label %#5
+
+#4:
+  %#28 = load i8, ptr %#26, align 4
+  %#29 = zext i8 %#28 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = add i32 %#30, %#24
+  %#32 = fshl i32 %#31, i32 %#31, i32 11
+  %#33 = mul i32 %#32, 2654435761
+  br label %#5
+
+#5:
+  %#34 = phi i32 [ %#24, %#3 ], [ %#33, %#4 ]
+  %#35 = lshr i32 %#34, 15
+  %#36 = xor i32 %#35, %#34
+  %#37 = mul i32 %#36, 2246822519
+  %#38 = lshr i32 %#37, 13
+  %#39 = xor i32 %#38, %#37
+  %#40 = mul i32 %#39, 3266489917
+  %#41 = lshr i32 %#40, 16
+  %#42 = xor i32 %#41, %#40
+  tail call void @free(nonnull noundef allocptr ptr %#8) nothrow willreturn alloc-family(malloc) allockind(free) memory(inaccessiblemem: readwrite)
+  br label %#6
+
+#6:
+  %#43 = phi i32 [ %#42, %#5 ], [ 0, %#2 ]
+  ret i32 %#43
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0008
+i32 noundef %#1 = #x00000003 (3)
+
+Source:
+i1 %#7 = #x0 (0)
+  >> Jump to %#3
+ptr %#8 = pointer(non-local, block_id=1, offset=5, attrs=3) / Address=#x000d
+i32 %#9 = #x165667b9 (374761401)
+i32 %#10 = poison
+i32 %#11 = poison
+i32 %#12 = poison
+i32 %#13 = poison
+i32 %#14 = poison
+ptr %#15 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x000c
+i1 %#16 = #x1 (1)
+  >> Jump to %#4
+i8 %#17 = poison
+i32 %#18 = poison
+i32 %#19 = poison
+i32 %#20 = poison
+i32 %#21 = poison
+i32 %#22 = poison
+  >> Jump to %#5
+i32 %#23 = poison
+i32 %#24 = poison
+i32 %#25 = poison
+i32 %#26 = poison
+i32 %#27 = poison
+i32 %#28 = poison
+i32 %#29 = poison
+i32 %#30 = poison
+i32 %#31 = poison
+  >> Jump to %#6
+i32 %#32 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 5	align: 1	alloc type: 0	alive: true	address: 8
+
+Target:
+i1 %#7 = #x0 (0)
+  >> Jump to %#3
+ptr %#8 = null
+void = UB triggered!
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 2 >	size: 56	align: 8	alloc type: 2	alive: true	address: 4096
+Block 3 >	size: 5	align: 1	alloc type: 0	alive: false	address: 8
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

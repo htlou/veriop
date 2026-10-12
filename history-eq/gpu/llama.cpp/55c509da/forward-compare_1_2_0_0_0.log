@@ -1,0 +1,32 @@
+
+----------------------------------------
+define void @compare_1_2_0_0_0(ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0) nofree willreturn memory(argmem: readwrite) {
+#1:
+  %#2 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, 1 x i64 512
+  %#3 = load float, ptr %#2, align 16
+  store float %#3, ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, align 16
+  %#4 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, 1 x i64 516
+  %#5 = load float, ptr %#4, align 4
+  %#6 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, 1 x i64 32
+  store float %#5, ptr %#6, align 16
+  ret void
+}
+=>
+define void @compare_1_2_0_0_0(ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0) nofree willreturn memory(argmem: readwrite) {
+#1:
+  %#2 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, 1 x i64 512
+  %#3 = load float, ptr %#2, align 16
+  store float %#3, ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, align 16
+  %#4 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, 1 x i64 516
+  %#5 = load float, ptr %#4, align 4
+  %#6 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 4), (32, 36)) %#0, 1 x i64 32
+  store float %#5, ptr %#6, align 16
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

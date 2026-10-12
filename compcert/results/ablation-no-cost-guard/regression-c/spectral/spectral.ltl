@@ -1,0 +1,132 @@
+eval_A_times_u() {
+   31:	
+   30:	R9 = 0; 
+   29:	if (R9 <s EDI) goto 28 else goto 1
+   28:	R8 = long32signed(R9); 
+   27:	XMM3 = 0.; 
+   26:	float64[EDX + R8 * 8 + 0] = XMM3; 
+   25:	R8 = 0; 
+   24:	if (R8 <s EDI) goto 23 else goto 2
+   23:	
+   22:	
+   21:	
+   20:	XMM0 = 1.; 
+   19:	EAX = R9 + R8 + 0 (int); 
+   18:	R10 = R9 + R8 + 1 (int); 
+   17:	EAX = EAX * R10; 
+   16:	EAX = EAX >>x 1; 
+   15:	R10 = EAX + R9 + 1 (int); 
+   14:	XMM5 = floatofint(R10); 
+   13:	XMM0 = XMM0 /f XMM5; 
+   12:	
+   11:	EAX = long32signed(R9); 
+   10:	
+    9:	XMM1 = float64[EDX + EAX * 8 + 0]; 
+    8:	R10 = long32signed(R8); 
+    7:	XMM4 = float64[ESI + R10 * 8 + 0]; 
+    6:	XMM0 = XMM0 *f XMM4; 
+    5:	XMM1 = XMM1 +f XMM0; 
+    4:	float64[EDX + EAX * 8 + 0] = XMM1; 
+    3:	R8 = R8 + 1 (int); goto 24
+    2:	R9 = R9 + 1 (int); goto 29
+    1:	return
+}
+
+eval_At_times_u() {
+   31:	
+   30:	R8 = 0; 
+   29:	if (R8 <s EDI) goto 28 else goto 1
+   28:	R9 = long32signed(R8); 
+   27:	XMM3 = 0.; 
+   26:	float64[EDX + R9 * 8 + 0] = XMM3; 
+   25:	R9 = 0; 
+   24:	if (R9 <s EDI) goto 23 else goto 2
+   23:	
+   22:	
+   21:	
+   20:	XMM0 = 1.; 
+   19:	EAX = R9 + R8 + 0 (int); 
+   18:	R10 = R9 + R8 + 1 (int); 
+   17:	EAX = EAX * R10; 
+   16:	EAX = EAX >>x 1; 
+   15:	R10 = EAX + R9 + 1 (int); 
+   14:	XMM5 = floatofint(R10); 
+   13:	XMM0 = XMM0 /f XMM5; 
+   12:	
+   11:	EAX = long32signed(R8); 
+   10:	
+    9:	XMM1 = float64[EDX + EAX * 8 + 0]; 
+    8:	R10 = long32signed(R9); 
+    7:	XMM4 = float64[ESI + R10 * 8 + 0]; 
+    6:	XMM0 = XMM0 *f XMM4; 
+    5:	XMM1 = XMM1 +f XMM0; 
+    4:	float64[EDX + EAX * 8 + 0] = XMM1; 
+    3:	R9 = R9 + 1 (int); goto 24
+    2:	R8 = R8 + 1 (int); goto 29
+    1:	return
+}
+
+eval_AtA_times_u() {
+    8:	EBX = EDX; EBP = ESI; R12 = EDI; 
+    7:	ESI = long32signed(R12); 
+    6:	EDI = ESI * 8 + 0 (long); 
+    5:	call "malloc"; 
+    4:	R13 = EAX; 
+    3:	EDX = R13; ESI = EBP; EDI = R12; call "eval_A_times_u"; 
+    2:	EDX = EBX; ESI = R13; EDI = R12; call "eval_At_times_u"; 
+    1:	EDI = R13; tailcall "free"
+}
+
+main() {
+   50:	
+   49:	if (EDI ==s 2) goto 48 else goto 45
+   48:	EDI = int64[ESI + 8]; 
+   47:	call "atoi"; 
+   46:	goto 44
+   45:	EAX = 1000; 
+   44:	R12 = EAX; 
+   43:	R9 = long32signed(R12); 
+   42:	EDI = R9 * 8 + 0 (long); 
+   41:	call "malloc"; 
+   40:	EBX = EAX; 
+   39:	R11 = long32signed(R12); 
+   38:	EDI = R11 * 8 + 0 (long); 
+   37:	call "malloc"; 
+   36:	EBP = EAX; 
+   35:	R10 = 0; 
+   34:	if (R10 <s R12) goto 33 else goto 29
+   33:	EDX = long32signed(R10); 
+   32:	XMM4 = 1.; 
+   31:	float64[EBX + EDX * 8 + 0] = XMM4; 
+   30:	R10 = R10 + 1 (int); goto 34
+   29:	R13 = 0; 
+   28:	EDX = EBP; ESI = EBX; EDI = R12; call "eval_AtA_times_u"; 
+   27:	EDX = EBX; ESI = EBP; EDI = R12; call "eval_AtA_times_u"; 
+   26:	R13 = R13 + 1 (int); 
+   25:	if (R13 <s 10) goto 28 else goto 24
+   24:	XMM1 = 0.; 
+   23:	
+   22:	XMM0 = XMM1; 
+   21:	ESI = 0; 
+   20:	if (ESI <s R12) goto 19 else goto 6
+   19:	EAX = long32signed(ESI); 
+   18:	XMM3 = float64[EBX + EAX * 8 + 0]; 
+   17:	
+   16:	XMM2 = float64[EBP + EAX * 8 + 0]; 
+   15:	XMM3 = XMM3 *f XMM2; 
+   14:	XMM0 = XMM0 +f XMM3; 
+   13:	
+   12:	
+   11:	
+   10:	XMM3 = XMM2; 
+    9:	XMM2 = XMM2 *f XMM3; 
+    8:	XMM1 = XMM1 +f XMM2; 
+    7:	ESI = ESI + 1 (int); goto 20
+    6:	XMM0 = XMM0 /f XMM1; 
+    5:	call "sqrt"; 
+    4:	EDI = __stringlit_1 + 0 (long); 
+    3:	call "printf"; 
+    2:	EAX = 0; 
+    1:	return
+}
+

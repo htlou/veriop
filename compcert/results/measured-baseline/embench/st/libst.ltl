@@ -1,0 +1,210 @@
+initialise_benchmark() {
+    2:	
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 13; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   34:	EBP = EDI; 
+   33:	EBX = 0; 
+   32:	if (EBX <s EBP) goto 31 else goto 2
+   31:	call "InitSeed"; 
+   30:	EDI = &ArrayA; 
+   29:	call "Initialize"; 
+   28:	EDI = &ArrayA; 
+   27:	ESI = &SumA; 
+   26:	EDX = stack(16) (long); 
+   25:	call "Calc_Sum_Mean"; 
+   24:	EDI = &ArrayA; 
+   23:	XMM0 = float64[stack(16)]; 
+   22:	ESI = stack(32) (long); 
+   21:	EDX = stack(0) (long); 
+   20:	call "Calc_Var_Stddev"; 
+   19:	EDI = &ArrayB; 
+   18:	call "Initialize"; 
+   17:	EDI = &ArrayB; 
+   16:	ESI = &SumB; 
+   15:	EDX = stack(24) (long); 
+   14:	call "Calc_Sum_Mean"; 
+   13:	EDI = &ArrayB; 
+   12:	XMM0 = float64[stack(24)]; 
+   11:	ESI = stack(40) (long); 
+   10:	EDX = stack(8) (long); 
+    9:	call "Calc_Var_Stddev"; 
+    8:	EDI = &ArrayA; 
+    7:	ESI = &ArrayB; 
+    6:	XMM0 = float64[stack(16)]; 
+    5:	XMM1 = float64[stack(24)]; 
+    4:	call "Calc_LinCorrCoef"; 
+    3:	EBX = EBX + 1 (int); goto 32
+    2:	EAX = 0; 
+    1:	return
+}
+
+InitSeed() {
+    5:	
+    4:	EAX = &Seed; 
+    3:	ECX = 0; 
+    2:	int32[EAX + 0] = ECX; 
+    1:	return
+}
+
+Calc_Sum_Mean() {
+   16:	
+   15:	XMM1 = 0.; 
+   14:	float64[ESI + 0] = XMM1; 
+   13:	R8 = 0; 
+   12:	XMM0 = float64[ESI + 0]; 
+   11:	ECX = long32signed(R8); 
+   10:	XMM2 = float64[EDI + ECX * 8 + 0]; 
+    9:	XMM0 = XMM0 +f XMM2; 
+    8:	float64[ESI + 0] = XMM0; 
+    7:	R8 = R8 + 1 (int); 
+    6:	if (R8 <s 100) goto 12 else goto 5
+    5:	
+    4:	XMM3 = 100.; 
+    3:	XMM0 = XMM0 /f XMM3; 
+    2:	float64[EDX + 0] = XMM0; 
+    1:	return
+}
+
+Square() {
+    3:	
+    2:	XMM0 = XMM0 *f XMM0; 
+    1:	return
+}
+
+Calc_Var_Stddev() {
+   17:	EBX = EDX; EBP = ESI; local(2,float) = XMM0; R12 = EDI; 
+   16:	XMM1 = 0.; local(0,float) = XMM1; 
+   15:	R13 = 0; 
+   14:	EAX = long32signed(R13); 
+   13:	XMM0 = float64[R12 + EAX * 8 + 0]; 
+   12:	XMM2 = local(2,float); XMM0 = XMM0 -f XMM2; 
+   11:	call "Square"; 
+   10:	XMM1 = local(0,float); XMM1 = XMM1 +f XMM0; local(0,float) = XMM1; 
+    9:	R13 = R13 + 1 (int); 
+    8:	if (R13 <s 100) goto 14 else goto 7
+    7:	XMM4 = 100.; 
+    6:	XMM0 = local(0,float); XMM0 = XMM0 /f XMM4; 
+    5:	float64[EBP + 0] = XMM0; 
+    4:	
+    3:	call "sqrt"; 
+    2:	float64[EBX + 0] = XMM0; 
+    1:	return
+}
+
+Calc_LinCorrCoef() {
+   33:	local(6,float) = XMM1; local(8,float) = XMM0; EBX = ESI; EBP = EDI; 
+   32:	XMM1 = 0.; local(0,float) = XMM1; 
+   31:	
+   30:	local(4,float) = XMM1; 
+   29:	local(2,float) = XMM1; 
+   28:	R12 = 0; 
+   27:	EAX = long32signed(R12); 
+   26:	XMM0 = float64[EBP + EAX * 8 + 0]; 
+   25:	XMM5 = local(8,float); XMM0 = XMM0 -f XMM5; 
+   24:	
+   23:	XMM9 = float64[EBX + EAX * 8 + 0]; 
+   22:	XMM3 = local(6,float); XMM9 = XMM9 -f XMM3; 
+   21:	XMM10 = XMM0; XMM10 = XMM10 *f XMM9; 
+   20:	XMM6 = local(0,float); XMM6 = XMM6 +f XMM10; local(0,float) = XMM6; 
+   19:	
+   18:	
+   17:	
+   16:	call "Square"; 
+   15:	XMM7 = local(2,float); XMM7 = XMM7 +f XMM0; local(2,float) = XMM7; 
+   14:	ESI = long32signed(R12); 
+   13:	XMM0 = float64[EBX + ESI * 8 + 0]; 
+   12:	XMM8 = local(6,float); XMM0 = XMM0 -f XMM8; 
+   11:	call "Square"; 
+   10:	XMM1 = local(4,float); XMM1 = XMM1 +f XMM0; local(4,float) = XMM1; 
+    9:	R12 = R12 + 1 (int); 
+    8:	if (R12 <s 100) goto 27 else goto 7
+    7:	XMM0 = local(2,float); call "sqrt"; local(2,float) = XMM0; 
+    6:	XMM0 = local(4,float); call "sqrt"; 
+    5:	EDX = &Coef; 
+    4:	XMM4 = local(2,float); XMM4 = XMM4 *f XMM0; 
+    3:	XMM2 = local(0,float); XMM2 = XMM2 /f XMM4; 
+    2:	float64[EDX + 0] = XMM2; 
+    1:	return
+}
+
+Initialize() {
+   13:	EBX = EDI; 
+   12:	EBP = 0; 
+   11:	call "RandomInteger"; 
+   10:	ECX = long32signed(EBP); 
+    9:	XMM1 = floatofint(EBP); 
+    8:	XMM0 = floatofint(EAX); 
+    7:	XMM2 = 8095.; 
+    6:	XMM0 = XMM0 /f XMM2; 
+    5:	XMM1 = XMM1 +f XMM0; 
+    4:	float64[EBX + ECX * 8 + 0] = XMM1; 
+    3:	EBP = EBP + 1 (int); 
+    2:	if (EBP <s 100) goto 11 else goto 1
+    1:	return
+}
+
+RandomInteger() {
+   17:	
+   16:	EDI = &Seed; 
+   15:	
+   14:	ESI = int32[EDI + 0]; 
+   13:	ESI = ESI * 133; 
+   12:	ECX = ESI + 81 (int); 
+   11:	R8 = 271652039; 
+   10:	EAX = ECX; EDX = mulhs(EAX,R8); 
+    9:	EDX = EDX >>s 9; 
+    8:	ESI = ECX; ESI = ESI >>u 31; 
+    7:	EDX = EDX + ESI + 0 (int); 
+    6:	EDX = EDX * 8095; 
+    5:	ECX = ECX - EDX; 
+    4:	int32[EDI + 0] = ECX; 
+    3:	
+    2:	EAX = ECX; 
+    1:	return
+}
+
+verify_benchmark() {
+   27:	
+   26:	XMM0 = 4999.0024706609; 
+   25:	XMM1 = 4996.84311303274; local(0,float) = XMM1; 
+   24:	XMM1 = 0.999900054853619; local(2,float) = XMM1; 
+   23:	EAX = &SumA; 
+   22:	XMM7 = float64[EAX + 0]; 
+   21:	XMM0 = XMM0 -f XMM7; 
+   20:	call "fabs"; 
+   19:	XMM6 = 1e-13; 
+   18:	if (XMM0 <f XMM6) goto 17 else goto 4
+   17:	EDX = &SumB; 
+   16:	XMM4 = float64[EDX + 0]; 
+   15:	XMM0 = local(0,float); XMM0 = XMM0 -f XMM4; 
+   14:	call "fabs"; 
+   13:	XMM2 = 1e-13; 
+   12:	
+   11:	if (XMM0 <f XMM2) goto 10 else goto 3
+   10:	ECX = &Coef; 
+    9:	XMM3 = float64[ECX + 0]; 
+    8:	XMM0 = local(2,float); XMM0 = XMM0 -f XMM3; 
+    7:	call "fabs"; 
+    6:	XMM5 = 1e-13; 
+    5:	EAX = XMM0 <f XMM5; goto 2
+    4:	
+    3:	EAX = 0; 
+    2:	
+    1:	return
+}
+

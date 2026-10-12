@@ -1,0 +1,963 @@
+RUSTUP_TOOLCHAIN=nightly-2026-06-01 ../../aeneas/charon/bin/charon cargo --preset=aeneas \
+    --start-from 'crate::sha3' \
+    --start-from 'crate::mlkem' \
+    --start-from 'crate::verify' \
+    --start-from 'crate::common' \
+    --start-from 'crate::sha3::sha3_impl::keccak_permute_textbook' \
+    --start-from 'crate::sha3::keccak_opt::keccak_permute_opt' \
+    --dest-file symcrust.llbc \
+    --targets=x86_64-unknown-linux-gnu,i686-unknown-linux-gnu,aarch64-unknown-linux-gnu -- --features verify \
+  || { echo "[extract] ERROR: charon failed; Code/ and EXTRACTION.md left unchanged." >&2; exit 1; }
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+    Blocking waiting for file lock on build directory
+   Compiling libc v0.2.172
+   Compiling symcrust v0.1.0 (/srv/home/hantaolou/code/veriop/benchmarks/repos/SymCrypt/SymCRust)
+warning: unused imports: `AtomicBool` and `Ordering`
+  --> src/common.rs:16:26
+   |
+16 | use core::sync::atomic::{AtomicBool, Ordering};
+   |                          ^^^^^^^^^^  ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `SymCryptInit` and `g_SymCryptFipsSelftestsPerformed`
+  --> src/common.rs:25:38
+   |
+25 |     g_SymCryptCpuFeaturesNotPresent, g_SymCryptFipsSelftestsPerformed, SymCryptCallbackRandom,
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+26 |     SymCryptCpuFeaturesNeverPresent, SymCryptInit, SymCryptWipe,
+   |                                      ^^^^^^^^^^^^
+
+warning: unused macro definition: `symcrypt_magic_value`
+  --> src/symcryptcommon.rs:25:14
+   |
+25 | macro_rules! symcrypt_magic_value {
+   |              ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_macros)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused macro definition: `symcrypt_check_magic`
+  --> src/symcryptcommon.rs:33:14
+   |
+33 | macro_rules! symcrypt_check_magic {
+   |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `symcrypt_check_magic`
+  --> src/symcryptcommon.rs:41:16
+   |
+41 | pub(crate) use symcrypt_check_magic;
+   |                ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `symcrypt_magic_value`
+  --> src/symcryptcommon.rs:42:16
+   |
+42 | pub(crate) use symcrypt_magic_value;
+   |                ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Int16x8 as int16x8_t`, `Uint16x4 as uint16x4_t`, `Uint16x8 as uint16x8_t`, `Uint32x4 as uint32x4_t`, `vaddq_u16`, `vandq_u16`, `vcgeq_u16`, `vcltzq_s16`, `vdupq_n_u16`, `vget_low_u16`, `vmlal_high_u16`, `vmlal_u16`, `vmull_high_u16`, `vmull_u16`, `vmulq_u16`, `vreinterpretq_s16_u16`, `vreinterpretq_u16_u32`, `vsubq_u16`, and `vuzp2q_u16`
+  --> src/mlkem/ntt_neon.rs:43:5
+   |
+43 |     Int16x8 as int16x8_t,
+   |     ^^^^^^^^^^^^^^^^^^^^
+44 |     Uint16x4 as uint16x4_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+45 |     Uint16x8 as uint16x8_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+46 |     Uint32x4 as uint32x4_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+47 |     vaddq_u16, vandq_u16, vcgeq_u16, vcltzq_s16, vdupq_n_u16, vget_low_u16,
+   |     ^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^^
+48 |     vmlal_high_u16, vmlal_u16, vmull_high_u16, vmull_u16, vmulq_u16,
+   |     ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^
+49 |     vreinterpretq_s16_u16, vreinterpretq_u16_u32, vsubq_u16, vuzp2q_u16,
+   |     ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^
+
+warning: unused import: `super::Q`
+  --> src/mlkem/ntt_neon.rs:52:5
+   |
+52 | use super::Q;
+   |     ^^^^^^^^
+
+warning: unused import: `super::PolyElement`
+  --> src/mlkem/ntt_neon.rs:53:5
+   |
+53 | use super::PolyElement;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::NttIntrinsicsInterface`
+  --> src/mlkem/ntt_neon.rs:54:5
+   |
+54 | use super::NttIntrinsicsInterface;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NttIntrinsicsNeon` is never constructed
+  --> src/mlkem/ntt_neon.rs:56:19
+   |
+56 | pub(super) struct NttIntrinsicsNeon;
+   |                   ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `SymCryptMlKemSelftest` is never used
+   --> src/mlkem/mlkem.rs:272:8
+    |
+272 |     fn SymCryptMlKemSelftest();
+    |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `wipe_private_state` is never used
+   --> src/mlkem/key.rs:212:19
+    |
+165 | impl Key {
+    | -------- method in this implementation
+...
+212 |     pub(super) fn wipe_private_state(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_VERSION_MAJOR` is never used
+  --> src/symcryptcommon.rs:19:18
+   |
+19 | pub(crate) const SYMCRYPT_VERSION_MAJOR: usize = 103;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_VERSION_MINOR` is never used
+  --> src/symcryptcommon.rs:20:18
+   |
+20 | pub(crate) const SYMCRYPT_VERSION_MINOR: usize = 13;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_API_VERSION` is never used
+  --> src/symcryptcommon.rs:21:18
+   |
+21 | pub(crate) const SYMCRYPT_API_VERSION: usize =
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt104<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl90<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<&'a T>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl9), TraitClause1: (@Adt104<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl90<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<&'a T>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl14), TraitClause1: (@Adt104<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl90<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Iter<'a, T>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_Iter<'a, T>: Iterator<Iter<'a, T>, &'a T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt105<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl91<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Iter<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_Iter<'a, T>: Iterator<Iter<'a, T>, &'a T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt105<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl91<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt79<missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl93<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl9), TraitClause1: (@Adt79<missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl93<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl14), TraitClause1: (@Adt79<missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl93<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (ChunksExact<'a, T>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_ChunksExact<'a, T>: Iterator<ChunksExact<'a, T>, &'a [T]>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt135<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl121<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter.rs:1890:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (ChunksExact<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_ChunksExact<'a, T>: Iterator<ChunksExact<'a, T>, &'a [T]>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt135<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl121<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter.rs:1890:1
+
+warning: The extraction generated 10 warnings
+warning: `symcrust` (lib) generated 16 warnings (run `cargo fix --lib -p symcrust` to apply 8 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.23s
+   Compiling libc v0.2.172
+   Compiling symcrust v0.1.0 (/srv/home/hantaolou/code/veriop/benchmarks/repos/SymCrypt/SymCRust)
+warning: unused imports: `AtomicBool` and `Ordering`
+  --> src/common.rs:16:26
+   |
+16 | use core::sync::atomic::{AtomicBool, Ordering};
+   |                          ^^^^^^^^^^  ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `SymCryptInit` and `g_SymCryptFipsSelftestsPerformed`
+  --> src/common.rs:25:38
+   |
+25 |     g_SymCryptCpuFeaturesNotPresent, g_SymCryptFipsSelftestsPerformed, SymCryptCallbackRandom,
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+26 |     SymCryptCpuFeaturesNeverPresent, SymCryptInit, SymCryptWipe,
+   |                                      ^^^^^^^^^^^^
+
+warning: unused macro definition: `symcrypt_magic_value`
+  --> src/symcryptcommon.rs:25:14
+   |
+25 | macro_rules! symcrypt_magic_value {
+   |              ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_macros)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused macro definition: `symcrypt_check_magic`
+  --> src/symcryptcommon.rs:33:14
+   |
+33 | macro_rules! symcrypt_check_magic {
+   |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `symcrypt_check_magic`
+  --> src/symcryptcommon.rs:41:16
+   |
+41 | pub(crate) use symcrypt_check_magic;
+   |                ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `symcrypt_magic_value`
+  --> src/symcryptcommon.rs:42:16
+   |
+42 | pub(crate) use symcrypt_magic_value;
+   |                ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Int16x8 as int16x8_t`, `Uint16x4 as uint16x4_t`, `Uint16x8 as uint16x8_t`, `Uint32x4 as uint32x4_t`, `vaddq_u16`, `vandq_u16`, `vcgeq_u16`, `vcltzq_s16`, `vdupq_n_u16`, `vget_low_u16`, `vmlal_high_u16`, `vmlal_u16`, `vmull_high_u16`, `vmull_u16`, `vmulq_u16`, `vreinterpretq_s16_u16`, `vreinterpretq_u16_u32`, `vsubq_u16`, and `vuzp2q_u16`
+  --> src/mlkem/ntt_neon.rs:43:5
+   |
+43 |     Int16x8 as int16x8_t,
+   |     ^^^^^^^^^^^^^^^^^^^^
+44 |     Uint16x4 as uint16x4_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+45 |     Uint16x8 as uint16x8_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+46 |     Uint32x4 as uint32x4_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+47 |     vaddq_u16, vandq_u16, vcgeq_u16, vcltzq_s16, vdupq_n_u16, vget_low_u16,
+   |     ^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^^
+48 |     vmlal_high_u16, vmlal_u16, vmull_high_u16, vmull_u16, vmulq_u16,
+   |     ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^
+49 |     vreinterpretq_s16_u16, vreinterpretq_u16_u32, vsubq_u16, vuzp2q_u16,
+   |     ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^
+
+warning: unused import: `super::Q`
+  --> src/mlkem/ntt_neon.rs:52:5
+   |
+52 | use super::Q;
+   |     ^^^^^^^^
+
+warning: unused import: `super::PolyElement`
+  --> src/mlkem/ntt_neon.rs:53:5
+   |
+53 | use super::PolyElement;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::NttIntrinsicsInterface`
+  --> src/mlkem/ntt_neon.rs:54:5
+   |
+54 | use super::NttIntrinsicsInterface;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `M256 as __m256i`, `add_epi16 as _mm256_add_epi16`, `and_si256 as _mm256_and_si256`, `andnot_si256 as _mm256_andnot_si256`, `cmpeq_epi16 as _mm256_cmpeq_epi16`, `cmpgt_epi16 as _mm256_cmpgt_epi16`, `mulhi_epu16 as _mm256_mulhi_epu16`, `mullo_epi16 as _mm256_mullo_epi16`, `set1_epi16 as _mm256_set1_epi16`, `setzero_si256 as _mm256_setzero_si256`, and `sub_epi16 as _mm256_sub_epi16`
+  --> src/mlkem/ntt_avx2.rs:54:5
+   |
+54 |     M256 as __m256i,
+   |     ^^^^^^^^^^^^^^^
+55 |     add_epi16 as _mm256_add_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+56 |     and_si256 as _mm256_and_si256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+57 |     andnot_si256 as _mm256_andnot_si256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+58 |     cmpeq_epi16 as _mm256_cmpeq_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+59 |     cmpgt_epi16 as _mm256_cmpgt_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+60 |     mulhi_epu16 as _mm256_mulhi_epu16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+61 |     mullo_epi16 as _mm256_mullo_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+62 |     set1_epi16 as _mm256_set1_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+63 |     setzero_si256 as _mm256_setzero_si256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+64 |     sub_epi16 as _mm256_sub_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `bytes256_to_words16x16`, `loadu_si256_u16`, `storeu_si256_u16`, and `words16x16_to_bytes256`
+  --> src/mlkem/ntt_avx2.rs:68:5
+   |
+68 |     bytes256_to_words16x16, loadu_si256_u16, storeu_si256_u16, words16x16_to_bytes256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::Q`
+  --> src/mlkem/ntt_avx2.rs:71:5
+   |
+71 | use super::Q;
+   |     ^^^^^^^^
+
+warning: unused import: `super::PolyElement`
+  --> src/mlkem/ntt_avx2.rs:72:5
+   |
+72 | use super::PolyElement;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `ZETA_BIT_REV_TIMES_R_TIMES_NEG_Q_INV_MOD_R` and `ZETA_BIT_REV_TIMES_R`
+  --> src/mlkem/ntt_avx2.rs:73:13
+   |
+73 | use super::{ZETA_BIT_REV_TIMES_R, ZETA_BIT_REV_TIMES_R_TIMES_NEG_Q_INV_MOD_R};
+   |             ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NttIntrinsicsNeon` is never constructed
+  --> src/mlkem/ntt_neon.rs:56:19
+   |
+56 | pub(super) struct NttIntrinsicsNeon;
+   |                   ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SYMCRYPT_VERSION_MAJOR` is never used
+  --> src/symcryptcommon.rs:19:18
+   |
+19 | pub(crate) const SYMCRYPT_VERSION_MAJOR: usize = 103;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `wipe_private_state` is never used
+   --> src/mlkem/key.rs:212:19
+    |
+165 | impl Key {
+    | -------- method in this implementation
+...
+212 |     pub(super) fn wipe_private_state(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: function `SymCryptMlKemSelftest` is never used
+   --> src/mlkem/mlkem.rs:272:8
+    |
+272 |     fn SymCryptMlKemSelftest();
+    |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_VERSION_MINOR` is never used
+  --> src/symcryptcommon.rs:20:18
+   |
+20 | pub(crate) const SYMCRYPT_VERSION_MINOR: usize = 13;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_API_VERSION` is never used
+  --> src/symcryptcommon.rs:21:18
+   |
+21 | pub(crate) const SYMCRYPT_API_VERSION: usize =
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt101<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl84<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<&'a T>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl9), TraitClause1: (@Adt101<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl84<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<&'a T>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl14), TraitClause1: (@Adt101<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl84<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Iter<'a, T>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_Iter<'a, T>: Iterator<Iter<'a, T>, &'a T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt102<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl85<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Iter<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_Iter<'a, T>: Iterator<Iter<'a, T>, &'a T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt102<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl85<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt76<missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl87<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl9), TraitClause1: (@Adt76<missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl87<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl14), TraitClause1: (@Adt76<missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl87<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (ChunksExact<'a, T>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_ChunksExact<'a, T>: Iterator<ChunksExact<'a, T>, &'a [T]>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt132<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl115<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter.rs:1890:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (ChunksExact<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_ChunksExact<'a, T>: Iterator<ChunksExact<'a, T>, &'a [T]>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt132<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl115<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter.rs:1890:1
+
+warning: The extraction generated 10 warnings
+warning: `symcrust` (lib) generated 21 warnings (run `cargo fix --lib -p symcrust` to apply 13 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 39.52s
+   Compiling libc v0.2.172
+   Compiling symcrust v0.1.0 (/srv/home/hantaolou/code/veriop/benchmarks/repos/SymCrypt/SymCRust)
+warning: unused imports: `AtomicBool` and `Ordering`
+  --> src/common.rs:16:26
+   |
+16 | use core::sync::atomic::{AtomicBool, Ordering};
+   |                          ^^^^^^^^^^  ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `SymCryptInit` and `g_SymCryptFipsSelftestsPerformed`
+  --> src/common.rs:25:38
+   |
+25 |     g_SymCryptCpuFeaturesNotPresent, g_SymCryptFipsSelftestsPerformed, SymCryptCallbackRandom,
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+26 |     SymCryptCpuFeaturesNeverPresent, SymCryptInit, SymCryptWipe,
+   |                                      ^^^^^^^^^^^^
+
+warning: unused macro definition: `symcrypt_magic_value`
+  --> src/symcryptcommon.rs:25:14
+   |
+25 | macro_rules! symcrypt_magic_value {
+   |              ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_macros)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused macro definition: `symcrypt_check_magic`
+  --> src/symcryptcommon.rs:33:14
+   |
+33 | macro_rules! symcrypt_check_magic {
+   |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `symcrypt_check_magic`
+  --> src/symcryptcommon.rs:41:16
+   |
+41 | pub(crate) use symcrypt_check_magic;
+   |                ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `symcrypt_magic_value`
+  --> src/symcryptcommon.rs:42:16
+   |
+42 | pub(crate) use symcrypt_magic_value;
+   |                ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `bytes_to_words` and `words_to_bytes`
+  --> src/mlkem/ntt_xmm.rs:44:40
+   |
+44 | use crate::verify::intrinsics::lanes::{bytes_to_words, words_to_bytes};
+   |                                        ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^
+
+warning: unused imports: `M128 as __m128i`, `add_epi16 as _mm_add_epi16`, `and_si128 as _mm_and_si128`, `andnot_si128 as _mm_andnot_si128`, `cmpeq_epi16 as _mm_cmpeq_epi16`, `cmpgt_epi16 as _mm_cmpgt_epi16`, `mulhi_epu16 as _mm_mulhi_epu16`, `mullo_epi16 as _mm_mullo_epi16`, `set1_epi16 as _mm_set1_epi16`, and `sub_epi16 as _mm_sub_epi16`
+  --> src/mlkem/ntt_xmm.rs:47:5
+   |
+47 |     M128 as __m128i,
+   |     ^^^^^^^^^^^^^^^
+48 |     add_epi16 as _mm_add_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+49 |     and_si128 as _mm_and_si128,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+50 |     andnot_si128 as _mm_andnot_si128,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+51 |     cmpeq_epi16 as _mm_cmpeq_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+52 |     cmpgt_epi16 as _mm_cmpgt_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+53 |     mulhi_epu16 as _mm_mulhi_epu16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+54 |     mullo_epi16 as _mm_mullo_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+55 |     set1_epi16 as _mm_set1_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+56 |     sub_epi16 as _mm_sub_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::Q`
+  --> src/mlkem/ntt_xmm.rs:59:5
+   |
+59 | use super::Q;
+   |     ^^^^^^^^
+
+warning: unused import: `super::PolyElement`
+  --> src/mlkem/ntt_xmm.rs:60:5
+   |
+60 | use super::PolyElement;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::NttIntrinsicsInterface`
+  --> src/mlkem/ntt_xmm.rs:61:5
+   |
+61 | use super::NttIntrinsicsInterface;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Int16x8 as int16x8_t`, `Uint16x4 as uint16x4_t`, and `Uint32x4 as uint32x4_t`
+  --> src/mlkem/ntt_neon.rs:43:5
+   |
+43 |     Int16x8 as int16x8_t,
+   |     ^^^^^^^^^^^^^^^^^^^^
+44 |     Uint16x4 as uint16x4_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+45 |     Uint16x8 as uint16x8_t,
+46 |     Uint32x4 as uint32x4_t,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `M256 as __m256i`, `add_epi16 as _mm256_add_epi16`, `and_si256 as _mm256_and_si256`, `andnot_si256 as _mm256_andnot_si256`, `cmpeq_epi16 as _mm256_cmpeq_epi16`, `cmpgt_epi16 as _mm256_cmpgt_epi16`, `mulhi_epu16 as _mm256_mulhi_epu16`, `mullo_epi16 as _mm256_mullo_epi16`, `set1_epi16 as _mm256_set1_epi16`, `setzero_si256 as _mm256_setzero_si256`, and `sub_epi16 as _mm256_sub_epi16`
+  --> src/mlkem/ntt_avx2.rs:54:5
+   |
+54 |     M256 as __m256i,
+   |     ^^^^^^^^^^^^^^^
+55 |     add_epi16 as _mm256_add_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+56 |     and_si256 as _mm256_and_si256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+57 |     andnot_si256 as _mm256_andnot_si256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+58 |     cmpeq_epi16 as _mm256_cmpeq_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+59 |     cmpgt_epi16 as _mm256_cmpgt_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+60 |     mulhi_epu16 as _mm256_mulhi_epu16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+61 |     mullo_epi16 as _mm256_mullo_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+62 |     set1_epi16 as _mm256_set1_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+63 |     setzero_si256 as _mm256_setzero_si256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+64 |     sub_epi16 as _mm256_sub_epi16,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `bytes256_to_words16x16`, `loadu_si256_u16`, `storeu_si256_u16`, and `words16x16_to_bytes256`
+  --> src/mlkem/ntt_avx2.rs:68:5
+   |
+68 |     bytes256_to_words16x16, loadu_si256_u16, storeu_si256_u16, words16x16_to_bytes256,
+   |     ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::Q`
+  --> src/mlkem/ntt_avx2.rs:71:5
+   |
+71 | use super::Q;
+   |     ^^^^^^^^
+
+warning: unused import: `super::PolyElement`
+  --> src/mlkem/ntt_avx2.rs:72:5
+   |
+72 | use super::PolyElement;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `ZETA_BIT_REV_TIMES_R_TIMES_NEG_Q_INV_MOD_R` and `ZETA_BIT_REV_TIMES_R`
+  --> src/mlkem/ntt_avx2.rs:73:13
+   |
+73 | use super::{ZETA_BIT_REV_TIMES_R, ZETA_BIT_REV_TIMES_R_TIMES_NEG_Q_INV_MOD_R};
+   |             ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_VERSION_MAJOR` is never used
+  --> src/symcryptcommon.rs:19:18
+   |
+19 | pub(crate) const SYMCRYPT_VERSION_MAJOR: usize = 103;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SYMCRYPT_VERSION_MINOR` is never used
+  --> src/symcryptcommon.rs:20:18
+   |
+20 | pub(crate) const SYMCRYPT_VERSION_MINOR: usize = 13;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYMCRYPT_API_VERSION` is never used
+  --> src/symcryptcommon.rs:21:18
+   |
+21 | pub(crate) const SYMCRYPT_API_VERSION: usize =
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `wipe_private_state` is never used
+   --> src/mlkem/key.rs:212:19
+    |
+165 | impl Key {
+    | -------- method in this implementation
+...
+212 |     pub(super) fn wipe_private_state(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: struct `NttIntrinsicsXmm` is never constructed
+  --> src/mlkem/ntt_xmm.rs:62:19
+   |
+62 | pub(super) struct NttIntrinsicsXmm;
+   |                   ^^^^^^^^^^^^^^^^
+
+warning: function `SymCryptMlKemSelftest` is never used
+   --> src/mlkem/mlkem.rs:272:8
+    |
+272 |     fn SymCryptMlKemSelftest();
+    |        ^^^^^^^^^^^^^^^^^^^^^
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt101<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl84<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<&'a T>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl9), TraitClause1: (@Adt101<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl84<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (IterMut<'a, T>: Iterator<&'a T>)
+            got: impl_Iterator_for_IterMut<'a, T>: Iterator<IterMut<'a, T>, &'a mut T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl14), TraitClause1: (@Adt101<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl84<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Iter<'a, T>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_Iter<'a, T>: Iterator<Iter<'a, T>, &'a T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt102<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl85<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Iter<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_Iter<'a, T>: Iterator<Iter<'a, T>, &'a T>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt102<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl85<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter/macros.rs:153:9
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt76<missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl87<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl9), TraitClause1: (@Adt76<missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl87<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (Enumerate<I>: Iterator<&'a T>)
+            got: impl_Iterator_for_Enumerate<I, Clause0_Item>[TraitClause0]: Iterator<Enumerate<I>, (usize, Clause0_Item)>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, Clause1_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl14), TraitClause1: (@Adt76<missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 1))>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl87<missing(@TypeBound(2, 0)), missing(@TypeBound(2, 1))>[missing(TraitClauseBound(2, 0))]::@AssocType0 = &missing('_Bound(1, 0)) missing(@TypeBound(1, 0))>
+         1: <I, Clause0_Item, TraitClause0: (missing(@TypeBound(1, 0)): @TraitDecl1<missing(@TypeBound(1, 1))>)>
+ --> /rustc/library/core/src/iter/adapters/enumerate.rs:62:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (ChunksExact<'a, T>: Iterator<&'a mut T>)
+            got: impl_Iterator_for_ChunksExact<'a, T>: Iterator<ChunksExact<'a, T>, &'a [T]>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <'a, T, P, Clause0_Clause0_Item, TraitClause0: (@Adt131<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl26<missing(@TypeBound(1, 2))>), TraitClause1: for<'_0> (missing(@TypeBound(1, 1)): @TraitDecl19<(&'_0 missing(@TypeBound(1, 0)),), bool>), TypeOutlives0: missing(@TypeBound(1, 0)): missing('_Bound(1, 0)), TypeConstraint0: @TraitImpl115<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = &missing('_Bound(1, 0)) mut missing(@TypeBound(1, 0))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter.rs:1890:1
+
+error: Type error after transformations:
+       Mismatched trait clause:
+       expected: TraitClause0_1: (ChunksExact<'a, T>: Iterator<(A, B)>)
+            got: impl_Iterator_for_ChunksExact<'a, T>: Iterator<ChunksExact<'a, T>, &'a [T]>
+       Visitor stack:
+         charon_lib::ast::gast::FunDeclRef
+         charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>
+         charon_lib::ids::index_map::IndexMap<charon_lib::ast::gast::TraitMethodId, charon_lib::ast::types::Binder<charon_lib::ast::gast::FunDeclRef>>
+         charon_lib::ast::gast::TraitImpl
+       Binding stack (depth 2):
+         0: <A, B, FromA, FromB, Clause4_Item, TraitClause0: (missing(@TypeBound(1, 2)): @TraitDecl25), TraitClause1: (missing(@TypeBound(1, 2)): @TraitDecl24<missing(@TypeBound(1, 0))>), TraitClause2: (missing(@TypeBound(1, 3)): @TraitDecl25), TraitClause3: (missing(@TypeBound(1, 3)): @TraitDecl24<missing(@TypeBound(1, 1))>), TraitClause4: (@Adt131<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>: @TraitDecl1<missing(@TypeBound(1, 4))>), TypeConstraint0: @TraitImpl115<missing('_Bound(2, 0)), missing(@TypeBound(2, 0))>::@AssocType0 = (missing(@TypeBound(1, 0)), missing(@TypeBound(1, 1)))>
+         1: <'a, T>
+ --> /rustc/library/core/src/slice/iter.rs:1890:1
+
+warning: The extraction generated 10 warnings
+warning: `symcrust` (lib) generated 23 warnings (run `cargo fix --lib -p symcrust` to apply 15 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 47.70s
+../../aeneas/bin/aeneas symcrust.llbc -dest lean -subdir Symcrust/Code -split-files -backend lean -print-error-emitters -color -max-error-spans -1 -loops-to-rec  \
+  || { echo "[extract] ERROR: aeneas failed; EXTRACTION.md left unchanged (Code/ may be partial)." >&2; exit 1; }
+[[92mInfo[39m ] Imported: symcrust.llbc
+[?25lApplied prepasses:  [------------------------------------------------]   0/652 ⠋Applied prepasses:  [------------------------------------------------]   1/652 ⠋Applied prepasses:  [------------------------------------------------]  10/652 ⠋Applied prepasses:  [------------------------------------------------]  11/652 ⠙Applied prepasses:  [#-----------------------------------------------]  14/652 ⠙Applied prepasses:  [##----------------------------------------------]  35/652 ⠙Applied prepasses:  [##----------------------------------------------]  39/652 ⠙Applied prepasses:  [####--------------------------------------------]  56/652 ⠹Applied prepasses:  [####--------------------------------------------]  64/652 ⠹Applied prepasses:  [#####-------------------------------------------]  77/652 ⠹Applied prepasses:  [######------------------------------------------]  88/652 ⠹Applied prepasses:  [############------------------------------------] 168/652 ⠹Applied prepasses:  [###############---------------------------------] 211/652 ⠸Applied prepasses:  [################--------------------------------] 225/652 ⠸Applied prepasses:  [######################--------------------------] 299/652 ⠼Applied prepasses:  [#########################-----------------------] 351/652 ⠼Applied prepasses:  [#################################---------------] 460/652 ⠼Applied prepasses:  [######################################----------] 524/652 ⠼Applied prepasses:  [###############################################-] 643/652 ⠼Applied prepasses:  [################################################] 652/652 ✔️
+[?25h[?25lTranslated globals:  [-------------------------------------------------]  0/79 ⠋Translated globals:  [#################################################] 79/79 ✔️
+[?25h[?25lTranslated opaque functions:  [--------------------------------------]   0/150 ⠋Translated opaque functions:  [--------------------------------------]   0/150 ✔️
+[?25hUncaught exception:
+  
+  (Failure "failed to allocate domain")
+
+Raised by primitive operation at Stdlib__Domain.spawn in file "domain.ml", line 284, characters 15-39
+Called from Stdlib__Array.init in file "array.ml", line 56, characters 22-27
+Called from Domainslib__Task.setup_pool in file "lib/task.ml", lines 145-146, characters 16-45
+Called from CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 49, characters 17-27
+Re-raised at CamlinternalLazy.do_force_block in file "camlinternalLazy.ml", line 56, characters 4-11
+Called from Aeneas__Parallel.parallel_filter_map_pool_aux in file "Parallel.ml", line 114, characters 15-26
+Called from Aeneas__Parallel.catch_reraise in file "Parallel.ml", line 17, characters 6-9
+Called from Progress_engine__Renderer.Make.Reporters.apply_all in file "src/progress/engine/renderer.ml", line 507, characters 54-59
+Called from Stdlib__Fun.protect in file "fun.ml", line 34, characters 8-15
+Re-raised at Stdlib__Fun.protect in file "fun.ml", line 39, characters 6-52
+Called from Aeneas__Translate.translate_crate_to_pure in file "Translate.ml", line 518, characters 17-47
+Called from Aeneas__Translate.translate_crate in file "Translate.ml", line 2183, characters 31-71
+Called from Dune__exe__Main in file "Main.ml", lines 743-744, characters 8-37
+[extract] ERROR: aeneas failed; EXTRACTION.md left unchanged (Code/ may be partial).
+make: *** [Makefile:176: extract] Error 1

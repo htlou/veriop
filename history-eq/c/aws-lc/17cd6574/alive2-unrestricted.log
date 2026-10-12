@@ -1,0 +1,54 @@
+
+----------------------------------------
+define i32 @raw_old_bit(i16 noundef signext %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = icmp slt i16 noundef signext %#0, 0
+  %#3 = select i1 %#2, i16 3329, i16 0
+  %#4 = add i16 %#3, noundef signext %#0
+  %#5 = zext i16 %#4 to i32
+  %#6 = shl nsw nuw i32 %#5, 1
+  %#7 = add nsw nuw i32 %#6, 1664
+  %#8 = udiv i32 %#7, 3329
+  %#9 = and i32 %#8, 1
+  %#range_0_%#9 = !range i32 %#9, i32 0, i32 2
+  ret i32 %#range_0_%#9
+}
+=>
+define i32 @raw_new_bit(i16 noundef signext %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = sext i16 noundef signext %#0 to i32
+  %#3 = mul i32 %#2, 161270
+  %#4 = add i32 %#3, 134257275
+  %#5 = lshr i32 %#4, 28
+  %#6 = and i32 %#5, 1
+  %#range_0_%#6 = !range i32 %#6, i32 0, i32 2
+  ret i32 %#range_0_%#6
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i16 noundef signext %#0 = #x9c84 (40068, -25468)
+
+Source:
+i1 %#2 = #x1 (1)
+i16 %#3 = #x0d01 (3329)
+i16 %#4 = #xa985 (43397, -22139)
+i32 %#5 = #x0000a985 (43397)
+i32 %#6 = #x0001530a (86794)
+i32 %#7 = #x0001598a (88458)
+i32 %#8 = #x0000001a (26)
+i32 %#9 = #x00000000 (0)
+i32 %#range_0_%#9 = #x00000000 (0)
+
+Target:
+i32 %#2 = #xffff9c84 (4294941828, -25468)
+i32 %#3 = #x0b30bad8 (187742936)
+i32 %#4 = #x13315553 (322000211)
+i32 %#5 = #x00000001 (1)
+i32 %#6 = #x00000001 (1)
+i32 %#range_0_%#6 = #x00000001 (1)
+Source value: #x00000000 (0)
+Target value: #x00000001 (1)
+

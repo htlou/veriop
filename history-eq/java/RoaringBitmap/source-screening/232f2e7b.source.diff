@@ -1,0 +1,86 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+index f5b2536f..d56f9b6c 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+@@ -1667,19 +1667,31 @@ public class RoaringBitmap
+    */
+   public boolean checkedRemove(final int x) {
+     final char hb = Util.highbits(x);
++    final char lb = Util.lowbits(x);
+     final int i = highLowContainer.getIndex(hb);
+     if (i < 0) {
+       return false;
+     }
++    boolean containerNotEmpty;
+     Container C = highLowContainer.getContainerAtIndex(i);
+-    int oldcard = C.getCardinality();
+-    Container newC = C.remove(Util.lowbits(x));
+-    int newcard = newC.getCardinality();
+-    if (newcard == oldcard) {
+-      return false;
++    if (C instanceof RunContainer) {
++      if (C.contains(lb)) { // getCardinality() is costly for run container
++        C = C.remove(lb);
++        containerNotEmpty = !C.isEmpty();
++      } else {
++        return false;
++      }
++    } else {
++      int oldcard = C.getCardinality();
++      C = C.remove(lb);
++      int newcard = C.getCardinality();
++      if (newcard == oldcard) {
++        return false;
++      }
++      containerNotEmpty = newcard > 0;
+     }
+-    if (newcard > 0) {
+-      highLowContainer.setContainerAtIndex(i, newC);
++    if (containerNotEmpty) {
++      highLowContainer.setContainerAtIndex(i, C);
+     } else {
+       highLowContainer.removeAtIndex(i);
+     }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
+index 892474b9..2d980c6a 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
+@@ -1133,19 +1133,31 @@ public class MutableRoaringBitmap extends ImmutableRoaringBitmap
+    */
+   public boolean checkedRemove(final int x) {
+     final char hb = BufferUtil.highbits(x);
++    final char lb = BufferUtil.lowbits(x);
+     final int i = highLowContainer.getIndex(hb);
+     if (i < 0) {
+       return false;
+     }
++    boolean containerNotEmpty;
+     MappeableContainer C = highLowContainer.getContainerAtIndex(i);
+-    int oldcard = C.getCardinality();
+-    MappeableContainer newC = C.remove(BufferUtil.lowbits(x));
+-    int newcard = newC.getCardinality();
+-    if (newcard == oldcard) {
+-      return false;
++    if (C instanceof MappeableRunContainer) {
++      if (C.contains(lb)) { // getCardinality() is costly for run container
++        C = C.remove(lb);
++        containerNotEmpty = !C.isEmpty();
++      } else {
++        return false;
++      }
++    } else {
++      int oldcard = C.getCardinality();
++      C = C.remove(lb);
++      int newcard = C.getCardinality();
++      if (newcard == oldcard) {
++        return false;
++      }
++      containerNotEmpty = newcard > 0;
+     }
+-    if (newcard > 0) {
+-      ((MutableRoaringArray) highLowContainer).setContainerAtIndex(i, newC);
++    if (containerNotEmpty) {
++      ((MutableRoaringArray) highLowContainer).setContainerAtIndex(i, C);
+     } else {
+       ((MutableRoaringArray) highLowContainer).removeAtIndex(i);
+     }

@@ -1,0 +1,47 @@
+{
+  "repo": "fast_float",
+  "commit": "265cb849f3ef03028f80f6d058fc400bca41e1d1",
+  "subject": "optimise fastfloat_strncasecmp",
+  "selected_from": "pinned-samples.json",
+  "performance_intent": "The commit message explicitly says optimise; the diff replaces a character loop with packed comparisons.",
+  "commit_verdict": "EQUIV_PARTIAL",
+  "coverage": "partial",
+  "reason": "Alive2 proves all three actual parse_infnan literal comparisons for char, char16_t, char32_t, and wchar_t in both directions. The internal comparator differs for unrestricted expected strings; the full parser consumed-position check timed out and public from_chars was not checked.",
+  "units": [
+    {
+      "name": "parse_infnan nan/inf/inity literal comparisons for four code-unit types",
+      "level": "callsite",
+      "verdict": "EQUIV",
+      "artifact": "caller_literals/result.json",
+      "scope": "all values of each compared code unit for char, char16_t, char32_t, and wchar_t; 12 instances proved forward and backward"
+    },
+    {
+      "name": "fastfloat_strncasecmp, unrestricted second operand, four bytes",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "artifact": "raw/result.json",
+      "witness": "actual=0, expected=0: old returns false; new returns true. Confirmed by native old-witness/new-witness."
+    },
+    {
+      "name": "fastfloat_strncasecmp, fixed lowercase 'infi'",
+      "level": "precond",
+      "verdict": "EQUIV_BOUNDED",
+      "bound": "four input bytes",
+      "artifact": "raw/result.json"
+    },
+    {
+      "name": "parse_infnan, fixed eight-byte char input, output value and error",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bound": "eight input bytes; outputs checked independently",
+      "artifact": "infnan/result.json"
+    },
+    {
+      "name": "parse_infnan, fixed eight-byte char input, consumed position",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "artifact": "infnan_offset_unroll8/result.json",
+      "evidence": "Alive2 timeout in both directions, including unroll=8"
+    }
+  ]
+}

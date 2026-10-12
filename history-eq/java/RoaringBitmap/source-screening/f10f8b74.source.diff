@@ -1,0 +1,109 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
+index c74a1518..f933ea2a 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
+@@ -128,12 +128,7 @@ public class Art {
+           // common prefix is the same ,then increase the depth
+           depth += branchNodePrefixLength;
+         }
+-        //TODO - expose an API that avoids this double dipping
+-        int pos = branchNode.getChildPos(LongUtils.getByte(key, depth));
+-        if (pos == BranchNode.ILLEGAL_IDX) {
+-          return null;
+-        }
+-        node = branchNode.getChild(pos);
++        node = branchNode.getChildAtKey(LongUtils.getByte(key, depth));
+         depth++;
+       } else {
+         LeafNode leafNode = (LeafNode) node;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
+index f44433da..d484296a 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
+@@ -145,6 +145,18 @@ public abstract class BranchNode extends Node {
+      * @return a Node corresponding to the input position
+      */
+     public abstract Node getChild(int pos);
++    /**
++     * get the child at the specified key in the node.
++     * the behavior is equivalent to {@code
++     *     int pos = getChildPos(key);
++     *     return (pos != ILLEGAL_IDX) ? getChild(pos) : null;
++     * }
++     * but subclasses may be able to provide a more efficient implementation
++     *
++     * @param key the position
++     * @return a Node corresponding to the input position, or null if not found
++     */
++    public abstract Node getChildAtKey(byte key);
+ 
+     /**
+      * replace the position child to the fresh one
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
+index b0f62c76..c76ebd32 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
+@@ -44,6 +44,12 @@ public class Node16 extends BranchNode {
+     }
+   }
+ 
++  @Override
++  public Node getChildAtKey(byte key) {
++    int pos = getChildPos(key);
++    return (pos != ILLEGAL_IDX) ? children[pos] : null;
++  }
++
+   @Override
+   public SearchResult getNearestChildPos(byte k) {
+     byte[] firstBytes = LongUtils.toBDBytes(firstV);
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
+index 1794ae7f..c7535ba5 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
+@@ -33,6 +33,11 @@ public class Node256 extends BranchNode {
+     return ILLEGAL_IDX;
+   }
+ 
++  @Override
++  public Node getChildAtKey(byte key) {
++    return children[Byte.toUnsignedInt(key)];
++  }
++
+   @Override
+   public SearchResult getNearestChildPos(byte k) {
+     int pos = Byte.toUnsignedInt(k);
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
+index a7d67015..791cb947 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
+@@ -52,6 +52,12 @@ public class Node4 extends BranchNode {
+     return children[pos];
+   }
+ 
++  @Override
++  public Node getChildAtKey(byte key) {
++    int pos = getChildPos(key);
++    return (pos != ILLEGAL_IDX) ? children[pos] : null;
++  }
++
+   @Override
+   public void replaceNode(int pos, Node freshOne) {
+     children[pos] = freshOne;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
+index 0ae74737..9bd5d76d 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
+@@ -63,6 +63,13 @@ public class Node48 extends BranchNode {
+     return children[(int) idx];
+   }
+ 
++  @Override
++  public Node getChildAtKey(byte key) {
++    int unsignedIdx = Byte.toUnsignedInt(key);
++    int childIdx = childrenIdx(unsignedIdx, childIndex);
++    return (childIdx != EMPTY_VALUE) ? children[childIdx] : null;
++  }
++
+   @Override
+   public void replaceNode(int pos, Node freshOne) {
+     byte idx = childrenIdx(pos, childIndex);

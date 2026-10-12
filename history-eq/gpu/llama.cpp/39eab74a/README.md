@@ -1,0 +1,7 @@
+# llama.cpp `39eab74a`: OpenCL Q6_K flat-GEMV routing
+
+**Verdict: scoped `NOT_EQUIV`.** The exact historical commit changes one OpenCL source file: the `use_flat_gemv_for_large_m_q6_K` helper gains a backend argument, an additional total-size condition, and four updated call sites. The [reproduction script](reproduce.py) checks the complete file against those edits and obtains the historical `ggml_nbytes` body, Q6_K block dimensions, and Adreno enum from the same revision.
+
+For a valid contiguous Q6_K tensor shaped `1024 × 327680 × 1 × 1`, the historical layout occupies **275,251,200 bytes**, above the new 256 MiB threshold. On Adreno A6X, the parent helper returns **false** (keep the noshuffle path) and the child returns **true** (choose the flat path). Native builds reproduce this result. A7X, a smaller tensor, and an `ne0=2048` control agree on both sides. Alive2 refutes the fixed-shape helper result [old→new](alive-old_to_new.log) and [new→old](alive-new_to_old.log), each with zero errors. The IR check removes identical compiler loop/TBAA annotations on both sides and unrolls the four-iteration byte-count loop five times; [result.json](result.json) records source IDs, IR hashes, and all outputs.
+
+This proves a difference in the helper's routing decision for the recorded valid shape. It does not prove different final OpenCL tensor values or a whole-operation behavior change. No official before/after llama.cpp benchmark score was measured for this commit.

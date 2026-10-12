@@ -1,0 +1,9 @@
+# Zstd `4d1a0ef5`: sequence-copy error path
+
+The selected optimization changes only `lib/zstd.c`, moving the short-tail capacity check before literal copying. The parent blob is available in the local historical Git store. [`recover.py`](recover.py) applies the [public historical diff](https://fuchsia.googlesource.com/third_party/zstd/%2B/4d1a0ef51537ff7c5296beac40b9f14a8ba51249%5E%21/) to it; both saved sources match the parent and child Git blob IDs `63ae947dca3c6d7c5414ffbef128bb84cee679a4` and `4b4909f2a349faaa97503dad1dfcf4455b8679ca`.
+
+**Verdict: scoped `NOT_EQUIV` for destination-buffer state after an error.** [`check_error_path.py`](check_error_path.py) extracts the exact old/new `ZSTD_execSequence` bodies and unchanged copy helpers. In a 16-byte output buffer with `litLength=9`, `matchLength=1`, and 16 readable literal bytes, both return `dstSize_tooSmall`. The old body copies nine literal bytes before detecting the short tail; the new body returns before writing them. The wrapper observes the first output byte after the error: old returns the symbolic literal byte, new returns the initial `0xa5`. [Alive2](alive2-error-path.log) gives a value-mismatch witness (`first=0`), and the [ASan/UBSan native witness](native-witness.log) passes with `first=0x3c`.
+
+This is a defined *internal error path*, not a valid-stream decompression counterexample or proof that the public API promises output-buffer contents after failure. The harness maps the same historical `dstSize_tooSmall` return on both sides to a common sentinel; it does not use the missing historical error header. It changes linkage for extraction and forces inlining so Alive2 can analyze the historical bodies. No official historical before/after benchmark score was measured.
+
+Run `sh history-eq/c/zstd/4d1a0ef5/verify.sh` from the project root to check the blob hashes, regenerate the source-derived harness, run the sanitizer witness, and repeat the Alive2 comparison.

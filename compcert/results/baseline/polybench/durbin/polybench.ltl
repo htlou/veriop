@@ -1,0 +1,100 @@
+rtclock() {
+    3:	
+    2:	XMM0 = 0.; 
+    1:	return
+}
+
+polybench_flush_cache() {
+   21:	
+   20:	
+   19:	EDI = 4194560L; 
+   18:	ESI = 8L; 
+   17:	call "calloc"; 
+   16:	EBX = EAX; 
+   15:	XMM0 = 0.; 
+   14:	EAX = 0; 
+   13:	ECX = long32signed(EAX); 
+   12:	XMM2 = float64[EBX + ECX * 8 + 0]; 
+   11:	XMM0 = XMM0 +f XMM2; 
+   10:	EAX = EAX + 1 (int); 
+    9:	if (EAX <s 4194560) goto 13 else goto 8
+    8:	XMM4 = 10.; 
+    7:	if (XMM0 <=f XMM4) goto 1 else goto 6
+    6:	EDI = __stringlit_2 + 0 (long); 
+    5:	ESI = __stringlit_1 + 0 (long); 
+    4:	EDX = 123; 
+    3:	ECX = __func__ + 0 (long); 
+    2:	call "__assert_fail"; 
+    1:	EDI = EBX; tailcall "free"
+}
+
+polybench_prepare_instruments() {
+    2:	
+    1:	tailcall "polybench_flush_cache"
+}
+
+polybench_timer_start() {
+    6:	
+    5:	call "polybench_prepare_instruments"; 
+    4:	call "rtclock"; 
+    3:	EAX = &polybench_t_start; 
+    2:	float64[EAX + 0] = XMM0; 
+    1:	return
+}
+
+polybench_timer_stop() {
+    5:	
+    4:	call "rtclock"; 
+    3:	EAX = &polybench_t_end; 
+    2:	float64[EAX + 0] = XMM0; 
+    1:	return
+}
+
+polybench_timer_print() {
+    9:	
+    8:	EDI = __stringlit_3 + 0 (long); 
+    7:	EDX = &polybench_t_end; 
+    6:	XMM0 = float64[EDX + 0]; 
+    5:	ECX = &polybench_t_start; 
+    4:	XMM1 = float64[ECX + 0]; 
+    3:	XMM0 = XMM0 -f XMM1; 
+    2:	call "printf"; 
+    1:	return
+}
+
+polybench_free_data() {
+    2:	
+    1:	tailcall "free"
+}
+
+polybench_alloc_data() {
+   28:	
+   27:	
+   26:	R8 = long32signed(ESI); 
+   25:	EDI = EDI *l R8; 
+   24:	
+   23:	R8 = 0L; 
+   22:	int64[stack(0)] = R8; 
+   21:	EAX = int64[polybench_inter_array_padding_sz + 0]; 
+   20:	int64[polybench_inter_array_padding_sz + 0] = EAX; 
+   19:	
+   18:	EDX = EDI + EAX + 0 (long); 
+   17:	EDI = stack(0) (long); 
+   16:	ESI = 4096; 
+   15:	call "posix_memalign"; 
+   14:	
+   13:	ECX = int64[stack(0)]; 
+   12:	if (ECX ==lu 0) goto 9 else goto 11
+   11:	
+   10:	if (EAX !=u 0) goto 8 else goto 2
+    9:	
+    8:	EAX = &stderr; 
+    7:	EDI = int64[EAX + 0]; 
+    6:	ESI = __stringlit_4 + 0 (long); 
+    5:	call "fprintf"; 
+    4:	EDI = 1; 
+    3:	call "exit"; 
+    2:	EAX = int64[stack(0)]; 
+    1:	return
+}
+

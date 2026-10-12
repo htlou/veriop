@@ -1,0 +1,5 @@
+# xxHash `5fad59e7`: length-eight path reassignment
+
+The historical commit has the subject “make len8 part of 8to16” and changes only three range/dispatch conditions in `xxh3.h`. Its message does not state a runtime-performance objective. The old and new code select different hash formulas for an eight-byte input, while the surrounding branches remain the same shape. This is an algorithm-output change, not an established historical optimization intent, so the commit is excluded from the optimization sample.
+
+Run `python3 -B history-eq/c/xxHash/5fad59e7/reproduce.py` from the project root. It verifies the exact old/new `xxh3.h` and dependency `xxhash.h` Git blobs, audits the complete source diff, and builds both public `XXH3_64bits` calls with Clang 20 `-O2`. Input `00 01 02 03 04 05 06 07` returns `5c06e8e5fae05fae` before and `8be7d585e5d63553` after. This witness documents why the intent screen should not silently treat the change as an equivalent speed rewrite; it is **not counted** in the four-category optimization results. No official benchmark score was measured.

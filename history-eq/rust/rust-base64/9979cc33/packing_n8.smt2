@@ -1,0 +1,12 @@
+(set-logic QF_BV)
+(declare-const m0 (_ BitVec 8))
+(declare-const m1 (_ BitVec 8))
+(declare-const m2 (_ BitVec 8))
+(declare-const m3 (_ BitVec 8))
+(declare-const m4 (_ BitVec 8))
+(declare-const m5 (_ BitVec 8))
+(declare-const m6 (_ BitVec 8))
+(declare-const m7 (_ BitVec 8))
+
+(assert (not (= (bvor (bvshl ((_ zero_extend 56) m0) (_ bv58 64)) (bvshl ((_ zero_extend 56) m1) (_ bv52 64)) (bvshl ((_ zero_extend 56) m2) (_ bv46 64)) (bvshl ((_ zero_extend 56) m3) (_ bv40 64)) (bvshl ((_ zero_extend 56) m4) (_ bv34 64)) (bvshl ((_ zero_extend 56) m5) (_ bv28 64)) (bvshl ((_ zero_extend 56) m6) (_ bv22 64)) (bvshl ((_ zero_extend 56) m7) (_ bv16 64))) (bvor (bvshl ((_ zero_extend 56) m0) (_ bv58 64)) (bvshl ((_ zero_extend 56) m1) (_ bv52 64)) (bvshl ((_ zero_extend 56) m2) (_ bv46 64)) (bvshl ((_ zero_extend 56) m3) (_ bv40 64)) (bvshl ((_ zero_extend 56) m4) (_ bv34 64)) (bvshl ((_ zero_extend 56) m5) (_ bv28 64)) (bvshl ((_ zero_extend 56) m6) (_ bv22 64)) (bvshl ((_ zero_extend 56) m7) (_ bv16 64))))))
+(check-sat)

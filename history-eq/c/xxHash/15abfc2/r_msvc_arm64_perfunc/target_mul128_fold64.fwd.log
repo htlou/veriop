@@ -1,0 +1,46 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_mul128_fold64  old.ll new.ll
+
+----------------------------------------
+define i64 @target_mul128_fold64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = and i64 noundef %#0, 4294967295
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = mul nuw i64 %#4, %#3
+  %#6 = lshr i64 noundef %#0, 32
+  %#7 = mul nuw i64 %#4, %#6
+  %#8 = lshr i64 noundef %#1, 32
+  %#9 = mul nuw i64 %#8, %#3
+  %#10 = mul nuw i64 %#8, %#6
+  %#11 = lshr i64 %#5, 32
+  %#12 = and i64 %#7, 4294967295
+  %#13 = add nuw i64 %#12, %#9
+  %#14 = add nuw i64 %#13, %#11
+  %#15 = lshr i64 %#7, 32
+  %#16 = lshr i64 %#14, 32
+  %#17 = add nuw i64 %#15, %#10
+  %#18 = add nuw i64 %#17, %#16
+  %#19 = shl i64 %#14, 32
+  %#20 = and i64 %#5, 4294967295
+  %#21 = or disjoint i64 %#19, %#20
+  %#22 = xor i64 %#21, %#18
+  ret i64 %#22
+}
+=>
+define i64 @target_mul128_fold64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = mul i64 noundef %#1, noundef %#0
+  %#4 = zext i64 noundef %#0 to i128
+  %#5 = zext i64 noundef %#1 to i128
+  %#6 = mul nuw i128 %#5, %#4
+  %#7 = lshr i128 %#6, 64
+  %#8 = trunc nuw i128 %#7 to i64
+  %#9 = xor i64 %#3, %#8
+  ret i64 %#9
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

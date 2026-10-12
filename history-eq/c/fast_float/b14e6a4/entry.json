@@ -1,0 +1,34 @@
+{
+  "repo": "fast_float",
+  "commit": "b14e6a466aba8813a9e8da2defb0671fa2db3410",
+  "parent": "13d4b9418364ab8c68b9f235065c700f88b3719a",
+  "selected_from": "history-eq/results/pinned-samples.json",
+  "performance_intent": "Simplifies the uint16_t decimal fast path and digit predicate, and changes the big-endian four-byte read",
+  "commit_verdict": "UNVERIFIED",
+  "checked_scope": "Public from_chars<uint16_t,char> in base ten, five arbitrary bytes, initial output 123, x86-64 little-endian LLVM IR",
+  "checker": "Earlier Alive2 attempt on separate error, consumed-position, and value outputs; superseded by scoped_proof",
+  "compiler": "Clang 20.1.8 -std=c++23 -O2 -mllvm -inline-threshold=100000 x86-64 with libstdc++ 11 headers",
+  "old_ir_sha256": "28358549c34223d173b542993c8bb9680ce070608e030df777c8517ebf40ab9f",
+  "new_ir_sha256": "2e04231c23a5db4cf09fa821f967967ea5998a9091d55c1565cd75cc0c4b61c0",
+  "source_diff_sha256": "2dd7074c993631130f4d903f9a0bc09911349b52f735e34c6eff2c2866aec9b5",
+  "result": {
+    "error": "new-to-old correct; old-to-new failed-to-prove because Alive2 approximated a large constant initializer",
+    "consumed_position": "old-to-new and new-to-old correct on five arbitrary bytes",
+    "value": "both directions failed-to-prove because Alive2 approximated a large constant initializer; auxiliary higher-constant-limit checker still timed out old-to-new at 120000 ms (zero incorrect transformations)",
+    "native_controls": "Exact historical public APIs agree on all 100000 five-digit decimal strings, 16 named cases, and 200000 fixed-seed mixed strings of lengths 1 through 8"
+  },
+  "scoped_proof": {
+    "verdict": "EQUIV_PARTIAL",
+    "scope": "Exact historical public from_chars<uint16_t,char> on five arbitrary bytes, base ten, initial value 123, x86-64 Clang 20 -O2 LLVM IR; returned value, consumed position, and error code",
+    "old_header_git_blob": "7422e74fecd083c681e4814c354795cc5e42039c",
+    "new_header_git_blob": "85435373a1425632fc154dbfa7a13e8453cbab37",
+    "old_ir_sha256": "e1fcf4c37e55ffbc90d102d14f1f21452dd3d27368ca49de0fe72b5657b2f9e3",
+    "new_ir_sha256": "010e7553dfc62207fcfb5f0714abab8d5401ce596ba137df785fa513ece8d337",
+    "checker": "alive2/build/alive2-constants/alive-tv --func=target_public5 --always-verify --smt-to=60000",
+    "old_to_new": "1 correct, 0 incorrect, 0 failed to prove, 0 errors; no approximation",
+    "new_to_old": "1 correct, 0 incorrect, 0 failed to prove, 0 errors; no approximation",
+    "public_path_audit": "check_public_path.py confirms unchanged historical public integer dispatch; old/new public-to-internal and internal-to-public Alive2 checks also pass"
+  },
+  "official_performance_score": null,
+  "limitations": "Only the specified five-byte public uint16_t,char base-ten call on x86-64 is proved. Other input lengths, code-unit types, bases, optional parsing macros, and big-endian builds remain unproved. No official historical before/after benchmark score was measured."
+}

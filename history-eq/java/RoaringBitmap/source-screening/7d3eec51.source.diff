@@ -1,0 +1,277 @@
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+index 82b42bf9..c7ffaff1 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+@@ -1278,14 +1278,14 @@ public final class ArrayContainer extends Container implements Cloneable {
+     if (this.cardinality == 0) {
+       return "{}";
+     }
+-    StringBuilder sb = new StringBuilder();
+-    sb.append("{");
++    StringBuilder sb = new StringBuilder("{}".length() + "-123456789,".length() * cardinality);
++    sb.append('{');
+     for (int i = 0; i < this.cardinality - 1; i++) {
+       sb.append((int)(this.content[i]));
+-      sb.append(",");
++      sb.append(',');
+     }
+     sb.append((int)(this.content[this.cardinality - 1]));
+-    sb.append("}");
++    sb.append('}');
+     return sb.toString();
+   }
+ 
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index 881aaf34..9a114e1e 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -1320,16 +1320,16 @@ public final class BitmapContainer extends Container implements Cloneable {
+ 
+   @Override
+   public String toString() {
+-    StringBuilder sb = new StringBuilder();
++    StringBuilder sb = new StringBuilder("{}".length() + "-123456789,".length() * 256);
+     final CharIterator i = this.getCharIterator();
+-    sb.append("{");
++    sb.append('{');
+     while (i.hasNext()) {
+       sb.append((int)(i.next()));
+       if (i.hasNext()) {
+-        sb.append(",");
++        sb.append(',');
+       }
+     }
+-    sb.append("}");
++    sb.append('}');
+     return sb.toString();
+   }
+ 
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+index 6f624ffe..02b47790 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+@@ -3103,23 +3103,22 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
+    */
+   @Override
+   public String toString() {
+-    final StringBuilder answer = new StringBuilder();
++    final StringBuilder answer = new StringBuilder("{}".length() + "-123456789,".length() * 256);
+     final IntIterator i = this.getIntIterator();
+-    answer.append("{");
++    answer.append('{');
+     if (i.hasNext()) {
+       answer.append(i.next() & 0xFFFFFFFFL);
+     }
+     while (i.hasNext()) {
+-      answer.append(",");
++      answer.append(',');
+       // to avoid using too much memory, we limit the size
+       if(answer.length() > 0x80000) {
+-        answer.append("...");
++        answer.append('.').append('.').append('.');
+         break;
+       }
+       answer.append(i.next() & 0xFFFFFFFFL);
+-
+     }
+-    answer.append("}");
++    answer.append('}');
+     return answer.toString();
+   }
+ 
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java
+index e175f48b..5542ecfb 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java
+@@ -2369,13 +2369,13 @@ public final class RunContainer extends Container implements Cloneable {
+ 
+   @Override
+   public String toString() {
+-    StringBuilder sb = new StringBuilder();
++    StringBuilder sb = new StringBuilder("[]".length() + "-123456789,".length() * nbrruns);
+     for (int k = 0; k < this.nbrruns; ++k) {
+-      sb.append("[");
++      sb.append('[');
+       sb.append((int)(this.getValue(k)));
+-      sb.append(",");
++      sb.append(',');
+       sb.append((this.getValue(k)) + (this.getLength(k)));
+-      sb.append("]");
++      sb.append(']');
+     }
+     return sb.toString();
+   }
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
+index 6c40ea9e..d97406a4 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
+@@ -1903,22 +1903,22 @@ public class ImmutableRoaringBitmap
+    */
+   @Override
+   public String toString() {
+-    final StringBuilder answer = new StringBuilder();
++    final StringBuilder answer = new StringBuilder("{}".length() + "-123456789,".length() * 256);
+     final IntIterator i = this.getIntIterator();
+-    answer.append("{");
++    answer.append('{');
+     if (i.hasNext()) {
+       answer.append(i.next() & 0xFFFFFFFFL);
+     }
+     while (i.hasNext()) {
+-      answer.append(",");
++      answer.append(',');
+       // to avoid using too much memory, we limit the size
+       if(answer.length() > 0x80000) {
+-        answer.append("...");
++        answer.append('.').append('.').append('.');
+         break;
+       }
+       answer.append(i.next() & 0xFFFFFFFFL);
+     }
+-    answer.append("}");
++    answer.append('}');
+     return answer.toString();
+   }
+ 
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+index 4d151758..3a4698b5 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+@@ -1590,14 +1590,15 @@ public final class MappeableArrayContainer extends MappeableContainer implements
+     if (this.cardinality == 0) {
+       return "{}";
+     }
+-    final StringBuilder sb = new StringBuilder();
+-    sb.append("{");
++    final StringBuilder sb = new StringBuilder("{}".length() + "-123456789,".length()
++        * cardinality);
++    sb.append('{');
+     for (int i = 0; i < this.cardinality - 1; i++) {
+       sb.append((int)(this.content.get(i)));
+-      sb.append(",");
++      sb.append(',');
+     }
+     sb.append((int)(this.content.get(this.cardinality - 1)));
+-    sb.append("}");
++    sb.append('}');
+     return sb.toString();
+   }
+ 
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+index 9e41df3f..5feaa9ce 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+@@ -1761,16 +1761,16 @@ public final class MappeableBitmapContainer extends MappeableContainer implement
+ 
+   @Override
+   public String toString() {
+-    final StringBuilder sb = new StringBuilder();
++    final StringBuilder sb = new StringBuilder("{}".length() + "-123456789,".length() * 256);
+     final CharIterator i = this.getCharIterator();
+-    sb.append("{");
++    sb.append('{');
+     while (i.hasNext()) {
+       sb.append((int)(i.next()));
+       if (i.hasNext()) {
+-        sb.append(",");
++        sb.append(',');
+       }
+     }
+-    sb.append("}");
++    sb.append('}');
+     return sb.toString();
+   }
+ 
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+index 383e6788..3c29a268 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+@@ -2327,14 +2327,14 @@ public final class MappeableRunContainer extends MappeableContainer implements C
+ 
+   @Override
+   public String toString() {
+-    StringBuilder sb = new StringBuilder();
++    StringBuilder sb = new StringBuilder("[]".length() + "-123456789,".length() * nbrruns);
+     for (int k = 0; k < this.nbrruns; ++k) {
+-      sb.append("[");
++      sb.append('[');
+       sb.append((int)(this.getValue(k)));
+-      sb.append(",");
++      sb.append(',');
+       sb.append((this.getValue(k))
+           + (this.getLength(k)));
+-      sb.append("]");
++      sb.append(']');
+     }
+     return sb.toString();
+   }
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/insights/NaiveWriterRecommender.java b/RoaringBitmap/src/main/java/org/roaringbitmap/insights/NaiveWriterRecommender.java
+index 043328af..c9ea9bbc 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/insights/NaiveWriterRecommender.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/insights/NaiveWriterRecommender.java
+@@ -15,7 +15,7 @@ public class NaiveWriterRecommender {
+     if (s.containerCount() == 0) {
+       return "Empty statistics, cannot recommend.";
+     }
+-    StringBuilder sb = new StringBuilder();
++    StringBuilder sb = new StringBuilder(600);
+     containerCountRecommendations(s, sb);
+     double acFraction = s.containerFraction(s.getArrayContainersStats().getContainersCount());
+     if (acFraction > ArrayContainersDomination) {
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
+index 896daf02..c9d1c612 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
+@@ -491,17 +491,18 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+    */
+   @Override
+   public String toString() {
+-    final StringBuilder answer = new StringBuilder();
++    final StringBuilder answer = new StringBuilder("{}".length() + "-1234567890123456789,".length()
++        * 256);
+     final LongIterator i = this.getLongIterator();
+-    answer.append("{");
++    answer.append('{');
+     if (i.hasNext()) {
+       answer.append(i.next());
+     }
+     while (i.hasNext()) {
+-      answer.append(",");
++      answer.append(',');
+       // to avoid using too much memory, we limit the size
+       if (answer.length() > 0x80000) {
+-        answer.append("...");
++        answer.append('.').append('.').append('.');
+         break;
+       }
+       answer.append(i.next());
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64NavigableMap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64NavigableMap.java
+index 20e798d6..f8109657 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64NavigableMap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64NavigableMap.java
+@@ -996,9 +996,10 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
+    */
+   @Override
+   public String toString() {
+-    final StringBuilder answer = new StringBuilder();
++    final StringBuilder answer = new StringBuilder("{}".length() + "-1234567890123456789,".length()
++        * 256);
+     final LongIterator i = this.getLongIterator();
+-    answer.append("{");
++    answer.append('{');
+     if (i.hasNext()) {
+       if (signedLongs) {
+         answer.append(i.next());
+@@ -1007,10 +1008,10 @@ public class Roaring64NavigableMap implements Externalizable, LongBitmapDataProv
+       }
+     }
+     while (i.hasNext()) {
+-      answer.append(",");
++      answer.append(',');
+       // to avoid using too much memory, we limit the size
+       if (answer.length() > 0x80000) {
+-        answer.append("...");
++        answer.append('.').append('.').append('.');
+         break;
+       }
+       if (signedLongs) {

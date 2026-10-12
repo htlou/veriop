@@ -1,0 +1,150 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/FastAggregation.java b/roaringbitmap/src/main/java/org/roaringbitmap/FastAggregation.java
+index f0033f60..658d01ce 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/FastAggregation.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/FastAggregation.java
+@@ -424,6 +424,7 @@ public final class FastAggregation {
+     }
+ 
+     RoaringArray array = new RoaringArray(keys, new Container[numContainers], 0);
++    outer:
+     for (int i = 0; i < numContainers; ++i) {
+       Container[] slice = containers[i];
+       Arrays.fill(words, -1L);
+@@ -436,6 +437,9 @@ public final class FastAggregation {
+         if (and != tmp) {
+           tmp = and;
+         }
++        if (tmp.isEmpty()) {
++          continue outer;
++        }
+       }
+       tmp = tmp.repairAfterLazy();
+       if (!tmp.isEmpty()) {
+@@ -453,14 +457,12 @@ public final class FastAggregation {
+     }
+     int numKeys = keys.length;
+     int cardinality = 0;
++    outer:
+     for (int i = 0; i < numKeys; i++) {
+       Arrays.fill(words, -1L);
+       Container tmp = new BitmapContainer(words, -1);
+       for (RoaringBitmap bitmap : bitmaps) {
+         int index = bitmap.highLowContainer.getIndex(keys[i]);
+-        if (index < 0) {
+-          continue;
+-        }
+         Container container = bitmap.highLowContainer.getContainerAtIndex(index);
+         // We only assign to 'tmp' when 'tmp != tmp.iand(container)'
+         // as a garbage-collection optimization: we want to avoid
+@@ -469,6 +471,9 @@ public final class FastAggregation {
+         if (and != tmp) {
+           tmp = and;
+         }
++        if (tmp.isEmpty()) {
++          continue outer;
++        }
+       }
+       cardinality += tmp.repairAfterLazy().getCardinality();
+     }
+@@ -534,15 +539,13 @@ public final class FastAggregation {
+     int numContainers = keys.length;
+ 
+     RoaringArray array = new RoaringArray(keys, new Container[numContainers], 0);
++    outer:
+     for (int i = 0; i < numContainers; ++i) {
+       char MatchingKey = keys[i];
+       Arrays.fill(words, -1L);
+       Container tmp = new BitmapContainer(words, -1);
+       for (RoaringBitmap bitmap : bitmaps) {
+         int idx = bitmap.highLowContainer.getIndex(MatchingKey);
+-        if (idx < 0) {
+-          continue;
+-        }
+         Container container = bitmap.highLowContainer.getContainerAtIndex(idx);
+         // We only assign to 'tmp' when 'tmp != tmp.iand(container)'
+         // as a garbage-collection optimization: we want to avoid
+@@ -551,6 +554,9 @@ public final class FastAggregation {
+         if (and != tmp) {
+           tmp = and;
+         }
++        if (tmp.isEmpty()) {
++          continue outer;
++        }
+       }
+       tmp = tmp.repairAfterLazy();
+       if (!tmp.isEmpty()) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java
+index 98d6113e..e76c1376 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java
+@@ -570,6 +570,7 @@ public final class BufferFastAggregation {
+ 
+     MutableRoaringArray array =
+         new MutableRoaringArray(keys, new MappeableContainer[numContainers], 0);
++    outer:
+     for (int i = 0; i < numContainers; ++i) {
+       MappeableContainer[] slice = containers[i];
+       Arrays.fill(words, -1L);
+@@ -582,6 +583,9 @@ public final class BufferFastAggregation {
+         if (and != tmp) {
+           tmp = and;
+         }
++        if (tmp.isEmpty()) {
++          continue outer;
++        }
+       }
+       tmp = tmp.repairAfterLazy();
+       if (!tmp.isEmpty()) {
+@@ -600,14 +604,12 @@ public final class BufferFastAggregation {
+ 
+     LongBuffer longBuffer = LongBuffer.wrap(words);
+     int cardinality = 0;
++    outer:
+     for (char key : keys) {
+       Arrays.fill(words, -1L);
+       MappeableContainer tmp = new MappeableBitmapContainer(longBuffer, -1);
+       for (ImmutableRoaringBitmap bitmap : bitmaps) {
+         int index = bitmap.highLowContainer.getIndex(key);
+-        if (index < 0) {
+-          continue;
+-        }
+         MappeableContainer container = bitmap.highLowContainer.getContainerAtIndex(index);
+         // We only assign to 'tmp' when 'tmp != tmp.iand(container)'
+         // as a garbage-collection optimization: we want to avoid
+@@ -616,6 +618,9 @@ public final class BufferFastAggregation {
+         if (and != tmp) {
+           tmp = and;
+         }
++        if (tmp.isEmpty()) {
++          continue outer;
++        }
+       }
+       cardinality += tmp.repairAfterLazy().getCardinality();
+     }
+@@ -684,15 +689,13 @@ public final class BufferFastAggregation {
+ 
+     MutableRoaringArray array =
+         new MutableRoaringArray(keys, new MappeableContainer[numContainers], 0);
++    outer:
+     for (int i = 0; i < numContainers; ++i) {
+       char MatchingKey = keys[i];
+       Arrays.fill(words, -1L);
+       MappeableContainer tmp = new MappeableBitmapContainer(LongBuffer.wrap(words), -1);
+       for (ImmutableRoaringBitmap bitmap : bitmaps) {
+         int idx = bitmap.highLowContainer.getIndex(MatchingKey);
+-        if (idx < 0) {
+-          continue;
+-        }
+         MappeableContainer container = bitmap.highLowContainer.getContainerAtIndex(idx);
+         // We only assign to 'tmp' when 'tmp != tmp.iand(container)'
+         // as a garbage-collection optimization: we want to avoid
+@@ -701,6 +704,9 @@ public final class BufferFastAggregation {
+         if (and != tmp) {
+           tmp = and;
+         }
++        if (tmp.isEmpty()) {
++          continue outer;
++        }
+       }
+       tmp = tmp.repairAfterLazy();
+       if (!tmp.isEmpty()) {

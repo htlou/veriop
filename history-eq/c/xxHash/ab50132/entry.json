@@ -1,0 +1,40 @@
+{
+ "commit": "ab50132",
+ "date": "2023-03-14",
+ "subject": "Compiler guard XXH32 on WASM128",
+ "selected_by": "keyword",
+ "perf_evidence": "Message: 'It JITs to the same thing that slowed down SSE4 and NEON.' The guard (empty asm barrier) prevents clang from auto-vectorizing XXH32's 4-lane round loop into slow SIMD code, now also on WASM SIMD128.",
+ "change_summary": "XXH32_round: the XXH_COMPILER_GUARD(acc) (empty inline asm '+r' barrier) is now also emitted when __wasm_simd128__ is defined.",
+ "units": [
+  {
+   "name": "asm barrier placement in XXH32_round (the perf mechanism itself)",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "inline-asm",
+   "not_equiv_kind": null,
+   "artifact_dir": null,
+   "evidence": "inline asm barrier is the change; Alive2 cannot model inline asm (it is only modeled below as freeze/identity)"
+  },
+  {
+   "name": "XXH32(p,len,seed) on wasm32 -msimd128, guard modeled as freeze",
+   "level": "api",
+   "verdict": "EQUIV_BOUNDED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/ab50132/r_wasm_xxh32",
+   "evidence": "fwd+bwd correct for len 16,17,31,32,48,64,100 (72 asm->freeze rewrites on new side, 0 on old; ir differs)"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "inline-asm",
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). Target wasm32-unknown-unknown -msimd128; cflags -O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -nostdlibinc -isystem _work2020/cross_sysinc -isystem c/xxHash/c9a7470/simde_inc -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000. The SIMDe arm_neon.h stand-in is needed only because xxhash.h (since c9a7470, the parent side here) includes <arm_neon.h> on wasm simd128 when __has_include finds one, and plain clang finds its own ARM-only arm_neon.h (#error) - XXH32 does not use it; identical on both sides. Modeling: empty asm guard rewritten to freeze (xx_alive.py). Input bytes are noundef scalar args copied into a local buffer: with a raw pointer input (r_wasm_xxh32_ptr) Alive2 reports REFINES only, bwd 'Target is more poisonous than source' because freeze makes the new side defined on poison input bytes - an artifact of the freeze model, not of C semantics. Fixed lengths only (EQUIV_BOUNDED); lengths >=16 exercise XXH32_round. Commit verdict follows BRIEF lesson 7 (asm-guard-only perf change)."
+}

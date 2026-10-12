@@ -1,0 +1,33 @@
+
+----------------------------------------
+define i1 @target(i64 noundef %#0) nofree noundef willreturn zeroext memory(none) {
+#1:
+  %#2 = icmp eq i64 noundef %#0, 1
+  ret i1 %#2
+}
+=>
+define i1 @target(i64 noundef %#0) nofree noundef willreturn zeroext memory(none) {
+#1:
+  %#2 = icmp slt i64 noundef %#0, 9
+  ret i1 %#2
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 noundef %#0 = #x0000000000000000 (0)
+
+Source:
+i1 %#2 = #x0 (0)
+
+Target:
+i1 %#2 = #x1 (1)
+Source value: #x0 (0)
+Target value: #x1 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,40 @@
+{
+  "commit": "8e9bf17",
+  "date": "2021-03-06",
+  "subject": "Reimplement vectorized high-multiplies",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit reimplements 64-bit SIMD high multiplication to improve instruction selection across SSE2, AVX2 and AVX512.",
+  "change_summary": "Rewrites the unsigned-64 high-half SIMD multiply in all three x86 vector-width implementations.",
+  "units": [
+    {
+      "name": "raw high-half multiply with arbitrary and repeated multiplier lanes, SSE2/AVX2/AVX512",
+      "level": "raw",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "repeated-lane subtarget matches the documented helper contract",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/8e9bf17/sse2",
+      "evidence": "Both raw targets time out in both directions for SSE2, AVX2 and AVX512 runs."
+    },
+    {
+      "name": "public generated signed/unsigned 64-bit branchfull and branchfree vector division, all three widths",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "nonzero divisor; unsigned branchfree divisor >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/8e9bf17/avx512",
+      "evidence": "All four public API targets time out in both directions on SSE2, AVX2 and AVX512, including the completed long AVX512 run."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "UNKNOWN",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The functions compile to Alive2-supported fixed-width vector IR; solver timeouts, not an unsupported SIMD instruction, prevent a verdict."
+}

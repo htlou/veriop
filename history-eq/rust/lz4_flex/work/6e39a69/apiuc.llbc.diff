@@ -1,0 +1,1818 @@
+44a45,70
+> #[lang_item(PartialEq)]
+> #[diagnostic_item("PartialEq")]
+> pub trait core::cmp::PartialEq<Self, Rhs>
+> {
+>     fn eq<'_0_1, '_1_1>;
+>     vtable: core::cmp::PartialEq::{vtable}<Rhs>
+> }
+> 
+> pub fn core::cmp::impls::{impl core::cmp::PartialEq<u8> for u8}::eq<'_0, '_1>(_1: &'_0 u8, _2: &'_1 u8) -> bool
+> = <opaque>
+> 
+> // Full name: core::cmp::impls::{impl core::cmp::PartialEq<u8> for u8}
+> impl core::cmp::PartialEq<u8> for u8 {
+>     fn eq<'_0_1, '_1_1> = core::cmp::impls::{impl core::cmp::PartialEq<u8> for u8}::eq<'_0_1, '_1_1>
+>     vtable: lazy
+> }
+> 
+> pub fn core::cmp::impls::{impl core::cmp::PartialEq<&'_0 B> for &'_1 A}::eq<'_0, '_1, '_2, '_3, A, B>(_1: &'_2 &'_1 A, _2: &'_3 &'_0 B) -> bool
+> where
+>     TraitClause0: (A: core::cmp::PartialEq<B>),
+>     TypeOutlives0: A: '_1,
+>     TypeOutlives1: B: '_0,
+>     RegionOutlives0: '_1: '_2,
+>     RegionOutlives1: '_0: '_3,
+> = <opaque>
+> 
+258a285,302
+> #[track_caller]
+> pub unsafe fn core::slice::{[T]}::get_unchecked<'_0, T, I, Clause0_Output>(_1: &'_0 [T], _2: I) -> &'_0 Clause0_Output
+> where
+>     TraitClause0: (I: core::slice::index::SliceIndex<[T], Clause0_Output>),
+>     TypeOutlives0: T: '_0,
+>     TypeOutlives1: Clause0_Output: '_0,
+>     TypeOutlives2: I: '_0,
+> = <opaque>
+> 
+> #[track_caller]
+> pub unsafe fn core::slice::{[T]}::get_unchecked_mut<'_0, T, I, Clause0_Output>(_1: &'_0 mut [T], _2: I) -> &'_0 mut Clause0_Output
+> where
+>     TraitClause0: (I: core::slice::index::SliceIndex<[T], Clause0_Output>),
+>     TypeOutlives0: T: '_0,
+>     TypeOutlives1: Clause0_Output: '_0,
+>     TypeOutlives2: I: '_0,
+> = <opaque>
+> 
+328c372
+< pub fn alloc::vec::{impl core::ops::index::Index<I, Clause0_Output> for alloc::vec::Vec<T>}::index<'_0, T, I, A, Clause0_Output>(_1: &'_0 alloc::vec::Vec<T>, _2: I) -> &'_0 Clause0_Output
+---
+> pub fn alloc::vec::{impl core::ops::deref::Deref<[T]> for alloc::vec::Vec<T>}::deref<'_0, T, A>(_1: &'_0 alloc::vec::Vec<T>) -> &'_0 [T]
+330d373
+<     TraitClause0: (I: core::slice::index::SliceIndex<[T], Clause0_Output>),
+333,334d375
+<     TypeOutlives2: Clause0_Output: '_0,
+<     TypeOutlives3: I: '_0,
+337c378
+< pub fn alloc::vec::{impl core::ops::index::IndexMut<I, Clause0_Output> for alloc::vec::Vec<T>}::index_mut<'_0, T, I, A, Clause0_Output>(_1: &'_0 mut alloc::vec::Vec<T>, _2: I) -> &'_0 mut Clause0_Output
+---
+> pub fn alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'_0, T, A>(_1: &'_0 mut alloc::vec::Vec<T>) -> &'_0 mut [T]
+339d379
+<     TraitClause0: (I: core::slice::index::SliceIndex<[T], Clause0_Output>),
+342,343d381
+<     TypeOutlives2: Clause0_Output: '_0,
+<     TypeOutlives3: I: '_0,
+717a756,823
+> #[inline(hint)]
+> fn lz4_flex::block::compress::token_from_literal_and_match_length(lit_len: usize, duplicate_length: usize) -> u8
+> {
+>     let _0: u8; // return
+>     let lit_len: usize; // arg #1
+>     let duplicate_length: usize; // arg #2
+>     let token: u8; // local
+>     let _4: bool; // anonymous local
+>     let _5: usize; // anonymous local
+>     let _6: u8; // anonymous local
+>     let _7: usize; // anonymous local
+>     let _8: u8; // anonymous local
+>     let _9: bool; // anonymous local
+>     let _10: usize; // anonymous local
+>     let _11: usize; // anonymous local
+> 
+>     storage_live(_0)
+>     storage_live(token)
+>     storage_live(_4)
+>     storage_live(_5)
+>     _5 = copy lit_len
+>     _4 = move _5 < const 15usize
+>     if move _4 {
+>         storage_dead(_5)
+>         storage_live(_6)
+>         storage_live(_7)
+>         // Since we can fit the literals length into it, there is no need for saturation.
+>         _7 = copy lit_len
+>         _6 = cast<usize, u8>(move _7)
+>         storage_dead(_7)
+>         token = move _6 panic.<< const 4i32
+>         storage_dead(_6)
+>     } else {
+>         storage_dead(_5)
+>         // We were unable to fit the literals into it, so we saturate to 0xF. We will later
+>         // write the extensional value through LSIC encoding.
+>         token = const 240u8
+>     }
+>     storage_dead(_4)
+>     fake_read(token)
+>     storage_live(_8)
+>     storage_live(_9)
+>     storage_live(_10)
+>     _10 = copy duplicate_length
+>     _9 = move _10 < const 15usize
+>     if move _9 {
+>         storage_dead(_10)
+>         storage_live(_11)
+>         // We could fit it in.
+>         _11 = copy duplicate_length
+>         _8 = cast<usize, u8>(move _11)
+>         storage_dead(_11)
+>     } else {
+>         storage_dead(_10)
+>         // We were unable to fit it in, so we default to 0xF, which will later be extended
+>         // by LSIC encoding.
+>         _8 = const 15u8
+>     }
+>     storage_dead(_9)
+>     token = copy token | move _8
+>     storage_dead(_8)
+>     _0 = copy token
+>     storage_dead(token)
+>     storage_dead(duplicate_length)
+>     storage_dead(lit_len)
+>     return
+> }
+> 
+2442a2549,2719
+> #[inline(hint)]
+> pub fn lz4_flex::block::compress::backtrack_match<'_0, '_1, '_2>(candidate: &'_0 mut usize, cur: &'_1 mut usize, literal_start: usize, input: &'_2 [u8])
+> {
+>     let _0: (); // return
+>     let candidate: &'1 mut usize; // arg #1
+>     let cur: &'2 mut usize; // arg #2
+>     let literal_start: usize; // arg #3
+>     let input: &'4 [u8]; // arg #4
+>     let _5: bool; // anonymous local
+>     let _6: bool; // anonymous local
+>     let _7: usize; // anonymous local
+>     let _8: bool; // anonymous local
+>     let _9: usize; // anonymous local
+>     let _10: usize; // anonymous local
+>     let _11: &'8 &'9 u8; // anonymous local
+>     let _12: &'10 u8; // anonymous local
+>     let _13: &'11 [u8]; // anonymous local
+>     let _14: usize; // anonymous local
+>     let _15: usize; // anonymous local
+>     let _16: usize; // anonymous local
+>     let _17: &'12 &'13 u8; // anonymous local
+>     let _18: &'14 u8; // anonymous local
+>     let _19: &'15 [u8]; // anonymous local
+>     let _20: usize; // anonymous local
+>     let _21: usize; // anonymous local
+>     let _22: usize; // anonymous local
+>     let _23: usize; // anonymous local
+>     let _24: usize; // anonymous local
+> 
+>     storage_live(_0)
+>     storage_live(_16)
+>     storage_live(_22)
+>     storage_live(_23)
+>     storage_live(_24)
+>     _0 = ()
+>     loop {
+>         storage_live(_5)
+>         storage_live(_6)
+>         storage_live(_7)
+>         _7 = copy (*candidate)
+>         _6 = move _7 > const 0usize
+>         if move _6 {
+>             storage_dead(_7)
+>             storage_live(_8)
+>             storage_live(_9)
+>             _9 = copy (*cur)
+>             storage_live(_10)
+>             _10 = copy literal_start
+>             _8 = move _9 > move _10
+>             if move _8 {
+>                 storage_dead(_10)
+>                 storage_dead(_9)
+>                 storage_live(_11)
+>                 storage_live(_12)
+>                 storage_live(_13)
+>                 _13 = &(*input) with_metadata(copy input.metadata)
+>                 storage_live(_14)
+>                 storage_live(_15)
+>                 _15 = copy (*cur)
+>                 _16 = copy _15 panic.- const 1usize
+>                 _14 = move _16
+>                 storage_dead(_15)
+>                 _12 = core::slice::{[T]}::get_unchecked<'17, u8, usize, u8>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u8>](move _13, move _14)
+>                 ↳⚡ storage_dead(_24)
+>                     storage_dead(_23)
+>                     storage_dead(_22)
+>                     storage_dead(_16)
+>                     storage_dead(input)
+>                     storage_dead(literal_start)
+>                     storage_dead(cur)
+>                     storage_dead(candidate)
+>                     unwind_continue
+>                 _11 = &_12
+>                 storage_dead(_14)
+>                 storage_dead(_13)
+>                 storage_live(_17)
+>                 storage_live(_18)
+>                 storage_live(_19)
+>                 _19 = &(*input) with_metadata(copy input.metadata)
+>                 storage_live(_20)
+>                 storage_live(_21)
+>                 _21 = copy (*candidate)
+>                 _22 = copy _21 panic.- const 1usize
+>                 _20 = move _22
+>                 storage_dead(_21)
+>                 _18 = core::slice::{[T]}::get_unchecked<'19, u8, usize, u8>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u8>](move _19, move _20)
+>                 ↳⚡ storage_dead(_24)
+>                     storage_dead(_23)
+>                     storage_dead(_22)
+>                     storage_dead(_16)
+>                     storage_dead(input)
+>                     storage_dead(literal_start)
+>                     storage_dead(cur)
+>                     storage_dead(candidate)
+>                     unwind_continue
+>                 _17 = &_18
+>                 storage_dead(_20)
+>                 storage_dead(_19)
+>                 _5 = core::cmp::impls::{impl core::cmp::PartialEq<&'_0 B> for &'_1 A}::eq<'20, '21, '24, '25, u8, u8>[core::cmp::impls::{impl core::cmp::PartialEq<u8> for u8}](move _11, move _17)
+>                 ↳⚡ storage_dead(_24)
+>                     storage_dead(_23)
+>                     storage_dead(_22)
+>                     storage_dead(_16)
+>                     storage_dead(input)
+>                     storage_dead(literal_start)
+>                     storage_dead(cur)
+>                     storage_dead(candidate)
+>                     unwind_continue
+>                 storage_dead(_18)
+>                 storage_dead(_17)
+>                 storage_dead(_12)
+>                 storage_dead(_11)
+>                 storage_dead(_8)
+>                 storage_dead(_6)
+>                 if move _5 {
+>                 } else {
+>                     break 0
+>                 }
+>                 _23 = copy (*cur) panic.- const 1usize
+>                 (*cur) = move _23
+>                 _24 = copy (*candidate) panic.- const 1usize
+>                 (*candidate) = move _24
+>                 storage_dead(_5)
+>                 continue 0
+>             } else {
+>                 storage_dead(_10)
+>                 storage_dead(_9)
+>                 _5 = const false
+>                 storage_dead(_8)
+>                 storage_dead(_6)
+>                 if move _5 {
+>                 } else {
+>                     break 0
+>                 }
+>                 _23 = copy (*cur) panic.- const 1usize
+>                 (*cur) = move _23
+>                 _24 = copy (*candidate) panic.- const 1usize
+>                 (*candidate) = move _24
+>                 storage_dead(_5)
+>                 continue 0
+>             }
+>         } else {
+>             storage_dead(_7)
+>             _5 = const false
+>             storage_dead(_8)
+>             storage_dead(_6)
+>             if move _5 {
+>             } else {
+>                 break 0
+>             }
+>             _23 = copy (*cur) panic.- const 1usize
+>             (*cur) = move _23
+>             _24 = copy (*candidate) panic.- const 1usize
+>             (*candidate) = move _24
+>             storage_dead(_5)
+>             continue 0
+>         }
+>     }
+>     _0 = ()
+>     storage_dead(_5)
+>     storage_dead(_24)
+>     storage_dead(_23)
+>     storage_dead(_22)
+>     storage_dead(_16)
+>     storage_dead(input)
+>     storage_dead(literal_start)
+>     storage_dead(cur)
+>     storage_dead(candidate)
+>     return
+> }
+> 
+2695c2972
+<     let start: usize; // local
+---
+>     let literal_start: usize; // local
+2735,2739c3012,3016
+<     let lit_len_79: usize; // local
+<     let _80: usize; // anonymous local
+<     let _81: usize; // anonymous local
+<     let _82: usize; // anonymous local
+<     let token_83: u8; // local
+---
+>     let _79: (); // anonymous local
+>     let _80: &'28 mut usize; // anonymous local
+>     let _81: &'29 mut usize; // anonymous local
+>     let _82: &'30 mut usize; // anonymous local
+>     let _83: &'31 mut usize; // anonymous local
+2741,2742c3018,3019
+<     let offset: u16; // local
+<     let _86: usize; // anonymous local
+---
+>     let _85: &'32 [u8]; // anonymous local
+>     let lit_len_86: usize; // local
+2746c3023,3028
+<     let _90: usize; // anonymous local
+---
+>     let offset: u16; // local
+>     let _91: usize; // anonymous local
+>     let _92: usize; // anonymous local
+>     let _93: usize; // anonymous local
+>     let _94: usize; // anonymous local
+>     let _95: usize; // anonymous local
+2748,2760c3030,3037
+<     let _92: &'27 [u8]; // anonymous local
+<     let _93: &'28 [u8]; // anonymous local
+<     let _94: &'29 [u8]; // anonymous local
+<     let _95: &'30 [u8]; // anonymous local
+<     let _96: &'31 [u8]; // anonymous local
+<     let _97: core::ops::range::RangeFrom<usize>; // anonymous local
+<     let _98: usize; // anonymous local
+<     let _99: usize; // anonymous local
+<     let _100: usize; // anonymous local
+<     let _101: &'33 mut usize; // anonymous local
+<     let _102: &'34 mut usize; // anonymous local
+<     let hash_103: usize; // local
+<     let _104: &'35 [u8]; // anonymous local
+---
+>     let _97: &'33 [u8]; // anonymous local
+>     let _98: &'34 [u8]; // anonymous local
+>     let _99: &'35 [u8]; // anonymous local
+>     let _100: &'36 [u8]; // anonymous local
+>     let _101: &'37 [u8]; // anonymous local
+>     let _102: core::ops::range::RangeFrom<usize>; // anonymous local
+>     let _103: usize; // anonymous local
+>     let _104: usize; // anonymous local
+2762,2765c3039,3042
+<     let _106: usize; // anonymous local
+<     let _107: usize; // anonymous local
+<     let _108: (); // anonymous local
+<     let _109: &'36 mut T; // anonymous local
+---
+>     let _106: &'38 mut usize; // anonymous local
+>     let _107: &'39 mut usize; // anonymous local
+>     let hash_108: usize; // local
+>     let _109: &'40 [u8]; // anonymous local
+2769,2771c3046,3048
+<     let _113: usize; // anonymous local
+<     let _114: u8; // anonymous local
+<     let _115: bool; // anonymous local
+---
+>     let _113: (); // anonymous local
+>     let _114: &'41 mut T; // anonymous local
+>     let _115: usize; // anonymous local
+2774,2781c3051,3058
+<     let _118: (); // anonymous local
+<     let _119: &'37 mut alloc::vec::Vec<u8>; // anonymous local
+<     let _120: u8; // anonymous local
+<     let _121: bool; // anonymous local
+<     let _122: usize; // anonymous local
+<     let _123: (); // anonymous local
+<     let _124: &'38 mut alloc::vec::Vec<u8>; // anonymous local
+<     let _125: usize; // anonymous local
+---
+>     let _118: usize; // anonymous local
+>     let token_119: u8; // local
+>     let _120: usize; // anonymous local
+>     let _121: usize; // anonymous local
+>     let _122: (); // anonymous local
+>     let _123: &'42 mut alloc::vec::Vec<u8>; // anonymous local
+>     let _124: u8; // anonymous local
+>     let _125: bool; // anonymous local
+2783,2794c3060,3071
+<     let _127: usize; // anonymous local
+<     let _128: (); // anonymous local
+<     let _129: &'39 mut alloc::vec::Vec<u8>; // anonymous local
+<     let _130: &'40 [u8]; // anonymous local
+<     let _131: &'41 [u8]; // anonymous local
+<     let _132: &'42 [u8]; // anonymous local
+<     let _133: &'43 [u8]; // anonymous local
+<     let _134: core::ops::range::Range<usize>; // anonymous local
+<     let _135: usize; // anonymous local
+<     let _136: usize; // anonymous local
+<     let _137: usize; // anonymous local
+<     let _138: usize; // anonymous local
+---
+>     let _127: (); // anonymous local
+>     let _128: &'43 mut alloc::vec::Vec<u8>; // anonymous local
+>     let _129: usize; // anonymous local
+>     let _130: usize; // anonymous local
+>     let _131: usize; // anonymous local
+>     let _132: (); // anonymous local
+>     let _133: &'44 mut alloc::vec::Vec<u8>; // anonymous local
+>     let _134: &'45 [u8]; // anonymous local
+>     let _135: &'46 [u8]; // anonymous local
+>     let _136: &'47 [u8]; // anonymous local
+>     let _137: &'48 [u8]; // anonymous local
+>     let _138: core::ops::range::Range<usize>; // anonymous local
+2796,2803c3073,3080
+<     let _140: (); // anonymous local
+<     let _141: &'44 mut alloc::vec::Vec<u8>; // anonymous local
+<     let _142: u16; // anonymous local
+<     let _143: bool; // anonymous local
+<     let _144: usize; // anonymous local
+<     let _145: (); // anonymous local
+<     let _146: &'45 mut alloc::vec::Vec<u8>; // anonymous local
+<     let _147: usize; // anonymous local
+---
+>     let _140: usize; // anonymous local
+>     let _141: usize; // anonymous local
+>     let _142: usize; // anonymous local
+>     let _143: usize; // anonymous local
+>     let _144: (); // anonymous local
+>     let _145: &'49 mut alloc::vec::Vec<u8>; // anonymous local
+>     let _146: u16; // anonymous local
+>     let _147: bool; // anonymous local
+2805,2806c3082,3087
+<     let _149: usize; // anonymous local
+<     let _150: usize; // anonymous local
+---
+>     let _149: (); // anonymous local
+>     let _150: &'50 mut alloc::vec::Vec<u8>; // anonymous local
+>     let _151: usize; // anonymous local
+>     let _152: usize; // anonymous local
+>     let _153: usize; // anonymous local
+>     let _154: usize; // anonymous local
+2815d3095
+<     storage_live(_82)
+2817,2823c3097,3104
+<     storage_live(_90)
+<     storage_live(_100)
+<     storage_live(_107)
+<     storage_live(_113)
+<     storage_live(_127)
+<     storage_live(_139)
+<     storage_live(_149)
+---
+>     storage_live(_94)
+>     storage_live(_95)
+>     storage_live(_105)
+>     storage_live(_112)
+>     storage_live(_118)
+>     storage_live(_131)
+>     storage_live(_143)
+>     storage_live(_153)
+2827,2834c3108,3116
+<     input_size = core::slice::{[T]}::len<'47, u8>(move _5)
+<     ↳⚡ storage_dead(_149)
+<         storage_dead(_139)
+<         storage_dead(_127)
+<         storage_dead(_113)
+<         storage_dead(_107)
+<         storage_dead(_100)
+<         storage_dead(_90)
+---
+>     input_size = core::slice::{[T]}::len<'52, u8>(move _5)
+>     ↳⚡ storage_dead(_153)
+>         storage_dead(_143)
+>         storage_dead(_131)
+>         storage_dead(_118)
+>         storage_dead(_112)
+>         storage_dead(_105)
+>         storage_dead(_95)
+>         storage_dead(_94)
+2836d3117
+<         storage_dead(_82)
+2867,2874c3148,3156
+<         hash_27 = lz4_flex::block::compress::get_hash_at<'49>(move _28, const 0usize)
+<         ↳⚡ storage_dead(_149)
+<             storage_dead(_139)
+<             storage_dead(_127)
+<             storage_dead(_113)
+<             storage_dead(_107)
+<             storage_dead(_100)
+<             storage_dead(_90)
+---
+>         hash_27 = lz4_flex::block::compress::get_hash_at<'54>(move _28, const 0usize)
+>         ↳⚡ storage_dead(_153)
+>             storage_dead(_143)
+>             storage_dead(_131)
+>             storage_dead(_118)
+>             storage_dead(_112)
+>             storage_dead(_105)
+>             storage_dead(_95)
+>             storage_dead(_94)
+2876d3157
+<             storage_dead(_82)
+2894,2901c3175,3183
+<         _29 = TraitClause0::put_at<'52>(move _30, move _31, const 0usize)
+<         ↳⚡ storage_dead(_149)
+<             storage_dead(_139)
+<             storage_dead(_127)
+<             storage_dead(_113)
+<             storage_dead(_107)
+<             storage_dead(_100)
+<             storage_dead(_90)
+---
+>         _29 = TraitClause0::put_at<'57>(move _30, move _31, const 0usize)
+>         ↳⚡ storage_dead(_153)
+>             storage_dead(_143)
+>             storage_dead(_131)
+>             storage_dead(_118)
+>             storage_dead(_112)
+>             storage_dead(_105)
+>             storage_dead(_95)
+>             storage_dead(_94)
+2903d3184
+<             storage_dead(_82)
+2938,2940c3219,3221
+<         storage_live(start)
+<         start = copy cur
+<         fake_read(start)
+---
+>         storage_live(literal_start)
+>         literal_start = copy cur
+>         fake_read(literal_start)
+2956c3237
+<                 // In this loop we search for duplicates via the hashtable. 4bytes are hashed and compared.
+---
+>                 // In this loop we search for duplicates via the hashtable. 4bytes or 8bytes are hashed and compared.
+2992,2999c3273,3281
+<                     hash_57 = lz4_flex::block::compress::get_hash_at<'69>(move _58, move _59)
+<                     ↳⚡ storage_dead(_149)
+<                         storage_dead(_139)
+<                         storage_dead(_127)
+<                         storage_dead(_113)
+<                         storage_dead(_107)
+<                         storage_dead(_100)
+<                         storage_dead(_90)
+---
+>                     hash_57 = lz4_flex::block::compress::get_hash_at<'74>(move _58, move _59)
+>                     ↳⚡ storage_dead(_153)
+>                         storage_dead(_143)
+>                         storage_dead(_131)
+>                         storage_dead(_118)
+>                         storage_dead(_112)
+>                         storage_dead(_105)
+>                         storage_dead(_95)
+>                         storage_dead(_94)
+3001d3282
+<                         storage_dead(_82)
+3020,3027c3301,3309
+<                     _60 = TraitClause0::get_at<'70>(move _61, move _62)
+<                     ↳⚡ storage_dead(_149)
+<                         storage_dead(_139)
+<                         storage_dead(_127)
+<                         storage_dead(_113)
+<                         storage_dead(_107)
+<                         storage_dead(_100)
+<                         storage_dead(_90)
+---
+>                     _60 = TraitClause0::get_at<'75>(move _61, move _62)
+>                     ↳⚡ storage_dead(_153)
+>                         storage_dead(_143)
+>                         storage_dead(_131)
+>                         storage_dead(_118)
+>                         storage_dead(_112)
+>                         storage_dead(_105)
+>                         storage_dead(_95)
+>                         storage_dead(_94)
+3029d3310
+<                         storage_dead(_82)
+3051,3058c3332,3340
+<                     _63 = TraitClause0::put_at<'71>(move _64, move _65, move _66)
+<                     ↳⚡ storage_dead(_149)
+<                         storage_dead(_139)
+<                         storage_dead(_127)
+<                         storage_dead(_113)
+<                         storage_dead(_107)
+<                         storage_dead(_100)
+<                         storage_dead(_90)
+---
+>                     _63 = TraitClause0::put_at<'76>(move _64, move _65, move _66)
+>                     ↳⚡ storage_dead(_153)
+>                         storage_dead(_143)
+>                         storage_dead(_131)
+>                         storage_dead(_118)
+>                         storage_dead(_112)
+>                         storage_dead(_105)
+>                         storage_dead(_95)
+>                         storage_dead(_94)
+3060d3341
+<                         storage_dead(_82)
+3101,3108c3382,3390
+<                         _73 = lz4_flex::block::compress::get_batch<'73>(move _74, move _75)
+<                         ↳⚡ storage_dead(_149)
+<                             storage_dead(_139)
+<                             storage_dead(_127)
+<                             storage_dead(_113)
+<                             storage_dead(_107)
+<                             storage_dead(_100)
+<                             storage_dead(_90)
+---
+>                         _73 = lz4_flex::block::compress::get_batch<'78>(move _74, move _75)
+>                         ↳⚡ storage_dead(_153)
+>                             storage_dead(_143)
+>                             storage_dead(_131)
+>                             storage_dead(_118)
+>                             storage_dead(_112)
+>                             storage_dead(_105)
+>                             storage_dead(_95)
+>                             storage_dead(_94)
+3110d3391
+<                             storage_dead(_82)
+3128,3135c3409,3417
+<                         _76 = lz4_flex::block::compress::get_batch<'75>(move _77, move _78)
+<                         ↳⚡ storage_dead(_149)
+<                             storage_dead(_139)
+<                             storage_dead(_127)
+<                             storage_dead(_113)
+<                             storage_dead(_107)
+<                             storage_dead(_100)
+<                             storage_dead(_90)
+---
+>                         _76 = lz4_flex::block::compress::get_batch<'80>(move _77, move _78)
+>                         ↳⚡ storage_dead(_153)
+>                             storage_dead(_143)
+>                             storage_dead(_131)
+>                             storage_dead(_118)
+>                             storage_dead(_112)
+>                             storage_dead(_105)
+>                             storage_dead(_95)
+>                             storage_dead(_94)
+3137d3418
+<                             storage_dead(_82)
+3156c3437
+<                             storage_live(lit_len_79)
+---
+>                             storage_live(_79)
+3158,3159d3438
+<                             // The length (in bytes) of the literals section.
+<                             _80 = copy cur
+3161,3167c3440,3445
+<                             _81 = copy start
+<                             _82 = copy _80 panic.- copy _81
+<                             lit_len_79 = move _82
+<                             storage_dead(_81)
+<                             storage_dead(_80)
+<                             fake_read(lit_len_79)
+<                             storage_live(token_83)
+---
+>                             _81 = &mut candidate
+>                             _80 = &two-phase-mut (*_81)
+>                             storage_live(_82)
+>                             storage_live(_83)
+>                             _83 = &mut cur
+>                             _82 = &two-phase-mut (*_83)
+3169,3178c3447,3458
+<                             // Generate the higher half of the token.
+<                             _84 = copy lit_len_79
+<                             token_83 = lz4_flex::block::compress::token_from_literal(move _84)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             _84 = copy literal_start
+>                             storage_live(_85)
+>                             _85 = &(*input) with_metadata(copy input.metadata)
+>                             _79 = lz4_flex::block::compress::backtrack_match<'84, '85, '86>(move _80, move _82, move _84, move _85)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3180d3459
+<                                 storage_dead(_82)
+3190a3470
+>                             storage_dead(_85)
+3192,3194c3472,3477
+<                             fake_read(token_83)
+<                             storage_live(offset)
+<                             storage_live(_86)
+---
+>                             storage_dead(_82)
+>                             storage_dead(_80)
+>                             storage_dead(_83)
+>                             storage_dead(_81)
+>                             storage_dead(_79)
+>                             storage_live(lit_len_86)
+3195a3479
+>                             // The length (in bytes) of the literals section.
+3198c3482
+<                             _88 = copy candidate
+---
+>                             _88 = copy literal_start
+3200c3484
+<                             _86 = move _89
+---
+>                             lit_len_86 = move _89
+3203,3208c3487,3489
+<                             offset = cast<usize, u16>(move _86)
+<                             storage_dead(_86)
+<                             fake_read(offset)
+<                             _90 = copy cur panic.+ copy lz4_flex::block::MINMATCH
+<                             cur = move _90
+<                             storage_live(duplicate_length)
+---
+>                             fake_read(lit_len_86)
+>                             storage_live(offset)
+>                             storage_live(_91)
+3210c3491,3492
+<                             _92 = &(*input) with_metadata(copy input.metadata)
+---
+>                             // Generate the higher half of the token.
+>                             _92 = copy cur
+3212,3215c3494,3504
+<                             storage_live(_94)
+<                             storage_live(_95)
+<                             storage_live(_96)
+<                             _96 = &(*input) with_metadata(copy input.metadata)
+---
+>                             _93 = copy candidate
+>                             _94 = copy _92 panic.- copy _93
+>                             _91 = move _94
+>                             storage_dead(_93)
+>                             storage_dead(_92)
+>                             offset = cast<usize, u16>(move _91)
+>                             storage_dead(_91)
+>                             fake_read(offset)
+>                             _95 = copy cur panic.+ copy lz4_flex::block::MINMATCH
+>                             cur = move _95
+>                             storage_live(duplicate_length)
+3216a3506
+>                             _97 = &(*input) with_metadata(copy input.metadata)
+3219,3248c3509
+<                             _99 = copy candidate
+<                             _100 = copy _99 panic.+ copy lz4_flex::block::MINMATCH
+<                             _98 = move _100
+<                             storage_dead(_99)
+<                             _97 = core::ops::range::RangeFrom { start: move _98 }
+<                             storage_dead(_98)
+<                             _95 = core::slice::index::{impl core::ops::index::Index<I, Clause0_Output> for [T]}::index<'77, u8, core::ops::range::RangeFrom<usize>, [u8]>[core::slice::index::{impl core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFrom<usize>}<u8>](move _96, move _97)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+<                                 storage_dead(_89)
+<                                 storage_dead(_82)
+<                                 storage_dead(_70)
+<                                 storage_dead(_49)
+<                                 storage_dead(_45)
+<                                 storage_dead(_40)
+<                                 storage_dead(_37)
+<                                 storage_dead(_21)
+<                                 storage_dead(dict)
+<                                 storage_dead(output)
+<                                 storage_dead(input)
+<                                 unwind_continue
+<                             storage_dead(_97)
+<                             storage_dead(_96)
+<                             _94 = &(*_95) with_metadata(copy _95.metadata)
+<                             _93 = &(*_94) with_metadata(copy _94.metadata)
+---
+>                             storage_live(_100)
+3249a3511
+>                             _101 = &(*input) with_metadata(copy input.metadata)
+3251,3260c3513,3529
+<                             _102 = &mut cur
+<                             _101 = &two-phase-mut (*_102)
+<                             duplicate_length = lz4_flex::block::compress::count_same_bytes<'81, '82, '83>(move _92, move _93, move _101)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             storage_live(_103)
+>                             storage_live(_104)
+>                             _104 = copy candidate
+>                             _105 = copy _104 panic.+ copy lz4_flex::block::MINMATCH
+>                             _103 = move _105
+>                             storage_dead(_104)
+>                             _102 = core::ops::range::RangeFrom { start: move _103 }
+>                             storage_dead(_103)
+>                             _100 = core::slice::index::{impl core::ops::index::Index<I, Clause0_Output> for [T]}::index<'88, u8, core::ops::range::RangeFrom<usize>, [u8]>[core::slice::index::{impl core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFrom<usize>}<u8>](move _101, move _102)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3262d3530
+<                                 storage_dead(_82)
+3273,3276d3540
+<                             storage_dead(_101)
+<                             storage_dead(_93)
+<                             storage_dead(_92)
+<                             fake_read(duplicate_length)
+3278,3283c3542,3544
+<                             storage_dead(_95)
+<                             storage_dead(_94)
+<                             storage_live(hash_103)
+<                             storage_live(_104)
+<                             _104 = &(*input) with_metadata(copy input.metadata)
+<                             storage_live(_105)
+---
+>                             storage_dead(_101)
+>                             _99 = &(*_100) with_metadata(copy _100.metadata)
+>                             _98 = &(*_99) with_metadata(copy _99.metadata)
+3285,3296c3546,3557
+<                             _106 = copy cur
+<                             _107 = copy _106 panic.- const 2usize
+<                             _105 = move _107
+<                             storage_dead(_106)
+<                             hash_103 = lz4_flex::block::compress::get_hash_at<'85>(move _104, move _105)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             storage_live(_107)
+>                             _107 = &mut cur
+>                             _106 = &two-phase-mut (*_107)
+>                             duplicate_length = lz4_flex::block::compress::count_same_bytes<'92, '93, '94>(move _97, move _98, move _106)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3298d3558
+<                                 storage_dead(_82)
+3309,3312c3569,3576
+<                             storage_dead(_105)
+<                             storage_dead(_104)
+<                             fake_read(hash_103)
+<                             storage_live(_108)
+---
+>                             storage_dead(_106)
+>                             storage_dead(_98)
+>                             storage_dead(_97)
+>                             fake_read(duplicate_length)
+>                             storage_dead(_107)
+>                             storage_dead(_100)
+>                             storage_dead(_99)
+>                             storage_live(hash_108)
+3314c3578
+<                             _109 = &two-phase-mut (*dict)
+---
+>                             _109 = &(*input) with_metadata(copy input.metadata)
+3316d3579
+<                             _110 = copy hash_103
+3318,3330c3581,3593
+<                             storage_live(_112)
+<                             _112 = copy cur
+<                             _113 = copy _112 panic.- const 2usize
+<                             _111 = move _113
+<                             storage_dead(_112)
+<                             _108 = TraitClause0::put_at<'86>(move _109, move _110, move _111)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             _111 = copy cur
+>                             _112 = copy _111 panic.- const 2usize
+>                             _110 = move _112
+>                             storage_dead(_111)
+>                             hash_108 = lz4_flex::block::compress::get_hash_at<'96>(move _109, move _110)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3332d3594
+<                                 storage_dead(_82)
+3343d3604
+<                             storage_dead(_111)
+3346c3607,3608
+<                             storage_dead(_108)
+---
+>                             fake_read(hash_108)
+>                             storage_live(_113)
+3347a3610
+>                             _114 = &two-phase-mut (*dict)
+3348a3612
+>                             _115 = copy hash_108
+3350,3366c3614,3639
+<                             // Generate the lower half of the token, the duplicates length.
+<                             // cur += duplicate_length + MINMATCH;
+<                             _116 = copy duplicate_length
+<                             _115 = move _116 < const 15usize
+<                             if move _115 {
+<                                 storage_dead(_116)
+<                                 storage_live(_117)
+<                                 // We could fit it in.
+<                                 _117 = copy duplicate_length
+<                                 _114 = cast<usize, u8>(move _117)
+<                                 storage_dead(_117)
+<                             } else {
+<                                 storage_dead(_116)
+<                                 // We were unable to fit it in, so we default to 0xF, which will later be extended
+<                                 // by LSIC encoding.
+<                                 _114 = const 15u8
+<                             }
+---
+>                             storage_live(_117)
+>                             _117 = copy cur
+>                             _118 = copy _117 panic.- const 2usize
+>                             _116 = move _118
+>                             storage_dead(_117)
+>                             _113 = TraitClause0::put_at<'97>(move _114, move _115, move _116)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+>                                 storage_dead(_89)
+>                                 storage_dead(_70)
+>                                 storage_dead(_49)
+>                                 storage_dead(_45)
+>                                 storage_dead(_40)
+>                                 storage_dead(_37)
+>                                 storage_dead(_21)
+>                                 storage_dead(dict)
+>                                 storage_dead(output)
+>                                 storage_dead(input)
+>                                 unwind_continue
+>                             storage_dead(_116)
+3368d3640
+<                             token_83 = copy token_83 | move _114
+3370,3373c3642,3643
+<                             storage_live(_118)
+<                             storage_live(_119)
+<                             // Push the token to the output stream.
+<                             _119 = &two-phase-mut (*output)
+---
+>                             storage_dead(_113)
+>                             storage_live(token_119)
+3375,3383c3645,3656
+<                             _120 = copy token_83
+<                             _118 = lz4_flex::block::compress::push_byte<'88>(move _119, move _120)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             _120 = copy lit_len_86
+>                             storage_live(_121)
+>                             _121 = copy duplicate_length
+>                             token_119 = lz4_flex::block::compress::token_from_literal_and_match_length(move _120, move _121)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3385d3657
+<                                 storage_dead(_82)
+3395a3668
+>                             storage_dead(_121)
+3397,3399c3670
+<                             storage_dead(_119)
+<                             storage_dead(_118)
+<                             storage_live(_121)
+---
+>                             fake_read(token_119)
+3400a3672,3701
+>                             storage_live(_123)
+>                             // Push the token to the output stream.
+>                             _123 = &two-phase-mut (*output)
+>                             storage_live(_124)
+>                             _124 = copy token_119
+>                             _122 = lz4_flex::block::compress::push_byte<'99>(move _123, move _124)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+>                                 storage_dead(_89)
+>                                 storage_dead(_70)
+>                                 storage_dead(_49)
+>                                 storage_dead(_45)
+>                                 storage_dead(_40)
+>                                 storage_dead(_37)
+>                                 storage_dead(_21)
+>                                 storage_dead(dict)
+>                                 storage_dead(output)
+>                                 storage_dead(input)
+>                                 unwind_continue
+>                             storage_dead(_124)
+>                             storage_dead(_123)
+>                             storage_dead(_122)
+>                             storage_live(_125)
+>                             storage_live(_126)
+3404,3415c3705,3707
+<                             _122 = copy lit_len_79
+<                             _121 = move _122 >= const 15usize
+<                             if move _121 {
+<                                 storage_dead(_122)
+<                                 storage_live(_123)
+<                                 storage_live(_124)
+<                                 _124 = &two-phase-mut (*output)
+<                                 storage_live(_125)
+<                                 storage_live(_126)
+<                                 _126 = copy lit_len_79
+<                                 _127 = copy _126 panic.- const 15usize
+<                                 _125 = move _127
+---
+>                             _126 = copy lit_len_86
+>                             _125 = move _126 >= const 15usize
+>                             if move _125 {
+3417,3424c3709,3726
+<                                 _123 = lz4_flex::block::compress::write_integer<'90>(move _124, move _125)
+<                                 ↳⚡ storage_dead(_149)
+<                                     storage_dead(_139)
+<                                     storage_dead(_127)
+<                                     storage_dead(_113)
+<                                     storage_dead(_107)
+<                                     storage_dead(_100)
+<                                     storage_dead(_90)
+---
+>                                 storage_live(_127)
+>                                 storage_live(_128)
+>                                 _128 = &two-phase-mut (*output)
+>                                 storage_live(_129)
+>                                 storage_live(_130)
+>                                 _130 = copy lit_len_86
+>                                 _131 = copy _130 panic.- const 15usize
+>                                 _129 = move _131
+>                                 storage_dead(_130)
+>                                 _127 = lz4_flex::block::compress::write_integer<'101>(move _128, move _129)
+>                                 ↳⚡ storage_dead(_153)
+>                                     storage_dead(_143)
+>                                     storage_dead(_131)
+>                                     storage_dead(_118)
+>                                     storage_dead(_112)
+>                                     storage_dead(_105)
+>                                     storage_dead(_95)
+>                                     storage_dead(_94)
+3426d3727
+<                                     storage_dead(_82)
+3437,3439c3738,3740
+<                                 storage_dead(_125)
+<                                 storage_dead(_124)
+<                                 storage_dead(_123)
+---
+>                                 storage_dead(_129)
+>                                 storage_dead(_128)
+>                                 storage_dead(_127)
+3441c3742
+<                                 storage_dead(_122)
+---
+>                                 storage_dead(_126)
+3443,3450c3744
+<                             storage_dead(_121)
+<                             storage_live(_128)
+<                             storage_live(_129)
+<                             // Now, write the actual literals.
+<                             // TODO check wildcopy 8byte
+<                             _129 = &two-phase-mut (*output)
+<                             storage_live(_130)
+<                             storage_live(_131)
+---
+>                             storage_dead(_125)
+3453c3747,3749
+<                             _133 = &(*input) with_metadata(copy input.metadata)
+---
+>                             // Now, write the actual literals.
+>                             // TODO check wildcopy 8byte
+>                             _133 = &two-phase-mut (*output)
+3456d3751
+<                             _135 = copy start
+3459c3754
+<                             _137 = copy start
+---
+>                             _137 = &(*input) with_metadata(copy input.metadata)
+3461,3476c3756,3778
+<                             _138 = copy lit_len_79
+<                             _139 = copy _137 panic.+ copy _138
+<                             _136 = move _139
+<                             storage_dead(_138)
+<                             storage_dead(_137)
+<                             _134 = core::ops::range::Range { start: move _135, end: move _136 }
+<                             storage_dead(_136)
+<                             storage_dead(_135)
+<                             _132 = core::slice::index::{impl core::ops::index::Index<I, Clause0_Output> for [T]}::index<'92, u8, core::ops::range::Range<usize>, [u8]>[core::slice::index::{impl core::slice::index::SliceIndex<[T], [T]> for core::ops::range::Range<usize>}<u8>](move _133, move _134)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             storage_live(_139)
+>                             _139 = copy literal_start
+>                             storage_live(_140)
+>                             storage_live(_141)
+>                             _141 = copy literal_start
+>                             storage_live(_142)
+>                             _142 = copy lit_len_86
+>                             _143 = copy _141 panic.+ copy _142
+>                             _140 = move _143
+>                             storage_dead(_142)
+>                             storage_dead(_141)
+>                             _138 = core::ops::range::Range { start: move _139, end: move _140 }
+>                             storage_dead(_140)
+>                             storage_dead(_139)
+>                             _136 = core::slice::index::{impl core::ops::index::Index<I, Clause0_Output> for [T]}::index<'103, u8, core::ops::range::Range<usize>, [u8]>[core::slice::index::{impl core::slice::index::SliceIndex<[T], [T]> for core::ops::range::Range<usize>}<u8>](move _137, move _138)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3478d3779
+<                                 storage_dead(_82)
+3489,3500c3790,3802
+<                             storage_dead(_134)
+<                             storage_dead(_133)
+<                             _131 = &(*_132) with_metadata(copy _132.metadata)
+<                             _130 = &(*_131) with_metadata(copy _131.metadata)
+<                             _128 = lz4_flex::block::compress::copy_literals<'95, '96>(move _129, move _130)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             storage_dead(_138)
+>                             storage_dead(_137)
+>                             _135 = &(*_136) with_metadata(copy _136.metadata)
+>                             _134 = &(*_135) with_metadata(copy _135.metadata)
+>                             _132 = lz4_flex::block::compress::copy_literals<'106, '107>(move _133, move _134)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3502d3803
+<                                 storage_dead(_82)
+3513,3514c3814,3817
+<                             storage_dead(_130)
+<                             storage_dead(_129)
+---
+>                             storage_dead(_134)
+>                             storage_dead(_133)
+>                             storage_dead(_136)
+>                             storage_dead(_135)
+3516,3519c3819,3820
+<                             storage_dead(_131)
+<                             storage_dead(_128)
+<                             storage_live(_140)
+<                             storage_live(_141)
+---
+>                             storage_live(_144)
+>                             storage_live(_145)
+3521,3531c3822,3833
+<                             _141 = &two-phase-mut (*output)
+<                             storage_live(_142)
+<                             _142 = copy offset
+<                             _140 = lz4_flex::block::compress::push_u16<'98>(move _141, move _142)
+<                             ↳⚡ storage_dead(_149)
+<                                 storage_dead(_139)
+<                                 storage_dead(_127)
+<                                 storage_dead(_113)
+<                                 storage_dead(_107)
+<                                 storage_dead(_100)
+<                                 storage_dead(_90)
+---
+>                             _145 = &two-phase-mut (*output)
+>                             storage_live(_146)
+>                             _146 = copy offset
+>                             _144 = lz4_flex::block::compress::push_u16<'109>(move _145, move _146)
+>                             ↳⚡ storage_dead(_153)
+>                                 storage_dead(_143)
+>                                 storage_dead(_131)
+>                                 storage_dead(_118)
+>                                 storage_dead(_112)
+>                                 storage_dead(_105)
+>                                 storage_dead(_95)
+>                                 storage_dead(_94)
+3533d3834
+<                                 storage_dead(_82)
+3544,3548c3845,3849
+<                             storage_dead(_142)
+<                             storage_dead(_141)
+<                             storage_dead(_140)
+<                             storage_live(_143)
+<                             storage_live(_144)
+---
+>                             storage_dead(_146)
+>                             storage_dead(_145)
+>                             storage_dead(_144)
+>                             storage_live(_147)
+>                             storage_live(_148)
+3551,3562c3852,3854
+<                             _144 = copy duplicate_length
+<                             _143 = move _144 >= const 15usize
+<                             if move _143 {
+<                                 storage_dead(_144)
+<                                 storage_live(_145)
+<                                 storage_live(_146)
+<                                 _146 = &two-phase-mut (*output)
+<                                 storage_live(_147)
+<                                 storage_live(_148)
+<                                 _148 = copy duplicate_length
+<                                 _149 = copy _148 panic.- const 15usize
+<                                 _147 = move _149
+---
+>                             _148 = copy duplicate_length
+>                             _147 = move _148 >= const 15usize
+>                             if move _147 {
+3564,3571c3856,3873
+<                                 _145 = lz4_flex::block::compress::write_integer<'100>(move _146, move _147)
+<                                 ↳⚡ storage_dead(_149)
+<                                     storage_dead(_139)
+<                                     storage_dead(_127)
+<                                     storage_dead(_113)
+<                                     storage_dead(_107)
+<                                     storage_dead(_100)
+<                                     storage_dead(_90)
+---
+>                                 storage_live(_149)
+>                                 storage_live(_150)
+>                                 _150 = &two-phase-mut (*output)
+>                                 storage_live(_151)
+>                                 storage_live(_152)
+>                                 _152 = copy duplicate_length
+>                                 _153 = copy _152 panic.- const 15usize
+>                                 _151 = move _153
+>                                 storage_dead(_152)
+>                                 _149 = lz4_flex::block::compress::write_integer<'111>(move _150, move _151)
+>                                 ↳⚡ storage_dead(_153)
+>                                     storage_dead(_143)
+>                                     storage_dead(_131)
+>                                     storage_dead(_118)
+>                                     storage_dead(_112)
+>                                     storage_dead(_105)
+>                                     storage_dead(_95)
+>                                     storage_dead(_94)
+3573d3874
+<                                     storage_dead(_82)
+3584,3586c3885,3887
+<                                 storage_dead(_147)
+<                                 storage_dead(_146)
+<                                 storage_dead(_145)
+---
+>                                 storage_dead(_151)
+>                                 storage_dead(_150)
+>                                 storage_dead(_149)
+3588c3889
+<                                 storage_dead(_144)
+---
+>                                 storage_dead(_148)
+3590,3594c3891,3895
+<                             storage_dead(_143)
+<                             storage_live(_150)
+<                             _150 = copy cur
+<                             start = move _150
+<                             storage_dead(_150)
+---
+>                             storage_dead(_147)
+>                             storage_live(_154)
+>                             _154 = copy cur
+>                             literal_start = move _154
+>                             storage_dead(_154)
+3596c3897,3898
+<                             storage_dead(hash_103)
+---
+>                             storage_dead(token_119)
+>                             storage_dead(hash_108)
+3599,3600c3901
+<                             storage_dead(token_83)
+<                             storage_dead(lit_len_79)
+---
+>                             storage_dead(lit_len_86)
+3632,3640c3933,3942
+<         _56 = copy start
+<         _0 = lz4_flex::block::compress::handle_last_literals<'66, '67>(move _53, move _54, move _55, move _56)
+<         ↳⚡ storage_dead(_149)
+<             storage_dead(_139)
+<             storage_dead(_127)
+<             storage_dead(_113)
+<             storage_dead(_107)
+<             storage_dead(_100)
+<             storage_dead(_90)
+---
+>         _56 = copy literal_start
+>         _0 = lz4_flex::block::compress::handle_last_literals<'71, '72>(move _53, move _54, move _55, move _56)
+>         ↳⚡ storage_dead(_153)
+>             storage_dead(_143)
+>             storage_dead(_131)
+>             storage_dead(_118)
+>             storage_dead(_112)
+>             storage_dead(_105)
+>             storage_dead(_95)
+>             storage_dead(_94)
+3642d3943
+<             storage_dead(_82)
+3662c3963
+<         storage_dead(start)
+---
+>         storage_dead(literal_start)
+3667,3673c3968,3975
+<         storage_dead(_149)
+<         storage_dead(_139)
+<         storage_dead(_127)
+<         storage_dead(_113)
+<         storage_dead(_107)
+<         storage_dead(_100)
+<         storage_dead(_90)
+---
+>         storage_dead(_153)
+>         storage_dead(_143)
+>         storage_dead(_131)
+>         storage_dead(_118)
+>         storage_dead(_112)
+>         storage_dead(_105)
+>         storage_dead(_95)
+>         storage_dead(_94)
+3675d3976
+<         storage_dead(_82)
+3696,3702c3997,4004
+<     ↳⚡ storage_dead(_149)
+<         storage_dead(_139)
+<         storage_dead(_127)
+<         storage_dead(_113)
+<         storage_dead(_107)
+<         storage_dead(_100)
+<         storage_dead(_90)
+---
+>     ↳⚡ storage_dead(_153)
+>         storage_dead(_143)
+>         storage_dead(_131)
+>         storage_dead(_118)
+>         storage_dead(_112)
+>         storage_dead(_105)
+>         storage_dead(_95)
+>         storage_dead(_94)
+3704d4005
+<         storage_dead(_82)
+3722,3729c4023,4031
+<     _12 = lz4_flex::block::compress::push_byte<'51>(move _13, move _14)
+<     ↳⚡ storage_dead(_149)
+<         storage_dead(_139)
+<         storage_dead(_127)
+<         storage_dead(_113)
+<         storage_dead(_107)
+<         storage_dead(_100)
+<         storage_dead(_90)
+---
+>     _12 = lz4_flex::block::compress::push_byte<'56>(move _13, move _14)
+>     ↳⚡ storage_dead(_153)
+>         storage_dead(_143)
+>         storage_dead(_131)
+>         storage_dead(_118)
+>         storage_dead(_112)
+>         storage_dead(_105)
+>         storage_dead(_95)
+>         storage_dead(_94)
+3731d4032
+<         storage_dead(_82)
+3760,3767c4061,4069
+<         _17 = lz4_flex::block::compress::write_integer<'56>(move _18, move _19)
+<         ↳⚡ storage_dead(_149)
+<             storage_dead(_139)
+<             storage_dead(_127)
+<             storage_dead(_113)
+<             storage_dead(_107)
+<             storage_dead(_100)
+<             storage_dead(_90)
+---
+>         _17 = lz4_flex::block::compress::write_integer<'61>(move _18, move _19)
+>         ↳⚡ storage_dead(_153)
+>             storage_dead(_143)
+>             storage_dead(_131)
+>             storage_dead(_118)
+>             storage_dead(_112)
+>             storage_dead(_105)
+>             storage_dead(_95)
+>             storage_dead(_94)
+3769d4070
+<             storage_dead(_82)
+3794,3801c4095,4103
+<     _22 = lz4_flex::block::compress::copy_literals<'60, '61>(move _23, move _24)
+<     ↳⚡ storage_dead(_149)
+<         storage_dead(_139)
+<         storage_dead(_127)
+<         storage_dead(_113)
+<         storage_dead(_107)
+<         storage_dead(_100)
+<         storage_dead(_90)
+---
+>     _22 = lz4_flex::block::compress::copy_literals<'65, '66>(move _23, move _24)
+>     ↳⚡ storage_dead(_153)
+>         storage_dead(_143)
+>         storage_dead(_131)
+>         storage_dead(_118)
+>         storage_dead(_112)
+>         storage_dead(_105)
+>         storage_dead(_95)
+>         storage_dead(_94)
+3803d4104
+<         storage_dead(_82)
+3820,3827c4121,4129
+<     _0 = alloc::vec::{alloc::vec::Vec<T>}::len<'63, u8, alloc::alloc::Global>(move _26)
+<     ↳⚡ storage_dead(_149)
+<         storage_dead(_139)
+<         storage_dead(_127)
+<         storage_dead(_113)
+<         storage_dead(_107)
+<         storage_dead(_100)
+<         storage_dead(_90)
+---
+>     _0 = alloc::vec::{alloc::vec::Vec<T>}::len<'68, u8, alloc::alloc::Global>(move _26)
+>     ↳⚡ storage_dead(_153)
+>         storage_dead(_143)
+>         storage_dead(_131)
+>         storage_dead(_118)
+>         storage_dead(_112)
+>         storage_dead(_105)
+>         storage_dead(_95)
+>         storage_dead(_94)
+3829d4130
+<         storage_dead(_82)
+3845,3851c4146,4153
+<     storage_dead(_149)
+<     storage_dead(_139)
+<     storage_dead(_127)
+<     storage_dead(_113)
+<     storage_dead(_107)
+<     storage_dead(_100)
+<     storage_dead(_90)
+---
+>     storage_dead(_153)
+>     storage_dead(_143)
+>     storage_dead(_131)
+>     storage_dead(_118)
+>     storage_dead(_112)
+>     storage_dead(_105)
+>     storage_dead(_95)
+>     storage_dead(_94)
+3853d4154
+<     storage_dead(_82)
+4666,4668c4967,4969
+<     let _6: &'5 mut alloc::vec::Vec<u16>; // anonymous local
+<     let _7: usize; // anonymous local
+<     let _8: usize; // anonymous local
+---
+>     let _6: &'5 mut [u16]; // anonymous local
+>     let _7: &'6 mut [u16]; // anonymous local
+>     let _8: &'8 mut alloc::vec::Vec<u16>; // anonymous local
+4669a4971,4972
+>     let _10: usize; // anonymous local
+>     let _11: usize; // anonymous local
+4677d4979
+<     _6 = &mut (*self).dict
+4680,4684c4982,4988
+<     _8 = copy hash
+<     storage_live(_9)
+<     _9 = copy (*self).dict_bitshift
+<     _7 = move _8 panic.>> move _9
+<     storage_dead(_9)
+---
+>     _8 = &mut (*self).dict
+>     _7 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'10, u16, alloc::alloc::Global>(move _8)
+>     ↳⚡ storage_dead(val)
+>         storage_dead(hash)
+>         storage_dead(self)
+>         unwind_continue
+>     _6 = &two-phase-mut (*_7) with_metadata(copy _7.metadata)
+4686c4990,4998
+<     _5 = alloc::vec::{impl core::ops::index::IndexMut<I, Clause0_Output> for alloc::vec::Vec<T>}::index_mut<'7, u16, usize, alloc::alloc::Global, u16>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u16>](move _6, move _7)
+---
+>     storage_live(_9)
+>     storage_live(_10)
+>     _10 = copy hash
+>     storage_live(_11)
+>     _11 = copy (*self).dict_bitshift
+>     _9 = move _10 panic.>> move _11
+>     storage_dead(_11)
+>     storage_dead(_10)
+>     _5 = core::slice::{[T]}::get_unchecked_mut<'12, u16, usize, u16>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u16>](move _6, move _9)
+4691c5003
+<     storage_dead(_7)
+---
+>     storage_dead(_9)
+4694a5007
+>     storage_dead(_7)
+4711,4713c5024,5026
+<     let _5: &'5 alloc::vec::Vec<u16>; // anonymous local
+<     let _6: usize; // anonymous local
+<     let _7: usize; // anonymous local
+---
+>     let _5: &'5 [u16]; // anonymous local
+>     let _6: &'6 [u16]; // anonymous local
+>     let _7: &'8 alloc::vec::Vec<u16>; // anonymous local
+4714a5028,5029
+>     let _9: usize; // anonymous local
+>     let _10: usize; // anonymous local
+4720d5034
+<     _5 = &(*self).dict
+4723,4727c5037,5042
+<     _7 = copy hash
+<     storage_live(_8)
+<     _8 = copy (*self).dict_bitshift
+<     _6 = move _7 panic.>> move _8
+<     storage_dead(_8)
+---
+>     _7 = &(*self).dict
+>     _6 = alloc::vec::{impl core::ops::deref::Deref<[T]> for alloc::vec::Vec<T>}::deref<'10, u16, alloc::alloc::Global>(move _7)
+>     ↳⚡ storage_dead(hash)
+>         storage_dead(self)
+>         unwind_continue
+>     _5 = &(*_6) with_metadata(copy _6.metadata)
+4729c5044,5052
+<     _4 = alloc::vec::{impl core::ops::index::Index<I, Clause0_Output> for alloc::vec::Vec<T>}::index<'7, u16, usize, alloc::alloc::Global, u16>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u16>](move _5, move _6)
+---
+>     storage_live(_8)
+>     storage_live(_9)
+>     _9 = copy hash
+>     storage_live(_10)
+>     _10 = copy (*self).dict_bitshift
+>     _8 = move _9 panic.>> move _10
+>     storage_dead(_10)
+>     storage_dead(_9)
+>     _4 = core::slice::{[T]}::get_unchecked<'12, u16, usize, u16>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u16>](move _5, move _8)
+4733,4734c5056
+<     _3 = copy (*_4)
+<     storage_dead(_6)
+---
+>     storage_dead(_8)
+4735a5058
+>     _3 = copy (*_4)
+4737a5061
+>     storage_dead(_6)
+4874,4876c5198,5200
+<     let _6: &'5 mut alloc::vec::Vec<u32>; // anonymous local
+<     let _7: usize; // anonymous local
+<     let _8: usize; // anonymous local
+---
+>     let _6: &'5 mut [u32]; // anonymous local
+>     let _7: &'6 mut [u32]; // anonymous local
+>     let _8: &'8 mut alloc::vec::Vec<u32>; // anonymous local
+4877a5202,5203
+>     let _10: usize; // anonymous local
+>     let _11: usize; // anonymous local
+4885d5210
+<     _6 = &mut (*self).dict
+4888,4892c5213,5219
+<     _8 = copy hash
+<     storage_live(_9)
+<     _9 = copy (*self).dict_bitshift
+<     _7 = move _8 panic.>> move _9
+<     storage_dead(_9)
+---
+>     _8 = &mut (*self).dict
+>     _7 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'10, u32, alloc::alloc::Global>(move _8)
+>     ↳⚡ storage_dead(val)
+>         storage_dead(hash)
+>         storage_dead(self)
+>         unwind_continue
+>     _6 = &two-phase-mut (*_7) with_metadata(copy _7.metadata)
+4894c5221,5229
+<     _5 = alloc::vec::{impl core::ops::index::IndexMut<I, Clause0_Output> for alloc::vec::Vec<T>}::index_mut<'7, u32, usize, alloc::alloc::Global, u32>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u32>](move _6, move _7)
+---
+>     storage_live(_9)
+>     storage_live(_10)
+>     _10 = copy hash
+>     storage_live(_11)
+>     _11 = copy (*self).dict_bitshift
+>     _9 = move _10 panic.>> move _11
+>     storage_dead(_11)
+>     storage_dead(_10)
+>     _5 = core::slice::{[T]}::get_unchecked_mut<'12, u32, usize, u32>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u32>](move _6, move _9)
+4899c5234
+<     storage_dead(_7)
+---
+>     storage_dead(_9)
+4902a5238
+>     storage_dead(_7)
+4919,4921c5255,5257
+<     let _5: &'5 alloc::vec::Vec<u32>; // anonymous local
+<     let _6: usize; // anonymous local
+<     let _7: usize; // anonymous local
+---
+>     let _5: &'5 [u32]; // anonymous local
+>     let _6: &'6 [u32]; // anonymous local
+>     let _7: &'8 alloc::vec::Vec<u32>; // anonymous local
+4922a5259,5260
+>     let _9: usize; // anonymous local
+>     let _10: usize; // anonymous local
+4928d5265
+<     _5 = &(*self).dict
+4931,4935c5268,5273
+<     _7 = copy hash
+<     storage_live(_8)
+<     _8 = copy (*self).dict_bitshift
+<     _6 = move _7 panic.>> move _8
+<     storage_dead(_8)
+---
+>     _7 = &(*self).dict
+>     _6 = alloc::vec::{impl core::ops::deref::Deref<[T]> for alloc::vec::Vec<T>}::deref<'10, u32, alloc::alloc::Global>(move _7)
+>     ↳⚡ storage_dead(hash)
+>         storage_dead(self)
+>         unwind_continue
+>     _5 = &(*_6) with_metadata(copy _6.metadata)
+4937c5275,5283
+<     _4 = alloc::vec::{impl core::ops::index::Index<I, Clause0_Output> for alloc::vec::Vec<T>}::index<'7, u32, usize, alloc::alloc::Global, u32>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u32>](move _5, move _6)
+---
+>     storage_live(_8)
+>     storage_live(_9)
+>     _9 = copy hash
+>     storage_live(_10)
+>     _10 = copy (*self).dict_bitshift
+>     _8 = move _9 panic.>> move _10
+>     storage_dead(_10)
+>     storage_dead(_9)
+>     _4 = core::slice::{[T]}::get_unchecked<'12, u32, usize, u32>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<u32>](move _5, move _8)
+4941,4942c5287
+<     _3 = copy (*_4)
+<     storage_dead(_6)
+---
+>     storage_dead(_8)
+4943a5289
+>     _3 = copy (*_4)
+4945a5292
+>     storage_dead(_6)
+5082,5084c5429,5431
+<     let _6: &'5 mut alloc::vec::Vec<usize>; // anonymous local
+<     let _7: usize; // anonymous local
+<     let _8: usize; // anonymous local
+---
+>     let _6: &'5 mut [usize]; // anonymous local
+>     let _7: &'6 mut [usize]; // anonymous local
+>     let _8: &'8 mut alloc::vec::Vec<usize>; // anonymous local
+5085a5433,5434
+>     let _10: usize; // anonymous local
+>     let _11: usize; // anonymous local
+5093d5441
+<     _6 = &mut (*self).dict
+5096,5100c5444,5450
+<     _8 = copy hash
+<     storage_live(_9)
+<     _9 = copy (*self).dict_bitshift
+<     _7 = move _8 panic.>> move _9
+<     storage_dead(_9)
+---
+>     _8 = &mut (*self).dict
+>     _7 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'10, usize, alloc::alloc::Global>(move _8)
+>     ↳⚡ storage_dead(val)
+>         storage_dead(hash)
+>         storage_dead(self)
+>         unwind_continue
+>     _6 = &two-phase-mut (*_7) with_metadata(copy _7.metadata)
+5102c5452,5460
+<     _5 = alloc::vec::{impl core::ops::index::IndexMut<I, Clause0_Output> for alloc::vec::Vec<T>}::index_mut<'7, usize, usize, alloc::alloc::Global, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _6, move _7)
+---
+>     storage_live(_9)
+>     storage_live(_10)
+>     _10 = copy hash
+>     storage_live(_11)
+>     _11 = copy (*self).dict_bitshift
+>     _9 = move _10 panic.>> move _11
+>     storage_dead(_11)
+>     storage_dead(_10)
+>     _5 = core::slice::{[T]}::get_unchecked_mut<'12, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _6, move _9)
+5107c5465
+<     storage_dead(_7)
+---
+>     storage_dead(_9)
+5110a5469
+>     storage_dead(_7)
+5126,5128c5485,5487
+<     let _4: &'5 alloc::vec::Vec<usize>; // anonymous local
+<     let _5: usize; // anonymous local
+<     let _6: usize; // anonymous local
+---
+>     let _4: &'5 [usize]; // anonymous local
+>     let _5: &'6 [usize]; // anonymous local
+>     let _6: &'8 alloc::vec::Vec<usize>; // anonymous local
+5129a5489,5490
+>     let _8: usize; // anonymous local
+>     let _9: usize; // anonymous local
+5134d5494
+<     _4 = &(*self).dict
+5137,5141c5497,5502
+<     _6 = copy hash
+<     storage_live(_7)
+<     _7 = copy (*self).dict_bitshift
+<     _5 = move _6 panic.>> move _7
+<     storage_dead(_7)
+---
+>     _6 = &(*self).dict
+>     _5 = alloc::vec::{impl core::ops::deref::Deref<[T]> for alloc::vec::Vec<T>}::deref<'10, usize, alloc::alloc::Global>(move _6)
+>     ↳⚡ storage_dead(hash)
+>         storage_dead(self)
+>         unwind_continue
+>     _4 = &(*_5) with_metadata(copy _5.metadata)
+5143c5504,5512
+<     _3 = alloc::vec::{impl core::ops::index::Index<I, Clause0_Output> for alloc::vec::Vec<T>}::index<'7, usize, usize, alloc::alloc::Global, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _4, move _5)
+---
+>     storage_live(_7)
+>     storage_live(_8)
+>     _8 = copy hash
+>     storage_live(_9)
+>     _9 = copy (*self).dict_bitshift
+>     _7 = move _8 panic.>> move _9
+>     storage_dead(_9)
+>     storage_dead(_8)
+>     _3 = core::slice::{[T]}::get_unchecked<'12, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _4, move _7)
+5146a5516,5517
+>     storage_dead(_7)
+>     storage_dead(_4)
+5149d5519
+<     storage_dead(_4)
+5493,5495c5863,5865
+< Source: 'src/block/compress.rs', lines 266:0-387:1
+< Source: 'src/block/compress.rs', lines 266:0-387:1
+< Source: 'src/block/compress.rs', lines 429:13-429:37
+---
+> Source: 'src/block/compress.rs', lines 310:0-423:1
+> Source: 'src/block/compress.rs', lines 310:0-423:1
+> Source: 'src/block/compress.rs', lines 465:13-465:37
+5497,5498c5867,5868
+< Definition span: 'src/block/compress.rs', lines 428:0-430:1
+< Source: 'src/block/compress.rs', lines 429:13-429:37
+---
+> Definition span: 'src/block/compress.rs', lines 464:0-466:1
+> Source: 'src/block/compress.rs', lines 465:13-465:37
+5501c5871
+< Source: 'src/block/compress.rs', lines 483:46-483:54
+---
+> Source: 'src/block/compress.rs', lines 519:46-519:54
+5503,5504c5873,5874
+< Definition span: 'src/block/compress.rs', lines 480:0-486:1
+< Source: 'src/block/compress.rs', lines 483:46-483:54
+---
+> Definition span: 'src/block/compress.rs', lines 516:0-522:1
+> Source: 'src/block/compress.rs', lines 519:46-519:54
+5507c5877
+< Source: 'src/block/compress.rs', lines 495:12-495:20
+---
+> Source: 'src/block/compress.rs', lines 531:12-531:20
+5509,5510c5879,5880
+< Definition span: 'src/block/compress.rs', lines 490:0-500:1
+< Source: 'src/block/compress.rs', lines 495:12-495:20
+---
+> Definition span: 'src/block/compress.rs', lines 526:0-536:1
+> Source: 'src/block/compress.rs', lines 531:12-531:20
+5513c5883
+< Source: 'src/block/compress.rs', lines 506:46-506:54
+---
+> Source: 'src/block/compress.rs', lines 542:46-542:54
+5515,5516c5885,5886
+< Definition span: 'src/block/compress.rs', lines 503:0-509:1
+< Source: 'src/block/compress.rs', lines 506:46-506:54
+---
+> Definition span: 'src/block/compress.rs', lines 539:0-545:1
+> Source: 'src/block/compress.rs', lines 542:46-542:54

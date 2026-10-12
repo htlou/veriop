@@ -1,0 +1,133 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/681ea2a/api_armv5_len3/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/681ea2a/api_armv5_len3/old.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#7 = ptrtoint ptr noundef %#0 to i32
+  %#8 = and i32 %#7, 3
+  %#9 = icmp eq i32 %#8, 0
+  br i1 %#9, label %#4, label %#3
+
+#3:
+  %#10 = gep ptr noundef %#0, 1 x i32 3
+  %#11 = add i32 noundef %#1, 374761396
+  %#12 = icmp ult ptr noundef %#0, %#10
+  br i1 %#12, label %#5, label %#6
+
+#4:
+  %#13 = add i32 noundef %#1, 374761396
+  br label %#5
+
+#5:
+  %#14 = phi i32 [ %#13, %#4 ], [ %#11, %#3 ]
+  %#15 = load i8, ptr noundef %#0, align 1
+  %#16 = zext i8 %#15 to i32
+  %#17 = mul i32 %#16, 374761393
+  %#18 = add i32 %#17, %#14
+  %#19 = fshl i32 %#18, i32 %#18, i32 11
+  %#20 = mul i32 %#19, 2654435761
+  %#21 = gep inbounds nuw ptr noundef %#0, 1 x i32 1
+  %#22 = load i8, ptr %#21, align 1
+  %#23 = zext i8 %#22 to i32
+  %#24 = mul i32 %#23, 374761393
+  %#25 = add i32 %#24, %#20
+  %#26 = fshl i32 %#25, i32 %#25, i32 11
+  %#27 = mul i32 %#26, 2654435761
+  %#28 = gep inbounds nuw ptr noundef %#0, 1 x i32 2
+  %#29 = load i8, ptr %#28, align 1
+  %#30 = zext i8 %#29 to i32
+  %#31 = mul i32 %#30, 374761393
+  %#32 = add i32 %#31, %#27
+  %#33 = fshl i32 %#32, i32 %#32, i32 11
+  %#34 = mul i32 %#33, 2654435761
+  br label %#6
+
+#6:
+  %#35 = phi i32 [ %#11, %#3 ], [ %#34, %#5 ]
+  %#36 = lshr i32 %#35, 15
+  %#37 = xor i32 %#36, %#35
+  %#38 = mul i32 %#37, 2246822519
+  %#39 = lshr i32 %#38, 13
+  %#40 = xor i32 %#39, %#38
+  %#41 = mul i32 %#40, 3266489917
+  %#42 = lshr i32 %#41, 16
+  %#43 = xor i32 %#42, %#41
+  ret i32 %#43
+}
+=>
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761396
+  %#4 = load i8, ptr nowrite noundef %#0, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = add i32 %#6, %#3
+  %#8 = fshl i32 %#7, i32 %#7, i32 11
+  %#9 = mul i32 %#8, 2654435761
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 1
+  %#11 = load i8, ptr %#10, align 1
+  %#12 = zext i8 %#11 to i32
+  %#13 = mul i32 %#12, 374761393
+  %#14 = add i32 %#13, %#9
+  %#15 = fshl i32 %#14, i32 %#14, i32 11
+  %#16 = mul i32 %#15, 2654435761
+  %#17 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 2
+  %#18 = load i8, ptr %#17, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#20, %#16
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noundef %#0 = pointer(non-local, block_id=0, offset=-1, attrs=2) / Address=#xffffffff
+i32 noundef %#1 = #x00000003 (3)
+
+Source:
+i32 %#7 = #xffffffff (4294967295, -1)
+i32 %#8 = #x00000003 (3)
+i1 %#9 = #x0 (0)
+  >> Jump to %#3
+ptr %#10 = pointer(non-local, block_id=0, offset=2, attrs=2) / Address=#x00000002
+i32 %#11 = #x165667b7 (374761399)
+i1 %#12 = #x0 (0)
+  >> Jump to %#6
+i32 %#35 = #x165667b7 (374761399)
+i32 %#36 = #x00002cac (11436)
+i32 %#37 = #x16564b1b (374754075)
+i32 %#38 = #x7229378d (1915303821)
+i32 %#39 = #x00039149 (233801)
+i32 %#40 = #x722aa6c4 (1915397828)
+i32 %#41 = #xadcaf4b4 (2915759284, -1379208012)
+i32 %#42 = #x0000adca (44490)
+i32 %#43 = #xadca597e (2915719550, -1379247746)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+i32 %#3 = #x165667b7 (374761399)
+i8 %#4 = UB triggered!
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,52 @@
+{
+  "commit": "d4dbf70",
+  "date": "2020-10-18",
+  "subject": "Various dispatcher improvements",
+  "selected_by": "keyword",
+  "perf_evidence": "Various dispatcher improvements",
+  "change_summary": "Various dispatcher improvements",
+  "units": [
+    {
+      "name": "Various dispatcher improvements",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/d4dbf70/r_hash64_cpu2",
+      "evidence": "Exact historical child source leaves max_leaves and abcd uninitialized when XXH_DISPATCH_SCALAR=0, then reads them in AVX checks. Alive2 finds a modeled internal backend-ID mismatch, but no defined-behavior public hash counterexample; the public hash target times out and update targets are inconclusive."
+    },
+    {
+      "name": "XXH_featureTest with XXH_DISPATCH_SCALAR=1",
+      "level": "internal",
+      "verdict": "EQUIV_PARTIAL",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "x86-64-v3, explicit scalar dispatch enabled, same pure CPUID/XGETBV query values",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/d4dbf70/feature-scalar-on-cpu0",
+      "evidence": "Alive2 bidirectional checks pass for symbolic CPU feature queries and a fixed AVX2 CPU; no unresolved feature-test call remains in the checked IR."
+    },
+    {
+      "name": "XXH3_64bits_dispatch for lengths 0 through 240",
+      "level": "api",
+      "verdict": "EQUIV_PARTIAL",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "len <= 240; input points to len valid bytes; Clang 20 x86-64-v3",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/d4dbf70/public-short-64",
+      "evidence": "Exact historical source and default secret retained; two functions pass Alive2 in both directions after symmetric alias-attribute weakening."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The internal feature-test mismatch depends on uninitialized child reads and is not a public C counterexample. The 0–240-byte public XXH3_64bits_dispatch result is proved for the archived Clang build; longer inputs, other APIs, whole-commit behavior, and official performance remain unproved."
+}

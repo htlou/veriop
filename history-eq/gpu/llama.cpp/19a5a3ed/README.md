@@ -1,0 +1,9 @@
+# llama.cpp `19a5a3ed`: AVX2 vectorization
+
+The exact historical parent `d8eaa26e4d9228df3aa46a930db60c8eaab67c1b` and child `19a5a3edfd306516cc419679d69d6435943b6816` change five functions in `ggml/src/ggml-cpu/vec.h`. [`reproduce.py`](reproduce.py) extracts both complete historical `ggml/` trees, verifies the changed header bytes against Git, and compiles the header with LLVM 20 Clang at `-O1 -mavx2 -mf16c -mfma`. The exact diff, normalized LLVM IR, checker logs, and hashes are saved alongside this file.
+
+For `ggml_vec_set_f32(32, x, v)` with a four-byte-aligned `float *x`, Alive2 reports one correct transformation in **both** directions. The old IR uses scalar stores; the new IR uses an AVX vector store. This proves only that specialization, not every length or the other four changed functions. The alignment precondition is necessary: without it, reverse Alive2 reports a mismatch on a pointer that is invalid for the old C `float` stores.
+
+For `ggml_vec_add1_f32`, [`overlap_witness.c`](overlap_witness.c) gives a valid function-level counterexample when the input and output arrays partially overlap: `z=a+1`, `x=a`, `n=32`, `v=1`, with `float a[33]={0}`. The exact old header prints `0 1 2 8 9`; the exact new header prints `0 1 1 1 2`. Both native executions exit successfully. This shows that the changed function is not equivalent on its unrestricted C interface. The historical call sites include an exact in-place use and a separate `dst`/`src` use; this witness does **not** establish that the partial-overlap case is reachable through a public ggml operation.
+
+Run `python3 history-eq/gpu/llama.cpp/19a5a3ed/reproduce.py` from the project root. [`verification-result.json`](verification-result.json) records the two Alive2 results and the two native outputs. Kuiper was not used for this historical pair. No official before/after benchmark score has been measured for it.

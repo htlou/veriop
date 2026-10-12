@@ -1,0 +1,67 @@
+diff --git a/hopper/flash_api.cpp b/hopper/flash_api.cpp
+index b5b8c1e..b57393a 100644
+--- a/hopper/flash_api.cpp
++++ b/hopper/flash_api.cpp
+@@ -395,7 +395,7 @@ inline int get_num_splits(Flash_fwd_params const& params) {
+     auto kBlockMN_kernel_args_sm90 = tile_size_fwd_sm90(params.d_rounded, params.is_causal, params.is_local, params.is_e4m3 ? 1 : 2 /*element_size*/, false /*v_colmajor*/, params.page_table, params.softcap > 0.f);
+     // Strictly speaking we need to pass in (varlen && params.num_splits > 1) but num_splits
+     // has not been set here. It's OK though because we might just underestimate kBlockN a bit
+-    auto kBlockMN_kernel_args_sm80 = tile_size_fwd_sm80(params.arch == 86 || params.arch == 89, params.d_rounded, params.is_causal, params.is_local, params.is_e4m3 ? 1 : 2 /*element_size*/, varlen, params.softcap > 0.f);
++    auto kBlockMN_kernel_args_sm8x = tile_size_fwd_sm8x(params.arch == 86 || params.arch == 89, params.d_rounded, params.is_causal, params.is_local, params.is_e4m3 ? 1 : 2 /*element_size*/, varlen, params.softcap > 0.f, params.knew_ptr);
+     int const kBlockM = params.arch >= 90 ? std::get<0>(kBlockMN_kernel_args_sm90) : std::get<0>(kBlockMN_kernel_args_sm80);
+     int const kBlockN = params.arch >= 90 ? std::get<1>(kBlockMN_kernel_args_sm90) : std::get<1>(kBlockMN_kernel_args_sm80);
+     int seqlen_q_packgqa = params.seqlen_q * (params.pack_gqa ? params.h / params.h_k : 1);
+diff --git a/hopper/flash_fwd_launch_template.h b/hopper/flash_fwd_launch_template.h
+index a533263..8333004 100644
+--- a/hopper/flash_fwd_launch_template.h
++++ b/hopper/flash_fwd_launch_template.h
+@@ -36,7 +36,7 @@ void run_flash_fwd(Flash_fwd_params &params, cudaStream_t stream) {
+ 
+     // Can't use structured binding since it's not compatible with constexpr
+     static constexpr std::tuple<int, int, bool, bool> kBlockMN_RS_IntraWGOverlap = tile_size_fwd_sm90(kHeadDim, Is_causal, Is_local, sizeof(Element) /*element_size*/, V_colmajor, PagedKV, Has_softcap);
+-    static constexpr std::tuple<int, int, int, int, bool> kBlockMN_kNWarps_Stages_RS = tile_size_fwd_sm80(Arch == 86 || Arch == 89, kHeadDim, Is_causal, Is_local, sizeof(Element) /*element_size*/, Varlen && Split, Has_softcap);
++    static constexpr std::tuple<int, int, int, int, bool> kBlockMN_kNWarps_Stages_RS = tile_size_fwd_sm8x(Arch == 86 || Arch == 89, kHeadDim, Is_causal, Is_local, sizeof(Element) /*element_size*/, Varlen && Split, Has_softcap, AppendKV);
+     static constexpr int kBlockM = Arch >= 90 ? std::get<0>(kBlockMN_RS_IntraWGOverlap) : std::get<0>(kBlockMN_kNWarps_Stages_RS);
+     static constexpr int kBlockN = Arch >= 90 ? std::get<1>(kBlockMN_RS_IntraWGOverlap) : std::get<1>(kBlockMN_kNWarps_Stages_RS);
+     static constexpr bool Mma1_is_RS = std::get<2>(kBlockMN_RS_IntraWGOverlap);
+diff --git a/hopper/setup.py b/hopper/setup.py
+index a1c566d..3b19efe 100644
+--- a/hopper/setup.py
++++ b/hopper/setup.py
+@@ -183,7 +183,7 @@ def _write_ninja_file(path,
+             f'  command = $nvcc {nvcc_gendeps} $cuda_cflags -c $in -o $out $cuda_post_cflags_sm80'
+         ]
+         cuda_compile_rule_sm80_sm90 = ['rule cuda_compile_sm80_sm90'] + cuda_compile_rule[1:] + [
+-            f'  command = $nvcc_from_env {nvcc_gendeps} $cuda_cflags -c $in -o $out $cuda_post_cflags_sm80_sm90'
++            f'  command = $nvcc {nvcc_gendeps} $cuda_cflags -c $in -o $out $cuda_post_cflags_sm80_sm90'
+         ]
+         cuda_compile_rule.append(
+             f'  command = $nvcc_from_env {nvcc_gendeps} $cuda_cflags -c $in -o $out $cuda_post_cflags')
+diff --git a/hopper/tile_size.h b/hopper/tile_size.h
+index 82f0c71..aa3e05b 100644
+--- a/hopper/tile_size.h
++++ b/hopper/tile_size.h
+@@ -42,9 +42,9 @@ constexpr std::tuple<int, int, bool, bool> tile_size_fwd_sm90(
+ }
+ 
+ // Return {kBlockM, kBlockN, kNWarps, kStages, Q_in_regs}
+-constexpr std::tuple<int, int, int, int, bool> tile_size_fwd_sm80(
++constexpr std::tuple<int, int, int, int, bool> tile_size_fwd_sm8x(
+         bool sm86_or_89, int headdim, bool is_causal, bool is_local, int element_size=2,
+-        bool varlen_and_split=false, bool softcap=false) {
++        bool varlen_and_split=false, bool softcap=false, bool append_kv=false) {
+     if (element_size == 2) {
+         if (headdim <= 64) {
+             return {128, varlen_and_split ? 80 : (is_local ? 96 : 112), 4, 1, false};
+@@ -54,9 +54,9 @@ constexpr std::tuple<int, int, int, int, bool> tile_size_fwd_sm80(
+             bool const use_8_warps = sm86_or_89 | varlen_and_split;
+             return {128, use_8_warps ? (varlen_and_split ? 112 : 128) : (is_local ? 48 : 64), use_8_warps ? 8 : 4, 1, use_8_warps};
+         } else if (headdim <= 192) {
+-            return {128, varlen_and_split || is_local ? 80 : 96, 8, sm86_or_89 ? 1 : 2, true};
++            return {128, append_kv ? 64 : (varlen_and_split || is_local ? 80 : 96), 8, sm86_or_89 ? 1 : 2, true};
+         } else {
+-            return {128, sm86_or_89 ? (varlen_and_split || is_local ? 48 : 64) : (varlen_and_split || is_local ? 64 : 96), 8, 1, sm86_or_89};
++            return {128, sm86_or_89 ? (varlen_and_split || is_local || append_kv ? 48 : 64) : (varlen_and_split || is_local || append_kv ? 64 : 96), 8, 1, sm86_or_89};
+         }
+     } else {
+         // Placeholder for now

@@ -1,0 +1,5 @@
+# Regex nonkeyword full-message correction
+
+The seeded [548-commit nonkeyword blob audit](regex-nonkeyword-first548-blob-audit.json) found six locally complete changed-source pairs; none is a selected runtime optimization. Commit `a0e72bc0c3b0fa652100e133a6cfe6e041eaf589` was previously excluded by a title/path-only intent screen. Its full message states that `c_literal` and `c_bytes` invoke expensive allocations and that direct calls to `c_char` or `c_byte` suffice. This establishes an allocation-saving intent in the existing `src/compile.rs` path. The commit is draw 148 in the existing intent screen and draw 292 in the later blob-audit permutation; both refer to the same pinned commit and changed blob IDs.
+
+Both exact changed blobs (`6f2321ec05bd2102fa35a22dc206264198b5e409` and `57793d420b20622e8f0ec4544ffa3fa8050329e0`) are absent from the local repository. The commit is therefore `UNKNOWN` with `checker_status: not_run`: no Aeneas old/new relation or counterexample was obtained. This correction changes the identified regex optimization count from 115 to 116; it is not a verified equality claim or a measured benchmark result.

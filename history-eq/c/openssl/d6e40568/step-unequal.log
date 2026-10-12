@@ -1,0 +1,129 @@
+
+----------------------------------------
+define i64 @step_all(i32 noundef %#0, i32 noundef %#1) {
+#2:
+  %#5 = alloca i64 4, align 4
+  %#6 = alloca i64 4, align 4
+  %#7 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#5, align 4
+  store i32 noundef %#1, ptr %#6, align 4
+  store i32 0, ptr %#7, align 4
+  %#8 = load i32, ptr %#5, align 4
+  %#9 = add nsw i32 %#8, 1
+  %#10 = load i32, ptr %#6, align 4
+  %#11 = srem i32 %#9, %#10
+  store i32 %#11, ptr %#5, align 4
+  %#12 = load i32, ptr %#5, align 4
+  %#13 = icmp ne i32 %#12, 0
+  br i1 %#13, label %#4, label %#3
+
+#3:
+  store i32 1, ptr %#7, align 4
+  br label %#4
+
+#4:
+  %#14 = load i32, ptr %#5, align 4
+  %#15 = zext i32 %#14 to i64
+  %#16 = shl i64 %#15, 1
+  %#17 = load i32, ptr %#7, align 4
+  %#18 = sext i32 %#17 to i64
+  %#19 = or i64 %#16, %#18
+  ret i64 %#19
+}
+=>
+define i64 @step_all(i32 noundef %#0, i32 noundef %#1) {
+#2:
+  %#5 = alloca i64 4, align 4
+  %#6 = alloca i64 4, align 4
+  %#7 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#5, align 4
+  store i32 noundef %#1, ptr %#6, align 4
+  store i32 0, ptr %#7, align 4
+  %#8 = load i32, ptr %#5, align 4
+  %#9 = add nsw i32 %#8, 1
+  store i32 %#9, ptr %#5, align 4
+  %#10 = load i32, ptr %#6, align 4
+  %#11 = icmp sge i32 %#9, %#10
+  br i1 %#11, label %#3, label %#4
+
+#3:
+  store i32 0, ptr %#5, align 4
+  store i32 1, ptr %#7, align 4
+  br label %#4
+
+#4:
+  %#12 = load i32, ptr %#5, align 4
+  %#13 = zext i32 %#12 to i64
+  %#14 = shl i64 %#13, 1
+  %#15 = load i32, ptr %#7, align 4
+  %#16 = sext i32 %#15 to i64
+  %#17 = or i64 %#14, %#16
+  ret i64 %#17
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i32 noundef %#1 = #xb544b3cc (3041178572, -1253788724)
+
+Source:
+ptr %#5 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#6 = pointer(local, block_id=1, offset=0) / Address=#x100
+ptr %#7 = pointer(local, block_id=2, offset=0) / Address=#x120
+i32 %#8 = #x00000000 (0)
+i32 %#9 = #x00000001 (1)
+i32 %#10 = #xb544b3cc (3041178572, -1253788724)
+i32 %#11 = #x00000001 (1)
+i32 %#12 = #x00000001 (1)
+i1 %#13 = #x1 (1)
+  >> Jump to %#4
+i32 %#14 = #x00000001 (1)
+i64 %#15 = #x0000000000000001 (1)
+i64 %#16 = #x0000000000000002 (2)
+i32 %#17 = #x00000000 (0)
+i64 %#18 = #x0000000000000000 (0)
+i64 %#19 = #x0000000000000002 (2)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	alive: true
+
+LOCAL BLOCKS:
+Block 4 >	size: 4	align: 4	alloc type: 1	alive: true	address: 272
+Block 5 >	size: 4	align: 4	alloc type: 1	alive: true	address: 256
+Block 6 >	size: 4	align: 4	alloc type: 1	alive: true	address: 288
+
+Target:
+ptr %#5 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#6 = pointer(local, block_id=1, offset=0) / Address=#x100
+ptr %#7 = pointer(local, block_id=2, offset=0) / Address=#x104
+i32 %#8 = #x00000000 (0)
+i32 %#9 = #x00000001 (1)
+i32 %#10 = #xb544b3cc (3041178572, -1253788724)
+i1 %#11 = #x1 (1)
+  >> Jump to %#3
+  >> Jump to %#4
+i32 %#12 = #x00000000 (0)
+i64 %#13 = #x0000000000000000 (0)
+i64 %#14 = #x0000000000000000 (0)
+i32 %#15 = #x00000001 (1)
+i64 %#16 = #x0000000000000001 (1)
+i64 %#17 = #x0000000000000001 (1)
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 4 >	size: 4	align: 4	alloc type: 1	alive: true	address: 272
+Block 5 >	size: 4	align: 4	alloc type: 1	alive: true	address: 256
+Block 6 >	size: 4	align: 4	alloc type: 1	alive: true	address: 260
+Source value: #x0000000000000002 (2)
+Target value: #x0000000000000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

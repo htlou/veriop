@@ -1,0 +1,98 @@
+pjpeg_need_bytes_callback() {
+   27:	EBP = EDX; 
+   26:	EBX = 570L; 
+   25:	R8 = int32[jpeg_off + 0]; 
+   24:	R11 = long32unsigned(R8); 
+   23:	EBX = EBX -l R11; 
+   22:	EAX = long32unsigned(ESI); 
+   21:	if (EBX <lu EAX) goto 20 else goto 16
+   20:	
+   19:	
+   18:	
+   17:	goto 15
+   16:	EBX = EAX; 
+   15:	EBX = lowlong(EBX); 
+   14:	R8 = jpeg_data + 0 (long); 
+   13:	EAX = int32[jpeg_off + 0]; 
+   12:	R10 = long32unsigned(EAX); 
+   11:	ESI = R8 + R10 + 0 (long); 
+   10:	EDX = long32unsigned(EBX); 
+    9:	call "memcpy"; 
+    8:	ECX = EBX; 
+    7:	
+    6:	int8u[EBP + 0] = ECX; 
+    5:	EDX = int32[jpeg_off + 0]; 
+    4:	EAX = EDX + EBX + 0 (int); 
+    3:	int32[jpeg_off + 0] = EAX; 
+    2:	EAX = 0; 
+    1:	return
+}
+
+verify_benchmark() {
+   24:	
+   23:	EAX = &pInfo; 
+   22:	EDI = int64[EAX + 32]; 
+   21:	ESI = r_ref + 0 (long); 
+   20:	EDX = 64L; 
+   19:	call "memcmp"; 
+   18:	if (EAX ==s 0) goto 17 else goto 4
+   17:	EAX = &pInfo; 
+   16:	EDI = int64[EAX + 40]; 
+   15:	ESI = g_ref + 0 (long); 
+   14:	EDX = 64L; 
+   13:	call "memcmp"; 
+   12:	
+   11:	if (EAX ==s 0) goto 10 else goto 3
+   10:	EAX = &pInfo; 
+    9:	EDI = int64[EAX + 48]; 
+    8:	ESI = b_ref + 0 (long); 
+    7:	EDX = 64L; 
+    6:	call "memcmp"; 
+    5:	EAX = EAX ==s 0; goto 2
+    4:	
+    3:	EAX = 0; 
+    2:	
+    1:	return
+}
+
+initialise_benchmark() {
+    2:	
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 6; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   20:	EBX = EDI; 
+   19:	EBP = 0; 
+   18:	if (EBP <s EBX) goto 17 else goto 2
+   17:	EDX = 0; 
+   16:	int32[jpeg_off + 0] = EDX; 
+   15:	EDI = &pInfo; 
+   14:	ESI = pjpeg_need_bytes_callback + 0 (long); 
+   13:	EDX = 0L; 
+   12:	ECX = 0; 
+   11:	call "pjpeg_decode_init"; 
+   10:	
+    9:	
+    8:	call "pjpeg_decode_mcu"; 
+    7:	EAX = int8unsigned(EAX); 
+    6:	
+    5:	if (EAX ==s 1) goto 3 else goto 4
+    4:	goto 8
+    3:	EBP = EBP + 1 (int); goto 18
+    2:	EAX = 0; 
+    1:	return
+}
+

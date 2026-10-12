@@ -1,0 +1,7 @@
+# xxHash `b63643dd`: s390x SIMD multiplication intrinsics
+
+The historical change selects `vec_mulo` and `vec_mule` intrinsics on s390x. Run `python3 -B history-eq/c/xxHash/b63643dd/reproduce.py` from the project root to audit the exact parent and child headers and cross-compile both for s390x/z13 with Clang 20.
+
+Both historical fixed-256-byte wrappers now compile to [old](old.ll) and [new](new.ll) s390x LLVM IR with freestanding standard-header declarations. The old IR reaches `vmulouw` inline assembly; the new IR reaches `llvm.s390.vmlof`. At the object-build stage, [old](old-object.log) fails because Clang's s390x assembler rejects `vmulouw`, while [new](new-object.log) succeeds. Exact-source one-operation wrappers for both `mulo` and `mule` were also submitted to Alive2. Their [mulo](alive2-mulo.log) and [mule](alive2-mule.log) runs both return **failed to prove** because Alive2 treats `llvm.s390.vmlof` and `llvm.s390.vmlef` as unknown calls. Only nonsemantic inline-assembly source-location metadata was removed symmetrically before those checks.
+
+**Verdict: `UNSUPPORTED` by this Clang/Alive2 pipeline**, not equality or inequality. The old Clang path has no executable object to compare, and Alive2 lacks a model for the new intrinsics. The temporary declarations are not a full s390x libc sysroot or a target-hardware execution. No official historical xxHash benchmark score was measured.

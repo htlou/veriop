@@ -1,0 +1,128 @@
+
+----------------------------------------
+define i1 @witness() nofree noundef willreturn zeroext memory(none) {
+#0:
+  ret i1 0
+}
+=>
+@__const.witness.t = constant 72 bytes, align 8
+
+define i1 @witness() nofree willreturn zeroext memory(none) {
+init:
+  store {[4 x i64], [4 x i64], i32, i32} { { 1024, 327680, 1, 1 }, { 210, 840, 275251200, 275251200 }, 14, [padding] }, ptr @__const.witness.t, align 8
+  br label %#0
+
+#0:
+  br label %#1
+
+#1:
+  %#3 = phi i64 [ 0, %#0 ], [ %#7, %#1 ]
+  %#4 = gep inbounds nuw ptr @__const.witness.t, 32 x i64 0, 8 x i64 %#3
+  %#5 = load i64, ptr %#4, align 8
+  %#6 = icmp sgt i64 %#5, 0
+  %#7 = add nsw nuw i64 %#3, 1
+  %#8 = icmp ne i64 %#7, 4
+  %#9 = select i1 %#6, i1 %#8, i1 0
+  br i1 %#9, label %#1#2, label %#2
+
+#1#2:
+  %#3#2 = phi i64 [ %#7, %#1 ]
+  %#4#2 = gep inbounds nuw ptr @__const.witness.t, 32 x i64 0, 8 x i64 %#3#2
+  %#5#2 = load i64, ptr %#4#2, align 8
+  %#6#2 = icmp sgt i64 %#5#2, 0
+  %#7#2 = add nsw nuw i64 %#3#2, 1
+  %#8#2 = icmp ne i64 %#7#2, 4
+  %#9#2 = select i1 %#6#2, i1 %#8#2, i1 0
+  br i1 %#9#2, label %#1#3, label %#2
+
+#1#3:
+  %#3#3 = phi i64 [ %#7#2, %#1#2 ]
+  %#4#3 = gep inbounds nuw ptr @__const.witness.t, 32 x i64 0, 8 x i64 %#3#3
+  %#5#3 = load i64, ptr %#4#3, align 8
+  %#6#3 = icmp sgt i64 %#5#3, 0
+  %#7#3 = add nsw nuw i64 %#3#3, 1
+  %#8#3 = icmp ne i64 %#7#3, 4
+  %#9#3 = select i1 %#6#3, i1 %#8#3, i1 0
+  br i1 %#9#3, label %#1#4, label %#2
+
+#1#4:
+  %#3#4 = phi i64 [ %#7#3, %#1#3 ]
+  %#4#4 = gep inbounds nuw ptr @__const.witness.t, 32 x i64 0, 8 x i64 %#3#4
+  %#5#4 = load i64, ptr %#4#4, align 8
+  %#6#4 = icmp sgt i64 %#5#4, 0
+  %#7#4 = add nsw nuw i64 %#3#4, 1
+  %#8#4 = icmp ne i64 %#7#4, 4
+  %#9#4 = select i1 %#6#4, i1 %#8#4, i1 0
+  br i1 %#9#4, label %#1#5, label %#2
+
+#1#5:
+  %#3#5 = phi i64 [ %#7#4, %#1#4 ]
+  %#4#5 = gep inbounds nuw ptr @__const.witness.t, 32 x i64 0, 8 x i64 %#3#5
+  %#5#5 = load i64, ptr %#4#5, align 8
+  %#6#5 = icmp sgt i64 %#5#5, 0
+  %#7#5 = add nsw nuw i64 %#3#5, 1
+  %#8#5 = icmp ne i64 %#7#5, 4
+  %#9#5 = select i1 %#6#5, i1 %#8#5, i1 0
+  br i1 %#9#5, label #sink, label %#2
+
+#2:
+  %#6#phi#0 = phi i1 [ %#6, %#1 ], [ %#6#2, %#1#2 ], [ %#6#3, %#1#3 ], [ %#6#4, %#1#4 ], [ %#6#5, %#1#5 ]
+  ret i1 %#6#phi#0
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+
+Source:
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 72	align: 8	alloc type: 0	alive: true	address: 9223372036854775736	const
+
+Target:
+  >> Jump to %#0
+  >> Jump to %#1
+i64 %#3 = #x0000000000000000 (0)
+ptr %#4 = pointer(non-local, block_id=0, offset=0) / Address=#x7fffffffffffffb8
+i64 %#5 = #x0000000000000400 (1024)
+i1 %#6 = #x1 (1)
+i64 %#7 = #x0000000000000001 (1)
+i1 %#8 = #x1 (1)
+i1 %#9 = #x1 (1)
+  >> Jump to %#1#2
+i64 %#3#2 = #x0000000000000001 (1)
+ptr %#4#2 = pointer(non-local, block_id=0, offset=8) / Address=#x7fffffffffffffc0
+i64 %#5#2 = #x0000000000050000 (327680)
+i1 %#6#2 = #x1 (1)
+i64 %#7#2 = #x0000000000000002 (2)
+i1 %#8#2 = #x1 (1)
+i1 %#9#2 = #x1 (1)
+  >> Jump to %#1#3
+i64 %#3#3 = #x0000000000000002 (2)
+ptr %#4#3 = pointer(non-local, block_id=0, offset=16) / Address=#x7fffffffffffffc8
+i64 %#5#3 = #x0000000000000001 (1)
+i1 %#6#3 = #x1 (1)
+i64 %#7#3 = #x0000000000000003 (3)
+i1 %#8#3 = #x1 (1)
+i1 %#9#3 = #x1 (1)
+  >> Jump to %#1#4
+i64 %#3#4 = #x0000000000000003 (3)
+ptr %#4#4 = pointer(non-local, block_id=0, offset=24) / Address=#x7fffffffffffffd0
+i64 %#5#4 = #x0000000000000001 (1)
+i1 %#6#4 = #x1 (1)
+i64 %#7#4 = #x0000000000000004 (4)
+i1 %#8#4 = #x0 (0)
+i1 %#9#4 = #x0 (0)
+  >> Jump to %#2
+i1 %#6#phi#0 = #x1 (1)
+Source value: #x0 (0)
+Target value: #x1 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

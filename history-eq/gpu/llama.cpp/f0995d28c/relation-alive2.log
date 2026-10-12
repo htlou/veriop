@@ -1,0 +1,108 @@
+
+----------------------------------------
+define i32 @relation(i64 noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 8, align 8
+  %#4 = alloca i64 8, align 8
+  store i64 noundef %#0, ptr %#3, align 8
+  store i64 noundef %#1, ptr %#4, align 8
+  ret i32 1
+}
+=>
+define i32 @relation(i64 noundef %#0, i64 noundef %#1) {
+#2:
+  %#17 = alloca i64 8, align 8
+  %#18 = alloca i64 8, align 8
+  %#19 = alloca i64 4, align 4
+  %#20 = alloca i64 4, align 4
+  store i64 noundef %#0, ptr %#17, align 8
+  store i64 noundef %#1, ptr %#18, align 8
+  %#21 = load i64, ptr %#18, align 8
+  %#22 = icmp sge i64 %#21, 4
+  br i1 %#22, label %#8, label %#3
+
+#3:
+  %#23 = load i64, ptr %#17, align 8
+  %#24 = srem i64 %#23, 128
+  %#25 = icmp ne i64 %#24, 0
+  br i1 %#25, label %#4, label %#7
+
+#4:
+  %#26 = load i64, ptr %#17, align 8
+  %#27 = icmp ne i64 %#26, 96
+  br i1 %#27, label %#5, label %#7
+
+#5:
+  %#28 = load i64, ptr %#17, align 8
+  %#29 = icmp ne i64 %#28, 192
+  br i1 %#29, label %#6, label %#7
+
+#6:
+  %#30 = load i64, ptr %#17, align 8
+  %#31 = icmp ne i64 %#30, 576
+  br label %#7
+
+#7:
+  %#32 = phi i1 [ 0, %#5 ], [ 0, %#4 ], [ 0, %#3 ], [ %#31, %#6 ]
+  br label %#8
+
+#8:
+  %#33 = phi i1 [ 1, %#2 ], [ %#32, %#7 ]
+  %#34 = xor i1 %#33, 1
+  %#35 = zext i1 %#34 to i32
+  store i32 %#35, ptr %#19, align 4
+  %#36 = load i64, ptr %#18, align 8
+  %#37 = icmp sge i64 %#36, 20
+  br i1 %#37, label %#14, label %#9
+
+#9:
+  %#38 = load i64, ptr %#17, align 8
+  %#39 = srem i64 %#38, 128
+  %#40 = icmp ne i64 %#39, 0
+  br i1 %#40, label %#10, label %#13
+
+#10:
+  %#41 = load i64, ptr %#17, align 8
+  %#42 = icmp ne i64 %#41, 96
+  br i1 %#42, label %#11, label %#13
+
+#11:
+  %#43 = load i64, ptr %#17, align 8
+  %#44 = icmp ne i64 %#43, 192
+  br i1 %#44, label %#12, label %#13
+
+#12:
+  %#45 = load i64, ptr %#17, align 8
+  %#46 = icmp ne i64 %#45, 576
+  br label %#13
+
+#13:
+  %#47 = phi i1 [ 0, %#11 ], [ 0, %#10 ], [ 0, %#9 ], [ %#46, %#12 ]
+  br label %#14
+
+#14:
+  %#48 = phi i1 [ 1, %#8 ], [ %#47, %#13 ]
+  %#49 = xor i1 %#48, 1
+  %#50 = zext i1 %#49 to i32
+  store i32 %#50, ptr %#20, align 4
+  %#51 = load i32, ptr %#19, align 4
+  %#52 = icmp ne i32 %#51, 0
+  br i1 %#52, label %#15, label %#16
+
+#15:
+  %#53 = load i32, ptr %#20, align 4
+  %#54 = icmp ne i32 %#53, 0
+  br label %#16
+
+#16:
+  %#55 = phi i1 [ 1, %#14 ], [ %#54, %#15 ]
+  %#56 = zext i1 %#55 to i32
+  ret i32 %#56
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

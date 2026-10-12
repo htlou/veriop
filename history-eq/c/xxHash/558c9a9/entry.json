@@ -1,0 +1,64 @@
+{
+ "commit": "558c9a9",
+ "date": "2020-02-21",
+ "subject": "XXH_mult32to64: Use downcast+upcast instead of mask",
+ "selected_by": "keyword",
+ "perf_evidence": "Commit message: old compilers (ARM GCC 2.95) emit an erroneous 64-bit mask + full 64x64 multiply for the masked form; '(xxh_u64)(xxh_u32)a * (xxh_u64)(xxh_u32)b' gives a single UMULL; 'making this a free optimization'.",
+ "change_summary": "Non-MSVC XXH_mult32to64(x,y) macro changes from ((u64)((x)&0xFFFFFFFF) * (u64)((y)&0xFFFFFFFF)) to ((u64)(u32)(x) * (u64)(u32)(y)) and moves below kSecret; MSVC __emulu branch unchanged.",
+ "units": [
+  {
+   "name": "XXH_mult32to64 macro (u64 operands), unoptimized IR (-O0 -disable-O0-optnone)",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/558c9a9/r_raw_O0",
+   "evidence": "IR differs (and 0xFFFFFFFF vs trunc/zext), correct fwd+bwd for u64 and u32 operands"
+  },
+  {
+   "name": "XXH_mult32to64 and portable XXH_mult64to128, x86-64 -O3 and i386 -O3",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/558c9a9/r_raw_i386",
+   "evidence": "correct fwd+bwd; IR identical (clang canonicalises both forms); x86-64 run in r_raw"
+  },
+  {
+   "name": "scalar XXH3_accumulate_512 (-DXXH_VECTOR=0), acc/input/secret by value",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/558c9a9/r_acc_scalar",
+   "evidence": "correct fwd+bwd; IR identical"
+  },
+  {
+   "name": "XXH3_128bits / _withSeed len 9..16 (lenContrib uses XXH_mult32to64), XXH3_64bits_withSeed len 0..16; x86-64 and i386 (portable 64x64->128 via XXH_mult32to64)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/558c9a9/r_api_i386",
+   "evidence": "3 targets correct fwd+bwd on i386 (r_api_i386) and x86-64 (r_api); IR identical"
+  }
+ ],
+ "commit_verdict": "EQUIV",
+ "raw_verdict": "EQUIV",
+ "coverage": "full",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "The perf benefit only exists for old compilers (ARM GCC 2.95); with clang 20 the optimized IR is identical at every user (x86-64 AVX2 default, scalar XXH_VECTOR=0, i386 portable mult64to128), so the non-trivial evidence is the unoptimized-IR (-O0 -Xclang -disable-O0-optnone) proof of the macro itself (r_raw_O0, IR differs, EQUIV). Old side (Feb 2020, before 777ec65) does not compile in clang's default gnu17 mode (XXH_ALIGN_MEMBER puts C11 alignas after the member), so ALL runs use -std=gnu99 on both sides. Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. i386 runs: --target i386-linux-gnu -ffreestanding -nostdlibinc -isystem c/xxHash/_work2020/cross_sysinc. MSVC __emulu path unchanged by the commit. Native sanity (native_x86_64/, -std=gnu99): all hash outputs for len 0..256 identical."
+}

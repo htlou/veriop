@@ -1,0 +1,77 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/288f7dc/api_xxh32_len3_reroll1/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/288f7dc/api_xxh32_len3_reroll1/new.ll
+
+----------------------------------------
+define i32 @target_oneshot(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761396
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i32
+  %#7 = mul i32 %#6, 374761393
+  %#8 = add i32 %#3, %#7
+  %#9 = fshl i32 %#8, i32 %#8, i32 11
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#12 = load i8, ptr %#4, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = add i32 %#10, %#14
+  %#16 = fshl i32 %#15, i32 %#15, i32 11
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = load i8, ptr %#11, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#17, %#20
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+=>
+define i32 @target_oneshot(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761396
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i32
+  %#7 = mul i32 %#6, 374761393
+  %#8 = add i32 %#7, %#3
+  %#9 = fshl i32 %#8, i32 %#8, i32 11
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#12 = load i8, ptr %#4, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = add i32 %#14, %#10
+  %#16 = fshl i32 %#15, i32 %#15, i32 11
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = load i8, ptr %#11, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#20, %#17
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,133 @@
+
+----------------------------------------
+define void @old16(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#3 = load <4 x i32>, ptr noundef %#0, align 4
+  %#4 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#5 = shufflevector <4 x i32> %#4, <4 x i32> poison, 0, 0, 0, 0
+  %#6 = usub_sat <4 x i32> %#3, %#5
+  store <4 x i32> %#6, ptr noundef %#0, align 4
+  %#7 = gep inbounds nuw ptr noundef %#0, 1 x i64 16
+  %#8 = load <4 x i32>, ptr %#7, align 4
+  %#9 = usub_sat <4 x i32> %#8, %#5
+  store <4 x i32> %#9, ptr %#7, align 4
+  %#10 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#11 = load <4 x i32>, ptr %#10, align 4
+  %#12 = usub_sat <4 x i32> %#11, %#5
+  store <4 x i32> %#12, ptr %#10, align 4
+  %#13 = gep inbounds nuw ptr noundef %#0, 1 x i64 48
+  %#14 = load <4 x i32>, ptr %#13, align 4
+  %#15 = usub_sat <4 x i32> %#14, %#5
+  store <4 x i32> %#15, ptr %#13, align 4
+  ret void
+}
+=>
+define void @new16_bad(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#3 = load i32, ptr noundef %#0, align 4
+  %#4 = usub_sat i32 %#3, noundef %#1
+  %#5 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#6 = load <4 x i32>, ptr %#5, align 4
+  %#7 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#8 = shufflevector <4 x i32> %#7, <4 x i32> poison, 0, 0, 0, 0
+  %#9 = usub_sat <4 x i32> %#6, %#8
+  store <4 x i32> %#9, ptr %#5, align 4
+  %#10 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#11 = load <4 x i32>, ptr %#10, align 4
+  %#12 = usub_sat <4 x i32> %#11, %#8
+  store <4 x i32> %#12, ptr %#10, align 4
+  %#13 = gep inbounds nuw ptr noundef %#0, 1 x i64 36
+  %#14 = load <4 x i32>, ptr %#13, align 4
+  %#15 = usub_sat <4 x i32> %#14, %#8
+  store <4 x i32> %#15, ptr %#13, align 4
+  %#16 = gep inbounds nuw ptr noundef %#0, 1 x i64 52
+  %#17 = load i32, ptr %#16, align 4
+  %#18 = usub_sat i32 %#17, noundef %#1
+  store i32 %#18, ptr %#16, align 4
+  %#19 = gep inbounds nuw ptr noundef %#0, 1 x i64 56
+  %#20 = load i32, ptr %#19, align 4
+  %#21 = usub_sat i32 %#20, noundef %#1
+  store i32 %#21, ptr %#19, align 4
+  %#22 = gep inbounds nuw ptr noundef %#0, 1 x i64 60
+  %#23 = load i32, ptr %#22, align 4
+  %#24 = usub_sat i32 %#23, noundef %#1
+  store i32 %#24, ptr %#22, align 4
+  %#25 = add i32 %#4, 1
+  store i32 %#25, ptr noundef %#0, align 4
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Mismatch in memory
+
+Example:
+ptr noundef %#0 = pointer(non-local, block_id=1, offset=160, attrs=1) / Address=#x0ac
+i32 noundef %#1 = #x00000000 (0)
+
+Source:
+<4 x i32> %#3 = < #x62000001 (1644167169), poison, #x00200000 (2097152), #x00000000 (0) >
+<4 x i32> %#4 = < #x00000000 (0), poison, poison, poison >
+<4 x i32> %#5 = < #x00000000 (0), #x00000000 (0), #x00000000 (0), #x00000000 (0) >
+<4 x i32> %#6 = < #x62000001 (1644167169), poison, #x00200000 (2097152), #x00000000 (0) >
+ptr %#7 = pointer(non-local, block_id=1, offset=176, attrs=1) / Address=#x0bc
+<4 x i32> %#8 = < #x00000000 (0), poison, poison, #x00000000 (0) >
+<4 x i32> %#9 = < #x00000000 (0), poison, poison, #x00000000 (0) >
+ptr %#10 = pointer(non-local, block_id=1, offset=192, attrs=1) / Address=#x0cc
+<4 x i32> %#11 = < #x00000000 (0), poison, poison, poison >
+<4 x i32> %#12 = < #x00000000 (0), poison, poison, poison >
+ptr %#13 = pointer(non-local, block_id=1, offset=208, attrs=1) / Address=#x0dc
+<4 x i32> %#14 = < #x00000040 (64), poison, poison, poison >
+<4 x i32> %#15 = < #x00000040 (64), poison, poison, poison >
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 4	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 227	align: 1	alloc type: 0	alive: true	address: 12
+Contents:
+43: #x00000000
+52: #x00000040
+44: #x00000000
+45: poison
+46: null, byte offset=0
+54: poison
+40: #x62000001
+50: poison
+51: poison
+42: #x00200000
+47: #x00000000
+48: #x00000000
+55: null, byte offset=0
+53: null, byte offset=0
+*: poison
+
+
+Target:
+i32 %#3 = #x62000001 (1644167169)
+i32 %#4 = #x62000001 (1644167169)
+ptr %#5 = pointer(non-local, block_id=1, offset=164, attrs=1) / Address=#x0b0
+<4 x i32> %#6 = < poison, #x00200000 (2097152), #x00000000 (0), #x00000000 (0) >
+<4 x i32> %#7 = < #x00000000 (0), poison, poison, poison >
+<4 x i32> %#8 = < #x00000000 (0), #x00000000 (0), #x00000000 (0), #x00000000 (0) >
+<4 x i32> %#9 = < poison, #x00200000 (2097152), #x00000000 (0), #x00000000 (0) >
+ptr %#10 = pointer(non-local, block_id=1, offset=180, attrs=1) / Address=#x0c0
+<4 x i32> %#11 = < poison, poison, #x00000000 (0), #x00000000 (0) >
+<4 x i32> %#12 = < poison, poison, #x00000000 (0), #x00000000 (0) >
+ptr %#13 = pointer(non-local, block_id=1, offset=196, attrs=1) / Address=#x0d0
+<4 x i32> %#14 = < poison, poison, poison, #x00000040 (64) >
+<4 x i32> %#15 = < poison, poison, poison, #x00000040 (64) >
+ptr %#16 = pointer(non-local, block_id=1, offset=212, attrs=1) / Address=#x0e0
+i32 %#17 = poison
+i32 %#18 = poison
+ptr %#19 = pointer(non-local, block_id=1, offset=216, attrs=1) / Address=#x0e4
+i32 %#20 = poison
+i32 %#21 = poison
+ptr %#22 = pointer(non-local, block_id=1, offset=220, attrs=1) / Address=#x0e8
+i32 %#23 = poison
+i32 %#24 = poison
+i32 %#25 = #x62000002 (1644167170)
+
+Mismatch in pointer(non-local, block_id=1, offset=160)
+Source value: #x62000001
+Target value: #x62000002
+

@@ -1,0 +1,234 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
+index 3eb7092f..2100b18b 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
+@@ -24,6 +24,15 @@ public class Art {
+   public Art() {
+     root = null;
+   }
++  @Override
++  public Art clone() {
++    Art art = new Art();
++    art.keySize = this.keySize;
++    if (this.root != null) {
++      art.root = this.root.clone();
++    }
++    return art;
++  }
+ 
+   public boolean isEmpty() {
+     return root == null;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
+index 9b4140ea..4f8d8a28 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
+@@ -3,6 +3,7 @@ package org.roaringbitmap.art;
+ import java.io.DataOutput;
+ import java.io.IOException;
+ import java.nio.ByteBuffer;
++import java.util.Arrays;
+ 
+ public abstract class BranchNode extends Node {
+ 
+@@ -23,6 +24,18 @@ public abstract class BranchNode extends Node {
+         prefix = compressedPrefixSize == 0 ? Art.EMPTY_BYTES : new byte[compressedPrefixSize];
+         count = 0;
+     }
++    public void postClone(BranchNode newlyCloned, Node[] oldChildren, Node[] newChildren) {
++        newlyCloned.count = this.count;
++        //we could potentially share the prefix, but it fragile and would safe so little
++        if (this.prefix.length > 0) {
++            newlyCloned.prefix = Arrays.copyOf(this.prefix, this.prefix.length);
++        }
++        for (int i = 0; i < oldChildren.length; i++) {
++            if (oldChildren[i] != null) {
++                newChildren[i] = oldChildren[i].clone();;
++            }
++        }
++    }
+     protected abstract NodeType nodeType();
+     // length of compressed path(prefix)
+     protected byte prefixLength() {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Containers.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Containers.java
+index f9213b3b..9f026ddf 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Containers.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Containers.java
+@@ -37,6 +37,25 @@ public class Containers {
+     reset();
+   }
+ 
++  @Override
++  public Containers clone() {
++    Containers containers = new Containers();
++    containers.containerArrays = new ArrayList<>(this.containerArrays.size());
++    for (Container[] array : this.containerArrays) {
++      Container[] values = Arrays.copyOf(array, array.length);
++      containers.containerArrays.add(values);
++      for (int i = 0; i < values.length; i++) {
++        if (values[i] != null) {
++          values[i] = values[i].clone();
++        }
++      }
++    }
++    containers.containerSize = this.containerSize;
++    containers.firstLevelIdx = this.firstLevelIdx;
++    containers.secondLevelIdx = this.secondLevelIdx;
++    return containers;
++  }
++
+   private void reset() {
+     containerSize = 0;
+     firstLevelIdx = -1;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/LeafNode.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/LeafNode.java
+index 83889ea7..bc187293 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/LeafNode.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/LeafNode.java
+@@ -42,6 +42,11 @@ public class LeafNode extends Node {
+     this.containerIdx = containerIdx;
+   }
+ 
++  @Override
++  protected LeafNode clone() {
++    return new LeafNode(getKey(), containerIdx);
++  }
++
+   @Override
+   public void serializeNodeBody(DataOutput dataOutput) throws IOException {
+     dataOutput.writeInt(keyHigh);
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java
+index a1f33298..c4deda36 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java
+@@ -10,6 +10,9 @@ public abstract class Node {
+   public Node() {
+   }
+ 
++  @Override
++  protected abstract Node clone();
++
+   /**
+    * sort the small arrays through the insertion sort alg.
+    */
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
+index b0f62c76..a1f3a981 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
+@@ -17,6 +17,14 @@ public class Node16 extends BranchNode {
+   public Node16(int compressionLength) {
+     super(compressionLength);
+   }
++  @Override
++  protected Node16 clone() {
++    Node16 clone = new Node16(this.prefixLength());
++    clone.firstV = this.firstV;
++    clone.secondV = this.secondV;
++    postClone(clone, this.children, clone.children);
++    return clone;
++  }
+ 
+   @Override
+   protected NodeType nodeType() {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
+index 1794ae7f..ceff15c9 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
+@@ -19,6 +19,14 @@ public class Node256 extends BranchNode {
+     super(compressedPrefixSize);
+   }
+ 
++  @Override
++  protected Node256 clone() {
++    Node256 clone = new Node256(this.prefixLength());
++    System.arraycopy(this.bitmapMask,0,clone.bitmapMask,0,bitmapMask.length);
++    postClone(clone, this.children, clone.children);
++    return clone;
++  }
++
+   @Override
+   protected NodeType nodeType() {
+     return NodeType.NODE256;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
+index a7d67015..9c6aeec4 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
+@@ -17,6 +17,14 @@ public class Node4 extends BranchNode {
+     super(compressedPrefixSize);
+   }
+ 
++  @Override
++  protected Node4 clone() {
++    Node4 clone = new Node4(this.prefixLength());
++    clone.key = this.key;
++    postClone(clone, this.children, clone.children);
++    return clone;
++  }
++
+   @Override
+   protected NodeType nodeType() {
+     return NodeType.NODE4;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
+index 0ae74737..852cd64c 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
+@@ -25,6 +25,14 @@ public class Node48 extends BranchNode {
+     super(compressedPrefixSize);
+     Arrays.fill(childIndex, INIT_LONG_VALUE);
+   }
++  @Override
++  protected Node48 clone() {
++    Node48 clone = new Node48(this.prefixLength());
++    System.arraycopy(this.childIndex,0,clone.childIndex,0,LONGS_USED);
++    postClone(clone, this.children, clone.children);
++    return clone;
++  }
++
+ 
+   @Override
+   protected NodeType nodeType() {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java
+index 8d226e6d..394abb00 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java
+@@ -28,6 +28,13 @@ public class HighLowContainer {
+     art = new Art();
+     containers = new Containers();
+   }
++  @Override
++  public HighLowContainer clone() {
++    HighLowContainer cloned = new HighLowContainer();
++    cloned.art = this.art.clone();
++    cloned.containers = this.containers.clone();
++    return cloned;
++  }
+ 
+   public Container getContainer(long containerIdx) {
+     return containers.getContainer(containerIdx);
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
+index 759cac78..df294c48 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
+@@ -1182,21 +1182,9 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+   // mainly used for benchmark
+   @Override
+   public Roaring64Bitmap clone() {
+-    long sizeInBytesL = this.serializedSizeInBytes();
+-    if (sizeInBytesL >= Integer.MAX_VALUE) {
+-      throw new UnsupportedOperationException();
+-    }
+-    int sizeInBytesInt = (int) sizeInBytesL;
+-    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytesInt).order(ByteOrder.LITTLE_ENDIAN);
+-    try {
+-      this.serialize(byteBuffer);
+-      byteBuffer.flip();
+-      Roaring64Bitmap freshOne = new Roaring64Bitmap();
+-      freshOne.deserialize(byteBuffer);
+-      return freshOne;
+-    } catch (Exception e) {
+-      throw new RuntimeException("fail to clone thorough the ser/deser", e);
+-    }
++    Roaring64Bitmap result = new Roaring64Bitmap();
++    result.highLowContainer = this.highLowContainer.clone();
++    return result;
+   }
+ 
+   private abstract class PeekableIterator implements PeekableLongIterator {

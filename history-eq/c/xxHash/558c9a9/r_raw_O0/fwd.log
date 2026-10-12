@@ -1,0 +1,72 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=300000 --always-verify r_raw_O0/old.ll r_raw_O0/new.ll
+
+----------------------------------------
+define i64 @target_raw_mult32to64_O0(i64 noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 8, align 8
+  %#4 = alloca i64 8, align 8
+  store i64 noundef %#0, ptr %#3, align 8
+  store i64 noundef %#1, ptr %#4, align 8
+  %#5 = load i64, ptr %#3, align 8
+  %#6 = and i64 %#5, 4294967295
+  %#7 = load i64, ptr %#4, align 8
+  %#8 = and i64 %#7, 4294967295
+  %#9 = mul i64 %#6, %#8
+  ret i64 %#9
+}
+=>
+define i64 @target_raw_mult32to64_O0(i64 noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 8, align 8
+  %#4 = alloca i64 8, align 8
+  store i64 noundef %#0, ptr %#3, align 8
+  store i64 noundef %#1, ptr %#4, align 8
+  %#5 = load i64, ptr %#3, align 8
+  %#6 = trunc i64 %#5 to i32
+  %#7 = zext i32 %#6 to i64
+  %#8 = load i64, ptr %#4, align 8
+  %#9 = trunc i64 %#8 to i32
+  %#10 = zext i32 %#9 to i64
+  %#11 = mul i64 %#7, %#10
+  ret i64 %#11
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_raw_mult32to64_u32args_O0(i32 noundef %#0, i32 noundef %#1) {
+#2:
+  %#3 = alloca i64 4, align 4
+  %#4 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#3, align 4
+  store i32 noundef %#1, ptr %#4, align 4
+  %#5 = load i32, ptr %#3, align 4
+  %#6 = and i32 %#5, 4294967295
+  %#7 = zext i32 %#6 to i64
+  %#8 = load i32, ptr %#4, align 4
+  %#9 = and i32 %#8, 4294967295
+  %#10 = zext i32 %#9 to i64
+  %#11 = mul i64 %#7, %#10
+  ret i64 %#11
+}
+=>
+define i64 @target_raw_mult32to64_u32args_O0(i32 noundef %#0, i32 noundef %#1) {
+#2:
+  %#3 = alloca i64 4, align 4
+  %#4 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#3, align 4
+  store i32 noundef %#1, ptr %#4, align 4
+  %#5 = load i32, ptr %#3, align 4
+  %#6 = zext i32 %#5 to i64
+  %#7 = load i32, ptr %#4, align 4
+  %#8 = zext i32 %#7 to i64
+  %#9 = mul i64 %#6, %#8
+  ret i64 %#9
+}
+Transformation seems to be correct!
+
+Summary:
+  2 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,757 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=300000 --always-verify r_api_i386/new.ll r_api_i386/old.ll
+
+----------------------------------------
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i32)
+
+@kSecret = constant 192 bytes, align 64
+
+define void @target_api_128_seed_9to16(ptr noundef %#0, i32 noundef %#1, i64 noundef %#2, ptr noread noundef %#3) {
+init:
+  br label %#4
+
+#4:
+  %#7 = alloca i64 8, align 8, dead
+  %#8 = alloca i64 8, align 8, dead
+  %#9 = alloca i64 8, align 8, dead
+  %#10 = alloca i64 8, align 8, dead
+  %#11 = add i32 noundef %#1, 4294967279
+  %#12 = icmp ult i32 %#11, 4294967288
+  br i1 %#12, label %#6, label %#5
+
+#5:
+  start_lifetime ptr %#10
+  %#13 = call ptr @memcpy(nonnull noundef ptr %#10, noundef ptr noundef %#0, noundef i32 8)
+  %#14 = load i64, ptr %#10, align 8
+  end_lifetime ptr %#10
+  start_lifetime ptr %#9
+  %#15 = call ptr @memcpy(nonnull noundef ptr %#9, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#16 = load i64, ptr %#9, align 8
+  end_lifetime ptr %#9
+  %#17 = add i64 %#16, noundef %#2
+  %#18 = xor i64 %#17, %#14
+  %#19 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#20 = gep inbounds ptr %#19, 1 x i32 4294967288
+  start_lifetime ptr %#8
+  %#21 = call ptr @memcpy(nonnull noundef ptr %#8, nonnull noundef ptr %#20, noundef i32 8)
+  %#22 = load i64, ptr %#8, align 8
+  end_lifetime ptr %#8
+  start_lifetime ptr %#7
+  %__constexpr_0 = gep inbounds nuw ptr @kSecret, 1 x i32 8
+  %#23 = call ptr @memcpy(nonnull noundef ptr %#7, nonnull noundef ptr %__constexpr_0, noundef i32 8)
+  %#24 = load i64, ptr %#7, align 8
+  end_lifetime ptr %#7
+  %#25 = sub i64 %#24, noundef %#2
+  %#26 = xor i64 %#25, %#22
+  %#27 = xor i64 %#18, %#26
+  %#28 = and i64 %#27, 4294967295
+  %#29 = mul nuw i64 %#28, 2246822535
+  %#30 = lshr i64 %#27, 32
+  %#31 = mul nuw i64 %#30, 2246822535
+  %#32 = mul nuw i64 %#28, 2654435761
+  %#33 = mul nuw i64 %#30, 2654435761
+  %#34 = lshr i64 %#29, 32
+  %#35 = and i64 %#31, 4294967295
+  %#36 = add nuw i64 %#35, %#32
+  %#37 = add nuw i64 %#36, %#34
+  %#38 = lshr i64 %#31, 32
+  %#39 = lshr i64 %#37, 32
+  %#40 = and i64 %#29, 4294967295
+  %#41 = zext nneg i32 noundef %#1 to i64
+  %#42 = mul nsw nuw i64 %#41, 374761393
+  %#43 = add nsw nuw i64 %#40, %#42
+  %#44 = mul i64 %#26, -7046029288634856825
+  %#45 = add i64 %#33, %#44
+  %#46 = add i64 %#45, %#38
+  %#47 = add i64 %#46, %#39
+  %#48 = lshr i64 %#47, 32
+  %#49 = and i64 %#43, 4294967295
+  %#50 = xor i64 %#48, %#49
+  %#51 = mul nsw nuw i64 %#50, 668265295
+  %#52 = lshr i64 %#43, 32
+  %#53 = add nuw i64 %#52, %#37
+  %#54 = and i64 %#53, 4294967295
+  %#55 = mul nsw nuw i64 %#54, 668265295
+  %#56 = mul nuw i64 %#50, 3266489917
+  %#57 = mul nuw i64 %#54, 3266489917
+  %#58 = lshr i64 %#51, 32
+  %#59 = and i64 %#55, 4294967295
+  %#60 = add nuw i64 %#56, %#59
+  %#61 = add nuw i64 %#60, %#58
+  %#62 = lshr i64 %#55, 32
+  %#63 = lshr i64 %#61, 32
+  %#64 = shl i64 %#61, 32
+  %#65 = and i64 %#51, 4294967295
+  %#66 = or disjoint i64 %#64, %#65
+  %#67 = mul i64 %#47, -4417276706812531889
+  %#68 = add i64 %#57, %#67
+  %#69 = add i64 %#68, %#62
+  %#70 = add i64 %#69, %#63
+  %#71 = lshr i64 %#64, 37
+  %#72 = xor i64 %#71, %#66
+  %#73 = mul i64 %#72, 1609587929392839161
+  %#74 = lshr i64 %#73, 32
+  %#75 = xor i64 %#74, %#73
+  %#76 = lshr i64 %#70, 37
+  %#77 = xor i64 %#76, %#70
+  %#78 = mul i64 %#77, 1609587929392839161
+  %#79 = lshr i64 %#78, 32
+  %#80 = xor i64 %#79, %#78
+  store i64 %#75, ptr noread noundef %#3, align 4
+  %#81 = gep inbounds nuw ptr noread noundef %#3, 1 x i32 8
+  store i64 %#80, ptr %#81, align 4
+  br label %#6
+
+#6:
+  ret void
+}
+=>
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i32)
+
+@kSecret = constant 192 bytes, align 64
+
+define void @target_api_128_seed_9to16(ptr noundef %#0, i32 noundef %#1, i64 noundef %#2, ptr noread noundef %#3) {
+init:
+  br label %#4
+
+#4:
+  %#7 = alloca i64 8, align 8, dead
+  %#8 = alloca i64 8, align 8, dead
+  %#9 = alloca i64 8, align 8, dead
+  %#10 = alloca i64 8, align 8, dead
+  %#11 = add i32 noundef %#1, 4294967279
+  %#12 = icmp ult i32 %#11, 4294967288
+  br i1 %#12, label %#6, label %#5
+
+#5:
+  start_lifetime ptr %#10
+  %#13 = call ptr @memcpy(nonnull noundef ptr %#10, noundef ptr noundef %#0, noundef i32 8)
+  %#14 = load i64, ptr %#10, align 8
+  end_lifetime ptr %#10
+  start_lifetime ptr %#9
+  %#15 = call ptr @memcpy(nonnull noundef ptr %#9, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#16 = load i64, ptr %#9, align 8
+  end_lifetime ptr %#9
+  %#17 = add i64 %#16, noundef %#2
+  %#18 = xor i64 %#17, %#14
+  %#19 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#20 = gep inbounds ptr %#19, 1 x i32 4294967288
+  start_lifetime ptr %#8
+  %#21 = call ptr @memcpy(nonnull noundef ptr %#8, nonnull noundef ptr %#20, noundef i32 8)
+  %#22 = load i64, ptr %#8, align 8
+  end_lifetime ptr %#8
+  start_lifetime ptr %#7
+  %__constexpr_0 = gep inbounds nuw ptr @kSecret, 1 x i32 8
+  %#23 = call ptr @memcpy(nonnull noundef ptr %#7, nonnull noundef ptr %__constexpr_0, noundef i32 8)
+  %#24 = load i64, ptr %#7, align 8
+  end_lifetime ptr %#7
+  %#25 = sub i64 %#24, noundef %#2
+  %#26 = xor i64 %#25, %#22
+  %#27 = xor i64 %#18, %#26
+  %#28 = and i64 %#27, 4294967295
+  %#29 = mul nuw i64 %#28, 2246822535
+  %#30 = lshr i64 %#27, 32
+  %#31 = mul nuw i64 %#30, 2246822535
+  %#32 = mul nuw i64 %#28, 2654435761
+  %#33 = mul nuw i64 %#30, 2654435761
+  %#34 = lshr i64 %#29, 32
+  %#35 = and i64 %#31, 4294967295
+  %#36 = add nuw i64 %#35, %#32
+  %#37 = add nuw i64 %#36, %#34
+  %#38 = lshr i64 %#31, 32
+  %#39 = lshr i64 %#37, 32
+  %#40 = and i64 %#29, 4294967295
+  %#41 = zext nneg i32 noundef %#1 to i64
+  %#42 = mul nsw nuw i64 %#41, 374761393
+  %#43 = add nsw nuw i64 %#40, %#42
+  %#44 = mul i64 %#26, -7046029288634856825
+  %#45 = add i64 %#33, %#44
+  %#46 = add i64 %#45, %#38
+  %#47 = add i64 %#46, %#39
+  %#48 = lshr i64 %#47, 32
+  %#49 = and i64 %#43, 4294967295
+  %#50 = xor i64 %#48, %#49
+  %#51 = mul nsw nuw i64 %#50, 668265295
+  %#52 = lshr i64 %#43, 32
+  %#53 = add nuw i64 %#52, %#37
+  %#54 = and i64 %#53, 4294967295
+  %#55 = mul nsw nuw i64 %#54, 668265295
+  %#56 = mul nuw i64 %#50, 3266489917
+  %#57 = mul nuw i64 %#54, 3266489917
+  %#58 = lshr i64 %#51, 32
+  %#59 = and i64 %#55, 4294967295
+  %#60 = add nuw i64 %#56, %#59
+  %#61 = add nuw i64 %#60, %#58
+  %#62 = lshr i64 %#55, 32
+  %#63 = lshr i64 %#61, 32
+  %#64 = shl i64 %#61, 32
+  %#65 = and i64 %#51, 4294967295
+  %#66 = or disjoint i64 %#64, %#65
+  %#67 = mul i64 %#47, -4417276706812531889
+  %#68 = add i64 %#57, %#67
+  %#69 = add i64 %#68, %#62
+  %#70 = add i64 %#69, %#63
+  %#71 = lshr i64 %#64, 37
+  %#72 = xor i64 %#71, %#66
+  %#73 = mul i64 %#72, 1609587929392839161
+  %#74 = lshr i64 %#73, 32
+  %#75 = xor i64 %#74, %#73
+  %#76 = lshr i64 %#70, 37
+  %#77 = xor i64 %#76, %#70
+  %#78 = mul i64 %#77, 1609587929392839161
+  %#79 = lshr i64 %#78, 32
+  %#80 = xor i64 %#79, %#78
+  store i64 %#75, ptr noread noundef %#3, align 4
+  %#81 = gep inbounds nuw ptr noread noundef %#3, 1 x i32 8
+  store i64 %#80, ptr %#81, align 4
+  br label %#6
+
+#6:
+  ret void
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i32)
+
+@kSecret = constant 192 bytes, align 64
+
+define void @target_api_128_9to16(ptr noundef %#0, i32 noundef %#1, ptr noread noundef %#2) {
+init:
+  br label %#3
+
+#3:
+  %#6 = alloca i64 8, align 8, dead
+  %#7 = alloca i64 8, align 8, dead
+  %#8 = alloca i64 8, align 8, dead
+  %#9 = alloca i64 8, align 8, dead
+  %#10 = add i32 noundef %#1, 4294967279
+  %#11 = icmp ult i32 %#10, 4294967288
+  br i1 %#11, label %#5, label %#4
+
+#4:
+  start_lifetime ptr %#9
+  %#12 = call ptr @memcpy(nonnull noundef ptr %#9, noundef ptr noundef %#0, noundef i32 8)
+  %#13 = load i64, ptr %#9, align 8
+  end_lifetime ptr %#9
+  start_lifetime ptr %#8
+  %#14 = call ptr @memcpy(nonnull noundef ptr %#8, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#15 = load i64, ptr %#8, align 8
+  end_lifetime ptr %#8
+  %#16 = xor i64 %#15, %#13
+  %#17 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#18 = gep inbounds ptr %#17, 1 x i32 4294967288
+  start_lifetime ptr %#7
+  %#19 = call ptr @memcpy(nonnull noundef ptr %#7, nonnull noundef ptr %#18, noundef i32 8)
+  %#20 = load i64, ptr %#7, align 8
+  end_lifetime ptr %#7
+  start_lifetime ptr %#6
+  %__constexpr_0 = gep inbounds nuw ptr @kSecret, 1 x i32 8
+  %#21 = call ptr @memcpy(nonnull noundef ptr %#6, nonnull noundef ptr %__constexpr_0, noundef i32 8)
+  %#22 = load i64, ptr %#6, align 8
+  end_lifetime ptr %#6
+  %#23 = xor i64 %#22, %#20
+  %#24 = xor i64 %#16, %#23
+  %#25 = and i64 %#24, 4294967295
+  %#26 = mul nuw i64 %#25, 2246822535
+  %#27 = lshr i64 %#24, 32
+  %#28 = mul nuw i64 %#27, 2246822535
+  %#29 = mul nuw i64 %#25, 2654435761
+  %#30 = mul nuw i64 %#27, 2654435761
+  %#31 = lshr i64 %#26, 32
+  %#32 = and i64 %#28, 4294967295
+  %#33 = add nuw i64 %#32, %#29
+  %#34 = add nuw i64 %#33, %#31
+  %#35 = lshr i64 %#28, 32
+  %#36 = lshr i64 %#34, 32
+  %#37 = and i64 %#26, 4294967295
+  %#38 = zext nneg i32 noundef %#1 to i64
+  %#39 = mul nsw nuw i64 %#38, 374761393
+  %#40 = add nsw nuw i64 %#37, %#39
+  %#41 = mul i64 %#23, -7046029288634856825
+  %#42 = add i64 %#30, %#41
+  %#43 = add i64 %#42, %#35
+  %#44 = add i64 %#43, %#36
+  %#45 = lshr i64 %#44, 32
+  %#46 = and i64 %#40, 4294967295
+  %#47 = xor i64 %#45, %#46
+  %#48 = mul nsw nuw i64 %#47, 668265295
+  %#49 = lshr i64 %#40, 32
+  %#50 = add nuw i64 %#49, %#34
+  %#51 = and i64 %#50, 4294967295
+  %#52 = mul nsw nuw i64 %#51, 668265295
+  %#53 = mul nuw i64 %#47, 3266489917
+  %#54 = mul nuw i64 %#51, 3266489917
+  %#55 = lshr i64 %#48, 32
+  %#56 = and i64 %#52, 4294967295
+  %#57 = add nuw i64 %#53, %#56
+  %#58 = add nuw i64 %#57, %#55
+  %#59 = lshr i64 %#52, 32
+  %#60 = lshr i64 %#58, 32
+  %#61 = shl i64 %#58, 32
+  %#62 = and i64 %#48, 4294967295
+  %#63 = or disjoint i64 %#61, %#62
+  %#64 = mul i64 %#44, -4417276706812531889
+  %#65 = add i64 %#54, %#64
+  %#66 = add i64 %#65, %#59
+  %#67 = add i64 %#66, %#60
+  %#68 = lshr i64 %#61, 37
+  %#69 = xor i64 %#68, %#63
+  %#70 = mul i64 %#69, 1609587929392839161
+  %#71 = lshr i64 %#70, 32
+  %#72 = xor i64 %#71, %#70
+  %#73 = lshr i64 %#67, 37
+  %#74 = xor i64 %#73, %#67
+  %#75 = mul i64 %#74, 1609587929392839161
+  %#76 = lshr i64 %#75, 32
+  %#77 = xor i64 %#76, %#75
+  store i64 %#72, ptr noread noundef %#2, align 4
+  %#78 = gep inbounds nuw ptr noread noundef %#2, 1 x i32 8
+  store i64 %#77, ptr %#78, align 4
+  br label %#5
+
+#5:
+  ret void
+}
+=>
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i32)
+
+@kSecret = constant 192 bytes, align 64
+
+define void @target_api_128_9to16(ptr noundef %#0, i32 noundef %#1, ptr noread noundef %#2) {
+init:
+  br label %#3
+
+#3:
+  %#6 = alloca i64 8, align 8, dead
+  %#7 = alloca i64 8, align 8, dead
+  %#8 = alloca i64 8, align 8, dead
+  %#9 = alloca i64 8, align 8, dead
+  %#10 = add i32 noundef %#1, 4294967279
+  %#11 = icmp ult i32 %#10, 4294967288
+  br i1 %#11, label %#5, label %#4
+
+#4:
+  start_lifetime ptr %#9
+  %#12 = call ptr @memcpy(nonnull noundef ptr %#9, noundef ptr noundef %#0, noundef i32 8)
+  %#13 = load i64, ptr %#9, align 8
+  end_lifetime ptr %#9
+  start_lifetime ptr %#8
+  %#14 = call ptr @memcpy(nonnull noundef ptr %#8, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#15 = load i64, ptr %#8, align 8
+  end_lifetime ptr %#8
+  %#16 = xor i64 %#15, %#13
+  %#17 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#18 = gep inbounds ptr %#17, 1 x i32 4294967288
+  start_lifetime ptr %#7
+  %#19 = call ptr @memcpy(nonnull noundef ptr %#7, nonnull noundef ptr %#18, noundef i32 8)
+  %#20 = load i64, ptr %#7, align 8
+  end_lifetime ptr %#7
+  start_lifetime ptr %#6
+  %__constexpr_0 = gep inbounds nuw ptr @kSecret, 1 x i32 8
+  %#21 = call ptr @memcpy(nonnull noundef ptr %#6, nonnull noundef ptr %__constexpr_0, noundef i32 8)
+  %#22 = load i64, ptr %#6, align 8
+  end_lifetime ptr %#6
+  %#23 = xor i64 %#22, %#20
+  %#24 = xor i64 %#16, %#23
+  %#25 = and i64 %#24, 4294967295
+  %#26 = mul nuw i64 %#25, 2246822535
+  %#27 = lshr i64 %#24, 32
+  %#28 = mul nuw i64 %#27, 2246822535
+  %#29 = mul nuw i64 %#25, 2654435761
+  %#30 = mul nuw i64 %#27, 2654435761
+  %#31 = lshr i64 %#26, 32
+  %#32 = and i64 %#28, 4294967295
+  %#33 = add nuw i64 %#32, %#29
+  %#34 = add nuw i64 %#33, %#31
+  %#35 = lshr i64 %#28, 32
+  %#36 = lshr i64 %#34, 32
+  %#37 = and i64 %#26, 4294967295
+  %#38 = zext nneg i32 noundef %#1 to i64
+  %#39 = mul nsw nuw i64 %#38, 374761393
+  %#40 = add nsw nuw i64 %#37, %#39
+  %#41 = mul i64 %#23, -7046029288634856825
+  %#42 = add i64 %#30, %#41
+  %#43 = add i64 %#42, %#35
+  %#44 = add i64 %#43, %#36
+  %#45 = lshr i64 %#44, 32
+  %#46 = and i64 %#40, 4294967295
+  %#47 = xor i64 %#45, %#46
+  %#48 = mul nsw nuw i64 %#47, 668265295
+  %#49 = lshr i64 %#40, 32
+  %#50 = add nuw i64 %#49, %#34
+  %#51 = and i64 %#50, 4294967295
+  %#52 = mul nsw nuw i64 %#51, 668265295
+  %#53 = mul nuw i64 %#47, 3266489917
+  %#54 = mul nuw i64 %#51, 3266489917
+  %#55 = lshr i64 %#48, 32
+  %#56 = and i64 %#52, 4294967295
+  %#57 = add nuw i64 %#53, %#56
+  %#58 = add nuw i64 %#57, %#55
+  %#59 = lshr i64 %#52, 32
+  %#60 = lshr i64 %#58, 32
+  %#61 = shl i64 %#58, 32
+  %#62 = and i64 %#48, 4294967295
+  %#63 = or disjoint i64 %#61, %#62
+  %#64 = mul i64 %#44, -4417276706812531889
+  %#65 = add i64 %#54, %#64
+  %#66 = add i64 %#65, %#59
+  %#67 = add i64 %#66, %#60
+  %#68 = lshr i64 %#61, 37
+  %#69 = xor i64 %#68, %#63
+  %#70 = mul i64 %#69, 1609587929392839161
+  %#71 = lshr i64 %#70, 32
+  %#72 = xor i64 %#71, %#70
+  %#73 = lshr i64 %#67, 37
+  %#74 = xor i64 %#73, %#67
+  %#75 = mul i64 %#74, 1609587929392839161
+  %#76 = lshr i64 %#75, 32
+  %#77 = xor i64 %#76, %#75
+  store i64 %#72, ptr noread noundef %#2, align 4
+  %#78 = gep inbounds nuw ptr noread noundef %#2, 1 x i32 8
+  store i64 %#77, ptr %#78, align 4
+  br label %#5
+
+#5:
+  ret void
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i32)
+
+@kSecret = constant 192 bytes, align 64
+
+define i64 @target_api_64_seed_0to16(ptr noundef %#0, i32 noundef %#1, i64 noundef %#2) {
+init:
+  br label %#3
+
+#3:
+  %#13 = alloca i64 8, align 8, dead
+  %#14 = alloca i64 4, align 4, dead
+  %#15 = alloca i64 8, align 8, dead
+  %#16 = alloca i64 4, align 4, dead
+  %#17 = alloca i64 4, align 4, dead
+  %#18 = alloca i64 8, align 8, dead
+  %#19 = alloca i64 8, align 8, dead
+  %#20 = alloca i64 8, align 8, dead
+  %#21 = alloca i64 8, align 8, dead
+  %#22 = icmp ugt i32 noundef %#1, 16
+  br i1 %#22, label %#12, label %#4
+
+#4:
+  %#23 = icmp samesign ugt i32 noundef %#1, 8
+  br i1 %#23, label %#5, label %#6
+
+#5:
+  start_lifetime ptr %#21
+  %#24 = call ptr @memcpy(nonnull noundef ptr %#21, noundef ptr noundef %#0, noundef i32 8)
+  %#25 = load i64, ptr %#21, align 8
+  end_lifetime ptr %#21
+  start_lifetime ptr %#20
+  %#26 = call ptr @memcpy(nonnull noundef ptr %#20, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#27 = load i64, ptr %#20, align 8
+  end_lifetime ptr %#20
+  %#28 = add i64 %#27, noundef %#2
+  %#29 = xor i64 %#28, %#25
+  %#30 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#31 = gep inbounds ptr %#30, 1 x i32 4294967288
+  start_lifetime ptr %#19
+  %#32 = call ptr @memcpy(nonnull noundef ptr %#19, nonnull noundef ptr %#31, noundef i32 8)
+  %#33 = load i64, ptr %#19, align 8
+  end_lifetime ptr %#19
+  start_lifetime ptr %#18
+  %__constexpr_0 = gep inbounds nuw ptr @kSecret, 1 x i32 8
+  %#34 = call ptr @memcpy(nonnull noundef ptr %#18, nonnull noundef ptr %__constexpr_0, noundef i32 8)
+  %#35 = load i64, ptr %#18, align 8
+  end_lifetime ptr %#18
+  %#36 = sub i64 %#35, noundef %#2
+  %#37 = xor i64 %#36, %#33
+  %#38 = zext nneg i32 noundef %#1 to i64
+  %#39 = and i64 %#29, 4294967295
+  %#40 = and i64 %#37, 4294967295
+  %#41 = mul nuw i64 %#40, %#39
+  %#42 = lshr i64 %#29, 32
+  %#43 = mul nuw i64 %#40, %#42
+  %#44 = lshr i64 %#37, 32
+  %#45 = mul nuw i64 %#44, %#39
+  %#46 = mul nuw i64 %#44, %#42
+  %#47 = lshr i64 %#41, 32
+  %#48 = and i64 %#43, 4294967295
+  %#49 = add nuw i64 %#48, %#45
+  %#50 = add nuw i64 %#49, %#47
+  %#51 = lshr i64 %#43, 32
+  %#52 = lshr i64 %#50, 32
+  %#53 = add nuw i64 %#51, %#46
+  %#54 = add nuw i64 %#53, %#52
+  %#55 = shl i64 %#50, 32
+  %#56 = and i64 %#41, 4294967295
+  %#57 = or disjoint i64 %#55, %#56
+  %#58 = xor i64 %#57, %#54
+  %#59 = add i64 %#29, %#38
+  %#60 = add i64 %#59, %#37
+  %#61 = add i64 %#60, %#58
+  br label %#11
+
+#6:
+  %#62 = icmp samesign ugt i32 noundef %#1, 3
+  br i1 %#62, label %#7, label %#8
+
+#7:
+  start_lifetime ptr %#17
+  %#63 = call ptr @memcpy(nonnull noundef ptr %#17, noundef ptr noundef %#0, noundef i32 4)
+  %#64 = load i32, ptr %#17, align 4
+  end_lifetime ptr %#17
+  %#65 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#66 = gep inbounds ptr %#65, 1 x i32 4294967292
+  start_lifetime ptr %#16
+  %#67 = call ptr @memcpy(nonnull noundef ptr %#16, nonnull noundef ptr %#66, noundef i32 4)
+  %#68 = load i32, ptr %#16, align 4
+  end_lifetime ptr %#16
+  %#69 = zext i32 %#64 to i64
+  %#70 = zext i32 %#68 to i64
+  %#71 = shl nuw i64 %#70, 32
+  %#72 = or disjoint i64 %#71, %#69
+  start_lifetime ptr %#15
+  %#73 = call ptr @memcpy(nonnull noundef ptr %#15, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#74 = load i64, ptr %#15, align 8
+  end_lifetime ptr %#15
+  %#75 = add i64 %#74, noundef %#2
+  %#76 = xor i64 %#75, %#72
+  %#77 = zext nneg i32 noundef %#1 to i64
+  %#78 = lshr i64 %#76, 51
+  %#79 = xor i64 %#78, %#76
+  %#80 = mul i64 %#79, 2654435761
+  %#81 = add i64 %#80, %#77
+  %#82 = lshr i64 %#81, 47
+  %#83 = xor i64 %#82, %#81
+  %#84 = mul i64 %#83, -4417276706812531889
+  br label %#11
+
+#8:
+  %#85 = icmp eq i32 noundef %#1, 0
+  br i1 %#85, label %#9, label %#10
+
+#9:
+  %#86 = add i64 noundef %#2, -7046029288634856825
+  start_lifetime ptr %#13
+  %#87 = call ptr @memcpy(nonnull noundef ptr %#13, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#88 = load i64, ptr %#13, align 8
+  end_lifetime ptr %#13
+  %#89 = xor i64 %#88, %#86
+  br label %#11
+
+#10:
+  %#90 = load i8, ptr noundef %#0, align 1
+  %#91 = lshr i32 noundef %#1, 1
+  %#92 = gep inbounds nuw ptr noundef %#0, 1 x i32 %#91
+  %#93 = load i8, ptr %#92, align 1
+  %#94 = gep ptr noundef %#0, 1 x i32 noundef %#1
+  %#95 = gep ptr %#94, 1 x i32 4294967295
+  %#96 = load i8, ptr %#95, align 1
+  %#97 = zext i8 %#90 to i32
+  %#98 = zext i8 %#93 to i32
+  %#99 = shl nsw nuw i32 %#98, 8
+  %#100 = or disjoint i32 %#99, %#97
+  %#101 = zext i8 %#96 to i32
+  %#102 = shl nsw nuw i32 %#101, 16
+  %#103 = or disjoint i32 %#100, %#102
+  %#104 = shl nsw nuw i32 noundef %#1, 24
+  %#105 = or disjoint i32 %#103, %#104
+  %#106 = zext nneg i32 %#105 to i64
+  start_lifetime ptr %#14
+  %#107 = call ptr @memcpy(nonnull noundef ptr %#14, nonnull noundef ptr @kSecret, noundef i32 4)
+  %#108 = load i32, ptr %#14, align 4
+  end_lifetime ptr %#14
+  %#109 = zext i32 %#108 to i64
+  %#110 = add i64 noundef %#2, %#109
+  %#111 = xor i64 %#110, %#106
+  %#112 = mul i64 %#111, -7046029288634856825
+  br label %#11
+
+#11:
+  %#113 = phi i64 [ %#89, %#9 ], [ %#112, %#10 ], [ %#84, %#7 ], [ %#61, %#5 ]
+  %#114 = lshr i64 %#113, 37
+  %#115 = xor i64 %#114, %#113
+  %#116 = mul i64 %#115, 1609587929392839161
+  %#117 = lshr i64 %#116, 32
+  %#118 = xor i64 %#117, %#116
+  br label %#12
+
+#12:
+  %#119 = phi i64 [ %#118, %#11 ], [ 0, %#3 ]
+  ret i64 %#119
+}
+=>
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i32)
+
+@kSecret = constant 192 bytes, align 64
+
+define i64 @target_api_64_seed_0to16(ptr noundef %#0, i32 noundef %#1, i64 noundef %#2) {
+init:
+  br label %#3
+
+#3:
+  %#13 = alloca i64 8, align 8, dead
+  %#14 = alloca i64 4, align 4, dead
+  %#15 = alloca i64 8, align 8, dead
+  %#16 = alloca i64 4, align 4, dead
+  %#17 = alloca i64 4, align 4, dead
+  %#18 = alloca i64 8, align 8, dead
+  %#19 = alloca i64 8, align 8, dead
+  %#20 = alloca i64 8, align 8, dead
+  %#21 = alloca i64 8, align 8, dead
+  %#22 = icmp ugt i32 noundef %#1, 16
+  br i1 %#22, label %#12, label %#4
+
+#4:
+  %#23 = icmp samesign ugt i32 noundef %#1, 8
+  br i1 %#23, label %#5, label %#6
+
+#5:
+  start_lifetime ptr %#21
+  %#24 = call ptr @memcpy(nonnull noundef ptr %#21, noundef ptr noundef %#0, noundef i32 8)
+  %#25 = load i64, ptr %#21, align 8
+  end_lifetime ptr %#21
+  start_lifetime ptr %#20
+  %#26 = call ptr @memcpy(nonnull noundef ptr %#20, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#27 = load i64, ptr %#20, align 8
+  end_lifetime ptr %#20
+  %#28 = add i64 %#27, noundef %#2
+  %#29 = xor i64 %#28, %#25
+  %#30 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#31 = gep inbounds ptr %#30, 1 x i32 4294967288
+  start_lifetime ptr %#19
+  %#32 = call ptr @memcpy(nonnull noundef ptr %#19, nonnull noundef ptr %#31, noundef i32 8)
+  %#33 = load i64, ptr %#19, align 8
+  end_lifetime ptr %#19
+  start_lifetime ptr %#18
+  %__constexpr_0 = gep inbounds nuw ptr @kSecret, 1 x i32 8
+  %#34 = call ptr @memcpy(nonnull noundef ptr %#18, nonnull noundef ptr %__constexpr_0, noundef i32 8)
+  %#35 = load i64, ptr %#18, align 8
+  end_lifetime ptr %#18
+  %#36 = sub i64 %#35, noundef %#2
+  %#37 = xor i64 %#36, %#33
+  %#38 = zext nneg i32 noundef %#1 to i64
+  %#39 = and i64 %#29, 4294967295
+  %#40 = and i64 %#37, 4294967295
+  %#41 = mul nuw i64 %#40, %#39
+  %#42 = lshr i64 %#29, 32
+  %#43 = mul nuw i64 %#40, %#42
+  %#44 = lshr i64 %#37, 32
+  %#45 = mul nuw i64 %#44, %#39
+  %#46 = mul nuw i64 %#44, %#42
+  %#47 = lshr i64 %#41, 32
+  %#48 = and i64 %#43, 4294967295
+  %#49 = add nuw i64 %#48, %#45
+  %#50 = add nuw i64 %#49, %#47
+  %#51 = lshr i64 %#43, 32
+  %#52 = lshr i64 %#50, 32
+  %#53 = add nuw i64 %#51, %#46
+  %#54 = add nuw i64 %#53, %#52
+  %#55 = shl i64 %#50, 32
+  %#56 = and i64 %#41, 4294967295
+  %#57 = or disjoint i64 %#55, %#56
+  %#58 = xor i64 %#57, %#54
+  %#59 = add i64 %#29, %#38
+  %#60 = add i64 %#59, %#37
+  %#61 = add i64 %#60, %#58
+  br label %#11
+
+#6:
+  %#62 = icmp samesign ugt i32 noundef %#1, 3
+  br i1 %#62, label %#7, label %#8
+
+#7:
+  start_lifetime ptr %#17
+  %#63 = call ptr @memcpy(nonnull noundef ptr %#17, noundef ptr noundef %#0, noundef i32 4)
+  %#64 = load i32, ptr %#17, align 4
+  end_lifetime ptr %#17
+  %#65 = gep inbounds nuw ptr noundef %#0, 1 x i32 noundef %#1
+  %#66 = gep inbounds ptr %#65, 1 x i32 4294967292
+  start_lifetime ptr %#16
+  %#67 = call ptr @memcpy(nonnull noundef ptr %#16, nonnull noundef ptr %#66, noundef i32 4)
+  %#68 = load i32, ptr %#16, align 4
+  end_lifetime ptr %#16
+  %#69 = zext i32 %#64 to i64
+  %#70 = zext i32 %#68 to i64
+  %#71 = shl nuw i64 %#70, 32
+  %#72 = or disjoint i64 %#71, %#69
+  start_lifetime ptr %#15
+  %#73 = call ptr @memcpy(nonnull noundef ptr %#15, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#74 = load i64, ptr %#15, align 8
+  end_lifetime ptr %#15
+  %#75 = add i64 %#74, noundef %#2
+  %#76 = xor i64 %#75, %#72
+  %#77 = zext nneg i32 noundef %#1 to i64
+  %#78 = lshr i64 %#76, 51
+  %#79 = xor i64 %#78, %#76
+  %#80 = mul i64 %#79, 2654435761
+  %#81 = add i64 %#80, %#77
+  %#82 = lshr i64 %#81, 47
+  %#83 = xor i64 %#82, %#81
+  %#84 = mul i64 %#83, -4417276706812531889
+  br label %#11
+
+#8:
+  %#85 = icmp eq i32 noundef %#1, 0
+  br i1 %#85, label %#9, label %#10
+
+#9:
+  %#86 = add i64 noundef %#2, -7046029288634856825
+  start_lifetime ptr %#13
+  %#87 = call ptr @memcpy(nonnull noundef ptr %#13, nonnull noundef ptr @kSecret, noundef i32 8)
+  %#88 = load i64, ptr %#13, align 8
+  end_lifetime ptr %#13
+  %#89 = xor i64 %#88, %#86
+  br label %#11
+
+#10:
+  %#90 = load i8, ptr noundef %#0, align 1
+  %#91 = lshr i32 noundef %#1, 1
+  %#92 = gep inbounds nuw ptr noundef %#0, 1 x i32 %#91
+  %#93 = load i8, ptr %#92, align 1
+  %#94 = gep ptr noundef %#0, 1 x i32 noundef %#1
+  %#95 = gep ptr %#94, 1 x i32 4294967295
+  %#96 = load i8, ptr %#95, align 1
+  %#97 = zext i8 %#90 to i32
+  %#98 = zext i8 %#93 to i32
+  %#99 = shl nsw nuw i32 %#98, 8
+  %#100 = or disjoint i32 %#99, %#97
+  %#101 = zext i8 %#96 to i32
+  %#102 = shl nsw nuw i32 %#101, 16
+  %#103 = or disjoint i32 %#100, %#102
+  %#104 = shl nsw nuw i32 noundef %#1, 24
+  %#105 = or disjoint i32 %#103, %#104
+  %#106 = zext nneg i32 %#105 to i64
+  start_lifetime ptr %#14
+  %#107 = call ptr @memcpy(nonnull noundef ptr %#14, nonnull noundef ptr @kSecret, noundef i32 4)
+  %#108 = load i32, ptr %#14, align 4
+  end_lifetime ptr %#14
+  %#109 = zext i32 %#108 to i64
+  %#110 = add i64 noundef %#2, %#109
+  %#111 = xor i64 %#110, %#106
+  %#112 = mul i64 %#111, -7046029288634856825
+  br label %#11
+
+#11:
+  %#113 = phi i64 [ %#89, %#9 ], [ %#112, %#10 ], [ %#84, %#7 ], [ %#61, %#5 ]
+  %#114 = lshr i64 %#113, 37
+  %#115 = xor i64 %#114, %#113
+  %#116 = mul i64 %#115, 1609587929392839161
+  %#117 = lshr i64 %#116, 32
+  %#118 = xor i64 %#117, %#116
+  br label %#12
+
+#12:
+  %#119 = phi i64 [ %#118, %#11 ], [ 0, %#3 ]
+  ret i64 %#119
+}
+Transformation seems to be correct!
+
+Summary:
+  3 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

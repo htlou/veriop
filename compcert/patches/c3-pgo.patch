@@ -1,0 +1,333 @@
+diff --git a/backend/LayoutSearch.ml b/backend/LayoutSearch.ml
+new file mode 100644
+index 0000000..6cfc7f8
+--- /dev/null
++++ b/backend/LayoutSearch.ml
+@@ -0,0 +1,169 @@
++(* Node-level layout policies. Pure graph code: no benchmark identities,
++   instruction rewriting, or access to the enumeration validator. *)
++type graph = { succ: int list array; eligible: int list array; entry: int }
++
++(* Cyclic SCCs are a static loop proxy, not measured frequencies. *)
++let components graph =
++  let n = Array.length graph.succ in
++  let reverse = Array.make n [] and seen = Array.make n false in
++  Array.iteri (fun u edges -> List.iter (fun v -> reverse.(v) <- u :: reverse.(v)) edges) graph.succ;
++  let finished = ref [] in
++  for start = 0 to n - 1 do
++    let stack = ref [start, false] in
++    while !stack <> [] do
++      match !stack with
++      | [] -> ()
++      | (u, leave) :: rest ->
++          stack := rest;
++          if leave then finished := u :: !finished
++          else if not seen.(u) then begin
++            seen.(u) <- true;
++            stack := (u, true) :: !stack;
++            List.iter (fun v -> if not seen.(v) then stack := (v, false) :: !stack) graph.succ.(u)
++          end
++    done
++  done;
++  let component = Array.make n (-1) and count = ref 0 in
++  List.iter (fun start ->
++    if component.(start) < 0 then begin
++      let stack = ref [start] in
++      component.(start) <- !count;
++      while !stack <> [] do
++        match !stack with
++        | [] -> ()
++        | u :: rest ->
++            stack := rest;
++            List.iter (fun v -> if component.(v) < 0 then begin
++              component.(v) <- !count; stack := v :: !stack
++            end) reverse.(u)
++      done;
++      incr count
++    end
++  ) !finished;
++  component
++
++let weights graph weighted =
++  let comp = components graph in
++  fun u v -> if weighted && comp.(u) = comp.(v) then 8 else 1
++
++let greedy graph order weight =
++  let n = Array.length graph.succ in
++  let used = Array.make n false and rank = Array.make n 0 in
++  List.iteri (fun i u -> rank.(u) <- i) order;
++  let result = ref [] in
++  List.iter (fun seed ->
++    let current = ref seed in
++    while !current >= 0 && not used.(!current) do
++      let u = !current in
++      used.(u) <- true; result := u :: !result;
++      let candidates = List.filter (fun v -> not used.(v)) graph.eligible.(u) in
++      current := List.fold_left (fun best v ->
++        if best < 0 || weight u v > weight u best ||
++          (weight u v = weight u best &&
++           (abs (rank.(v) - rank.(u) - 1), rank.(v)) <
++           (abs (rank.(best) - rank.(u) - 1), rank.(best)))
++        then v else best) (-1) candidates
++    done
++  ) (graph.entry :: order);
++  List.rev !result
++
++let improve graph seed weight random consider =
++  let n = Array.length graph.succ in
++  let entry = n and stop = n + 1 in
++  let next = Array.make (n + 2) stop and prev = Array.make (n + 2) entry in
++  let last = ref entry in
++  List.iter (fun u -> next.(!last) <- u; prev.(u) <- !last; last := u) seed;
++  next.(!last) <- stop; prev.(stop) <- !last;
++  let edge u v =
++    if u = entry then (if v = graph.entry then 1 else 0)
++    else if u = stop || v >= n then 0
++    else if List.mem v graph.eligible.(u) then weight u v else 0 in
++  let emit () =
++    let result = ref [] and u = ref next.(entry) in
++    for _ = 1 to n do
++      assert (!u < n); result := !u :: !result; u := next.(!u)
++    done;
++    assert (!u = stop); List.rev !result in
++  let neutral = Array.make n false and allow_neutral = ref false in
++  let accept u gain =
++    if gain > 0 then true
++    else if gain = 0 && !allow_neutral && not neutral.(u)
++            && Random.State.int random 4 = 0
++    then (neutral.(u) <- true; true) else false in
++  let move x first tail =
++    if x <> first && x <> tail && next.(x) <> first then begin
++      let before = prev.(first) and after = next.(tail) and nx = next.(x) in
++      let gain = edge before after + edge x first + edge tail nx
++               - edge before first - edge tail after - edge x nx in
++      if accept first gain then begin
++        next.(before) <- after; prev.(after) <- before;
++        next.(x) <- first; prev.(first) <- x;
++        next.(tail) <- nx; prev.(nx) <- tail
++      end
++    end in
++  let swap x y =
++    if y < n && x <> y then
++      if next.(x) = y then move y x x
++      else if next.(y) = x then move x y y
++      else begin
++        let px = prev.(x) and nx = next.(x) and py = prev.(y) and ny = next.(y) in
++        let gain = edge px y + edge y nx + edge py x + edge x ny
++                 - edge px x - edge x nx - edge py y - edge y ny in
++        if accept x gain then begin
++          next.(px) <- y; prev.(y) <- px; next.(y) <- nx; prev.(nx) <- y;
++          next.(py) <- x; prev.(x) <- py; next.(x) <- ny; prev.(ny) <- x
++        end
++      end in
++  let reverse_after x y =
++    let u = ref next.(x) and nodes = ref [] and budget = ref 16 in
++    while !u < n && !u <> y && !budget > 0 do
++      nodes := !u :: !nodes; u := next.(!u); decr budget
++    done;
++    if !u = y && !nodes <> [] then begin
++      let reversed = y :: !nodes and after = next.(y) in
++      let value sequence =
++        let p = ref x and score = ref 0 in
++        List.iter (fun v -> score := !score + edge !p v; p := v) sequence;
++        !score + edge !p after in
++      if accept y (value reversed - value (List.rev reversed)) then begin
++        let p = ref x in
++        List.iter (fun v -> next.(!p) <- v; prev.(v) <- !p; p := v) reversed;
++        next.(!p) <- after; prev.(after) <- !p
++      end
++    end in
++  consider (emit ());
++  (* ponytail: fixed rounds and bounded reversal/trace length cap compile cost;
++     an optimal path-cover solver would be a separate, more expensive policy. *)
++  for round = 0 to 11 do
++    allow_neutral := round mod 3 <> 0;
++    Array.fill neutral 0 n false;
++    let nodes = Array.init n (fun i -> i) in
++    for i = n - 1 downto 1 do
++      let j = Random.State.int random (i + 1) in
++      let tmp = nodes.(i) in nodes.(i) <- nodes.(j); nodes.(j) <- tmp
++    done;
++    Array.iter (fun x ->
++      List.iter (fun y ->
++        move x y y;
++        move prev.(y) x x;
++        swap x prev.(y);
++        if x <> y && next.(x) <> y then begin
++          let tail = ref y and budget = ref 64 in
++          while next.(!tail) < n && next.(!tail) <> x
++                && edge !tail next.(!tail) > 0 && !budget > 0 do
++            tail := next.(!tail); decr budget
++          done;
++          move x y !tail;
++          reverse_after x y
++        end
++      ) graph.eligible.(x);
++      if !allow_neutral then swap x (Random.State.int random n)
++    ) nodes;
++    consider (emit ())
++  done
++
++let search graph baseline weight consider =
++  let random = Random.State.make [|0x51a7; Array.length graph.succ|] in
++  let trace = greedy graph baseline weight in
++  List.iter (fun seed -> improve graph seed weight random consider)
++    [baseline; trace; List.rev baseline]
+diff --git a/backend/Linearizeaux.ml b/backend/Linearizeaux.ml
+index 902724e..8edcf84 100644
+--- a/backend/Linearizeaux.ml
++++ b/backend/Linearizeaux.ml
+@@ -111,4 +111,58 @@ let flatten_blocks blks =
+ (* Build the enumeration *)
+ 
+ let enumerate_aux f reach =
+-  flatten_blocks (basic_blocks f (join_points f))
++  let baseline = flatten_blocks (basic_blocks f (join_points f)) in
++  let key, profile = PgoLayout.lookup f in
++  let log matched changed = match Sys.getenv_opt "VERIOP_LAYOUT_LOG" with
++  | None -> ()
++  | Some path ->
++    let oc = open_out_gen [Open_creat;Open_append;Open_text] 0o600 path in
++    Printf.fprintf oc "%s %b %b %d\n" key matched changed (List.length baseline);
++    close_out oc in
++  match profile with
++  | None -> log false false; baseline
++  | Some profile ->
++    let pcs = Array.of_list baseline in
++    let n = Array.length pcs in
++    if n = 0 then baseline else
++    let index = Hashtbl.create n in
++    Array.iteri (fun i pc -> Hashtbl.add index (P.to_int pc) i) pcs;
++    let indices targets = List.filter_map (fun pc -> Hashtbl.find_opt index (P.to_int pc)) targets in
++    let blocks = Array.map (fun pc -> match PTree.get pc f.fn_code with Some b -> b | None -> []) pcs in
++    let rec eligible = function
++      | Lbranch s :: _ -> [s]
++      | Lcond (_, _, yes, no) :: _ -> [yes; no]
++      | Lreturn :: _ | Ltailcall _ :: _ | Ljumptable _ :: _ | [] -> []
++      | _ :: rest -> eligible rest in
++    let graph = LayoutSearch.{
++      succ = Array.map (fun b -> indices (successors_block b)) blocks;
++      eligible = Array.map (fun b -> indices (eligible b)) blocks;
++      entry = Hashtbl.find index (P.to_int f.fn_entrypoint)
++    } in
++    let count u v = Option.value (Hashtbl.find_opt profile (u,v)) ~default:0. in
++    let entry_count = count 0 (P.to_int f.fn_entrypoint) in
++    let original = List.init n (fun i -> i) in
++    let jumps order =
++      let labels = ref IntSet.empty and jumps = ref 0 in
++      List.iter (fun u ->
++        let rec scan ordinary = function
++          | [] -> if ordinary then labels := IntSet.empty
++          | Lbranch s :: _ ->
++            let v = Hashtbl.find index (P.to_int s) in
++            if not (IntSet.mem v !labels) then (incr jumps; labels := IntSet.empty);
++            if ordinary then labels := IntSet.empty
++          | Lcond (_, _, yes, no) :: _ ->
++            let v1 = Hashtbl.find index (P.to_int yes)
++            and v2 = Hashtbl.find index (P.to_int no) in
++            if not (IntSet.mem v1 !labels || IntSet.mem v2 !labels) then incr jumps;
++            labels := IntSet.empty
++          | Lreturn :: _ | Ltailcall _ :: _ | Ljumptable _ :: _ -> labels := IntSet.empty
++          | _ :: rest -> scan true rest in
++        scan false blocks.(u); labels := IntSet.add u !labels) (List.rev order);
++      if not (IntSet.mem graph.LayoutSearch.entry !labels) then incr jumps;
++      !jumps in
++    let order = if entry_count = 0. then original else
++      PgoLayout.search graph (Array.map (fun b -> max 4 (4 * List.length b)) blocks)
++        (fun u v -> count (P.to_int pcs.(u)) (P.to_int pcs.(v))) entry_count jumps original in
++    log true (order <> original);
++    List.map (Array.get pcs) order
+diff --git a/backend/PgoLayout.ml b/backend/PgoLayout.ml
+new file mode 100644
+index 0000000..f5ba2e5
+--- /dev/null
++++ b/backend/PgoLayout.ml
+@@ -0,0 +1,88 @@
++(* Untrusted profile input and pure node permutations. No CFG rewriting. *)
++let profiles = lazy (
++  match Sys.getenv_opt "VERIOP_LAYOUT_PROFILE" with
++  | None -> None
++  | Some path ->
++    try
++      let ic = open_in path in
++      Fun.protect ~finally:(fun () -> close_in ic) (fun () ->
++        let all = Hashtbl.create 512 and lines = ref 0 in
++        (try while true do
++          let line = input_line ic in incr lines;
++          if !lines > 2000000 then failwith "profile too large";
++          match String.split_on_char ' ' line with
++          | [key; source; target; count] ->
++              if String.length key <> 32 || not (String.for_all (function
++                | '0'..'9' | 'a'..'f' -> true | _ -> false) key)
++              then failwith "profile key";
++              let u = int_of_string source and v = int_of_string target
++              and f = float_of_string count in
++              if u < 0 || v <= 0 || not (f >= 0. && f <= 1e15)
++              then failwith "profile count";
++              let edges = match Hashtbl.find_opt all key with
++              | Some edges -> edges
++              | None -> let edges = Hashtbl.create 64 in Hashtbl.add all key edges; edges in
++              let old = Option.value (Hashtbl.find_opt edges (u,v)) ~default:0. in
++              if old +. f > 1e15 then failwith "profile sum";
++              Hashtbl.replace edges (u,v) (old +. f)
++          | _ -> failwith "profile row"
++        done with End_of_file -> ()); Some all)
++    with Sys_error _ | Failure _ | Invalid_argument _ -> None)
++
++let lookup f =
++  let key = Digest.to_hex (Digest.string (Marshal.to_string f [Marshal.No_sharing])) in
++  match Lazy.force profiles with None -> key, None
++  | Some all -> key, Hashtbl.find_opt all key
++
++let search graph sizes counts entry_count actual_jumps baseline =
++  let n = Array.length graph.LayoutSearch.succ in
++  let edge_list = ref [] and total = ref entry_count and largest = ref 1. in
++  Array.iteri (fun u targets -> List.iter (fun v ->
++    let f = counts u v in
++    if f > 0. then begin
++      edge_list := (u,v,f) :: !edge_list; total := !total +. f;
++      largest := max !largest f
++    end) (List.sort_uniq compare targets)) graph.LayoutSearch.succ;
++  let base_jumps = actual_jumps baseline in
++  let instructions = Array.fold_left (+) 0 sizes / 4 in
++  let score order =
++    let jumps = actual_jumps order in
++    if jumps > base_jumps + max 1 (instructions / 100) then neg_infinity else
++    let pos = Array.make n 0 and next = Array.make n (-1) and offset = ref 0 in
++    let last = ref (-1) in
++    List.iter (fun u ->
++      pos.(u) <- !offset; offset := !offset + sizes.(u);
++      if !last >= 0 then next.(!last) <- u; last := u) order;
++    let reward = ref (if List.hd order = graph.LayoutSearch.entry then entry_count else 0.) in
++    List.iter (fun (u,v,f) ->
++      let fall = next.(u) = v && List.mem v graph.LayoutSearch.eligible.(u) in
++      let distance = abs (pos.(v) - pos.(u) - sizes.(u)) in
++      let near = max 0. (1. -. float distance /. 1024.) in
++      let benefit = if fall then 1. else
++        0.1 *. near -. (if List.length graph.LayoutSearch.succ.(u) = 1 then 0.15 else 0.) in
++      reward := !reward +. f *. benefit) !edge_list;
++    !reward -. 0.002 *. (!total /. float (max 1 n)) *. float (max 0 (jumps - base_jumps)) in
++  let best = ref baseline and value = ref (score baseline) in
++  let consider order =
++    let v = score order in
++    if v > !value +. 1e-9 then (best := order; value := v) in
++  let weight u v = int_of_float (1e6 *. counts u v /. !largest) in
++  LayoutSearch.search graph baseline weight consider;
++  (* ponytail: bound full distance rescoring to 512 nodes and 4096 proposals;
++     incremental distance deltas are only needed if compile cost warrants it. *)
++  if n <= 512 then begin
++    let budget = ref 4096 in
++    let insert x y before =
++      if x <> y && !budget > 0 then begin
++        decr budget;
++        let rest = List.filter ((<>) x) !best in
++        let order = List.concat_map (fun u ->
++          if u = y then (if before then [x;y] else [y;x]) else [u]) rest in
++        consider order
++      end in
++    for _ = 1 to 2 do
++      List.iter (fun (u,v,_) -> insert v u false; insert u v true)
++        (List.sort (fun (_,_,a) (_,_,b) -> compare b a) !edge_list)
++    done
++  end;
++  !best

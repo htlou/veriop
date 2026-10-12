@@ -1,0 +1,30 @@
+
+----------------------------------------
+define i64 @src(i32 noundef %#0) nofree noundef willreturn memory(globals: write, errno: write, other: write) {
+#1:
+  %#2 = icmp eq i32 noundef %#0, 0
+  %#3 = select i1 %#2, i64 32, i64 0
+  %#range_0_%#3 = !range i64 %#3, i64 0, i64 33
+  ret i64 %#range_0_%#3
+}
+=>
+define i64 @tgt(i32 noundef %#0) nofree noundef willreturn memory(globals: write, errno: write, other: write) {
+#1:
+  ret i64 32
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000001 (1)
+
+Source:
+i1 %#2 = #x0 (0)
+i64 %#3 = #x0000000000000000 (0)
+i64 %#range_0_%#3 = #x0000000000000000 (0)
+
+Target:
+Source value: #x0000000000000000 (0)
+Target value: #x0000000000000020 (32)
+

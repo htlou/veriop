@@ -1,0 +1,27 @@
+diff --git a/ggml/src/ggml-sycl/getrows.cpp b/ggml/src/ggml-sycl/getrows.cpp
+index 03f8dd907..ca4574547 100644
+--- a/ggml/src/ggml-sycl/getrows.cpp
++++ b/ggml/src/ggml-sycl/getrows.cpp
+@@ -183,6 +183,10 @@ void ggml_sycl_op_get_rows(ggml_backend_sycl_context & ctx, ggml_tensor * dst) {
+             get_rows_sycl_float(ctx, dst->src[0], dst->src[1], dst, (const sycl::half *)dst->src[0]->data,
+                                 src1_i32, (float *)dst->data, ctx.stream());
+             break;
++        case GGML_TYPE_BF16:
++            get_rows_sycl_float(ctx, dst->src[0], dst->src[1], dst, (const sycl::ext::oneapi::bfloat16 *)dst->src[0]->data,
++                                src1_i32, (float *)dst->data, ctx.stream());
++            break;
+         case GGML_TYPE_F32:
+             get_rows_sycl_float(ctx, dst->src[0], dst->src[1], dst, (const float *)dst->src[0]->data,
+             src1_i32, (float *)dst->data, ctx.stream());
+diff --git a/ggml/src/ggml-sycl/ggml-sycl.cpp b/ggml/src/ggml-sycl/ggml-sycl.cpp
+index f86ff3e94..b6e705cdf 100644
+--- a/ggml/src/ggml-sycl/ggml-sycl.cpp
++++ b/ggml/src/ggml-sycl/ggml-sycl.cpp
+@@ -4974,6 +4974,7 @@ static bool ggml_backend_sycl_device_supports_op(ggml_backend_dev_t dev, const g
+             {
+                 switch (op->src[0]->type) {
+                     case GGML_TYPE_F16:
++                    case GGML_TYPE_BF16:
+                     case GGML_TYPE_F32:
+                     case GGML_TYPE_Q4_0:
+                     case GGML_TYPE_Q4_1:

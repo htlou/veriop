@@ -1,0 +1,220 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+index 5f998ad4..6d258bfe 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+@@ -41,6 +41,9 @@ public final class ArrayContainer extends Container implements Cloneable {
+     this(DEFAULT_INIT_SIZE);
+   }
+ 
++  public static ArrayContainer empty() {
++    return new ArrayContainer();
++  }
+   /**
+    * Create an array container with specified capacity
+    *
+@@ -226,43 +229,32 @@ public final class ArrayContainer extends Container implements Cloneable {
+   }
+ 
+   @Override
+-  public Container andNot(RunContainer x) {
+-    int writeLocation = 0;
+-    int runStart, runEnd; // the current or upcoming run.
+-    int whichRun;
+-    short[] buffer = new short[cardinality];
+-    if (x.nbrruns == 0) {
++  public ArrayContainer andNot(RunContainer x) {
++    if (x.numberOfRuns() == 0) {
+       return clone();
+-    } else {
+-      runStart = Util.toIntUnsigned(x.getValue(0));
+-      runEnd = runStart + Util.toIntUnsigned(x.getLength(0));
+-      whichRun = 0;
+-    }
+-
+-    short val;
+-    for (int i = 0; i < cardinality; ++i) {
+-      val = content[i];
+-      int valInt = Util.toIntUnsigned(val);
+-      if (valInt < runStart) {
+-        buffer[writeLocation++] = val;
+-      } else if (valInt <= runEnd) {
+-        ; // don't want item
+-      } else {
+-        // greater than this run, need to do an advanceUntil on runs
+-        // done sequentially for now (no galloping attempts).
+-        do {
+-          if (whichRun + 1 < x.nbrruns) {
+-            whichRun++;
+-            runStart = Util.toIntUnsigned(x.getValue(whichRun));
+-            runEnd = runStart + Util.toIntUnsigned(x.getLength(whichRun));
+-          } else {
+-            runStart = runEnd = (1 << 16) + 1; // infinity....
+-          }
+-        } while (valInt > runEnd);
+-        --i; // need to re-process this val
++    } else if (x.isFull()) {
++      return ArrayContainer.empty();
++    }
++    int write = 0;
++    int read = 0;
++    ArrayContainer answer = new ArrayContainer(cardinality);
++    for (int i = 0; i < x.numberOfRuns() && read < cardinality; ++i) {
++      int runStart = Util.toIntUnsigned(x.getValue(i));
++      int runEnd = runStart + Util.toIntUnsigned(x.getLength(i));
++      if (Util.toIntUnsigned(content[read]) > runEnd) {
++        continue;
+       }
++      int firstInRun = Util.iterateUntil(content, read, cardinality, runStart);
++      int toWrite = firstInRun - read;
++      System.arraycopy(content, read, answer.content, write, toWrite);
++      write += toWrite;
++
++      read = Util.iterateUntil(content, firstInRun, cardinality, runEnd + 1);
+     }
+-    return new ArrayContainer(writeLocation, buffer);
++    System.arraycopy(content, read, answer.content, write, cardinality - read);
++    write += cardinality - read;
++    answer.cardinality = write;
++    return answer;
+   }
+ 
+   @Override
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/Util.java b/roaringbitmap/src/main/java/org/roaringbitmap/Util.java
+index fb4016f4..9bac0c84 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/Util.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/Util.java
+@@ -84,6 +84,24 @@ public final class Util {
+ 
+   }
+ 
++  /**
++   * Find the smallest integer larger than pos such that array[pos]&gt;= min. If none can be found,
++   * return length.
++   *
++   * @param array array to search within
++   * @param pos starting position of the search
++   * @param length length of the array to search
++   * @param min minimum value
++   * @return x greater than pos such that array[pos] is at least as large as min, pos is is equal to
++   *         length if it is not possible.
++   */
++  public static int iterateUntil(short[] array, int pos, int length, int min) {
++    while (pos < length && toIntUnsigned(array[pos]) < min) {
++      pos++;
++    }
++    return pos;
++  }
++
+   protected static int branchyUnsignedBinarySearch(final short[] array, final int begin,
+       final int end, final short k) {
+     int ikey = toIntUnsigned(k);
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java
+index b2bf4603..34fa6129 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java
+@@ -85,6 +85,24 @@ public final class BufferUtil {
+ 
+   }
+ 
++  /**
++   * Find the smallest integer larger than pos such that array[pos]&gt;= min. If none can be found,
++   * return length.
++   *
++   * @param array array to search within
++   * @param pos starting position of the search
++   * @param length length of the array to search
++   * @param min minimum value
++   * @return x greater than pos such that array[pos] is at least as large as min, pos is is equal to
++   *         length if it is not possible.
++   */
++  public static int iterateUntil(ShortBuffer array, int pos, int length, int min) {
++    while (pos < length && toIntUnsigned(array.get(pos)) < min) {
++      pos++;
++    }
++    return pos;
++  }
++
+ 
+   protected static void arraycopy(ShortBuffer src, int srcPos, ShortBuffer dest, int destPos,
+       int length) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+index fb7f517e..e7c70d6a 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+@@ -53,6 +53,10 @@ public final class MappeableArrayContainer extends MappeableContainer implements
+     this(DEFAULT_INIT_SIZE);
+   }
+ 
++  public static MappeableArrayContainer empty() {
++    return new MappeableArrayContainer();
++  }
++
+   /**
+    * Creates a new container from a non-mappeable one. This copies the data.
+    *
+@@ -293,42 +297,32 @@ public final class MappeableArrayContainer extends MappeableContainer implements
+ 
+   @Override
+   public MappeableContainer andNot(final MappeableRunContainer x) {
+-    int writeLocation = 0;
+-    int runStart, runEnd; // the current or upcoming run.
+-    if (x.nbrruns == 0) {
++    if (x.numberOfRuns() == 0) {
+       return clone();
+-    }
+-
+-    ShortBuffer buffer = ShortBuffer.allocate(cardinality);
+-
+-    runStart = toIntUnsigned(x.getValue(0));
+-    runEnd = runStart + toIntUnsigned(x.getLength(0));
+-    int whichRun = 0;
+-
+-    short val;
+-    for (int i = 0; i < cardinality; ++i) {
+-      val = content.get(i);
+-      int valInt = toIntUnsigned(val);
+-      if (valInt < runStart) {
+-        buffer.put(writeLocation++, val);
+-      } else if (valInt <= runEnd) {
+-        ; // don't want item
+-      } else {
+-        // greater than this run, need to do an advanceUntil on runs
+-        // done sequentially for now (no galloping attempts).
+-        do {
+-          if (whichRun + 1 < x.nbrruns) {
+-            whichRun++;
+-            runStart = toIntUnsigned(x.getValue(whichRun));
+-            runEnd = runStart + toIntUnsigned(x.getLength(whichRun));
+-          } else {
+-            runStart = runEnd = (1 << 16) + 1; // infinity....
+-          }
+-        } while (valInt > runEnd);
+-        --i; // need to re-process this val
++    } else if (x.isFull()) {
++      return MappeableArrayContainer.empty();
++    }
++    int write = 0;
++    int read = 0;
++    MappeableArrayContainer answer = new MappeableArrayContainer(cardinality);
++    for (int i = 0; i < x.numberOfRuns() && read < cardinality; ++i) {
++      int runStart = BufferUtil.toIntUnsigned(x.getValue(i));
++      int runEnd = runStart + BufferUtil.toIntUnsigned(x.getLength(i));
++      if (BufferUtil.toIntUnsigned(content.get(read)) > runEnd) {
++        continue;
+       }
++      int firstInRun = BufferUtil.iterateUntil(content, read, cardinality, runStart);
++      int toWrite = firstInRun - read;
++      BufferUtil.arraycopy(content, read, answer.content, write, toWrite);
++      write += toWrite;
++
++      read = BufferUtil.iterateUntil(content, firstInRun, cardinality, runEnd + 1);
+     }
+-    return new MappeableArrayContainer(writeLocation, buffer);
++    BufferUtil.arraycopy(content, read, answer.content, write, cardinality - read);
++    write += cardinality - read;
++    answer.cardinality = write;
++    return answer;
++
+   }
+ 
+   @Override

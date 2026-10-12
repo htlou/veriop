@@ -1,0 +1,7 @@
+# llama.cpp `0bbc87b16`: Vulkan submission threshold
+
+**Whole-graph output verdict: `UNKNOWN`.** This commit reduces the command-submission FLOP cap on smaller AMD GPUs. [The reproducer](reproduce.py) extracts the exact old and new threshold statements from the historical `ggml-vulkan.cpp` blobs and places them in a minimal context with the same unsigned field widths. Its local `std::min` has the standard two-argument minimum semantics; `VK_VENDOR_ID_AMD` and `AMD_GCN` are represented by distinct enum tags. [Source hashes](result.json) lock both historical blobs.
+
+[Alive2 refutes threshold equality](alive2.log) and [proves the new threshold is never greater than the old threshold](relation-alive2.log) over all 64-bit `last_total_flops` and 32-bit device tags/core counts in this source-mapped model. A [native witness](witness.log) for an AMD GCN device with one shader core and `400,000,000,000` last-graph FLOPs has old threshold `10,000,000,000` and new threshold `500,000,000`. The smaller threshold can cause earlier submissions; the full scheduling trace, Vulkan runtime behavior, and output tensors were not checked.
+
+This is a one-way **threshold** relation, not a proof of output equivalence or an official before/after benchmark result. Volta's one-PTX-kernel interface cannot express the graph's host submission schedule, and Kuiper was not used. Reproduce with `python3 -B history-eq/gpu/llama.cpp/0bbc87b16/reproduce.py` from the project root.

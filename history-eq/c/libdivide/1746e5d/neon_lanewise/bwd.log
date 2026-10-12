@@ -1,0 +1,2588 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/1746e5d/neon_lanewise/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/1746e5d/neon_lanewise/old.ll
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+declare <4 x i32> @llvm.aarch64.neon.uhsub.v4i32(<4 x i32>, <4 x i32>) nofree willreturn memory(none)
+declare <4 x i32> @llvm.aarch64.neon.ushl.v4i32(<4 x i32>, <4 x i32>) nofree willreturn memory(none)
+
+define <4 x i32> @target_u32_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  %#13 = icmp eq i32 noundef %#1, 0
+  br i1 %#13, label %#12, label %#3
+
+#3:
+  %#14 = ctlz i32 noundef %#1, 1
+  %#range_0_%#14 = !range i32 %#14, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#14
+  %#15 = xor i32 %#range_0_%#14, 31
+  %#16 = ctpop i32 noundef %#1
+  %#range_1_%#16 = !range i32 %#16, i32 1, i32 33
+  %#17 = icmp samesign ult i32 %#range_1_%#16, 2
+  br i1 %#17, label %#4, label %#5
+
+#4:
+  %#18 = trunc nsw nuw i32 %#15 to i8
+  br label %#11
+
+#5:
+  %#19 = shl nuw i32 1, %#15
+  %#20 = zext i32 %#19 to i64
+  %#21 = shl nuw i64 %#20, 32
+  %#22 = zext i32 noundef %#1 to i64
+  %#23 = udiv i64 %#21, %#22
+  %#24 = trunc i64 %#23 to i32
+  %#25 = mul i32 noundef %#1, %#24
+  %#26 = add i32 %#25, noundef %#1
+  %#27 = icmp ult i32 %#26, %#19
+  br i1 %#27, label %#6, label %#7
+
+#6:
+  %#28 = trunc nsw nuw i32 %#15 to i8
+  br label %#8
+
+#7:
+  %#29 = sub i32 0, %#25
+  %#30 = shl i32 %#24, 1
+  %#31 = shl i32 %#29, 1
+  %#32 = icmp uge i32 %#31, noundef %#1
+  %#33 = icmp slt i32 %#29, 0
+  %#34 = or i1 %#33, %#32
+  %#35 = zext i1 %#34 to i32
+  %#36 = or disjoint i32 %#30, %#35
+  %#37 = trunc nsw nuw i32 %#15 to i8
+  %#38 = or disjoint i8 %#37, 64
+  br label %#8
+
+#8:
+  %#39 = phi i32 [ %#36, %#7 ], [ %#24, %#6 ]
+  %#40 = phi i8 [ %#38, %#7 ], [ %#28, %#6 ]
+  %#41 = add i32 %#39, 1
+  %#42 = icmp eq i32 %#41, 0
+  br i1 %#42, label %#11, label %#9
+
+#9:
+  %#43 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 0, 1
+  %#44 = insertelement <2 x i32> poison, i32 %#41, i64 0
+  %#45 = shufflevector <2 x i32> %#44, <2 x i32> poison, 0, 0
+  %#46 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#43, <2 x i32> %#45) nofree noundef willreturn memory(none)
+  %#47 = bitcast <2 x i64> %#46 to <4 x i32>
+  %#48 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 2, 3
+  %#49 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#48, <2 x i32> %#45) nofree noundef willreturn memory(none)
+  %#50 = bitcast <2 x i64> %#49 to <4 x i32>
+  %#51 = shufflevector <4 x i32> %#47, <4 x i32> %#50, 1, 3, 5, 7
+  %#52 = and i8 %#40, 64
+  %#53 = icmp eq i8 %#52, 0
+  br i1 %#53, label %#11, label %#10
+
+#10:
+  %#54 = and i8 %#40, 31
+  %#55 = tail call <4 x i32> @llvm.aarch64.neon.uhsub.v4i32(<4 x i32> noundef %#0, <4 x i32> %#51) nofree noundef willreturn memory(none)
+  %#56 = add <4 x i32> %#55, %#51
+  br label %#11
+
+#11:
+  %#57 = phi i8 [ %#54, %#10 ], [ %#18, %#4 ], [ %#40, %#8 ], [ %#40, %#9 ]
+  %#58 = phi <4 x i32> [ %#56, %#10 ], [ noundef %#0, %#4 ], [ noundef %#0, %#8 ], [ %#51, %#9 ]
+  %#59 = zext nneg i8 %#57 to i32
+  %#60 = sub nsw i32 0, %#59
+  %#61 = insertelement <4 x i32> poison, i32 %#60, i64 0
+  %#62 = shufflevector <4 x i32> %#61, <4 x i32> poison, 0, 0, 0, 0
+  %#63 = tail call <4 x i32> @llvm.aarch64.neon.ushl.v4i32(<4 x i32> %#58, <4 x i32> %#62) nofree noundef willreturn memory(none)
+  br label %#12
+
+#12:
+  %#64 = phi <4 x i32> [ noundef %#0, %#2 ], [ %#63, %#11 ]
+  ret <4 x i32> %#64
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <4 x i32> @target_u32_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) {
+#2:
+  %#14 = alloca i64 16, align 16
+  %#15 = alloca i64 16, align 4, dead
+  %#16 = alloca i64 16, align 16, dead
+  store <4 x i32> noundef %#0, ptr %#14, align 16
+  %#17 = icmp eq i32 noundef %#1, 0
+  br i1 %#17, label %#13, label %#3
+
+#3:
+  %#18 = ctlz i32 noundef %#1, 1
+  %#range_0_%#18 = !range i32 %#18, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#18
+  %#19 = xor i32 %#range_0_%#18, 31
+  %#20 = ctpop i32 noundef %#1
+  %#range_1_%#20 = !range i32 %#20, i32 1, i32 33
+  %#21 = icmp samesign ult i32 %#range_1_%#20, 2
+  br i1 %#21, label %#7, label %#4
+
+#4:
+  %#22 = shl nuw i32 1, %#19
+  %#23 = zext i32 %#22 to i64
+  %#24 = shl nuw i64 %#23, 32
+  %#25 = zext i32 noundef %#1 to i64
+  %#26 = udiv i64 %#24, %#25
+  %#27 = trunc i64 %#26 to i32
+  %#28 = mul i32 noundef %#1, %#27
+  %#29 = add i32 %#28, noundef %#1
+  %#30 = icmp ult i32 %#29, %#22
+  br i1 %#30, label %#6, label %#5
+
+#5:
+  %#31 = sub i32 0, %#28
+  %#32 = shl i32 %#27, 1
+  %#33 = shl i32 %#31, 1
+  %#34 = icmp uge i32 %#33, noundef %#1
+  %#35 = icmp slt i32 %#31, 0
+  %#36 = or i1 %#35, %#34
+  %#37 = zext i1 %#36 to i32
+  %#38 = or disjoint i32 %#32, %#37
+  %#39 = or disjoint i32 %#19, 64
+  br label %#6
+
+#6:
+  %#40 = phi i32 [ %#38, %#5 ], [ %#27, %#4 ]
+  %#41 = phi i32 [ %#39, %#5 ], [ %#19, %#4 ]
+  %#42 = add i32 %#40, 1
+  br label %#7
+
+#7:
+  %#43 = phi i32 [ %#42, %#6 ], [ 0, %#3 ]
+  %#44 = phi i32 [ %#41, %#6 ], [ %#19, %#3 ]
+  start_lifetime ptr %#15
+  %#45 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#15, nonnull noundef ptr %#14, noundef i64 16) noundef
+  %#46 = icmp eq i32 %#43, 0
+  %#47 = zext i32 %#43 to i64
+  %#48 = and i32 %#44, 31
+  br i1 %#46, label %#8, label %#9
+
+#8:
+  %#49 = load i32, ptr %#15, align 4
+  %#50 = lshr i32 %#49, %#44
+  store i32 %#50, ptr %#15, align 4
+  %#51 = gep inbounds nuw ptr %#15, 1 x i64 4
+  %#52 = load i32, ptr %#51, align 4
+  %#53 = lshr i32 %#52, %#44
+  store i32 %#53, ptr %#51, align 4
+  %#54 = gep inbounds nuw ptr %#15, 1 x i64 8
+  %#55 = load i32, ptr %#54, align 4
+  %#56 = lshr i32 %#55, %#44
+  store i32 %#56, ptr %#54, align 4
+  %#57 = gep inbounds nuw ptr %#15, 1 x i64 12
+  %#58 = load i32, ptr %#57, align 4
+  %#59 = lshr i32 %#58, %#44
+  store i32 %#59, ptr %#57, align 4
+  br label %#12
+
+#9:
+  %#60 = and i32 %#44, 64
+  %#61 = icmp eq i32 %#60, 0
+  %#62 = load i32, ptr %#15, align 4
+  %#63 = zext i32 %#62 to i64
+  %#64 = mul nuw i64 %#63, %#47
+  %#65 = lshr i64 %#64, 32
+  %#66 = trunc nuw i64 %#65 to i32
+  br i1 %#61, label %#10, label %#11
+
+#10:
+  %#67 = lshr i32 %#66, %#44
+  store i32 %#67, ptr %#15, align 4
+  %#68 = gep inbounds nuw ptr %#15, 1 x i64 4
+  %#69 = load i32, ptr %#68, align 4
+  %#70 = zext i32 %#69 to i64
+  %#71 = mul nuw i64 %#70, %#47
+  %#72 = lshr i64 %#71, 32
+  %#73 = trunc nuw i64 %#72 to i32
+  %#74 = lshr i32 %#73, %#44
+  store i32 %#74, ptr %#68, align 4
+  %#75 = gep inbounds nuw ptr %#15, 1 x i64 8
+  %#76 = load i32, ptr %#75, align 4
+  %#77 = zext i32 %#76 to i64
+  %#78 = mul nuw i64 %#77, %#47
+  %#79 = lshr i64 %#78, 32
+  %#80 = trunc nuw i64 %#79 to i32
+  %#81 = lshr i32 %#80, %#44
+  store i32 %#81, ptr %#75, align 4
+  %#82 = gep inbounds nuw ptr %#15, 1 x i64 12
+  %#83 = load i32, ptr %#82, align 4
+  %#84 = zext i32 %#83 to i64
+  %#85 = mul nuw i64 %#84, %#47
+  %#86 = lshr i64 %#85, 32
+  %#87 = trunc nuw i64 %#86 to i32
+  %#88 = lshr i32 %#87, %#44
+  store i32 %#88, ptr %#82, align 4
+  br label %#12
+
+#11:
+  %#89 = sub i32 %#62, %#66
+  %#90 = lshr i32 %#89, 1
+  %#91 = add i32 %#90, %#66
+  %#92 = lshr i32 %#91, %#48
+  store i32 %#92, ptr %#15, align 4
+  %#93 = gep inbounds nuw ptr %#15, 1 x i64 4
+  %#94 = load i32, ptr %#93, align 4
+  %#95 = zext i32 %#94 to i64
+  %#96 = mul nuw i64 %#95, %#47
+  %#97 = lshr i64 %#96, 32
+  %#98 = trunc nuw i64 %#97 to i32
+  %#99 = sub i32 %#94, %#98
+  %#100 = lshr i32 %#99, 1
+  %#101 = add i32 %#100, %#98
+  %#102 = lshr i32 %#101, %#48
+  store i32 %#102, ptr %#93, align 4
+  %#103 = gep inbounds nuw ptr %#15, 1 x i64 8
+  %#104 = load i32, ptr %#103, align 4
+  %#105 = zext i32 %#104 to i64
+  %#106 = mul nuw i64 %#105, %#47
+  %#107 = lshr i64 %#106, 32
+  %#108 = trunc nuw i64 %#107 to i32
+  %#109 = sub i32 %#104, %#108
+  %#110 = lshr i32 %#109, 1
+  %#111 = add i32 %#110, %#108
+  %#112 = lshr i32 %#111, %#48
+  store i32 %#112, ptr %#103, align 4
+  %#113 = gep inbounds nuw ptr %#15, 1 x i64 12
+  %#114 = load i32, ptr %#113, align 4
+  %#115 = zext i32 %#114 to i64
+  %#116 = mul nuw i64 %#115, %#47
+  %#117 = lshr i64 %#116, 32
+  %#118 = trunc nuw i64 %#117 to i32
+  %#119 = sub i32 %#114, %#118
+  %#120 = lshr i32 %#119, 1
+  %#121 = add i32 %#120, %#118
+  %#122 = lshr i32 %#121, %#48
+  store i32 %#122, ptr %#113, align 4
+  br label %#12
+
+#12:
+  start_lifetime ptr %#16
+  %#123 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#16, nonnull noundef ptr %#15, noundef i64 16) noundef
+  %#124 = load <4 x i32>, ptr %#16, align 16
+  end_lifetime ptr %#16
+  end_lifetime ptr %#15
+  br label %#13
+
+#13:
+  %#125 = phi <4 x i32> [ %#124, %#12 ], [ noundef %#0, %#2 ]
+  ret <4 x i32> %#125
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.uhsub.v4i32
+ - Unknown libcall: @llvm.aarch64.neon.umull.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.ushl.v4i32
+
+
+
+----------------------------------------
+declare <4 x i32> @llvm.aarch64.neon.sshl.v4i32(<4 x i32>, <4 x i32>) nofree willreturn memory(none)
+declare <2 x i64> @llvm.aarch64.neon.smull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+
+define <4 x i32> @target_s32_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i32 noundef %#1, 0
+  %#16 = abs i32 noundef %#1, 0
+  %#17 = ctlz i32 %#16, 1
+  %#range_0_%#17 = !range i32 %#17, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#17
+  %#18 = xor i32 %#range_0_%#17, 31
+  %#19 = ctpop i32 %#16
+  %#range_1_%#19 = !range i32 %#19, i32 1, i32 33
+  %#20 = icmp samesign ult i32 %#range_1_%#19, 2
+  br i1 %#20, label %#4, label %#5
+
+#4:
+  %#21 = lshr i32 noundef %#1, 24
+  %#22 = and i32 %#21, 128
+  %#23 = or disjoint i32 %#18, %#22
+  %#24 = trunc nuw i32 %#23 to i8
+  br label %#9
+
+#5:
+  %#25 = sub nsw i32 30, %#range_0_%#17
+  %#26 = shl nsw nuw i32 1, %#25
+  %#27 = zext nneg i32 %#26 to i64
+  %#28 = shl nsw nuw i64 %#27, 32
+  %#29 = zext i32 %#16 to i64
+  %#30 = udiv i64 %#28, %#29
+  %#31 = trunc i64 %#30 to i32
+  %#32 = mul i32 %#16, %#31
+  %#33 = add i32 %#32, %#16
+  %#34 = lshr i32 %#33, %#18
+  %#35 = icmp eq i32 %#34, 0
+  br i1 %#35, label %#6, label %#7
+
+#6:
+  %#36 = trunc nsw i32 %#25 to i8
+  br label %#8
+
+#7:
+  %#37 = sub i32 0, %#32
+  %#38 = shl i32 %#31, 1
+  %#39 = shl i32 %#37, 1
+  %#40 = icmp uge i32 %#39, %#16
+  %#41 = icmp slt i32 %#37, 0
+  %#42 = or i1 %#41, %#40
+  %#43 = zext i1 %#42 to i32
+  %#44 = or disjoint i32 %#38, %#43
+  %#45 = trunc nsw nuw i32 %#18 to i8
+  %#46 = or disjoint i8 %#45, 64
+  br label %#8
+
+#8:
+  %#47 = phi i32 [ %#44, %#7 ], [ %#31, %#6 ]
+  %#48 = phi i8 [ %#46, %#7 ], [ %#36, %#6 ]
+  %#49 = add i32 %#47, 1
+  %#50 = or i8 %#48, 128
+  %#51 = xor i32 %#47, 4294967295
+  %#52 = select i1 %#15, i8 %#50, i8 %#48
+  %#53 = select i1 %#15, i32 %#51, i32 %#49
+  %#54 = icmp eq i32 %#53, 0
+  br i1 %#54, label %#9, label %#10
+
+#9:
+  %#55 = phi i8 [ %#24, %#4 ], [ %#52, %#8 ]
+  %#56 = and i8 %#55, 31
+  %#57 = zext nneg i8 %#56 to i32
+  %#58 = shl nsw i32 4294967295, %#57
+  %#59 = xor i32 %#58, 4294967295
+  %#60 = insertelement <4 x i32> poison, i32 %#59, i64 0
+  %#61 = shufflevector <4 x i32> %#60, <4 x i32> poison, 0, 0, 0, 0
+  %#62 = icmp slt <4 x i32> noundef %#0, { 0, 0, 0, 0 }
+  %#63 = select <4 x i1> %#62, <4 x i32> %#61, <4 x i32> { 0, 0, 0, 0 }
+  %#64 = add <4 x i32> %#63, noundef %#0
+  %#65 = sub nsw i32 0, %#57
+  %#66 = insertelement <4 x i32> poison, i32 %#65, i64 0
+  %#67 = shufflevector <4 x i32> %#66, <4 x i32> poison, 0, 0, 0, 0
+  %#68 = tail call <4 x i32> @llvm.aarch64.neon.sshl.v4i32(<4 x i32> %#64, <4 x i32> %#67) nofree noundef willreturn memory(none)
+  %#69 = ashr i8 %#55, 7
+  %#70 = sext i8 %#69 to i32
+  %#71 = insertelement <4 x i32> poison, i32 %#70, i64 0
+  %#72 = shufflevector <4 x i32> %#71, <4 x i32> poison, 0, 0, 0, 0
+  %#73 = xor <4 x i32> %#68, %#72
+  %#74 = sub <4 x i32> %#73, %#72
+  br label %#13
+
+#10:
+  %#75 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 0, 1
+  %#76 = insertelement <2 x i32> poison, i32 %#53, i64 0
+  %#77 = shufflevector <2 x i32> %#76, <2 x i32> poison, 0, 0
+  %#78 = tail call <2 x i64> @llvm.aarch64.neon.smull.v2i64(<2 x i32> %#75, <2 x i32> %#77) nofree noundef willreturn memory(none)
+  %#79 = bitcast <2 x i64> %#78 to <4 x i32>
+  %#80 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 2, 3
+  %#81 = tail call <2 x i64> @llvm.aarch64.neon.smull.v2i64(<2 x i32> %#80, <2 x i32> %#77) nofree noundef willreturn memory(none)
+  %#82 = bitcast <2 x i64> %#81 to <4 x i32>
+  %#83 = shufflevector <4 x i32> %#79, <4 x i32> %#82, 1, 3, 5, 7
+  %#84 = and i8 %#52, 64
+  %#85 = icmp eq i8 %#84, 0
+  br i1 %#85, label %#12, label %#11
+
+#11:
+  %#86 = ashr i8 %#52, 7
+  %#87 = sext i8 %#86 to i32
+  %#88 = insertelement <4 x i32> poison, i32 %#87, i64 0
+  %#89 = shufflevector <4 x i32> %#88, <4 x i32> poison, 0, 0, 0, 0
+  %#90 = xor <4 x i32> %#89, noundef %#0
+  %#91 = sub <4 x i32> %#90, %#89
+  %#92 = add <4 x i32> %#91, %#83
+  br label %#12
+
+#12:
+  %#93 = phi <4 x i32> [ %#92, %#11 ], [ %#83, %#10 ]
+  %#94 = and i8 %#52, 31
+  %#95 = zext nneg i8 %#94 to i32
+  %#96 = sub nsw i32 0, %#95
+  %#97 = insertelement <4 x i32> poison, i32 %#96, i64 0
+  %#98 = shufflevector <4 x i32> %#97, <4 x i32> poison, 0, 0, 0, 0
+  %#99 = tail call <4 x i32> @llvm.aarch64.neon.sshl.v4i32(<4 x i32> %#93, <4 x i32> %#98) nofree noundef willreturn memory(none)
+  %#100 = lshr <4 x i32> %#99, { 31, 31, 31, 31 }
+  %#101 = add <4 x i32> %#100, %#99
+  br label %#13
+
+#13:
+  %#102 = phi <4 x i32> [ noundef %#0, %#2 ], [ %#101, %#12 ], [ %#74, %#9 ]
+  ret <4 x i32> %#102
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <4 x i32> @target_s32_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) {
+#2:
+  %#16 = alloca i64 16, align 16
+  %#17 = alloca i64 16, align 4, dead
+  %#18 = alloca i64 16, align 16, dead
+  store <4 x i32> noundef %#0, ptr %#16, align 16
+  %#19 = icmp eq i32 noundef %#1, 0
+  br i1 %#19, label %#15, label %#3
+
+#3:
+  %#20 = icmp slt i32 noundef %#1, 0
+  %#21 = abs i32 noundef %#1, 0
+  %#22 = ctlz i32 %#21, 1
+  %#range_0_%#22 = !range i32 %#22, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#22
+  %#23 = xor i32 %#range_0_%#22, 31
+  %#24 = ctpop i32 %#21
+  %#range_1_%#24 = !range i32 %#24, i32 1, i32 33
+  %#25 = icmp samesign ult i32 %#range_1_%#24, 2
+  br i1 %#25, label %#4, label %#5
+
+#4:
+  %#26 = lshr i32 noundef %#1, 24
+  %#27 = and i32 %#26, 128
+  %#28 = or disjoint i32 %#23, %#27
+  %#29 = trunc nuw i32 %#28 to i8
+  br label %#9
+
+#5:
+  %#30 = sub nsw i32 30, %#range_0_%#22
+  %#31 = shl nsw nuw i32 1, %#30
+  %#32 = zext nneg i32 %#31 to i64
+  %#33 = shl nsw nuw i64 %#32, 32
+  %#34 = zext i32 %#21 to i64
+  %#35 = udiv i64 %#33, %#34
+  %#36 = trunc i64 %#35 to i32
+  %#37 = mul i32 %#21, %#36
+  %#38 = add i32 %#37, %#21
+  %#39 = lshr i32 %#38, %#23
+  %#40 = icmp eq i32 %#39, 0
+  br i1 %#40, label %#6, label %#7
+
+#6:
+  %#41 = trunc nsw i32 %#30 to i8
+  br label %#8
+
+#7:
+  %#42 = sub i32 0, %#37
+  %#43 = shl i32 %#36, 1
+  %#44 = shl i32 %#42, 1
+  %#45 = icmp uge i32 %#44, %#21
+  %#46 = icmp slt i32 %#42, 0
+  %#47 = or i1 %#46, %#45
+  %#48 = zext i1 %#47 to i32
+  %#49 = or disjoint i32 %#43, %#48
+  %#50 = trunc nsw nuw i32 %#23 to i8
+  %#51 = or disjoint i8 %#50, 64
+  br label %#8
+
+#8:
+  %#52 = phi i32 [ %#49, %#7 ], [ %#36, %#6 ]
+  %#53 = phi i8 [ %#51, %#7 ], [ %#41, %#6 ]
+  %#54 = add i32 %#52, 1
+  %#55 = or i8 %#53, 128
+  %#56 = xor i32 %#52, 4294967295
+  %#57 = select i1 %#20, i8 %#55, i8 %#53
+  %#58 = select i1 %#20, i32 %#56, i32 %#54
+  br label %#9
+
+#9:
+  %#59 = phi i32 [ 0, %#4 ], [ %#58, %#8 ]
+  %#60 = phi i8 [ %#29, %#4 ], [ %#57, %#8 ]
+  start_lifetime ptr %#17
+  %#61 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#17, nonnull noundef ptr %#16, noundef i64 16) noundef
+  %#62 = and i8 %#60, 31
+  %#63 = icmp eq i32 %#59, 0
+  %#64 = sext i32 %#59 to i64
+  %#65 = ashr i8 %#60, 7
+  %#66 = sext i8 %#65 to i32
+  %#67 = zext nneg i8 %#62 to i32
+  %#68 = load i32, ptr %#17, align 4
+  br i1 %#63, label %#10, label %#11
+
+#10:
+  %#69 = shl nsw i32 4294967295, %#67
+  %#70 = xor i32 %#69, 4294967295
+  %#71 = icmp slt i32 %#68, 0
+  %#72 = select i1 %#71, i32 %#70, i32 0
+  %#73 = add i32 %#72, %#68
+  %#74 = ashr i32 %#73, %#67
+  %#75 = xor i32 %#74, %#66
+  %#76 = sub i32 %#75, %#66
+  store i32 %#76, ptr %#17, align 4
+  %#77 = gep inbounds nuw ptr %#17, 1 x i64 4
+  %#78 = load i32, ptr %#77, align 4
+  %#79 = icmp slt i32 %#78, 0
+  %#80 = select i1 %#79, i32 %#70, i32 0
+  %#81 = add i32 %#80, %#78
+  %#82 = ashr i32 %#81, %#67
+  %#83 = xor i32 %#82, %#66
+  %#84 = sub i32 %#83, %#66
+  store i32 %#84, ptr %#77, align 4
+  %#85 = gep inbounds nuw ptr %#17, 1 x i64 8
+  %#86 = load i32, ptr %#85, align 4
+  %#87 = icmp slt i32 %#86, 0
+  %#88 = select i1 %#87, i32 %#70, i32 0
+  %#89 = add i32 %#88, %#86
+  %#90 = ashr i32 %#89, %#67
+  %#91 = xor i32 %#90, %#66
+  %#92 = sub i32 %#91, %#66
+  store i32 %#92, ptr %#85, align 4
+  %#93 = gep inbounds nuw ptr %#17, 1 x i64 12
+  %#94 = load i32, ptr %#93, align 4
+  %#95 = icmp slt i32 %#94, 0
+  %#96 = select i1 %#95, i32 %#70, i32 0
+  %#97 = add i32 %#96, %#94
+  %#98 = ashr i32 %#97, %#67
+  %#99 = xor i32 %#98, %#66
+  %#100 = sub i32 %#99, %#66
+  store i32 %#100, ptr %#93, align 4
+  br label %#14
+
+#11:
+  %#101 = and i8 %#60, 64
+  %#102 = icmp eq i8 %#101, 0
+  %#103 = sext i32 %#68 to i64
+  %#104 = mul nsw i64 %#103, %#64
+  %#105 = lshr i64 %#104, 32
+  %#106 = trunc nuw i64 %#105 to i32
+  br i1 %#102, label %#12, label %#13
+
+#12:
+  %#107 = ashr i32 %#106, %#67
+  %#108 = lshr i32 %#107, 31
+  %#109 = add nsw i32 %#108, %#107
+  store i32 %#109, ptr %#17, align 4
+  %#110 = gep inbounds nuw ptr %#17, 1 x i64 4
+  %#111 = load i32, ptr %#110, align 4
+  %#112 = sext i32 %#111 to i64
+  %#113 = mul nsw i64 %#112, %#64
+  %#114 = lshr i64 %#113, 32
+  %#115 = trunc nuw i64 %#114 to i32
+  %#116 = ashr i32 %#115, %#67
+  %#117 = lshr i32 %#116, 31
+  %#118 = add nsw i32 %#117, %#116
+  store i32 %#118, ptr %#110, align 4
+  %#119 = gep inbounds nuw ptr %#17, 1 x i64 8
+  %#120 = load i32, ptr %#119, align 4
+  %#121 = sext i32 %#120 to i64
+  %#122 = mul nsw i64 %#121, %#64
+  %#123 = lshr i64 %#122, 32
+  %#124 = trunc nuw i64 %#123 to i32
+  %#125 = ashr i32 %#124, %#67
+  %#126 = lshr i32 %#125, 31
+  %#127 = add nsw i32 %#126, %#125
+  store i32 %#127, ptr %#119, align 4
+  %#128 = gep inbounds nuw ptr %#17, 1 x i64 12
+  %#129 = load i32, ptr %#128, align 4
+  %#130 = sext i32 %#129 to i64
+  %#131 = mul nsw i64 %#130, %#64
+  %#132 = lshr i64 %#131, 32
+  %#133 = trunc nuw i64 %#132 to i32
+  %#134 = ashr i32 %#133, %#67
+  %#135 = lshr i32 %#134, 31
+  %#136 = add nsw i32 %#135, %#134
+  store i32 %#136, ptr %#128, align 4
+  br label %#14
+
+#13:
+  %#137 = xor i32 %#68, %#66
+  %#138 = sub i32 %#137, %#66
+  %#139 = add i32 %#138, %#106
+  %#140 = ashr i32 %#139, %#67
+  %#141 = lshr i32 %#140, 31
+  %#142 = add nsw i32 %#141, %#140
+  store i32 %#142, ptr %#17, align 4
+  %#143 = gep inbounds nuw ptr %#17, 1 x i64 4
+  %#144 = load i32, ptr %#143, align 4
+  %#145 = sext i32 %#144 to i64
+  %#146 = mul nsw i64 %#145, %#64
+  %#147 = lshr i64 %#146, 32
+  %#148 = trunc nuw i64 %#147 to i32
+  %#149 = xor i32 %#144, %#66
+  %#150 = sub i32 %#149, %#66
+  %#151 = add i32 %#150, %#148
+  %#152 = ashr i32 %#151, %#67
+  %#153 = lshr i32 %#152, 31
+  %#154 = add nsw i32 %#153, %#152
+  store i32 %#154, ptr %#143, align 4
+  %#155 = gep inbounds nuw ptr %#17, 1 x i64 8
+  %#156 = load i32, ptr %#155, align 4
+  %#157 = sext i32 %#156 to i64
+  %#158 = mul nsw i64 %#157, %#64
+  %#159 = lshr i64 %#158, 32
+  %#160 = trunc nuw i64 %#159 to i32
+  %#161 = xor i32 %#156, %#66
+  %#162 = sub i32 %#161, %#66
+  %#163 = add i32 %#162, %#160
+  %#164 = ashr i32 %#163, %#67
+  %#165 = lshr i32 %#164, 31
+  %#166 = add nsw i32 %#165, %#164
+  store i32 %#166, ptr %#155, align 4
+  %#167 = gep inbounds nuw ptr %#17, 1 x i64 12
+  %#168 = load i32, ptr %#167, align 4
+  %#169 = sext i32 %#168 to i64
+  %#170 = mul nsw i64 %#169, %#64
+  %#171 = lshr i64 %#170, 32
+  %#172 = trunc nuw i64 %#171 to i32
+  %#173 = xor i32 %#168, %#66
+  %#174 = sub i32 %#173, %#66
+  %#175 = add i32 %#174, %#172
+  %#176 = ashr i32 %#175, %#67
+  %#177 = lshr i32 %#176, 31
+  %#178 = add nsw i32 %#177, %#176
+  store i32 %#178, ptr %#167, align 4
+  br label %#14
+
+#14:
+  start_lifetime ptr %#18
+  %#179 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#18, nonnull noundef ptr %#17, noundef i64 16) noundef
+  %#180 = load <4 x i32>, ptr %#18, align 16
+  end_lifetime ptr %#18
+  end_lifetime ptr %#17
+  br label %#15
+
+#15:
+  %#181 = phi <4 x i32> [ %#180, %#14 ], [ noundef %#0, %#2 ]
+  ret <4 x i32> %#181
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.smull.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.sshl.v4i32
+
+
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+declare <2 x i64> @llvm.aarch64.neon.ushl.v2i64(<2 x i64>, <2 x i64>) nofree willreturn memory(none)
+
+define <2 x i64> @target_u64_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  %#24 = icmp eq i64 noundef %#1, 0
+  br i1 %#24, label %#23, label %#3
+
+#3:
+  %#25 = ctlz i64 noundef %#1, 1
+  %#range_0_%#25 = !range i64 %#25, i64 0, i64 65
+  %#26 = trunc nsw nuw i64 %#range_0_%#25 to i32
+  %#27 = xor i32 %#26, 63
+  %#28 = ctpop i64 noundef %#1
+  %#range_1_%#28 = !range i64 %#28, i64 1, i64 65
+  %#29 = icmp samesign ult i64 %#range_1_%#28, 2
+  br i1 %#29, label %#4, label %#5
+
+#4:
+  %#30 = trunc nsw nuw i32 %#27 to i8
+  br label %#18
+
+#5:
+  %#31 = zext nneg i32 %#27 to i64
+  %#32 = shl nuw i64 1, %#31
+  %#33 = icmp ult i64 %#32, noundef %#1
+  br i1 %#33, label %#6, label %#15
+
+#6:
+  %#34 = shl i64 noundef %#1, %#range_0_%#25
+  %#35 = shl i64 %#32, %#range_0_%#25
+  %#36 = lshr i64 %#34, 32
+  %#37 = and i64 %#34, 4294967295
+  %#38 = udiv i64 %#35, %#36
+  %#39 = mul i64 %#38, %#36
+  %#40 = sub i64 %#35, %#39
+  br label %#7
+
+#7:
+  %#41 = phi i64 [ %#38, %#6 ], [ %#47, %#9 ]
+  %#42 = phi i64 [ %#40, %#6 ], [ %#48, %#9 ]
+  %#43 = icmp ugt i64 %#41, 4294967295
+  br i1 %#43, label %#9, label %#8
+
+#8:
+  %#44 = mul nuw i64 %#41, %#37
+  %#45 = shl i64 %#42, 32
+  %#46 = icmp ugt i64 %#44, %#45
+  br i1 %#46, label %#9, label %#10
+
+#9:
+  %#47 = add i64 %#41, -1
+  %#48 = add i64 %#42, %#36
+  %#49 = icmp ugt i64 %#48, 4294967295
+  br i1 %#49, label %#10, label %#7
+
+#10:
+  %#50 = phi i64 [ %#47, %#9 ], [ %#41, %#8 ]
+  %#51 = shl i64 %#35, 32
+  %#52 = mul i64 %#50, %#34
+  %#53 = sub i64 %#51, %#52
+  %#54 = udiv i64 %#53, %#36
+  %#55 = mul i64 %#54, %#36
+  %#56 = sub i64 %#53, %#55
+  br label %#11
+
+#11:
+  %#57 = phi i64 [ %#54, %#10 ], [ %#63, %#13 ]
+  %#58 = phi i64 [ %#56, %#10 ], [ %#64, %#13 ]
+  %#59 = icmp ugt i64 %#57, 4294967295
+  br i1 %#59, label %#13, label %#12
+
+#12:
+  %#60 = mul nuw i64 %#57, %#37
+  %#61 = shl i64 %#58, 32
+  %#62 = icmp ugt i64 %#60, %#61
+  br i1 %#62, label %#13, label %#14
+
+#13:
+  %#63 = add i64 %#57, -1
+  %#64 = add i64 %#58, %#36
+  %#65 = icmp ugt i64 %#64, 4294967295
+  br i1 %#65, label %#14, label %#11
+
+#14:
+  %#66 = phi i64 [ %#63, %#13 ], [ %#57, %#12 ]
+  %#67 = shl i64 %#53, 32
+  %#68 = mul i64 %#66, %#34
+  %#69 = sub i64 %#67, %#68
+  %#70 = lshr i64 %#69, %#range_0_%#25
+  %#71 = shl i64 %#50, 32
+  %#72 = add i64 %#66, %#71
+  br label %#15
+
+#15:
+  %#73 = phi i64 [ %#70, %#14 ], [ -1, %#5 ]
+  %#74 = phi i64 [ %#72, %#14 ], [ -1, %#5 ]
+  %#75 = sub i64 noundef %#1, %#73
+  %#76 = icmp ult i64 %#75, %#32
+  br i1 %#76, label %#17, label %#16
+
+#16:
+  %#77 = shl i64 %#74, 1
+  %#78 = shl i64 %#73, 1
+  %#79 = icmp uge i64 %#78, noundef %#1
+  %#80 = icmp slt i64 %#73, 0
+  %#81 = or i1 %#80, %#79
+  %#82 = zext i1 %#81 to i64
+  %#83 = or disjoint i64 %#77, %#82
+  %#84 = or disjoint i32 %#27, 64
+  br label %#17
+
+#17:
+  %#85 = phi i32 [ %#84, %#16 ], [ %#27, %#15 ]
+  %#86 = phi i64 [ %#83, %#16 ], [ %#74, %#15 ]
+  %#87 = add i64 %#86, 1
+  %#88 = trunc nsw nuw i32 %#85 to i8
+  %#89 = icmp eq i64 %#87, 0
+  br i1 %#89, label %#18, label %#19
+
+#18:
+  %#90 = phi i8 [ %#30, %#4 ], [ %#88, %#17 ]
+  %#91 = zext nneg i8 %#90 to i64
+  br label %#22
+
+#19:
+  %#92 = insertelement <2 x i64> poison, i64 %#87, i64 0
+  %#93 = shufflevector <2 x i64> %#92, <2 x i64> poison, 0, 0
+  %#94 = trunc <2 x i64> noundef %#0 to <2 x i32>
+  %#95 = trunc <2 x i64> %#93 to <2 x i32>
+  %#96 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#97 = trunc nuw <2 x i64> %#96 to <2 x i32>
+  %#98 = lshr <2 x i64> %#93, { 32, 32 }
+  %#99 = trunc nuw <2 x i64> %#98 to <2 x i32>
+  %#100 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#94, <2 x i32> %#95) nofree noundef willreturn memory(none)
+  %#101 = lshr <2 x i64> %#100, { 32, 32 }
+  %#102 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#97, <2 x i32> %#95) nofree noundef willreturn memory(none)
+  %#103 = add <2 x i64> %#101, %#102
+  %#104 = and <2 x i64> %#103, { 4294967295, 4294967295 }
+  %#105 = lshr <2 x i64> %#103, { 32, 32 }
+  %#106 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#94, <2 x i32> %#99) nofree noundef willreturn memory(none)
+  %#107 = add <2 x i64> %#104, %#106
+  %#108 = lshr <2 x i64> %#107, { 32, 32 }
+  %#109 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#97, <2 x i32> %#99) nofree noundef willreturn memory(none)
+  %#110 = add <2 x i64> %#105, %#109
+  %#111 = add <2 x i64> %#110, %#108
+  %#112 = and i8 %#88, 64
+  %#113 = icmp eq i8 %#112, 0
+  br i1 %#113, label %#20, label %#21
+
+#20:
+  %#114 = and i32 %#85, 255
+  %#115 = zext nneg i32 %#114 to i64
+  br label %#22
+
+#21:
+  %#116 = and i8 %#88, 63
+  %#117 = sub <2 x i64> noundef %#0, %#111
+  %#118 = lshr <2 x i64> %#117, { 1, 1 }
+  %#119 = add <2 x i64> %#118, %#111
+  %#120 = zext nneg i8 %#116 to i64
+  br label %#22
+
+#22:
+  %#121 = phi i64 [ %#115, %#20 ], [ %#120, %#21 ], [ %#91, %#18 ]
+  %#122 = phi <2 x i64> [ %#111, %#20 ], [ %#119, %#21 ], [ noundef %#0, %#18 ]
+  %#123 = sub nsw i64 0, %#121
+  %#124 = insertelement <2 x i64> poison, i64 %#123, i64 0
+  %#125 = shufflevector <2 x i64> %#124, <2 x i64> poison, 0, 0
+  %#126 = tail call <2 x i64> @llvm.aarch64.neon.ushl.v2i64(<2 x i64> %#122, <2 x i64> %#125) nofree noundef willreturn memory(none)
+  br label %#23
+
+#23:
+  %#127 = phi <2 x i64> [ noundef %#0, %#2 ], [ %#126, %#22 ]
+  ret <2 x i64> %#127
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <2 x i64> @target_u64_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) {
+#2:
+  %#24 = alloca i64 16, align 16
+  %#25 = alloca i64 16, align 8, dead
+  %#26 = alloca i64 16, align 16, dead
+  store <2 x i64> noundef %#0, ptr %#24, align 16
+  %#27 = icmp eq i64 noundef %#1, 0
+  br i1 %#27, label %#23, label %#3
+
+#3:
+  %#28 = ctlz i64 noundef %#1, 1
+  %#range_0_%#28 = !range i64 %#28, i64 0, i64 65
+  %#29 = trunc nsw nuw i64 %#range_0_%#28 to i32
+  %#30 = xor i32 %#29, 63
+  %#31 = ctpop i64 noundef %#1
+  %#range_1_%#31 = !range i64 %#31, i64 1, i64 65
+  %#32 = icmp samesign ult i64 %#range_1_%#31, 2
+  br i1 %#32, label %#17, label %#4
+
+#4:
+  %#33 = zext nneg i32 %#30 to i64
+  %#34 = shl nuw i64 1, %#33
+  %#35 = icmp ult i64 %#34, noundef %#1
+  br i1 %#35, label %#5, label %#14
+
+#5:
+  %#36 = shl i64 noundef %#1, %#range_0_%#28
+  %#37 = shl i64 %#34, %#range_0_%#28
+  %#38 = lshr i64 %#36, 32
+  %#39 = and i64 %#36, 4294967295
+  %#40 = udiv i64 %#37, %#38
+  %#41 = mul i64 %#40, %#38
+  %#42 = sub i64 %#37, %#41
+  br label %#6
+
+#6:
+  %#43 = phi i64 [ %#40, %#5 ], [ %#49, %#8 ]
+  %#44 = phi i64 [ %#42, %#5 ], [ %#50, %#8 ]
+  %#45 = icmp ugt i64 %#43, 4294967295
+  br i1 %#45, label %#8, label %#7
+
+#7:
+  %#46 = mul nuw i64 %#43, %#39
+  %#47 = shl i64 %#44, 32
+  %#48 = icmp ugt i64 %#46, %#47
+  br i1 %#48, label %#8, label %#9
+
+#8:
+  %#49 = add i64 %#43, -1
+  %#50 = add i64 %#44, %#38
+  %#51 = icmp ugt i64 %#50, 4294967295
+  br i1 %#51, label %#9, label %#6
+
+#9:
+  %#52 = phi i64 [ %#49, %#8 ], [ %#43, %#7 ]
+  %#53 = shl i64 %#37, 32
+  %#54 = mul i64 %#52, %#36
+  %#55 = sub i64 %#53, %#54
+  %#56 = udiv i64 %#55, %#38
+  %#57 = mul i64 %#56, %#38
+  %#58 = sub i64 %#55, %#57
+  br label %#10
+
+#10:
+  %#59 = phi i64 [ %#56, %#9 ], [ %#65, %#12 ]
+  %#60 = phi i64 [ %#58, %#9 ], [ %#66, %#12 ]
+  %#61 = icmp ugt i64 %#59, 4294967295
+  br i1 %#61, label %#12, label %#11
+
+#11:
+  %#62 = mul nuw i64 %#59, %#39
+  %#63 = shl i64 %#60, 32
+  %#64 = icmp ugt i64 %#62, %#63
+  br i1 %#64, label %#12, label %#13
+
+#12:
+  %#65 = add i64 %#59, -1
+  %#66 = add i64 %#60, %#38
+  %#67 = icmp ugt i64 %#66, 4294967295
+  br i1 %#67, label %#13, label %#10
+
+#13:
+  %#68 = phi i64 [ %#65, %#12 ], [ %#59, %#11 ]
+  %#69 = shl i64 %#55, 32
+  %#70 = mul i64 %#68, %#36
+  %#71 = sub i64 %#69, %#70
+  %#72 = lshr i64 %#71, %#range_0_%#28
+  %#73 = shl i64 %#52, 32
+  %#74 = add i64 %#68, %#73
+  br label %#14
+
+#14:
+  %#75 = phi i64 [ %#72, %#13 ], [ -1, %#4 ]
+  %#76 = phi i64 [ %#74, %#13 ], [ -1, %#4 ]
+  %#77 = sub i64 noundef %#1, %#75
+  %#78 = icmp ult i64 %#77, %#34
+  br i1 %#78, label %#16, label %#15
+
+#15:
+  %#79 = shl i64 %#76, 1
+  %#80 = shl i64 %#75, 1
+  %#81 = icmp uge i64 %#80, noundef %#1
+  %#82 = icmp slt i64 %#75, 0
+  %#83 = or i1 %#82, %#81
+  %#84 = zext i1 %#83 to i64
+  %#85 = or disjoint i64 %#79, %#84
+  %#86 = or disjoint i32 %#30, 64
+  br label %#16
+
+#16:
+  %#87 = phi i32 [ %#86, %#15 ], [ %#30, %#14 ]
+  %#88 = phi i64 [ %#85, %#15 ], [ %#76, %#14 ]
+  %#89 = add i64 %#88, 1
+  br label %#17
+
+#17:
+  %#90 = phi i64 [ %#89, %#16 ], [ 0, %#3 ]
+  %#91 = phi i32 [ %#87, %#16 ], [ %#30, %#3 ]
+  start_lifetime ptr %#25
+  %#92 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#25, nonnull noundef ptr %#24, noundef i64 16) noundef
+  %#93 = icmp eq i64 %#90, 0
+  %#94 = zext i64 %#90 to i128
+  %#95 = and i32 %#91, 63
+  %#96 = zext nneg i32 %#95 to i64
+  %#97 = and i32 %#91, 191
+  %#98 = zext nneg i32 %#97 to i64
+  %#99 = load i64, ptr %#25, align 8
+  br i1 %#93, label %#18, label %#19
+
+#18:
+  %#100 = and i32 %#91, 255
+  %#101 = zext nneg i32 %#100 to i64
+  %#102 = lshr i64 %#99, %#101
+  store i64 %#102, ptr %#25, align 8
+  %#103 = gep inbounds nuw ptr %#25, 1 x i64 8
+  %#104 = load i64, ptr %#103, align 8
+  %#105 = lshr i64 %#104, %#101
+  store i64 %#105, ptr %#103, align 8
+  br label %#22
+
+#19:
+  %#106 = and i32 %#91, 64
+  %#107 = icmp eq i32 %#106, 0
+  %#108 = zext i64 %#99 to i128
+  %#109 = mul nuw i128 %#108, %#94
+  %#110 = lshr i128 %#109, 64
+  %#111 = trunc nuw i128 %#110 to i64
+  br i1 %#107, label %#20, label %#21
+
+#20:
+  %#112 = lshr i64 %#111, %#98
+  store i64 %#112, ptr %#25, align 8
+  %#113 = gep inbounds nuw ptr %#25, 1 x i64 8
+  %#114 = load i64, ptr %#113, align 8
+  %#115 = zext i64 %#114 to i128
+  %#116 = mul nuw i128 %#115, %#94
+  %#117 = lshr i128 %#116, 64
+  %#118 = trunc nuw i128 %#117 to i64
+  %#119 = lshr i64 %#118, %#98
+  store i64 %#119, ptr %#113, align 8
+  br label %#22
+
+#21:
+  %#120 = sub i64 %#99, %#111
+  %#121 = lshr i64 %#120, 1
+  %#122 = add i64 %#121, %#111
+  %#123 = lshr i64 %#122, %#96
+  store i64 %#123, ptr %#25, align 8
+  %#124 = gep inbounds nuw ptr %#25, 1 x i64 8
+  %#125 = load i64, ptr %#124, align 8
+  %#126 = zext i64 %#125 to i128
+  %#127 = mul nuw i128 %#126, %#94
+  %#128 = lshr i128 %#127, 64
+  %#129 = trunc nuw i128 %#128 to i64
+  %#130 = sub i64 %#125, %#129
+  %#131 = lshr i64 %#130, 1
+  %#132 = add i64 %#131, %#129
+  %#133 = lshr i64 %#132, %#96
+  store i64 %#133, ptr %#124, align 8
+  br label %#22
+
+#22:
+  start_lifetime ptr %#26
+  %#134 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#26, nonnull noundef ptr %#25, noundef i64 16) noundef
+  %#135 = load <2 x i64>, ptr %#26, align 16
+  end_lifetime ptr %#26
+  end_lifetime ptr %#25
+  br label %#23
+
+#23:
+  %#136 = phi <2 x i64> [ %#135, %#22 ], [ noundef %#0, %#2 ]
+  ret <2 x i64> %#136
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.umull.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.ushl.v2i64
+
+
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.sshl.v2i64(<2 x i64>, <2 x i64>) nofree willreturn memory(none)
+declare <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+
+define <2 x i64> @target_s64_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#24 = icmp eq i64 noundef %#1, 0
+  br i1 %#24, label %#23, label %#3
+
+#3:
+  %#25 = icmp slt i64 noundef %#1, 0
+  %#26 = abs i64 noundef %#1, 0
+  %#27 = ctlz i64 %#26, 1
+  %#range_0_%#27 = !range i64 %#27, i64 0, i64 65
+  %#28 = trunc nsw nuw i64 %#range_0_%#27 to i32
+  %#29 = xor i32 %#28, 63
+  %#30 = ctpop i64 %#26
+  %#range_1_%#30 = !range i64 %#30, i64 1, i64 65
+  %#31 = icmp samesign ult i64 %#range_1_%#30, 2
+  br i1 %#31, label %#4, label %#5
+
+#4:
+  %#32 = lshr i64 noundef %#1, 56
+  %#33 = trunc nsw nuw i64 %#32 to i32
+  %#34 = and i32 %#33, 128
+  %#35 = or disjoint i32 %#29, %#34
+  %#36 = trunc nuw i32 %#35 to i8
+  br label %#19
+
+#5:
+  %#37 = sub nsw i32 62, %#28
+  %#38 = zext nneg i32 %#37 to i64
+  %#39 = shl nuw i64 1, %#38
+  %#40 = icmp ult i64 %#39, %#26
+  br i1 %#40, label %#6, label %#15
+
+#6:
+  %#41 = shl i64 %#26, %#range_0_%#27
+  %#42 = shl i64 %#39, %#range_0_%#27
+  %#43 = lshr i64 %#41, 32
+  %#44 = and i64 %#41, 4294967295
+  %#45 = udiv i64 %#42, %#43
+  %#46 = mul i64 %#45, %#43
+  %#47 = sub i64 %#42, %#46
+  br label %#7
+
+#7:
+  %#48 = phi i64 [ %#45, %#6 ], [ %#54, %#9 ]
+  %#49 = phi i64 [ %#47, %#6 ], [ %#55, %#9 ]
+  %#50 = icmp ugt i64 %#48, 4294967295
+  br i1 %#50, label %#9, label %#8
+
+#8:
+  %#51 = mul nuw i64 %#48, %#44
+  %#52 = shl i64 %#49, 32
+  %#53 = icmp ugt i64 %#51, %#52
+  br i1 %#53, label %#9, label %#10
+
+#9:
+  %#54 = add i64 %#48, -1
+  %#55 = add i64 %#49, %#43
+  %#56 = icmp ugt i64 %#55, 4294967295
+  br i1 %#56, label %#10, label %#7
+
+#10:
+  %#57 = phi i64 [ %#54, %#9 ], [ %#48, %#8 ]
+  %#58 = shl i64 %#42, 32
+  %#59 = mul i64 %#57, %#41
+  %#60 = sub i64 %#58, %#59
+  %#61 = udiv i64 %#60, %#43
+  %#62 = mul i64 %#61, %#43
+  %#63 = sub i64 %#60, %#62
+  br label %#11
+
+#11:
+  %#64 = phi i64 [ %#61, %#10 ], [ %#70, %#13 ]
+  %#65 = phi i64 [ %#63, %#10 ], [ %#71, %#13 ]
+  %#66 = icmp ugt i64 %#64, 4294967295
+  br i1 %#66, label %#13, label %#12
+
+#12:
+  %#67 = mul nuw i64 %#64, %#44
+  %#68 = shl i64 %#65, 32
+  %#69 = icmp ugt i64 %#67, %#68
+  br i1 %#69, label %#13, label %#14
+
+#13:
+  %#70 = add i64 %#64, -1
+  %#71 = add i64 %#65, %#43
+  %#72 = icmp ugt i64 %#71, 4294967295
+  br i1 %#72, label %#14, label %#11
+
+#14:
+  %#73 = phi i64 [ %#70, %#13 ], [ %#64, %#12 ]
+  %#74 = shl i64 %#60, 32
+  %#75 = mul i64 %#73, %#41
+  %#76 = sub i64 %#74, %#75
+  %#77 = lshr i64 %#76, %#range_0_%#27
+  %#78 = shl i64 %#57, 32
+  %#79 = add i64 %#73, %#78
+  br label %#15
+
+#15:
+  %#80 = phi i64 [ %#77, %#14 ], [ -1, %#5 ]
+  %#81 = phi i64 [ %#79, %#14 ], [ -1, %#5 ]
+  %#82 = sub i64 %#26, %#80
+  %#83 = zext nneg i32 %#29 to i64
+  %#84 = lshr i64 %#82, %#83
+  %#85 = icmp eq i64 %#84, 0
+  br i1 %#85, label %#16, label %#17
+
+#16:
+  %#86 = trunc nsw i32 %#37 to i8
+  br label %#18
+
+#17:
+  %#87 = shl i64 %#81, 1
+  %#88 = shl i64 %#80, 1
+  %#89 = icmp uge i64 %#88, %#26
+  %#90 = icmp slt i64 %#80, 0
+  %#91 = or i1 %#90, %#89
+  %#92 = zext i1 %#91 to i64
+  %#93 = or disjoint i64 %#87, %#92
+  %#94 = trunc nsw nuw i32 %#29 to i8
+  %#95 = or disjoint i8 %#94, 64
+  br label %#18
+
+#18:
+  %#96 = phi i64 [ %#93, %#17 ], [ %#81, %#16 ]
+  %#97 = phi i8 [ %#95, %#17 ], [ %#86, %#16 ]
+  %#98 = add i64 %#96, 1
+  %#99 = or i8 %#97, 128
+  %#100 = xor i64 %#96, -1
+  %#101 = select i1 %#25, i8 %#99, i8 %#97
+  %#102 = select i1 %#25, i64 %#100, i64 %#98
+  %#103 = icmp eq i64 %#102, 0
+  br i1 %#103, label %#19, label %#20
+
+#19:
+  %#104 = phi i8 [ %#36, %#4 ], [ %#101, %#18 ]
+  %#105 = and i8 %#104, 63
+  %#106 = zext nneg i8 %#105 to i64
+  %#107 = shl nsw i64 -1, %#106
+  %#108 = xor i64 %#107, -1
+  %#109 = insertelement <2 x i64> poison, i64 %#108, i64 0
+  %#110 = shufflevector <2 x i64> %#109, <2 x i64> poison, 0, 0
+  %#111 = icmp slt <2 x i64> noundef %#0, { 0, 0 }
+  %#112 = select <2 x i1> %#111, <2 x i64> %#110, <2 x i64> { 0, 0 }
+  %#113 = add <2 x i64> %#112, noundef %#0
+  %#114 = sub nsw i64 0, %#106
+  %#115 = insertelement <2 x i64> poison, i64 %#114, i64 0
+  %#116 = shufflevector <2 x i64> %#115, <2 x i64> poison, 0, 0
+  %#117 = tail call <2 x i64> @llvm.aarch64.neon.sshl.v2i64(<2 x i64> %#113, <2 x i64> %#116) nofree noundef willreturn memory(none)
+  %#118 = ashr i8 %#104, 7
+  %#119 = insertelement <16 x i8> poison, i8 %#118, i64 0
+  %#120 = shufflevector <16 x i8> %#119, <16 x i8> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#121 = bitcast <16 x i8> %#120 to <2 x i64>
+  %#122 = xor <2 x i64> %#117, %#121
+  %#123 = sub <2 x i64> %#122, %#121
+  br label %#23
+
+#20:
+  %#124 = insertelement <2 x i64> poison, i64 %#102, i64 0
+  %#125 = shufflevector <2 x i64> %#124, <2 x i64> poison, 0, 0
+  %#126 = trunc <2 x i64> noundef %#0 to <2 x i32>
+  %#127 = trunc <2 x i64> %#125 to <2 x i32>
+  %#128 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#129 = trunc nuw <2 x i64> %#128 to <2 x i32>
+  %#130 = lshr <2 x i64> %#125, { 32, 32 }
+  %#131 = trunc nuw <2 x i64> %#130 to <2 x i32>
+  %#132 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#126, <2 x i32> %#127) nofree noundef willreturn memory(none)
+  %#133 = lshr <2 x i64> %#132, { 32, 32 }
+  %#134 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#129, <2 x i32> %#127) nofree noundef willreturn memory(none)
+  %#135 = add <2 x i64> %#133, %#134
+  %#136 = and <2 x i64> %#135, { 4294967295, 4294967295 }
+  %#137 = lshr <2 x i64> %#135, { 32, 32 }
+  %#138 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#126, <2 x i32> %#131) nofree noundef willreturn memory(none)
+  %#139 = add <2 x i64> %#136, %#138
+  %#140 = lshr <2 x i64> %#139, { 32, 32 }
+  %#141 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#129, <2 x i32> %#131) nofree noundef willreturn memory(none)
+  %#142 = icmp slt <2 x i64> noundef %#0, { 0, 0 }
+  %#143 = select <2 x i1> %#142, <2 x i64> %#125, <2 x i64> { 0, 0 }
+  %#144 = icmp slt <2 x i64> %#125, { 0, 0 }
+  %#145 = select <2 x i1> %#144, <2 x i64> noundef %#0, <2 x i64> { 0, 0 }
+  %#146 = add <2 x i64> %#145, %#143
+  %#147 = sub <2 x i64> %#141, %#146
+  %#148 = add <2 x i64> %#147, %#137
+  %#149 = add <2 x i64> %#148, %#140
+  %#150 = and i8 %#101, 64
+  %#151 = icmp eq i8 %#150, 0
+  br i1 %#151, label %#22, label %#21
+
+#21:
+  %#152 = ashr i8 %#101, 7
+  %#153 = sext i8 %#152 to i64
+  %#154 = insertelement <2 x i64> poison, i64 %#153, i64 0
+  %#155 = shufflevector <2 x i64> %#154, <2 x i64> poison, 0, 0
+  %#156 = xor <2 x i64> %#155, noundef %#0
+  %#157 = sub <2 x i64> %#156, %#155
+  %#158 = add <2 x i64> %#157, %#149
+  br label %#22
+
+#22:
+  %#159 = phi <2 x i64> [ %#158, %#21 ], [ %#149, %#20 ]
+  %#160 = and i8 %#101, 63
+  %#161 = zext nneg i8 %#160 to i64
+  %#162 = sub nsw i64 0, %#161
+  %#163 = insertelement <2 x i64> poison, i64 %#162, i64 0
+  %#164 = shufflevector <2 x i64> %#163, <2 x i64> poison, 0, 0
+  %#165 = tail call <2 x i64> @llvm.aarch64.neon.sshl.v2i64(<2 x i64> %#159, <2 x i64> %#164) nofree noundef willreturn memory(none)
+  %#166 = lshr <2 x i64> %#165, { 63, 63 }
+  %#167 = add <2 x i64> %#166, %#165
+  br label %#23
+
+#23:
+  %#168 = phi <2 x i64> [ noundef %#0, %#2 ], [ %#123, %#19 ], [ %#167, %#22 ]
+  ret <2 x i64> %#168
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <2 x i64> @target_s64_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) {
+#2:
+  %#26 = alloca i64 16, align 16
+  %#27 = alloca i64 16, align 8, dead
+  %#28 = alloca i64 16, align 16, dead
+  store <2 x i64> noundef %#0, ptr %#26, align 16
+  %#29 = icmp eq i64 noundef %#1, 0
+  br i1 %#29, label %#25, label %#3
+
+#3:
+  %#30 = icmp slt i64 noundef %#1, 0
+  %#31 = abs i64 noundef %#1, 0
+  %#32 = ctlz i64 %#31, 1
+  %#range_0_%#32 = !range i64 %#32, i64 0, i64 65
+  %#33 = trunc nsw nuw i64 %#range_0_%#32 to i32
+  %#34 = xor i32 %#33, 63
+  %#35 = ctpop i64 %#31
+  %#range_1_%#35 = !range i64 %#35, i64 1, i64 65
+  %#36 = icmp samesign ult i64 %#range_1_%#35, 2
+  br i1 %#36, label %#4, label %#5
+
+#4:
+  %#37 = lshr i64 noundef %#1, 56
+  %#38 = trunc nsw nuw i64 %#37 to i32
+  %#39 = and i32 %#38, 128
+  %#40 = or disjoint i32 %#34, %#39
+  %#41 = trunc nuw i32 %#40 to i8
+  br label %#19
+
+#5:
+  %#42 = sub nsw i32 62, %#33
+  %#43 = zext nneg i32 %#42 to i64
+  %#44 = shl nuw i64 1, %#43
+  %#45 = icmp ult i64 %#44, %#31
+  br i1 %#45, label %#6, label %#15
+
+#6:
+  %#46 = shl i64 %#31, %#range_0_%#32
+  %#47 = shl i64 %#44, %#range_0_%#32
+  %#48 = lshr i64 %#46, 32
+  %#49 = and i64 %#46, 4294967295
+  %#50 = udiv i64 %#47, %#48
+  %#51 = mul i64 %#50, %#48
+  %#52 = sub i64 %#47, %#51
+  br label %#7
+
+#7:
+  %#53 = phi i64 [ %#50, %#6 ], [ %#59, %#9 ]
+  %#54 = phi i64 [ %#52, %#6 ], [ %#60, %#9 ]
+  %#55 = icmp ugt i64 %#53, 4294967295
+  br i1 %#55, label %#9, label %#8
+
+#8:
+  %#56 = mul nuw i64 %#53, %#49
+  %#57 = shl i64 %#54, 32
+  %#58 = icmp ugt i64 %#56, %#57
+  br i1 %#58, label %#9, label %#10
+
+#9:
+  %#59 = add i64 %#53, -1
+  %#60 = add i64 %#54, %#48
+  %#61 = icmp ugt i64 %#60, 4294967295
+  br i1 %#61, label %#10, label %#7
+
+#10:
+  %#62 = phi i64 [ %#59, %#9 ], [ %#53, %#8 ]
+  %#63 = shl i64 %#47, 32
+  %#64 = mul i64 %#62, %#46
+  %#65 = sub i64 %#63, %#64
+  %#66 = udiv i64 %#65, %#48
+  %#67 = mul i64 %#66, %#48
+  %#68 = sub i64 %#65, %#67
+  br label %#11
+
+#11:
+  %#69 = phi i64 [ %#66, %#10 ], [ %#75, %#13 ]
+  %#70 = phi i64 [ %#68, %#10 ], [ %#76, %#13 ]
+  %#71 = icmp ugt i64 %#69, 4294967295
+  br i1 %#71, label %#13, label %#12
+
+#12:
+  %#72 = mul nuw i64 %#69, %#49
+  %#73 = shl i64 %#70, 32
+  %#74 = icmp ugt i64 %#72, %#73
+  br i1 %#74, label %#13, label %#14
+
+#13:
+  %#75 = add i64 %#69, -1
+  %#76 = add i64 %#70, %#48
+  %#77 = icmp ugt i64 %#76, 4294967295
+  br i1 %#77, label %#14, label %#11
+
+#14:
+  %#78 = phi i64 [ %#75, %#13 ], [ %#69, %#12 ]
+  %#79 = shl i64 %#65, 32
+  %#80 = mul i64 %#78, %#46
+  %#81 = sub i64 %#79, %#80
+  %#82 = lshr i64 %#81, %#range_0_%#32
+  %#83 = shl i64 %#62, 32
+  %#84 = add i64 %#78, %#83
+  br label %#15
+
+#15:
+  %#85 = phi i64 [ %#82, %#14 ], [ -1, %#5 ]
+  %#86 = phi i64 [ %#84, %#14 ], [ -1, %#5 ]
+  %#87 = sub i64 %#31, %#85
+  %#88 = zext nneg i32 %#34 to i64
+  %#89 = lshr i64 %#87, %#88
+  %#90 = icmp eq i64 %#89, 0
+  br i1 %#90, label %#16, label %#17
+
+#16:
+  %#91 = trunc nsw i32 %#42 to i8
+  br label %#18
+
+#17:
+  %#92 = shl i64 %#86, 1
+  %#93 = shl i64 %#85, 1
+  %#94 = icmp uge i64 %#93, %#31
+  %#95 = icmp slt i64 %#85, 0
+  %#96 = or i1 %#95, %#94
+  %#97 = zext i1 %#96 to i64
+  %#98 = or disjoint i64 %#92, %#97
+  %#99 = trunc nsw nuw i32 %#34 to i8
+  %#100 = or disjoint i8 %#99, 64
+  br label %#18
+
+#18:
+  %#101 = phi i64 [ %#98, %#17 ], [ %#86, %#16 ]
+  %#102 = phi i8 [ %#100, %#17 ], [ %#91, %#16 ]
+  %#103 = add i64 %#101, 1
+  %#104 = or i8 %#102, 128
+  %#105 = xor i64 %#101, -1
+  %#106 = select i1 %#30, i8 %#104, i8 %#102
+  %#107 = select i1 %#30, i64 %#105, i64 %#103
+  br label %#19
+
+#19:
+  %#108 = phi i64 [ 0, %#4 ], [ %#107, %#18 ]
+  %#109 = phi i8 [ %#41, %#4 ], [ %#106, %#18 ]
+  start_lifetime ptr %#27
+  %#110 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#27, nonnull noundef ptr %#26, noundef i64 16) noundef
+  %#111 = and i8 %#109, 63
+  %#112 = icmp eq i64 %#108, 0
+  %#113 = sext i64 %#108 to i128
+  %#114 = ashr i8 %#109, 7
+  %#115 = sext i8 %#114 to i64
+  %#116 = zext nneg i8 %#111 to i64
+  %#117 = load i64, ptr %#27, align 8
+  br i1 %#112, label %#20, label %#21
+
+#20:
+  %#118 = shl nsw i64 -1, %#116
+  %#119 = xor i64 %#118, -1
+  %#120 = icmp slt i64 %#117, 0
+  %#121 = select i1 %#120, i64 %#119, i64 0
+  %#122 = add i64 %#121, %#117
+  %#123 = ashr i64 %#122, %#116
+  %#124 = xor i64 %#123, %#115
+  %#125 = sub nsw i64 %#124, %#115
+  store i64 %#125, ptr %#27, align 8
+  %#126 = gep inbounds nuw ptr %#27, 1 x i64 8
+  %#127 = load i64, ptr %#126, align 8
+  %#128 = icmp slt i64 %#127, 0
+  %#129 = select i1 %#128, i64 %#119, i64 0
+  %#130 = add i64 %#129, %#127
+  %#131 = ashr i64 %#130, %#116
+  %#132 = xor i64 %#131, %#115
+  %#133 = sub nsw i64 %#132, %#115
+  store i64 %#133, ptr %#126, align 8
+  br label %#24
+
+#21:
+  %#134 = and i8 %#109, 64
+  %#135 = icmp eq i8 %#134, 0
+  %#136 = sext i64 %#117 to i128
+  %#137 = mul nsw i128 %#136, %#113
+  %#138 = lshr i128 %#137, 64
+  %#139 = trunc nuw i128 %#138 to i64
+  br i1 %#135, label %#22, label %#23
+
+#22:
+  %#140 = ashr i64 %#139, %#116
+  %#141 = lshr i64 %#140, 63
+  %#142 = add nsw i64 %#141, %#140
+  store i64 %#142, ptr %#27, align 8
+  %#143 = gep inbounds nuw ptr %#27, 1 x i64 8
+  %#144 = load i64, ptr %#143, align 8
+  %#145 = sext i64 %#144 to i128
+  %#146 = mul nsw i128 %#145, %#113
+  %#147 = lshr i128 %#146, 64
+  %#148 = trunc nuw i128 %#147 to i64
+  %#149 = ashr i64 %#148, %#116
+  %#150 = lshr i64 %#149, 63
+  %#151 = add nsw i64 %#150, %#149
+  store i64 %#151, ptr %#143, align 8
+  br label %#24
+
+#23:
+  %#152 = xor i64 %#117, %#115
+  %#153 = sub i64 %#152, %#115
+  %#154 = add i64 %#153, %#139
+  %#155 = ashr i64 %#154, %#116
+  %#156 = lshr i64 %#155, 63
+  %#157 = add nsw i64 %#156, %#155
+  store i64 %#157, ptr %#27, align 8
+  %#158 = gep inbounds nuw ptr %#27, 1 x i64 8
+  %#159 = load i64, ptr %#158, align 8
+  %#160 = sext i64 %#159 to i128
+  %#161 = mul nsw i128 %#160, %#113
+  %#162 = lshr i128 %#161, 64
+  %#163 = trunc nuw i128 %#162 to i64
+  %#164 = xor i64 %#159, %#115
+  %#165 = sub i64 %#164, %#115
+  %#166 = add i64 %#165, %#163
+  %#167 = ashr i64 %#166, %#116
+  %#168 = lshr i64 %#167, 63
+  %#169 = add nsw i64 %#168, %#167
+  store i64 %#169, ptr %#158, align 8
+  br label %#24
+
+#24:
+  start_lifetime ptr %#28
+  %#170 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#28, nonnull noundef ptr %#27, noundef i64 16) noundef
+  %#171 = load <2 x i64>, ptr %#28, align 16
+  end_lifetime ptr %#28
+  end_lifetime ptr %#27
+  br label %#25
+
+#25:
+  %#172 = phi <2 x i64> [ %#171, %#24 ], [ noundef %#0, %#2 ]
+  ret <2 x i64> %#172
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.sshl.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.umull.v2i64
+
+
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+declare <4 x i32> @llvm.aarch64.neon.uhsub.v4i32(<4 x i32>, <4 x i32>) nofree willreturn memory(none)
+declare <4 x i32> @llvm.aarch64.neon.ushl.v4i32(<4 x i32>, <4 x i32>) nofree willreturn memory(none)
+
+define <4 x i32> @target_u32_branchfree_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  %#8 = icmp ult i32 noundef %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = ctlz i32 noundef %#1, 1
+  %#range_0_%#9 = !range i32 %#9, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#9
+  %#10 = ctpop i32 noundef %#1
+  %#range_1_%#10 = !range i32 %#10, i32 1, i32 33
+  %#11 = icmp samesign ult i32 %#range_1_%#10, 2
+  br i1 %#11, label %#4, label %#5
+
+#4:
+  %#12 = sub nsw nuw i32 30, %#range_0_%#9
+  br label %#6
+
+#5:
+  %#13 = xor i32 %#range_0_%#9, 31
+  %#14 = shl nuw i32 1, %#13
+  %#15 = zext i32 %#14 to i64
+  %#16 = shl nuw i64 %#15, 32
+  %#17 = zext i32 noundef %#1 to i64
+  %#18 = udiv i64 %#16, %#17
+  %#19 = trunc i64 %#18 to i32
+  %#20 = mul i32 noundef %#1, %#19
+  %#21 = sub i32 0, %#20
+  %#22 = shl i32 %#19, 1
+  %#23 = shl i32 %#21, 1
+  %#24 = icmp uge i32 %#23, noundef %#1
+  %#25 = icmp slt i32 %#21, 0
+  %#26 = or i1 %#25, %#24
+  %#27 = zext i1 %#26 to i32
+  %#28 = or disjoint i32 %#22, 1
+  %#29 = add i32 %#28, %#27
+  br label %#6
+
+#6:
+  %#30 = phi i32 [ 0, %#4 ], [ %#29, %#5 ]
+  %#31 = phi i32 [ %#12, %#4 ], [ %#13, %#5 ]
+  %#32 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 0, 1
+  %#33 = insertelement <2 x i32> poison, i32 %#30, i64 0
+  %#34 = shufflevector <2 x i32> %#33, <2 x i32> poison, 0, 0
+  %#35 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#32, <2 x i32> %#34) nofree noundef willreturn memory(none)
+  %#36 = bitcast <2 x i64> %#35 to <4 x i32>
+  %#37 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 2, 3
+  %#38 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#37, <2 x i32> %#34) nofree noundef willreturn memory(none)
+  %#39 = bitcast <2 x i64> %#38 to <4 x i32>
+  %#40 = shufflevector <4 x i32> %#36, <4 x i32> %#39, 1, 3, 5, 7
+  %#41 = tail call <4 x i32> @llvm.aarch64.neon.uhsub.v4i32(<4 x i32> noundef %#0, <4 x i32> %#40) nofree noundef willreturn memory(none)
+  %#42 = add <4 x i32> %#40, %#41
+  %#43 = sub nsw i32 0, %#31
+  %#44 = insertelement <4 x i32> poison, i32 %#43, i64 0
+  %#45 = shufflevector <4 x i32> %#44, <4 x i32> poison, 0, 0, 0, 0
+  %#46 = tail call <4 x i32> @llvm.aarch64.neon.ushl.v4i32(<4 x i32> %#42, <4 x i32> %#45) nofree noundef willreturn memory(none)
+  br label %#7
+
+#7:
+  %#47 = phi <4 x i32> [ %#46, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i32> %#47
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <4 x i32> @target_u32_branchfree_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) {
+#2:
+  %#8 = alloca i64 16, align 16
+  %#9 = alloca i64 16, align 4, dead
+  %#10 = alloca i64 16, align 16, dead
+  store <4 x i32> noundef %#0, ptr %#8, align 16
+  %#11 = icmp ult i32 noundef %#1, 2
+  br i1 %#11, label %#7, label %#3
+
+#3:
+  %#12 = ctlz i32 noundef %#1, 1
+  %#range_0_%#12 = !range i32 %#12, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#12
+  %#13 = ctpop i32 noundef %#1
+  %#range_1_%#13 = !range i32 %#13, i32 1, i32 33
+  %#14 = icmp samesign ult i32 %#range_1_%#13, 2
+  br i1 %#14, label %#4, label %#5
+
+#4:
+  %#15 = sub nsw nuw i32 30, %#range_0_%#12
+  br label %#6
+
+#5:
+  %#16 = xor i32 %#range_0_%#12, 31
+  %#17 = shl nuw i32 1, %#16
+  %#18 = zext i32 %#17 to i64
+  %#19 = shl nuw i64 %#18, 32
+  %#20 = zext i32 noundef %#1 to i64
+  %#21 = udiv i64 %#19, %#20
+  %#22 = trunc i64 %#21 to i32
+  %#23 = mul i32 noundef %#1, %#22
+  %#24 = sub i32 0, %#23
+  %#25 = shl nsw nuw i64 %#21, 1
+  %#26 = shl i32 %#24, 1
+  %#27 = icmp uge i32 %#26, noundef %#1
+  %#28 = icmp slt i32 %#24, 0
+  %#29 = or i1 %#28, %#27
+  %#30 = zext i1 %#29 to i64
+  %#31 = or disjoint i64 %#25, 1
+  %#32 = add nsw nuw i64 %#31, %#30
+  %#33 = and i64 %#32, 4294967295
+  br label %#6
+
+#6:
+  %#34 = phi i64 [ 0, %#4 ], [ %#33, %#5 ]
+  %#35 = phi i32 [ %#15, %#4 ], [ %#16, %#5 ]
+  start_lifetime ptr %#9
+  %#36 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#9, nonnull noundef ptr %#8, noundef i64 16) noundef
+  %#37 = load i32, ptr %#9, align 4
+  %#38 = zext i32 %#37 to i64
+  %#39 = mul nuw i64 %#34, %#38
+  %#40 = lshr i64 %#39, 32
+  %#41 = trunc nuw i64 %#40 to i32
+  %#42 = sub i32 %#37, %#41
+  %#43 = lshr i32 %#42, 1
+  %#44 = add i32 %#43, %#41
+  %#45 = lshr i32 %#44, %#35
+  store i32 %#45, ptr %#9, align 4
+  %#46 = gep inbounds nuw ptr %#9, 1 x i64 4
+  %#47 = load i32, ptr %#46, align 4
+  %#48 = zext i32 %#47 to i64
+  %#49 = mul nuw i64 %#34, %#48
+  %#50 = lshr i64 %#49, 32
+  %#51 = trunc nuw i64 %#50 to i32
+  %#52 = sub i32 %#47, %#51
+  %#53 = lshr i32 %#52, 1
+  %#54 = add i32 %#53, %#51
+  %#55 = lshr i32 %#54, %#35
+  store i32 %#55, ptr %#46, align 4
+  %#56 = gep inbounds nuw ptr %#9, 1 x i64 8
+  %#57 = load i32, ptr %#56, align 4
+  %#58 = zext i32 %#57 to i64
+  %#59 = mul nuw i64 %#34, %#58
+  %#60 = lshr i64 %#59, 32
+  %#61 = trunc nuw i64 %#60 to i32
+  %#62 = sub i32 %#57, %#61
+  %#63 = lshr i32 %#62, 1
+  %#64 = add i32 %#63, %#61
+  %#65 = lshr i32 %#64, %#35
+  store i32 %#65, ptr %#56, align 4
+  %#66 = gep inbounds nuw ptr %#9, 1 x i64 12
+  %#67 = load i32, ptr %#66, align 4
+  %#68 = zext i32 %#67 to i64
+  %#69 = mul nuw i64 %#34, %#68
+  %#70 = lshr i64 %#69, 32
+  %#71 = trunc nuw i64 %#70 to i32
+  %#72 = sub i32 %#67, %#71
+  %#73 = lshr i32 %#72, 1
+  %#74 = add i32 %#73, %#71
+  %#75 = lshr i32 %#74, %#35
+  store i32 %#75, ptr %#66, align 4
+  start_lifetime ptr %#10
+  %#76 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#10, nonnull noundef ptr %#9, noundef i64 16) noundef
+  %#77 = load <4 x i32>, ptr %#10, align 16
+  end_lifetime ptr %#10
+  end_lifetime ptr %#9
+  br label %#7
+
+#7:
+  %#78 = phi <4 x i32> [ %#77, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i32> %#78
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.uhsub.v4i32
+ - Unknown libcall: @llvm.aarch64.neon.umull.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.ushl.v4i32
+
+
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.smull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+declare <4 x i32> @llvm.aarch64.neon.sshl.v4i32(<4 x i32>, <4 x i32>) nofree willreturn memory(none)
+
+define <4 x i32> @target_s32_branchfree_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#8 = icmp eq i32 noundef %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i32 noundef %#1, 0
+  %#10 = ctlz i32 %#9, 1
+  %#range_0_%#10 = !range i32 %#10, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#10
+  %#11 = xor i32 %#range_0_%#10, 31
+  %#12 = ctpop i32 %#9
+  %#range_1_%#12 = !range i32 %#12, i32 1, i32 33
+  %#13 = icmp samesign ult i32 %#range_1_%#12, 2
+  br i1 %#13, label %#4, label %#5
+
+#4:
+  %#14 = lshr i32 noundef %#1, 24
+  %#15 = and i32 %#14, 128
+  %#16 = or disjoint i32 %#11, %#15
+  %#17 = trunc nuw i32 %#16 to i8
+  br label %#6
+
+#5:
+  %#18 = icmp slt i32 noundef %#1, 0
+  %#19 = sub nsw i32 30, %#range_0_%#10
+  %#20 = shl nsw nuw i32 1, %#19
+  %#21 = zext nneg i32 %#20 to i64
+  %#22 = shl nsw nuw i64 %#21, 32
+  %#23 = zext i32 %#9 to i64
+  %#24 = udiv i64 %#22, %#23
+  %#25 = trunc i64 %#24 to i32
+  %#26 = mul i32 %#9, %#25
+  %#27 = sub i32 0, %#26
+  %#28 = shl i32 %#25, 1
+  %#29 = shl i32 %#27, 1
+  %#30 = icmp uge i32 %#29, %#9
+  %#31 = icmp slt i32 %#27, 0
+  %#32 = or i1 %#31, %#30
+  %#33 = zext i1 %#32 to i32
+  %#34 = trunc nsw nuw i32 %#11 to i8
+  %#35 = or disjoint i32 %#28, 1
+  %#36 = add i32 %#35, %#33
+  %#37 = select i1 %#18, i8 192, i8 64
+  %#38 = or disjoint i8 %#37, %#34
+  br label %#6
+
+#6:
+  %#39 = phi i32 [ 0, %#4 ], [ %#36, %#5 ]
+  %#40 = phi i8 [ %#17, %#4 ], [ %#38, %#5 ]
+  %#41 = and i8 %#40, 31
+  %#42 = ashr i8 %#40, 7
+  %#43 = sext i8 %#42 to i32
+  %#44 = insertelement <4 x i32> poison, i32 %#43, i64 0
+  %#45 = shufflevector <4 x i32> %#44, <4 x i32> poison, 0, 0, 0, 0
+  %#46 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 0, 1
+  %#47 = insertelement <2 x i32> poison, i32 %#39, i64 0
+  %#48 = shufflevector <2 x i32> %#47, <2 x i32> poison, 0, 0
+  %#49 = tail call <2 x i64> @llvm.aarch64.neon.smull.v2i64(<2 x i32> %#46, <2 x i32> %#48) nofree noundef willreturn memory(none)
+  %#50 = bitcast <2 x i64> %#49 to <4 x i32>
+  %#51 = shufflevector <4 x i32> noundef %#0, <4 x i32> poison, 2, 3
+  %#52 = tail call <2 x i64> @llvm.aarch64.neon.smull.v2i64(<2 x i32> %#51, <2 x i32> %#48) nofree noundef willreturn memory(none)
+  %#53 = bitcast <2 x i64> %#52 to <4 x i32>
+  %#54 = shufflevector <4 x i32> %#50, <4 x i32> %#53, 1, 3, 5, 7
+  %#55 = add <4 x i32> %#54, noundef %#0
+  %#56 = icmp eq i32 %#39, 0
+  %#57 = sext i1 %#56 to i32
+  %#58 = zext nneg i8 %#41 to i32
+  %#59 = shl nuw i32 1, %#58
+  %#60 = add i32 %#59, %#57
+  %#61 = insertelement <4 x i32> poison, i32 %#60, i64 0
+  %#62 = shufflevector <4 x i32> %#61, <4 x i32> poison, 0, 0, 0, 0
+  %#63 = icmp slt <4 x i32> %#55, { 0, 0, 0, 0 }
+  %#64 = select <4 x i1> %#63, <4 x i32> %#62, <4 x i32> { 0, 0, 0, 0 }
+  %#65 = add <4 x i32> %#64, %#55
+  %#66 = sub nsw i32 0, %#58
+  %#67 = insertelement <4 x i32> poison, i32 %#66, i64 0
+  %#68 = shufflevector <4 x i32> %#67, <4 x i32> poison, 0, 0, 0, 0
+  %#69 = tail call <4 x i32> @llvm.aarch64.neon.sshl.v4i32(<4 x i32> %#65, <4 x i32> %#68) nofree noundef willreturn memory(none)
+  %#70 = xor <4 x i32> %#45, %#69
+  %#71 = sub <4 x i32> %#70, %#45
+  br label %#7
+
+#7:
+  %#72 = phi <4 x i32> [ %#71, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i32> %#72
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <4 x i32> @target_s32_branchfree_lanewise(<4 x i32> noundef %#0, i32 noundef %#1) {
+#2:
+  %#8 = alloca i64 16, align 16
+  %#9 = alloca i64 16, align 4, dead
+  %#10 = alloca i64 16, align 16, dead
+  store <4 x i32> noundef %#0, ptr %#8, align 16
+  %#11 = icmp eq i32 noundef %#1, 0
+  br i1 %#11, label %#7, label %#3
+
+#3:
+  %#12 = abs i32 noundef %#1, 0
+  %#13 = ctlz i32 %#12, 1
+  %#range_0_%#13 = !range i32 %#13, i32 0, i32 32
+  assume_welldefined i32 %#range_0_%#13
+  %#14 = xor i32 %#range_0_%#13, 31
+  %#15 = ctpop i32 %#12
+  %#range_1_%#15 = !range i32 %#15, i32 1, i32 33
+  %#16 = icmp samesign ult i32 %#range_1_%#15, 2
+  br i1 %#16, label %#4, label %#5
+
+#4:
+  %#17 = lshr i32 noundef %#1, 24
+  %#18 = and i32 %#17, 128
+  %#19 = or disjoint i32 %#14, %#18
+  %#20 = trunc nuw i32 %#19 to i8
+  br label %#6
+
+#5:
+  %#21 = icmp slt i32 noundef %#1, 0
+  %#22 = sub nsw i32 30, %#range_0_%#13
+  %#23 = shl nsw nuw i32 1, %#22
+  %#24 = zext nneg i32 %#23 to i64
+  %#25 = shl nsw nuw i64 %#24, 32
+  %#26 = zext i32 %#12 to i64
+  %#27 = udiv i64 %#25, %#26
+  %#28 = trunc i64 %#27 to i32
+  %#29 = mul i32 %#12, %#28
+  %#30 = sub i32 0, %#29
+  %#31 = shl i32 %#28, 1
+  %#32 = shl i32 %#30, 1
+  %#33 = icmp uge i32 %#32, %#12
+  %#34 = icmp slt i32 %#30, 0
+  %#35 = or i1 %#34, %#33
+  %#36 = zext i1 %#35 to i32
+  %#37 = trunc nsw nuw i32 %#14 to i8
+  %#38 = or disjoint i32 %#31, 1
+  %#39 = add i32 %#38, %#36
+  %#40 = select i1 %#21, i8 192, i8 64
+  %#41 = or disjoint i8 %#40, %#37
+  br label %#6
+
+#6:
+  %#42 = phi i32 [ 0, %#4 ], [ %#39, %#5 ]
+  %#43 = phi i8 [ %#20, %#4 ], [ %#41, %#5 ]
+  start_lifetime ptr %#9
+  %#44 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#9, nonnull noundef ptr %#8, noundef i64 16) noundef
+  %#45 = and i8 %#43, 31
+  %#46 = ashr i8 %#43, 7
+  %#47 = sext i8 %#46 to i32
+  %#48 = sext i32 %#42 to i64
+  %#49 = icmp eq i32 %#42, 0
+  %#50 = sext i1 %#49 to i32
+  %#51 = zext nneg i8 %#45 to i32
+  %#52 = shl nuw i32 1, %#51
+  %#53 = add i32 %#52, %#50
+  %#54 = load i32, ptr %#9, align 4
+  %#55 = sext i32 %#54 to i64
+  %#56 = mul nsw i64 %#55, %#48
+  %#57 = lshr i64 %#56, 32
+  %#58 = trunc nuw i64 %#57 to i32
+  %#59 = add nsw i32 %#54, %#58
+  %#60 = icmp slt i32 %#59, 0
+  %#61 = select i1 %#60, i32 %#53, i32 0
+  %#62 = add i32 %#61, %#59
+  %#63 = ashr i32 %#62, %#51
+  %#64 = xor i32 %#63, %#47
+  %#65 = sub nsw i32 %#64, %#47
+  store i32 %#65, ptr %#9, align 4
+  %#66 = gep inbounds nuw ptr %#9, 1 x i64 4
+  %#67 = load i32, ptr %#66, align 4
+  %#68 = sext i32 %#67 to i64
+  %#69 = mul nsw i64 %#68, %#48
+  %#70 = lshr i64 %#69, 32
+  %#71 = trunc nuw i64 %#70 to i32
+  %#72 = add nsw i32 %#67, %#71
+  %#73 = icmp slt i32 %#72, 0
+  %#74 = select i1 %#73, i32 %#53, i32 0
+  %#75 = add i32 %#74, %#72
+  %#76 = ashr i32 %#75, %#51
+  %#77 = xor i32 %#76, %#47
+  %#78 = sub nsw i32 %#77, %#47
+  store i32 %#78, ptr %#66, align 4
+  %#79 = gep inbounds nuw ptr %#9, 1 x i64 8
+  %#80 = load i32, ptr %#79, align 4
+  %#81 = sext i32 %#80 to i64
+  %#82 = mul nsw i64 %#81, %#48
+  %#83 = lshr i64 %#82, 32
+  %#84 = trunc nuw i64 %#83 to i32
+  %#85 = add nsw i32 %#80, %#84
+  %#86 = icmp slt i32 %#85, 0
+  %#87 = select i1 %#86, i32 %#53, i32 0
+  %#88 = add i32 %#87, %#85
+  %#89 = ashr i32 %#88, %#51
+  %#90 = xor i32 %#89, %#47
+  %#91 = sub nsw i32 %#90, %#47
+  store i32 %#91, ptr %#79, align 4
+  %#92 = gep inbounds nuw ptr %#9, 1 x i64 12
+  %#93 = load i32, ptr %#92, align 4
+  %#94 = sext i32 %#93 to i64
+  %#95 = mul nsw i64 %#94, %#48
+  %#96 = lshr i64 %#95, 32
+  %#97 = trunc nuw i64 %#96 to i32
+  %#98 = add nsw i32 %#93, %#97
+  %#99 = icmp slt i32 %#98, 0
+  %#100 = select i1 %#99, i32 %#53, i32 0
+  %#101 = add i32 %#100, %#98
+  %#102 = ashr i32 %#101, %#51
+  %#103 = xor i32 %#102, %#47
+  %#104 = sub nsw i32 %#103, %#47
+  store i32 %#104, ptr %#92, align 4
+  start_lifetime ptr %#10
+  %#105 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#10, nonnull noundef ptr %#9, noundef i64 16) noundef
+  %#106 = load <4 x i32>, ptr %#10, align 16
+  end_lifetime ptr %#10
+  end_lifetime ptr %#9
+  br label %#7
+
+#7:
+  %#107 = phi <4 x i32> [ %#106, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i32> %#107
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.smull.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.sshl.v4i32
+
+
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+declare <2 x i64> @llvm.aarch64.neon.ushl.v2i64(<2 x i64>, <2 x i64>) nofree willreturn memory(none)
+
+define <2 x i64> @target_u64_branchfree_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  %#18 = icmp ult i64 noundef %#1, 2
+  br i1 %#18, label %#17, label %#3
+
+#3:
+  %#19 = ctlz i64 noundef %#1, 1
+  %#range_0_%#19 = !range i64 %#19, i64 0, i64 65
+  %#20 = trunc nsw nuw i64 %#range_0_%#19 to i32
+  %#21 = xor i32 %#20, 63
+  %#22 = ctpop i64 noundef %#1
+  %#range_1_%#22 = !range i64 %#22, i64 1, i64 65
+  %#23 = icmp samesign ult i64 %#range_1_%#22, 2
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  %#24 = sub nsw nuw i32 62, %#20
+  br label %#16
+
+#5:
+  %#25 = zext nneg i32 %#21 to i64
+  %#26 = shl nuw i64 1, %#25
+  %#27 = icmp ult i64 %#26, noundef %#1
+  br i1 %#27, label %#6, label %#15
+
+#6:
+  %#28 = shl i64 noundef %#1, %#range_0_%#19
+  %#29 = shl i64 %#26, %#range_0_%#19
+  %#30 = lshr i64 %#28, 32
+  %#31 = and i64 %#28, 4294967295
+  %#32 = udiv i64 %#29, %#30
+  %#33 = mul i64 %#32, %#30
+  %#34 = sub i64 %#29, %#33
+  br label %#7
+
+#7:
+  %#35 = phi i64 [ %#32, %#6 ], [ %#41, %#9 ]
+  %#36 = phi i64 [ %#34, %#6 ], [ %#42, %#9 ]
+  %#37 = icmp ugt i64 %#35, 4294967295
+  br i1 %#37, label %#9, label %#8
+
+#8:
+  %#38 = mul nuw i64 %#35, %#31
+  %#39 = shl i64 %#36, 32
+  %#40 = icmp ugt i64 %#38, %#39
+  br i1 %#40, label %#9, label %#10
+
+#9:
+  %#41 = add i64 %#35, -1
+  %#42 = add i64 %#36, %#30
+  %#43 = icmp ugt i64 %#42, 4294967295
+  br i1 %#43, label %#10, label %#7
+
+#10:
+  %#44 = phi i64 [ %#41, %#9 ], [ %#35, %#8 ]
+  %#45 = shl i64 %#29, 32
+  %#46 = mul i64 %#44, %#28
+  %#47 = sub i64 %#45, %#46
+  %#48 = udiv i64 %#47, %#30
+  %#49 = mul i64 %#48, %#30
+  %#50 = sub i64 %#47, %#49
+  br label %#11
+
+#11:
+  %#51 = phi i64 [ %#48, %#10 ], [ %#57, %#13 ]
+  %#52 = phi i64 [ %#50, %#10 ], [ %#58, %#13 ]
+  %#53 = icmp ugt i64 %#51, 4294967295
+  br i1 %#53, label %#13, label %#12
+
+#12:
+  %#54 = mul nuw i64 %#51, %#31
+  %#55 = shl i64 %#52, 32
+  %#56 = icmp ugt i64 %#54, %#55
+  br i1 %#56, label %#13, label %#14
+
+#13:
+  %#57 = add i64 %#51, -1
+  %#58 = add i64 %#52, %#30
+  %#59 = icmp ugt i64 %#58, 4294967295
+  br i1 %#59, label %#14, label %#11
+
+#14:
+  %#60 = phi i64 [ %#57, %#13 ], [ %#51, %#12 ]
+  %#61 = shl i64 %#47, 32
+  %#62 = mul i64 %#60, %#28
+  %#63 = sub i64 %#61, %#62
+  %#64 = lshr i64 %#63, %#range_0_%#19
+  %#65 = shl i64 %#44, 33
+  %#66 = shl i64 %#60, 1
+  %#67 = add i64 %#66, %#65
+  %#68 = or disjoint i64 %#67, 1
+  br label %#15
+
+#15:
+  %#69 = phi i64 [ %#64, %#14 ], [ -1, %#5 ]
+  %#70 = phi i64 [ %#68, %#14 ], [ -1, %#5 ]
+  %#71 = shl i64 %#69, 1
+  %#72 = icmp uge i64 %#71, noundef %#1
+  %#73 = icmp slt i64 %#69, 0
+  %#74 = or i1 %#73, %#72
+  %#75 = zext i1 %#74 to i64
+  %#76 = add i64 %#70, %#75
+  br label %#16
+
+#16:
+  %#77 = phi i64 [ 0, %#4 ], [ %#76, %#15 ]
+  %#78 = phi i32 [ %#24, %#4 ], [ %#21, %#15 ]
+  %#79 = and i32 %#78, 63
+  %#80 = zext nneg i32 %#79 to i64
+  %#81 = insertelement <2 x i64> poison, i64 %#77, i64 0
+  %#82 = shufflevector <2 x i64> %#81, <2 x i64> poison, 0, 0
+  %#83 = trunc <2 x i64> noundef %#0 to <2 x i32>
+  %#84 = trunc <2 x i64> %#82 to <2 x i32>
+  %#85 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#86 = trunc nuw <2 x i64> %#85 to <2 x i32>
+  %#87 = lshr <2 x i64> %#82, { 32, 32 }
+  %#88 = trunc nuw <2 x i64> %#87 to <2 x i32>
+  %#89 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#83, <2 x i32> %#84) nofree noundef willreturn memory(none)
+  %#90 = lshr <2 x i64> %#89, { 32, 32 }
+  %#91 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#86, <2 x i32> %#84) nofree noundef willreturn memory(none)
+  %#92 = add <2 x i64> %#90, %#91
+  %#93 = and <2 x i64> %#92, { 4294967295, 4294967295 }
+  %#94 = lshr <2 x i64> %#92, { 32, 32 }
+  %#95 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#83, <2 x i32> %#88) nofree noundef willreturn memory(none)
+  %#96 = add <2 x i64> %#93, %#95
+  %#97 = lshr <2 x i64> %#96, { 32, 32 }
+  %#98 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#86, <2 x i32> %#88) nofree noundef willreturn memory(none)
+  %#99 = add <2 x i64> %#94, %#98
+  %#100 = add <2 x i64> %#99, %#97
+  %#101 = sub <2 x i64> noundef %#0, %#100
+  %#102 = lshr <2 x i64> %#101, { 1, 1 }
+  %#103 = add <2 x i64> %#102, %#100
+  %#104 = sub nsw i64 0, %#80
+  %#105 = insertelement <2 x i64> poison, i64 %#104, i64 0
+  %#106 = shufflevector <2 x i64> %#105, <2 x i64> poison, 0, 0
+  %#107 = tail call <2 x i64> @llvm.aarch64.neon.ushl.v2i64(<2 x i64> %#103, <2 x i64> %#106) nofree noundef willreturn memory(none)
+  br label %#17
+
+#17:
+  %#108 = phi <2 x i64> [ %#107, %#16 ], [ noundef %#0, %#2 ]
+  ret <2 x i64> %#108
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <2 x i64> @target_u64_branchfree_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) {
+#2:
+  %#18 = alloca i64 16, align 16
+  %#19 = alloca i64 16, align 8, dead
+  %#20 = alloca i64 16, align 16, dead
+  store <2 x i64> noundef %#0, ptr %#18, align 16
+  %#21 = icmp ult i64 noundef %#1, 2
+  br i1 %#21, label %#17, label %#3
+
+#3:
+  %#22 = ctlz i64 noundef %#1, 1
+  %#range_0_%#22 = !range i64 %#22, i64 0, i64 65
+  %#23 = trunc nsw nuw i64 %#range_0_%#22 to i32
+  %#24 = xor i32 %#23, 63
+  %#25 = ctpop i64 noundef %#1
+  %#range_1_%#25 = !range i64 %#25, i64 1, i64 65
+  %#26 = icmp samesign ult i64 %#range_1_%#25, 2
+  br i1 %#26, label %#4, label %#5
+
+#4:
+  %#27 = sub nsw nuw i32 62, %#23
+  br label %#16
+
+#5:
+  %#28 = zext nneg i32 %#24 to i64
+  %#29 = shl nuw i64 1, %#28
+  %#30 = icmp ult i64 %#29, noundef %#1
+  br i1 %#30, label %#6, label %#15
+
+#6:
+  %#31 = shl i64 noundef %#1, %#range_0_%#22
+  %#32 = shl i64 %#29, %#range_0_%#22
+  %#33 = lshr i64 %#31, 32
+  %#34 = and i64 %#31, 4294967295
+  %#35 = udiv i64 %#32, %#33
+  %#36 = mul i64 %#35, %#33
+  %#37 = sub i64 %#32, %#36
+  br label %#7
+
+#7:
+  %#38 = phi i64 [ %#35, %#6 ], [ %#44, %#9 ]
+  %#39 = phi i64 [ %#37, %#6 ], [ %#45, %#9 ]
+  %#40 = icmp ugt i64 %#38, 4294967295
+  br i1 %#40, label %#9, label %#8
+
+#8:
+  %#41 = mul nuw i64 %#38, %#34
+  %#42 = shl i64 %#39, 32
+  %#43 = icmp ugt i64 %#41, %#42
+  br i1 %#43, label %#9, label %#10
+
+#9:
+  %#44 = add i64 %#38, -1
+  %#45 = add i64 %#39, %#33
+  %#46 = icmp ugt i64 %#45, 4294967295
+  br i1 %#46, label %#10, label %#7
+
+#10:
+  %#47 = phi i64 [ %#44, %#9 ], [ %#38, %#8 ]
+  %#48 = shl i64 %#32, 32
+  %#49 = mul i64 %#47, %#31
+  %#50 = sub i64 %#48, %#49
+  %#51 = udiv i64 %#50, %#33
+  %#52 = mul i64 %#51, %#33
+  %#53 = sub i64 %#50, %#52
+  br label %#11
+
+#11:
+  %#54 = phi i64 [ %#51, %#10 ], [ %#60, %#13 ]
+  %#55 = phi i64 [ %#53, %#10 ], [ %#61, %#13 ]
+  %#56 = icmp ugt i64 %#54, 4294967295
+  br i1 %#56, label %#13, label %#12
+
+#12:
+  %#57 = mul nuw i64 %#54, %#34
+  %#58 = shl i64 %#55, 32
+  %#59 = icmp ugt i64 %#57, %#58
+  br i1 %#59, label %#13, label %#14
+
+#13:
+  %#60 = add i64 %#54, -1
+  %#61 = add i64 %#55, %#33
+  %#62 = icmp ugt i64 %#61, 4294967295
+  br i1 %#62, label %#14, label %#11
+
+#14:
+  %#63 = phi i64 [ %#60, %#13 ], [ %#54, %#12 ]
+  %#64 = shl i64 %#50, 32
+  %#65 = mul i64 %#63, %#31
+  %#66 = sub i64 %#64, %#65
+  %#67 = lshr i64 %#66, %#range_0_%#22
+  %#68 = shl i64 %#47, 33
+  %#69 = shl i64 %#63, 1
+  %#70 = add i64 %#69, %#68
+  %#71 = or disjoint i64 %#70, 1
+  br label %#15
+
+#15:
+  %#72 = phi i64 [ %#67, %#14 ], [ -1, %#5 ]
+  %#73 = phi i64 [ %#71, %#14 ], [ -1, %#5 ]
+  %#74 = shl i64 %#72, 1
+  %#75 = icmp uge i64 %#74, noundef %#1
+  %#76 = icmp slt i64 %#72, 0
+  %#77 = or i1 %#76, %#75
+  %#78 = zext i1 %#77 to i64
+  %#79 = add i64 %#73, %#78
+  br label %#16
+
+#16:
+  %#80 = phi i64 [ 0, %#4 ], [ %#79, %#15 ]
+  %#81 = phi i32 [ %#27, %#4 ], [ %#24, %#15 ]
+  %#82 = and i32 %#81, 63
+  %#83 = zext nneg i32 %#82 to i64
+  start_lifetime ptr %#19
+  %#84 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#19, nonnull noundef ptr %#18, noundef i64 16) noundef
+  %#85 = zext i64 %#80 to i128
+  %#86 = load i64, ptr %#19, align 8
+  %#87 = zext i64 %#86 to i128
+  %#88 = mul nuw i128 %#87, %#85
+  %#89 = lshr i128 %#88, 64
+  %#90 = trunc nuw i128 %#89 to i64
+  %#91 = sub i64 %#86, %#90
+  %#92 = lshr i64 %#91, 1
+  %#93 = add i64 %#92, %#90
+  %#94 = lshr i64 %#93, %#83
+  store i64 %#94, ptr %#19, align 8
+  %#95 = gep inbounds nuw ptr %#19, 1 x i64 8
+  %#96 = load i64, ptr %#95, align 8
+  %#97 = zext i64 %#96 to i128
+  %#98 = mul nuw i128 %#97, %#85
+  %#99 = lshr i128 %#98, 64
+  %#100 = trunc nuw i128 %#99 to i64
+  %#101 = sub i64 %#96, %#100
+  %#102 = lshr i64 %#101, 1
+  %#103 = add i64 %#102, %#100
+  %#104 = lshr i64 %#103, %#83
+  store i64 %#104, ptr %#95, align 8
+  start_lifetime ptr %#20
+  %#105 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#20, nonnull noundef ptr %#19, noundef i64 16) noundef
+  %#106 = load <2 x i64>, ptr %#20, align 16
+  end_lifetime ptr %#20
+  end_lifetime ptr %#19
+  br label %#17
+
+#17:
+  %#107 = phi <2 x i64> [ %#106, %#16 ], [ noundef %#0, %#2 ]
+  ret <2 x i64> %#107
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.umull.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.ushl.v2i64
+
+
+
+----------------------------------------
+declare <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32>, <2 x i32>) nofree willreturn memory(none)
+declare <2 x i64> @llvm.aarch64.neon.sshl.v2i64(<2 x i64>, <2 x i64>) nofree willreturn memory(none)
+
+define <2 x i64> @target_s64_branchfree_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#18 = icmp eq i64 noundef %#1, 0
+  br i1 %#18, label %#17, label %#3
+
+#3:
+  %#19 = icmp slt i64 noundef %#1, 0
+  %#20 = abs i64 noundef %#1, 0
+  %#21 = ctlz i64 %#20, 1
+  %#range_0_%#21 = !range i64 %#21, i64 0, i64 65
+  %#22 = trunc nsw nuw i64 %#range_0_%#21 to i32
+  %#23 = xor i32 %#22, 63
+  %#24 = ctpop i64 %#20
+  %#range_1_%#24 = !range i64 %#24, i64 1, i64 65
+  %#25 = icmp samesign ult i64 %#range_1_%#24, 2
+  br i1 %#25, label %#4, label %#5
+
+#4:
+  %#26 = lshr i64 noundef %#1, 56
+  %#27 = trunc nsw nuw i64 %#26 to i32
+  %#28 = and i32 %#27, 128
+  %#29 = or disjoint i32 %#23, %#28
+  %#30 = trunc nuw i32 %#29 to i8
+  br label %#16
+
+#5:
+  %#31 = sub nsw i64 62, %#range_0_%#21
+  %#32 = and i64 %#31, 4294967295
+  %#33 = shl nuw i64 1, %#32
+  %#34 = icmp ult i64 %#33, %#20
+  br i1 %#34, label %#6, label %#15
+
+#6:
+  %#35 = shl i64 %#20, %#range_0_%#21
+  %#36 = shl i64 %#33, %#range_0_%#21
+  %#37 = lshr i64 %#35, 32
+  %#38 = and i64 %#35, 4294967295
+  %#39 = udiv i64 %#36, %#37
+  %#40 = mul i64 %#39, %#37
+  %#41 = sub i64 %#36, %#40
+  br label %#7
+
+#7:
+  %#42 = phi i64 [ %#39, %#6 ], [ %#48, %#9 ]
+  %#43 = phi i64 [ %#41, %#6 ], [ %#49, %#9 ]
+  %#44 = icmp ugt i64 %#42, 4294967295
+  br i1 %#44, label %#9, label %#8
+
+#8:
+  %#45 = mul nuw i64 %#42, %#38
+  %#46 = shl i64 %#43, 32
+  %#47 = icmp ugt i64 %#45, %#46
+  br i1 %#47, label %#9, label %#10
+
+#9:
+  %#48 = add i64 %#42, -1
+  %#49 = add i64 %#43, %#37
+  %#50 = icmp ugt i64 %#49, 4294967295
+  br i1 %#50, label %#10, label %#7
+
+#10:
+  %#51 = phi i64 [ %#48, %#9 ], [ %#42, %#8 ]
+  %#52 = shl i64 %#36, 32
+  %#53 = mul i64 %#51, %#35
+  %#54 = sub i64 %#52, %#53
+  %#55 = udiv i64 %#54, %#37
+  %#56 = mul i64 %#55, %#37
+  %#57 = sub i64 %#54, %#56
+  br label %#11
+
+#11:
+  %#58 = phi i64 [ %#55, %#10 ], [ %#64, %#13 ]
+  %#59 = phi i64 [ %#57, %#10 ], [ %#65, %#13 ]
+  %#60 = icmp ugt i64 %#58, 4294967295
+  br i1 %#60, label %#13, label %#12
+
+#12:
+  %#61 = mul nuw i64 %#58, %#38
+  %#62 = shl i64 %#59, 32
+  %#63 = icmp ugt i64 %#61, %#62
+  br i1 %#63, label %#13, label %#14
+
+#13:
+  %#64 = add i64 %#58, -1
+  %#65 = add i64 %#59, %#37
+  %#66 = icmp ugt i64 %#65, 4294967295
+  br i1 %#66, label %#14, label %#11
+
+#14:
+  %#67 = phi i64 [ %#64, %#13 ], [ %#58, %#12 ]
+  %#68 = shl i64 %#54, 32
+  %#69 = mul i64 %#67, %#35
+  %#70 = sub i64 %#68, %#69
+  %#71 = lshr i64 %#70, %#range_0_%#21
+  %#72 = shl i64 %#51, 33
+  %#73 = shl i64 %#67, 1
+  %#74 = add i64 %#73, %#72
+  %#75 = or disjoint i64 %#74, 1
+  br label %#15
+
+#15:
+  %#76 = phi i64 [ %#71, %#14 ], [ -1, %#5 ]
+  %#77 = phi i64 [ %#75, %#14 ], [ -1, %#5 ]
+  %#78 = shl i64 %#76, 1
+  %#79 = icmp uge i64 %#78, %#20
+  %#80 = icmp slt i64 %#76, 0
+  %#81 = or i1 %#80, %#79
+  %#82 = zext i1 %#81 to i64
+  %#83 = trunc nsw nuw i32 %#23 to i8
+  %#84 = add i64 %#77, %#82
+  %#85 = select i1 %#19, i8 192, i8 64
+  %#86 = or disjoint i8 %#85, %#83
+  br label %#16
+
+#16:
+  %#87 = phi i64 [ 0, %#4 ], [ %#84, %#15 ]
+  %#88 = phi i8 [ %#30, %#4 ], [ %#86, %#15 ]
+  %#89 = and i8 %#88, 63
+  %#90 = ashr i8 %#88, 7
+  %#91 = sext i8 %#90 to i64
+  %#92 = insertelement <2 x i64> poison, i64 %#91, i64 0
+  %#93 = shufflevector <2 x i64> %#92, <2 x i64> poison, 0, 0
+  %#94 = insertelement <2 x i64> poison, i64 %#87, i64 0
+  %#95 = shufflevector <2 x i64> %#94, <2 x i64> poison, 0, 0
+  %#96 = trunc <2 x i64> noundef %#0 to <2 x i32>
+  %#97 = trunc <2 x i64> %#95 to <2 x i32>
+  %#98 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#99 = trunc nuw <2 x i64> %#98 to <2 x i32>
+  %#100 = lshr <2 x i64> %#95, { 32, 32 }
+  %#101 = trunc nuw <2 x i64> %#100 to <2 x i32>
+  %#102 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#96, <2 x i32> %#97) nofree noundef willreturn memory(none)
+  %#103 = lshr <2 x i64> %#102, { 32, 32 }
+  %#104 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#99, <2 x i32> %#97) nofree noundef willreturn memory(none)
+  %#105 = add <2 x i64> %#103, %#104
+  %#106 = and <2 x i64> %#105, { 4294967295, 4294967295 }
+  %#107 = lshr <2 x i64> %#105, { 32, 32 }
+  %#108 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#96, <2 x i32> %#101) nofree noundef willreturn memory(none)
+  %#109 = add <2 x i64> %#106, %#108
+  %#110 = lshr <2 x i64> %#109, { 32, 32 }
+  %#111 = tail call <2 x i64> @llvm.aarch64.neon.umull.v2i64(<2 x i32> %#99, <2 x i32> %#101) nofree noundef willreturn memory(none)
+  %#112 = icmp slt <2 x i64> noundef %#0, { 0, 0 }
+  %#113 = select <2 x i1> %#112, <2 x i64> %#95, <2 x i64> { 0, 0 }
+  %#114 = icmp slt <2 x i64> %#95, { 0, 0 }
+  %#115 = select <2 x i1> %#114, <2 x i64> noundef %#0, <2 x i64> { 0, 0 }
+  %#116 = add <2 x i64> %#113, %#115
+  %#117 = sub <2 x i64> noundef %#0, %#116
+  %#118 = add <2 x i64> %#117, %#111
+  %#119 = add <2 x i64> %#118, %#107
+  %#120 = add <2 x i64> %#119, %#110
+  %#121 = icmp eq i64 %#87, 0
+  %#122 = zext nneg i8 %#89 to i64
+  %#123 = shl nuw i64 1, %#122
+  %#124 = sext i1 %#121 to i64
+  %#125 = add i64 %#123, %#124
+  %#126 = insertelement <2 x i64> poison, i64 %#125, i64 0
+  %#127 = shufflevector <2 x i64> %#126, <2 x i64> poison, 0, 0
+  %#128 = icmp slt <2 x i64> %#120, { 0, 0 }
+  %#129 = select <2 x i1> %#128, <2 x i64> %#127, <2 x i64> { 0, 0 }
+  %#130 = add <2 x i64> %#129, %#120
+  %#131 = sub nsw i64 0, %#122
+  %#132 = insertelement <2 x i64> poison, i64 %#131, i64 0
+  %#133 = shufflevector <2 x i64> %#132, <2 x i64> poison, 0, 0
+  %#134 = tail call <2 x i64> @llvm.aarch64.neon.sshl.v2i64(<2 x i64> %#130, <2 x i64> %#133) nofree noundef willreturn memory(none)
+  %#135 = xor <2 x i64> %#134, %#93
+  %#136 = sub <2 x i64> %#135, %#93
+  br label %#17
+
+#17:
+  %#137 = phi <2 x i64> [ %#136, %#16 ], [ noundef %#0, %#2 ]
+  ret <2 x i64> %#137
+}
+=>
+declare ptr @_Z6memcpyPvPKvm(noundef ptr, noundef ptr, noundef i64) noundef
+
+define <2 x i64> @target_s64_branchfree_lanewise(<2 x i64> noundef %#0, i64 noundef %#1) {
+#2:
+  %#18 = alloca i64 16, align 16
+  %#19 = alloca i64 16, align 8, dead
+  %#20 = alloca i64 16, align 16, dead
+  store <2 x i64> noundef %#0, ptr %#18, align 16
+  %#21 = icmp eq i64 noundef %#1, 0
+  br i1 %#21, label %#17, label %#3
+
+#3:
+  %#22 = icmp slt i64 noundef %#1, 0
+  %#23 = abs i64 noundef %#1, 0
+  %#24 = ctlz i64 %#23, 1
+  %#range_0_%#24 = !range i64 %#24, i64 0, i64 65
+  %#25 = trunc nsw nuw i64 %#range_0_%#24 to i32
+  %#26 = xor i32 %#25, 63
+  %#27 = ctpop i64 %#23
+  %#range_1_%#27 = !range i64 %#27, i64 1, i64 65
+  %#28 = icmp samesign ult i64 %#range_1_%#27, 2
+  br i1 %#28, label %#4, label %#5
+
+#4:
+  %#29 = lshr i64 noundef %#1, 56
+  %#30 = trunc nsw nuw i64 %#29 to i32
+  %#31 = and i32 %#30, 128
+  %#32 = or disjoint i32 %#26, %#31
+  %#33 = trunc nuw i32 %#32 to i8
+  br label %#16
+
+#5:
+  %#34 = sub nsw i64 62, %#range_0_%#24
+  %#35 = and i64 %#34, 4294967295
+  %#36 = shl nuw i64 1, %#35
+  %#37 = icmp ult i64 %#36, %#23
+  br i1 %#37, label %#6, label %#15
+
+#6:
+  %#38 = shl i64 %#23, %#range_0_%#24
+  %#39 = shl i64 %#36, %#range_0_%#24
+  %#40 = lshr i64 %#38, 32
+  %#41 = and i64 %#38, 4294967295
+  %#42 = udiv i64 %#39, %#40
+  %#43 = mul i64 %#42, %#40
+  %#44 = sub i64 %#39, %#43
+  br label %#7
+
+#7:
+  %#45 = phi i64 [ %#42, %#6 ], [ %#51, %#9 ]
+  %#46 = phi i64 [ %#44, %#6 ], [ %#52, %#9 ]
+  %#47 = icmp ugt i64 %#45, 4294967295
+  br i1 %#47, label %#9, label %#8
+
+#8:
+  %#48 = mul nuw i64 %#45, %#41
+  %#49 = shl i64 %#46, 32
+  %#50 = icmp ugt i64 %#48, %#49
+  br i1 %#50, label %#9, label %#10
+
+#9:
+  %#51 = add i64 %#45, -1
+  %#52 = add i64 %#46, %#40
+  %#53 = icmp ugt i64 %#52, 4294967295
+  br i1 %#53, label %#10, label %#7
+
+#10:
+  %#54 = phi i64 [ %#51, %#9 ], [ %#45, %#8 ]
+  %#55 = shl i64 %#39, 32
+  %#56 = mul i64 %#54, %#38
+  %#57 = sub i64 %#55, %#56
+  %#58 = udiv i64 %#57, %#40
+  %#59 = mul i64 %#58, %#40
+  %#60 = sub i64 %#57, %#59
+  br label %#11
+
+#11:
+  %#61 = phi i64 [ %#58, %#10 ], [ %#67, %#13 ]
+  %#62 = phi i64 [ %#60, %#10 ], [ %#68, %#13 ]
+  %#63 = icmp ugt i64 %#61, 4294967295
+  br i1 %#63, label %#13, label %#12
+
+#12:
+  %#64 = mul nuw i64 %#61, %#41
+  %#65 = shl i64 %#62, 32
+  %#66 = icmp ugt i64 %#64, %#65
+  br i1 %#66, label %#13, label %#14
+
+#13:
+  %#67 = add i64 %#61, -1
+  %#68 = add i64 %#62, %#40
+  %#69 = icmp ugt i64 %#68, 4294967295
+  br i1 %#69, label %#14, label %#11
+
+#14:
+  %#70 = phi i64 [ %#67, %#13 ], [ %#61, %#12 ]
+  %#71 = shl i64 %#57, 32
+  %#72 = mul i64 %#70, %#38
+  %#73 = sub i64 %#71, %#72
+  %#74 = lshr i64 %#73, %#range_0_%#24
+  %#75 = shl i64 %#54, 33
+  %#76 = shl i64 %#70, 1
+  %#77 = add i64 %#76, %#75
+  %#78 = or disjoint i64 %#77, 1
+  br label %#15
+
+#15:
+  %#79 = phi i64 [ %#74, %#14 ], [ -1, %#5 ]
+  %#80 = phi i64 [ %#78, %#14 ], [ -1, %#5 ]
+  %#81 = shl i64 %#79, 1
+  %#82 = icmp uge i64 %#81, %#23
+  %#83 = icmp slt i64 %#79, 0
+  %#84 = or i1 %#83, %#82
+  %#85 = zext i1 %#84 to i64
+  %#86 = trunc nsw nuw i32 %#26 to i8
+  %#87 = add i64 %#80, %#85
+  %#88 = select i1 %#22, i8 192, i8 64
+  %#89 = or disjoint i8 %#88, %#86
+  br label %#16
+
+#16:
+  %#90 = phi i64 [ 0, %#4 ], [ %#87, %#15 ]
+  %#91 = phi i8 [ %#33, %#4 ], [ %#89, %#15 ]
+  start_lifetime ptr %#19
+  %#92 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#19, nonnull noundef ptr %#18, noundef i64 16) noundef
+  %#93 = and i8 %#91, 63
+  %#94 = ashr i8 %#91, 7
+  %#95 = sext i8 %#94 to i64
+  %#96 = sext i64 %#90 to i128
+  %#97 = icmp eq i64 %#90, 0
+  %#98 = sext i1 %#97 to i64
+  %#99 = zext nneg i8 %#93 to i64
+  %#100 = shl nuw i64 1, %#99
+  %#101 = add i64 %#100, %#98
+  %#102 = load i64, ptr %#19, align 8
+  %#103 = sext i64 %#102 to i128
+  %#104 = mul nsw i128 %#103, %#96
+  %#105 = lshr i128 %#104, 64
+  %#106 = trunc nuw i128 %#105 to i64
+  %#107 = add nsw i64 %#102, %#106
+  %#108 = icmp slt i64 %#107, 0
+  %#109 = select i1 %#108, i64 %#101, i64 0
+  %#110 = add i64 %#109, %#107
+  %#111 = ashr i64 %#110, %#99
+  %#112 = xor i64 %#111, %#95
+  %#113 = sub nsw i64 %#112, %#95
+  store i64 %#113, ptr %#19, align 8
+  %#114 = gep inbounds nuw ptr %#19, 1 x i64 8
+  %#115 = load i64, ptr %#114, align 8
+  %#116 = sext i64 %#115 to i128
+  %#117 = mul nsw i128 %#116, %#96
+  %#118 = lshr i128 %#117, 64
+  %#119 = trunc nuw i128 %#118 to i64
+  %#120 = add nsw i64 %#115, %#119
+  %#121 = icmp slt i64 %#120, 0
+  %#122 = select i1 %#121, i64 %#101, i64 0
+  %#123 = add i64 %#122, %#120
+  %#124 = ashr i64 %#123, %#99
+  %#125 = xor i64 %#124, %#95
+  %#126 = sub nsw i64 %#125, %#95
+  store i64 %#126, ptr %#114, align 8
+  start_lifetime ptr %#20
+  %#127 = call ptr @_Z6memcpyPvPKvm(nonnull noundef ptr %#20, nonnull noundef ptr %#19, noundef i64 16) noundef
+  %#128 = load <2 x i64>, ptr %#20, align 16
+  end_lifetime ptr %#20
+  end_lifetime ptr %#19
+  br label %#17
+
+#17:
+  %#129 = phi <2 x i64> [ %#128, %#16 ], [ noundef %#0, %#2 ]
+  ret <2 x i64> %#129
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @llvm.aarch64.neon.sshl.v2i64
+ - Unknown libcall: @llvm.aarch64.neon.umull.v2i64
+
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  8 failed-to-prove transformations
+  0 Alive2 errors

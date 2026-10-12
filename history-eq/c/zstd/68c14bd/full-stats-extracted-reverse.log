@@ -1,0 +1,118 @@
+
+----------------------------------------
+define i32 @target() nofree memory(none) {
+.preheader.i.i.i.preheader.critedge:
+  %#0 = alloca i64 64, align 16, dead
+  start_lifetime ptr %#0
+  memset ptr %#0 align 16, i8 0, i64 52
+  %#1 = load i32, ptr %#0, align 16
+  %#2 = add i32 %#1, 1
+  store i32 %#2, ptr %#0, align 16
+  %#3 = gep inbounds nuw ptr %#0, 1 x i64 4
+  %#4 = load i32, ptr %#3, align 4
+  %#5 = add i32 %#4, 1
+  store i32 %#5, ptr %#3, align 4
+  %#6 = gep inbounds nuw ptr %#0, 1 x i64 4
+  %#7 = load i32, ptr %#6, align 4
+  %#8 = add i32 %#7, 1
+  store i32 %#8, ptr %#6, align 4
+  %#9 = gep inbounds nuw ptr %#0, 1 x i64 8
+  %#10 = load i32, ptr %#9, align 8
+  %#11 = add i32 %#10, 1
+  store i32 %#11, ptr %#9, align 8
+  %#12 = gep inbounds nuw ptr %#0, 1 x i64 4
+  %#13 = load i32, ptr %#12, align 4
+  %#14 = icmp ugt i32 %#13, 1
+  %#15 = and i32 %#13, 1
+  %#16 = icmp eq i32 %#15, 0
+  %#17 = and i1 %#14, %#16
+  %#18 = load i32, ptr %#0, align 16
+  %#19 = icmp ne i32 %#18, 0
+  %#20 = zext i1 %#19 to i32
+  %.0 = select i1 %#17, i32 %#20, i32 7
+  end_lifetime ptr %#0
+  %#range_0_%.0 = !range i32 %.0, i32 0, i32 8
+  ret i32 %#range_0_%.0
+}
+=>
+define i32 @target() nofree noundef memory(none) {
+.preheader.i.i.i.preheader.critedge:
+  %#0 = alloca i64 64, align 16, dead
+  start_lifetime ptr %#0
+  memset ptr %#0 align 16, i8 0, i64 52
+  %#1 = load i32, ptr %#0, align 16
+  %#2 = add i32 %#1, 1
+  store i32 %#2, ptr %#0, align 16
+  %#3 = gep inbounds nuw ptr %#0, 1 x i64 4
+  %#4 = load i32, ptr %#3, align 4
+  %#5 = add i32 %#4, 1
+  store i32 %#5, ptr %#3, align 4
+  %#6 = gep inbounds nuw ptr %#0, 1 x i64 4
+  %#7 = load i32, ptr %#6, align 4
+  %#8 = add i32 %#7, 1
+  store i32 %#8, ptr %#6, align 4
+  end_lifetime ptr %#0
+  ret i32 7
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+
+Source:
+ptr %#0 = pointer(local, block_id=0, offset=0) / Address=#x100
+i32 %#1 = #x00000000 (0)
+i32 %#2 = #x00000001 (1)
+ptr %#3 = pointer(local, block_id=0, offset=4) / Address=#x104
+i32 %#4 = #x00000000 (0)
+i32 %#5 = #x00000001 (1)
+ptr %#6 = pointer(local, block_id=0, offset=4) / Address=#x104
+i32 %#7 = #x00000001 (1)
+i32 %#8 = #x00000002 (2)
+ptr %#9 = pointer(local, block_id=0, offset=8) / Address=#x108
+i32 %#10 = #x00000000 (0)
+i32 %#11 = #x00000001 (1)
+ptr %#12 = pointer(local, block_id=0, offset=4) / Address=#x104
+i32 %#13 = #x00000002 (2)
+i1 %#14 = #x1 (1)
+i32 %#15 = #x00000000 (0)
+i1 %#16 = #x1 (1)
+i1 %#17 = #x1 (1)
+i32 %#18 = #x00000001 (1)
+i1 %#19 = #x1 (1)
+i32 %#20 = #x00000001 (1)
+i32 %.0 = #x00000001 (1)
+i32 %#range_0_%.0 = #x00000001 (1)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	alive: true
+
+LOCAL BLOCKS:
+Block 2 >	size: 64	align: 16	alloc type: 1	alive: false	address: 256
+
+Target:
+ptr %#0 = pointer(local, block_id=0, offset=0) / Address=#x100
+i32 %#1 = #x00000000 (0)
+i32 %#2 = #x00000001 (1)
+ptr %#3 = pointer(local, block_id=0, offset=4) / Address=#x104
+i32 %#4 = #x00000000 (0)
+i32 %#5 = #x00000001 (1)
+ptr %#6 = pointer(local, block_id=0, offset=4) / Address=#x104
+i32 %#7 = #x00000001 (1)
+i32 %#8 = #x00000002 (2)
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 2 >	size: 64	align: 16	alloc type: 1	alive: false	address: 256
+Source value: #x00000001 (1)
+Target value: #x00000007 (7)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

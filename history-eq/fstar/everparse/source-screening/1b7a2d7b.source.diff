@@ -1,0 +1,251 @@
+diff --git a/src/3d/InterpreterTarget.fst b/src/3d/InterpreterTarget.fst
+index 823b8cd2..9cb0e900 100644
+--- a/src/3d/InterpreterTarget.fst
++++ b/src/3d/InterpreterTarget.fst
+@@ -230,7 +230,7 @@ let tag_of_parser p
+     | Parse_nlist _ _ _ -> "Parse_nlist"
+     | Parse_t_at_most _ _ -> "Parse_t_at_most"
+     | Parse_t_exact _ _ -> "Parse_t_exact"
+-    | Parse_pair _ _ _ -> "Parse_pair"
++    | Parse_pair _ _ _ _ _ -> "Parse_pair"
+     | Parse_dep_pair _ _ _ -> "Parse_dep_pair"
+     | Parse_dep_pair_with_refinement _ _ _ _ -> "Parse_dep_pair_with_refinement"
+     | Parse_dep_pair_with_action _ _ _ -> "Parse_dep_pair_with_action"
+@@ -337,7 +337,7 @@ let rec typ_indexes_of_parser (en:env) (p:T.parser)
+       end
+ 
+     | T.Parse_if_else _ p q
+-    | T.Parse_pair _ p q ->
++    | T.Parse_pair _ _ p _ q ->
+       typ_indexes_union (typ_indexes_of_parser p) (typ_indexes_of_parser q)
+ 
+     | T.Parse_dep_pair _ p (_, q)
+@@ -418,8 +418,8 @@ let typ_of_parser (en: env) : Tot (T.parser -> ML typ)
+     | T.Parse_app _ _ ->
+       T_denoted fn (dtyp_of_parser p)
+ 
+-    | T.Parse_pair _ p q ->
+-      T_pair (nes p.p_fieldname) (typ_of_parser p) (typ_of_parser q)
++    | T.Parse_pair _ p_const p q_const q ->
++      T_pair (nes p.p_fieldname) p_const (typ_of_parser p) q_const (typ_of_parser q)
+ 
+     | T.Parse_with_comment p c ->
+       T_with_comment fn (typ_of_parser p) (String.concat "; " c)
+@@ -555,7 +555,7 @@ let rec has_action_of_typ (t:typ)
+     | DT_IType i -> false
+     | DT_App has_action readable _ _ -> has_action
+     end
+-  | T_pair _ t1 t2 ->
++  | T_pair _ _ t1 _ t2 ->
+     has_action_of_typ t1 || has_action_of_typ t2
+   | T_dep_pair _ t1 (_, t2) ->
+     has_action_of_dtyp t1 || has_action_of_typ t2
+@@ -772,10 +772,12 @@ let rec print_typ (mname:string) (t:typ)
+                      fn
+                      (print_dtyp mname dt)
+ 
+-    | T_pair fn t1 t2 ->
+-      Printf.sprintf "(T_pair \"%s\" %s %s)"
++    | T_pair fn t1_const t1 t2_const t2 ->
++      Printf.sprintf "(T_pair \"%s\" %s %s %s %s)"
+                      fn
++                     (if t1_const then "true" else "false")
+                      (print_typ mname t1)
++                     (if t2_const then "true" else "false")
+                      (print_typ mname t2)
+ 
+     | T_dep_pair fn t k ->
+diff --git a/src/3d/InterpreterTarget.fsti b/src/3d/InterpreterTarget.fsti
+index c04b0a44..5df60550 100644
+--- a/src/3d/InterpreterTarget.fsti
++++ b/src/3d/InterpreterTarget.fsti
+@@ -87,7 +87,9 @@ type typ : Type =
+ 
+   | T_pair:
+       fn:non_empty_string ->
++      k1_const: bool -> // whether t1 is a total compile-time constant size type without actions
+       t1:typ ->
++      k2_const: bool ->
+       t2:typ ->
+       typ
+ 
+diff --git a/src/3d/Target.fst b/src/3d/Target.fst
+index 70042755..20f9e667 100644
+--- a/src/3d/Target.fst
++++ b/src/3d/Target.fst
+@@ -414,6 +414,10 @@ let rec print_typ (mname:string) (t:typ) : ML string = //(decreases t) =
+     Printf.sprintf "(%s %s)"
+       hd'
+       (String.concat " " (print_indexes mname args))
++  | T_pair t1 t2 ->
++    Printf.sprintf "(%s & %s)"
++      (print_typ mname t1)
++      (print_typ mname t2)
+   | T_dep_pair t1 (x, t2) ->
+     Printf.sprintf "(%s:%s & %s)"
+       (print_ident x)
+diff --git a/src/3d/Target.fsti b/src/3d/Target.fsti
+index 7681dd24..dbf31afe 100644
+--- a/src/3d/Target.fsti
++++ b/src/3d/Target.fsti
+@@ -93,6 +93,7 @@ noeq
+ type typ =
+   | T_false    : typ
+   | T_app      : hd:A.ident -> A.t_kind -> args:list index -> typ
++  | T_pair     : fst: typ -> snd: typ -> typ
+   | T_dep_pair : dfst:typ -> dsnd:(A.ident & typ) -> typ
+   | T_refine   : base:typ -> refinement:lam expr -> typ
+   | T_if_else  : e:expr -> t:typ -> f:typ -> typ
+@@ -180,7 +181,7 @@ type parser' =
+   | Parse_nlist     : t_size_constant:bool -> n:expr -> t:parser -> parser'
+   | Parse_t_at_most : n:expr -> t:parser -> parser'
+   | Parse_t_exact   : n:expr -> t:parser -> parser'
+-  | Parse_pair      : n1: A.ident -> p:parser -> q:parser -> parser'
++  | Parse_pair      : n1: A.ident -> p_is_const: bool -> p:parser -> q_is_const: bool -> q:parser -> parser' // p_is_const, q_is_const record whether p and q are total compile-time constant size parsers
+   | Parse_dep_pair  : n1: A.ident -> p:parser -> k:lam parser -> parser'
+   | Parse_dep_pair_with_refinement: n1: A.ident -> dfst:parser -> refinement:lam expr -> dsnd:lam parser -> parser'
+   | Parse_dep_pair_with_action: dfst:parser -> a:lam action -> dsnd:lam parser -> parser'
+diff --git a/src/3d/TranslateForInterpreter.fst b/src/3d/TranslateForInterpreter.fst
+index b8302f72..615a09a5 100644
+--- a/src/3d/TranslateForInterpreter.fst
++++ b/src/3d/TranslateForInterpreter.fst
+@@ -164,6 +164,22 @@ let pk_glb k1 k2 = T.({
+   pk_nz = k1.pk_nz && k2.pk_nz
+ })
+ 
++let rec is_fixed_size_array_payload (env:global_env) (t:T.typ)
++: ML bool
++= match t with
++  | T.T_false -> true
++  | T.T_app hd _ _ -> 
++    let size = TypeSizes.size_of_typename env.size_env hd in
++    TS.Fixed? size
++  | T.T_pointer _ -> true
++  | T.T_refine base _ -> is_fixed_size_array_payload env base
++  | T.T_with_comment t _ -> is_fixed_size_array_payload env t
++  | T.T_pair t1 t2 -> // this is the main reason why we need T.T_pair
++    if is_fixed_size_array_payload env t1
++    then is_fixed_size_array_payload env t2
++    else false
++  | _ -> false
++
+ let false_typ = T.T_false
+ let unit_typ =
+     T.T_app (with_dummy_range (to_ident' "unit")) KindSpec []
+@@ -173,20 +189,22 @@ let unit_parser =
+     let unit_id = with_dummy_range (to_ident' "unit") in
+     mk_parser pk_return unit_typ unit_id "none" (T.Parse_return unit_val)
+ let pair_typ t1 t2 =
+-    T.T_app (with_dummy_range (to_ident' "tuple2")) KindSpec [Inl t1; Inl t2]
++    T.T_pair t1 t2
+ let pair_value x y =
+     T.Record (with_dummy_range (to_ident' "tuple2"))
+              [(with_dummy_range (to_ident' "fst"), T.mk_expr (T.Identifier x));
+               (with_dummy_range (to_ident' "snd"), T.mk_expr (T.Identifier y))]
+-let pair_parser n1 p1 p2 =
++let pair_parser env n1 p1 p2 =
+     let open T in
+     let pt = pair_typ p1.p_typ p2.p_typ in
+     let t_id = with_dummy_range (to_ident' "tuple2") in
++    let p1_is_const = is_fixed_size_array_payload env p1.p_typ in
++    let p2_is_const = is_fixed_size_array_payload env p2.p_typ in
+     mk_parser (pk_and_then p1.p_kind p2.p_kind)
+               pt
+               t_id
+               (ident_to_string n1)
+-              (Parse_pair n1 p1 p2)
++              (Parse_pair n1 p1_is_const p1 p2_is_const p2)
+ let dep_pair_typ t1 (t2:(A.ident & T.typ)) : T.typ =
+     T.T_dep_pair t1 t2
+ let dep_pair_value x y : T.expr =
+@@ -373,18 +391,6 @@ let rec translate_typ (t:A.typ) : ML (T.typ & T.decls) =
+     let args, decls = args |> List.map translate_typ_param |> List.split in
+     T.T_app hd b (List.map Inr args), List.flatten decls
+ 
+-let rec is_fixed_size_array_payload (env:global_env) (t:T.typ)
+-: ML bool
+-= match t with
+-  | T.T_false -> true
+-  | T.T_app hd _ _ -> 
+-    let size = TypeSizes.size_of_typename env.size_env hd in
+-    TS.Fixed? size
+-  | T.T_pointer _ -> true
+-  | T.T_refine base _ -> is_fixed_size_array_payload env base
+-  | T.T_with_comment t _ -> is_fixed_size_array_payload env t
+-  | _ -> false
+-
+ let translate_probe_entrypoint
+   (p: A.probe_entrypoint)
+ : ML T.probe_entrypoint
+@@ -526,6 +532,11 @@ let rec parse_typ (env:global_env)
+     let p2 = parse_typ env typename fieldname t2 in
+     ite_parser typename fieldname e p1 p2
+ 
++  | T.T_pair t1 t2 ->
++    pair_parser env typename
++      (parse_typ env typename (extend_fieldname "first") t1)
++      (parse_typ env typename (extend_fieldname "second") t1)
++
+   | T.T_dep_pair t1 (x, t2) ->
+     dep_pair_parser typename (parse_typ env typename (extend_fieldname "first") t1) 
+                              (x, parse_typ env typename (extend_fieldname "second") t2)
+@@ -713,7 +724,7 @@ let rec parser_is_constant_size_without_actions
+       | T.Constant (A.Int _ array_size) -> parser_is_constant_size_without_actions env parse_elem
+       | _ -> false
+       end
+-  | T.Parse_pair _ hd tl
++  | T.Parse_pair _ _ hd _ tl
+     -> if parser_is_constant_size_without_actions env hd
+       then parser_is_constant_size_without_actions env tl
+       else false
+@@ -898,7 +909,7 @@ let parse_grouped_fields (env:global_env) (typename:A.ident) (gfs:grouped_fields
+           parse_typ sf.sf_ident sf.sf_typ
+ 
+         | Some rest -> 
+-          pair_parser sf.sf_ident
++          pair_parser env sf.sf_ident
+             (parse_typ sf.sf_ident sf.sf_typ)
+             (aux rest)
+         )
+@@ -915,7 +926,7 @@ let parse_grouped_fields (env:global_env) (typename:A.ident) (gfs:grouped_fields
+           aux gfs
+ 
+         | Some rest -> 
+-          pair_parser id
++          pair_parser env id
+             (aux gfs)
+             (aux rest)
+         )
+@@ -986,6 +997,10 @@ let rec hoist_typ
+     match t with
+     | T_false -> [], t
+     | T_app _ _ _ -> [], t
++    | T_pair t1 t2 ->
++      let ds, t1 = hoist_typ fn genv env t1 in
++      let ds', t2 = hoist_typ fn genv env t2 in
++      ds@ds', T_pair t1 t2
+     | T_dep_pair t1 (x, t2) ->
+       let ds, t1 = hoist_typ fn genv env t1 in
+       let ds', t2 = hoist_typ fn genv ((x, t1)::env) t2 in
+diff --git a/src/3d/Z3TestGen.fst b/src/3d/Z3TestGen.fst
+index 7e0fb34b..d7e4aa52 100644
+--- a/src/3d/Z3TestGen.fst
++++ b/src/3d/Z3TestGen.fst
+@@ -912,7 +912,7 @@ let rec typ_depth (t: I.typ) : GTot nat
+ = match t with
+   | I.T_if_else _ t1 t2 // 2 accounts for the call to parse_then_else_with_branch_trace
+     -> 2 + typ_depth t1 + typ_depth t2
+-  | I.T_pair _ t1 t2
++  | I.T_pair _ _ t1 _ t2
+     -> 1 + typ_depth t1 + typ_depth t2
+   | I.T_dep_pair _ _ (_, t')
+   | I.T_dep_pair_with_action _ _ (_, t') _
+@@ -941,7 +941,7 @@ let rec parse_typ (t : I.typ) : Tot (parser not_reading)
+   | I.T_false _ -> parse_false
+   | I.T_with_dep_action _ d _
+   | I.T_denoted _ d -> parse_denoted d
+-  | I.T_pair _ t1 t2 -> parse_pair (parse_typ t1) (parse_typ t2)
++  | I.T_pair _ _ t1 _ t2 -> parse_pair (parse_typ t1) (parse_typ t2)
+   | I.T_dep_pair_with_action _ t1 (lam, t2) _
+   | I.T_dep_pair _ t1 (lam, t2) -> parse_dep_pair (parse_readable_dtyp t1) lam (parse_typ t2)
+   | I.T_refine_with_action _ base (lam, cond) _

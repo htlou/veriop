@@ -1,0 +1,40 @@
+{
+  "commit": "96a2ca1",
+  "date": "2021-08-27",
+  "subject": "Fix XXH_STATIC_ASSERT to avoid possible stack allocation",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit replaces the pre-C11 array-based static assertion that could allocate stack space.",
+  "change_summary": "Changes the C99 XXH_STATIC_ASSERT fallback from a local array declaration to a function declaration.",
+  "units": [
+    {
+      "name": "public canonical conversion and XXH3 fixed long inputs in C99 scalar mode",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/96a2ca1/r_c99_scalar",
+      "evidence": "Five public scalar C99 targets pass Alive2 in both directions."
+    },
+    {
+      "name": "C99 AVX2/low-optimization paths containing the changed assertion macro",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "alive2-crash-or-parse-error",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/96a2ca1/r_c99_O0",
+      "evidence": "The retained -O0 run encounters unsupported noalias attributes in long-path bodies; the AVX2 run also fails Alive2 translation before proving public targets."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": "alive2-crash-or-parse-error",
+  "not_equiv_kind": null,
+  "notes": "The macro's compile-time behavior differs, while the checked C99 scalar output paths agree. Some vector/low-optimization IR remains untranslatable by this Alive2 build."
+}

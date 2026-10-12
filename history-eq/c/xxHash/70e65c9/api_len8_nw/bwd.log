@@ -1,0 +1,90 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=900000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/api_len8_nw/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/api_len8_nw/old.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i64 -9 to ptr
+  %#5 = icmp ugt ptr nowrite noundef %#0, %__constexpr_0
+  br i1 %#5, label %#4, label %#3
+
+#3:
+  %#6 = add i32 noundef %#1, 374761401
+  %#7 = load i32, ptr nowrite noundef %#0, align 4
+  %#8 = mul i32 %#7, 3266489917
+  %#9 = add i32 %#8, %#6
+  %#10 = fshl i32 %#9, i32 %#9, i32 17
+  %#11 = mul i32 %#10, 668265263
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#13 = load i32, ptr %#12, align 4
+  %#14 = mul i32 %#13, 3266489917
+  %#15 = add i32 %#14, %#11
+  %#16 = fshl i32 %#15, i32 %#15, i32 17
+  %#17 = mul i32 %#16, 668265263
+  %#18 = lshr i32 %#17, 15
+  %#19 = xor i32 %#18, %#17
+  %#20 = mul i32 %#19, 2246822519
+  %#21 = lshr i32 %#20, 13
+  %#22 = xor i32 %#21, %#20
+  %#23 = mul i32 %#22, 3266489917
+  %#24 = lshr i32 %#23, 16
+  %#25 = xor i32 %#24, %#23
+  br label %#4
+
+#4:
+  %#26 = phi i32 [ %#25, %#3 ], [ 0, %#2 ]
+  ret i32 %#26
+}
+=>
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i64 -9 to ptr
+  %#8 = icmp ugt ptr nowrite noundef %#0, %__constexpr_0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#9, label %#4, label %#5
+
+#4:
+  %#10 = add i32 noundef %#1, 374761393
+  br label %#6
+
+#5:
+  %#11 = load i64, ptr nowrite noundef %#0, align 1
+  %#12 = add i32 noundef %#1, 374761401
+  %#13 = trunc i64 %#11 to i32
+  %#14 = mul i32 %#13, 3266489917
+  %#15 = add i32 %#14, %#12
+  %#16 = fshl i32 %#15, i32 %#15, i32 17
+  %#17 = mul i32 %#16, 668265263
+  %#18 = lshr i64 %#11, 32
+  %#19 = trunc nuw i64 %#18 to i32
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = add i32 %#20, %#17
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  br label %#6
+
+#6:
+  %#24 = phi i32 [ %#23, %#5 ], [ %#10, %#4 ]
+  %#25 = lshr i32 %#24, 15
+  %#26 = xor i32 %#25, %#24
+  %#27 = mul i32 %#26, 2246822519
+  %#28 = lshr i32 %#27, 13
+  %#29 = xor i32 %#28, %#27
+  %#30 = mul i32 %#29, 3266489917
+  %#31 = lshr i32 %#30, 16
+  %#32 = xor i32 %#31, %#30
+  br label %#7
+
+#7:
+  %#33 = phi i32 [ %#32, %#6 ], [ 0, %#2 ]
+  ret i32 %#33
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

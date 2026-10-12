@@ -1,0 +1,52 @@
+{
+  "commit": "a16928e",
+  "date": "2020-03-12",
+  "subject": "[ARMv7] Reroll and block Clang autovec in mergeAccs",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says a four-step loop and ARMv7 Clang vectorization guard improve XXH3 throughput and size.",
+  "change_summary": "Rerolls XXH3_mergeAccs and inserts an empty inline-assembly barrier in the ARMv7 NEON Clang path.",
+  "units": [
+    {
+      "name": "raw XXH3_mergeAccs, ARMv7 NEON with the actual autovectorization guard",
+      "level": "raw",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/a16928e/r_raw_arm_neon",
+      "evidence": "Both Alive2 directions time out on the changed ARMv7 NEON path. Disabling the barrier on both sides permits a separate raw bidirectional proof, but omits the performance-relevant guard."
+    },
+    {
+      "name": "public XXH3 64/128-bit fixed long-input ARMv7 NEON paths",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/a16928e/r_api_arm_neon",
+      "evidence": "Three public fixed-length targets remain inconclusive; only old-to-new for one 256-byte target passes."
+    },
+    {
+      "name": "public x86-64-v3 fixed-length control",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/a16928e/r_api_v3",
+      "evidence": "Three fixed-length x86 control targets pass bidirectional Alive2."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "UNKNOWN",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The no-guard variant isolates the arithmetic reroll but is not a proof of the full ARMv7 optimization."
+}

@@ -1,0 +1,52 @@
+{
+  "commit": "91788f1",
+  "date": "2022-11-10",
+  "subject": "switch to full accmulating loop",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit keeps XXH3 accumulators across a full stripe loop to reduce memory traffic.",
+  "change_summary": "Rewrites the XXH3 accumulation loop and updates the x86 runtime-dispatch variants.",
+  "units": [
+    {
+      "name": "raw scalar/SSE2/AVX2/AVX512 accumulation at one, two and four stripes",
+      "level": "raw",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 5,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/91788f1/r_raw_sym_avx2",
+      "evidence": "The 12 fixed-stripe raw targets pass both directions across four x86 modes; a symbolic-stripe AVX2 target also passes with unroll 5."
+    },
+    {
+      "name": "public XXH3 fixed 256/320-byte scalar and x86 SIMD paths",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "withSecret secret size 136 or 192",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/91788f1/api-recheck",
+      "evidence": "Forty source-locked bidirectional Alive2 function-pair checks prove in scalar, SSE2, AVX2, and AVX512 modes."
+    },
+    {
+      "name": "x86 dispatch-source per-ISA XXH3 long-input entry points",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/91788f1/r_dispatch",
+      "evidence": "Four dispatch-source targets pass; AVX512 64-bit times out and AVX2 128-bit forward has no verdict after a module-level SMT memory failure. The latter is inconclusive, not a proof of non-equivalence."
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": "EQUIV_BOUNDED",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "Fixed-length generic public hash targets prove bidirectionally in four x86 modes; changed x86 runtime dispatch and arbitrary lengths remain unresolved."
+}

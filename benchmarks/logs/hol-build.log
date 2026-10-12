@@ -1,0 +1,20 @@
+make: Entering directory '/srv/home/hantaolou/code/veriop/benchmarks/tools/hol-light'
+if test `ocamlc -version | cut -c1-3` = "3.0" ; \
+                   then ocamlc -c -pp "camlp4r pa_extend.cmo q_MLast.cmo" -I `camlp4 -where` pa_j.ml ; \
+                   elif test `ocamlc -version | cut -c1-3` = "3.1" -o `ocamlc -version | cut -c1-4` = "4.00" -o `ocamlc -version | cut -c1-4` = "4.01"  -o `ocamlc -version | cut -c1-4` = "4.02" -o `ocamlc -version | cut -c1-4` = "4.03" -o `ocamlc -version | cut -c1-4` = "4.04" -o `ocamlc -version | cut -c1-4` = "4.05" ; \
+                   then ocamlc -c -pp "camlp5r pa_lexer.cmo pa_extend.cmo q_MLast.cmo" -I `camlp5 -where` pa_j.ml ; \
+                   else ocamlc -safe-string -c -pp "camlp5r pa_lexer.cmo pa_extend.cmo q_MLast.cmo" -I `camlp5 -where` -I `ocamlfind query camlp-streams` pa_j.ml ; \
+                   fi
+if [ `uname` = "Linux" ] || [ `uname` = "Darwin" ] ; then \
+	if [ `ocamlc -version | cut -c1` = "5" ] || [ `ocamlc -version | cut -c1-4` = "4.14" ] ; then \
+		ocamlfind ocamlmktop -package zarith -o ocaml-hol zarith.cma bignum.cmo hol_loader.cmo ; \
+		sed "s^__DIR__^`pwd`^g; s^__USE_MODULE__^0^g" hol_4.14.sh > hol.sh ; \
+	else \
+		ocamlmktop -o ocaml-hol nums.cma bignum.cmo hol_loader.cmo ; \
+		sed "s^__DIR__^`pwd`^g; s^__USE_MODULE__^0^g" hol_4.sh > hol.sh ; \
+	fi ; \
+	chmod +x hol.sh ; \
+else \
+	echo 'FAILURE: hol.sh assumes Linux' ; \
+fi
+make: Leaving directory '/srv/home/hantaolou/code/veriop/benchmarks/tools/hol-light'

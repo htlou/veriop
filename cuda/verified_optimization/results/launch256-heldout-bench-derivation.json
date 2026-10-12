@@ -1,0 +1,12 @@
+{
+  "base": "bench_rms.py",
+  "base_sha256": "ef2bf45a0a86c5f11d23126541a1b82752e89ca46be2e77f6112b1f12cfd7a0c",
+  "generated": "bench_launch_heldout.py",
+  "generated_sha256": "6a35fe8a6c8cec665837dbc206204be37b31be9048ba1754927e5f888e012ae1",
+  "replacements": {
+    "    assert json.loads((OUT / 'results/launch256-tests.json').read_text())['returncode'] == 0": "    assert json.loads((OUT / 'results/launch256-tests.json').read_text())['returncode'] == 0\n    extra = json.loads((OUT / 'volta/launch256-heldout-summary.json').read_text())\n    assert extra['accepted'] and len(extra['checks']) == 6\n    for case in extra['checks']:\n        name = f\"launch256-heldout-{case['ncols']}-\" + ('inplace' if case['inplace'] else 'separate')\n        assert accepted((OUT / f'volta/{name}.log').read_text(), case['ncols'])",
+    "    shapes = [(n, rows) for n in [256, 4096, 8192, 16384] for rows in [1, 128, 2048]]\n    shapes += [(n, 128) for n in [1024, 2048, 3072, 6144]]": "    shapes = [(n, rows) for n in [5120, 6144, 7168, 8191] for rows in [1, 128, 2048]]\n    shapes += [(n, rows) for n in [4096, 8192] for rows in [128, 2048]]",
+    "OUT / 'bench/launch256-pairs'": "OUT / 'bench/launch256-heldout-pairs'"
+  },
+  "gpu": "6; less busy in repeated observations, still shared; compare only paired measurements from this run"
+}

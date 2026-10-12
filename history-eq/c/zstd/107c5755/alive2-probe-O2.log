@@ -1,0 +1,53 @@
+
+----------------------------------------
+define i32 @zstd_old_probe() nofree noundef willreturn memory(none) {
+#0:
+  %#range_0_0 = !range i32 0, i32 0, i32 256
+  ret i32 %#range_0_0
+}
+=>
+declare ptr @memcpy(noundef ptr, noundef ptr, noundef i64)
+
+define i32 @zstd_new_probe() {
+#0:
+  %#1 = alloca i64 8, align 8, dead
+  %#2 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#1
+  store i64 1, ptr %#1, align 8
+  start_lifetime ptr %#2
+  store i64 0, ptr %#2, align 8
+  %#3 = call ptr @memcpy(nonnull noundef ptr %#2, nonnull noundef ptr %#1, noundef i64 8)
+  %#4 = load i8, ptr %#2, align 8
+  %#5 = zext i8 %#4 to i32
+  end_lifetime ptr %#2
+  end_lifetime ptr %#1
+  %#range_0_%#5 = !range i32 %#5, i32 0, i32 256
+  ret i32 %#range_0_%#5
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+
+Source:
+i32 %#range_0_0 = #x00000000 (0)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+ptr %#1 = pointer(local, block_id=0, offset=0) / Address=#x178
+ptr %#2 = pointer(local, block_id=1, offset=0) / Address=#x100
+Function @memcpy triggered UB
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 2 >	size: 8	align: 8	alloc type: 1	alive: false	address: 376
+Block 3 >	size: 8	align: 8	alloc type: 1	alive: false	address: 256
+
+

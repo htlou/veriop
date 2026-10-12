@@ -1,0 +1,17 @@
+# zstd `5d39357b`: long-sequence encoding
+
+**Whole-commit verdict: UNKNOWN. Local threshold projection: bidirectionally equal under a 128 KiB block bound.** This optimization replaces the sentinel `65535` plus a shared `longLength` field with a long-length kind and sequence position. The exact parent/child `lib/zstd_compress.c` and `lib/zstd_internal.h` objects are preserved as `old-source.c`, `new-source.c`, `old-internal.h`, and `new-internal.h`. Their SHA-256 hashes are `3d8a1917f731cbf771cf16dd3716edb137b789baa9c63989a922f4fb996d0091`, `c61241180d63486807e253f221730bbffea3e141006e0bdda1ea6bbeeb868439`, `0ca1066a2f5544a8b7aa4328dfd88805ef1c34b6608323e33b309929c240bee5`, and `8e86138bd968d44973a1924bd44de1003310a4aeaa1888c8b83ad51f821e1283`, respectively. `prepare.py` reproduces these files from Git.
+
+`old.c` and `new.c` contain the *exact* historical `ZSTD_seqToCodes` bodies with only internal linkage substituted. Their one-sequence wrappers transcribe the changed `ZSTD_storeSeq` length branches and omit unchanged literal copying, statistics, and pointer increments. The wrapper assumes `litLength + matchCode + MINMATCH <= 131072`, fixes a valid offset code of one, and returns the two length codes and stored 16-bit lengths. On this wrapper, the installed Alive2 reports `Transformation doesn't verify!` (`exact-forward.log`). Its trace places the target at an apparently in-bounds constant-table read of `ML_Code[2]` and marks that read UB. The reported witness, `litLength=64, matchCode=65538`, gives identical results when the same two wrappers execute natively (`witness.log`). Therefore the Alive2 report is **not accepted as a program inequivalence witness**; the exact-body check remains unresolved.
+
+`threshold.c` isolates the *changed* long-length storage and code assignment. A zero code in this projection stands for the unchanged short-code table. The block bound excludes two long lengths in one sequence. Both directions of Alive2 verification pass (`threshold-forward.log`, `threshold-reverse.log`), proving that the two projected 16-bit lengths and the long-length code assignments agree for all 32-bit length inputs satisfying that bound. Both LLVM modules pass `opt -passes=verify`. This does **not** prove a whole-block or public-compressor equivalence: multiple sequences, sequence-position updates, all short-code lookups, and all callers remain outside the successful proof. The historical `lib/zstd.h` blob needed to confirm the 128 KiB constant is missing locally, so that bound is an explicit condition. No official historical benchmark score was measured.
+
+Reproduce the proved local check from the project root:
+
+```sh
+python3 history-eq/c/zstd/5d39357b/prepare.py
+alive2/toolchain/usr/lib/llvm-20/bin/clang -std=c11 -O2 -fno-strict-aliasing -DCHILD=0 -S -emit-llvm history-eq/c/zstd/5d39357b/threshold.c -o history-eq/c/zstd/5d39357b/threshold-old.ll
+alive2/toolchain/usr/lib/llvm-20/bin/clang -std=c11 -O2 -fno-strict-aliasing -DCHILD=1 -S -emit-llvm history-eq/c/zstd/5d39357b/threshold.c -o history-eq/c/zstd/5d39357b/threshold-new.ll
+alive2/build/alive2/alive-tv --func=target_long_length --always-verify -quiet history-eq/c/zstd/5d39357b/threshold-old.ll history-eq/c/zstd/5d39357b/threshold-new.ll
+alive2/build/alive2/alive-tv --func=target_long_length --always-verify -quiet history-eq/c/zstd/5d39357b/threshold-new.ll history-eq/c/zstd/5d39357b/threshold-old.ll
+```

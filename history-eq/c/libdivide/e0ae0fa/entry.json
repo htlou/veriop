@@ -1,0 +1,40 @@
+{
+  "commit": "e0ae0fa",
+  "date": "2019-05-28",
+  "subject": "Optimize libdivide_128_div_64_to_64() using _udiv128",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit chooses the MSVC x64 _udiv128 intrinsic for the portable 128-by-64 division helper.",
+  "change_summary": "Adds an MSVC-only _udiv128 fast path that this Clang/Alive2 toolchain cannot compile directly.",
+  "units": [
+    {
+      "name": "actual MSVC x64 _udiv128 path",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/e0ae0fa/msvc",
+      "evidence": "Clang targeting x86_64-pc-windows-msvc cannot declare/compile the new _udiv128 intrinsic, so no actual candidate IR is available for Alive2."
+    },
+    {
+      "name": "supplementary modeled _udiv128, quotient-fit helper and generated 64-bit API",
+      "level": "precond",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "hi < den for helper; d != 0 for API; _udiv128 modeled using __uint128_t division",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/e0ae0fa/msvc_model",
+      "evidence": "The modeled preconditioned helper and public generator/division targets all time out; raw zero-denominator counterexamples are outside the helper contract."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": "UNSUPPORTED",
+  "coverage": "partial",
+  "unsupported_reason": "non-x86-target-intrinsics",
+  "not_equiv_kind": null,
+  "notes": "The modeled wrapper adds a replacement for _udiv128 and therefore cannot be promoted to a proof about the original MSVC intrinsic."
+}

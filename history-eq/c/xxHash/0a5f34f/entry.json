@@ -1,0 +1,52 @@
+{
+ "commit": "0a5f34f",
+ "date": "2020-02-13",
+ "subject": "modified small inputs for xxh3",
+ "selected_by": "keyword",
+ "perf_evidence": "Commit message: 'in order to pass the new Perlin_noise test. Sizes 4-8 should also be slightly faster.' (XXH3_len_4to8_64b now uses one 64x64 multiply by PRIME64_2 instead of PRIME32_1 multiply + extra multiply in the final mix).",
+ "change_summary": "Pre-v0.8.0 XXH3 output change: new XXH3_len_4to8_64b mixing (inputs swapped, shift 39, multiply by PRIME64_2, no pre-avalanche multiply), new avalanche constant, reordered 1to3 combination, seed removed from 9to16 low lane, len==0 now hashes the secret (64b and 128b).",
+ "units": [
+  {
+   "name": "XXH3_len_4to8_64b (perf claim)",
+   "level": "raw",
+   "verdict": "NOT_EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": "intended-output-change",
+   "artifact_dir": "c/xxHash/0a5f34f/r_rawcex",
+   "evidence": "fwd counterexample with len fixed 4 and 8, secret=64 zero bytes: in0=0,in1=3,seed=0 len=4 -> old 0x97ed819670874eb5 vs new 0x59599e46218479a2"
+  },
+  {
+   "name": "XXH3_len_4to8_64b / XXH3_len_0to16_64b, symbolic len + symbolic secret",
+   "level": "raw",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/0a5f34f/r_raw",
+   "evidence": "fully symbolic value-arg raw (len 4..8 and 0..16): SMT timeout (300 s) both directions"
+  },
+  {
+   "name": "XXH3_64bits / _withSeed / _withSecret, len 4..8; XXH3_128bits_withSeed len 0..16",
+   "level": "api",
+   "verdict": "NOT_EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": "intended-output-change",
+   "artifact_dir": "c/xxHash/0a5f34f/r_api",
+   "evidence": "fwd: XXH3_64bits len=8 old 0x64bad420cb821768 vs new 0xd76a2403484872c7 (Value mismatch); all 4 api targets incorrect in fwd and bwd"
+  }
+ ],
+ "commit_verdict": "NOT_EQUIV",
+ "raw_verdict": "NOT_EQUIV",
+ "coverage": "full",
+ "unsupported_reason": null,
+ "not_equiv_kind": "intended-output-change",
+ "notes": "Intentional pre-v0.8.0 hash-formula change (XXH3 output frozen only at v0.8.0, 2020-07-27). Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. Raw targets pass input (16 B) and secret (64 B) as noundef scalar args copied into fresh local buffers (no aliasing/poison). Api targets: input pointer + symbolic len bounded to the length class, seed symbolic; _withSecret targets take a secret pointer with secretSize>=136. Counterexample search on raw needed concrete len/secret (r_rawcex); fully symbolic raw timed out (r_raw, UNKNOWN). Native sanity (native_x86_64/): old vs new XXH3 outputs differ for every length 0..256 (avalanche constant changed), XXH32/XXH64 unchanged."
+}

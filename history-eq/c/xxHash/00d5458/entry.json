@@ -1,0 +1,40 @@
+{
+  "commit": "00d5458",
+  "date": "2020-02-20",
+  "subject": "minor optimization",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says the 4..8-byte XXH3 64-bit path is slightly faster on ARM and x86.",
+  "change_summary": "Changes the 4..8-byte XXH3 64-bit input mixing expression, replacing a shifted byte swap with a 32-bit rotation.",
+  "units": [
+    {
+      "name": "public XXH3_64bits, withSeed and withSecret, changed 4..8-byte path",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "4 <= len <= 8; withSecret secret size >= 136",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/00d5458/r_api",
+      "evidence": "All three changed public API targets yield valid-length forward Alive2 value-mismatch counterexamples; the 0..16 seeded dispatcher also differs."
+    },
+    {
+      "name": "raw 4..8-byte XXH3 64-bit helper",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "4 <= len <= 8",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/00d5458/r_raw",
+      "evidence": "The raw changed helper fails Alive2 in both directions; fixed length-4 and length-8 wrappers also supply counterexamples."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "full",
+  "unsupported_reason": null,
+  "not_equiv_kind": "intended-output-change",
+  "notes": "This is an intended output change in a non-cryptographic hash, not a functional-correctness bug."
+}

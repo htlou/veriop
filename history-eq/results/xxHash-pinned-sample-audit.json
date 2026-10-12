@@ -1,0 +1,3522 @@
+{
+  "repo": "xxHash",
+  "pin": "680bf463fa1ca0461b9a7c2dab7556e1f54cf4cf",
+  "sample_seed": "veriop-history-v1",
+  "sample_size": 173,
+  "source_manifest": "history-eq/results/pinned-samples.json",
+  "classification_sources": [
+    "history-eq/results/xxHash-pre2020.json",
+    "history-eq/results/xxHash-2020on.json"
+  ],
+  "summary": {
+    "confirmed_optimizations": 94,
+    "excluded_non_optimizations": 79,
+    "verified_inequal": 17,
+    "verified_equal_or_refinement_full": 12,
+    "verified_equal_or_refinement_bounded": 22,
+    "unverified": 22,
+    "unsupported": 19,
+    "verified_equal_or_refinement_partial": 2
+  },
+  "entries": [
+    {
+      "commit": "00d54587619d715a4d4f5fe63a1df04953a3b3e0",
+      "subject": "minor optimization",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "00d5458",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "public XXH3_64bits, withSeed and withSecret, changed 4..8-byte path",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/00d5458/r_api"
+        },
+        {
+          "name": "raw 4..8-byte XXH3 64-bit helper",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/00d5458/r_raw"
+        }
+      ]
+    },
+    {
+      "commit": "0117f18e660d53f3ebb678bc2804c24b3cf8d53c",
+      "subject": "improved SSE2 detection macro for Visual",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "0117f18",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_64bits/XXH3_128bits long input as MSVC x64 (old: scalar path, new: SSE2 path)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/0117f18/{api128_len256_msvc_x64_na,api128_len300_msvc_x64_na,api64_len256_msvc_x64,api64_len300_msvc_x64}"
+        },
+        {
+          "name": "(info) Linux x86-64 unchanged",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0117f18/{api128_len256_linux_avx2,api64_len256_linux_avx2}"
+        }
+      ]
+    },
+    {
+      "commit": "028c0fd5342045b74afe8b798db7e3655560df20",
+      "subject": "Fix endianness detection on GCC, avoid XXH_cpuIsLittleEndian.",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "028c0fd",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32/XXH64 one-shot x86-64",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/028c0fd/{api_xxh32_len16,api_xxh32_len33,api_xxh64_len16,api_xxh64_len33}"
+        },
+        {
+          "name": "XXH32/XXH64 one-shot powerpc64 (big endian)",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/028c0fd/{api_xxh32_len16_ppc64be,api_xxh32_len33_ppc64be,api_xxh64_len16_ppc64be,api_xxh64_len33_ppc64be}"
+        },
+        {
+          "name": "XXH3 64/128 x86-64 and ppc64be",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/028c0fd/{api128_len300_avx2,api128_len300_scalar,api64_len16_ppc64be,api64_len256_avx2,api64_len256_ppc64be_u20,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "0767d9601d19ba03b26aa320b41051fafc069b07",
+      "subject": "Document accumulate_512 and scrambleAcc, rename vsx typedefs",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "0767d96",
+      "reason": "documentation + typedef renames"
+    },
+    {
+      "commit": "0828f90ffbe23e77917e41ed978cd82ccfda79b7",
+      "subject": "[WIP] Simplify VSX code",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "0828f90",
+      "reason": "VSX-only simplification (removes the permxor optimisation for portability; \"hopefully maintaining performance\") - not a perf change"
+    },
+    {
+      "commit": "082a9a8d93cb570a293f2fe0e2b07ae8ec8dac1e",
+      "subject": "Document WASM SIMD128, rename an unclear macro.",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "082a9a8",
+      "reason": "documentation + rename of an asm-guard macro (condition adds __ARM_ARCH); no perf claim"
+    },
+    {
+      "commit": "090b389778a219a3f62f2229911dbbd9a98b1850",
+      "subject": "[NEON] Move veor below if block",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "090b389",
+      "verdict": "EQUIV",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw XXH3_accumulate_512, 64/128-bit accumulation widths, AArch64",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/090b389/r_acc_a64_id"
+        },
+        {
+          "name": "raw XXH3_accumulate_512, 64/128-bit widths, ARMv7 NEON",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/090b389/r_acc_v7_id_long"
+        }
+      ]
+    },
+    {
+      "commit": "0a5f34f8cfc1ce3cf38bf18405f287e0ec3939ea",
+      "subject": "modified small inputs for xxh3",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "0a5f34f",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "XXH3_len_4to8_64b (perf claim)",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0a5f34f/r_rawcex"
+        },
+        {
+          "name": "XXH3_len_4to8_64b / XXH3_len_0to16_64b, symbolic len + symbolic secret",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0a5f34f/r_raw"
+        },
+        {
+          "name": "XXH3_64bits / _withSeed / _withSecret, len 4..8; XXH3_128bits_withSeed len 0..16",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0a5f34f/r_api"
+        }
+      ]
+    },
+    {
+      "commit": "0ab31bc6361ef5299e62e30d718326ed3a576477",
+      "subject": "fixed performance regression for XXH3_64bits()",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "0ab31bc",
+      "verdict": "NOT_EQUIV",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "XXH3_64bits / _withSeed long input, concrete witness (AVX2)",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/0ab31bc/{conc64_seed0_len256_v2,conc64_seed_len256_v2}"
+        },
+        {
+          "name": "XXH3_64bits long input symbolic (AVX2)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/0ab31bc/{api64_seed0_len256_avx2,api64_seed0_len300_avx2,api64_seed_len256_avx2}"
+        },
+        {
+          "name": "(info) short/mid inputs and XXH128 unchanged",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0ab31bc/{api128_len300_avx2,api128_seed_len256_avx2,api64_seed0_len100_avx2,api64_seed0_len16_avx2,conc128_len256_v2}"
+        },
+        {
+          "name": "scalar configuration",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0ab31bc/{api128_len300_scalar,api128_seed_len256_scalar,api64_len300_scalar,api64_seed0_len100_scalar,api64_seed0_len16_scalar,api64_seed0_len256_scalar,api64_seed0_len300_scalar,api64_seed_len256_scalar,conc128_len256_v0,conc64_seed0_len256_v0,conc64_seed_len256_v0}"
+        }
+      ]
+    },
+    {
+      "commit": "0bced63140f6b0a3499c251852be2c1f80aaa664",
+      "subject": "vectorize XXH3_initCustomSecret  (#376)",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "0bced63",
+      "verdict": "NOT_EQUIV",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": "bug",
+      "unit_evidence": [
+        {
+          "name": "vectorize XXH3_initCustomSecret  (#376)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0bced63/r_api_sse2"
+        },
+        {
+          "name": "Public XXH3_64bits_withSeed: 256-byte SSE2 input, seed 2^63",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0bced63"
+        }
+      ]
+    },
+    {
+      "commit": "0e479116d6125f19b8ec09a179cf2011f2262957",
+      "subject": "removed date for reproducibility minor `__inline`",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "0e47911",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32/XXH64/streaming XXH32 with XXH_PRIVATE_API, forced full inlining",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0e47911/{api_stream32_len0,api_stream32_len16,api_stream32_len33,api_stream32_len4,api_xxh32_len0,api_xxh32_len16,api_xxh32_len33,api_xxh32_len4,api_xxh64_len0,api_xxh64_len16,api_xxh64_len33,api_xxh64_len4}"
+        },
+        {
+          "name": "same, clang default -O3 inlining (no inline-threshold override)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0e47911/{noinl_stream32_len0,noinl_stream32_len16,noinl_stream32_len33,noinl_stream32_len4,noinl_xxh32_len0,noinl_xxh32_len16,noinl_xxh32_len33,noinl_xxh32_len4,noinl_xxh64_len0,noinl_xxh64_len16,noinl_xxh64_len33,noinl_xxh64_len4}"
+        }
+      ]
+    },
+    {
+      "commit": "0e73b84c9a382679f1dad6a2567f5303816cce4e",
+      "subject": "[NEON] Refactor NEON code",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "0e73b84",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "[NEON] Refactor NEON code",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/0e73b84/r_accm_v7_id"
+        }
+      ]
+    },
+    {
+      "commit": "0ed81e0c9f0da900d7ae21a52d3f1503a8ecf288",
+      "subject": "changed (again) formula for len:4-8",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "0ed81e0",
+      "reason": "hash-quality formula change for len 4-8 (DiffDist failure); latency only discussed as a trade-off"
+    },
+    {
+      "commit": "11ded569a6028756761e44d90003687a235933f5",
+      "subject": "ARM and scalar improvements/fixes",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "11ded56",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "inline-asm",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw scalar XXH3_accumulate_512 (acc local copy)",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/11ded56/pre_acc512_scalar"
+        },
+        {
+          "name": "raw scalar XXH3_accumulate_512, key 8-byte aligned",
+          "level": "precond",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/11ded56/pre_acc512_scalar_keyalign8"
+        },
+        {
+          "name": "raw XXH3_accumulate nbStripes<=4 (x86 scalar, aarch64 scalar), with/without key alignment",
+          "level": "precond",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/11ded56/raw_accum_nb4_scalar_keyalign8"
+        },
+        {
+          "name": "XXH3_64bits long inputs, scalar (x86-64 and aarch64; aarch64 also drops the unroll pragma)",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/11ded56/{api64_len1100_scalar,api64_len256_aarch64_scalar,api64_len256_scalar,api64_len300_avx2,api64_len300_scalar}"
+        },
+        {
+          "name": "XXH128 long inputs, scalar",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/11ded56/{api128_len1100_scalar,api128_len256_aarch64_scalar_long,api128_len256_scalar_long,api128_len300_avx2,api128_len300_scalar_long}"
+        },
+        {
+          "name": "NEON path armv7 (vzip inline asm) / aarch64",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/11ded56/{api128_len256_aarch64_neon,api64_len256_aarch64_neon}"
+        }
+      ]
+    },
+    {
+      "commit": "123db71fd0ae0e62a271226c6026b002c6e03f84",
+      "subject": "improvement vs mul0",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "123db71",
+      "reason": "quality change (\"improvement vs mul0\"), no perf claim (examined diff)"
+    },
+    {
+      "commit": "1456dc5cbf51ec810c44a7a17ed0faf8d17a3eaa",
+      "subject": "Avoid signed truncation in hash 17to128 and 129to240",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "1456dc5",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_len_129to240_64b/128b raw, symbolic len per trip-count class, input/secret pointers (read-only), secretSize=136",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/1456dc5/r_raw_cls"
+        },
+        {
+          "name": "XXH3_len_17to128_64b/128b raw, XXH_SIZE_OPT=1, symbolic len per trip-count class",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/1456dc5/r_raw17_sizeopt_cls"
+        },
+        {
+          "name": "XXH3_len_129to240_64b/128b via XXH3_64bits_withSeed / XXH3_128bits_withSeed, symbolic len split by loop trip count (129..143,...,240 / 129..159,...,224..240)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/1456dc5/r_api_cls64a"
+        },
+        {
+          "name": "XXH3_len_17to128_64b/128b XXH_SIZE_OPT=1 loop path, symbolic len per trip-count class 17..32/33..64/65..96/97..128 (+ fixed lengths 17,32,33,64,65,96,97,128)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/1456dc5/r_17to128_sizeopt_cls"
+        },
+        {
+          "name": "default config XXH3_len_17to128 (unchanged path, control)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/1456dc5/r_17to128_default"
+        }
+      ]
+    },
+    {
+      "commit": "152d50900b56a858eeebcc62911a971da5075bda",
+      "subject": "xxh3 len[9-16] : minor quality improvement",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "152d509",
+      "reason": "quality improvement (popcount distribution)"
+    },
+    {
+      "commit": "155f5605181038250871a20e48800e4fa81ccef0",
+      "subject": "minor change to [4-8] hash",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "155f560",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "XXH3_64bits len 4..8 (symbolic length) and fixed 4/5/8",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/155f560/{api64_len4,api64_len5,api64_len8,api64_sym4to8}"
+        },
+        {
+          "name": "XXH3_64bits concrete witness len 6",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/155f560/{conc64_len6_v0,conc64_len6_v2}"
+        },
+        {
+          "name": "(info) other length classes 0-3, 9-16 and XXH128 4-8",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/155f560/{api128_sym4to8,api64_sym0to3,api64_sym9to16}"
+        }
+      ]
+    },
+    {
+      "commit": "15abfc22c7d3c3c94e1da9858c8818531f038006",
+      "subject": "Improve XXH_mult64to128 performance on MSVC ARM64",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "15abfc2",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "MSVC ARM64 XXH_mult64to128",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/15abfc2/r_newcheck"
+        }
+      ]
+    },
+    {
+      "commit": "18f0991cef924c3b1220ba5b5249602444f90984",
+      "subject": "do not regenerate secret from seed",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "18f0991",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "do not regenerate secret from seed",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/18f0991/r_obs_scalar_t2"
+        }
+      ]
+    },
+    {
+      "commit": "19cd4ffed3d69781b2f922fb5faf3fe669d5c9ca",
+      "subject": "xxhash can be inlined even if it was previously included",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "19cd4ff",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "interface-or-state-layout-change",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "target double include without XXH_STATIC_LINKING_ONLY",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/19cd4ff/r_double_nosl"
+        },
+        {
+          "name": "public fixed-size hash cases in previously supported single/double-include modes",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/19cd4ff/r_single"
+        }
+      ]
+    },
+    {
+      "commit": "1acf797a8531b12890e55adf7d9cf9b8c523c4d0",
+      "subject": "Move 17to128 and 129to240 into a more logical location",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "1acf797",
+      "reason": "code motion (reorder functions by length), no behaviour/perf change claimed"
+    },
+    {
+      "commit": "1c9f6ef789ac5cd2201e44848789a21b25730307",
+      "subject": "introduced XXH_ASSERT()",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "1c9f6ef",
+      "reason": "introduces XXH_ASSERT macro (debug assert plumbing)"
+    },
+    {
+      "commit": "1cc96340532f65f606661ac6dc0837397a129b37",
+      "subject": "improve speed for large inputs",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "1cc9634",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3 64/128 long inputs (scalar/AVX2)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/1cc9634/{api128_len1100_scalar_u20,api128_len256_avx2_long,api128_len256_scalar,api128_len300_avx2_long,api128_len300_scalar,api64_len1100_avx2_u20,api64_len1100_scalar_u20,api64_len256_avx2,api64_len256_scalar,api64_len300_avx2,api64_len300_scalar}"
+        },
+        {
+          "name": "raw XXH3_accumulate nbStripes<=4 scalar",
+          "level": "raw",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/1cc9634/raw_accum_nb4_scalar"
+        }
+      ]
+    },
+    {
+      "commit": "1dcc4d5d3ea79c5dc77ccbcecb16c02db36388f7",
+      "subject": "fix #562 : compilation with gcc-8",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "1dcc4d5",
+      "reason": "compilation fix for gcc-8 (\"checked that performance remains unaffected\")"
+    },
+    {
+      "commit": "1e4aca971800c9664bfa02953cf327ac2fe91e2b",
+      "subject": "favor SSE2 auto-vectorization",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "1e4aca9",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3 64/128 long inputs (AVX2, scalar with vectorizers on for SSE2 and AVX2 machines)",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/1e4aca9/{api128_len1100_avx2,api128_len256_avx2,api128_len300_avx2,api128_len300_scalar,api64_len1100_avx2,api64_len1100_scalar_sse2_vecon,api64_len1100_scalar_v3_vecon,api64_len256_avx2,api64_len256_scalar_sse2_vecon,api64_len256_scalar_v3_vecon,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "21804396b4df596c67444dbf6ff7d2292e751172",
+      "subject": "revert XXH3's 17to128 variant to single accumulator",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "2180439",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_len_17to128_64b, symbolic len per branch class 17..32/33..64/65..96/97..128",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/2180439/r_raw_cls"
+        },
+        {
+          "name": "XXH3_64bits / _withSeed / _withSecret, symbolic len per class 17..32/33..64/65..96/97..128",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/2180439/r_api_cls"
+        },
+        {
+          "name": "XXH3_64bits_withSeed at fixed lengths 17,32,33,64,65,96,97,128",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/2180439/r_api_fixed"
+        },
+        {
+          "name": "XXH_SIZE_OPT=1 configuration (loop path), same class targets",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/2180439/r_api_cls_sizeopt"
+        }
+      ]
+    },
+    {
+      "commit": "21e64a92bf5b9805100c5fcf24deff923372cd04",
+      "subject": "comment on force_inline and Visual",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "21e64a9",
+      "reason": "comment only"
+    },
+    {
+      "commit": "23a889d6377ff9e24e5a344d44c4b25aa3c18a98",
+      "subject": "Fix minor compile error using XXH_ACCEPT_NULL_INPUT_POINTER",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "23a889d",
+      "reason": "compile fix with XXH_ACCEPT_NULL_INPUT_POINTER"
+    },
+    {
+      "commit": "268fde417e83d2ad48cae524587c054efebf0eeb",
+      "subject": "Force inline withSecret when inlining only (and not on GCC 12)",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "268fde4",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Force inline withSecret when inlining only (and not on GCC 12)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/268fde4/r_newcheck"
+        },
+        {
+          "name": "Both changed withSecret long-hash helper bodies",
+          "level": "helper",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/268fde4/helper-check"
+        }
+      ]
+    },
+    {
+      "commit": "288f7dcb59f47359ca81931757155b44e4456ee8",
+      "subject": "Add configuration to reroll most loops.",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "288f7dc",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "bug",
+      "unit_evidence": [
+        {
+          "name": "XXH64 one-shot on i386 (default config: XXH_REROLL_XXH64 auto-enabled)",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/288f7dc/{api_stream64_len12_i386_nw,api_xxh64_len12_i386_nw,api_xxh64_len20_i386_nw,api_xxh64_len28_i386_nw,api_xxh64_len31_i386,api_xxh64_len4_i386_nw,api_xxh64_len63_i386,api_xxh64_len7_i386}"
+        },
+        {
+          "name": "XXH64 one-shot with -DXXH_REROLL=1 (x86-64)",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/288f7dc/{api_stream64_len31_reroll1,api_xxh64_len0_reroll1,api_xxh64_len12_reroll1_nw,api_xxh64_len20_reroll1_nw,api_xxh64_len28_reroll1_nw,api_xxh64_len31_reroll1,api_xxh64_len32_reroll1,api_xxh64_len4_reroll1_nw,api_xxh64_len5_reroll1,api_xxh64_len63_reroll1,api_xxh64_sym0to31_reroll1_nw}"
+        },
+        {
+          "name": "XXH32 one-shot/stream with -DXXH_REROLL=1",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/288f7dc/{api_stream32_len15_reroll1,api_xxh32_len0_reroll1,api_xxh32_len15_reroll1,api_xxh32_len16_reroll1,api_xxh32_len31_reroll1,api_xxh32_len3_reroll1,api_xxh32_len47_reroll1,api_xxh32_len7_reroll1,api_xxh32_sym0to15_reroll1_nw}"
+        },
+        {
+          "name": "XXH3 17-128 with -DXXH_REROLL=1 (64/128-bit)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/288f7dc/{api128_len128_reroll1_u8,api128_len17_reroll1,api128_len32_reroll1,api128_len33_reroll1,api128_len64_reroll1,api128_len65_reroll1,api128_len96_reroll1,api128_len97_reroll1,api64_len128_reroll1_u8,api64_len17_reroll1,api64_len256_reroll1,api64_len32_reroll1,api64_len33_reroll1,api64_len64_reroll1,api64_len65_reroll1,api64_len96_reroll1,api64_len97_reroll1,api64_sym17to128_reroll1}"
+        },
+        {
+          "name": "default config x86-64 (XXH_REROLL=0) all entry points",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/288f7dc/{api128_len128_reroll0,api128_len17_reroll0,api128_len32_reroll0,api128_len33_reroll0,api128_len64_reroll0,api128_len65_reroll0,api128_len96_reroll0,api128_len97_reroll0,api64_len128_reroll0,api64_len17_reroll0,api64_len32_reroll0,api64_len33_reroll0,api64_len64_reroll0,api64_len65_reroll0,api64_len96_reroll0,api64_len97_reroll0,api64_sym17to128_reroll0,api_stream32_len15_reroll0,api_stream64_len31_reroll0,api_xxh32_len0_reroll0,api_xxh32_len15_reroll0,api_xxh32_len16_reroll0,api_xxh32_len31_reroll0,api_xxh32_len3_reroll0,api_xxh32_len47_reroll0,api_xxh32_len7_reroll0,api_xxh32_sym0to15_reroll0,api_xxh64_len0_reroll0,api_xxh64_len12_reroll0,api_xxh64_len20_reroll0,api_xxh64_len28_reroll0,api_xxh64_len31_reroll0,api_xxh64_len32_reroll0,api_xxh64_len4_reroll0,api_xxh64_len5_reroll0,api_xxh64_len63_reroll0,api_xxh64_sym0to31_reroll0}"
+        }
+      ]
+    },
+    {
+      "commit": "2ae8976579e1b0b4933a96ad7a901ee07365db75",
+      "subject": "Improved comments",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "2ae8976",
+      "reason": "comments only"
+    },
+    {
+      "commit": "2afd24d8bb564eba44543f617118a5e85137b1a9",
+      "subject": "xxh128: minor modifications to improve bias",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "2afd24d",
+      "reason": "hash-quality change (XXH128 bias)"
+    },
+    {
+      "commit": "2b83bca869ea5fb35bcf0c0c379f856fef661217",
+      "subject": "Fix XXH_INLINE_ALL build",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "2b83bca",
+      "reason": "build fix for XXH_INLINE_ALL name prefixing"
+    },
+    {
+      "commit": "3231cdfb155342f3da457529c118764f28dd430c",
+      "subject": "XXH_INLINE_ALL can be declared after XXH_NAMESPACE",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "3231cdf",
+      "reason": "build feature: XXH_INLINE_ALL after XXH_NAMESPACE"
+    },
+    {
+      "commit": "361eb01a8ed6457aa11fc73f8337b56178a1ff2b",
+      "subject": "[xxh128] improved MC2 result for 32-bit input",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "361eb01",
+      "reason": "xxh128 quality improvement (MC2 result), no perf claim"
+    },
+    {
+      "commit": "368a6f969995a3d35dab0f39719ef519e0a6b5d6",
+      "subject": "Improve typedefs, fix 16-bit int/seed type bug",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "368a6f9",
+      "reason": "typedef renames + 16-bit int seed type bug fix"
+    },
+    {
+      "commit": "37a68f29dfdcb28ea81c706bcc1581e7c9bf7213",
+      "subject": "remove alignment check on aarch64",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "37a68f2",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH32/XXH64/XXH3 fixed-length AArch64 matrix",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/37a68f2/r_read_a64"
+        },
+        {
+          "name": "x86 control with the same 22 public fixed-length cases",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/37a68f2/r_read_x86"
+        }
+      ]
+    },
+    {
+      "commit": "387a1ba1d3fc046dcb1307effa69a7134296d956",
+      "subject": "[VSX/ZV] Improve commenting, switch to inline func",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "387a1ba",
+      "reason": "VSX/zVector comment/refactor (macro -> inline function), no perf intent"
+    },
+    {
+      "commit": "3bb5bb64baff1035d562b601eec3e50f8313e1e1",
+      "subject": "changed XXH32 finalization to use switch()/case strategy",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "3bb5bb6",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32(p,len,seed) one-shot",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/3bb5bb6/{api_xxh32_len0,api_xxh32_len1,api_xxh32_len10,api_xxh32_len11,api_xxh32_len12,api_xxh32_len13,api_xxh32_len14,api_xxh32_len15,api_xxh32_len16,api_xxh32_len17_nw,api_xxh32_len18_nw,api_xxh32_len19_nw,api_xxh32_len2,api_xxh32_len20,api_xxh32_len3,api_xxh32_len31_nw,api_xxh32_len32,api_xxh32_len35,api_xxh32_len4,api_xxh32_len47,api_xxh32_len48,api_xxh32_len5,api_xxh32_len6,api_xxh32_len63,api_xxh32_len7,api_xxh32_len8,api_xxh32_len9}"
+        },
+        {
+          "name": "streaming XXH32_reset/update/digest",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/3bb5bb6/{api_stream32_len0,api_stream32_len1,api_stream32_len10,api_stream32_len11,api_stream32_len12,api_stream32_len13,api_stream32_len14,api_stream32_len15,api_stream32_len16,api_stream32_len17_nw,api_stream32_len18_nw,api_stream32_len19_nw,api_stream32_len2,api_stream32_len20_nw,api_stream32_len3,api_stream32_len31_nw,api_stream32_len31_u4_nw,api_stream32_len32,api_stream32_len35,api_stream32_len4,api_stream32_len47,api_stream32_len48_nw,api_stream32_len5,api_stream32_len6,api_stream32_len63_nw,api_stream32_len63_u4_nw,api_stream32_len7,api_stream32_len8,api_stream32_len9}"
+        },
+        {
+          "name": "XXH32_digest_endian over symbolic states and valid memsize 0..15, both endian modes",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/3bb5bb6/digest-state-all"
+        },
+        {
+          "name": "XXH32_digest_endian with all state fields initialized, memsize 0..15 and both endian modes",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/3bb5bb6/digest-initialized-all"
+        }
+      ]
+    },
+    {
+      "commit": "3e4af280eee59b12113c1aae4d82dc39273d1f3f",
+      "subject": "Fix building for ARM with GCC < 8",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "3e4af28",
+      "reason": "build fix: skip `#pragma GCC unroll` on GCC < 8"
+    },
+    {
+      "commit": "3eeba74bab07f7106372899d06781fd5f12a9801",
+      "subject": "improved code comments",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "3eeba74",
+      "reason": "comment only"
+    },
+    {
+      "commit": "4104e9e222a4a48758cdc229ebe60d282a993e4e",
+      "subject": "chore: Improve document",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "4104e9e",
+      "reason": "documentation formatting"
+    },
+    {
+      "commit": "417578779b14866f339415de96f8a2d3de0d1d95",
+      "subject": "Don't attempt to dispatch to AVX2 on GCC <= 4.9 (closes #473)",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "4175787",
+      "reason": "dispatcher build fix for GCC <= 4.9"
+    },
+    {
+      "commit": "425dbd8d86c7cc6d997852f80dacb64ae5635d2e",
+      "subject": "Try to improve some variable names.",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "425dbd8",
+      "reason": "variable renames only"
+    },
+    {
+      "commit": "44bb94ed60322d862d3aeccc0f2d2d00a1ca43eb",
+      "subject": "Rewrite XXH3_update",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "44bb94e",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Rewrite XXH3_update",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/44bb94e/r_api_pin_t3"
+        },
+        {
+          "name": "Three fixed-length public XXH3 64-bit streaming calls with 136-byte secret",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/44bb94e/subset-recheck"
+        }
+      ]
+    },
+    {
+      "commit": "45f39e6d34c776956e37f33e66592ea1a8bb2524",
+      "subject": "first implementation of XXH3_64b",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "45f39e6",
+      "reason": "new feature: first XXH3 implementation"
+    },
+    {
+      "commit": "49b2d47884dcb889dca6e280223f232704ff7de3",
+      "subject": "fix #627",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "49b2d47",
+      "reason": "static-analyzer (PVS) warning workaround; explicitly \"blind fix\", not perf"
+    },
+    {
+      "commit": "4b1237686209490cfd2ff447ea2793a197f5fe86",
+      "subject": "add optimized implementation for AVX512 targets",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "4b12376",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "add optimized implementation for AVX512 targets",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4b12376/r_api"
+        }
+      ]
+    },
+    {
+      "commit": "4bc56e466d3926042f50692a80538174db229e7b",
+      "subject": "Update comments for 9to16_128b, add 32-bit path",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "4bc56e4",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_len_9to16_128b, 32-bit path (i386 target)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4bc56e4/r_raw_i386"
+        },
+        {
+          "name": "XXH3_128bits / _withSeed / _withSecret len 9..16, i386",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4bc56e4/r_api_i386"
+        },
+        {
+          "name": "XXH3_len_9to16_128b + 128-bit api len 9..16, x86-64 (64-bit path)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4bc56e4/r_api"
+        }
+      ]
+    },
+    {
+      "commit": "4c19ec2b80db0369c2a94de86407fd2406079a4e",
+      "subject": "Update XXH3_mix16B() collision disclaimer",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "4c19ec2",
+      "reason": "documentation-only (collision disclaimer comment)"
+    },
+    {
+      "commit": "4dd799c922d960989614172b3bb764cb6621b069",
+      "subject": "fix static analyzer warnings",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "4dd799c",
+      "reason": "static-analyzer warning fix"
+    },
+    {
+      "commit": "4f43b71778dbc7c9b132ab7ad7acb8c680a539b8",
+      "subject": "small optimization when streaming small quantities",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "4f43b71",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Moves small updates through a more direct buffer path.",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4f43b71/r_api_st1_t2"
+        },
+        {
+          "name": "Public XXH3 streaming with direct state accumulators, 128-bit 100+200-byte case",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4f43b71/r_api_st0_t5"
+        },
+        {
+          "name": "Internal XXH3_update small-input path with symbolic length",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4f43b71/r_raw_st1_t1"
+        },
+        {
+          "name": "Internal XXH3_update large-input path with fixed 200-byte input",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/4f43b71/r_raw_st1_t2"
+        }
+      ]
+    },
+    {
+      "commit": "5176062578b239366c5332e8ec97d48f37091236",
+      "subject": "xxh32sum & xxh64sum enabled short latency versions",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "5176062",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "other",
+      "unit_evidence": [
+        {
+          "name": "XXH32(p,len,seed), x86-64",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/5176062/{api_xxh32_len0,api_xxh32_len1,api_xxh32_len11_nw,api_xxh32_len15_nw,api_xxh32_len16_nw,api_xxh32_len17_nw,api_xxh32_len19_nw,api_xxh32_len2,api_xxh32_len3,api_xxh32_len31_nw,api_xxh32_len32_nw,api_xxh32_len33_nw,api_xxh32_len47_nw,api_xxh32_len48_nw,api_xxh32_len4_nw,api_xxh32_len5_nw,api_xxh32_len63_nw,api_xxh32_len64_nw,api_xxh32_len7_nw,api_xxh32_len8_nw}"
+        },
+        {
+          "name": "XXH64(p,len,seed), x86-64",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/5176062/{api_xxh64_len0,api_xxh64_len1,api_xxh64_len12_nw,api_xxh64_len15_nw,api_xxh64_len16_nw,api_xxh64_len17_nw,api_xxh64_len24_nw,api_xxh64_len3,api_xxh64_len31_nw,api_xxh64_len32_nw,api_xxh64_len33_nw,api_xxh64_len40_nw,api_xxh64_len40_u16_nw,api_xxh64_len4_nw,api_xxh64_len5_nw,api_xxh64_len63_nw,api_xxh64_len64_nw,api_xxh64_len65_nw,api_xxh64_len7_nw,api_xxh64_len8_nw,api_xxh64_len9_nw}"
+        },
+        {
+          "name": "XXH32 with 8-byte-aligned input (NOT library-guaranteed precondition)",
+          "level": "precond",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/5176062/{pre_aligned8_xxh32_len0,pre_aligned8_xxh32_len1,pre_aligned8_xxh32_len15,pre_aligned8_xxh32_len16_nw,pre_aligned8_xxh32_len17_nw,pre_aligned8_xxh32_len3,pre_aligned8_xxh32_len31_nw,pre_aligned8_xxh32_len32_nw,pre_aligned8_xxh32_len33_nw,pre_aligned8_xxh32_len4,pre_aligned8_xxh32_len47_nw,pre_aligned8_xxh32_len64_nw,pre_aligned8_xxh32_len7}"
+        },
+        {
+          "name": "XXH64 with 8-byte-aligned input (NOT library-guaranteed precondition)",
+          "level": "precond",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/5176062/{pre_aligned8_xxh64_len0,pre_aligned8_xxh64_len1,pre_aligned8_xxh64_len15,pre_aligned8_xxh64_len16,pre_aligned8_xxh64_len31,pre_aligned8_xxh64_len32_nw,pre_aligned8_xxh64_len33_nw,pre_aligned8_xxh64_len4,pre_aligned8_xxh64_len63_nw,pre_aligned8_xxh64_len63_u16_nw,pre_aligned8_xxh64_len64_nw,pre_aligned8_xxh64_len7,pre_aligned8_xxh64_len8}"
+        }
+      ]
+    },
+    {
+      "commit": "5309e282ce703fc31f39087038b147d17b013904",
+      "subject": "Force -O2 on GCC + AVX2, document split load",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "5309e28",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "compile-time-or-build-only",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Force -O2 on GCC + AVX2, document split load",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": null
+        }
+      ]
+    },
+    {
+      "commit": "5543c3dbe9b34faf78a8240f1c9d72bfcd88c6d5",
+      "subject": "xxh128 len[4-8]: improved distribution quality",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "5543c3d",
+      "reason": "quality (distribution) change"
+    },
+    {
+      "commit": "558c9a97bfaf7c099eb0325caad8b9cc9f81af7b",
+      "subject": "XXH_mult32to64: Use downcast+upcast instead of mask",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "558c9a9",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH_mult32to64 macro (u64 operands), unoptimized IR (-O0 -disable-O0-optnone)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/558c9a9/r_raw_O0"
+        },
+        {
+          "name": "XXH_mult32to64 and portable XXH_mult64to128, x86-64 -O3 and i386 -O3",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/558c9a9/r_raw_i386"
+        },
+        {
+          "name": "scalar XXH3_accumulate_512 (-DXXH_VECTOR=0), acc/input/secret by value",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/558c9a9/r_acc_scalar"
+        },
+        {
+          "name": "XXH3_128bits / _withSeed len 9..16 (lenContrib uses XXH_mult32to64), XXH3_64bits_withSeed len 0..16; x86-64 and i386 (portable 64x64->128 via XXH_mult32to64)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/558c9a9/r_api_i386"
+        }
+      ]
+    },
+    {
+      "commit": "56314ee122e435fe9267e358fde7f74c64ca2f59",
+      "subject": "New functions XXH32_sizeofState() and XXH32_resetState(), for external allocation. Thanks to Takayuki Matsuoka for suggestion. Slightly improved speed of XXH32_update() New mode XXH_ACCEPT_NULL_INPUT_POINTER (as a #define), suggested by Brian White and Thomas Kaiser. Added : Makefile, for GCC Modified Basic Types and C99 detection.",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "56314ee",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "unit_evidence": [
+        {
+          "name": "streaming XXH32_init/XXH32_update(p,len)/XXH32_digest, x86-64",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/56314ee/{api_stream_len0,api_stream_len11_nw,api_stream_len15_nw,api_stream_len16_nw,api_stream_len17_nw,api_stream_len19_nw,api_stream_len1_nw,api_stream_len2_nw,api_stream_len31_nw,api_stream_len32_nw,api_stream_len33_nw,api_stream_len3_nw,api_stream_len47_nw,api_stream_len48_nw,api_stream_len4_nw,api_stream_len5_nw,api_stream_len63_nw,api_stream_len64_nw,api_stream_len7_nw,api_stream_len8_nw}"
+        },
+        {
+          "name": "streaming, precondition input != NULL (single update and two-update splits)",
+          "level": "precond",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/56314ee/{pre_nonnull_split10_len64_nw,pre_nonnull_split15_len16,pre_nonnull_split15_len40_nw,pre_nonnull_split1_len33_nw,pre_nonnull_split3_len20_nw,pre_nonnull_split8_len24_nw,pre_nonnull_stream_len0,pre_nonnull_stream_len11_nw,pre_nonnull_stream_len15_nw,pre_nonnull_stream_len16_nw,pre_nonnull_stream_len17_nw,pre_nonnull_stream_len19_nw,pre_nonnull_stream_len1_nw,pre_nonnull_stream_len2_nw,pre_nonnull_stream_len31_nw,pre_nonnull_stream_len32,pre_nonnull_stream_len33_nw,pre_nonnull_stream_len3_nw,pre_nonnull_stream_len4,pre_nonnull_stream_len47_nw,pre_nonnull_stream_len48,pre_nonnull_stream_len5_nw,pre_nonnull_stream_len63_nw,pre_nonnull_stream_len64_nw,pre_nonnull_stream_len7_nw,pre_nonnull_stream_len8}"
+        },
+        {
+          "name": "(info) one-shot XXH32 (reformatted, unchanged)",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/56314ee/{api_xxh32_len0,api_xxh32_len1,api_xxh32_len11,api_xxh32_len15,api_xxh32_len16,api_xxh32_len17,api_xxh32_len19,api_xxh32_len2,api_xxh32_len3,api_xxh32_len31,api_xxh32_len32,api_xxh32_len33,api_xxh32_len4,api_xxh32_len47,api_xxh32_len48,api_xxh32_len5,api_xxh32_len63,api_xxh32_len64,api_xxh32_len7,api_xxh32_len8}"
+        }
+      ]
+    },
+    {
+      "commit": "57d44d5773e27f27c8aa221199d03c8f4b138d84",
+      "subject": "change XXH_REROLL into XXH32_ENDJMP",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "57d44d5",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw XXH32_finalize, all 16 len&15 residues and both pointer alignments",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/57d44d5/finalizer_modes/old0_new0"
+        },
+        {
+          "name": "Changes XXH32 unroll/end-jump control flow.",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/57d44d5/r_s32_val"
+        }
+      ]
+    },
+    {
+      "commit": "593c51465474a63ded7fb0cddf5aaa59ffa533c6",
+      "subject": "first midsize version",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "593c514",
+      "reason": "new mid-size (129-240) algorithm \"just for test with benchHash\"; hash-design change, no stated perf claim"
+    },
+    {
+      "commit": "5b827f538c5903c8200b22b098b90d95fe7c4c33",
+      "subject": "improved 8-ways mixer",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "5b827f5",
+      "reason": "hash-quality change of the 8-way mixer"
+    },
+    {
+      "commit": "5cf7b718c0944a34d7a87cd5e7dd2cb33940a466",
+      "subject": "minor tweak, to avoid outstanding strict-aliasing warnings",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "5cf7b71",
+      "reason": "strict-aliasing warning fix"
+    },
+    {
+      "commit": "5d3ed49c067c70b7ea09a188c977f2fb56256ec0",
+      "subject": "Prefer NEON over SVE",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "5d3ed49",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH3_64bits, 256 bytes, AArch64 SVE+NEON default dispatch",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/5d3ed49/r_api256_sve"
+        },
+        {
+          "name": "AArch64 without SVE and x86 unaffected controls",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/5d3ed49/r_apix_a64"
+        }
+      ]
+    },
+    {
+      "commit": "6090b0d18b1e0ee7f49c630acde681c911e081f6",
+      "subject": "fixed XXH128_stream performance with DISPATCH=1",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "6090b0d",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "fixed XXH128_stream performance with DISPATCH=1",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/6090b0d/r_isa2_128"
+        }
+      ]
+    },
+    {
+      "commit": "60c7cc70fa9f55b1e00c974f89343fb9bff9d201",
+      "subject": "disable clang unroll statement on emscripten",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "60c7cc7",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw XXH3_accumulate nbStripes<=4 on wasm32-emscripten",
+          "level": "raw",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/60c7cc7/raw_accum_nb4_wasm"
+        },
+        {
+          "name": "XXH3_64bits long inputs on wasm32 and x86-64",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/60c7cc7/{api64_len1100_wasm_u20,api64_len256_avx2,api64_len256_wasm,api64_len300_wasm}"
+        }
+      ]
+    },
+    {
+      "commit": "61041e5b22b0fffc3521c525df6934f8b91d7964",
+      "subject": "reduce stack usage of XXH64 streaming variant",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "61041e5",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH64_reset/update/digest, 11 fixed streaming segment pairs",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/61041e5/r_s64_val"
+        }
+      ]
+    },
+    {
+      "commit": "620facc54562825e78ae365ca156ec1e8bacfcf1",
+      "subject": "optimize XXH3_accumulate_512_neon",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "620facc",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "optimize XXH3_accumulate_512_neon",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/620facc/r_neonm_v7"
+        }
+      ]
+    },
+    {
+      "commit": "64f95e4102df6ed0db5a39b2167762256084124b",
+      "subject": "xxh3: modified 9-16 bytes formula",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "64f95e4",
+      "reason": "hash-quality/security reasoning for 9-16 bytes formula, no perf claim"
+    },
+    {
+      "commit": "662b223eef69b4c5d98e934a6e1509a9156cc925",
+      "subject": "slightly improved streaming speed on small",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "662b223",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "slightly improved streaming speed on small",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/662b223/r_obs_scalar_t2"
+        }
+      ]
+    },
+    {
+      "commit": "665424e72078511238fe9053159dc073244672e8",
+      "subject": "added variant XXH3_64bits_withSecretandSeed()",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "665424e",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "added variant XXH3_64bits_withSecretandSeed()",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/665424e/r_newapi"
+        },
+        {
+          "name": "generated 192-byte secret bridge for arbitrary seed, scalar x86-64",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/665424e/secret-bridge"
+        }
+      ]
+    },
+    {
+      "commit": "681ea2aad6367279f8b82149de8657e9b17be8d6",
+      "subject": "Support non-aligned input on strict-align CPU systems, as requested by Gregory Pakosz Type XXH32_stateSpace_t, for static allocation ( typically for stack allocation, or freestanding systems). Suggested by Christoph Cullmann and Takayuki Matsuoka User definable memory-related functions (malloc, free, memcpy) Changed enum OK into XXH_OK Restricted intrinsic _rotl to MSVC, due to poor performance under minGW",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "681ea2a",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32 one-shot on x86_64-w64-mingw32 (_rotl -> shift/or rotate)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/681ea2a/{api_mingw_len0,api_mingw_len1,api_mingw_len15,api_mingw_len16_nw,api_mingw_len17_nw,api_mingw_len3,api_mingw_len31_nw,api_mingw_len32_nw,api_mingw_len33_nw,api_mingw_len4,api_mingw_len47_nw,api_mingw_len64_nw,api_mingw_len7}"
+        },
+        {
+          "name": "XXH32 one-shot x86-64 linux",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/681ea2a/{api_x86_64_len0,api_x86_64_len1,api_x86_64_len15,api_x86_64_len16,api_x86_64_len17,api_x86_64_len3,api_x86_64_len31,api_x86_64_len32,api_x86_64_len33,api_x86_64_len4,api_x86_64_len47,api_x86_64_len64,api_x86_64_len7}"
+        },
+        {
+          "name": "XXH32 one-shot on armv5te (strict alignment: packed reads + aligned fast path)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/681ea2a/{api_armv5_len0,api_armv5_len15_nw,api_armv5_len16_nw,api_armv5_len17_nw,api_armv5_len1_nw,api_armv5_len31_nw,api_armv5_len32_nw,api_armv5_len33_nw,api_armv5_len3_nw,api_armv5_len47_nw,api_armv5_len4_nw,api_armv5_len64_nw,api_armv5_len7_nw}"
+        }
+      ]
+    },
+    {
+      "commit": "6a64e4f17e4078849bca3bc7b8cb04fa8d6fa68b",
+      "subject": "first xxh128 design",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "6a64e4f",
+      "reason": "new XXH128 design (\"not terribly fast\") - hash design, not an optimisation"
+    },
+    {
+      "commit": "6d95829a7b9024f1eaa6d8891209a926283b86a0",
+      "subject": "Corrected a bug in the compact version of XXH32. Thanks Adrien Grand for detecting it. Update is recommended. Bench.c now also checks results integrity as part of starting sequence.",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "6d95829",
+      "reason": "bug fix in compact XXH32"
+    },
+    {
+      "commit": "6f97097934be520ea289e06e24844e50e60813ff",
+      "subject": "Introduce XXH_SIZE_OPT and XXH_NO_STREAM",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "6f97097",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "interface-or-state-layout-change",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Introduce XXH_SIZE_OPT and XXH_NO_STREAM",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/6f97097/r_nostream"
+        }
+      ]
+    },
+    {
+      "commit": "70e65c925a03b63d4e84e67cf22b34f36fcdb3c8",
+      "subject": "re-enabled fast version of XXH32()",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "70e65c9",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "unit_evidence": [
+        {
+          "name": "XXH32(p,len,seed) one-shot, x86-64",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/70e65c9/{api_len0,api_len11_nw,api_len15_nw,api_len16_nw,api_len17_nw,api_len19_nw,api_len1_nw,api_len2_nw,api_len31_nw,api_len32_nw,api_len33_nw,api_len3_nw,api_len47_nw,api_len48_nw,api_len4_nw,api_len5_nw,api_len63_nw,api_len64_nw,api_len7_nw,api_len8_nw}"
+        },
+        {
+          "name": "XXH32 one-shot, precondition input != NULL",
+          "level": "precond",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/70e65c9/{pre_nonnull_len0,pre_nonnull_len11_nw,pre_nonnull_len15_nw,pre_nonnull_len16_nw,pre_nonnull_len17_nw,pre_nonnull_len19_nw,pre_nonnull_len1_nw,pre_nonnull_len2_nw,pre_nonnull_len31_nw,pre_nonnull_len32_nw,pre_nonnull_len33_nw,pre_nonnull_len3_nw,pre_nonnull_len47_nw,pre_nonnull_len48_nw,pre_nonnull_len4_nw,pre_nonnull_len5_nw,pre_nonnull_len63_nw,pre_nonnull_len64_nw,pre_nonnull_len7_nw,pre_nonnull_len8_nw}"
+        },
+        {
+          "name": "XXH32 one-shot, precondition input != NULL and 8-byte aligned (NOT library-guaranteed)",
+          "level": "precond",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/70e65c9/{pre_nonnull_aligned8_len0,pre_nonnull_aligned8_len15_nw,pre_nonnull_aligned8_len16_nw,pre_nonnull_aligned8_len17_nw,pre_nonnull_aligned8_len1_nw,pre_nonnull_aligned8_len31_nw,pre_nonnull_aligned8_len32_nw,pre_nonnull_aligned8_len33_nw,pre_nonnull_aligned8_len3_nw,pre_nonnull_aligned8_len4,pre_nonnull_aligned8_len47_nw,pre_nonnull_aligned8_len64_nw,pre_nonnull_aligned8_len7_nw}"
+        }
+      ]
+    },
+    {
+      "commit": "71566dfceea70310b05c294bbee5d1e165a5f456",
+      "subject": "fixed performance issue reported in #398",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "71566df",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "fixed performance issue reported in #398",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/71566df/r_newcheck"
+        }
+      ]
+    },
+    {
+      "commit": "7221be4f63e9810e4ac5bacb2b688feccc260aa6",
+      "subject": "Speedup size hash for 17to128 by using independent accumulators.",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "7221be4",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_len_17to128_64b, symbolic len per branch class 17..32/33..64/65..96/97..128",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7221be4/r_raw_cls"
+        },
+        {
+          "name": "XXH3_64bits / _withSeed / _withSecret, symbolic len per class 17..32/33..64/65..96/97..128",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7221be4/r_api_cls"
+        },
+        {
+          "name": "XXH3_64bits_withSeed at fixed lengths 17,32,33,64,65,96,97,128",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7221be4/r_api_fixed"
+        },
+        {
+          "name": "XXH_SIZE_OPT=1 configuration (loop path), same class targets",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7221be4/r_api_cls_sizeopt"
+        }
+      ]
+    },
+    {
+      "commit": "726e4fa4f4b5c90ce703760a6727613b87b26913",
+      "subject": "minor : improve comment and code readability",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "726e4fa",
+      "reason": "readability + seeds[] initialization bug fix in kdf"
+    },
+    {
+      "commit": "7512a40279c0b487445cf8fcbda225a478b7e7b4",
+      "subject": "dispatch: fix compilation with XXH_INLINE_ALL",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "7512a40",
+      "reason": "build fix: dispatch entry points with XXH_INLINE_ALL (linkage), no perf intent"
+    },
+    {
+      "commit": "755445db888fbc5e129bacff8fd8d765278474ff",
+      "subject": "Small improvements to 129to240 hash ranges",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "755445d",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Small improvements to 129to240 hash ranges",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/755445d/r_api_fixed"
+        }
+      ]
+    },
+    {
+      "commit": "7558f18493484738ebcbbaa41fe0aa8d50038b51",
+      "subject": "Add improved 128-bit multiply routine for 32-bit  and use intrinsics long multiply",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "7558f18",
+      "verdict": "NOT_EQUIV",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": "other",
+      "unit_evidence": [
+        {
+          "name": "raw XXH3_mul128(a,b) on i386 (portable 32-bit path old vs new)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7558f18/raw_mul128_i386"
+        },
+        {
+          "name": "raw XXH3_mul128(a,b) on x86-64 (int128 old vs portable new)",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7558f18/raw_mul128_x86_64_long"
+        },
+        {
+          "name": "raw XXH3_mul128 on armv7-a (new = inline asm umull/umaal)",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7558f18/raw_mul128_armv7"
+        },
+        {
+          "name": "raw scalar XXH3_scrambleAcc (acc local copy)",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7558f18/pre_scramble_scalar"
+        },
+        {
+          "name": "XXH3_64b long input, concrete witness (scalar / AVX2)",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/7558f18/{conc64_len1100_v0,conc64_len1100_v2}"
+        },
+        {
+          "name": "XXH3_64b len 256/300 symbolic (scalar, AVX2)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/7558f18/{api64_len256_avx2_long,api64_len256_scalar_long,api64_len300_avx2_long,api64_len300_scalar}"
+        },
+        {
+          "name": "XXH3_64b short inputs 1-3, 4-8, 9-16 symbolic length",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/7558f18/{api64_sym1to3,api64_sym4to8,api64_sym9to16_long}"
+        },
+        {
+          "name": "XXH128 len 4-8 (symbolic) and concrete len 6",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/7558f18/{api128_sym4to8,conc128_len6_v0,conc128_len6_v2}"
+        }
+      ]
+    },
+    {
+      "commit": "7631115f2d6115e95713f2a54d6b592d969945ba",
+      "subject": "[VSX] Fix issues on older compilers",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "7631115",
+      "reason": "compile fixes for VSX on older compilers"
+    },
+    {
+      "commit": "76f7ea37821a45c38d3b573082a32f105efffa96",
+      "subject": "use stdint.h inside xxhash.h",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "76f7ea3",
+      "reason": "portability/type fix (use stdint.h in xxhash.h)"
+    },
+    {
+      "commit": "777ec6529a21b262ae9dafb0a7ecf8c1438ca70f",
+      "subject": "Implement alternative byteshift load",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "777ec65",
+      "verdict": "REFINES",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH_readLE32 / XXH_readLE64 with XXH_FORCE_MEMORY_ACCESS=3",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_raw_fma3"
+        },
+        {
+          "name": "XXH_readBE32 / XXH_readBE64 with XXH_FORCE_MEMORY_ACCESS=3",
+          "level": "raw",
+          "verdict": "REFINES",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_raw_fma3"
+        },
+        {
+          "name": "XXH32_hashFromCanonical / XXH64_hashFromCanonical (canonical by pointer), FMA=3",
+          "level": "api",
+          "verdict": "REFINES",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_api_canon_fma3"
+        },
+        {
+          "name": "XXH32/XXH64/XXH128_hashFromCanonical with canonical bytes by value, FMA=3",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_api_canon_fma3"
+        },
+        {
+          "name": "XXH32 len 0..15, XXH64 len 0..31, XXH3_64bits_withSeed len 0..128, XXH3_128bits_withSeed len 0..16 (symbolic len), FMA=3",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_api_fma3"
+        },
+        {
+          "name": "XXH32 len 16/31, XXH64 len 32/63 (main loops), FMA=3",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_api_fixed_fma3"
+        },
+        {
+          "name": "default configuration (no XXH_FORCE_MEMORY_ACCESS): raw readers, api, canonical decoders",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/777ec65/r_api"
+        }
+      ]
+    },
+    {
+      "commit": "77b74c9dc9ebee25d4d1d8da7c55881d99ba0de1",
+      "subject": "Put __attribute__((aligned)) after struct member",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "77b74c9",
+      "reason": "compatibility with old GCC (attribute placement)"
+    },
+    {
+      "commit": "7ad240669e11646a0926ce55ade753d59f21b837",
+      "subject": "xxhash: rename XXH_USELESS_ALIGN_BRANCH to XXH_FORCE_ALIGN_CHECK",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "7ad2406",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32/XXH64 one-shot x86-64 (default config)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7ad2406/{api_xxh32_x86_64_len0,api_xxh32_x86_64_len15,api_xxh32_x86_64_len16,api_xxh32_x86_64_len33,api_xxh32_x86_64_len4,api_xxh64_x86_64_len0,api_xxh64_x86_64_len15,api_xxh64_x86_64_len16,api_xxh64_x86_64_len33,api_xxh64_x86_64_len4}"
+        },
+        {
+          "name": "XXH32 one-shot aarch64 / armv5te (default config)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7ad2406/{api_xxh32_aarch64_len0,api_xxh32_aarch64_len15,api_xxh32_aarch64_len16,api_xxh32_aarch64_len33,api_xxh32_aarch64_len4,api_xxh32_armv5_len0,api_xxh32_armv5_len15,api_xxh32_armv5_len16,api_xxh32_armv5_len33,api_xxh32_armv5_len4}"
+        },
+        {
+          "name": "XXH32/XXH64 one-shot with opt-in XXH_FORCE_ALIGN_CHECK=0 on armv5te",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/7ad2406/{opt_armv5_xxh32_len0,opt_armv5_xxh32_len15,opt_armv5_xxh32_len16,opt_armv5_xxh32_len33,opt_armv5_xxh32_len4,opt_armv5_xxh64_len0,opt_armv5_xxh64_len15,opt_armv5_xxh64_len16,opt_armv5_xxh64_len33,opt_armv5_xxh64_len4}"
+        }
+      ]
+    },
+    {
+      "commit": "7bf3d9f331d0b7d0f5856ae1894e0314e2b304c2",
+      "subject": "removed XXH64's switch finalizer (#521)",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "7bf3d9f",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Replaces switch-based XXH64 tail handling.",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7bf3d9f/r_s64_nounroll"
+        },
+        {
+          "name": "Raw XXH64_finalize, all 32 tail residues and both alignments, old switch and rerolled modes on x86-64",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/7bf3d9f/finalizer-raw"
+        }
+      ]
+    },
+    {
+      "commit": "7d5eae1df4e54295374c4c802992f417b964ab2f",
+      "subject": "prepare convergence torwards hashlong_internal",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "7d5eae1",
+      "reason": "refactor preparing convergence of hashLong variants"
+    },
+    {
+      "commit": "7d6bd4ea09ade21410d48ca42d50cf7836a47110",
+      "subject": "feat(xsum): Display which mode is complied in the welcome message for LoongArch",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "7d6bd4e",
+      "reason": "xxhsum display / macro alignment for LoongArch, no perf intent"
+    },
+    {
+      "commit": "81d343d04b5405244f8b42e7bf20fc60b822cb75",
+      "subject": "check multiple inclusions of XXH_INLINE_ALL",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "81d343d",
+      "reason": "multiple-inclusion check / tidy-up of XXH_INLINE_ALL"
+    },
+    {
+      "commit": "8719a6afc58c96618a7954485e396445efba604d",
+      "subject": "[WIP] Start porting VSX code to s390x",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "8719a6a",
+      "verdict": "UNSUPPORTED",
+      "coverage": "full",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3 64/128 on s390x -march=z14 -mzvector",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/8719a6a/{api128_len256_s390x_na,api64_len256_s390x}"
+        },
+        {
+          "name": "(info) x86-64 and ppc64le unchanged",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/8719a6a/{api128_len300_avx2,api128_len300_scalar,api64_len256_avx2,api64_len256_ppc64le,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "879d0af51a490885c2d1dd94d01ad5cd6e5764a1",
+      "subject": "Add comment about CRC32 speed comparison",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "879d0af",
+      "reason": "comment only (CRC32 speed comparison)"
+    },
+    {
+      "commit": "87b712ade86cdbcb7f1d7a2bc2980955466efbda",
+      "subject": "enhance riscv-v implementation performance. Co-authored-by: gong-flying <gongxiaofei24@iscas.ac.cn>",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "87b712a",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_accumulate_512_rvv",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/87b712a/r_rvv"
+        },
+        {
+          "name": "XXH3_64bits_withSeed(p,1024,seed) on riscv64 rv64gcv",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/87b712a/r_rvv"
+        }
+      ]
+    },
+    {
+      "commit": "891e3308b2de9875d772cbafab6b4461f7fe3485",
+      "subject": "implemented a variant \"with custom secret\"",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "891e330",
+      "reason": "new feature: XXH3 variant with custom secret"
+    },
+    {
+      "commit": "91788f1677f5a8449ae57b825009781f4d9eec73",
+      "subject": "switch to full accmulating loop",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "91788f1",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw scalar/SSE2/AVX2/AVX512 accumulation at one, two and four stripes",
+          "level": "raw",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/91788f1/r_raw_sym_avx2"
+        },
+        {
+          "name": "public XXH3 fixed 256/320-byte scalar and x86 SIMD paths",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/91788f1/api-recheck"
+        },
+        {
+          "name": "x86 dispatch-source per-ISA XXH3 long-input entry points",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/91788f1/r_dispatch"
+        }
+      ]
+    },
+    {
+      "commit": "91d43dbc7b6cc24251d2caf6fd20e826b5594ae9",
+      "subject": "simplified len9to16",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "91d43db",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "public XXH3_128bits, withSeed and withSecret, length 9..16",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/91d43db/r_api"
+        },
+        {
+          "name": "fixed-input raw length-16 witness",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/91d43db/r_rawcex"
+        }
+      ]
+    },
+    {
+      "commit": "9231e6d8ed60e4818cd8a9e3d361d06a19dc45dc",
+      "subject": "added build macro XXH_INLINE_ALL",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "9231e6d",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32/XXH64/streaming with XXH_PRIVATE_API (forced inlining and NOINL)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/9231e6d/{api_stream32_len0,api_stream32_len16,api_stream32_len33,api_stream32_len4,api_xxh32_len0,api_xxh32_len16,api_xxh32_len33,api_xxh32_len4,api_xxh64_len0,api_xxh64_len16,api_xxh64_len33,api_xxh64_len4,noinl_stream32_len0,noinl_stream32_len16,noinl_stream32_len33,noinl_stream32_len4,noinl_xxh32_len0,noinl_xxh32_len16,noinl_xxh32_len33,noinl_xxh32_len4,noinl_xxh64_len0,noinl_xxh64_len16,noinl_xxh64_len33,noinl_xxh64_len4}"
+        },
+        {
+          "name": "default build (library compiled into the TU)",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/9231e6d/{api_default_xxh32_len0,api_default_xxh32_len16,api_default_xxh32_len33,api_default_xxh32_len4}"
+        },
+        {
+          "name": "new XXH_INLINE_ALL mode vs old XXH_PRIVATE_API mode",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/9231e6d/{alias_len0,alias_len16,alias_len33}"
+        }
+      ]
+    },
+    {
+      "commit": "935f280a76e3dc72bccada68b3849c1e96cd53ff",
+      "subject": "xxh128: speedup len [4,8]",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "935f280",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "XXH3_len_4to8_128b (len fixed 4 and 8, secret = 64 zero bytes)",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/935f280/r_rawcex"
+        },
+        {
+          "name": "XXH3_len_4to8_128b fully symbolic (len 4..8, secret by value)",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/935f280/r_raw"
+        },
+        {
+          "name": "XXH3_128bits / _withSeed / _withSecret, len 4..8",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/935f280/r_api"
+        },
+        {
+          "name": "XXH_xorshift64 refactor: XXH3_64bits_withSeed len 4..8 and 9..16, scalar XXH3_scrambleAcc (XXH_VECTOR=0, by value)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/935f280/r_refactor_scalar"
+        }
+      ]
+    },
+    {
+      "commit": "93dcc6f9db7fcee0042811f67b740a7122a0c2cf",
+      "subject": "Use inline ASM on IBM XL",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "93dcc6f",
+      "reason": "compiler-compat: IBM XL vec_mule/vec_mulo selection"
+    },
+    {
+      "commit": "93f114c261054a6a5f7829d316b7f549f792d029",
+      "subject": "try to factorize small sizes",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "93f114c",
+      "reason": "refactoring experiment (factorise small-size dispatch, kept under #if 0); the message only says to measure impact"
+    },
+    {
+      "commit": "94e7193eeaad2829f70aef9b9de4e52fac9bef5d",
+      "subject": "AArch64 tuning, put asm guard in macro (#519)",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "94e7193",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "AArch64 tuning, put asm guard in macro (#519)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/94e7193/r_a64_o32_val"
+        }
+      ]
+    },
+    {
+      "commit": "9506eb6db02dff31fa175a0b6b5f71363329b959",
+      "subject": "changed fold64 to ^",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "9506eb6",
+      "reason": "hash-quality change (fold64 to xor, collision rate)"
+    },
+    {
+      "commit": "96a2ca14cd900a8f3910e9fe810605885cb8adb0",
+      "subject": "Fix XXH_STATIC_ASSERT to avoid possible stack allocation",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "96a2ca1",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "alive2-crash-or-parse-error",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public canonical conversion and XXH3 fixed long inputs in C99 scalar mode",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/96a2ca1/r_c99_scalar"
+        },
+        {
+          "name": "C99 AVX2/low-optimization paths containing the changed assertion macro",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/96a2ca1/r_c99_O0"
+        }
+      ]
+    },
+    {
+      "commit": "97952e90295885d9d8e127d91aa199a876c22981",
+      "subject": "Workaround for Clang vectorization bug",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "97952e9",
+      "verdict": "UNSUPPORTED",
+      "coverage": "full",
+      "unsupported_reason": "inline-asm",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32 one-shot with SSE4.1 (asm present)",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/97952e9/{api_xxh32_len16_nw,api_xxh32_len32_nw}"
+        },
+        {
+          "name": "(info) XXH32 one-shot without SSE4.1",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/97952e9/{api_xxh32_len16_nosse41,api_xxh32_len32_nosse41}"
+        }
+      ]
+    },
+    {
+      "commit": "99a867a14adda6a233f6d8bfb93a735010b88268",
+      "subject": "Runtime endianess detection removed typecast warnings for 64-bits CPU with aligned-only memory accesses made bench.c compatible with tcc small bench.c optimisation, reducing impact of timer calls",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "99a867a",
+      "reason": "runtime endianness detection (portability); only bench.c (out of scope) got an optimisation"
+    },
+    {
+      "commit": "9b6fa1067f442dd18772744757c3e7f91de353a3",
+      "subject": "[SCALAR] Improve scalar XXH3_accumulate_512 loop",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "9b6fa10",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw scalar XXH3_accumulate_512 (64- and 128-bit accWidth), acc local copy",
+          "level": "precond",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/9b6fa10/{pre_acc512_128_scalar,pre_acc512_64_scalar}"
+        },
+        {
+          "name": "raw scalar XXH3_accumulate_512 with caller-provided (possibly aliasing) acc",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/9b6fa10/raw_acc512_scalar"
+        },
+        {
+          "name": "XXH3_64bits / XXH3_128bits long inputs, scalar",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/9b6fa10/{api128_len1100_scalar_u20,api128_len256_scalar,api128_len300_scalar,api64_len1100_scalar_u20,api64_len256_scalar,api64_len300_scalar,api_xxh128_len256_scalar,api_xxh3_64_len256_scalar}"
+        },
+        {
+          "name": "(info) AVX2 build unchanged",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/9b6fa10/{api128_len300_avx2,api64_len1100_avx2_u20,api64_len300_avx2}"
+        }
+      ]
+    },
+    {
+      "commit": "9eb91a3b535bb37d6102256b2e6dcf78cd7652b4",
+      "subject": "Let the Great Typo Hunt commence!",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "9eb91a3",
+      "reason": "typo/comment/documentation pass"
+    },
+    {
+      "commit": "a16928e06a4205240f9d54fd6ef11e781ed2fbaf",
+      "subject": "[ARMv7] Reroll and block Clang autovec in mergeAccs",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "a16928e",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw XXH3_mergeAccs, ARMv7 NEON with the actual autovectorization guard",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/a16928e/r_raw_arm_neon"
+        },
+        {
+          "name": "public XXH3 64/128-bit fixed long-input ARMv7 NEON paths",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/a16928e/r_api_arm_neon"
+        },
+        {
+          "name": "public x86-64-v3 fixed-length control",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/a16928e/r_api_v3"
+        }
+      ]
+    },
+    {
+      "commit": "a2f7a0fef588581f849878337abd0e9b6852493f",
+      "subject": "Fix GCC 12 -Og",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "a2f7a0f",
+      "reason": "build fix: GCC 12 -Og (force-inline vs function pointer)"
+    },
+    {
+      "commit": "a375247055145452f90a0d4eb61edcf3c87e802c",
+      "subject": "Improve some xxhash.h comments.",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "a375247",
+      "reason": "comments"
+    },
+    {
+      "commit": "a39b22e01b3283851ac3cc262830f6b024d6de97",
+      "subject": "tiny change improving llvm's autovectorization",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "a39b22e",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_64bits long inputs (scalar/AVX2, vectorizer off and on)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/a39b22e/{api128_len300_avx2,api128_len300_scalar,api64_len1100_avx2,api64_len1100_scalar,api64_len1100_scalar_sse2_vecon,api64_len1100_scalar_v3_vecon,api64_len256_avx2,api64_len256_scalar,api64_len256_scalar_sse2_vecon,api64_len256_scalar_v3_vecon,api64_len300_avx2,api64_len300_scalar}"
+        },
+        {
+          "name": "raw XXH3_accumulate nbStripes<=4 (vectorizer off/on)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/a39b22e/{raw_accum_nb4_scalar,raw_accum_nb4_scalar_v3_vecon}"
+        }
+      ]
+    },
+    {
+      "commit": "a4ecdedafb7872d7dd9d6a2aa1d84ae47803e069",
+      "subject": "improve _withSecret() performance",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "a4ecded",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "improve _withSecret() performance",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/a4ecded/r_newcheck"
+        },
+        {
+          "name": "scalar long-secret body and fixed 256-byte public specialization with neutralized inline hints",
+          "level": "api",
+          "verdict": "EQUIV_PARTIAL",
+          "bounded": false,
+          "artifact_dir": "history-eq/c/xxHash/a4ecded/body-proof"
+        }
+      ]
+    },
+    {
+      "commit": "a5d5bf778f631412fd14a466457878f1a53eace2",
+      "subject": "improve algorithm by compensating UMAC deficiency",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "a5d5bf7",
+      "reason": "hash-quality change (compensate UMAC deficiency)"
+    },
+    {
+      "commit": "a9054f397d7f41bc505638df3853b270eb9e7493",
+      "subject": "Small improvements (#515)",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "a9054f3",
+      "reason": "typo fixes"
+    },
+    {
+      "commit": "aa61b378b306b9065186d3f3c9feb1285c6b4b54",
+      "subject": "removed extraneous include",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "aa61b37",
+      "reason": "build fix (extraneous include, Windows/msys2 benchHash compilation)"
+    },
+    {
+      "commit": "aa9a586693f72d8bc12fad65619527176d9a3dd6",
+      "subject": "Introduce cast via void* for AVX2 and AVX512",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "aa9a586",
+      "reason": "warning workaround (cast via void*) for old clang"
+    },
+    {
+      "commit": "ab50132c41b1fd90b8bae0bc8976457e9e8afd3b",
+      "subject": "Compiler guard XXH32 on WASM128",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "ab50132",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "inline-asm",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "asm barrier placement in XXH32_round (the perf mechanism itself)",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": null
+        },
+        {
+          "name": "XXH32(p,len,seed) on wasm32 -msimd128, guard modeled as freeze",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/ab50132/r_wasm_xxh32"
+        }
+      ]
+    },
+    {
+      "commit": "abf8f0388744bde0bdd27ddd300ab46e53083226",
+      "subject": "[ARM/AARCH64] Fix GCC",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "abf8f03",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "[ARM/AARCH64] Fix GCC",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/abf8f03/r_accm_v7"
+        }
+      ]
+    },
+    {
+      "commit": "ac897bec29daa5d176db45d0bba4cf01f59ea45b",
+      "subject": "alignment hint for auto-vectorizer",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "ac897be",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "XXH3_64bits(_withSeed) len 300, concrete witness (scalar/AVX2)",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/ac897be/{conc64_seed0_len300_v0,conc64_seed0_len300_v2,conc64_seed_len300_v0,conc64_seed_len300_v2}"
+        },
+        {
+          "name": "XXH3_64bits len 300/1100 symbolic",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/ac897be/{api128_len300_avx2,api128_len300_scalar,api64_len1100_avx2,api64_len1100_scalar,api64_len300_avx2,api64_len300_scalar,api64_seed0_len300_avx2,api64_seed0_len300_scalar}"
+        },
+        {
+          "name": "alignment-hint part: raw scalar accumulate_512 / scrambleAcc",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/ac897be/{pre_acc512_scalar,pre_scramble_scalar}"
+        },
+        {
+          "name": "(info) len 16 and len 256 (multiple of the stripe: no last stripe)",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/ac897be/{api64_len16_avx2,api64_len16_scalar,api64_len256_avx2,api64_len256_scalar,api64_len256_scalar_v3_vecon,api64_len256_seed_avx2,api64_len256_seed_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "ace22bddc7a366a5dd8a71e8b8247694530684ec",
+      "subject": "Change whether to inline XXH3_hashLong_withSecret to a config option",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "ace22bd",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Change whether to inline XXH3_hashLong_withSecret to a config option",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/ace22bd/r_newcheck"
+        }
+      ]
+    },
+    {
+      "commit": "acfcfa97ef0043868ff5be2767b14c136a6b0308",
+      "subject": "Remove stream loads and slightly improve avx512 seed generation",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "acfcfa9",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "alive2-crash-or-parse-error",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH3 fixed 256/320-byte AVX2 paths",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/acfcfa9/r_api_avx2"
+        },
+        {
+          "name": "exact AVX512 nontemporal-load IR, public seeded and raw initializer paths",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/acfcfa9/r_api_avx512"
+        },
+        {
+          "name": "AVX512 seed generation after removing unsupported nontemporal metadata from old IR",
+          "level": "precond",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/acfcfa9/r_api_avx512_nt"
+        }
+      ]
+    },
+    {
+      "commit": "ad63946825f89c69ffac3861d8156fb2f10b5e17",
+      "subject": "[NEON/VSX] Fix GCC strict aliasing issues",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "ad63946",
+      "reason": "bug fix: GCC strict-aliasing issues on NEON/VSX (may_alias)"
+    },
+    {
+      "commit": "b2929c469c08599941e0975a380fa8108e5a2b8d",
+      "subject": "Replace 2x vpxor with vpternlogd in avx512 scramble",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "b2929c4",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Replaces two AVX512 XORs with ternary logic in scramble.",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/b2929c4/r_api_avx512"
+        }
+      ]
+    },
+    {
+      "commit": "b54708f05b026e18f7ca10beafa4091542aa1e84",
+      "subject": "xxh128 len[4-8] : minor change",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "b54708f",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "public XXH3_128bits, withSeed and withSecret, length 4..8",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/b54708f/r_api"
+        },
+        {
+          "name": "raw length-8 hash witness",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/b54708f/r_rawcex"
+        }
+      ]
+    },
+    {
+      "commit": "b8ad12a60ed8921c34ef47b22e06c777f4aebc40",
+      "subject": "fix #625",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "b8ad12a",
+      "reason": "static-analyzer fix: initialize whole state struct"
+    },
+    {
+      "commit": "b8dfa44bbcce9d8c36c52996ec7073242e2aa04b",
+      "subject": "Implement XXH_NO_INLINE_HINTS to disable forced inlining.",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "b8dfa44",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Adds an option to disable forced inlining in XXH3 functions.",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/b8dfa44/r_O3_nih1_thr"
+        }
+      ]
+    },
+    {
+      "commit": "bca2d275b258c2a99af90f70b265d9d2f9d745de",
+      "subject": "Modernize XXH32/XXH64",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "bca2d27",
+      "verdict": "NOT_EQUIV",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": "bug",
+      "unit_evidence": [
+        {
+          "name": "public XXH64_state_s.total_len after reset and one update",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/bca2d27/r_totlen"
+        },
+        {
+          "name": "public XXH32/XXH64 one-shot fixed-length x86 and i386 matrices",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/bca2d27/r_i386_o64_val"
+        },
+        {
+          "name": "public XXH32/XXH64 streaming fixed-segment matrices",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/bca2d27/r_x86_s32_val"
+        }
+      ]
+    },
+    {
+      "commit": "bf16b4e6df69d31d03fed34765ee45b0541297fb",
+      "subject": "xxh128: changed mix2 shuffle",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "bf16b4e",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "XXH3_128bits long input, concrete witness (scalar/SSE2/AVX2)",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/bf16b4e/{conc128_len300_v0,conc128_len300_v1,conc128_len300_v2}"
+        },
+        {
+          "name": "XXH3_128bits len 256/300 symbolic",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/bf16b4e/{api128_len256_avx2,api128_len256_scalar,api128_len256_sse2,api128_len300_avx2,api128_len300_scalar,api128_len300_sse2}"
+        },
+        {
+          "name": "(info) XXH3_64bits long input unchanged",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/bf16b4e/{api64_len256_avx2,api64_len256_scalar,api64_len256_sse2,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "c0cebc7075a34d4ef721b15d44cd86502538ca8e",
+      "subject": "XXH3: return 0 on len==0",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "c0cebc7",
+      "reason": "security/quality: XXH3 returns 0 on len==0 to avoid leaking the seed"
+    },
+    {
+      "commit": "c1d70f5dd6332df8ebf634a79bb970159cff85c3",
+      "subject": "fixed XXH3_stream performance with DISPATCH",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "c1d70f5",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "global-state-or-dispatch",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "per-ISA streaming update, ISA=AVX2 (old: XXH3_update with k_coreFunc[AVX2] pointers; new: XXH3_64bits_update_avx2)",
+          "level": "precond",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c1d70f5/r_isa2"
+        },
+        {
+          "name": "per-ISA streaming update, ISA=SSE2",
+          "level": "precond",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c1d70f5/r_isa1"
+        },
+        {
+          "name": "per-ISA streaming update, ISA=scalar",
+          "level": "precond",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c1d70f5/r_isa0"
+        },
+        {
+          "name": "dispatcher entry XXH3_64bits_update_dispatch through the global dispatch tables (fixed AVX2 / SSE2 CPU models, symbolic CPU)",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c1d70f5/r_upd64_cpu2"
+        }
+      ]
+    },
+    {
+      "commit": "c224e5836bdd8905200074c2de6c9b96013a1f13",
+      "subject": "Improve comments for XXH_malloc",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "c224e58",
+      "reason": "comments for XXH_malloc"
+    },
+    {
+      "commit": "c3e587a1ca34e86c63e72e3adb2500cb181a386e",
+      "subject": "attempt to silence a recent ubsan warning with code reorganization",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "c3e587a",
+      "reason": "silence UBSAN warning by code reorganization (no perf intent)"
+    },
+    {
+      "commit": "c477d6c140ebad8bfe068af8c9004af14a28b27f",
+      "subject": "disable XXH64 autovectorization",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "c477d6c",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "inline-asm",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "asm barrier placement (XXH_COMPILER_GUARD in XXH64_round under AVX512F)",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c477d6c/r_avx512_o64_val"
+        },
+        {
+          "name": "XXH64(p,len,seed) one-shot + XXH64 streaming (reset/update/update/digest), -mavx512f, guard modeled as freeze",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c477d6c/r_avx512_o64_val"
+        },
+        {
+          "name": "same targets, default x86-64-v3 (no AVX512F): change does not bite",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c477d6c/r_x86v3_o64"
+        }
+      ]
+    },
+    {
+      "commit": "c546d08ff35be6c67480697d7ebb38903c0371fb",
+      "subject": "kdf v3",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "c546d08",
+      "reason": "kdf v3 secret-generator redesign (security/quality), not perf"
+    },
+    {
+      "commit": "c5953f132c548a0413a4635c8ecc6d801f04f75a",
+      "subject": "Add unroll pragma for Clang in XXH3_accumulate.",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "c5953f1",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "whole historical xxhash.c translation unit, all 49 functions",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c5953f1/full-source-proof"
+        },
+        {
+          "name": "raw XXH3_accumulate(acc,data,key,nbStripes), nbStripes<=4 symbolic",
+          "level": "raw",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c5953f1/{raw_accum_nb4_avx2,raw_accum_nb4_scalar}"
+        },
+        {
+          "name": "XXH3_64b long inputs",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c5953f1/{api64_len1100_avx2_u20,api64_len1100_scalar_u20,api64_len256_avx2,api64_len256_scalar,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "c5a6a14676d1ebb3933e79eb1362837680652ca8",
+      "subject": "only enforce inlining of XXH64_finalize() when XXH_INLINE_ALL is enabled",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "c5a6a14",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH64 one-shot and streaming fixed-length matrix across implementation/inline-all modes",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c5a6a14/r_impl_hints_dflt_u4"
+        },
+        {
+          "name": "public XXH64 one-shot with symbolic length, implementation mode",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c5a6a14/r_sym_impl_dflt"
+        }
+      ]
+    },
+    {
+      "commit": "c6013d80d94665726132408deed6f9e1de1cae1a",
+      "subject": "xxh128: slight optimization for len [4,8]",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "c6013d8",
+      "verdict": "NOT_EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "unit_evidence": [
+        {
+          "name": "public XXH3_128bits, withSeed and withSecret, length 4..8",
+          "level": "api",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c6013d8/r_api"
+        },
+        {
+          "name": "raw fixed-length 4 and 8 witnesses",
+          "level": "raw",
+          "verdict": "NOT_EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c6013d8/r_rawcex"
+        }
+      ]
+    },
+    {
+      "commit": "c6205ae7116b7c0dc501dcffbedd42810ebbcd64",
+      "subject": "xxhash: add ARM SVE intrinsic implementation",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "c6205ae",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH3_64bits, 256 bytes, new SVE implementation versus prior vector path",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c6205ae/r_api256_sve"
+        }
+      ]
+    },
+    {
+      "commit": "c94e68d705c9b2742970ac111c4c7d6eb457587d",
+      "subject": "Better 128-bit multiply, multiple bugfixes.",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "c94e68d",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "inline-asm",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw XXH3_mul128_fold64 on i386 (portable path old vs new)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c94e68d/raw_fold64_i386"
+        },
+        {
+          "name": "raw XXH3_mul128_fold64 on x86-64 (int128 path)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c94e68d/raw_fold64_x86_64"
+        },
+        {
+          "name": "raw XXH3_mul128_fold64 on armv7-a (old = umull/umaal inline asm)",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c94e68d/raw_fold64_armv7"
+        },
+        {
+          "name": "XXH3 on i386 (uses the portable multiply): XXH128 4-8 / 9-16, XXH3_64 9-16, long scalar",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c94e68d/{api128_len300_i386_scalar_na,api128_sym4to8_i386_na,api64_len256_i386_scalar_long,api64_len300_i386_scalar,api64_sym9to16_i386_long}"
+        },
+        {
+          "name": "XXH3 x86-64 long inputs (pragma removal), scalar/AVX2",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c94e68d/{api128_len300_avx2,api128_len300_scalar,api64_len1100_avx2_u20,api64_len1100_scalar_u20,api64_len256_avx2,api64_len256_scalar,api64_len300_avx2,api64_len300_scalar}"
+        },
+        {
+          "name": "raw XXH3_accumulate nbStripes<=4 (pragma removal)",
+          "level": "raw",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c94e68d/{raw_accum_nb4_avx2,raw_accum_nb4_scalar}"
+        },
+        {
+          "name": "XXH32/XXH64 on armv7-a / armv6 (memory-access mode removed)",
+          "level": "api",
+          "verdict": "REFINES",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/c94e68d/{api_xxh32_len16_armv6,api_xxh32_len16_armv6ua_nw,api_xxh32_len16_armv7a,api_xxh32_len17_armv6,api_xxh32_len17_armv6ua_nw,api_xxh32_len17_armv7a,api_xxh32_len33_armv6,api_xxh32_len33_armv6ua_nw,api_xxh32_len33_armv7a,api_xxh64_len16_armv6,api_xxh64_len16_armv6ua_nw,api_xxh64_len16_armv7a,api_xxh64_len17_armv6,api_xxh64_len17_armv6ua_nw,api_xxh64_len17_armv7a,api_xxh64_len33_armv6,api_xxh64_len33_armv6ua_nw,api_xxh64_len33_armv7a}"
+        }
+      ]
+    },
+    {
+      "commit": "c994f5c9ef982a9706def92ee3d602016b8e23e9",
+      "subject": "Fix copyright years",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "c994f5c",
+      "reason": "copyright years"
+    },
+    {
+      "commit": "c9a747017dd26881e526253346d244f808f00d99",
+      "subject": "[WASM] Support SIMD128 via XXH_NEON (from EMSDK's SIMDe polyfill)",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "c9a7470",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "WASM SIMD128 path with plain clang (no SIMDe)",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_wasm_plain"
+        },
+        {
+          "name": "XXH3_scrambleAcc scalar -> NEON-via-SIMDe, wasm32 -msimd128",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_wasm_simde_fix"
+        },
+        {
+          "name": "XXH3_accumulate_512 scalar -> NEON-via-SIMDe, wasm32, as compiled",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_wasm_simde_fix"
+        },
+        {
+          "name": "XXH3_accumulate_512 scalar -> NEON-via-SIMDe, wasm32, llvm.wasm.shuffle modeled as shufflevector",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_wasm_simde_model"
+        },
+        {
+          "name": "XXH3_64bits(p,256) wasm32 scalar -> SIMDe NEON, shuffle modeled (+O2)",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_wasm_api_model_O2"
+        },
+        {
+          "name": "XXH3_scrambleAcc_neon old -> new (the 'obvious' optimization), aarch64-linux-gnu, as compiled",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_neon"
+        },
+        {
+          "name": "XXH3_scrambleAcc_neon old -> new, aarch64, umull modeled (XXH3_NEON_LANES 6 and 8)",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/c9a7470/r_neon_umullmodel"
+        }
+      ]
+    },
+    {
+      "commit": "cd078d265d9032c93ff3f4d8e47dbad9edf952ea",
+      "subject": "xxh3: use combined secrets for small inputs",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "cd078d2",
+      "reason": "security/quality: combined secrets for small inputs (\"should cost nothing\")"
+    },
+    {
+      "commit": "cd3ab0100d05c429abc7d4b176b5c52cfc1d3fd0",
+      "subject": "xxh3: keys are xored, instead of added",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "cd3ab01",
+      "reason": "security/quality: keys xored instead of added (\"performance free\")"
+    },
+    {
+      "commit": "cd626c344b2fc571825e2b08dc974226b920dded",
+      "subject": "Makefile : switch default optimization to -O3",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "cd626c3",
+      "reason": "perf change is in the Makefile (-O3); scope-file change is a comment only"
+    },
+    {
+      "commit": "cfbf0b7207379ae3d244b8d9ef7f8828e849aa1c",
+      "subject": "customize full accumulating loop for ARM64 SVE",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "cfbf0b7",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw one-stripe SVE accumulation",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/cfbf0b7/r_sve_raw"
+        },
+        {
+          "name": "public XXH3_64bits, 256 bytes, SVE path",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/cfbf0b7/r_api256_sve"
+        }
+      ]
+    },
+    {
+      "commit": "d14b2934c5391895e0c27c34aceb97202601fe7c",
+      "subject": "reduce stack usage of XXH32 streaming variant",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "d14b293",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Reworks XXH32 streaming buffer handling to reduce stack use.",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/d14b293/r_s32_val"
+        }
+      ]
+    },
+    {
+      "commit": "d2602b9053ad3139a42703220708dcbd95e9ac99",
+      "subject": "prevent clang's detrimental autovectorization of XXH32",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "d2602b9",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "prevent clang's detrimental autovectorization of XXH32",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/d2602b9/r_msvc_o32_val"
+        },
+        {
+          "name": "Whole xxhash.c translation unit under Clang 20 with __GNUC__ defined",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/d2602b9/clang-default-proof"
+        }
+      ]
+    },
+    {
+      "commit": "d2df04efcbef7d7f6886d345861e5dfda4edacc1",
+      "subject": "c++ can use inline keyword",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "d2df04e",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH32/XXH64/streaming, compiled as C++, forced full inlining",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/d2df04e/{api_stream32_len0,api_stream32_len16,api_stream32_len33,api_stream32_len4,api_xxh32_len0,api_xxh32_len16,api_xxh32_len33,api_xxh32_len4,api_xxh64_len0,api_xxh64_len16,api_xxh64_len33,api_xxh64_len4}"
+        },
+        {
+          "name": "same, clang default -O3 inlining",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/d2df04e/{noinl_stream32_len0,noinl_stream32_len16,noinl_stream32_len33,noinl_stream32_len4,noinl_xxh32_len0,noinl_xxh32_len16,noinl_xxh32_len33,noinl_xxh32_len4,noinl_xxh64_len0,noinl_xxh64_len16,noinl_xxh64_len33,noinl_xxh64_len4}"
+        }
+      ]
+    },
+    {
+      "commit": "d4dbf709fcbccf39a3a253435be315baba8f4da0",
+      "subject": "Various dispatcher improvements",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "d4dbf70",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Various dispatcher improvements",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/d4dbf70/r_hash64_cpu2"
+        }
+      ]
+    },
+    {
+      "commit": "d5803b1dae7ab106d3015ac6de43d832e92934a4",
+      "subject": "improved xxh3_64:9-16",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "d5803b1",
+      "reason": "hash-quality change for len 9-16"
+    },
+    {
+      "commit": "d5e42a6947ca968eb232657b4d705986223b4798",
+      "subject": "improved performance for most compilers",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "d5e42a6",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3 64/128 long inputs (AVX2, scalar with vectorizers on)",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/d5e42a6/{api128_len1100_avx2,api128_len256_avx2,api128_len300_avx2,api128_len300_scalar,api64_len1100_avx2,api64_len1100_scalar_sse2_vecon,api64_len1100_scalar_v3_vecon,api64_len256_avx2,api64_len256_scalar_sse2_vecon,api64_len256_scalar_v3_vecon,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "d6a6bd9e7289121c7bb858938d014508514efda6",
+      "subject": "New version Added : capability to provide input in several consecutive blocks Single version provided : XXH32() (Speed 5.4 GB/s), with a Q.Score of 10",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "d6a6bd9",
+      "reason": "new version / API redesign (XXH_fast32/XXH_strong32 -> XXH32 + streaming); no common interface"
+    },
+    {
+      "commit": "d6f83c47f9160c849ea7a8bd958cd9e6d6ed0261",
+      "subject": "renamed FORCE_INLINE into XXH_FORCE_INLINE",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "d6f83c4",
+      "reason": "rename FORCE_INLINE -> XXH_FORCE_INLINE (symbol hygiene)"
+    },
+    {
+      "commit": "d74ab00f94fbd835b1862026747b6ffe2b0e22f5",
+      "subject": "Initial attempt at 128-bit XXH3 streaming variant: - seems to produce same results as non-streaming functions, - the 128-bit non-streaming ones don't support \"custom secret\", so   neither does the streaming variant - the 64-bit functions seem to do something more clever in order to   avoid leaking the key/secret, which none of current 128-bit functions   do - the naming of the streaming functions is a bit weird now, since   most of the ones with \"64\" in the name are what should be used in   128 bit case too",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "d74ab00",
+      "reason": "new feature: XXH128 streaming API"
+    },
+    {
+      "commit": "d80f820834517bbc5beff82a08971196774debad",
+      "subject": "Remove unnecessary XXH_ALIGN()",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "d80f820",
+      "verdict": "EQUIV",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Remove unnecessary XXH_ALIGN()",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/d80f820/r_changed"
+        }
+      ]
+    },
+    {
+      "commit": "d8c2dfe0e09d888fd8aad6641b0b9ad5cc7a0794",
+      "subject": "s390x: add memory barrier to avoid fault issue",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "d8c2dfe",
+      "reason": "bug fix: s390x memory barrier to avoid fault"
+    },
+    {
+      "commit": "da9fd1df10bf46b238b17dd427d7e1288a7e204c",
+      "subject": "aligned streaming implementation of 128bits with 64bits",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "da9fd1d",
+      "reason": "refactor of XXH128 streaming to share the 64-bit implementation + benchmark program change"
+    },
+    {
+      "commit": "db3c9f7f3bfc6dcccde41a8994f09a081365f4f9",
+      "subject": "Added : benchmark program, for easier evaluation Corrected : _rotl() support limited to Windows; replaced with software-defined for other targets",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "db3c9f7",
+      "reason": "portability fix (_rotl only on Windows) + benchmark program"
+    },
+    {
+      "commit": "df8f69941ffd2378d0b5c236bbebdfb52427dc28",
+      "subject": "[NEON] Split XXH3 into 6 NEON lanes and 2 scalar lanes on aarch64",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "df8f699",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "[NEON] Split XXH3 into 6 NEON lanes and 2 scalar lanes on aarch64",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/df8f699/r_accm_v7"
+        }
+      ]
+    },
+    {
+      "commit": "e2cf439b71fb21e7a7c4bf837c53d78fa949f0ff",
+      "subject": "fix: add special #ifndef block for XXH_DOXYGEN",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "e2cf439",
+      "reason": "doxygen-only block"
+    },
+    {
+      "commit": "e5883c4a332550ae5826955980adff752045e64d",
+      "subject": "Improve wording on XXH3_accumulate_512 comment",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "e5883c4",
+      "reason": "comment wording"
+    },
+    {
+      "commit": "e616faf273311db5578db1f1af03e4241fd22eff",
+      "subject": "Autovectorization in-source quickfixes",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "e616faf",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH3 64/128-bit fixed mid-size and long-input paths, x86 scalar and x86-64-v3",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/e616faf/r_api_x64scalar"
+        },
+        {
+          "name": "public XXH3 64-bit 200/240-byte ARMv7 NEON paths",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/e616faf/r_arm_neon"
+        }
+      ]
+    },
+    {
+      "commit": "e6433e8dfda583809bbc7f9ce733331827a62c63",
+      "subject": "restored clang #pragma unroll statement",
+      "screen": "confirmed_optimization",
+      "source_part": "pre2020",
+      "prior_record": "e6433e8",
+      "verdict": "EQUIV",
+      "coverage": "full",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "whole historical xxhash.c translation unit, all 49 functions",
+          "level": "api",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/e6433e8/full-source-proof"
+        },
+        {
+          "name": "raw XXH3_accumulate, nbStripes<=4 symbolic",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/e6433e8/{raw_accum_nb4_avx2,raw_accum_nb4_scalar_long}"
+        },
+        {
+          "name": "XXH3_64bits long inputs",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/e6433e8/{api128_len300_avx2,api128_len300_scalar,api64_len1100_avx2_u20,api64_len1100_scalar_u20,api64_len256_avx2,api64_len256_scalar,api64_len300_avx2,api64_len300_scalar}"
+        }
+      ]
+    },
+    {
+      "commit": "e701df3908cfd64cb7536aacd80b6074bbc5ea5f",
+      "subject": "Various AArch64 speed hacks",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "e701df3",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Various AArch64 speed hacks",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/e701df3/r_accm_a64_id"
+        }
+      ]
+    },
+    {
+      "commit": "e7c94efe457acef302a4e18af1e56b4b3ed11757",
+      "subject": "Add LoongArch SX SIMD extenstion implementation",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "e7c94ef",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "XXH3_accumulate_512 + XXH3_scrambleAcc scalar -> LSX, loongarch64 -mlsx, as compiled",
+          "level": "raw",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/e7c94ef/r_lsx"
+        },
+        {
+          "name": "XXH3_accumulate_512 scalar -> LSX, LSX intrinsics modeled + O2-normalized",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/e7c94ef/r_lsx_model_O2"
+        },
+        {
+          "name": "XXH3_scrambleAcc scalar -> LSX, LSX intrinsics modeled (+O2)",
+          "level": "raw",
+          "verdict": "UNKNOWN",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/e7c94ef/r_lsx_model_O2"
+        }
+      ]
+    },
+    {
+      "commit": "e876423360824d9028136b9059a529b5f837efff",
+      "subject": "fixed XXH64_finalize() not being inlined",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "e876423",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "public XXH64 one-shot and streaming fixed-length matrix, four inline configurations",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/e876423/r_hints_dflt_u4"
+        },
+        {
+          "name": "public XXH64 one-shot with symbolic length",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/e876423/r_sym_dflt"
+        },
+        {
+          "name": "Raw XXH64_finalize, all 32 tail residues and both alignments",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/e876423/finalize-residues"
+        }
+      ]
+    },
+    {
+      "commit": "eff96851ac4596a9e324813423b6df2c3a8b69b3",
+      "subject": "Use `alignas()` in C++11",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "eff9685",
+      "reason": "C++11 alignas portability"
+    },
+    {
+      "commit": "f2163b8b75d29b213d129e8ea063b17594a10dda",
+      "subject": "changed algorithm for small inputs",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "f2163b8",
+      "reason": "hash-quality change for small inputs (\"slightly slower\")"
+    },
+    {
+      "commit": "f534e5bf0232f51e2862442784dfac9991ebc632",
+      "subject": "Use `vpsrlq` instead of `vpshufd` in avx2/avx512 accumulate.",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "f534e5b",
+      "verdict": "UNKNOWN",
+      "coverage": "partial",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "raw AVX2 and AVX512 one-stripe accumulate and scramble",
+          "level": "raw",
+          "verdict": "EQUIV",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/f534e5b/r_avx2"
+        },
+        {
+          "name": "public XXH3 64/128-bit fixed 256/320-byte AVX2 and AVX512 cases",
+          "level": "api",
+          "verdict": "EQUIV_BOUNDED",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/f534e5b/r_api_avx2"
+        },
+        {
+          "name": "public XXH3_64bits, 1088 bytes, path including accumulator scramble",
+          "level": "api",
+          "verdict": "UNKNOWN",
+          "bounded": true,
+          "artifact_dir": "c/xxHash/f534e5b/r_api_big_avx512"
+        }
+      ]
+    },
+    {
+      "commit": "f90b0aba409833ea52a9c5dd97c7b4d281daa91b",
+      "subject": "Reduce void pointers and evil casts.",
+      "screen": "excluded_non_optimization",
+      "source_part": "pre2020",
+      "prior_record": "f90b0ab",
+      "reason": "refactor: fewer void pointers / casts (type hygiene)"
+    },
+    {
+      "commit": "fd42399e87170b8d427bcf19cc5cc462581c45bc",
+      "subject": "[WIP] xxh3.h: Wrap some long lines",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "fd42399",
+      "reason": "line wrapping only"
+    },
+    {
+      "commit": "fd7deb84312ee548c356ceb933b4adeb7774ae61",
+      "subject": "Use __attribute__((aligned)) instead of packed",
+      "screen": "confirmed_optimization",
+      "source_part": "2020on",
+      "prior_record": "fd7deb8",
+      "verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "other",
+      "not_equiv_kind": null,
+      "unit_evidence": [
+        {
+          "name": "Replaces packed alignment with aligned attributes in ARM and x86 paths.",
+          "level": "api",
+          "verdict": "UNSUPPORTED",
+          "bounded": false,
+          "artifact_dir": "c/xxHash/fd7deb8/r_read_v7"
+        }
+      ]
+    },
+    {
+      "commit": "febebd1505b4f29ea3fd03e812aed6ad0ed81a17",
+      "subject": "Use may_alias with unaligned reads to fix miscompilation on GCC",
+      "screen": "excluded_non_optimization",
+      "source_part": "2020on",
+      "prior_record": "febebd1",
+      "reason": "bug fix: may_alias on unaligned reads to fix a GCC miscompilation"
+    }
+  ]
+}

@@ -1,0 +1,551 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 9a36b45de..b3c269783 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -4074,19 +4074,35 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     }
+ #endif
+ 
++    auto const &ggml_vk_mul_mm_spec = [](std::vector<uint32_t> spec, bool aligned) {
++        spec.push_back(aligned ? 1u : 0u);
++        return spec;
++    };
++
+     const int mul_mat_id_param_count = 5;
+ 
+ #if defined(VK_NV_cooperative_matrix2) && defined(GGML_VULKAN_COOPMAT2_GLSLC_SUPPORT)
+     if (device->coopmat2) {
++        auto const &ggml_vk_mul_mm_cm2_spec = [](std::vector<uint32_t> spec, bool aligned, bool mul_mat_id) {
++            if (mul_mat_id && spec.size() > 5) {
++                spec.insert(spec.begin() + 5, aligned ? 1u : 0u);
++            } else {
++                spec.push_back(aligned ? 1u : 0u);
++            }
++            if (mul_mat_id && spec.size() == 6) {
++                spec.push_back(32);
++            }
++            return spec;
++        };
+ 
+         // Create 6 variants, {s,m,l}x{unaligned,aligned}
+ #define CREATE_MM(PIPELINE_NAME, NAMELC, F16ACC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT) \
+-        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, 1, true);   \
+-        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, 1, true);   \
+-        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, 1, true);   \
+-        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## _aligned ## F16ACC ## _cm2_len, NAMELC ## _aligned ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, l_align, true);   \
+-        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## _aligned ## F16ACC ## _cm2_len, NAMELC ## _aligned ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, m_align, true);   \
+-        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## _aligned ## F16ACC ## _cm2_len, NAMELC ## _aligned ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, s_align, true);   \
++        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_cm2_spec(l_ ## WARPTILE, false, PARAMCOUNT == mul_mat_id_param_count), 1, true);   \
++        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_cm2_spec(m_ ## WARPTILE, false, PARAMCOUNT == mul_mat_id_param_count), 1, true);   \
++        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_cm2_spec(s_ ## WARPTILE, false, PARAMCOUNT == mul_mat_id_param_count), 1, true);   \
++        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_cm2_spec(l_ ## WARPTILE, true, PARAMCOUNT == mul_mat_id_param_count), l_align, true);   \
++        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_cm2_spec(m_ ## WARPTILE, true, PARAMCOUNT == mul_mat_id_param_count), m_align, true);   \
++        ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## F16ACC ## _cm2_len, NAMELC ## F16ACC ## _cm2_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_cm2_spec(s_ ## WARPTILE, true, PARAMCOUNT == mul_mat_id_param_count), s_align, true);   \
+ 
+         // Create 2 variants, {f16,f32} accumulator
+ #define CREATE_MM2(PIPELINE_NAME, NAMELC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT) \
+@@ -4161,17 +4177,17 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+         // Create 6 variants, {s,m,l}x{unaligned,aligned}
+ #define CREATE_MM(TYPE, PIPELINE_NAME, NAMELC, F16ACC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID) \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, 1, false, true);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, false), 1, false, true);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, 1, false, true);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, false), 1, false, true);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, 1, false, true);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, false), 1, false, true);   \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## _aligned ## F16ACC ## _cm1_len, NAMELC ## _aligned ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, l_align, false, true);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, true), l_align, false, true);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## _aligned ## F16ACC ## _cm1_len, NAMELC ## _aligned ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, m_align, false, true);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, true), m_align, false, true);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## _aligned ## F16ACC ## _cm1_len, NAMELC ## _aligned ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, s_align, false, true);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## F16ACC ## _cm1_len, NAMELC ## F16ACC ## _cm1_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, true), s_align, false, true);   \
+ 
+         // Create 2 variants, {f16,f32} accumulator
+ #define CREATE_MM2(TYPE, PIPELINE_NAME, NAMELC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID) \
+@@ -4284,32 +4300,32 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+         // Selects dot2 SPIR-V variant at runtime when device->dot2_f16 is true
+ #define CREATE_MM(TYPE, PIPELINE_NAME, NAMELC, F16ACC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID, REQSUBGROUPSIZE) \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", (device->dot2_f16 ? NAMELC ## _dot2_aligned ## F16ACC ## _len : NAMELC ## _aligned ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2_aligned ## F16ACC ## _data : NAMELC ## _aligned ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, l_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, true), l_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", (device->dot2_f16 ? NAMELC ## _dot2_aligned ## F16ACC ## _len : NAMELC ## _aligned ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2_aligned ## F16ACC ## _data : NAMELC ## _aligned ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, m_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, true), m_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", (device->dot2_f16 ? NAMELC ## _dot2_aligned ## F16ACC ## _len : NAMELC ## _aligned ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2_aligned ## F16ACC ## _data : NAMELC ## _aligned ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, s_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _len : NAMELC ## F16ACC ## _len), (device->dot2_f16 ? NAMELC ## _dot2 ## F16ACC ## _data : NAMELC ## F16ACC ## _data), "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, true), s_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+ 
+         // bf16 scalar path promotes to f32, no dot2 variant
+ #define CREATE_MM_NODOT2(TYPE, PIPELINE_NAME, NAMELC, F16ACC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID, REQSUBGROUPSIZE) \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## _aligned ## F16ACC ## _len, NAMELC ## _aligned ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, l_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, true), l_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## _aligned ## F16ACC ## _len, NAMELC ## _aligned ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, m_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, true), m_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## _aligned ## F16ACC ## _len, NAMELC ## _aligned ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, s_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## F16ACC ## _len, NAMELC ## F16ACC ## _data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, true), s_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+ 
+ #define CREATE_MMQ(TYPE, PIPELINE_NAME, NAMELC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID, REQSUBGROUPSIZE) \
+         if (device->mul_mat ## ID ## _l_int[TYPE]) { \
+@@ -4474,17 +4490,17 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+         // Create 6 variants, {s,m,l}x{unaligned,aligned}
+ #define CREATE_MM(TYPE, PIPELINE_NAME, NAMELC, F16ACC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID, REQSUBGROUPSIZE) \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->l, #NAMELC #F16ACC "_l", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->m, #NAMELC #F16ACC "_m", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->s, #NAMELC #F16ACC "_s", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, false), 1, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _l[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## _aligned ## F16ACC ## _fp32_len, NAMELC ## _aligned ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, l_ ## WARPTILE, l_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_l, #NAMELC #F16ACC "_aligned_l", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), l_ ## WG_DENOMS, ggml_vk_mul_mm_spec(l_ ## WARPTILE, true), l_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _m[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## _aligned ## F16ACC ## _fp32_len, NAMELC ## _aligned ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, m_ ## WARPTILE, m_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_m, #NAMELC #F16ACC "_aligned_m", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), m_ ## WG_DENOMS, ggml_vk_mul_mm_spec(m_ ## WARPTILE, true), m_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+         if (device->mul_mat ## ID ## _s[TYPE]) \
+-            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## _aligned ## F16ACC ## _fp32_len, NAMELC ## _aligned ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, s_ ## WARPTILE, s_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
++            ggml_vk_create_pipeline(device, device-> PIPELINE_NAME ->a_s, #NAMELC #F16ACC "_aligned_s", NAMELC ## F16ACC ## _fp32_len, NAMELC ## F16ACC ## _fp32_data, "main", PARAMCOUNT, sizeof(PUSHCONST), s_ ## WG_DENOMS, ggml_vk_mul_mm_spec(s_ ## WARPTILE, true), s_align, false, REQSUBGROUPSIZE > 0, REQSUBGROUPSIZE);   \
+ 
+ #define CREATE_MMQ(TYPE, PIPELINE_NAME, NAMELC, WG_DENOMS, WARPTILE, PUSHCONST, PARAMCOUNT, ID) \
+         if (device->mul_mat ## ID ## _l_int[TYPE]) \
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
+index f39410d74..57c0410e4 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
+@@ -38,17 +38,7 @@
+ #define LOAD_VEC_B 1
+ #endif
+ 
+-// Load 2 values at once without affecting index calculations through LOAD_VEC
+-#if (defined(DATA_A_F32) || defined(DATA_A_F16) || defined(DATA_A_BF16)) && !defined(ALIGNED)
+-#define LOAD_VEC_BATCH_A 2
+-#else
+-#define LOAD_VEC_BATCH_A 1
+-#endif
+-#if !defined(ALIGNED)
+-#define LOAD_VEC_BATCH_B 2
+-#else
+-#define LOAD_VEC_BATCH_B 1
+-#endif
++layout (constant_id = 11) const uint ALIGNED = 0;
+ 
+ #if !defined(TO_FLOAT_TYPE)
+ #define TO_FLOAT_TYPE FLOAT_TYPE
+@@ -57,6 +47,13 @@
+ layout(local_size_x_id = 0, local_size_y = 1, local_size_z = 1) in;
+ 
+ layout (binding = 0) readonly buffer A {A_TYPE data_a[];};
++#if defined(DATA_A_F32)
++layout (binding = 0) readonly buffer A_SCALAR {float data_a_scalar[];};
++#elif defined(DATA_A_F16)
++layout (binding = 0) readonly buffer A_SCALAR {float16_t data_a_scalar[];};
++#elif defined(DATA_A_BF16)
++layout (binding = 0) readonly buffer A_SCALAR {uint16_t data_a_scalar[];};
++#endif
+ #if defined(A_TYPE_PACKED16)
+ layout (binding = 0) readonly buffer A_PACKED16 {A_TYPE_PACKED16 data_a_packed16[];};
+ #endif
+@@ -65,6 +62,7 @@ layout (binding = 0) readonly buffer A_PACKED32 {A_TYPE_PACKED32 data_a_packed32
+ #endif
+ 
+ layout (binding = 1) readonly buffer B {B_TYPE data_b[];};
++layout (binding = 1) readonly buffer B_SCALAR {B_TYPE_SCALAR data_b_scalar[];};
+ layout (binding = 2) writeonly buffer D {D_TYPE data_d[];};
+ 
+ #ifdef MUL_MAT_ID
+@@ -194,13 +192,23 @@ void main() {
+     const uint warp_r = warp_i % (BM / WM);
+     const uint warp_c = warp_i / (BM / WM);
+ 
+-    const uint loadr_a = gl_LocalInvocationID.x % (BK / LOAD_VEC_A / LOAD_VEC_BATCH_A);
+-    const uint loadc_a = gl_LocalInvocationID.x / (BK / LOAD_VEC_A / LOAD_VEC_BATCH_A);
+-    const uint loadr_b = gl_LocalInvocationID.x % (BK / LOAD_VEC_B / LOAD_VEC_BATCH_B);
+-    const uint loadc_b = gl_LocalInvocationID.x / (BK / LOAD_VEC_B / LOAD_VEC_BATCH_B);
++#if defined(DATA_A_F32) || defined(DATA_A_F16) || defined(DATA_A_BF16)
++    const uint LOAD_VEC_A_EFF = (ALIGNED != 0) ? LOAD_VEC_A : 1;
++    const uint LOAD_VEC_BATCH_A = (ALIGNED != 0) ? 1 : 2;
++#else
++    const uint LOAD_VEC_A_EFF = LOAD_VEC_A;
++    const uint LOAD_VEC_BATCH_A = 1;
++#endif
++    const uint LOAD_VEC_B_EFF = (ALIGNED != 0) ? LOAD_VEC_B : 1;
++    const uint LOAD_VEC_BATCH_B = (ALIGNED != 0) ? 1 : 2;
++
++    const uint loadr_a = gl_LocalInvocationID.x % (BK / LOAD_VEC_A_EFF / LOAD_VEC_BATCH_A);
++    const uint loadc_a = gl_LocalInvocationID.x / (BK / LOAD_VEC_A_EFF / LOAD_VEC_BATCH_A);
++    const uint loadr_b = gl_LocalInvocationID.x % (BK / LOAD_VEC_B_EFF / LOAD_VEC_BATCH_B);
++    const uint loadc_b = gl_LocalInvocationID.x / (BK / LOAD_VEC_B_EFF / LOAD_VEC_BATCH_B);
+ 
+-    const uint loadstride_a = gl_WorkGroupSize.x * LOAD_VEC_A * LOAD_VEC_BATCH_A / BK;
+-    const uint loadstride_b = gl_WorkGroupSize.x * LOAD_VEC_B * LOAD_VEC_BATCH_B / BK;
++    const uint loadstride_a = gl_WorkGroupSize.x * LOAD_VEC_A_EFF * LOAD_VEC_BATCH_A / BK;
++    const uint loadstride_b = gl_WorkGroupSize.x * LOAD_VEC_B_EFF * LOAD_VEC_BATCH_B / BK;
+ 
+ #ifdef MUL_MAT_ID
+ #ifdef MUL_MAT_ID_USE_SUBGROUPS
+@@ -239,15 +247,15 @@ void main() {
+ 
+     uint pos_a =
+ #ifdef MUL_MAT_ID
+-        expert_idx * (p.batch_stride_a / LOAD_VEC_A) +
++        expert_idx * (p.batch_stride_a / LOAD_VEC_A_EFF) +
+ #else
+-        batch_idx_a * (p.batch_stride_a / LOAD_VEC_A) +
++        batch_idx_a * (p.batch_stride_a / LOAD_VEC_A_EFF) +
+ #endif
+-        (ir * BM * p.stride_a + start_k) / LOAD_VEC_A;
++        (ir * BM * p.stride_a + start_k) / LOAD_VEC_A_EFF;
+ #ifdef MUL_MAT_ID
+     uint pos_b = 0;
+ #else
+-    uint pos_b = (batch_idx * p.batch_stride_b + ic * BN * p.stride_b + start_k) / LOAD_VEC_B;
++    uint pos_b = (batch_idx * p.batch_stride_b + ic * BN * p.stride_b + start_k) / LOAD_VEC_B_EFF;
+ #endif
+ 
+ #ifdef COOPMAT
+@@ -287,8 +295,8 @@ void main() {
+ 
+         barrier();
+ 
+-        pos_a += BK / LOAD_VEC_A;
+-        pos_b += BK / LOAD_VEC_B;
++        pos_a += BK / LOAD_VEC_A_EFF;
++        pos_b += BK / LOAD_VEC_B_EFF;
+ 
+ #ifdef COOPMAT
+         [[unroll]] for (uint i = 0; i < BK; i += TK) {
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_cm2.comp b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_cm2.comp
+index 2656fe1c3..a2e15f6f5 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_cm2.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_cm2.comp
+@@ -36,6 +36,7 @@ layout (constant_id = 3) const uint BK = 16;  // Assumed to be 32 if working wit
+ layout (constant_id = 4) const bool enable_smaller_matrices = false;
+ const uint BNover2 = enable_smaller_matrices ? (BN / 2) : BN;
+ const uint BNover4 = enable_smaller_matrices ? (BN / 4) : BN;
++layout (constant_id = 5) const uint ALIGNED = 0;
+ 
+ layout (push_constant) uniform parameter
+ {
+@@ -111,7 +112,7 @@ layout(buffer_reference, std430, buffer_reference_align = 2) buffer decodeBufB {
+ };
+ 
+ uint _ne1;
+-layout (constant_id = 5) const uint subgroup_size = 32;
++layout (constant_id = 6) const uint subgroup_size = 32;
+ shared uvec4 ballots_sh[BLOCK_SIZE / subgroup_size];
+ 
+ B_TYPE decodeFuncB(const in decodeBufB bl, const in uint blockCoords[2], const in uint coordInBlock[2])
+@@ -297,12 +298,12 @@ void main() {
+ 
+     // Hint to the compiler that values are aligned (want 16B alignment).
+     // Quants are always block-aligned, no alignment needed.
+-#if ALIGNED
++    if (ALIGNED != 0) {
+ #if QUANT_K == 1
+-    stride_a &= ~7;
+-#endif
+-    stride_b &= ~7;
++        stride_a &= ~7;
+ #endif
++        stride_b &= ~7;
++    }
+ 
+     // Create layouts for both clamped and unclamped accesses
+     tensorLayoutNV<2> tensorLayoutA = createTensorLayoutNV(2);
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_funcs.glsl b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_funcs.glsl
+index 735951689..56a8a0f18 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_funcs.glsl
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm_funcs.glsl
+@@ -1,50 +1,57 @@
+ void load_a_to_shmem(const uint pos_a, const uint row, const uint col, const uint idx_m, const uint block, const uint end_k) {
+ #if defined(DATA_A_F32) || defined(DATA_A_F16)
+ #if LOAD_VEC_A == 8
+-            const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 2;
+-            FLOAT_TYPEV8 aa = FLOAT_TYPEV8(data_a[idx]);
+-            buf_a[buf_idx    ] = aa[0].xy;
+-            buf_a[buf_idx + 1] = aa[0].zw;
+-            buf_a[buf_idx + 2] = aa[1].xy;
+-            buf_a[buf_idx + 3] = aa[1].zw;
++            if (ALIGNED != 0) {
++                const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 2;
++                FLOAT_TYPEV8 aa = FLOAT_TYPEV8(data_a[idx]);
++                buf_a[buf_idx    ] = aa[0].xy;
++                buf_a[buf_idx + 1] = aa[0].zw;
++                buf_a[buf_idx + 2] = aa[1].xy;
++                buf_a[buf_idx + 3] = aa[1].zw;
++                return;
++            }
+ #elif LOAD_VEC_A == 4
+-            const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 2;
+-            FLOAT_TYPEV4 aa = FLOAT_TYPEV4(data_a[idx]);
+-            buf_a[buf_idx    ] = aa.xy;
+-            buf_a[buf_idx + 1] = aa.zw;
+-#else // LOAD_VEC_BATCH_A == 2
++            if (ALIGNED != 0) {
++                const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 2;
++                FLOAT_TYPEV4 aa = FLOAT_TYPEV4(data_a[idx]);
++                buf_a[buf_idx    ] = aa.xy;
++                buf_a[buf_idx + 1] = aa.zw;
++                return;
++            }
++#endif
+             const uint idx = pos_a + col * p.stride_a + row * 2;
+             const uint buf_idx = col * SHMEM_STRIDE + row;
+             if (idx_m < p.M && block + row * 2 + 1 < end_k) {
+-                buf_a[buf_idx] = FLOAT_TYPEV2(data_a[idx],
+-                                              data_a[idx + 1]);
++                buf_a[buf_idx] = FLOAT_TYPEV2(data_a_scalar[idx],
++                                              data_a_scalar[idx + 1]);
+             } else if (idx_m < p.M && block + row * 2 < end_k) {
+-                buf_a[buf_idx] = FLOAT_TYPEV2(data_a[idx], 0.0f);
++                buf_a[buf_idx] = FLOAT_TYPEV2(data_a_scalar[idx], 0.0f);
+             } else {
+                 buf_a[buf_idx] = FLOAT_TYPEV2(0.0f);
+             }
+-#endif
+ #elif defined(DATA_A_BF16)
+ #if LOAD_VEC_A == 4
+-            const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 2;
+-            FLOAT_TYPEV4 aa = FLOAT_TYPEV4(TO_FLOAT_TYPE(data_a[idx]));
+-            buf_a[buf_idx    ] = aa.xy;
+-            buf_a[buf_idx + 1] = aa.zw;
+-#else // LOAD_VEC_BATCH_A == 2
++            if (ALIGNED != 0) {
++                const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 2;
++                FLOAT_TYPEV4 aa = FLOAT_TYPEV4(TO_FLOAT_TYPE(data_a[idx]));
++                buf_a[buf_idx    ] = aa.xy;
++                buf_a[buf_idx + 1] = aa.zw;
++                return;
++            }
++#endif
+             const uint idx = pos_a + col * p.stride_a + row * 2;
+             const uint buf_idx = col * SHMEM_STRIDE + row;
+             if (idx_m < p.M && block + row * 2 + 1 < end_k) {
+-                buf_a[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_a[idx]),
+-                                              TO_FLOAT_TYPE(data_a[idx + 1]));
++                buf_a[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_a_scalar[idx]),
++                                              TO_FLOAT_TYPE(data_a_scalar[idx + 1]));
+             } else if (idx_m < p.M && block + row * 2 < end_k) {
+-                buf_a[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_a[idx]), 0.0f);
++                buf_a[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_a_scalar[idx]), 0.0f);
+             } else {
+                 buf_a[buf_idx] = FLOAT_TYPEV2(0.0f);
+             }
+-#endif
+ #elif defined(DATA_A_Q4_0)
+             const uint idx = pos_a + col * p.stride_a / LOAD_VEC_A + row;
+             const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_A / 4;
+@@ -526,75 +533,85 @@ void load_a_to_shmem(const uint pos_a, const uint row, const uint col, const uin
+ #if !defined(MUL_MAT_ID)
+ void load_b_to_shmem(const uint pos_b, const uint row, const uint col, const uint idx_n, const uint block, const uint end_k) {
+ #if LOAD_VEC_B == 8
+-            // Not supported for b_type bf16 because bf16mat2x4 does not exist
+-            const uint idx = pos_b + col * p.stride_b / LOAD_VEC_B + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
+-            FLOAT_TYPEV8 bb = FLOAT_TYPEV8(data_b[idx]);
+-            buf_b[buf_idx + 0] = bb[0].xy;
+-            buf_b[buf_idx + 1] = bb[0].zw;
+-            buf_b[buf_idx + 2] = bb[1].xy;
+-            buf_b[buf_idx + 3] = bb[1].zw;
++            if (ALIGNED != 0) {
++                // Not supported for b_type bf16 because bf16mat2x4 does not exist
++                const uint idx = pos_b + col * p.stride_b / LOAD_VEC_B + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
++                FLOAT_TYPEV8 bb = FLOAT_TYPEV8(data_b[idx]);
++                buf_b[buf_idx + 0] = bb[0].xy;
++                buf_b[buf_idx + 1] = bb[0].zw;
++                buf_b[buf_idx + 2] = bb[1].xy;
++                buf_b[buf_idx + 3] = bb[1].zw;
++                return;
++            }
+ #elif LOAD_VEC_B == 4
+-            const uint idx = pos_b + col * p.stride_b / LOAD_VEC_B + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
++            if (ALIGNED != 0) {
++                const uint idx = pos_b + col * p.stride_b / LOAD_VEC_B + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
+ #if defined(DATA_B_BF16)
+-            FLOAT_TYPEV4 bb = FLOAT_TYPEV4(TO_FLOAT_TYPE(data_b[idx]));
++                FLOAT_TYPEV4 bb = FLOAT_TYPEV4(TO_FLOAT_TYPE(data_b[idx]));
+ #else
+-            FLOAT_TYPEV4 bb = FLOAT_TYPEV4(data_b[idx]);
++                FLOAT_TYPEV4 bb = FLOAT_TYPEV4(data_b[idx]);
++#endif
++                buf_b[buf_idx + 0] = bb.xy;
++                buf_b[buf_idx + 1] = bb.zw;
++                return;
++            }
+ #endif
+-            buf_b[buf_idx + 0] = bb.xy;
+-            buf_b[buf_idx + 1] = bb.zw;
+-#else // LOAD_VEC_BATCH_B == 2
+             const uint idx = pos_b + col * p.stride_b + row * 2;
+             const uint buf_idx = col * SHMEM_STRIDE + row;
+             if (idx_n < p.N && block + row * 2 + 1 < end_k) {
+-                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b[idx]),
+-                                              TO_FLOAT_TYPE(data_b[idx + 1]));
++                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b_scalar[idx]),
++                                              TO_FLOAT_TYPE(data_b_scalar[idx + 1]));
+             } else if (idx_n < p.N && block + row * 2 < end_k) {
+-                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b[idx]), 0.0f);
++                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b_scalar[idx]), 0.0f);
+             } else {
+                 buf_b[buf_idx] = FLOAT_TYPEV2(0.0f);
+             }
+-#endif
+ }
+ #else
+ void load_b_to_shmem(const uint pos_b, const uint row, const uint col, const uint ic, const uint _ne1, const uint block, const uint end_k) {
+ #if LOAD_VEC_B == 8
+-            // Not supported for b_type bf16 because bf16mat2x4 does not exist
+-            const u16vec2 row_idx = row_ids[col];
+-            const uint idx = pos_b + row_idx.y * p.batch_stride_b / LOAD_VEC_B + (row_idx.x % p.ne11) * p.stride_b / LOAD_VEC_B + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
+-            FLOAT_TYPEV8 bb = FLOAT_TYPEV8(data_b[idx]);
+-            buf_b[buf_idx + 0] = bb[0].xy;
+-            buf_b[buf_idx + 1] = bb[0].zw;
+-            buf_b[buf_idx + 2] = bb[1].xy;
+-            buf_b[buf_idx + 3] = bb[1].zw;
++            if (ALIGNED != 0) {
++                // Not supported for b_type bf16 because bf16mat2x4 does not exist
++                const u16vec2 row_idx = row_ids[col];
++                const uint idx = pos_b + row_idx.y * p.batch_stride_b / LOAD_VEC_B + (row_idx.x % p.ne11) * p.stride_b / LOAD_VEC_B + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
++                FLOAT_TYPEV8 bb = FLOAT_TYPEV8(data_b[idx]);
++                buf_b[buf_idx + 0] = bb[0].xy;
++                buf_b[buf_idx + 1] = bb[0].zw;
++                buf_b[buf_idx + 2] = bb[1].xy;
++                buf_b[buf_idx + 3] = bb[1].zw;
++                return;
++            }
+ #elif LOAD_VEC_B == 4
+-            const u16vec2 row_idx = row_ids[col];
+-            const uint idx = pos_b + row_idx.y * p.batch_stride_b / LOAD_VEC_B + (row_idx.x % p.ne11) * p.stride_b / LOAD_VEC_B + row;
+-            const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
++            if (ALIGNED != 0) {
++                const u16vec2 row_idx = row_ids[col];
++                const uint idx = pos_b + row_idx.y * p.batch_stride_b / LOAD_VEC_B + (row_idx.x % p.ne11) * p.stride_b / LOAD_VEC_B + row;
++                const uint buf_idx = col * SHMEM_STRIDE + row * LOAD_VEC_B / 2;
+ #if defined(DATA_B_BF16)
+-            FLOAT_TYPEV4 bb = FLOAT_TYPEV4(TO_FLOAT_TYPE(data_b[idx]));
++                FLOAT_TYPEV4 bb = FLOAT_TYPEV4(TO_FLOAT_TYPE(data_b[idx]));
+ #else
+-            FLOAT_TYPEV4 bb = FLOAT_TYPEV4(data_b[idx]);
++                FLOAT_TYPEV4 bb = FLOAT_TYPEV4(data_b[idx]);
++#endif
++                buf_b[buf_idx + 0] = bb.xy;
++                buf_b[buf_idx + 1] = bb.zw;
++                return;
++            }
+ #endif
+-            buf_b[buf_idx + 0] = bb.xy;
+-            buf_b[buf_idx + 1] = bb.zw;
+-#else // LOAD_VEC_BATCH_B == 2
+             const uint row_i = ic * BN + col;
+             const uint buf_idx = col * SHMEM_STRIDE + row;
+             if (row_i < _ne1 && block + row * 2 + 1 < end_k) {
+                 const u16vec2 row_idx = row_ids[col];
+                 const uint idx = pos_b + row_idx.y * p.batch_stride_b + (row_idx.x % p.ne11) * p.stride_b + row * 2;
+-                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b[idx]),
+-                                              TO_FLOAT_TYPE(data_b[idx + 1]));
++                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b_scalar[idx]),
++                                              TO_FLOAT_TYPE(data_b_scalar[idx + 1]));
+             } else if (row_i < _ne1 && block + row * 2 < end_k) {
+                 const u16vec2 row_idx = row_ids[col];
+                 const uint idx = pos_b + row_idx.y * p.batch_stride_b + (row_idx.x % p.ne11) * p.stride_b + row * 2;
+-                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b[idx]), 0.0f);
++                buf_b[buf_idx] = FLOAT_TYPEV2(TO_FLOAT_TYPE(data_b_scalar[idx]), 0.0f);
+             } else {
+                 buf_b[buf_idx] = FLOAT_TYPEV2(0.0f);
+             }
+-#endif
+ }
+ #endif
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index ca6b44431..f07583b6a 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -539,11 +539,9 @@ void matmul_shaders(bool fp16, MatMulIdType matmul_id_type, bool coopmat, bool c
+     };
+ 
+     // Shaders with f16 B_TYPE
+-    string_to_spv(shader_name + "_f32_f16" + dot2_sfx,              source_name, merge_maps(merge_maps(base_dict, float_type_dict_f16), {{"DATA_A_F32", "1"},                                                     {"B_TYPE", "float16_t"},        {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}, }), fp16, coopmat, coopmat2, f16acc);
+-    string_to_spv(shader_name + "_f32_f16" + dot2_sfx + "_aligned", source_name, merge_maps(merge_maps(base_dict, float_type_dict_f16), {{"DATA_A_F32", "1"}, {"LOAD_VEC_A", load_vec}, {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f16}, {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}, {"ALIGNED", "1"}}), fp16, coopmat, coopmat2, f16acc);
++    string_to_spv(shader_name + "_f32_f16" + dot2_sfx, source_name, merge_maps(merge_maps(base_dict, float_type_dict_f16), {{"DATA_A_F32", "1"}, {"LOAD_VEC_A", load_vec}, {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f16}, {"B_TYPE_SCALAR", "float16_t"}, {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+ 
+-    string_to_spv(shader_name + "_f16" + dot2_sfx,              source_name, merge_maps(merge_maps(base_dict, float_type_dict_f16), {{"DATA_A_F16", "1"},                                                     {"B_TYPE", "float16_t"},            {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+-    string_to_spv(shader_name + "_f16" + dot2_sfx + "_aligned", source_name, merge_maps(merge_maps(base_dict, float_type_dict_f16), {{"DATA_A_F16", "1"}, {"LOAD_VEC_A", load_vec}, {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f16},     {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}, {"ALIGNED", "1"}}), fp16, coopmat, coopmat2, f16acc);
++    string_to_spv(shader_name + "_f16" + dot2_sfx, source_name, merge_maps(merge_maps(base_dict, float_type_dict_f16), {{"DATA_A_F16", "1"}, {"LOAD_VEC_A", load_vec}, {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f16}, {"B_TYPE_SCALAR", "float16_t"}, {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+ 
+     // bf16
+     {
+@@ -565,8 +563,7 @@ void matmul_shaders(bool fp16, MatMulIdType matmul_id_type, bool coopmat, bool c
+ #endif
+         {
+             if (!dot2) {
+-                string_to_spv(shader_name + "_bf16",         source_name, merge_maps(merge_maps(base_dict, float_type_dict_bf16), {{"TO_FLOAT_TYPE", to_float_type}, {"DATA_A_BF16", "1"},                             {"B_TYPE", coopmat2 ? "bfloat16_t" : "uint16_t"}, {"B_TYPEV4", "bf16vec4"}, {"D_TYPE", "float"}, {"B_IS_FLOAT", "1"}, {"DATA_B_BF16", "1"}}),                   fp16, coopmat, coopmat2, f16acc);
+-                string_to_spv(shader_name + "_bf16_aligned", source_name, merge_maps(merge_maps(base_dict, float_type_dict_bf16), {{"TO_FLOAT_TYPE", to_float_type}, {"DATA_A_BF16", "1"}, {"LOAD_VEC_A", load_vec_a}, {"LOAD_VEC_B", "4"}, {"B_TYPE", coopmat2 ? "bfloat16_t" : "u16vec4"},  {"B_TYPEV4", "bf16vec4"}, {"D_TYPE", "float"}, {"B_IS_FLOAT", "1"}, {"DATA_B_BF16", "1"}, {"ALIGNED", "1"}}), fp16, coopmat, coopmat2, f16acc);
++                string_to_spv(shader_name + "_bf16", source_name, merge_maps(merge_maps(base_dict, float_type_dict_bf16), {{"TO_FLOAT_TYPE", to_float_type}, {"DATA_A_BF16", "1"}, {"LOAD_VEC_A", load_vec_a}, {"LOAD_VEC_B", "4"}, {"B_TYPE", coopmat2 ? "bfloat16_t" : "u16vec4"}, {"B_TYPE_SCALAR", coopmat2 ? "bfloat16_t" : "uint16_t"}, {"B_TYPEV4", "bf16vec4"}, {"D_TYPE", "float"}, {"B_IS_FLOAT", "1"}, {"DATA_B_BF16", "1"}}), fp16, coopmat, coopmat2, f16acc);
+             }
+         }
+     }
+@@ -583,8 +580,6 @@ void matmul_shaders(bool fp16, MatMulIdType matmul_id_type, bool coopmat, bool c
+         }
+ 
+         std::string data_a_key = "DATA_A_" + to_uppercase(tname);
+-        // For unaligned, load one at a time for f32/f16, or two at a time for quants
+-        std::string load_vec_a_unaligned = (coopmat2 || tname == "f32" || tname == "f16" || tname == "bf16") ? "1" : load_vec_quant;
+         // For aligned matmul loads
+         std::string load_vec_a = (coopmat2 || tname == "f32" || tname == "f16" || tname == "bf16") ? load_vec : load_vec_quant;
+ 
+@@ -597,13 +592,11 @@ void matmul_shaders(bool fp16, MatMulIdType matmul_id_type, bool coopmat, bool c
+ 
+         // don't generate f32 variants for coopmat2
+         if (!coopmat2) {
+-            string_to_spv(shader_name + "_" + tname + "_f32" + dot2_sfx,              source_name, merge_maps(merge_maps(base_dict, float_type_dict), {{data_a_key, "1"}, {"LOAD_VEC_A", load_vec_a_unaligned},                           {"B_TYPE", "float"},            {"B_TYPEV4", "vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+-            string_to_spv(shader_name + "_" + tname + "_f32" + dot2_sfx + "_aligned", source_name, merge_maps(merge_maps(base_dict, float_type_dict), {{data_a_key, "1"}, {"LOAD_VEC_A", load_vec_a},           {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f32}, {"B_TYPEV4", "vec4"}, {"D_TYPE", "float"}, {"ALIGNED", "1"}}), fp16, coopmat, coopmat2, f16acc);
++            string_to_spv(shader_name + "_" + tname + "_f32" + dot2_sfx, source_name, merge_maps(merge_maps(base_dict, float_type_dict), {{data_a_key, "1"}, {"LOAD_VEC_A", load_vec_a}, {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f32}, {"B_TYPE_SCALAR", "float"}, {"B_TYPEV4", "vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+         }
+ 
+         if (tname != "f16" && tname != "f32") {
+-            string_to_spv(shader_name + "_" + tname + "_f16" + dot2_sfx,              source_name,  merge_maps(merge_maps(base_dict, float_type_dict), {{data_a_key, "1"}, {"LOAD_VEC_A", load_vec_a_unaligned},                           {"B_TYPE", "float16_t"},        {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+-            string_to_spv(shader_name + "_" + tname + "_f16" + dot2_sfx + "_aligned", source_name,  merge_maps(merge_maps(base_dict, float_type_dict), {{data_a_key, "1"}, {"LOAD_VEC_A", load_vec_a},           {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f16}, {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}, {"ALIGNED", "1"}}), fp16, coopmat, coopmat2, f16acc);
++            string_to_spv(shader_name + "_" + tname + "_f16" + dot2_sfx, source_name,  merge_maps(merge_maps(base_dict, float_type_dict), {{data_a_key, "1"}, {"LOAD_VEC_A", load_vec_a}, {"LOAD_VEC_B", load_vec}, {"B_TYPE", aligned_b_type_f16}, {"B_TYPE_SCALAR", "float16_t"}, {"B_TYPEV4", "f16vec4"}, {"D_TYPE", "float"}}), fp16, coopmat, coopmat2, f16acc);
+         }
+ 
+ #if defined(GGML_VULKAN_INTEGER_DOT_GLSLC_SUPPORT)

@@ -1,0 +1,154 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java b/roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java
+new file mode 100644
+index 00000000..9bcfaf7e
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java
+@@ -0,0 +1,65 @@
++package org.roaringbitmap;
++
++import java.util.Arrays;
++
++public class OrderedWriter {
++
++  private static final int WORD_COUNT = 1 << 10;
++  private final long[] bitmap;
++  private final RoaringBitmap underlying;
++
++  private short currentKey;
++  private boolean dirty = false;
++
++  public OrderedWriter(RoaringBitmap underlying) {
++    this.underlying = underlying;
++    this.bitmap = new long[WORD_COUNT];
++  }
++
++  /**
++   * Adds the value to the underlying bitmap.
++   * @param value the value to add.
++   */
++  public void add(int value) {
++    short key = Util.highbits(value);
++    short low = Util.lowbits(value);
++    if (key != currentKey) {
++      if (Util.compareUnsigned(key, currentKey) < 0) {
++        throw new IllegalStateException("Must write in ascending key order");
++      }
++      flush();
++    }
++    int ulow = low & 0xFFFF;
++    bitmap[(ulow >>> 6)] |= (1L << ulow);
++    currentKey = key;
++    dirty = true;
++  }
++
++  /**
++   * Ensures that any buffered additions are flushed to the underlying bitmap.
++   */
++  public void flush() {
++    if (dirty) {
++      RoaringArray highLowContainer = underlying.highLowContainer;
++      // we check that it's safe to append since RoaringArray.append does no validation
++      if (highLowContainer.size > 0) {
++        short key = highLowContainer.getKeyAtIndex(highLowContainer.size - 1);
++        if (Util.compareUnsigned(currentKey, key) <= 0) {
++          throw new IllegalStateException("Cannot write " + currentKey + " after " + key);
++        }
++      }
++      highLowContainer.append(currentKey, chooseBestContainer());
++      clearBitmap();
++      dirty = false;
++    }
++  }
++
++  private Container chooseBestContainer() {
++    Container container = new BitmapContainer(bitmap,-1).repairAfterLazy().runOptimize();
++    return container instanceof BitmapContainer ? container.clone() : container;
++  }
++
++  private void clearBitmap() {
++    Arrays.fill(bitmap, 0L);
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+index cd4f970e..2d46a1f5 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+@@ -18,6 +18,8 @@ import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
+ import org.roaringbitmap.buffer.MappeableContainerPointer;
+ import org.roaringbitmap.buffer.MutableRoaringBitmap;
+ 
++import static org.roaringbitmap.Util.partialRadixSort;
++
+ 
+ /**
+  * RoaringBitmap, a compressed alternative to the BitSet.
+@@ -448,6 +450,22 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
+     return ans;
+   }
+ 
++  /**
++   * Efficiently builds a RoaringBitmap from unordered data
++   * @param data unsorted data
++   * @return a new bitmap
++   */
++  public static RoaringBitmap bitmapOfUnordered(final int... data) {
++    partialRadixSort(data);
++    RoaringBitmap bitmap = new RoaringBitmap();
++    OrderedWriter writer = new OrderedWriter(bitmap);
++    for (int i : data) {
++      writer.add(i);
++    }
++    writer.flush();
++    return bitmap;
++  }
++
+   /**
+    * Complements the bits in the given range, from rangeStart (inclusive) rangeEnd (exclusive). The
+    * given bitmap is unchanged.
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/Util.java b/roaringbitmap/src/main/java/org/roaringbitmap/Util.java
+index bfe64f1f..fb4016f4 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/Util.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/Util.java
+@@ -4,6 +4,8 @@
+ 
+ package org.roaringbitmap;
+ 
++import java.util.Arrays;
++
+ /**
+  * Various useful methods for roaring bitmaps.
+  */
+@@ -986,6 +988,33 @@ public final class Util {
+     return ((long) x) & 0xffffffffL;
+   }
+ 
++  /**
++   * Sorts the data by the 16 bit prefix.
++   * @param data - the data
++   */
++  public static void partialRadixSort(int[] data) {
++    final int radix = 8;
++    int shift = 16;
++    int mask = 0xFF0000;
++    int[] copy = new int[data.length];
++    int[] histogram = new int[(1 << radix) + 1];
++    while (shift < 32) {
++      for (int i = 0; i < data.length; ++i) {
++        ++histogram[((data[i] & mask) >>> shift) + 1];
++      }
++      for (int i = 0; i < 1 << radix; ++i) {
++        histogram[i + 1] += histogram[i];
++      }
++      for (int i = 0; i < data.length; ++i) {
++        copy[histogram[(data[i] & mask) >>> shift]++] = data[i];
++      }
++      System.arraycopy(copy, 0, data, 0, data.length);
++      shift += radix;
++      mask <<= radix;
++      Arrays.fill(histogram, 0);
++    }
++  }
++
+   /**
+    * Private constructor to prevent instantiation of utility class
+    */

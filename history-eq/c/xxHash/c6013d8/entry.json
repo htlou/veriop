@@ -1,0 +1,40 @@
+{
+  "commit": "c6013d8",
+  "date": "2020-02-24",
+  "subject": "xxh128: slight optimization for len [4,8]",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit changes how length enters the 4..8-byte multiplication to improve speed and hash quality.",
+  "change_summary": "Changes the XXH3 128-bit 4..8-byte mixing formula from postmultiply length adjustments to a length-dependent multiplier.",
+  "units": [
+    {
+      "name": "public XXH3_128bits, withSeed and withSecret, length 4..8",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "4 <= len <= 8; withSecret secret size >= 136",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/c6013d8/r_api",
+      "evidence": "All three public API targets yield Alive2 forward value-in-memory counterexamples for valid lengths; both directions fail."
+    },
+    {
+      "name": "raw fixed-length 4 and 8 witnesses",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "len = 4 or 8",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/c6013d8/r_rawcex",
+      "evidence": "Both fixed-length raw wrappers yield forward and backward Alive2 counterexamples."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "full",
+  "unsupported_reason": null,
+  "not_equiv_kind": "intended-output-change",
+  "notes": "The changed hash formula is observed through all public XXH3 128-bit variants on its entire length class."
+}

@@ -1,0 +1,7 @@
+# `73ab7599`: Q4_K/Q5_K branchless scale unpack
+
+**Scoped verdict: `EQUIV_PARTIAL`.** The historical `vecdotq.cuh` changes the two 16-bit scale words computed by each Q4_K and Q5_K vector-dot helper. [`reproduce.py`](reproduce.py) checks exact parent/child Git blob IDs, extracts those statements from both helpers, and compares all four valid `bq8_offset` values (0, 2, 4, 6). The historical `block_q4_K` and `block_q5_K` declarations each contain a 12-byte scale array. For every possible value of those initialized bytes, Alive2 proves both directions for all eight helper/offset pairs: [16/16 checks pass](result.json), with zero incorrect, failed-to-prove, or tool-error results.
+
+The source-mapped wrapper changes only the pointer to the scale bytes and returns the two unpacked words. Clang 20 `-O0` produces distinct old/new LLVM bodies. The proof adds `noundef` to the two ABI arguments representing the 12 initialized bytes. Without that precondition, [Alive2 finds](unrestricted-diagnostic.log) that the new eager load can propagate poison from undefined scale bytes even when the old branch would not read them. This is a model diagnostic, not a valid initialized-block counterexample.
+
+The remaining vector-dot arithmetic, other changes in the commit, complete GPU kernels, and official historical benchmark performance are unverified. Reproduce from the project root with `python3 -B history-eq/gpu/llama.cpp/73ab7599/reproduce.py`.

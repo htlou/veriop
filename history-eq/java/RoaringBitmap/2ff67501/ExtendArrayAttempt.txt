@@ -1,0 +1,54 @@
+public final class ExtendArrayRelation {
+  /*@ public normal_behavior
+    @ requires source != null;
+    @ requires source.length <= newCapacity && newCapacity <= 500000;
+    @ ensures \result.length == newCapacity;
+    @ ensures (\forall int i; 0 <= i && i < source.length; \result[i] == source[i]);
+    @*/
+  public static char[] copyPrefix(char[] source, int newCapacity) {
+    char[] copied = new char[newCapacity];
+    /*@ loop_invariant 0 <= i && i <= source.length;
+      @ loop_invariant copied.length == newCapacity;
+      @ loop_invariant (\forall int j; 0 <= j && j < i; copied[j] == source[j]);
+      @ decreases source.length - i;
+      @*/
+    for (int i = 0; i < source.length; i++) {
+      copied[i] = source[i];
+    }
+    return copied;
+  }
+
+  /*@ public normal_behavior
+    @ requires keys != null;
+    @ requires 0 <= size && size <= keys.length;
+    @ requires 0 <= extra && size + extra <= 100000;
+    @ requires keys.length <= 100000;
+    @ requires 0 <= index && index < size;
+    @ ensures \result;
+    @*/
+  public static boolean sameUsedKey(char[] keys, int size, int extra, int index) {
+    int requested = size + extra;
+    char[] oldKeys = keys;
+    if (requested >= keys.length) {
+      int newCapacity;
+      if (keys.length < 1024) {
+        newCapacity = 2 * requested;
+      } else {
+        newCapacity = 5 * requested / 4;
+      }
+      oldKeys = copyPrefix(keys, newCapacity);
+    }
+    char[] newKeys = keys;
+    if (requested > keys.length) {
+      int newCapacity;
+      if (keys.length < 1024) {
+        newCapacity = 2 * requested;
+      } else {
+        newCapacity = 5 * requested / 4;
+      }
+      newKeys = copyPrefix(keys, newCapacity);
+    }
+    return oldKeys[index] == newKeys[index]
+        && oldKeys.length >= requested && newKeys.length >= requested;
+  }
+}

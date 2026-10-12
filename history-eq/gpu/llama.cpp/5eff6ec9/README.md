@@ -1,0 +1,7 @@
+# llama.cpp `5eff6ec9`: NVIDIA warp-wide all reduction
+
+**Selected verdict: `EQUIV_PARTIAL`; whole-commit verdict: `UNKNOWN`.** The exact historical `warp_reduce_all` function bodies from `ggml/src/ggml-cuda/common.cuh` are in [old-source.txt](old-source.txt) and [new-source.txt](new-source.txt); [reproduce.py](reproduce.py) extracts them again from the parent and commit. The wrapper fixes the NVIDIA physical warp size to 32, matching the historical `ggml_cuda_get_physical_warp_size()` definition, and calls each function on one 32-thread warp. It compiles both wrappers with `nvcc -arch=sm_80 -O2`.
+
+The resulting [old.ptx](old.ptx) and [new.ptx](new.ptx) are byte-identical, with the same SHA-256 in [result.json](result.json). Because the wrapper, launch shape, and complete generated PTX are identical, this is an equality proof for this compiled one-warp specialization. [Volta's attempted comparison](volta-compare.log) stops before checking outputs because its installed model does not implement `vote.sync.all.pred`; this is **PTX identity evidence, not a Volta equivalence verdict**. The other changed code moves expert-ID preparation from host code into a CUDA kernel and changes tile selection; those paths have not been compared here. No official before/after benchmark score was measured for this historical pair. Kuiper was not run.
+
+Run `python3 -B history-eq/gpu/llama.cpp/5eff6ec9/reproduce.py` from the project root to regenerate the PTX, compare it byte-for-byte, and reproduce the Volta diagnostic.

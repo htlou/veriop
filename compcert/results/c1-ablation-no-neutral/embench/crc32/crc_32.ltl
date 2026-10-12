@@ -1,0 +1,57 @@
+crc32pseudo() {
+   16:	
+   15:	EBX = 4294967295L; 
+   14:	EBP = 0; 
+   13:	call "rand_beebs"; 
+   12:	ESI = crc_32_tab + 0 (long); 
+   11:	
+   10:	EDI = long32unsigned(EAX); 
+    9:	EAX = EBX; EAX = EAX ^l EDI; 
+    8:	EAX = EAX &l 255; 
+    7:	EDX = int64[ESI + EAX * 8 + 0]; 
+    6:	ECX = EBX; ECX = ECX >>lu 8; 
+    5:	EBX = EDX; EBX = EBX ^l ECX; 
+    4:	EBP = EBP + 1 (int); 
+    3:	if (EBP <s 1024) goto 13 else goto 2
+    2:	EAX = EBX; EAX = notl(EAX); 
+    1:	return
+}
+
+initialise_benchmark() {
+    2:	
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 170; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   11:	EBX = EDI; 
+   10:	EBP = 0; 
+    9:	if (EBP <s EBX) goto 8 else goto 3
+    8:	EDI = 0; 
+    7:	call "srand_beebs"; 
+    6:	call "crc32pseudo"; ECX = EAX; 
+    5:	
+    4:	EBP = EBP + 1 (int); goto 9
+    3:	ECX = ECX &l 32767; 
+    2:	EAX = ECX; EAX = lowlong(EAX); 
+    1:	return
+}
+
+verify_benchmark() {
+    3:	
+    2:	EAX = EDI ==s 11433; 
+    1:	return
+}
+

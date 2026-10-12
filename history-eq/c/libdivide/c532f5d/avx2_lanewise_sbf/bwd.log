@@ -1,0 +1,533 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=3600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/c532f5d/avx2_lanewise_sbf/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/c532f5d/avx2_lanewise_sbf/old.ll
+
+----------------------------------------
+define <4 x i64> @target_s32_branchfree_lanewise(<4 x i64> noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  switch i32 noundef %#1, label %#3 [
+    i32 4294967295, label %#7
+    i32 1, label %#7
+    i32 0, label %#7
+  ]
+
+#3:
+  %#8 = abs i32 noundef %#1, 0
+  %#9 = ctlz i32 %#8, 1
+  %#range_0_%#9 = !range i32 %#9, i32 0, i32 31
+  %#10 = xor i32 %#range_0_%#9, 31
+  %#11 = ctpop i32 %#8
+  %#range_1_%#11 = !range i32 %#11, i32 1, i32 33
+  %#12 = icmp samesign ult i32 %#range_1_%#11, 2
+  br i1 %#12, label %#4, label %#5
+
+#4:
+  %#13 = lshr i32 noundef %#1, 24
+  %#14 = and i32 %#13, 128
+  %#15 = or disjoint i32 %#10, %#14
+  %#16 = trunc nuw i32 %#15 to i8
+  br label %#6
+
+#5:
+  %#17 = icmp slt i32 noundef %#1, 0
+  %#18 = sub nsw nuw i32 30, %#range_0_%#9
+  %#19 = shl nsw nuw i32 1, %#18
+  %#20 = zext nneg i32 %#19 to i64
+  %#21 = shl nsw nuw i64 %#20, 32
+  %#22 = zext i32 %#8 to i64
+  %#23 = udiv i64 %#21, %#22
+  %#24 = trunc i64 %#23 to i32
+  %#25 = mul i32 %#8, %#24
+  %#26 = sub i32 0, %#25
+  %#27 = shl i32 %#24, 1
+  %#28 = shl i32 %#26, 1
+  %#29 = icmp uge i32 %#28, %#8
+  %#30 = icmp slt i32 %#26, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i32
+  %#33 = trunc nsw nuw i32 %#10 to i8
+  %#34 = or disjoint i32 %#27, 1
+  %#35 = add i32 %#34, %#32
+  %#36 = select i1 %#17, i8 192, i8 64
+  %#37 = or disjoint i8 %#36, %#33
+  br label %#6
+
+#6:
+  %#38 = phi i32 [ 0, %#4 ], [ %#35, %#5 ]
+  %#39 = phi i8 [ %#16, %#4 ], [ %#37, %#5 ]
+  %#40 = and i8 %#39, 31
+  %#41 = ashr i8 %#39, 7
+  %#42 = sext i8 %#41 to i32
+  %#43 = insertelement <8 x i32> poison, i32 %#42, i64 0
+  %#44 = shufflevector <8 x i32> %#43, <8 x i32> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#45 = insertelement <8 x i32> poison, i32 %#38, i64 0
+  %#46 = shufflevector <8 x i32> %#45, <8 x i32> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#47 = bitcast <8 x i32> %#46 to <4 x i64>
+  %#48 = shl <4 x i64> noundef %#0, { 32, 32, 32, 32 }
+  %#49 = ashr exact <4 x i64> %#48, { 32, 32, 32, 32 }
+  %#50 = shl <4 x i64> %#47, { 32, 32, 32, 32 }
+  %#51 = ashr exact <4 x i64> %#50, { 32, 32, 32, 32 }
+  %#52 = mul nsw <4 x i64> %#51, %#49
+  %#53 = lshr <4 x i64> %#52, { 32, 32, 32, 32 }
+  %#54 = ashr <4 x i64> noundef %#0, { 32, 32, 32, 32 }
+  %#55 = mul nsw <4 x i64> %#51, %#54
+  %#56 = and <4 x i64> %#55, { -4294967296, -4294967296, -4294967296, -4294967296 }
+  %#57 = or disjoint <4 x i64> %#53, %#56
+  %#58 = bitcast <4 x i64> %#57 to <8 x i32>
+  %#59 = bitcast <4 x i64> noundef %#0 to <8 x i32>
+  %#60 = add <8 x i32> %#58, %#59
+  %#61 = icmp eq i32 %#38, 0
+  %#62 = sext i1 %#61 to i32
+  %#63 = zext nneg i8 %#40 to i32
+  %#64 = shl nuw i32 1, %#63
+  %#65 = add i32 %#64, %#62
+  %#66 = insertelement <8 x i32> poison, i32 %#65, i64 0
+  %#67 = shufflevector <8 x i32> %#66, <8 x i32> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#68 = icmp slt <8 x i32> %#60, { 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#69 = select <8 x i1> %#68, <8 x i32> %#67, <8 x i32> { 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#70 = add <8 x i32> %#69, %#60
+  %#71 = insertelement <8 x i32> poison, i32 %#63, i64 0
+  %#72 = shufflevector <8 x i32> %#71, <8 x i32> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#73 = ashr <8 x i32> %#70, %#72
+  %#74 = xor <8 x i32> %#73, %#44
+  %#75 = sub <8 x i32> %#74, %#44
+  %#76 = bitcast <8 x i32> %#75 to <4 x i64>
+  br label %#7
+
+#7:
+  %#77 = phi <4 x i64> [ %#76, %#6 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#77
+}
+=>
+define <4 x i64> @target_s32_branchfree_lanewise(<4 x i64> noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  switch i32 noundef %#1, label %#3 [
+    i32 4294967295, label %#7
+    i32 1, label %#7
+    i32 0, label %#7
+  ]
+
+#3:
+  %#8 = abs i32 noundef %#1, 0
+  %#9 = ctlz i32 %#8, 1
+  %#range_0_%#9 = !range i32 %#9, i32 0, i32 31
+  %#10 = xor i32 %#range_0_%#9, 31
+  %#11 = ctpop i32 %#8
+  %#range_1_%#11 = !range i32 %#11, i32 1, i32 33
+  %#12 = icmp samesign ult i32 %#range_1_%#11, 2
+  br i1 %#12, label %#4, label %#5
+
+#4:
+  %#13 = lshr i32 noundef %#1, 24
+  %#14 = and i32 %#13, 128
+  %#15 = or disjoint i32 %#10, %#14
+  %#16 = trunc nuw i32 %#15 to i8
+  %#17 = or disjoint i8 %#16, 32
+  br label %#6
+
+#5:
+  %#18 = icmp slt i32 noundef %#1, 0
+  %#19 = sub nsw nuw i32 30, %#range_0_%#9
+  %#20 = shl nsw nuw i32 1, %#19
+  %#21 = zext nneg i32 %#20 to i64
+  %#22 = shl nsw nuw i64 %#21, 32
+  %#23 = zext i32 %#8 to i64
+  %#24 = udiv i64 %#22, %#23
+  %#25 = trunc i64 %#24 to i32
+  %#26 = mul i32 %#8, %#25
+  %#27 = sub i32 0, %#26
+  %#28 = shl i32 %#25, 1
+  %#29 = shl i32 %#27, 1
+  %#30 = icmp uge i32 %#29, %#8
+  %#31 = icmp slt i32 %#27, 0
+  %#32 = or i1 %#31, %#30
+  %#33 = zext i1 %#32 to i32
+  %#34 = trunc nsw nuw i32 %#10 to i8
+  %#35 = or disjoint i32 %#28, 1
+  %#36 = add i32 %#35, %#33
+  %#37 = select i1 %#18, i8 192, i8 64
+  %#38 = or disjoint i8 %#37, %#34
+  %#39 = sext i32 %#36 to i64
+  br label %#6
+
+#6:
+  %#40 = phi i64 [ 0, %#4 ], [ %#39, %#5 ]
+  %#41 = phi i8 [ %#17, %#4 ], [ %#38, %#5 ]
+  %#42 = bitcast <4 x i64> noundef %#0 to <8 x i32>
+  %#43 = and i8 %#41, 31
+  %#44 = ashr i8 %#41, 7
+  %#45 = sext i8 %#44 to i32
+  %#46 = lshr i8 %#41, 5
+  %#47 = and i8 %#46, 1
+  %#48 = zext nneg i8 %#47 to i32
+  %#49 = zext nneg i8 %#43 to i32
+  %#50 = shl nuw i32 1, %#49
+  %#51 = sub nuw i32 %#50, %#48
+  %#52 = extractelement <8 x i32> %#42, i64 0
+  %#53 = sext i32 %#52 to i64
+  %#54 = mul nsw i64 %#40, %#53
+  %#55 = lshr i64 %#54, 32
+  %#56 = trunc nuw i64 %#55 to i32
+  %#57 = add nsw i32 %#52, %#56
+  %#58 = icmp slt i32 %#57, 0
+  %#59 = select i1 %#58, i32 %#51, i32 0
+  %#60 = add i32 %#59, %#57
+  %#61 = ashr i32 %#60, %#49
+  %#62 = xor i32 %#61, %#45
+  %#63 = sub nsw i32 %#62, %#45
+  %#64 = insertelement <8 x i32> poison, i32 %#63, i64 0
+  %#65 = extractelement <8 x i32> %#42, i64 1
+  %#66 = sext i32 %#65 to i64
+  %#67 = mul nsw i64 %#40, %#66
+  %#68 = lshr i64 %#67, 32
+  %#69 = trunc nuw i64 %#68 to i32
+  %#70 = add nsw i32 %#65, %#69
+  %#71 = icmp slt i32 %#70, 0
+  %#72 = select i1 %#71, i32 %#51, i32 0
+  %#73 = add i32 %#72, %#70
+  %#74 = ashr i32 %#73, %#49
+  %#75 = xor i32 %#74, %#45
+  %#76 = sub nsw i32 %#75, %#45
+  %#77 = insertelement <8 x i32> %#64, i32 %#76, i64 1
+  %#78 = extractelement <8 x i32> %#42, i64 2
+  %#79 = sext i32 %#78 to i64
+  %#80 = mul nsw i64 %#40, %#79
+  %#81 = lshr i64 %#80, 32
+  %#82 = trunc nuw i64 %#81 to i32
+  %#83 = add nsw i32 %#78, %#82
+  %#84 = icmp slt i32 %#83, 0
+  %#85 = select i1 %#84, i32 %#51, i32 0
+  %#86 = add i32 %#85, %#83
+  %#87 = ashr i32 %#86, %#49
+  %#88 = xor i32 %#87, %#45
+  %#89 = sub nsw i32 %#88, %#45
+  %#90 = insertelement <8 x i32> %#77, i32 %#89, i64 2
+  %#91 = extractelement <8 x i32> %#42, i64 3
+  %#92 = sext i32 %#91 to i64
+  %#93 = mul nsw i64 %#40, %#92
+  %#94 = lshr i64 %#93, 32
+  %#95 = trunc nuw i64 %#94 to i32
+  %#96 = add nsw i32 %#91, %#95
+  %#97 = icmp slt i32 %#96, 0
+  %#98 = select i1 %#97, i32 %#51, i32 0
+  %#99 = add i32 %#98, %#96
+  %#100 = ashr i32 %#99, %#49
+  %#101 = xor i32 %#100, %#45
+  %#102 = sub nsw i32 %#101, %#45
+  %#103 = insertelement <8 x i32> %#90, i32 %#102, i64 3
+  %#104 = extractelement <8 x i32> %#42, i64 4
+  %#105 = sext i32 %#104 to i64
+  %#106 = mul nsw i64 %#40, %#105
+  %#107 = lshr i64 %#106, 32
+  %#108 = trunc nuw i64 %#107 to i32
+  %#109 = add nsw i32 %#104, %#108
+  %#110 = icmp slt i32 %#109, 0
+  %#111 = select i1 %#110, i32 %#51, i32 0
+  %#112 = add i32 %#111, %#109
+  %#113 = ashr i32 %#112, %#49
+  %#114 = xor i32 %#113, %#45
+  %#115 = sub nsw i32 %#114, %#45
+  %#116 = insertelement <8 x i32> %#103, i32 %#115, i64 4
+  %#117 = extractelement <8 x i32> %#42, i64 5
+  %#118 = sext i32 %#117 to i64
+  %#119 = mul nsw i64 %#40, %#118
+  %#120 = lshr i64 %#119, 32
+  %#121 = trunc nuw i64 %#120 to i32
+  %#122 = add nsw i32 %#117, %#121
+  %#123 = icmp slt i32 %#122, 0
+  %#124 = select i1 %#123, i32 %#51, i32 0
+  %#125 = add i32 %#124, %#122
+  %#126 = ashr i32 %#125, %#49
+  %#127 = xor i32 %#126, %#45
+  %#128 = sub nsw i32 %#127, %#45
+  %#129 = insertelement <8 x i32> %#116, i32 %#128, i64 5
+  %#130 = extractelement <8 x i32> %#42, i64 6
+  %#131 = sext i32 %#130 to i64
+  %#132 = mul nsw i64 %#40, %#131
+  %#133 = lshr i64 %#132, 32
+  %#134 = trunc nuw i64 %#133 to i32
+  %#135 = add nsw i32 %#130, %#134
+  %#136 = icmp slt i32 %#135, 0
+  %#137 = select i1 %#136, i32 %#51, i32 0
+  %#138 = add i32 %#137, %#135
+  %#139 = ashr i32 %#138, %#49
+  %#140 = xor i32 %#139, %#45
+  %#141 = sub nsw i32 %#140, %#45
+  %#142 = insertelement <8 x i32> %#129, i32 %#141, i64 6
+  %#143 = extractelement <8 x i32> %#42, i64 7
+  %#144 = sext i32 %#143 to i64
+  %#145 = mul nsw i64 %#40, %#144
+  %#146 = lshr i64 %#145, 32
+  %#147 = trunc nuw i64 %#146 to i32
+  %#148 = add nsw i32 %#143, %#147
+  %#149 = icmp slt i32 %#148, 0
+  %#150 = select i1 %#149, i32 %#51, i32 0
+  %#151 = add i32 %#150, %#148
+  %#152 = ashr i32 %#151, %#49
+  %#153 = xor i32 %#152, %#45
+  %#154 = sub nsw i32 %#153, %#45
+  %#155 = insertelement <8 x i32> %#142, i32 %#154, i64 7
+  %#156 = bitcast <8 x i32> %#155 to <4 x i64>
+  br label %#7
+
+#7:
+  %#157 = phi <4 x i64> [ %#156, %#6 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#157
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define <4 x i64> @target_s64_branchfree_lanewise(<4 x i64> noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  switch i64 noundef %#1, label %#3 [
+    i64 -1, label %#7
+    i64 1, label %#7
+    i64 0, label %#7
+  ]
+
+#3:
+  %#8 = abs i64 noundef %#1, 0
+  %#9 = ctlz i64 %#8, 1
+  %#range_0_%#9 = !range i64 %#9, i64 0, i64 65
+  %#10 = trunc nsw nuw i64 %#range_0_%#9 to i32
+  %#11 = xor i32 %#10, 63
+  %#12 = ctpop i64 %#8
+  %#range_1_%#12 = !range i64 %#12, i64 1, i64 65
+  %#13 = icmp samesign ult i64 %#range_1_%#12, 2
+  br i1 %#13, label %#4, label %#5
+
+#4:
+  %#14 = lshr i64 noundef %#1, 56
+  %#15 = trunc nsw nuw i64 %#14 to i32
+  %#16 = and i32 %#15, 128
+  %#17 = or disjoint i32 %#11, %#16
+  %#18 = trunc nuw i32 %#17 to i8
+  br label %#6
+
+#5:
+  %#19 = icmp slt i64 noundef %#1, 0
+  %#20 = sub nsw nuw i64 62, %#range_0_%#9
+  %#21 = shl nsw nuw i64 1, %#20
+  %#22 = zext nneg i64 %#21 to i128
+  %#23 = shl nsw nuw i128 %#22, 64
+  %#24 = zext i64 %#8 to i128
+  %#25 = udiv i128 %#23, %#24
+  %#26 = trunc i128 %#25 to i64
+  %#27 = mul i64 %#8, %#26
+  %#28 = sub i64 0, %#27
+  %#29 = shl i64 %#26, 1
+  %#30 = shl i64 %#28, 1
+  %#31 = icmp uge i64 %#30, %#8
+  %#32 = icmp slt i64 %#28, 0
+  %#33 = or i1 %#32, %#31
+  %#34 = zext i1 %#33 to i64
+  %#35 = trunc nsw nuw i32 %#11 to i8
+  %#36 = or disjoint i64 %#29, 1
+  %#37 = add i64 %#36, %#34
+  %#38 = select i1 %#19, i8 192, i8 64
+  %#39 = or disjoint i8 %#38, %#35
+  br label %#6
+
+#6:
+  %#40 = phi i64 [ 0, %#4 ], [ %#37, %#5 ]
+  %#41 = phi i8 [ %#18, %#4 ], [ %#39, %#5 ]
+  %#42 = and i8 %#41, 63
+  %#43 = ashr i8 %#41, 7
+  %#44 = sext i8 %#43 to i32
+  %#45 = insertelement <8 x i32> poison, i32 %#44, i64 0
+  %#46 = shufflevector <8 x i32> %#45, <8 x i32> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#47 = bitcast <8 x i32> %#46 to <4 x i64>
+  %#48 = insertelement <4 x i64> poison, i64 %#40, i64 0
+  %#49 = shufflevector <4 x i64> %#48, <4 x i64> poison, 0, 0, 0, 0
+  %#50 = bitcast <4 x i64> noundef %#0 to <8 x i32>
+  %#51 = shufflevector <8 x i32> %#50, <8 x i32> poison, 1, 0, 3, 2, 5, 4, 7, 6
+  %#52 = bitcast <8 x i32> %#51 to <4 x i64>
+  %#53 = bitcast <4 x i64> %#49 to <8 x i32>
+  %#54 = shufflevector <8 x i32> %#53, <8 x i32> poison, 1, 0, 3, 2, 5, 4, 7, 6
+  %#55 = bitcast <8 x i32> %#54 to <4 x i64>
+  %#56 = and <4 x i64> noundef %#0, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#57 = and <4 x i64> %#49, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#58 = mul nuw <4 x i64> %#57, %#56
+  %#59 = and <4 x i64> %#55, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#60 = mul nuw <4 x i64> %#59, %#56
+  %#61 = and <4 x i64> %#52, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#62 = mul nuw <4 x i64> %#57, %#61
+  %#63 = mul nuw <4 x i64> %#59, %#61
+  %#64 = lshr <4 x i64> %#58, { 32, 32, 32, 32 }
+  %#65 = add nuw <4 x i64> %#60, %#64
+  %#66 = and <4 x i64> %#65, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#67 = lshr <4 x i64> %#65, { 32, 32, 32, 32 }
+  %#68 = add nuw <4 x i64> %#66, %#62
+  %#69 = lshr <4 x i64> %#68, { 32, 32, 32, 32 }
+  %#70 = ashr <8 x i32> %#50, { 0, 31, 0, 31, 0, 31, 0, 31 }
+  %#71 = shufflevector <8 x i32> %#70, <8 x i32> poison, 1, 1, 3, 3, 5, 5, 7, 7
+  %#72 = bitcast <8 x i32> %#71 to <4 x i64>
+  %#73 = and <4 x i64> %#49, %#72
+  %#74 = ashr <8 x i32> %#53, { 0, 31, 0, 31, 0, 31, 0, 31 }
+  %#75 = shufflevector <8 x i32> %#74, <8 x i32> poison, 1, 1, 3, 3, 5, 5, 7, 7
+  %#76 = bitcast <8 x i32> %#75 to <4 x i64>
+  %#77 = and <4 x i64> noundef %#0, %#76
+  %#78 = add <4 x i64> %#73, %#77
+  %#79 = sub <4 x i64> noundef %#0, %#78
+  %#80 = add <4 x i64> %#79, %#63
+  %#81 = add <4 x i64> %#80, %#67
+  %#82 = add <4 x i64> %#81, %#69
+  %#83 = icmp eq i64 %#40, 0
+  %#84 = bitcast <4 x i64> %#82 to <8 x i32>
+  %#85 = ashr <8 x i32> %#84, { 0, 31, 0, 31, 0, 31, 0, 31 }
+  %#86 = shufflevector <8 x i32> %#85, <8 x i32> poison, 1, 1, 3, 3, 5, 5, 7, 7
+  %#87 = bitcast <8 x i32> %#86 to <4 x i64>
+  %#88 = zext nneg i8 %#42 to i64
+  %#89 = shl nuw i64 1, %#88
+  %#90 = sext i1 %#83 to i64
+  %#91 = add i64 %#89, %#90
+  %#92 = insertelement <4 x i64> poison, i64 %#91, i64 0
+  %#93 = shufflevector <4 x i64> %#92, <4 x i64> poison, 0, 0, 0, 0
+  %#94 = and <4 x i64> %#93, %#87
+  %#95 = add <4 x i64> %#94, %#82
+  %#96 = xor i8 %#42, 63
+  %#97 = zext nneg i8 %#96 to i64
+  %#98 = shl nuw i64 1, %#97
+  %#99 = insertelement <4 x i64> poison, i64 %#98, i64 0
+  %#100 = shufflevector <4 x i64> %#99, <4 x i64> poison, 0, 0, 0, 0
+  %#101 = insertelement <4 x i64> poison, i64 %#88, i64 0
+  %#102 = shufflevector <4 x i64> %#101, <4 x i64> poison, 0, 0, 0, 0
+  %#103 = lshr <4 x i64> %#95, %#102
+  %#104 = xor <4 x i64> %#103, %#100
+  %#105 = sub <4 x i64> %#104, %#100
+  %#106 = xor <4 x i64> %#105, %#47
+  %#107 = sub <4 x i64> %#106, %#47
+  br label %#7
+
+#7:
+  %#108 = phi <4 x i64> [ %#107, %#6 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#108
+}
+=>
+define <4 x i64> @target_s64_branchfree_lanewise(<4 x i64> noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  switch i64 noundef %#1, label %#3 [
+    i64 -1, label %#7
+    i64 1, label %#7
+    i64 0, label %#7
+  ]
+
+#3:
+  %#8 = abs i64 noundef %#1, 0
+  %#9 = ctlz i64 %#8, 1
+  %#range_0_%#9 = !range i64 %#9, i64 0, i64 65
+  %#10 = trunc nsw nuw i64 %#range_0_%#9 to i32
+  %#11 = xor i32 %#10, 63
+  %#12 = ctpop i64 %#8
+  %#range_1_%#12 = !range i64 %#12, i64 1, i64 65
+  %#13 = icmp samesign ult i64 %#range_1_%#12, 2
+  br i1 %#13, label %#4, label %#5
+
+#4:
+  %#14 = lshr i64 noundef %#1, 56
+  %#15 = trunc nsw nuw i64 %#14 to i32
+  %#16 = and i32 %#15, 128
+  %#17 = or disjoint i32 %#11, %#16
+  %#18 = trunc nuw i32 %#17 to i8
+  br label %#6
+
+#5:
+  %#19 = icmp slt i64 noundef %#1, 0
+  %#20 = sub nsw nuw i64 62, %#range_0_%#9
+  %#21 = shl nsw nuw i64 1, %#20
+  %#22 = zext nneg i64 %#21 to i128
+  %#23 = shl nsw nuw i128 %#22, 64
+  %#24 = zext i64 %#8 to i128
+  %#25 = udiv i128 %#23, %#24
+  %#26 = trunc i128 %#25 to i64
+  %#27 = mul i64 %#8, %#26
+  %#28 = sub i64 0, %#27
+  %#29 = shl i64 %#26, 1
+  %#30 = shl i64 %#28, 1
+  %#31 = icmp uge i64 %#30, %#8
+  %#32 = icmp slt i64 %#28, 0
+  %#33 = or i1 %#32, %#31
+  %#34 = zext i1 %#33 to i64
+  %#35 = trunc nsw nuw i32 %#11 to i8
+  %#36 = or disjoint i64 %#29, 1
+  %#37 = add i64 %#36, %#34
+  %#38 = select i1 %#19, i8 192, i8 64
+  %#39 = or disjoint i8 %#38, %#35
+  br label %#6
+
+#6:
+  %#40 = phi i64 [ 0, %#4 ], [ %#37, %#5 ]
+  %#41 = phi i8 [ %#18, %#4 ], [ %#39, %#5 ]
+  %#42 = and i8 %#41, 63
+  %#43 = ashr i8 %#41, 7
+  %#44 = sext i8 %#43 to i64
+  %#45 = sext i64 %#40 to i128
+  %#46 = icmp eq i64 %#40, 0
+  %#47 = zext nneg i8 %#42 to i64
+  %#48 = shl nuw i64 1, %#47
+  %#49 = sext i1 %#46 to i64
+  %#50 = add i64 %#48, %#49
+  %#51 = extractelement <4 x i64> noundef %#0, i64 0
+  %#52 = sext i64 %#51 to i128
+  %#53 = mul nsw i128 %#52, %#45
+  %#54 = lshr i128 %#53, 64
+  %#55 = trunc nuw i128 %#54 to i64
+  %#56 = add nsw i64 %#51, %#55
+  %#57 = icmp slt i64 %#56, 0
+  %#58 = select i1 %#57, i64 %#50, i64 0
+  %#59 = add i64 %#58, %#56
+  %#60 = ashr i64 %#59, %#47
+  %#61 = xor i64 %#60, %#44
+  %#62 = sub nsw i64 %#61, %#44
+  %#63 = insertelement <4 x i64> poison, i64 %#62, i64 0
+  %#64 = extractelement <4 x i64> noundef %#0, i64 1
+  %#65 = sext i64 %#64 to i128
+  %#66 = mul nsw i128 %#65, %#45
+  %#67 = lshr i128 %#66, 64
+  %#68 = trunc nuw i128 %#67 to i64
+  %#69 = add nsw i64 %#64, %#68
+  %#70 = icmp slt i64 %#69, 0
+  %#71 = select i1 %#70, i64 %#50, i64 0
+  %#72 = add i64 %#71, %#69
+  %#73 = ashr i64 %#72, %#47
+  %#74 = xor i64 %#73, %#44
+  %#75 = sub nsw i64 %#74, %#44
+  %#76 = insertelement <4 x i64> %#63, i64 %#75, i64 1
+  %#77 = extractelement <4 x i64> noundef %#0, i64 2
+  %#78 = sext i64 %#77 to i128
+  %#79 = mul nsw i128 %#78, %#45
+  %#80 = lshr i128 %#79, 64
+  %#81 = trunc nuw i128 %#80 to i64
+  %#82 = add nsw i64 %#77, %#81
+  %#83 = icmp slt i64 %#82, 0
+  %#84 = select i1 %#83, i64 %#50, i64 0
+  %#85 = add i64 %#84, %#82
+  %#86 = ashr i64 %#85, %#47
+  %#87 = xor i64 %#86, %#44
+  %#88 = sub nsw i64 %#87, %#44
+  %#89 = insertelement <4 x i64> %#76, i64 %#88, i64 2
+  %#90 = extractelement <4 x i64> noundef %#0, i64 3
+  %#91 = sext i64 %#90 to i128
+  %#92 = mul nsw i128 %#91, %#45
+  %#93 = lshr i128 %#92, 64
+  %#94 = trunc nuw i128 %#93 to i64
+  %#95 = add nsw i64 %#90, %#94
+  %#96 = icmp slt i64 %#95, 0
+  %#97 = select i1 %#96, i64 %#50, i64 0
+  %#98 = add i64 %#97, %#95
+  %#99 = ashr i64 %#98, %#47
+  %#100 = xor i64 %#99, %#44
+  %#101 = sub nsw i64 %#100, %#44
+  %#102 = insertelement <4 x i64> %#89, i64 %#101, i64 3
+  br label %#7
+
+#7:
+  %#103 = phi <4 x i64> [ %#102, %#6 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#103
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  2 failed-to-prove transformations
+  0 Alive2 errors

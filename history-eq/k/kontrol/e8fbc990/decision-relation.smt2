@@ -1,0 +1,13 @@
+(set-logic QF_UF)
+(declare-const force Bool)
+(declare-const timestamp Bool)
+(declare-const k_digest Bool)
+(declare-const foundry_current Bool)
+(declare-const options_digest Bool)
+(declare-const kontrol_current Bool)
+(define-fun old () Bool (or force (not timestamp) (not (and k_digest foundry_current kontrol_current))))
+(define-fun new () Bool (or force (not timestamp) (not (and k_digest options_digest kontrol_current))))
+(assert (not (= (not (= old new))
+                (and (not force) timestamp k_digest kontrol_current
+                     (not (= foundry_current options_digest))))))
+(check-sat)

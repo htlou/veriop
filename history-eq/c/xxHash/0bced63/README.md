@@ -1,0 +1,7 @@
+# xxHash `0bced63`: seeded XXH3 custom-secret vectorization
+
+**Verdict: `NOT_EQUIV` for a definedness case in the public `XXH3_64bits_withSeed` API.** The [reproducer](check_public_ub.py) locks the old and new `xxhash.h`/`xxh3.h` files to the exact historical Git objects, then calls the public API with a valid 256-byte input and seed `0x8000000000000000`. Both sides build with Clang `-O1 -march=x86-64-v3`, `XXH_VECTOR=XXH_SSE2`, and `XXH_OLD_NAMES` (the historical child needs that compatibility macro to expose `kSecret`).
+
+The [old run](public-old-ubsan.log) returns `42d3a0e82d6efcb5` with exit code 0 under UndefinedBehaviorSanitizer. The [new run](public-new-ubsan.log) stops at historical `xxh3.h:1587`: negating `(xxh_i64)seed64` when `seed64 == 2^63` overflows signed 64-bit arithmetic ([machine result](public-ub-result.json)). The old custom-secret loop adds and subtracts the seed as unsigned `xxh_u64`; the new SSE2 path builds a lane with `_mm_set_epi64x(-(xxh_i64)seed64, ...)`. This establishes loss of defined behavior for this valid public call, not a different observed hash value in an unsanitized binary.
+
+The earlier [Alive2 raw-helper result](r_raw_sse2/result.json) found a memory mismatch at the same seed because the new signed negation becomes poison. The public source-level run now shows that the problematic expression is reached through `XXH3_64bits_withSeed`. Other architectures, vector modes, seeds, and performance scores are not covered. Run `python3 history-eq/c/xxHash/0bced63/check_public_ub.py` from the project root to reproduce.

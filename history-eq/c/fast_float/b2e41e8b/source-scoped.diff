@@ -1,0 +1,169 @@
+diff --git a/include/fast_float/ascii_number.h b/include/fast_float/ascii_number.h
+index 52f1e84..e814f12 100644
+--- a/include/fast_float/ascii_number.h
++++ b/include/fast_float/ascii_number.h
+@@ -339,10 +339,11 @@ report_parse_error(UC const *p, parse_error error) {
+ // spans (read only by the rare digit_comp slow path) are not materialized,
+ // which keeps the fat parsed_number_string_t off the hot path. The caller
+ // re-parses with store_spans=true if the slow path is actually reached.
+-template <bool basic_json_fmt, typename UC>
++template <bool basic_json_fmt, bool basic_javascript_fmt, typename UC>
+ fastfloat_really_inline FASTFLOAT_CONSTEXPR20 parsed_number_string_t<UC>
+-parse_number_string(UC const *p, UC const *pend, parse_options_t<UC> options,
+-                    bool store_spans = true) noexcept {
++parse_number_string_impl(UC const *p, UC const *pend,
++                         parse_options_t<UC> options,
++                         bool store_spans) noexcept {
+   chars_format const fmt = detail::adjust_for_feature_macros(options.format);
+   UC const decimal_point = options.decimal_point;
+ 
+@@ -424,7 +425,7 @@ parse_number_string(UC const *p, UC const *pend, parse_options_t<UC> options,
+                                     parse_error::leading_zeros_in_integer_part);
+     }
+   }
+-  else if (uint64_t(fmt & detail::basic_javascript_fmt)) {
++  else FASTFLOAT_IF_CONSTEXPR17(basic_javascript_fmt) {
+     // ECMAScript DecimalIntegerLiteral is "0" or a non-zero digit followed by
+     // digits: no leading zeros. Unlike JSON, the integer part may be empty
+     // (".5"); the no_digits_in_mantissa check below still rejects ".".
+@@ -587,6 +588,40 @@ parse_number_string(UC const *p, UC const *pend, parse_options_t<UC> options,
+   return answer;
+ }
+ 
++// Cold instantiation of the parser: the ECMAScript integer-part rule costs two
++// error returns plus the Annex B octal scan, and parse_number_string_impl is
++// force-inlined, so an inlined javascript body would enlarge the frame of every
++// caller that never asks for it. Out of line, it costs those callers nothing.
++template <typename UC>
++fastfloat_never_inline FASTFLOAT_CONSTEXPR20 parsed_number_string_t<UC>
++parse_number_string_javascript(UC const *p, UC const *pend,
++                               parse_options_t<UC> options,
++                               bool store_spans) noexcept {
++  return parse_number_string_impl<false, true, UC>(p, pend, options,
++                                                   store_spans);
++}
++
++// Public entry point, behaviour unchanged: chars_format::javascript is still
++// honoured, it is just selected here once instead of being re-tested inside the
++// parser loop. Callers that have already ruled the format out (see
++// from_chars_float_advanced) should call parse_number_string_impl directly so
++// that not even this test reaches their hot path.
++template <bool basic_json_fmt, typename UC>
++fastfloat_really_inline FASTFLOAT_CONSTEXPR20 parsed_number_string_t<UC>
++parse_number_string(UC const *p, UC const *pend, parse_options_t<UC> options,
++                    bool store_spans = true) noexcept {
++  // JSON and JavaScript are mutually exclusive, so only the non-JSON
++  // instantiation has to look at the flag.
++  FASTFLOAT_IF_CONSTEXPR17(!basic_json_fmt) {
++    if fastfloat_unlikely (uint64_t(options.format &
++                                    detail::basic_javascript_fmt)) {
++      return parse_number_string_javascript<UC>(p, pend, options, store_spans);
++    }
++  }
++  return parse_number_string_impl<basic_json_fmt, false, UC>(p, pend, options,
++                                                             store_spans);
++}
++
+ template <typename T, typename UC>
+ fastfloat_really_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
+ parse_int_string(UC const *p, UC const *pend, T &value,
+diff --git a/include/fast_float/float_common.h b/include/fast_float/float_common.h
+index 87c72b0..3769972 100644
+--- a/include/fast_float/float_common.h
++++ b/include/fast_float/float_common.h
+@@ -217,6 +217,17 @@ using parse_options = parse_options_t<char>;
+ #define fastfloat_really_inline inline __attribute__((always_inline))
+ #endif
+ 
++// Opposite of fastfloat_really_inline. Used for a rare, format-specific variant
++// of a force-inlined function, so that its body does not land in the frame of
++// every caller that will never execute it.
++#ifdef FASTFLOAT_VISUAL_STUDIO
++#define fastfloat_never_inline __declspec(noinline)
++#elif defined(__GNUC__) || defined(__clang__)
++#define fastfloat_never_inline __attribute__((noinline))
++#else
++#define fastfloat_never_inline
++#endif
++
+ // Branch-probability hint marking the rare slow-path branches as cold, so the
+ // optimizer keeps the out-of-line slow-path re-parse off the hot path (and does
+ // not duplicate the force-inlined hot scanner into the caller, which bloated
+diff --git a/include/fast_float/parse_number.h b/include/fast_float/parse_number.h
+index 58cdafd..14d077b 100644
+--- a/include/fast_float/parse_number.h
++++ b/include/fast_float/parse_number.h
+@@ -306,8 +306,41 @@ FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
+ parse_number_slow_path(UC const *first, UC const *last, T &value,
+                        parse_options_t<UC> options, bool bjf) noexcept {
+   parsed_number_string_t<UC> pns =
+-      bjf ? parse_number_string<true, UC>(first, last, options, true)
+-          : parse_number_string<false, UC>(first, last, options, true);
++      bjf ? parse_number_string_impl<true, false, UC>(first, last, options,
++                                                      true)
++          : parse_number_string_impl<false, false, UC>(first, last, options,
++                                                       true);
++  return from_chars_advanced(pns, value);
++}
++
++// Cold: the whole chars_format::javascript conversion. Kept out of line and out
++// of from_chars_float_advanced so the common frame holds neither the javascript
++// parser body nor a call that would force the parsed number string onto the
++// stack. Mirrors the main path, only with the javascript parser.
++template <typename T, typename UC>
++fastfloat_never_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_float_javascript(UC const *first, UC const *last, T &value,
++                            parse_options_t<UC> options) noexcept {
++  chars_format const fmt = detail::adjust_for_feature_macros(options.format);
++  if (uint64_t(fmt & chars_format::skip_white_space)) {
++    while ((first != last) && fast_float::is_space(*first)) {
++      first++;
++    }
++  }
++  from_chars_result_t<UC> answer;
++  answer.ec = std::errc::invalid_argument;
++  answer.ptr = first;
++  if (first == last) {
++    return answer;
++  }
++  parsed_number_string_t<UC> pns =
++      parse_number_string_javascript<UC>(first, last, options, true);
++  if (!pns.valid) {
++    if (uint64_t(fmt & chars_format::no_infnan)) {
++      return answer;
++    }
++    return detail::parse_infnan(first, last, value, fmt);
++  }
+   return from_chars_advanced(pns, value);
+ }
+ 
+@@ -323,6 +356,13 @@ from_chars_float_advanced(UC const *first, UC const *last, T &value,
+ 
+   chars_format const fmt = detail::adjust_for_feature_macros(options.format);
+ 
++  // Leave for the javascript conversion before anything else is live, so this
++  // compiles to a tail call and the common path keeps its registers. The cold
++  // function repeats the leading-whitespace and empty-input handling below.
++  if fastfloat_unlikely (uint64_t(fmt & detail::basic_javascript_fmt)) {
++    return from_chars_float_javascript<T, UC>(first, last, value, options);
++  }
++
+   from_chars_result_t<UC> answer;
+   if (uint64_t(fmt & chars_format::skip_white_space)) {
+     while ((first != last) && fast_float::is_space(*first)) {
+@@ -339,10 +379,12 @@ from_chars_float_advanced(UC const *first, UC const *last, T &value,
+   // Fast path: parse WITHOUT materializing the integer/fraction spans (read
+   // only by the rare slow paths). Skipping their stores keeps the fat
+   // parsed_number_string_t off the hot path. store_spans is a runtime argument,
+-  // so this reuses the single parse_number_string instantiation.
++  // so this reuses the single parse_number_string_impl instantiation.
+   parsed_number_string_t<UC> pns =
+-      bjf ? parse_number_string<true, UC>(first, last, options, false)
+-          : parse_number_string<false, UC>(first, last, options, false);
++      bjf ? parse_number_string_impl<true, false, UC>(first, last, options,
++                                                      false)
++          : parse_number_string_impl<false, false, UC>(first, last, options,
++                                                       false);
+   if (!pns.valid) {
+     if (uint64_t(fmt & chars_format::no_infnan)) {
+       answer.ec = std::errc::invalid_argument;

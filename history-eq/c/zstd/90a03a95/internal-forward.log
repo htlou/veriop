@@ -1,0 +1,40 @@
+
+----------------------------------------
+define i64 @target_internal(i32 noundef %#0, i64 noundef %#1, i64 noundef %#2, i64 noundef %#3) nofree noundef willreturn memory(none) {
+#4:
+  %#5 = icmp eq i32 noundef %#0, 0
+  %#6 = select i1 %#5, i64 noundef %#1, i64 noundef %#2
+  ret i64 %#6
+}
+=>
+define i64 @target_internal(i32 noundef %#0, i64 noundef %#1, i64 noundef %#2, i64 noundef %#3) nofree noundef willreturn memory(none) {
+#4:
+  %#5 = icmp eq i32 noundef %#0, 0
+  %#6 = select i1 %#5, i64 noundef %#1, i64 noundef %#3
+  ret i64 %#6
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000001 (1)
+i64 noundef %#1 = #x0000000000000000 (0)
+i64 noundef %#2 = #x0000000000000000 (0)
+i64 noundef %#3 = #x0000000000000001 (1)
+
+Source:
+i1 %#5 = #x0 (0)
+i64 %#6 = #x0000000000000000 (0)
+
+Target:
+i1 %#5 = #x0 (0)
+i64 %#6 = #x0000000000000001 (1)
+Source value: #x0000000000000000 (0)
+Target value: #x0000000000000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,403 @@
+
+----------------------------------------
+define i64 @target_consumed(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#28 = alloca i64 8, align 1, dead
+  start_lifetime ptr %#28
+  %#29 = trunc i64 noundef %#0 to i8
+  store i8 %#29, ptr %#28, align 1
+  %#30 = lshr i64 noundef %#0, 8
+  %#31 = trunc i64 %#30 to i8
+  %#32 = gep inbounds nuw ptr %#28, 1 x i64 1
+  store i8 %#31, ptr %#32, align 1
+  %#33 = lshr i64 noundef %#0, 16
+  %#34 = trunc i64 %#33 to i8
+  %#35 = gep inbounds nuw ptr %#28, 1 x i64 2
+  store i8 %#34, ptr %#35, align 1
+  %#36 = lshr i64 noundef %#0, 24
+  %#37 = trunc i64 %#36 to i8
+  %#38 = gep inbounds nuw ptr %#28, 1 x i64 3
+  store i8 %#37, ptr %#38, align 1
+  %#39 = lshr i64 noundef %#0, 32
+  %#40 = trunc i64 %#39 to i8
+  %#41 = gep inbounds nuw ptr %#28, 1 x i64 4
+  store i8 %#40, ptr %#41, align 1
+  %#42 = lshr i64 noundef %#0, 40
+  %#43 = trunc i64 %#42 to i8
+  %#44 = gep inbounds nuw ptr %#28, 1 x i64 5
+  store i8 %#43, ptr %#44, align 1
+  %#45 = lshr i64 noundef %#0, 48
+  %#46 = trunc i64 %#45 to i8
+  %#47 = gep inbounds nuw ptr %#28, 1 x i64 6
+  store i8 %#46, ptr %#47, align 1
+  %#48 = lshr i64 noundef %#0, 56
+  %#49 = trunc nuw i64 %#48 to i8
+  %#50 = gep inbounds nuw ptr %#28, 1 x i64 7
+  store i8 %#49, ptr %#50, align 1
+  %#51 = ptrtoint ptr %#28 to i64
+  %#52 = ptrtoint ptr %#44 to i64
+  switch i8 %#29, label %#7 [
+    i8 45, label %#27
+    i8 48, label %#2
+  ]
+
+#2:
+  %#53 = icmp eq i8 %#31, 48
+  br i1 %#53, label %#3, label %#6
+
+#3:
+  %#54 = icmp eq i8 %#34, 48
+  br i1 %#54, label %#4, label %#6
+
+#4:
+  %#55 = icmp eq i8 %#37, 48
+  br i1 %#55, label %#5, label %#6
+
+#5:
+  %#56 = icmp eq i8 %#40, 48
+  br i1 %#56, label %#27, label %#6
+
+#6:
+  %#57 = phi ptr [ %#32, %#2 ], [ %#35, %#3 ], [ %#38, %#4 ], [ %#41, %#5 ]
+  %#58 = phi i8 [ %#31, %#2 ], [ %#34, %#3 ], [ %#37, %#4 ], [ %#40, %#5 ]
+  %#59 = phi i64 [ 1, %#2 ], [ 2, %#3 ], [ 3, %#4 ], [ 4, %#5 ]
+  %#60 = ptrtoint ptr %#57 to i64
+  br label %#7
+
+#7:
+  %#61 = phi i64 [ %#60, %#6 ], [ %#51, %#1 ]
+  %#62 = phi i8 [ %#58, %#6 ], [ %#29, %#1 ]
+  %#63 = phi i64 [ %#59, %#6 ], [ 0, %#1 ]
+  %#64 = gep ptr %#28, 1 x i64 %#63
+  %#65 = icmp ugt ptr %#64, %#28
+  %#66 = sub i64 %#52, %#61
+  %#67 = icmp ugt i64 %#66, 3
+  br i1 %#67, label %#8, label %#9
+
+#8:
+  %#68 = load i32, ptr %#64, align 1
+  br label %#13
+
+#9:
+  %#69 = zext i8 %#62 to i32
+  %#70 = icmp samesign ugt i64 %#66, 1
+  br i1 %#70, label %#10, label %#12
+
+#10:
+  %#71 = gep inbounds nuw ptr %#64, 1 x i64 1
+  %#72 = load i8, ptr %#71, align 1
+  %#73 = zext i8 %#72 to i32
+  %#74 = shl nsw nuw i32 %#73, 8
+  %#75 = icmp eq i64 %#66, 3
+  br i1 %#75, label %#11, label %#12
+
+#11:
+  %#76 = gep inbounds nuw ptr %#64, 1 x i64 2
+  %#77 = load i8, ptr %#76, align 1
+  %#78 = zext i8 %#77 to i32
+  %#79 = shl nsw nuw i32 %#78, 16
+  br label %#12
+
+#12:
+  %#80 = phi i32 [ %#74, %#11 ], [ %#74, %#10 ], [ 65280, %#9 ]
+  %#81 = phi i32 [ %#79, %#11 ], [ 16711680, %#10 ], [ 16711680, %#9 ]
+  %#82 = or disjoint i32 %#80, %#69
+  %#83 = or i32 %#82, %#81
+  %#84 = or i32 %#83, 4278190080
+  br label %#13
+
+#13:
+  %#85 = phi i32 [ %#68, %#8 ], [ %#84, %#12 ]
+  %#86 = add i32 %#85, 1179010630
+  %#87 = add i32 %#85, 3486502864
+  %#88 = or i32 %#86, %#87
+  %#89 = and i32 %#88, 2155905152
+  %#90 = icmp eq i32 %#89, 0
+  br i1 %#90, label %#14, label %#24
+
+#14:
+  %#91 = mul i32 %#87, 10
+  %#92 = lshr i32 %#87, 8
+  %#93 = add i32 %#91, %#92
+  %#94 = and i32 %#93, 16711935
+  %#95 = mul i32 %#94, 6553601
+  %#96 = icmp ugt i64 %#66, 4
+  br i1 %#96, label %#15, label %#23
+
+#15:
+  %#97 = gep inbounds nuw ptr %#64, 1 x i64 4
+  %#98 = load i8, ptr %#97, align 1
+  %#99 = sext i8 %#98 to i32
+  %#100 = add nsw i32 %#99, 4294967248
+  %#101 = icmp ugt i32 %#100, 9
+  br i1 %#101, label %#23, label %#16
+
+#16:
+  %#102 = icmp eq i64 %#66, 5
+  br i1 %#102, label %#18, label %#17
+
+#17:
+  %#103 = gep inbounds nuw ptr %#64, 1 x i64 5
+  %#104 = load i8, ptr %#103, align 1
+  %#105 = sext i8 %#104 to i32
+  %#106 = add nsw i32 %#105, 4294967238
+  %#107 = icmp ult i32 %#106, 4294967286
+  br i1 %#107, label %#18, label %#22
+
+#18:
+  %#108 = icmp ugt i32 %#95, 429522943
+  br i1 %#108, label %#20, label %#19
+
+#19:
+  %#109 = and i32 %#95, 536805376
+  %#110 = icmp eq i32 %#109, 429457408
+  %#111 = icmp samesign ugt i32 %#100, 5
+  %#112 = and i1 %#110, %#111
+  br i1 %#112, label %#20, label %#21
+
+#20:
+  %#113 = gep inbounds nuw ptr %#64, 1 x i64 5
+  br label %#27
+
+#21:
+  %#114 = gep inbounds nuw ptr %#64, 1 x i64 5
+  br label %#27
+
+#22:
+  %#115 = gep ptr %#64, 1 x i64 6
+  br label %#27
+
+#23:
+  %#116 = gep inbounds nuw ptr %#64, 1 x i64 4
+  br label %#27
+
+#24:
+  %#117 = cttz i32 %#89, 1
+  %#range_0_%#117 = !range i32 %#117, i32 0, i32 33
+  assume_welldefined i32 %#range_0_%#117
+  %#118 = icmp samesign ult i32 %#range_0_%#117, 8
+  br i1 %#118, label %#25, label %#26
+
+#25:
+  %#119 = select i1 %#65, ptr %#64, ptr %#28
+  br label %#27
+
+#26:
+  %#120 = lshr i32 %#range_0_%#117, 3
+  %#121 = zext nneg i32 %#120 to i64
+  %#122 = gep inbounds nuw ptr %#64, 1 x i64 %#121
+  br label %#27
+
+#27:
+  %#123 = phi ptr [ %#28, %#1 ], [ %#116, %#23 ], [ %#113, %#20 ], [ %#114, %#21 ], [ %#115, %#22 ], [ %#122, %#26 ], [ %#119, %#25 ], [ %#44, %#5 ]
+  %#124 = ptrtoint ptr %#123 to i64
+  %#125 = sub i64 %#124, %#51
+  %#126 = and i64 %#125, 4294967295
+  end_lifetime ptr %#28
+  %#range_1_%#126 = !range i64 %#126, i64 0, i64 4294967296
+  ret i64 %#range_1_%#126
+}
+=>
+define i64 @target_consumed(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#28 = alloca i64 8, align 1, dead
+  start_lifetime ptr %#28
+  %#29 = trunc i64 noundef %#0 to i8
+  store i8 %#29, ptr %#28, align 1
+  %#30 = lshr i64 noundef %#0, 8
+  %#31 = trunc i64 %#30 to i8
+  %#32 = gep inbounds nuw ptr %#28, 1 x i64 1
+  store i8 %#31, ptr %#32, align 1
+  %#33 = lshr i64 noundef %#0, 16
+  %#34 = trunc i64 %#33 to i8
+  %#35 = gep inbounds nuw ptr %#28, 1 x i64 2
+  store i8 %#34, ptr %#35, align 1
+  %#36 = lshr i64 noundef %#0, 24
+  %#37 = trunc i64 %#36 to i8
+  %#38 = gep inbounds nuw ptr %#28, 1 x i64 3
+  store i8 %#37, ptr %#38, align 1
+  %#39 = lshr i64 noundef %#0, 32
+  %#40 = trunc i64 %#39 to i8
+  %#41 = gep inbounds nuw ptr %#28, 1 x i64 4
+  store i8 %#40, ptr %#41, align 1
+  %#42 = lshr i64 noundef %#0, 40
+  %#43 = trunc i64 %#42 to i8
+  %#44 = gep inbounds nuw ptr %#28, 1 x i64 5
+  store i8 %#43, ptr %#44, align 1
+  %#45 = lshr i64 noundef %#0, 48
+  %#46 = trunc i64 %#45 to i8
+  %#47 = gep inbounds nuw ptr %#28, 1 x i64 6
+  store i8 %#46, ptr %#47, align 1
+  %#48 = lshr i64 noundef %#0, 56
+  %#49 = trunc nuw i64 %#48 to i8
+  %#50 = gep inbounds nuw ptr %#28, 1 x i64 7
+  store i8 %#49, ptr %#50, align 1
+  %#51 = ptrtoint ptr %#28 to i64
+  %#52 = ptrtoint ptr %#44 to i64
+  switch i8 %#29, label %#7 [
+    i8 45, label %#27
+    i8 48, label %#2
+  ]
+
+#2:
+  %#53 = icmp eq i8 %#31, 48
+  br i1 %#53, label %#3, label %#6
+
+#3:
+  %#54 = icmp eq i8 %#34, 48
+  br i1 %#54, label %#4, label %#6
+
+#4:
+  %#55 = icmp eq i8 %#37, 48
+  br i1 %#55, label %#5, label %#6
+
+#5:
+  %#56 = icmp eq i8 %#40, 48
+  br i1 %#56, label %#27, label %#6
+
+#6:
+  %#57 = phi ptr [ %#32, %#2 ], [ %#35, %#3 ], [ %#38, %#4 ], [ %#41, %#5 ]
+  %#58 = phi i64 [ 1, %#2 ], [ 2, %#3 ], [ 3, %#4 ], [ 4, %#5 ]
+  %#59 = ptrtoint ptr %#57 to i64
+  br label %#7
+
+#7:
+  %#60 = phi i64 [ %#59, %#6 ], [ %#51, %#1 ]
+  %#61 = phi i64 [ %#58, %#6 ], [ 0, %#1 ]
+  %#62 = gep inbounds nuw ptr %#28, 1 x i64 %#61
+  %#63 = icmp ugt ptr %#62, %#28
+  %#64 = sub i64 %#52, %#60
+  %#65 = icmp ugt i64 %#64, 3
+  br i1 %#65, label %#8, label %#22
+
+#8:
+  %#66 = load i32, ptr %#62, align 1
+  %#67 = add i32 %#66, 1179010630
+  %#68 = add i32 %#66, 3486502864
+  %#69 = or i32 %#67, %#68
+  %#70 = and i32 %#69, 2155905152
+  %#71 = icmp eq i32 %#70, 0
+  br i1 %#71, label %#9, label %#18
+
+#9:
+  %#72 = icmp eq i64 %#64, 4
+  br i1 %#72, label %#17, label %#10
+
+#10:
+  %#73 = gep inbounds nuw ptr %#62, 1 x i64 4
+  %#74 = load i8, ptr %#73, align 1
+  %#75 = sext i8 %#74 to i32
+  %#76 = add nsw i32 %#75, 4294967248
+  %#77 = icmp ult i32 %#76, 10
+  br i1 %#77, label %#11, label %#17
+
+#11:
+  %#78 = icmp ugt i64 %#64, 5
+  br i1 %#78, label %#12, label %#16
+
+#12:
+  %#79 = add nsw nuw i64 %#61, 5
+  %#80 = gep inbounds nuw ptr %#28, 1 x i64 %#79
+  %#81 = load i8, ptr %#80, align 1
+  %#82 = sext i8 %#81 to i32
+  %#83 = add nsw i32 %#82, 4294967248
+  %#84 = icmp ult i32 %#83, 10
+  br i1 %#84, label %#13, label %#16
+
+#13:
+  %#85 = icmp samesign eq i64 %#61, 0
+  br i1 %#85, label %#27, label %#14
+
+#14:
+  %#86 = phi i64 [ %#92, %#14 ], [ %#79, %#13 ]
+  %#87 = gep inbounds nuw ptr %#28, 1 x i64 %#86
+  %#88 = load i8, ptr %#87, align 1
+  %#89 = sext i8 %#88 to i32
+  %#90 = add nsw i32 %#89, 4294967248
+  %#91 = icmp ult i32 %#90, 10
+  %#92 = add nsw nuw i64 %#86, 1
+  br i1 %#91, label %#14, label %#15
+
+#15:
+  %#93 = gep inbounds nuw ptr %#28, 1 x i64 %#86
+  br label %#27
+
+#16:
+  %#94 = gep inbounds nuw ptr %#62, 1 x i64 5
+  br label %#27
+
+#17:
+  %#95 = gep inbounds nuw ptr %#62, 1 x i64 4
+  br label %#27
+
+#18:
+  %#96 = icmp sgt i64 %#64, 7
+  br i1 %#96, label %#19, label %#22
+
+#19:
+  %#97 = load i64, ptr %#62, align 1
+  %#98 = add i64 %#97, 5063812098665367110
+  %#99 = add i64 %#97, -3472328296227680304
+  %#100 = or i64 %#98, %#99
+  %#101 = and i64 %#100, -9187201950435737472
+  %#102 = icmp eq i64 %#101, 0
+  br i1 %#102, label %#20, label %#21
+
+#20:
+  %#103 = add i64 %#61, %#51
+  %#104 = add i64 %#103, 8
+  %#105 = add nsw nuw i64 %#61, 8
+  br label %#22
+
+#21:
+  %#106 = ptrtoint ptr %#62 to i64
+  br label %#22
+
+#22:
+  %#107 = phi i64 [ %#60, %#18 ], [ %#60, %#7 ], [ %#106, %#21 ], [ %#104, %#20 ]
+  %#108 = phi i64 [ %#61, %#18 ], [ %#61, %#7 ], [ %#61, %#21 ], [ %#105, %#20 ]
+  %#109 = gep inbounds nuw ptr %#28, 1 x i64 %#108
+  %#110 = sub i64 %#52, %#107
+  %#111 = gep ptr %#109, 1 x i64 %#110
+  br label %#23
+
+#23:
+  %#112 = phi i64 [ %#117, %#24 ], [ %#108, %#22 ]
+  %#113 = gep inbounds nuw ptr %#28, 1 x i64 %#112
+  %#114 = load i8, ptr %#113, align 1
+  %#115 = add i8 %#114, 208
+  %#116 = icmp ult i8 %#115, 10
+  br i1 %#116, label %#24, label %#25
+
+#24:
+  %#117 = add nsw nuw i64 %#112, 1
+  %#118 = icmp eq i64 %#117, 5
+  br i1 %#118, label %#26, label %#23
+
+#25:
+  %#119 = gep inbounds nuw ptr %#28, 1 x i64 %#112
+  br label %#26
+
+#26:
+  %#120 = phi ptr [ %#119, %#25 ], [ %#111, %#24 ]
+  %#121 = icmp eq ptr %#120, %#62, offsetonly
+  %#122 = select i1 %#63, ptr %#62, ptr %#28
+  %#123 = select i1 %#121, ptr %#122, ptr %#120
+  br label %#27
+
+#27:
+  %#124 = phi ptr [ %#28, %#1 ], [ %#95, %#17 ], [ %#44, %#13 ], [ %#94, %#16 ], [ %#123, %#26 ], [ %#44, %#5 ], [ %#93, %#15 ]
+  %#125 = ptrtoint ptr %#124 to i64
+  %#126 = sub i64 %#125, %#51
+  %#127 = and i64 %#126, 4294967295
+  end_lifetime ptr %#28
+  %#range_0_%#127 = !range i64 %#127, i64 0, i64 4294967296
+  ret i64 %#range_0_%#127
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

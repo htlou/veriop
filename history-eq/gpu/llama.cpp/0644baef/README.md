@@ -1,0 +1,7 @@
+# llama.cpp `0644baef`: Metal graph concurrency
+
+**Selected-checker verdict: `UNSUPPORTED`; checker not run.** The exact historical [diff](source.diff) changes only `ggml/src/ggml-metal/ggml-metal-common.cpp`: it adds graph operations considered safe to reorder and increases the forward search window from 8 to 64 nodes. The parent is `490eb96b8875dcaa3ca171c7be517a8c3aa4c2f4`. The old file's Git blob is `95627d386655ce9ad9fe3473c30436176425cbba`; the new file's blob is `87e13786849001c2e7c361d8292da9e6e53679f3`. The full commit contains this one changed file.
+
+This optimization changes **host-side Metal graph scheduling**, not one NVIDIA PTX kernel. [Volta's input](../../../../cuda/repos/volta/README.md) is a before/after PTX kernel pair at one CTA. Even if the same Metal shader code runs at the graph's nodes, comparing one shader pair would omit the changed node order and concurrency. An output-equivalence proof would need a graph-level execution and dependency relation. Neither Volta nor Kuiper was run for this historical pair; the classification is an exact-source checker-scope audit, not an equivalence or counterexample result. No official historical before/after benchmark score was measured.
+
+Reproduce the source audit with `git -C cuda/repos/llama.cpp show --format= --no-ext-diff --no-renames 0644baefde6afc8d2fee8d0ce7770b6485aa4c06 -- ggml/src/ggml-metal/ggml-metal-common.cpp` from the project root.

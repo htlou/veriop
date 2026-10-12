@@ -1,0 +1,52 @@
+{
+ "commit": "4bc56e4",
+ "date": "2020-02-28",
+ "subject": "Update comments for 9to16_128b, add 32-bit path",
+ "selected_by": "keyword",
+ "perf_evidence": "Commit message: 'add the more literal 32-bit friendly path which avoids some dependencies on the low bits of m128.high64 and removes an ADC'; code comment: 'On 32-bit, it removes an ADC and delays a dependency between the two halves of m128.high64'.",
+ "change_summary": "XXH3_len_9to16_128b: when sizeof(void*) < 8 the high-lane update becomes m128.high64 += (input_hi & 0xFFFFFFFF00000000) + XXH_mult32to64((u32)input_hi, PRIME32_2); the 64-bit path keeps input_hi + XXH_mult32to64((u32)input_hi, PRIME32_2 - 1) (algebraically equal mod 2^64). Rest is comments.",
+ "units": [
+  {
+   "name": "XXH3_len_9to16_128b, 32-bit path (i386 target)",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/4bc56e4/r_raw_i386",
+   "evidence": "len 9..16 symbolic, value args; correct fwd+bwd; IR differs (new has the 0xFFFFFFFF00000000 mask path)"
+  },
+  {
+   "name": "XXH3_128bits / _withSeed / _withSecret len 9..16, i386",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/4bc56e4/r_api_i386",
+   "evidence": "3 targets correct fwd+bwd; IR differs"
+  },
+  {
+   "name": "XXH3_len_9to16_128b + 128-bit api len 9..16, x86-64 (64-bit path)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/4bc56e4/r_api",
+   "evidence": "correct fwd+bwd; IR identical (64-bit branch is the old formula; dead 32-bit branch removed at compile time); raw in r_raw also EQUIV/identical"
+  }
+ ],
+ "commit_verdict": "EQUIV",
+ "raw_verdict": "EQUIV",
+ "coverage": "full",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "The perf change is the 32-bit-only branch selected by sizeof(void*) < sizeof(u64); it was checked by compiling both sides for --target i386-linux-gnu (-O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -ffreestanding -nostdlibinc -isystem c/xxHash/_work2020/cross_sysinc, plus the inline flags below). On x86-64 the IR is identical (expected). Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. Raw targets pass input (16 B) and secret (64 B) as noundef scalar args copied into fresh local buffers (no aliasing/poison). Api targets: input pointer + symbolic len bounded to the length class, seed symbolic; _withSecret targets take a secret pointer with secretSize>=136. Native sanity (native_x86_64/): all outputs len 0..256 identical (64-bit path)."
+}

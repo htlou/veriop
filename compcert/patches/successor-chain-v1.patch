@@ -1,0 +1,81 @@
+diff --git a/backend/Linearizeaux.ml b/backend/Linearizeaux.ml
+index 902724e..50fd2ca 100644
+--- a/backend/Linearizeaux.ml
++++ b/backend/Linearizeaux.ml
+@@ -110,5 +110,75 @@ let flatten_blocks blks =
+ 
+ (* Build the enumeration *)
+ 
++(* Count the Lgoto instructions produced by an enumeration.  Track the
++   initial run of labels in the continuation, just as starts_with does.
++   This is only a quality comparison, never a correctness validator. *)
++let jump_cost f order =
++  let labels = ref IntSet.empty in
++  let jumps = ref 0 in
++  let rec block = function
++    | [] -> ()
++    | Lbranch s :: _ ->
++        if not (IntSet.mem (P.to_int s) !labels) then begin
++          incr jumps; labels := IntSet.empty
++        end
++    | Lcond (_, _, s1, s2) :: _ ->
++        if not (IntSet.mem (P.to_int s1) !labels
++                || IntSet.mem (P.to_int s2) !labels) then incr jumps;
++        labels := IntSet.empty
++    | Lreturn :: _ | Ltailcall _ :: _ | Ljumptable _ :: _ ->
++        labels := IntSet.empty
++    | _ :: rest -> block rest; labels := IntSet.empty
++  in
++  List.iter (fun pc ->
++    match PTree.get pc f.fn_code with
++    | None -> ()
++    | Some b -> block b; labels := IntSet.add (P.to_int pc) !labels
++  ) (List.rev order);
++  !jumps + (if IntSet.mem (P.to_int f.fn_entrypoint) !labels then 0 else 1)
++
++(* Link the existing single-entry chains into traces.  Only ordinary branch
++   and conditional edges can become fall-through in the Linear interface.
++   Unvisited trace seeds retain the baseline's node-number priority. *)
++let chain_blocks f blocks =
++  let sorted = List.sort (fun (a, _) (b, _) -> compare b a) blocks in
++  let heads = Hashtbl.create (List.length blocks) in
++  let rec successors = function
++    | [] -> []
++    | Lbranch s :: _ -> [s]
++    | Lcond (_, _, ifso, ifnot) :: _ -> [ifnot; ifso]
++    | Lreturn :: _ | Ltailcall _ :: _ | Ljumptable _ :: _ -> []
++    | _ :: rest -> successors rest
++  in
++  List.iter (fun (_, nodes) ->
++    let first = List.hd nodes in
++    let last = List.fold_left (fun _ pc -> pc) first nodes in
++    let succs = match PTree.get last f.fn_code with
++      | None -> [] | Some b -> successors b in
++    Hashtbl.add heads (P.to_int first) (nodes, succs)
++  ) sorted;
++  let seen = ref IntSet.empty and traces = ref [] in
++  let available pc =
++    let n = P.to_int pc in
++    Hashtbl.mem heads n && not (IntSet.mem n !seen)
++  in
++  let rec follow pc =
++    if available pc then begin
++      let n = P.to_int pc in
++      let nodes, succs = Hashtbl.find heads n in
++      seen := IntSet.add n !seen;
++      traces := nodes :: !traces;
++      match List.find_opt available succs with
++      | None -> () | Some next -> follow next
++    end
++  in
++  follow f.fn_entrypoint;
++  List.iter (fun (_, nodes) -> follow (List.hd nodes)) sorted;
++  List.concat (List.rev !traces)
++
+ let enumerate_aux f reach =
+-  flatten_blocks (basic_blocks f (join_points f))
++  let blocks = basic_blocks f (join_points f) in
++  let baseline = flatten_blocks blocks in
++  let candidate = chain_blocks f blocks in
++  if jump_cost f candidate < jump_cost f baseline
++  then candidate else baseline

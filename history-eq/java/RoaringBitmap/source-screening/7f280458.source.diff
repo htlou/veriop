@@ -1,0 +1,116 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+index 2a3ca16e..b53bc605 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+@@ -25,12 +25,13 @@ public abstract class Container implements Iterable<Short>, Cloneable, Externali
+    * @return a new container initialized with the specified values
+    */
+   public static Container rangeOfOnes(final int start, final int last) {
+-    final int sizeAsArrayContainer = ArrayContainer.serializedSizeInBytes(last - start);
+-    final int sizeAsRunContainer = RunContainer.serializedSizeInBytes(1);
+-    Container answer =
+-        sizeAsRunContainer < sizeAsArrayContainer ? new RunContainer() : new ArrayContainer();
+-    answer = answer.iadd(start, last);
+-    return answer;
++    final int arrayContainerOverRunThreshold = 2;
++    final int cardinality = last - start;
++
++    if (cardinality <= arrayContainerOverRunThreshold) {
++      return new ArrayContainer(start, last);
++    }
++    return new RunContainer(start, last);
+   }
+ 
+   /**
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+index b270792b..9373585e 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+@@ -141,6 +141,17 @@ public final class RunContainer extends Container implements Cloneable {
+     setLength(runCount - 1, (short) runLen);
+   }
+ 
++  /**
++   * Create an run container with a run of ones from firstOfRun to lastOfRun.
++   *
++   * @param firstOfRun first index
++   * @param lastOfRun last index (range is exclusive)
++   */
++  public RunContainer(final int firstOfRun, final int lastOfRun) {
++    this.nbrruns = 1;
++    this.valueslength = new short[]{(short) firstOfRun, (short) (lastOfRun - 1 - firstOfRun)};
++  }
++
+   // convert a bitmap container to a run container somewhat efficiently.
+   protected RunContainer(BitmapContainer bc, int nbrRuns) {
+     this.nbrruns = nbrRuns;
+@@ -1622,8 +1633,8 @@ public final class RunContainer extends Container implements Cloneable {
+     return (this.nbrruns == 1) && (this.getValue(0) == 0) && (this.getLength(0) == -1);
+   }
+ 
+-  public static Container full() {
+-    return new RunContainer(1, new short[]{0, -1});
++  public static RunContainer full() {
++    return new RunContainer(0, 1 << 16);
+   }
+ 
+   @Override
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
+index 964a4dd1..f4bf4de7 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
+@@ -27,12 +27,13 @@ public abstract class MappeableContainer implements Iterable<Short>, Cloneable,
+    * @return a new container initialized with the specified values
+    */
+   public static MappeableContainer rangeOfOnes(final int start, final int last) {
+-    final int sizeAsArrayContainer = MappeableArrayContainer.serializedSizeInBytes(last - start);
+-    final int sizeAsRunContainer = MappeableRunContainer.serializedSizeInBytes(1);
+-    MappeableContainer answer = sizeAsRunContainer < sizeAsArrayContainer
+-        ? new MappeableRunContainer() : new MappeableArrayContainer();
+-    answer = answer.iadd(start, last);
+-    return answer;
++    final int arrayContainerOverRunThreshold = 2;
++    final int cardinality = last - start;
++
++    if (cardinality <= arrayContainerOverRunThreshold) {
++      return new MappeableArrayContainer(start, last);
++    }
++    return new MappeableRunContainer(start, last);
+   }
+ 
+   /**
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+index 1817a2e9..330d27de 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+@@ -180,6 +180,18 @@ public final class MappeableRunContainer extends MappeableContainer implements C
+     vl[2 * (runCount - 1) + 1] = (short) runLen;
+   }
+ 
++  /**
++   * Create an run container with a run of ones from firstOfRun to lastOfRun.
++   *
++   * @param firstOfRun first index
++   * @param lastOfRun last index (range is exclusive)
++   */
++  public MappeableRunContainer(final int firstOfRun, final int lastOfRun) {
++    this.nbrruns = 1;
++    short[] vl = {(short) firstOfRun, (short) (lastOfRun - 1 - firstOfRun)};
++    this.valueslength = ShortBuffer.wrap(vl);
++  }
++
+   // convert a bitmap container to a run container somewhat efficiently.
+   protected MappeableRunContainer(MappeableBitmapContainer bc, int nbrRuns) {
+     this.nbrruns = nbrRuns;
+@@ -1533,9 +1545,8 @@ public final class MappeableRunContainer extends MappeableContainer implements C
+     return (this.nbrruns == 1) && (this.getValue(0) == 0) && (this.getLength(0) == -1);
+   }
+ 
+-  public static MappeableContainer full() {
+-    ShortBuffer sb = ShortBuffer.wrap(new short[]{0, -1});
+-    return new MappeableRunContainer(sb, 1);
++  public static MappeableRunContainer full() {
++    return new MappeableRunContainer(0, 1 << 16);
+   }
+ 
+   @Override

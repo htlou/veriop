@@ -1,0 +1,11 @@
+(set-logic QF_BV)
+(declare-fun x () (_ BitVec 64))
+; NEG sets SF from -x; CMOVS selects the original x when SF is set.
+(define-fun neg-x () (_ BitVec 64) (bvneg x))
+(define-fun old-abs () (_ BitVec 64)
+  (ite (= ((_ extract 63 63) neg-x) #b1) x neg-x))
+(define-fun sign-mask () (_ BitVec 64) (bvashr x #x000000000000003f))
+(define-fun new-abs () (_ BitVec 64)
+  (bvsub (bvxor x sign-mask) sign-mask))
+(assert (not (= old-abs new-abs)))
+(check-sat)

@@ -1,0 +1,214 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=900000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/681ea2a/api_armv5_len7_nw/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/681ea2a/api_armv5_len7_nw/old.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i32 4294967288 to ptr
+  %#9 = icmp ugt ptr noundef %#0, %__constexpr_0
+  br i1 %#9, label %#8, label %#3
+
+#3:
+  %#10 = gep inbounds nuw ptr noundef %#0, 1 x i32 7
+  %#11 = ptrtoint ptr noundef %#0 to i32
+  %#12 = and i32 %#11, 3
+  %#13 = icmp eq i32 %#12, 0
+  %#14 = add i32 noundef %#1, 374761400
+  %#15 = gep ptr noundef %#0, 1 x i32 4
+  %#16 = icmp ult ptr %#15, %#10
+  br i1 %#13, label %#4, label %#5
+
+#4:
+  %#17 = load i32, ptr noundef %#0, align 4
+  %#18 = mul i32 %#17, 3266489917
+  %#19 = add i32 %#14, %#18
+  %#20 = fshl i32 %#19, i32 %#19, i32 17
+  %#21 = mul i32 %#20, 668265263
+  br i1 %#16, label %#6, label %#7
+
+#5:
+  %#22 = load i32, ptr noundef %#0, align 1
+  %#23 = mul i32 %#22, 3266489917
+  %#24 = add i32 %#14, %#23
+  %#25 = fshl i32 %#24, i32 %#24, i32 17
+  %#26 = mul i32 %#25, 668265263
+  br i1 %#16, label %#6, label %#7
+
+#6:
+  %#27 = phi i32 [ %#21, %#4 ], [ %#26, %#5 ]
+  %#28 = load i8, ptr %#15, align 1
+  %#29 = zext i8 %#28 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = add i32 %#30, %#27
+  %#32 = fshl i32 %#31, i32 %#31, i32 11
+  %#33 = mul i32 %#32, 2654435761
+  %#34 = gep ptr noundef %#0, 1 x i32 5
+  %#35 = load i8, ptr %#34, align 1
+  %#36 = zext i8 %#35 to i32
+  %#37 = mul i32 %#36, 374761393
+  %#38 = add i32 %#37, %#33
+  %#39 = fshl i32 %#38, i32 %#38, i32 11
+  %#40 = mul i32 %#39, 2654435761
+  %#41 = gep ptr noundef %#0, 1 x i32 6
+  %#42 = load i8, ptr %#41, align 1
+  %#43 = zext i8 %#42 to i32
+  %#44 = mul i32 %#43, 374761393
+  %#45 = add i32 %#44, %#40
+  %#46 = fshl i32 %#45, i32 %#45, i32 11
+  %#47 = mul i32 %#46, 2654435761
+  br label %#7
+
+#7:
+  %#48 = phi i32 [ %#21, %#4 ], [ %#26, %#5 ], [ %#47, %#6 ]
+  %#49 = lshr i32 %#48, 15
+  %#50 = xor i32 %#49, %#48
+  %#51 = mul i32 %#50, 2246822519
+  %#52 = lshr i32 %#51, 13
+  %#53 = xor i32 %#52, %#51
+  %#54 = mul i32 %#53, 3266489917
+  %#55 = lshr i32 %#54, 16
+  %#56 = xor i32 %#55, %#54
+  br label %#8
+
+#8:
+  %#57 = phi i32 [ %#56, %#7 ], [ 0, %#2 ]
+  ret i32 %#57
+}
+=>
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i32 4294967288 to ptr
+  %#7 = icmp ugt ptr nowrite noundef %#0, %__constexpr_0
+  br i1 %#7, label %#6, label %#3
+
+#3:
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 7
+  %#9 = add i32 noundef %#1, 374761400
+  %#10 = load i32, ptr nowrite noundef %#0, align 4
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = gep ptr nowrite noundef %#0, 1 x i32 4
+  %#16 = icmp ult ptr %#15, %#8
+  br i1 %#16, label %#4, label %#5
+
+#4:
+  %#17 = load i8, ptr %#15, align 1
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#19, %#14
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  %#23 = gep ptr nowrite noundef %#0, 1 x i32 5
+  %#24 = load i8, ptr %#23, align 1
+  %#25 = zext i8 %#24 to i32
+  %#26 = mul i32 %#25, 374761393
+  %#27 = add i32 %#26, %#22
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = gep ptr nowrite noundef %#0, 1 x i32 6
+  %#31 = load i8, ptr %#30, align 1
+  %#32 = zext i8 %#31 to i32
+  %#33 = mul i32 %#32, 374761393
+  %#34 = add i32 %#33, %#29
+  %#35 = fshl i32 %#34, i32 %#34, i32 11
+  %#36 = mul i32 %#35, 2654435761
+  br label %#5
+
+#5:
+  %#37 = phi i32 [ %#14, %#3 ], [ %#36, %#4 ]
+  %#38 = lshr i32 %#37, 15
+  %#39 = xor i32 %#38, %#37
+  %#40 = mul i32 %#39, 2246822519
+  %#41 = lshr i32 %#40, 13
+  %#42 = xor i32 %#41, %#40
+  %#43 = mul i32 %#42, 3266489917
+  %#44 = lshr i32 %#43, 16
+  %#45 = xor i32 %#44, %#43
+  br label %#6
+
+#6:
+  %#46 = phi i32 [ %#45, %#5 ], [ 0, %#2 ]
+  ret i32 %#46
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noundef %#0 = pointer(non-local, block_id=1, offset=3, attrs=2) / Address=#x00000005
+i32 noundef %#1 = #x00000003 (3)
+
+Source:
+ptr %__constexpr_0 = phy-ptr(addr=4294967288) / Address=#xfffffff8
+i1 %#9 = #x0 (0)
+  >> Jump to %#3
+ptr %#10 = pointer(non-local, block_id=1, offset=10, attrs=2) / Address=#x0000000c
+i32 %#11 = #x00000005 (5)
+i32 %#12 = #x00000001 (1)
+i1 %#13 = #x0 (0)
+i32 %#14 = #x165667bb (374761403)
+ptr %#15 = pointer(non-local, block_id=1, offset=7, attrs=2) / Address=#x00000009
+i1 %#16 = #x1 (1)
+  >> Jump to %#5
+i32 %#22 = poison
+i32 %#23 = poison
+i32 %#24 = poison
+i32 %#25 = poison
+i32 %#26 = poison
+  >> Jump to %#6
+i32 %#27 = poison
+i8 %#28 = poison
+i32 %#29 = poison
+i32 %#30 = poison
+i32 %#31 = poison
+i32 %#32 = poison
+i32 %#33 = poison
+ptr %#34 = pointer(non-local, block_id=1, offset=8, attrs=2) / Address=#x0000000a
+i8 %#35 = poison
+i32 %#36 = poison
+i32 %#37 = poison
+i32 %#38 = poison
+i32 %#39 = poison
+i32 %#40 = poison
+ptr %#41 = pointer(non-local, block_id=1, offset=9, attrs=2) / Address=#x0000000b
+i8 %#42 = poison
+i32 %#43 = poison
+i32 %#44 = poison
+i32 %#45 = poison
+i32 %#46 = poison
+i32 %#47 = poison
+  >> Jump to %#7
+i32 %#48 = poison
+i32 %#49 = poison
+i32 %#50 = poison
+i32 %#51 = poison
+i32 %#52 = poison
+i32 %#53 = poison
+i32 %#54 = poison
+i32 %#55 = poison
+i32 %#56 = poison
+  >> Jump to %#8
+i32 %#57 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 12	align: 1	alloc type: 0	alive: true	address: 2
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 15
+
+Target:
+ptr %__constexpr_0 = phy-ptr(addr=4294967288) / Address=#xfffffff8
+i1 %#7 = #x0 (0)
+  >> Jump to %#3
+ptr %#8 = pointer(non-local, block_id=1, offset=10, attrs=3) / Address=#x0000000c
+i32 %#9 = #x165667bb (374761403)
+i32 %#10 = UB triggered!
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

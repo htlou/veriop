@@ -1,0 +1,7 @@
+# xxHash `44bb94e`: XXH3 streaming update rewrite
+
+**Verdict: `EQUIV_PARTIAL` for three fixed-length public 64-bit streaming calls; whole-commit equivalence remains unproved.** The [recheck](recheck_subset.py) verifies the saved parent and child headers against historical Git commit `44bb94ed60322d862d3aeccc0f2d2d00a1ca43eb`, recompiles both sides with Clang 20, and confirms that removing the same non-executable alias annotations reproduces the exact [archived IR](r_api_pin_t2/old.ll). It then runs Alive2 in both directions for each target. All six [logs](subset-recheck/result.json) report one correct transformation, zero incorrect transformations, and zero checker errors.
+
+The proved targets call `XXH3_64bits_reset_withSecret`, update, and digest with symbolic input and 136-byte secret contents at fixed lengths: one 700-byte update, 300+400 bytes, and one 1100-byte update. The shared [wrapper](wrap_api.c) uses `__builtin_assume` after update to pin `totalLen` and `extSecret`; the historical update code increments `totalLen` by each fixed length, and the reset keeps the supplied secret reference. The proof is conditional on these state facts and on valid input/secret buffers.
+
+The 1153-byte boundary case and 128-bit streaming path still time out or fail to return in the checker model ([earlier result](r_api_pin_t3/result.json)). Other lengths, dispatch modes, and official before/after benchmark scores are not established. Run `python3 history-eq/c/xxHash/44bb94e/recheck_subset.py` from the project root to reproduce the six proofs.

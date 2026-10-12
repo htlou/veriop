@@ -1,0 +1,102 @@
+
+----------------------------------------
+define i32 @ff_lz_generic(i64 noundef %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp ne i64 noundef %#0, 0
+  assume i1 %#2
+  %#3 = icmp ult i64 noundef %#0, 4294967296
+  %#4 = lshr i64 noundef %#0, 32
+  %#5 = select i1 %#3, i64 noundef %#0, i64 %#4
+  %#6 = select i1 %#3, i32 0, i32 32
+  %#7 = icmp samesign ult i64 %#5, 65536
+  %#8 = lshr i64 %#5, 16
+  %#9 = or disjoint i32 %#6, 16
+  %#10 = select i1 %#7, i64 %#5, i64 %#8
+  %#11 = select i1 %#7, i32 %#6, i32 %#9
+  %#12 = icmp samesign ult i64 %#10, 256
+  %#13 = lshr i64 %#10, 8
+  %#14 = or disjoint i32 %#11, 8
+  %#15 = select i1 %#12, i64 %#10, i64 %#13
+  %#16 = select i1 %#12, i32 %#11, i32 %#14
+  %#17 = icmp samesign ult i64 %#15, 16
+  %#18 = lshr i64 %#15, 4
+  %#19 = or disjoint i32 %#16, 4
+  %#20 = select i1 %#17, i64 %#15, i64 %#18
+  %#21 = select i1 %#17, i32 %#16, i32 %#19
+  %#22 = and i64 %#20, 12
+  %#23 = icmp eq i64 %#22, 0
+  %#24 = lshr i64 %#20, 2
+  %#25 = or i32 %#21, 2
+  %#26 = select i1 %#23, i64 %#20, i64 %#24
+  %#27 = select i1 %#23, i32 %#21, i32 %#25
+  %#28 = trunc i64 %#26 to i32
+  %#29 = lshr i32 %#28, 1
+  %#30 = and i32 %#29, 1
+  %#31 = or i32 %#30, %#27
+  %#32 = sub nsw nuw i32 63, %#31
+  %#range_0_%#32 = !range i32 %#32, i32 0, i32 64
+  ret i32 %#range_0_%#32
+}
+=>
+define i32 @ff_lz_builtin(i64 noundef %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp ne i64 noundef %#0, 0
+  assume i1 %#2
+  %#3 = ctlz i64 noundef %#0, 1
+  %#range_0_%#3 = !range i64 %#3, i64 0, i64 65
+  %#4 = trunc nsw nuw i64 %#range_0_%#3 to i32
+  %#5 = add nsw nuw i32 %#4, 1
+  %#range_1_%#5 = !range i32 %#5, i32 1, i32 65
+  ret i32 %#range_1_%#5
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 noundef %#0 = #x000000000000000c (12)
+
+Source:
+i1 %#2 = #x1 (1)
+i1 %#3 = #x1 (1)
+i64 %#4 = #x0000000000000000 (0)
+i64 %#5 = #x000000000000000c (12)
+i32 %#6 = #x00000000 (0)
+i1 %#7 = #x1 (1)
+i64 %#8 = #x0000000000000000 (0)
+i32 %#9 = #x00000010 (16)
+i64 %#10 = #x000000000000000c (12)
+i32 %#11 = #x00000000 (0)
+i1 %#12 = #x1 (1)
+i64 %#13 = #x0000000000000000 (0)
+i32 %#14 = #x00000008 (8)
+i64 %#15 = #x000000000000000c (12)
+i32 %#16 = #x00000000 (0)
+i1 %#17 = #x1 (1)
+i64 %#18 = #x0000000000000000 (0)
+i32 %#19 = #x00000004 (4)
+i64 %#20 = #x000000000000000c (12)
+i32 %#21 = #x00000000 (0)
+i64 %#22 = #x000000000000000c (12)
+i1 %#23 = #x0 (0)
+i64 %#24 = #x0000000000000003 (3)
+i32 %#25 = #x00000002 (2)
+i64 %#26 = #x0000000000000003 (3)
+i32 %#27 = #x00000002 (2)
+i32 %#28 = #x00000003 (3)
+i32 %#29 = #x00000001 (1)
+i32 %#30 = #x00000001 (1)
+i32 %#31 = #x00000003 (3)
+i32 %#32 = #x0000003c (60)
+i32 %#range_0_%#32 = #x0000003c (60)
+
+Target:
+i1 %#2 = #x1 (1)
+i64 %#3 = #x000000000000003c (60)
+i64 %#range_0_%#3 = #x000000000000003c (60)
+i32 %#4 = #x0000003c (60)
+i32 %#5 = #x0000003d (61)
+i32 %#range_1_%#5 = #x0000003d (61)
+Source value: #x0000003c (60)
+Target value: #x0000003d (61)
+

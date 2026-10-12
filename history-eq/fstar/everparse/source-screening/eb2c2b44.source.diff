@@ -1,0 +1,221 @@
+diff --git a/src/cbor/spec/CBOR.Spec.Util.fst b/src/cbor/spec/CBOR.Spec.Util.fst
+index e2ae8706..ea6d229c 100644
+--- a/src/cbor/spec/CBOR.Spec.Util.fst
++++ b/src/cbor/spec/CBOR.Spec.Util.fst
+@@ -813,6 +813,31 @@ let rec list_no_setoid_repeats_append_elim_r
+   | [] -> ()
+   | a :: q -> list_no_setoid_repeats_append_elim_r equiv q l2
+ 
++let rec list_no_setoid_repeats_append_elim_memP
++  (#t: Type)
++  (equiv: t -> t -> bool)
++  (l1 l2: list t)
++  (sq: squash (list_no_setoid_repeats equiv (List.Tot.append l1 l2)))
++  (x1 x2: t)
++: Lemma
++  (ensures (List.Tot.memP x1 l1 /\ List.Tot.memP x2 l2) ==> equiv x1 x2 == false)
++  (decreases l1)
++= if FStar.StrongExcludedMiddle.strong_excluded_middle (List.Tot.memP x1 l1 /\ List.Tot.memP x2 l2)
++  then begin
++    let x1' :: l1' = l1 in
++    if FStar.StrongExcludedMiddle.strong_excluded_middle (x1 == x1')
++    then begin
++      if equiv x1 x2
++      then begin
++        List.Tot.append_memP l1' l2 x2;
++        list_existsb_intro (equiv x1) (List.Tot.append l1' l2) x2; ()
++      end
++      else ()
++    end
++    else (list_no_setoid_repeats_append_elim_memP equiv l1' l2 () x1 x2; ())
++  end
++  else ()
++
+ let rec list_no_setoid_repeats_implies
+   (#t: Type)
+   (equiv1 equiv2: t -> t -> bool)
+@@ -1412,6 +1437,61 @@ let rec list_setoid_assoc_destruct
+     ((x', y') :: ll, (x'', lr))
+   end
+ 
++let rec list_setoid_assoc_eq_refl_gen
++  (#t1: Type)
++  (#t2: Type)
++  (equiv1: t1 -> t1 -> bool {
++    (forall x . equiv1 x x) /\
++    (forall xl xr . equiv1 xl xr == equiv1 xr xl) /\
++    (forall xl xm xr . (equiv1 xl xm /\ equiv1 xm xr) ==> equiv1 xl xr)
++  })
++  (equiv2: t2 -> t2 -> bool {
++    forall x . equiv2 x x
++  })
++  (ll lr: list (t1 & t2))
++: Lemma
++  (requires (list_no_setoid_repeats equiv1 (List.Tot.map fst (List.Tot.append ll lr))))
++  (ensures (
++    List.Tot.for_all (setoid_assoc_eq equiv1 equiv2 (List.Tot.append ll lr)) lr
++  ))
++  (decreases lr)
++= match lr with
++  | [] -> ()
++  | (x1, x2) :: lr' ->
++    list_setoid_assoc_append equiv1 x1 ll lr;
++    begin match list_setoid_assoc equiv1 x1 ll with
++    | Some x2' ->
++      let Some x1' = list_setoid_assoc_mem equiv1 x1 ll in
++      List.Tot.memP_map_intro fst (x1', x2') ll;
++      List.Tot.map_append fst ll lr;
++      List.Tot.memP_map_intro fst (x1, x2) lr;
++      list_no_setoid_repeats_append_elim_memP equiv1 (List.Tot.map fst ll) (List.Tot.map fst lr) () x1' x1;
++      assert False
++    | None ->
++      List.Tot.append_assoc ll [x1, x2] lr';
++      list_setoid_assoc_eq_refl_gen equiv1 equiv2 (List.Tot.append ll [x1, x2]) lr';
++      ()
++    end
++
++let list_setoid_assoc_eq_refl
++  (#t1: Type)
++  (#t2: Type)
++  (equiv1: t1 -> t1 -> bool {
++    (forall x . equiv1 x x) /\
++    (forall xl xr . equiv1 xl xr == equiv1 xr xl) /\
++    (forall xl xm xr . (equiv1 xl xm /\ equiv1 xm xr) ==> equiv1 xl xr)
++  })
++  (equiv2: t2 -> t2 -> bool {
++    forall x . equiv2 x x
++  })
++  (l: list (t1 & t2))
++: Lemma
++  (requires (list_no_setoid_repeats equiv1 (List.Tot.map fst l)))
++  (ensures (
++    List.Tot.for_all (setoid_assoc_eq equiv1 equiv2 l) l
++  ))
++= list_setoid_assoc_eq_refl_gen equiv1 equiv2 [] l
++
+ let list_assoc_append
+     (#tk: eqtype)
+     (#tv: Type)
+diff --git a/src/cbor/spec/raw/CBOR.Spec.Raw.Optimal.fst b/src/cbor/spec/raw/CBOR.Spec.Raw.Optimal.fst
+index 91b30685..98179c01 100644
+--- a/src/cbor/spec/raw/CBOR.Spec.Raw.Optimal.fst
++++ b/src/cbor/spec/raw/CBOR.Spec.Raw.Optimal.fst
+@@ -66,7 +66,6 @@ let raw_data_item_uint64_optimize_elem (x: raw_data_item) : Tot raw_data_item =
+   | Tagged tag v -> Tagged (raw_uint64_optimize tag) v
+   | _ -> x
+ 
+-(*
+ let raw_data_item_uint64_optimize_elem_valid (x: raw_data_item) : Lemma
+   (requires (valid basic_data_model x == true))
+   (ensures (valid basic_data_model (raw_data_item_uint64_optimize_elem x) == true /\
+@@ -79,14 +78,10 @@ let raw_data_item_uint64_optimize_elem_valid (x: raw_data_item) : Lemma
+   | Array _ v ->
+     list_for_all2_refl raw_equiv2 v (fun x -> equiv_refl basic_data_model x)
+   | Map _ v ->
+-    list_for_all_intro (setoid_assoc_eq raw_equiv2 raw_equiv2 v) v (fun y ->
+-      equiv_refl basic_data_model (fst y);
+-      list_setoid_assoc_mem_elim raw_equiv2 v y (fst y);
+-      let Some y' = list_setoid_assoc raw_equiv2 (fst y) v in
+-      
+-      equiv_refl basic_data_model y';
+-      ()
+-    );
++    equiv_refl_forall basic_data_model;
++    equiv_sym_forall basic_data_model;
++    equiv_trans_forall basic_data_model;
++    list_setoid_assoc_eq_refl raw_equiv2 raw_equiv2 v;
+     ()
+   | Tagged _ v -> equiv_refl basic_data_model v
+   | _ -> ()
+diff --git a/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fst b/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fst
+index 19a9f01b..07367860 100644
+--- a/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fst
++++ b/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fst
+@@ -26,7 +26,7 @@ let rec valid'
+   | Map _ v ->
+     List.Tot.for_all (valid' data_model (fuel - 1)) (List.Tot.map fst v) &&
+     List.Tot.for_all (valid' data_model (fuel - 1)) (List.Tot.map snd v) &&
+-    not (list_no_setoid_repeats (equiv' data_model (fuel - 1)) (List.Tot.map fst v))
++    (list_no_setoid_repeats (equiv' data_model (fuel - 1)) (List.Tot.map fst v))
+   | _ -> true
+ 
+ and equiv'
+@@ -206,7 +206,7 @@ let valid_eq
+     | Map _ v ->
+       List.Tot.for_all (valid data_model) (List.Tot.map fst v) &&
+       List.Tot.for_all (valid data_model) (List.Tot.map snd v) &&
+-      not (list_no_setoid_repeats (equiv data_model) (List.Tot.map fst v))
++      (list_no_setoid_repeats (equiv data_model) (List.Tot.map fst v))
+     | _ -> true
+   )))
+ = match x with
+diff --git a/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fsti b/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fsti
+index 9657d10f..40e46578 100644
+--- a/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fsti
++++ b/src/cbor/spec/raw/CBOR.Spec.Raw.Valid2.fsti
+@@ -23,7 +23,7 @@ val valid_eq
+     | Map _ v ->
+       List.Tot.for_all (valid data_model) (List.Tot.map fst v) &&
+       List.Tot.for_all (valid data_model) (List.Tot.map snd v) &&
+-      not (list_no_setoid_repeats (equiv data_model) (List.Tot.map fst v))
++      list_no_setoid_repeats (equiv data_model) (List.Tot.map fst v)
+     | _ -> true
+   )))
+ 
+@@ -61,6 +61,12 @@ val equiv_refl
+ : Lemma
+   (ensures equiv data_model x1 x1)
+ 
++let equiv_refl_forall
++  (data_model: (raw_data_item -> raw_data_item -> bool))
++: Lemma
++  (ensures forall x1 . equiv data_model x1 x1)
++= Classical.forall_intro (equiv_refl data_model)
++
+ val equiv_sym
+   (data_model: (raw_data_item -> raw_data_item -> bool) {
+     forall x1 x2 . data_model x1 x2 == data_model x2 x1
+@@ -69,6 +75,14 @@ val equiv_sym
+ : Lemma
+   (ensures equiv data_model x1 x2 == equiv data_model x2 x1)
+ 
++let equiv_sym_forall
++  (data_model: (raw_data_item -> raw_data_item -> bool) {
++    forall x1 x2 . data_model x1 x2 == data_model x2 x1
++  })
++: Lemma
++  (ensures forall x1 x2 . equiv data_model x1 x2 == equiv data_model x2 x1)
++= Classical.forall_intro_2 (equiv_sym data_model)
++
+ val equiv_trans
+   (data_model: (raw_data_item -> raw_data_item -> bool) {
+     (forall x1 x2 . data_model x1 x2 == data_model x2 x1) /\
+@@ -79,13 +93,27 @@ val equiv_trans
+   (requires (equiv data_model x1 x2 /\ equiv data_model x2 x3))
+   (ensures (equiv data_model x1 x3))
+ 
++let equiv_trans_forall
++  (data_model: (raw_data_item -> raw_data_item -> bool) {
++    (forall x1 x2 . data_model x1 x2 == data_model x2 x1) /\
++    (forall x1 x2 x3 . (data_model x1 x2 /\ equiv data_model x2 x3) ==> data_model x1 x3)
++  })
++: Lemma
++  (forall x1 x2 x3 .  (equiv data_model x1 x2 /\ equiv data_model x2 x3) ==> equiv data_model x1 x3)
++= let prf
++    x1 x2 x3
++  : Lemma ((equiv data_model x1 x2 /\ equiv data_model x2 x3) ==> equiv data_model x1 x3)
++  = Classical.move_requires (equiv_trans data_model x1 x2) x3
++  in
++  Classical.forall_intro_3 prf
++
+ let valid_item
+   (data_model: (raw_data_item -> raw_data_item -> bool))
+   (x: raw_data_item)
+ : Tot bool
+ =   match x with
+     | Map _ v ->
+-      not (list_no_setoid_repeats (equiv data_model) (List.Tot.map fst v))
++      (list_no_setoid_repeats (equiv data_model) (List.Tot.map fst v))
+     | _ -> true
+ 
+ val valid_eq'

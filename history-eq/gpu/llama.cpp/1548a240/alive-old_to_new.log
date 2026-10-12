@@ -1,0 +1,55 @@
+
+----------------------------------------
+define i64 @target(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree noundef willreturn memory(inaccessiblemem: write) {
+#3:
+  %#4 = add i64 noundef %#0, -32
+  %#5 = icmp ult i64 %#4, 2147483616
+  assume i1 %#5
+  %#6 = icmp ult i64 noundef %#1, noundef %#0
+  %#7 = icmp ult i64 noundef %#2, -9223372036854775807
+  assume i1 %#6
+  assume i1 %#7
+  %#8 = shl i64 noundef %#1, 2
+  %#9 = add i64 noundef %#2, %#8
+  ret i64 %#9
+}
+=>
+define i64 @target(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree noundef willreturn memory(inaccessiblemem: write) {
+#3:
+  %#8 = add i64 noundef %#0, -32
+  %#9 = icmp ult i64 %#8, 2147483616
+  assume i1 %#9
+  %#10 = icmp ult i64 noundef %#1, noundef %#0
+  %#11 = icmp ult i64 noundef %#2, -9223372036854775807
+  assume i1 %#10
+  assume i1 %#11
+  %#12 = lshr i64 noundef %#0, 2
+  %#13 = lshr i64 noundef %#1, 2
+  %#14 = icmp samesign ult i64 %#13, %#12
+  br i1 %#14, label %#6, label %#4
+
+#4:
+  %#15 = icmp eq i64 %#13, %#12
+  br i1 %#15, label %#5, label %#7
+
+#5:
+  %#16 = shl i64 noundef %#1, 2
+  %#17 = add i64 noundef %#2, %#16
+  br label %#7
+
+#6:
+  %#18 = shl i64 noundef %#1, 2
+  %#19 = add i64 noundef %#2, %#18
+  br label %#7
+
+#7:
+  %#20 = phi i64 [ %#19, %#6 ], [ %#17, %#5 ], [ -1, %#4 ]
+  ret i64 %#20
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,39 @@
+[
+  {
+    "name": "base64::decode::decode_engine",
+    "level": "api",
+    "verdict": "REFINES",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/C5c043f9",
+    "evidence": "Proof.lean: deng_refines (Old = ok r -> New = ok (resMap r)); deng_old_overflow (as_ref input = ok s, usize::MAX < s.len*4 -> Old = fail integerOverflow); deng_rel (exact relation: Old ;map resMap = as_ref; len*4; /3; New); all kernel-checked, no sorry",
+    "hypotheses": [
+      "htrunc : @Old.alloc.vec.Vec.truncate = @New.alloc.vec.Vec.truncate (same external fn)",
+      "hasmut : @Old.alloc.vec.Vec.as_mut_slice = @New.alloc.vec.Vec.as_mut_slice (same external fn)",
+      "hmap : New.core.result.Result.map inst (resMap r) f = Old.core.result.Result.map inst r f >>= ok o resMap (same external generic fn Result::map, instantiated at the two Aeneas copies of DecodeError; i.e. it commutes with the copy isomorphism)",
+      "Engine impl correspondence: New impl = engMap instO (field-wise copy; decode output's DecodeError mapped by errMap). engMap is a bijection so all corresponding impl pairs are covered. AsRef impl, E, T, Config, DecodeEstimate types are shared."
+    ],
+    "notes": "Aeneas does not model Vec capacity: alloc.vec.Vec.with_capacity _ n := Vec.new, so the capacity change itself (the only real difference: capacity of the returned Vec) is invisible in the model. However the old code still evaluates input.as_ref().len() * 4 with overflow checking (Aeneas = debug-build semantics) and panics when len*4 > usize::MAX (possible for slices of length in (usize::MAX/4, isize::MAX], e.g. >1 GiB inputs on 32-bit targets, debug builds only); the new code never computes it. Hence REFINES in the model (new more defined); in release builds (wrapping arithmetic) the two are EQUIV. 'Not conversely' is witnessed only on the old side (old = fail integerOverflow); whether new returns ok there depends on the user Engine impl and opaque Vec::as_mut_slice. Old also calls as_ref twice (once for the capacity hint, once in decode_engine_vec); the model treats AsRef::as_ref as a pure function, so this is harmless. Proof time ~20 min.",
+    "primary": true
+  },
+  {
+    "name": "base64::decode::decode_engine",
+    "level": "precond",
+    "verdict": "EQUIV_UNDER_PRECOND",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": "for every s with input.as_ref() = Ok(s): s.len() * 4 <= usize::MAX (no overflow in the old capacity hint; not a documented library guarantee, but holds for every input that fits in memory on 64-bit targets)",
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/C5c043f9",
+    "evidence": "Proof.lean: deng_equiv_no_overflow : New.decode_engine (engMap instO) asRef input engine = (Old.decode_engine instO asRef input engine >>= ok o resMap)",
+    "hypotheses": [
+      "same as api unit"
+    ],
+    "notes": "Plain equality (modulo the DecodeError copy) under the no-overflow precondition; covers as_ref failing/diverging too.",
+    "primary": false
+  }
+]

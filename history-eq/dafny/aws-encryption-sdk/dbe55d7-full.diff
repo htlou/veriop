@@ -1,0 +1,1379 @@
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/AwsEncryptionSdkOperations.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/AwsEncryptionSdkOperations.dfy
+index bba1270..d9d8280 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/AwsEncryptionSdkOperations.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/AwsEncryptionSdkOperations.dfy
+@@ -36,6 +36,7 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+   import EncryptionContext
+ 
+   import opened Seq
++  import opened StandardLibrary.MemoryMath
+ 
+   datatype Config = Config(
+     nameonly crypto: Primitives.AtomicPrimitivesClient,
+@@ -160,9 +161,10 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+       .MapFailure(e => Types.AwsCryptographyMaterialProviders(e));
+     }
+ 
+-      // int64 fits 9 exabytes so we're never going to actually hit this. But if we don't
+-      // include this the verifier is not convinced that we can cast the size to int64
+-    :- Need(|input.plaintext| < INT64_MAX_LIMIT,
++    // int64 fits 9 exabytes so we're never going to actually hit this. But if we don't
++    // include this the verifier is not convinced that we can cast the size to int64
++    SequenceIsSafeBecauseItIsInMemory(input.plaintext);
++    :- Need(|input.plaintext| as uint64 < INT64_MAX_LIMIT as uint64,
+             Types.AwsEncryptionSdkException(
+               message := "Plaintext exceeds maximum allowed size"));
+ 
+@@ -316,7 +318,8 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+       var bytes :- maybeBytes
+       .MapFailure(e => Types.AwsCryptographyPrimitives(e));
+ 
+-      :- Need(|bytes| < UINT16_LIMIT,
++      SequenceIsSafeBecauseItIsInMemory(bytes);
++      :- Need(|bytes| as uint64 < UINT16_LIMIT as uint64,
+               Types.AwsEncryptionSdkException(
+                 message := "Length of signature bytes is larger than the uint16 limit."));
+ 
+@@ -527,7 +530,7 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+     //# This default CMM MUST obtain the decryption materials required for
+     //# decryption.
+     // TODO :: Consider removing "Default CMM MUST obtain" from spec.
+-    // It is redundent and hard to prove.
++    // It is redundant and hard to prove.
+ 
+     //= compliance/client-apis/decrypt.txt#2.7.2
+     //# This operation MUST obtain this set of decryption materials
+@@ -762,8 +765,8 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+       decMat,
+       config.crypto
+     );
+-
+-    :- Need(signature.start == |signature.bytes|,
++    SequenceIsSafeBecauseItIsInMemory(signature.bytes);
++    :- Need(signature.start == |signature.bytes| as uint64,
+             Types.AwsEncryptionSdkException(
+               message := "Data after message footer."));
+ 
+@@ -818,7 +821,7 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+   )
+     requires exists readRange: seq<uint8> :: SerializeFunctions.CorrectlyReadRange(buffer, verifiedTail, readRange)
+     ensures
+-      && buffer.start <= verifiedTail.start <= |buffer.bytes|
++      && buffer.start as nat <= verifiedTail.start as nat <= |buffer.bytes|
+       && SerializeFunctions.CorrectlyReadRange(buffer, verifiedTail, buffer.bytes[buffer.start..verifiedTail.start])
+       && buffer.bytes == verifiedTail.bytes
+   {
+@@ -830,7 +833,7 @@ module AwsEncryptionSdkOperations refines AbstractAwsCryptographyEncryptionSdkOp
+     verifiedMid: SerializeFunctions.ReadableBuffer,
+     verifiedTail: SerializeFunctions.ReadableBuffer
+   )
+-    requires buffer.start <= verifiedMid.start <= verifiedTail.start <= |buffer.bytes|
++    requires buffer.start as nat <= verifiedMid.start as nat <= verifiedTail.start as nat <= |buffer.bytes|
+     requires SerializeFunctions.CorrectlyReadRange(buffer, verifiedMid, buffer.bytes[buffer.start..verifiedMid.start])
+     requires SerializeFunctions.CorrectlyReadRange(verifiedMid, verifiedTail, buffer.bytes[verifiedMid.start..verifiedTail.start])
+     ensures SerializeFunctions.CorrectlyReadRange(buffer, verifiedTail, buffer.bytes[buffer.start..verifiedTail.start])
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/EncryptDecrypt.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/EncryptDecrypt.dfy
+index 83be927..f00eb24 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/EncryptDecrypt.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/EncryptDecrypt.dfy
+@@ -12,6 +12,7 @@ module EncryptDecryptHelpers {
+   import opened Wrappers
+   import opened StandardLibrary
+   import opened UInt = StandardLibrary.UInt
++  import opened StandardLibrary.MemoryMath
+   import Types = AwsCryptographyEncryptionSdkTypes
+   import MPL = AwsCryptographyMaterialProvidersTypes
+   import MaterialProviders
+@@ -359,9 +360,10 @@ module EncryptDecryptHelpers {
+       ==>
+         output.Fail?
+   {
++    SequenceIsSafeBecauseItIsInMemory(edks);
+     if
+       && maxEncryptedDataKeys.Some?
+-      && |edks| > maxEncryptedDataKeys.value as int
++      && |edks| as uint64 > maxEncryptedDataKeys.value as uint64
+     then
+       Fail(Types.AwsEncryptionSdkException( message := "Encrypted data keys exceed maxEncryptedDataKeys"))
+     else
+@@ -385,13 +387,13 @@ module EncryptDecryptHelpers {
+       && res.Success?
+       && suite.messageVersion == 1
+       ==>
+-        |res.value| == HeaderTypes.MESSAGE_ID_LEN_V1
++        |res.value| == HeaderTypes.MESSAGE_ID_LEN_V1 as nat
+ 
+     ensures
+       && res.Success?
+       && suite.messageVersion == 2
+       ==>
+-        |res.value| == HeaderTypes.MESSAGE_ID_LEN_V2
++        |res.value| == HeaderTypes.MESSAGE_ID_LEN_V2 as nat
+   {
+     var maybeId;
+     if suite.messageVersion == 1 {
+@@ -551,7 +553,7 @@ module EncryptDecryptHelpers {
+                     encryptionContext := encryptionContext,
+                     encryptedDataKeys := encryptedDataKeys,
+                     contentType := HeaderTypes.ContentType.Framed,
+-                    headerIvLength := SerializableTypes.GetIvLength(suite) as nat,
++                    headerIvLength := SerializableTypes.GetIvLength(suite) as uint64,
+                     frameLength := frameLength
+                   )
+   {
+@@ -570,7 +572,7 @@ module EncryptDecryptHelpers {
+           encryptionContext := encryptionContext,
+           encryptedDataKeys := encryptedDataKeys,
+           contentType := contentType,
+-          headerIvLength := SerializableTypes.GetIvLength(suite) as nat,
++          headerIvLength := SerializableTypes.GetIvLength(suite) as uint64,
+           frameLength := frameLength
+         );
+       case HKDF(_) => return HeaderTypes.HeaderBody.V2HeaderBody(
+@@ -606,13 +608,13 @@ module EncryptDecryptHelpers {
+     //# algorithm (../framework/algorithm-suites.md#encryption-algorithm)
+     //# specified by the algorithm suite (../framework/algorithm-suites.md),
+     //# with the following inputs:
+-    var keyLength := SerializableTypes.GetEncryptKeyLength(suite) as nat;
+-    :- Need(|dataKey| == keyLength,
++    var keyLength := SerializableTypes.GetEncryptKeyLength(suite);
++    SequenceIsSafeBecauseItIsInMemory(dataKey);
++    :- Need(|dataKey| as uint64 == keyLength as uint64,
+             Types.AwsEncryptionSdkException( message := "Incorrect data key length"));
+ 
+-    var ivLength := SerializableTypes.GetIvLength(suite);
+     //#*  The IV has a value of 0.
+-    var iv: seq<uint8> := seq(ivLength, _ => 0);
++    var iv := SerializableTypes.GetIvLengthZeros(suite);
+ 
+     var maybeEncryptionOutput := crypto.AESEncrypt(
+       Primitives.Types.AESEncryptInput(
+@@ -815,8 +817,9 @@ module EncryptDecryptHelpers {
+     ensures header.suiteData != expectedSuiteData ==> res.Failure?
+     ensures |header.suiteData| != suite.commitment.HKDF.outputKeyLength as int ==> res.Failure?
+   {
++    SequenceIsSafeBecauseItIsInMemory(header.suiteData);
+     :- Need(
+-      |header.suiteData| == suite.commitment.HKDF.outputKeyLength as int,
++      |header.suiteData| as uint64 == suite.commitment.HKDF.outputKeyLength as uint64,
+       Types.AwsEncryptionSdkException(
+         message := "Commitment key is invalid")
+     );
+@@ -843,11 +846,11 @@ module EncryptDecryptHelpers {
+     modifies crypto.Modifies
+     ensures crypto.ValidState()
+ 
+-    requires buffer.start <= |buffer.bytes|
++    requires buffer.start as nat <= |buffer.bytes|
+     requires |key| == SerializableTypes.GetEncryptKeyLength(header.suite) as nat
+     ensures res.Success? ==>
+               var (plaintext, tail) := res.value;
+-              && buffer.start <= tail.start <= |buffer.bytes|
++              && buffer.start as nat <= tail.start as nat <= |buffer.bytes|
+               && SerializeFunctions.CorrectlyReadRange(buffer, tail, buffer.bytes[buffer.start..tail.start])
+   {
+     assert CorrectlyReadRange(buffer, buffer, []) by { reveal CorrectlyReadRange(); }
+@@ -879,11 +882,11 @@ module EncryptDecryptHelpers {
+     modifies crypto.Modifies
+     ensures crypto.ValidState()
+ 
+-    requires buffer.start <= |buffer.bytes|
++    requires buffer.start as nat <= |buffer.bytes|
+     requires |key| == SerializableTypes.GetEncryptKeyLength(header.suite) as nat
+     ensures res.Success? ==>
+               var (plaintext, tail) := res.value;
+-              && buffer.start <= tail.start <= |buffer.bytes|
++              && buffer.start as nat <= tail.start as nat <= |buffer.bytes|
+               && SerializeFunctions.CorrectlyReadRange(buffer, tail, buffer.bytes[buffer.start..tail.start])
+   {
+     var messageBody :- MessageBody.ReadNonFramedMessageBody(buffer, header)
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/KeyDerivation.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/KeyDerivation.dfy
+index 17ce359..2c8cf29 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/KeyDerivation.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/KeyDerivation.dfy
+@@ -260,7 +260,7 @@ module KeyDerivation {
+ 
+       :- Need(
+         && SerializableTypes.GetEncryptKeyLength(suite) == suite.kdf.HKDF.outputKeyLength
+-        && |plaintextKey| == suite.kdf.HKDF.inputKeyLength as nat, Types.AwsEncryptionSdkException(
++        && |plaintextKey| as int32 == suite.kdf.HKDF.inputKeyLength as int32, Types.AwsEncryptionSdkException(
+           message := "Invalid Materials"));
+ 
+       keys :- ExpandKeyMaterial(messageId, plaintextKey, suite, crypto);
+@@ -269,9 +269,9 @@ module KeyDerivation {
+                 message := "Suites with message version 1 must not have commitment"));
+ 
+       :- Need(match suite.kdf {
+-                case IDENTITY(i) => |plaintextKey| == SerializableTypes.GetEncryptKeyLength(suite) as nat
++                case IDENTITY(i) => |plaintextKey| as int32 == SerializableTypes.GetEncryptKeyLength(suite)
+                 case HKDF(hkdf) =>
+-                  && |plaintextKey| == suite.kdf.HKDF.inputKeyLength as nat
++                  && |plaintextKey| as int32 == suite.kdf.HKDF.inputKeyLength
+                   && suite.kdf.HKDF.outputKeyLength == SerializableTypes.GetEncryptKeyLength(suite)
+                 case None => false
+               }, Types.AwsEncryptionSdkException(
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/MessageBody.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/MessageBody.dfy
+index 81bfc24..b53e57f 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/MessageBody.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/MessageBody.dfy
+@@ -20,6 +20,7 @@ module MessageBody {
+ 
+   import opened Wrappers
+   import opened UInt = StandardLibrary.UInt
++  import opened StandardLibrary.MemoryMath
+   import Types = AwsCryptographyEncryptionSdkTypes
+   import MPL = AwsCryptographyMaterialProvidersTypes
+   import Primitives = AtomicPrimitives
+@@ -49,7 +50,7 @@ module MessageBody {
+   const ENDFRAME_SEQUENCE_NUMBER: uint32 := Frames.ENDFRAME_SEQUENCE_NUMBER
+   const NONFRAMED_SEQUENCE_NUMBER: uint32 := Frames.NONFRAMED_SEQUENCE_NUMBER
+ 
+-  function method IVSeq(suite: MPL.AlgorithmSuiteInfo, sequenceNumber: uint32)
++  function method {:opaque} IVSeq(suite: MPL.AlgorithmSuiteInfo, sequenceNumber: uint32)
+     :(ret: seq<uint8>)
+     requires 4 <= SerializableTypes.GetIvLength(suite)
+     //= compliance/data-format/message-body.txt#2.5.2.1.2
+@@ -64,7 +65,13 @@ module MessageBody {
+     //# (../framework/algorithm-suites.md) that generated the message.
+     ensures |ret| == SerializableTypes.GetIvLength(suite) as nat
+   {
+-    seq(SerializableTypes.GetIvLength(suite) as nat - 4, _ => 0) + UInt32ToSeq(sequenceNumber)
++    var len : uint8 := SerializableTypes.GetIvLength(suite);
++    var num  := UInt32ToSeq(sequenceNumber);
++    if len == 12 then
++      [0,0,0,0,0,0,0,0] + num
++    else
++      // We never actually get here, but maybe one day
++      seq(len as nat - 4, _ => 0) + num
+   }
+ 
+   //= compliance/data-format/message-body.txt#2.5.2.1.2
+@@ -81,6 +88,7 @@ module MessageBody {
+     ensures IVSeq(suite, m) != IVSeq(suite, n)
+   {
+     var paddingLength :=  SerializableTypes.GetIvLength(suite) as nat - 4;
++    reveal IVSeq;
+     assert IVSeq(suite, m)[paddingLength..] == UInt32ToSeq(m);
+     assert IVSeq(suite, n)[paddingLength..] == UInt32ToSeq(n);
+     UInt32SeqSerializeDeserialize(m);
+@@ -248,7 +256,7 @@ module MessageBody {
+                       && frame.authTag == callEvent.output.value.authTag
+               )
+   {
+-    var n : int, sequenceNumber := 0, START_SEQUENCE_NUMBER;
++    var n : uint64, sequenceNumber := 0, START_SEQUENCE_NUMBER;
+     var regularFrames: MessageRegularFrames := [];
+ 
+     //= compliance/client-apis/encrypt.txt#2.7
+@@ -265,8 +273,9 @@ module MessageBody {
+     // adding another frame puts us at < |plaintext|. This means we will never
+     // consume the entire plaintext in this while loop, and will always construct
+     // a final frame after exiting it.
+-    while n + header.body.frameLength as nat < |plaintext|
+-      invariant |plaintext| != 0 ==> 0 <= n < |plaintext|
++    SequenceIsSafeBecauseItIsInMemory(plaintext);
++    while Add(n, header.body.frameLength as uint64) < |plaintext| as uint64
++      invariant |plaintext| != 0 ==> 0 <= n as nat < |plaintext|
+       invariant |plaintext| == 0 ==> 0 == n
+       invariant START_SEQUENCE_NUMBER <= sequenceNumber <= ENDFRAME_SEQUENCE_NUMBER
+       invariant |regularFrames| == (sequenceNumber - START_SEQUENCE_NUMBER) as nat
+@@ -294,7 +303,7 @@ module MessageBody {
+     {
+       :- Need(sequenceNumber < ENDFRAME_SEQUENCE_NUMBER, Types.AwsEncryptionSdkException(
+                 message := "too many frames"));
+-      var plaintextFrame := plaintext[n..n + header.body.frameLength as nat];
++      var plaintextFrame := plaintext[n..Add(n, header.body.frameLength as uint64)];
+ 
+       //= compliance/client-apis/encrypt.txt#2.7
+       //# *  If there are enough input plaintext bytes consumable to create a
+@@ -314,7 +323,7 @@ module MessageBody {
+       LemmaAddingNextRegularFrame(regularFrames, regularFrame);
+       regularFrames := regularFrames + [regularFrame];
+ 
+-      n := n + header.body.frameLength as nat;
++      n := Add(n, header.body.frameLength as uint64);
+ 
+       //= compliance/client-apis/encrypt.txt#2.7.1
+       //# Otherwise, this value MUST be 1 greater than
+@@ -710,7 +719,7 @@ module MessageBody {
+     assert |AESDecryptHistory| == 0;
+     assert SumDecryptCalls(AESDecryptHistory) == plaintext;
+ 
+-    for i := 0 to |body.regularFrames|
++    for i : uint64 := 0 to |body.regularFrames| as uint64
+       // // The goal is to assert FramesEncryptPlaintext.
+       // // But this requires the final frame e.g. a FramedMessage.
+       // // So I decompose this into parts
+@@ -734,7 +743,7 @@ module MessageBody {
+ 
+       AESDecryptHistory := AESDecryptHistory + [Seq.Last(crypto.History.AESDecrypt)];
+       assert Seq.Last(AESDecryptHistory) == Seq.Last(crypto.History.AESDecrypt);
+-      assert crypto.History.AESDecrypt[i + |old(crypto.History.AESDecrypt)|].input.iv == body.regularFrames[i].iv;
++      assert crypto.History.AESDecrypt[i as nat + |old(crypto.History.AESDecrypt)|].input.iv == body.regularFrames[i].iv;
+     }
+ 
+     var finalPlaintextSegment :- DecryptFrame(body.finalFrame, key, crypto);
+@@ -977,7 +986,7 @@ module MessageBody {
+   }
+   by method { // because Seq.DropLast makes a full copy
+     var result : seq<uint8> := [];
+-    for i := 0 to |frames|
++    for i : uint64 := 0 to |frames| as uint64
+       invariant IsMessageRegularFrames(frames)
+       invariant IsMessageRegularFrames(frames[..i])
+       invariant result == WriteMessageRegularFrames(frames[..i])
+@@ -1008,7 +1017,7 @@ module MessageBody {
+     requires forall frame: Frames.Frame | frame in regularFrames :: frame.header == header
+     requires buffer.bytes == continuation.bytes
+     requires buffer.start <= continuation.start
+-    requires 0 <= continuation.start <= |buffer.bytes|
++    requires 0 <= continuation.start as nat <= |buffer.bytes|
+     requires CorrectlyReadRange(buffer, continuation, buffer.bytes[buffer.start..continuation.start])
+     requires CorrectlyRead(buffer, Success(SuccessfulRead(regularFrames, continuation)), WriteMessageRegularFrames)
+     decreases ENDFRAME_SEQUENCE_NUMBER as nat - |regularFrames|
+@@ -1024,7 +1033,7 @@ module MessageBody {
+     //# data), this operation MUST use the first 4 bytes of a frame to
+     //# determine if the frame MUST be deserialized as a final frame
+     //# (../data-format/message-body.md#final-frame) or regular frame
+-    //# (../fata-format/message-body/md#regular-frame).
++    //# (../data-format/message-body/md#regular-frame).
+     if (sequenceNumber.data != ENDFRAME_SEQUENCE_NUMBER) then
+ 
+       //= compliance/client-apis/decrypt.txt#2.7.4
+@@ -1043,13 +1052,15 @@ module MessageBody {
+       //# Otherwise, this
+       //# value MUST be 1 greater than the value of the sequence number
+       //# of the previous frame.
+-      :- Need(regularFrame.data.seqNum as nat == |regularFrames| + 1, Error("Sequence number out of order."));
+-
++      SequenceIsSafeBecauseItIsInMemory(regularFrames);
++      :- Need(regularFrame.data.seqNum as uint64 == |regularFrames| as uint64 + 1, Error("Sequence number out of order."));
++      assert regularFrame.data.seqNum as nat == |regularFrames| + 1;
+       LemmaAddingNextRegularFrame(regularFrames, regularFrame.data);
+ 
+       var nextRegularFrames: MessageRegularFrames := regularFrames + [regularFrame.data];
+ 
+       CorrectlyReadByteRange(buffer, continuation, WriteMessageRegularFrames(regularFrames));
++      assert CorrectlyReadRange(continuation, regularFrame.tail, Frames.WriteRegularFrame(regularFrame.data));
+       AppendToCorrectlyReadByteRange(buffer, continuation, regularFrame.tail, Frames.WriteRegularFrame(regularFrame.data));
+       assert buffer.bytes == continuation.bytes == regularFrame.tail.bytes by {
+         reveal CorrectlyReadRange();
+@@ -1097,10 +1108,11 @@ module MessageBody {
+ 
+       var finalFrame :- Frames.ReadFinalFrame(continuation, header);
+       :- Need(
+-           finalFrame.data.seqNum as nat == |regularFrames| + 1,
++           finalFrame.data.seqNum as uint64 == |regularFrames| as uint64 + 1,
+            Error("Sequence number out of order.")
+          );
+ 
++      assert finalFrame.data.seqNum as nat == |regularFrames| + 1;
+       assert MessageFramesAreMonotonic(regularFrames + [finalFrame.data]);
+       assert MessageFramesAreForTheSameMessage(regularFrames + [finalFrame.data]);
+ 
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptedDataKeys.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptedDataKeys.dfy
+index f7ce408..7ee56eb 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptedDataKeys.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptedDataKeys.dfy
+@@ -29,7 +29,7 @@ module {:options "/functionSyntax:4" } EncryptedDataKeys {
+   ):
+     (ret: seq<uint8>)
+   {
+-    if |edks| == 0 then []
++    if |edks| as uint64 == 0 then []
+     else
+       WriteEncryptedDataKeys(Seq.DropLast(edks)) + WriteEncryptedDataKey(Seq.Last(edks))
+   }
+@@ -84,7 +84,7 @@ module {:options "/functionSyntax:4" } EncryptedDataKeys {
+     ensures CorrectlyRead(buffer, res, WriteEncryptedDataKeys)
+     ensures res.Success? ==> count as nat == |res.value.data|
+   {
+-    if count as int > |accumulator| then
++    if count as uint64 > |accumulator| as uint64 then
+       var SuccessfulRead(edk, newPos) :- ReadEncryptedDataKey(nextEdkStart);
+       var nextAcc := accumulator + [edk];
+       assert CorrectlyReadRange(buffer, newPos, WriteEncryptedDataKeys(nextAcc)) by {
+@@ -106,7 +106,7 @@ module {:options "/functionSyntax:4" } EncryptedDataKeys {
+ 
+     if
+       && maxEdks.Some?
+-      && count as int > maxEdks.value as int
++      && count as int64 > maxEdks.value
+     then
+       //= compliance/client-apis/decrypt.txt#2.7.1
+       //# If the number of encrypted data keys (../framework/
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptionContext.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptionContext.dfy
+index 3dfd4b6..c179ddf 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptionContext.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/EncryptionContext.dfy
+@@ -14,6 +14,7 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+   import opened Wrappers
+   import opened UTF8
+   import opened SerializeFunctions
++  import opened StandardLibrary.MemoryMath
+ 
+   // There needs to be a canonical representation of the encryption context.
+   // Once the encryption context has been serialized,
+@@ -70,6 +71,7 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+     // This is needed because Dafny can not reveal the subset type by default?
+     assert ESDKCanonicalEncryptionContext?(canonicalEncryptionContext);
+     assert KeysAreUnique(canonicalEncryptionContext);
++    // Can't make this uint64, because Dafny explodes
+     map i
+       | 0 <= i < |canonicalEncryptionContext|
+       :: canonicalEncryptionContext[i].key := canonicalEncryptionContext[i].value
+@@ -227,9 +229,9 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+     var complement := Complement(ec, subEC);
+ 
+     calc {
+-      Length(complement) + Length(subEC);
++      Add(Length(complement), Length(subEC));
+     ==
+-      LinearLength(GetCanonicalLinearPairs(complement)) + LinearLength(GetCanonicalLinearPairs(subEC));
++      Add(LinearLength(GetCanonicalLinearPairs(complement)), LinearLength(GetCanonicalLinearPairs(subEC)));
+     == {LinearLengthIsDistributive(GetCanonicalLinearPairs(complement), GetCanonicalLinearPairs(subEC));}
+       LinearLength(GetCanonicalLinearPairs(complement) + GetCanonicalLinearPairs(subEC));
+     == {
+@@ -314,21 +316,22 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+         && var aad := WriteAAD(ec);
+         && ret == WriteUint16(|aad| as uint16) + aad
+   {
+-    if |ec| == 0 then WriteUint16(0)
++    SequenceIsSafeBecauseItIsInMemory(ec);
++    if |ec| as uint64 == 0 then WriteUint16(0)
+     else
+       var aad := WriteAAD(ec);
+       WriteUint16(|aad| as uint16) + aad
+   }
+ 
+-  // To Calculate the Authenication Only AAD for the Encryption Context,
++  // To Calculate the Authentication Only AAD for the Encryption Context,
+   // the Encryption Context MUST be:
+   // - filtered,
+   // - Canonicalized
+-  // Finally, if the result of the above is an empy Encryption Context,
++  // Finally, if the result of the above is an empty Encryption Context,
+   // it is serialized as [].
+   // Otherwise, it is serialized following the spec's
+   // compliance/data-format/message-header.txt#2.5.1.7.2
+-  // This method ONLY handles the last porition.
++  // This method ONLY handles the last portion.
+   //
+   // On Decrypt, the Decryption Materials' filtering is done
+   // via buildEncryptionContextToOnlyAuthenticate,
+@@ -344,7 +347,8 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+   {
+     // The Serialization of No Encryption Context is NOT `[0, [0, 0]]`,
+     // but `[]`.
+-    if |ec| == 0 then
++    SequenceIsSafeBecauseItIsInMemory(ec);
++    if |ec| as uint64 == 0 then
+       []
+     else
+       WriteAAD(ec)
+@@ -393,13 +397,13 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+     (ret: seq<uint8>)
+     ensures |ec| == 0
+             ==>
+-              && LinearLength(ec) == |ret|
++              && LinearLength(ec) as nat == |ret|
+               && ret == []
+     ensures |ec| != 0
+             ==>
+-              && LinearLength(Seq.DropLast(ec)) + PairLength(Seq.Last(ec)) == |ret|
++              && LinearLength(Seq.DropLast(ec)) as nat + PairLength(Seq.Last(ec)) as nat == |ret|
+               && WriteAADPairs(Seq.DropLast(ec)) + WriteAADPair(Seq.Last(ec)) == ret
+-    ensures |ret| < ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH
++    ensures |ret| < ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH as nat
+   {
+     if |ec| == 0 then []
+     else
+@@ -408,7 +412,8 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+   }
+   by method { // because Seq.DropLast makes a full copy
+     var result : seq<uint8> := [];
+-    for i := 0 to |ec|
++    SequenceIsSafeBecauseItIsInMemory(ec);
++    for i : uint64 := 0 to |ec| as uint64
+       invariant ESDKCanonicalEncryptionContext?(ec)
+       invariant ESDKCanonicalEncryptionContext?(ec[..i])
+       invariant result == WriteAADPairs(ec[..i])
+@@ -453,7 +458,7 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+     pair: ESDKEncryptionContextPair
+   ):
+     (ret: seq<uint8>)
+-    ensures PairLength(pair) == |ret|
++    ensures PairLength(pair) as nat == |ret|
+   {
+     WriteShortLengthSeq(pair.key) + WriteShortLengthSeq(pair.value)
+   }
+@@ -463,7 +468,7 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+   )
+     :(res: ReadCorrect<ESDKEncryptionContextPair>)
+     ensures CorrectlyRead(buffer, res, WriteAADPair)
+-    ensures res.Success? ==> PairLength(res.value.data) == res.value.tail.start - buffer.start
++    ensures res.Success? ==> (res.value.tail.start >= buffer.start) && PairLength(res.value.data) == res.value.tail.start - buffer.start
+   {
+     var SuccessfulRead(key, keyEnd) :- ReadShortLengthSeq(buffer);
+     :- Need(ValidUTF8Seq(key), Error("Invalid Encryption Context key"));
+@@ -496,10 +501,10 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+     ensures res.Success? ==> count as nat == |res.value.data|
+     ensures CorrectlyRead(buffer, res, WriteAADPairs)
+   {
+-    if count as int > |accumulator| then
++    if count > |accumulator| as uint16 then
+       var SuccessfulRead(pair, newPos) :- ReadAADPair(nextPair);
+       :- Need(pair.key !in keys, Error("Duplicate Encryption Context key value."));
+-      :- Need(newPos.start - buffer.start < ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH, Error("Encryption Context exceeds maximum length."));
++      :- Need((newPos.start >= buffer.start) && newPos.start - buffer.start < ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH, Error("Encryption Context exceeds maximum length."));
+ 
+       var nextAcc := accumulator + [pair];
+       // Calling `KeysToSet` once per pair
+@@ -514,8 +519,8 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+         reveal KeysToSet();
+       }
+       assert ESDKCanonicalEncryptionContext?(nextAcc) by {
+-        assert LinearLength(accumulator) == |WriteAADPairs(accumulator)|;
+-        assert nextPair.start == buffer.start + |WriteAADPairs(accumulator)| by {
++        assert LinearLength(accumulator) as nat == |WriteAADPairs(accumulator)|;
++        assert nextPair.start as nat == buffer.start as nat + |WriteAADPairs(accumulator)| by {
+           reveal CorrectlyReadRange();
+         }
+         assert LinearLength(accumulator) == nextPair.start - buffer.start;
+@@ -568,7 +573,8 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+ 
+       Success(SuccessfulRead(empty, length.tail))
+     else
+-      :- Need(length.tail.start + length.data as nat <= |length.tail.bytes|, MoreNeeded(length.tail.start + length.data as nat));
++      SequenceIsSafeBecauseItIsInMemory(length.tail.bytes);
++      :- Need(Add(length.tail.start, length.data as uint64) <= |length.tail.bytes| as uint64, MoreNeeded(Add(length.tail.start, length.data as uint64)));
+ 
+       var verifyCount :- ReadUInt16(length.tail);
+       AppendToCorrectlyReadByteRange(buffer, length.tail, verifyCount.tail, WriteUint16(verifyCount.data));
+@@ -590,7 +596,7 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+         :- Need(0 < verifyCount.data, Error("Encryption Context byte length exceeds pairs count."));
+ 
+         var aad :- ReadAAD(length.tail);
+-        :- Need(aad.tail.start - length.tail.start == length.data as nat, Error("AAD Length did not match stored length."));
++        :- Need((aad.tail.start >= length.tail.start) && aad.tail.start - length.tail.start == length.data as uint64, Error("AAD Length did not match stored length."));
+ 
+         assert !IsExpandedAADSection(buffer);
+         AppendToCorrectlyReadByteRange(buffer, length.tail, aad.tail, WriteAAD(aad.data));
+@@ -619,10 +625,10 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+   {
+     reveal CorrectlyReadRange();
+     reveal ReadUInt16();
+-    && buffer.start + 2 <= |buffer.bytes|
++    && buffer.start as nat + 2 <= |buffer.bytes|
+     && var sectionLength := ReadUInt16(buffer).value;
+     && sectionLength.data == 2
+-    && sectionLength.tail.start + 2 <= |buffer.bytes|
++    && sectionLength.tail.start as nat + 2 <= |buffer.bytes|
+     && ReadUInt16(sectionLength.tail).value.data == 0
+   }
+ 
+@@ -964,7 +970,7 @@ module {:options "/functionSyntax:4" } EncryptionContext {
+       AdvanceCorrectlyReadableByteRange?(buffer, bytes, length.tail, WriteAAD(data));
+ 
+       assert length.data == |WriteAAD(data)| as uint16;
+-      assert length.tail.start + length.data as nat <= |length.tail.bytes|;
++      assert length.tail.start as nat + length.data as nat <= |length.tail.bytes|;
+       assert !IsExpandedAADSection(buffer);
+ 
+       var aad := ReadAADIsComplete(
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Frames.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Frames.dfy
+index c4bc1b9..6a7dc3b 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Frames.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Frames.dfy
+@@ -119,7 +119,7 @@ module Frames {
+        //# The length MUST NOT be greater than "2^36 - 32", or 64 gibibytes (64
+        //# GiB), due to restrictions imposed by the implemented algorithms
+        //# (../framework/algorithm-suites.md).
+-    && |frame.encContent| < SAFE_MAX_ENCRYPT
++    && |frame.encContent| < SAFE_MAX_ENCRYPT as nat
+   }
+ 
+   type NonFramed = frame: Frame
+@@ -135,7 +135,7 @@ module Frames {
+             ==> |frame.encContent| <= 0xFFFF_FFFF
+   {}
+ 
+-  const SAFE_MAX_ENCRYPT := 0xFFFFFFFE0 // 2^36 - 32
++  const SAFE_MAX_ENCRYPT := 0xFFFFFFFE0 as uint64 // 2^36 - 32
+ 
+   function method WriteRegularFrame(
+     regularFrame: RegularFrame
+@@ -160,7 +160,7 @@ module Frames {
+   )
+     :(res: ReadCorrect<RegularFrame>)
+     ensures res.Success?
+-            ==> res.value.data.header == header && res.value.tail.start <= |buffer.bytes|
++            ==> res.value.data.header == header && res.value.tail.start as nat <= |buffer.bytes|
+     ensures CorrectlyRead(buffer, res, WriteRegularFrame)
+   {
+ 
+@@ -170,13 +170,13 @@ module Frames {
+     assert buffer.bytes == sequenceNumber.tail.bytes by {
+       reveal CorrectlyReadRange();
+     }
+-    var iv :- Read(sequenceNumber.tail, GetIvLength(header.suite) as nat);
+-    var encContent :- Read(iv.tail, header.body.frameLength as nat);
+-    var authTag :- Read(encContent.tail, GetTagLength(header.suite) as nat);
++    var iv :- Read(sequenceNumber.tail, GetIvLength(header.suite) as uint64);
++    var encContent :- Read(iv.tail, header.body.frameLength as uint64);
++    var authTag :- Read(encContent.tail, GetTagLength(header.suite) as uint64);
+     assert
+-      && authTag.tail.start <= |buffer.bytes|
++      && authTag.tail.start as nat <= |buffer.bytes|
+       && buffer.start <= authTag.tail.start
+-      && authTag.tail.start == buffer.start + |buffer.bytes[buffer.start..authTag.tail.start]|
++      && authTag.tail.start as nat == buffer.start as nat + |buffer.bytes[buffer.start..authTag.tail.start]|
+     by {
+       reveal CorrectlyReadRange();
+     }
+@@ -242,7 +242,7 @@ module Frames {
+         && finalFrameSignalRes.Success?
+         && var sequenceNumberRes := ReadUInt32(finalFrameSignalRes.value.tail);
+         && sequenceNumberRes.Success?
+-        && var ivRes := Read(sequenceNumberRes.value.tail, GetIvLength(header.suite) as nat);
++        && var ivRes := Read(sequenceNumberRes.value.tail, GetIvLength(header.suite) as uint64);
+         && ivRes.Success?
+         && var encContentRes := ReadUint32Seq(ivRes.value.tail);
+         && encContentRes.Success?
+@@ -254,7 +254,7 @@ module Frames {
+     :- Need(finalFrameSignal.data == ENDFRAME_SEQUENCE_NUMBER, Error("Final frame sequence number MUST be the end-frame sequence number."));
+ 
+     var sequenceNumber :- ReadUInt32(finalFrameSignal.tail);
+-    var iv :- Read(sequenceNumber.tail, GetIvLength(header.suite) as nat);
++    var iv :- Read(sequenceNumber.tail, GetIvLength(header.suite) as uint64);
+ 
+     //= compliance/client-apis/decrypt.txt#2.7.4
+     //# If deserializing a final frame (../data-format/message-body.md#final-
+@@ -265,7 +265,7 @@ module Frames {
+     :- Need(contentLength.data <= header.body.frameLength, Error("Content length MUST NOT exceed the frame length."));
+ 
+     var encContent :- ReadUint32Seq(iv.tail);
+-    var authTag :- Read(encContent.tail, GetTagLength(header.suite) as nat);
++    var authTag :- Read(encContent.tail, GetTagLength(header.suite) as uint64);
+     var finalFrame: FinalFrame := Frame.FinalFrame(
+                                     header,
+                                     sequenceNumber.data,
+@@ -297,13 +297,13 @@ module Frames {
+             ==> res.value.data.header == header
+     ensures CorrectlyRead(buffer, res, WriteNonFramed)
+   {
+-    var iv :- Read(buffer, GetIvLength(header.suite) as nat);
++    var iv :- Read(buffer, GetIvLength(header.suite) as uint64);
+     // Checking only the content length _before_ reading it into memory
+     // is just a nice thing to do given the sizes involved.
+     var contentLength :- ReadUInt64(iv.tail);
+-    :- Need(contentLength.data as nat < SAFE_MAX_ENCRYPT, Error("Frame exceeds AES-GCM cryptographic safety for a single key/iv."));
++    :- Need(contentLength.data < SAFE_MAX_ENCRYPT, Error("Frame exceeds AES-GCM cryptographic safety for a single key/iv."));
+     var encContent :- ReadUint64Seq(iv.tail);
+-    var authTag :- Read(encContent.tail, GetTagLength(header.suite) as nat);
++    var authTag :- Read(encContent.tail, GetTagLength(header.suite) as uint64);
+ 
+     var nonFramed: NonFramed := Frame.NonFramed(
+                                   header,
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Header.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Header.dfy
+index ffe5286..3c30a26 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Header.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/Header.dfy
+@@ -30,6 +30,7 @@ module Header {
+   import opened Wrappers
+   import opened UTF8
+   import opened SerializeFunctions
++  import opened StandardLibrary.MemoryMath
+ 
+   datatype HeaderInfo = HeaderInfo(
+     nameonly body: HeaderTypes.HeaderBody,
+@@ -83,10 +84,15 @@ module Header {
+     body: HeaderTypes.HeaderBody
+   )
+   {
++    assert body.V2HeaderBody? ==> HasUint64Len(body.suiteData) by {
++      if body.V2HeaderBody? {
++        SequenceIsSafeBecauseItIsInMemory(body.suiteData);
++      }
++    }
+     && (suite.commitment.HKDF?
+         ==>
+           && body.V2HeaderBody?
+-          && |body.suiteData| == suite.commitment.HKDF.outputKeyLength as nat)
++          && |body.suiteData| as uint64 == suite.commitment.HKDF.outputKeyLength as uint64)
+     && (!suite.commitment.HKDF?
+         ==>
+           && body.V1HeaderBody?)
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderAuth.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderAuth.dfy
+index d7f4993..513c3ff 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderAuth.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderAuth.dfy
+@@ -92,8 +92,8 @@ module HeaderAuth {
+               && |res.value.data.headerIv| == GetIvLength(suite) as nat
+               && |res.value.data.headerAuthTag| == GetTagLength(suite) as nat
+   {
+-    var headerIv :- Read(buffer, GetIvLength(suite) as nat);
+-    var headerAuthTag :- Read(headerIv.tail, GetTagLength(suite) as nat);
++    var headerIv :- Read(buffer, GetIvLength(suite) as uint64);
++    var headerAuthTag :- Read(headerIv.tail, GetTagLength(suite) as uint64);
+ 
+     var auth: AESMac := HeaderTypes.HeaderAuth.AESMac(
+                           headerIv := headerIv.data,
+@@ -119,8 +119,8 @@ module HeaderAuth {
+               && |res.value.data.headerAuthTag| == GetTagLength(suite) as nat
+   {
+     // TODO: probably this hardcoded iv of all 0s will go into alg suite
+-    var headerIv := seq(GetIvLength(suite) as int, _ => 0);
+-    var headerAuthTag :- Read(buffer, GetTagLength(suite) as nat);
++    var headerIv := GetIvLengthZeros(suite);
++    var headerAuthTag :- Read(buffer, GetTagLength(suite) as uint64);
+ 
+     var auth: AESMac := HeaderTypes.HeaderAuth.AESMac(
+                           headerIv := headerIv,
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderTypes.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderTypes.dfy
+index ea91936..f6c34d4 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderTypes.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/HeaderTypes.dfy
+@@ -52,7 +52,7 @@ module HeaderTypes {
+     {
+       :- Need(x == [0x01] || x == [0x02], "Unsupported Version value.");
+       Success(
+-        match x[0]
++        match x[0 as uint32]
+         case 0x01 => V1
+         case 0x02 => V2
+       )
+@@ -74,7 +74,7 @@ module HeaderTypes {
+         nameonly encryptionContext: EncryptionContext.ESDKCanonicalEncryptionContext,
+         nameonly encryptedDataKeys: ESDKEncryptedDataKeys,
+         nameonly contentType: ContentType,
+-        nameonly headerIvLength: nat,
++        nameonly headerIvLength: uint64,
+         nameonly frameLength: uint32
+       )
+     | V2HeaderBody(
+@@ -158,10 +158,10 @@ module HeaderTypes {
+   }
+ 
+   // TODO: push this into the `IsHeader`
+-  const MESSAGE_ID_LEN_V1 := 16
+-  const MESSAGE_ID_LEN_V2 := 32
++  const MESSAGE_ID_LEN_V1 := 16 as uint64
++  const MESSAGE_ID_LEN_V2 := 32 as uint64
+   type MessageId = x: seq<uint8> |
+-      || |x| == MESSAGE_ID_LEN_V1
+-      || |x| == MESSAGE_ID_LEN_V2
++      || |x| == MESSAGE_ID_LEN_V1 as nat
++      || |x| == MESSAGE_ID_LEN_V2 as nat
+     witness *
+ }
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializableTypes.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializableTypes.dfy
+index 9660d94..a50ffb4 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializableTypes.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializableTypes.dfy
+@@ -7,6 +7,7 @@ module SerializableTypes {
+   import StandardLibrary
+   import opened UInt = StandardLibrary.UInt
+   import opened UTF8
++  import opened StandardLibrary.MemoryMath
+   import MPL = AwsCryptographyMaterialProvidersTypes
+   import AwsCryptographyPrimitivesTypes
+   import SortedSets
+@@ -30,10 +31,11 @@ module SerializableTypes {
+   // The AAD section is the total length|number of pairs|key|value|key|value...
+   // The total length is uint16, so the maximum length for the keys and values
+   // MUST be able to include the uint16 for the number of pairs.
+-  const ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH := UINT16_LIMIT - 2
++  const ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH : uint64 := UINT16_LIMIT as uint64 - 2
+ 
+   predicate method IsESDKEncryptionContext(ec: MPL.EncryptionContext) {
+-    && |ec| < UINT16_LIMIT
++    ValueIsSafeBecauseItIsInMemory(|ec|);
++    && |ec| as uint64 < UINT16_LIMIT as uint64
+     && Length(ec) < ESDK_CANONICAL_ENCRYPTION_CONTEXT_MAX_LENGTH
+     && forall element
+          | element in (multiset(ec.Keys) + multiset(ec.Values))
+@@ -53,6 +55,18 @@ module SerializableTypes {
+     case AES_GCM(e) => e.ivLength as uint8
+   }
+ 
++  function method GetIvLengthZeros(a: MPL.AlgorithmSuiteInfo)
++    : (output: seq<uint8>)
++    ensures |output| == GetIvLength(a) as nat
++    ensures forall x <- output :: x == 0
++  {
++    var len := GetIvLength(a);
++    if len == 12 then
++      [0,0,0,0,0,0,0,0,0,0,0,0]
++    else
++      seq(len, _ => 0)
++  }
++
+   function method GetTagLength(a: MPL.AlgorithmSuiteInfo)
+     : (output: uint8)
+   {
+@@ -86,12 +100,13 @@ module SerializableTypes {
+   function method Length(
+     encryptionContext: MPL.EncryptionContext
+   )
+-    : (ret: nat)
++    : (ret: uint64)
+     ensures
+       var pairs := GetCanonicalLinearPairs(encryptionContext);
+       && ret == LinearLength(pairs)
+   {
+-    if |encryptionContext| == 0 then 0 else
++    ValueIsSafeBecauseItIsInMemory(|encryptionContext|);
++    if |encryptionContext| as uint64 == 0 then 0 else
+     var pairs := GetCanonicalLinearPairs(encryptionContext);
+     LinearLength(pairs)
+   }
+@@ -152,22 +167,23 @@ module SerializableTypes {
+   function LinearLength(
+     pairs: Linear<UTF8.ValidUTF8Bytes, UTF8.ValidUTF8Bytes>
+   ):
+-    (ret: nat)
++    (ret: uint64)
+     ensures |pairs| == 0
+             ==> ret == 0
+     ensures |pairs| != 0
+-            ==> ret == LinearLength(Seq.DropLast(pairs)) + PairLength(Seq.Last(pairs))
++            ==> ret as nat == LinearLength(Seq.DropLast(pairs)) as nat + PairLength(Seq.Last(pairs)) as nat
+   {
+     if |pairs| == 0 then 0
+     else
+-      LinearLength(Seq.DropLast(pairs)) + PairLength(Seq.Last(pairs))
++      Add(LinearLength(Seq.DropLast(pairs)), PairLength(Seq.Last(pairs)))
+   }
+   by method { // because Seq.DropLast makes a full copy
+-    var result : nat := 0;
+-    for i := 0 to |pairs|
++    var result : uint64 := 0;
++    SequenceIsSafeBecauseItIsInMemory(pairs);
++    for i : uint64 := 0 to |pairs| as uint64
+       invariant result == LinearLength(pairs[..i])
+     {
+-      result := result + PairLength(pairs[i]);
++      result := Add(result, PairLength(pairs[i]));
+       assert result == LinearLength(pairs[..i]) + PairLength(pairs[i]);
+       assert Seq.DropLast(pairs[..i+1]) == pairs[..i];
+       assert result == LinearLength(Seq.DropLast(pairs[..i+1])) + PairLength(Seq.Last(pairs[..i+1]));
+@@ -184,16 +200,18 @@ module SerializableTypes {
+   function method PairLength(
+     pair: Pair<UTF8.ValidUTF8Bytes, UTF8.ValidUTF8Bytes>
+   ):
+-    (ret: nat)
++    (ret: uint64)
+   {
+-    2 + |pair.key| + 2 + |pair.value|
++    SequenceIsSafeBecauseItIsInMemory(pair.key);
++    SequenceIsSafeBecauseItIsInMemory(pair.value);
++    Add4(2, |pair.key| as uint64, 2, |pair.value| as uint64)
+   }
+ 
+   lemma LinearLengthIsDistributive(
+     a: Linear<UTF8.ValidUTF8Bytes, UTF8.ValidUTF8Bytes>,
+     b: Linear<UTF8.ValidUTF8Bytes, UTF8.ValidUTF8Bytes>
+   )
+-    ensures LinearLength(a + b) == LinearLength(a) + LinearLength(b)
++    ensures LinearLength(a + b) == Add(LinearLength(a), LinearLength(b))
+   {
+     if b == [] {
+       assert a + b == a;
+@@ -202,17 +220,17 @@ module SerializableTypes {
+         LinearLength(a + b);
+       == // Definition of LinearLength
+         if |a+b| == 0 then 0
+-        else LinearLength(Seq.DropLast(a + b)) + PairLength(Seq.Last(a+b));
++        else Add(LinearLength(Seq.DropLast(a + b)), PairLength(Seq.Last(a+b)));
+       == {assert |a+b| > 0;} // Because of the above `if` block
+-        LinearLength(Seq.DropLast(a + b)) + PairLength(Seq.Last(a+b));
++        Add(LinearLength(Seq.DropLast(a + b)), PairLength(Seq.Last(a+b)));
+       == {assert Seq.Last(a+b) == Seq.Last(b) && Seq.DropLast(a+b) == a + Seq.DropLast(b);} // Breaking apart (a+b)
+-        LinearLength(a + Seq.DropLast(b)) + PairLength(Seq.Last(b));
++        Add(LinearLength(a + Seq.DropLast(b)), PairLength(Seq.Last(b)));
+       == {LinearLengthIsDistributive(a, Seq.DropLast(b));} // This lets us break apart LinearLength(a + Seq.DropLast(b))
+-        (LinearLength(a) + LinearLength(Seq.DropLast(b))) + PairLength(Seq.Last(b));
++        Add(Add(LinearLength(a), LinearLength(Seq.DropLast(b))), PairLength(Seq.Last(b)));
+       == // Move () to prove associativity of +
+-        LinearLength(a) + (LinearLength(Seq.DropLast(b)) + PairLength(Seq.Last(b)));
++        Add(LinearLength(a), Add(LinearLength(Seq.DropLast(b)), PairLength(Seq.Last(b))));
+       == {assert LinearLength(Seq.DropLast(b)) + PairLength(Seq.Last(b)) == LinearLength(b);} // join the 2 parts of b back together
+-        LinearLength(a) + LinearLength(b);
++        Add(LinearLength(a), LinearLength(b));
+       }
+     }
+   }
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializeFunctions.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializeFunctions.dfy
+index 5608d02..f87ef64 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializeFunctions.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SerializeFunctions.dfy
+@@ -8,6 +8,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+   import opened StandardLibrary.UInt
+   import opened Wrappers
+   import opened UTF8
++  import opened StandardLibrary.MemoryMath
+ 
+   datatype ReadProblems =
+       // This _may_ be recoverable.
+@@ -16,7 +17,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+       // a read function _may_ be able to return a datatype.
+       // If the caller is at EOS,
+       // then this is not recoverable.
+-    | MoreNeeded(pos: nat)
++    | MoreNeeded(pos: uint64)
+       // These errors should not be recoverable.
+       // The data is incorrect
+       // and reading the same data again will generate the same error.
+@@ -29,7 +30,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+   // This data structure represents this information.
+   datatype ReadableBuffer = ReadableBuffer(
+     bytes: seq<uint8>,
+-    start: nat
++    start: uint64
+   )
+ 
+   // This holds the data from a successful read.
+@@ -91,7 +92,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     && buffer.bytes == tail.bytes
+        // buffer and tail can start at the same place (i.e the beginning)
+        // as you read more, tail will grow but not larger than the size of the buffer.
+-    && buffer.start <= tail.start <= |buffer.bytes|
++    && buffer.start as nat <= tail.start as nat <= |buffer.bytes|
+        // buffer and tail bytes are the same because when we splice them using buffer.start
+        // as the start all the way to end we have the same sequence
+     && buffer.bytes[buffer.start..] == tail.bytes[buffer.start..]
+@@ -100,7 +101,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     && readRange <= buffer.bytes[buffer.start..]
+        // the start of where we have read up to so far must be equal to where the buffer starts
+        // and the length of the sequence of what we have read.
+-    && tail.start == buffer.start + |readRange|
++    && tail.start as nat == buffer.start as nat + |readRange|
+   }
+ 
+   // Sequence ranges are complicated in Dafny.
+@@ -113,7 +114,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     readRange: seq<uint8>
+   )
+     requires CorrectlyReadRange(buffer, tail, readRange)
+-    ensures buffer.start <= tail.start <= |buffer.bytes|
++    ensures buffer.start as nat <= tail.start as nat <= |buffer.bytes|
+     // we ensure that from buffer.start to tail.start we have correctly read that segment
+     ensures CorrectlyReadRange(buffer, tail, buffer.bytes[buffer.start..tail.start])
+     // once we know we have correctly read, we assert that the splice of buffer.start to tail.start
+@@ -139,14 +140,14 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     tail:ReadableBuffer,
+     readRange: seq<uint8>
+   )
+-    requires buffer.start <= verifiedTail.start <= |buffer.bytes|
++    requires buffer.start as nat <= verifiedTail.start as nat <= |buffer.bytes|
+     // We require that we have correctly read up to the point where we have verified we have read to
+     requires CorrectlyReadRange(buffer, verifiedTail, buffer.bytes[buffer.start..verifiedTail.start])
+     // By moving the pointer to now start at verifiedTail we want to require that packing on the size of
+     // readRange we stay within the bounds of the buffer.
+     requires CorrectlyReadRange(verifiedTail, tail, readRange)
+     // Make sure we have not read past the length of total available byte
+-    ensures buffer.start <= tail.start <= |buffer.bytes|
++    ensures buffer.start as nat <= tail.start as nat <= |buffer.bytes|
+     // Tail is the point of where we have read to; this point is past the verifiedTail
+     // but less than the total buffer.
+     ensures CorrectlyReadRange(buffer, tail, buffer.bytes[buffer.start..tail.start])
+@@ -176,27 +177,28 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+ 
+   opaque function Read(
+     buffer: ReadableBuffer,
+-    length: nat
++    length: uint64
+   ):
+     (res: ReadBinaryCorrect<seq<uint8>>)
+     // Optional elements in a data structure can be represented with a length of 0 bytes.
+     ensures
+-      && buffer.start + length <= |buffer.bytes|
++      && buffer.start as nat + length as nat <= |buffer.bytes|
+       <==>
+       && res.Success?
+-      && |res.value.data| == length
++      && |res.value.data| == length as nat
+     ensures
+-      && |buffer.bytes| < buffer.start + length
++      && |buffer.bytes| < buffer.start as nat + length as nat
+       <==>
+       && res.Failure?
+       && res.error.MoreNeeded?
+-      && res.error.pos == buffer.start + length
++      && res.error.pos == Add(buffer.start, length)
+     ensures CorrectlyRead(buffer, res, Write)
+   {
+     reveal CorrectlyReadRange();
+ 
+-    var end := buffer.start + length;
+-    :- Need(|buffer.bytes| >= end, MoreNeeded(end));
++    var end := Add(buffer.start, length);
++    SequenceIsSafeBecauseItIsInMemory(buffer.bytes);
++    :- Need(|buffer.bytes| as uint64 >= end, MoreNeeded(end));
+ 
+     Success(SuccessfulRead(
+               buffer.bytes[buffer.start..end],
+@@ -215,7 +217,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     buffer: ReadableBuffer
+   )
+     :(res: ReadBinaryCorrect<uint16>)
+-    ensures buffer.start + 2 <= |buffer.bytes| <==> res.Success?
++    ensures buffer.start as nat + 2 <= |buffer.bytes| <==> res.Success?
+     ensures CorrectlyRead(buffer, res, WriteUint16)
+   {
+     var SuccessfulRead(uint16Bytes, tail) :- Read(buffer, 2);
+@@ -234,7 +236,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     buffer: ReadableBuffer
+   ):
+     (res: ReadBinaryCorrect<uint32>)
+-    ensures buffer.start + 4 <= |buffer.bytes| <==> res.Success?
++    ensures buffer.start as nat + 4 <= |buffer.bytes| <==> res.Success?
+     ensures CorrectlyRead(buffer, res, WriteUint32)
+   {
+     var SuccessfulRead(uint32Bytes, tail) :- Read(buffer, 4);
+@@ -253,7 +255,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     buffer: ReadableBuffer
+   ):
+     (res: ReadBinaryCorrect<uint64>)
+-    ensures buffer.start + 8 <= |buffer.bytes| <==> res.Success?
++    ensures buffer.start as nat + 8 <= |buffer.bytes| <==> res.Success?
+     ensures CorrectlyRead(buffer, res, UInt64ToSeq)
+   {
+     var SuccessfulRead(uint64Bytes, tail) :- Read(buffer, 8);
+@@ -279,7 +281,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+               && |res.value.data| == ReadUInt16(buffer).value.data as nat
+   {
+     var length: SuccessfulRead<uint16> :- ReadUInt16(buffer);
+-    var d: SuccessfulRead<Uint8Seq16> :- Read(length.tail, length.data as nat);
++    var d: SuccessfulRead<Uint8Seq16> :- Read(length.tail, length.data as uint64);
+ 
+     assert CorrectlyReadRange(buffer, d.tail, WriteShortLengthSeq(d.data)) by {
+       reveal CorrectlyReadRange();
+@@ -306,7 +308,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+               && |res.value.data| == ReadUInt32(buffer).value.data as nat
+   {
+     var length :- ReadUInt32(buffer);
+-    var d: SuccessfulRead<Uint8Seq32> :- Read(length.tail, length.data as nat);
++    var d: SuccessfulRead<Uint8Seq32> :- Read(length.tail, length.data as uint64);
+ 
+     assert CorrectlyReadRange(buffer, d.tail, WriteUint32Seq(d.data)) by {
+       reveal CorrectlyReadRange();
+@@ -334,7 +336,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+               && |res.value.data| == ReadUInt64(buffer).value.data as nat
+   {
+     var length :- ReadUInt64(buffer);
+-    var d: SuccessfulRead<Uint8Seq64> :- Read(length.tail, length.data as nat);
++    var d: SuccessfulRead<Uint8Seq64> :- Read(length.tail, length.data);
+ 
+     assert CorrectlyReadRange(buffer, d.tail, WriteUint64Seq(d.data)) by {
+       reveal CorrectlyReadRange();
+@@ -358,10 +360,11 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+   )
+     ensures CorrectlyReadableByteRange?(buffer, bytes)
+             ==>
+-              && buffer.start <= buffer.start + |bytes| <= |buffer.bytes|
++              && buffer.start as nat <= buffer.start as nat + |bytes| <= |buffer.bytes|
+               && CorrectlyReadRange(buffer, buffer, buffer.bytes[buffer.start..buffer.start])
+   {
+     reveal CorrectlyReadRange();
++    SequenceIsSafeBecauseItIsInMemory(bytes);
+     CorrectlyReadRange(buffer, MoveStart(buffer, |bytes|), bytes)
+   }
+ 
+@@ -371,7 +374,8 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+   )
+     :(ret: ReadableBuffer)
+   {
+-    buffer.(start := buffer.start + length)
++    ValueIsSafeBecauseItIsInMemory(buffer.start as nat + length);
++    buffer.(start := (buffer.start as nat + length) as uint64)
+   }
+ 
+   // Useful lemma in order to prove the completeness of advancing the read buffer
+@@ -383,9 +387,9 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     readRange?: seq<uint8>
+   )
+     requires CorrectlyReadableByteRange?(buffer, bytes)
+-    // verfified tail is what we have read and verified we have correctly read
++    // verified tail is what we have read and verified we have correctly read
+     // require that it is not longer than the length of bytes available
+-    requires buffer.start <= verifiedTail.start <= |buffer.bytes|
++    requires buffer.start as nat <= verifiedTail.start as nat <= |buffer.bytes|
+     // In order to pack on readRange? we MUST require that we have correctly read up to
+     // verifiedTail. We could get the completeness that packing on verifiedTail succeeded from another
+     // lemma, but in order to pack on we MUST be able to read up until the verifiedTail.
+@@ -417,13 +421,13 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+       && CorrectlyReadableByteRange?(buffer, bytes)
+     ensures
+       && ret.data == data
+-      && Success(ret) == Read(buffer, |bytes|)
++      && Success(ret) == Read(buffer, |bytes| as uint64)
+   {
+     reveal CorrectlyReadRange();
+            // After we have written data and gotten its length we can read its length from
+            // the buffer and we know we can do this from our precondition.
+-    ret := Read(buffer, |Write(data)|).value;
+-    // After we have read what we have writen we need to prove
++    ret := Read(buffer, |Write(data)| as uint64).value;
++    // After we have read what we have written we need to prove
+     // that we can read the length of the what we wrote
+     // In order to satisfy the postcondition
+     CorrectlyReadByteRange(buffer, ret.tail, bytes);
+@@ -548,7 +552,7 @@ module {:options "/functionSyntax:4" } SerializeFunctions {
+     ensures
+       && ReadUint64Seq(buffer).Success?
+       && ReadUint64Seq(buffer).value.data == data
+-      && ReadUint64Seq(buffer).value.tail.start == buffer.start + |bytes|
++      && ReadUint64Seq(buffer).value.tail.start as nat == buffer.start as nat + |bytes|
+     ensures
+       && ret.data == data
+       && Success(ret) == ReadUint64Seq(buffer)
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SharedHeaderFunctions.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SharedHeaderFunctions.dfy
+index 83aafb2..6c78099 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SharedHeaderFunctions.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/SharedHeaderFunctions.dfy
+@@ -119,7 +119,7 @@ module SharedHeaderFunctions {
+     ensures CorrectlyRead(buffer, res, WriteContentType)
+   {
+     var SuccessfulRead(raw, tail) :- SerializeFunctions.Read(buffer, 1);
+-    var contentType :- ContentType.Get(raw[0]).MapFailure(e => Error(e));
++    var contentType :- ContentType.Get(raw[0 as uint32]).MapFailure(e => Error(e));
+ 
+     assert CorrectlyReadRange(buffer, tail, WriteContentType(contentType)) by {
+       reveal CorrectlyReadRange();
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V1HeaderBody.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V1HeaderBody.dfy
+index abad479..a44946f 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V1HeaderBody.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V1HeaderBody.dfy
+@@ -145,7 +145,7 @@ module {:options "/functionSyntax:4" } V1HeaderBody {
+                                encryptionContext := encryptionContext.data,
+                                encryptedDataKeys := encryptedDataKeys.data,
+                                contentType := contentType.data,
+-                               headerIvLength := headerIvLength.data as nat,
++                               headerIvLength := headerIvLength.data as uint64,
+                                frameLength := frameLength.data
+                              );
+     // To prove that we can correctly read what we just wrote we have to break down the pieces
+@@ -170,7 +170,7 @@ module {:options "/functionSyntax:4" } V1HeaderBody {
+             assert |WriteMessageFormatVersion(version.data)| == 1;
+             assert |WriteV1MessageType(messageType.data)| == 1;
+             assert |WriteESDKSuiteId(suite.data)| == 2;
+-            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V1;
++            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V1 as nat;
+             reveal CorrectlyReadRange();
+           }
+           AppendToCorrectlyReadByteRange(buffer, messageId.tail, encryptionContext.tail, WriteExpandedAADSection(encryptionContext.data));
+@@ -190,7 +190,7 @@ module {:options "/functionSyntax:4" } V1HeaderBody {
+             assert |WriteMessageFormatVersion(version.data)| == 1;
+             assert |WriteV1MessageType(messageType.data)| == 1;
+             assert |WriteESDKSuiteId(suite.data)| == 2;
+-            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V1;
++            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V1 as nat;
+             reveal CorrectlyReadRange();
+           }
+           AppendToCorrectlyReadByteRange(buffer, messageId.tail, encryptionContext.tail, WriteAADSection(encryptionContext.data));
+@@ -243,7 +243,7 @@ module {:options "/functionSyntax:4" } V1HeaderBody {
+     ensures CorrectlyRead(buffer, res, WriteV1MessageType)
+   {
+     var SuccessfulRead(raw, tail) :- SerializeFunctions.Read(buffer, 1);
+-    var messageType :- HeaderTypes.MessageType.Get(raw[0]).MapFailure(e => Error(e));
++    var messageType :- HeaderTypes.MessageType.Get(raw[0 as uint32]).MapFailure(e => Error(e));
+ 
+     assert CorrectlyReadRange(buffer, tail, WriteV1MessageType(messageType)) by {
+       reveal CorrectlyReadRange();
+@@ -265,7 +265,7 @@ module {:options "/functionSyntax:4" } V1HeaderBody {
+     :(res: ReadCorrect<ReservedBytes>)
+     ensures CorrectlyRead(buffer, res, WriteV1ReservedBytes)
+   {
+-    var SuccessfulRead(raw, tail) :- SerializeFunctions.Read(buffer, |RESERVED_BYTES|);
++    var SuccessfulRead(raw, tail) :- SerializeFunctions.Read(buffer, |RESERVED_BYTES| as uint64);
+     :- Need(raw == RESERVED_BYTES, Error("Incorrect reserved bytes."));
+     var reservedBytes: ReservedBytes := raw;
+     Success(SuccessfulRead(reservedBytes, tail))
+@@ -288,13 +288,13 @@ module {:options "/functionSyntax:4" } V1HeaderBody {
+     ensures res.Success? ==> GetIvLength(suite) == res.value.data
+   {
+     var SuccessfulRead(raw, tail) :- SerializeFunctions.Read(buffer, 1);
+-    :- Need(raw[0] == GetIvLength(suite), Error("HeaderIv Length does not match Algorithm Suite."));
++    :- Need(raw[0 as uint32] == GetIvLength(suite), Error("HeaderIv Length does not match Algorithm Suite."));
+ 
+-    assert CorrectlyReadRange(buffer, tail, WriteV1HeaderIvLength(raw[0])) by {
++    assert CorrectlyReadRange(buffer, tail, WriteV1HeaderIvLength(raw[0 as uint32])) by {
+       reveal CorrectlyReadRange();
+     }
+ 
+-    Success(SuccessfulRead(raw[0], tail))
++    Success(SuccessfulRead(raw[0 as uint32], tail))
+   }
+ 
+   // This is *not* a function,
+diff --git a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V2HeaderBody.dfy b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V2HeaderBody.dfy
+index d34d8b9..1d56dcc 100644
+--- a/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V2HeaderBody.dfy
++++ b/AwsEncryptionSDK/dafny/AwsEncryptionSdk/src/Serialize/V2HeaderBody.dfy
+@@ -109,7 +109,7 @@ module V2HeaderBody {
+ 
+     var frameLength :- ReadUInt32(contentType.tail);
+ 
+-    var suiteData :- Read(frameLength.tail, suite.data.commitment.HKDF.outputKeyLength as nat);
++    var suiteData :- Read(frameLength.tail, suite.data.commitment.HKDF.outputKeyLength as uint64);
+     assert |suiteData.data| == suite.data.commitment.HKDF.outputKeyLength as nat;
+ 
+     var body:V2HeaderBody := HeaderTypes.V2HeaderBody(
+@@ -132,7 +132,7 @@ module V2HeaderBody {
+           assert IsExpandedAADSection(messageId.tail) by {
+             assert |WriteMessageFormatVersion(version.data)| == 1;
+             assert |WriteESDKSuiteId(suite.data)| == 2;
+-            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V2;
++            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V2 as nat;
+             reveal CorrectlyReadRange();
+           }
+           AppendToCorrectlyReadByteRange(buffer, messageId.tail, encryptionContext.tail, WriteExpandedAADSection(encryptionContext.data));
+@@ -148,7 +148,7 @@ module V2HeaderBody {
+           assert !IsExpandedAADSection(messageId.tail) by {
+             assert |WriteMessageFormatVersion(version.data)| == 1;
+             assert |WriteESDKSuiteId(suite.data)| == 2;
+-            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V2;
++            assert |WriteMessageId(messageId.data)| == HeaderTypes.MESSAGE_ID_LEN_V2 as nat;
+             reveal CorrectlyReadRange();
+           }
+           AppendToCorrectlyReadByteRange(buffer, suite.tail, messageId.tail, WriteMessageId(messageId.data));
+@@ -176,12 +176,12 @@ module V2HeaderBody {
+   }
+ 
+   // version + suiteId + messageId
+-  const headerBytesToAADStart := 1 + 2 + 32
++  const headerBytesToAADStart := (1 + 2 + 32) as uint64
+   predicate IsV2ExpandedAADSection(
+     buffer: ReadableBuffer
+   )
+   {
+-    IsExpandedAADSection(MoveStart(buffer, headerBytesToAADStart))
++    IsExpandedAADSection(MoveStart(buffer, headerBytesToAADStart as nat))
+   }
+ 
+   // This is *not* a function method,
+diff --git a/AwsEncryptionSDK/runtimes/go/examples/go.mod b/AwsEncryptionSDK/runtimes/go/examples/go.mod
+index 7854155..4edb3fa 100644
+--- a/AwsEncryptionSDK/runtimes/go/examples/go.mod
++++ b/AwsEncryptionSDK/runtimes/go/examples/go.mod
+@@ -3,10 +3,11 @@ module github.com/aws/aws-encryption-sdk/releases/go/encryption-sdk/examples
+ go 1.23.0
+ 
+ replace (
+-	github.com/aws/aws-cryptographic-material-providers-library/releases/go/dynamodb v0.0.0 => ../../../../mpl/ComAmazonawsDynamodb/runtimes/go/ImplementationFromDafny-go/
+-	github.com/aws/aws-cryptographic-material-providers-library/releases/go/kms v0.0.0 => ../../../../mpl/ComAmazonawsKms/runtimes/go/ImplementationFromDafny-go/
+-	github.com/aws/aws-cryptographic-material-providers-library/releases/go/primitives v0.0.0 => ../../../../mpl/AwsCryptographyPrimitives/runtimes/go/ImplementationFromDafny-go/
+-	github.com/aws/aws-cryptographic-material-providers-library/releases/go/smithy-dafny-standard-library v0.0.1 => ../../../../mpl/StandardLibrary/runtimes/go/ImplementationFromDafny-go/
++	github.com/aws/aws-cryptographic-material-providers-library/releases/go/dynamodb => ../../../../mpl/ComAmazonawsDynamodb/runtimes/go/ImplementationFromDafny-go/
++	github.com/aws/aws-cryptographic-material-providers-library/releases/go/kms => ../../../../mpl/ComAmazonawsKms/runtimes/go/ImplementationFromDafny-go/
++	github.com/aws/aws-cryptographic-material-providers-library/releases/go/mpl => ../../../../mpl/AwsCryptographicMaterialProviders/runtimes/go/ImplementationFromDafny-go
++	github.com/aws/aws-cryptographic-material-providers-library/releases/go/primitives => ../../../../mpl/AwsCryptographyPrimitives/runtimes/go/ImplementationFromDafny-go/
++	github.com/aws/aws-cryptographic-material-providers-library/releases/go/smithy-dafny-standard-library => ../../../../mpl/StandardLibrary/runtimes/go/ImplementationFromDafny-go/
+ 	github.com/aws/aws-encryption-sdk/releases/go/encryption-sdk => ../ImplementationFromDafny-go/
+ )
+ 
+diff --git a/AwsEncryptionSDK/runtimes/go/examples/go.sum b/AwsEncryptionSDK/runtimes/go/examples/go.sum
+index 53885d3..7e543d1 100644
+--- a/AwsEncryptionSDK/runtimes/go/examples/go.sum
++++ b/AwsEncryptionSDK/runtimes/go/examples/go.sum
+@@ -1,13 +1,3 @@
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/dynamodb v0.2.0 h1:kow/mXv8Hu6aLWl8rlnRDKA897tl3lRa8ALOcSDwWMQ=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/dynamodb v0.2.0/go.mod h1:JHhMzDQkrbrze8jkTYbIKI0+uK2Up6UxqVUOKRUj1qo=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/kms v0.2.0 h1:xVK6j0MNjVrzmwzjRXnuq2BOc0mjlRWQ35Mc1OTKmjo=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/kms v0.2.0/go.mod h1:KMs3humzWQ5kbdPLuXukCtxt/JbKr2tPWj+jlJUF7T4=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/mpl v0.2.0 h1:M6tCnqVjHus/wulPyXrn63Y5gcDLfzbTOw1N31h4Wr4=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/mpl v0.2.0/go.mod h1:wTGJJgTeWcyztSEDg5ziNqgCfOty9Ml83libL4HnkqM=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/primitives v0.2.0 h1:nvPnMVl9dUqDb7oYvJh/7SiWcccs4n0dk7WjLX1BsJ8=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/primitives v0.2.0/go.mod h1:W9V6Mm0ULDvH1JGL7/0qkrzRYuGTaxXfgEOoT7TodQM=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/smithy-dafny-standard-library v0.2.0 h1:NhVxn86bWyWc/uOnE+oTikZdj75yOW6kMCfZNBf2x5E=
+-github.com/aws/aws-cryptographic-material-providers-library/releases/go/smithy-dafny-standard-library v0.2.0/go.mod h1:m3mzHKiNiSC0LWeWX6ZAxSe6mKbJHgliux1Yu/sjCYI=
+ github.com/aws/aws-sdk-go-v2 v1.33.0 h1:Evgm4DI9imD81V0WwD+TN4DCwjUMdc94TrduMLbgZJs=
+ github.com/aws/aws-sdk-go-v2 v1.33.0/go.mod h1:P5WJBrYqqbWVaOxgH0X/FYYD47/nooaPOZPlQdmiN2U=
+ github.com/aws/aws-sdk-go-v2/config v1.29.0 h1:Vk/u4jof33or1qAQLdofpjKV7mQQT7DcUpnYx8kdmxY=
+diff --git a/AwsEncryptionSDK/runtimes/rust/Cargo.toml b/AwsEncryptionSDK/runtimes/rust/Cargo.toml
+index 30db589..0c5e02d 100644
+--- a/AwsEncryptionSDK/runtimes/rust/Cargo.toml
++++ b/AwsEncryptionSDK/runtimes/rust/Cargo.toml
+@@ -16,21 +16,21 @@ readme = "README.md"
+ # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+ 
+ [dependencies]
+-aws-config = "1.5.15"
+-aws-lc-rs = "=1.12.2"
+-aws-lc-sys = "=0.25.1"
+-aws-sdk-dynamodb = "1.62.0"
+-aws-sdk-kms = "1.57.0"
+-aws-smithy-runtime-api = {version = "1.7.3", features = ["client"] }
+-aws-smithy-types = "1.2.12"
+-chrono = "0.4.39"
++aws-config = "1.6.2"
++aws-lc-rs = "=1.13.0"
++aws-lc-sys = "=0.28.2"
++aws-sdk-dynamodb = "1.73.0"
++aws-sdk-kms = "1.67.0"
++aws-smithy-runtime-api = {version = "1.8.0", features = ["client"] }
++aws-smithy-types = "1.3.1"
++chrono = "0.4.41"
+ cpu-time = "1.0.0"
+ dafny_runtime = { path = "../../../mpl/smithy-dafny/TestModels/dafny-dependencies/dafny_runtime_rust", features = ["sync","small-int"]}
+ dashmap = "6.1.0"
+-pem = "3.0.4"
+-rand = "0.9.0"
+-tokio = {version = "1.43.0", features = ["full"] }
+-uuid = { version = "1.12.1", features = ["v4"] }
++pem = "3.0.5"
++rand = "0.9.1"
++tokio = {version = "1.45.0", features = ["full"] }
++uuid = { version = "1.16.0", features = ["v4"] }
+ 
+ [[example]]
+ name = "main"
+diff --git a/TestVectors/runtimes/rust/Cargo.toml b/TestVectors/runtimes/rust/Cargo.toml
+index 3477170..df5d4aa 100644
+--- a/TestVectors/runtimes/rust/Cargo.toml
++++ b/TestVectors/runtimes/rust/Cargo.toml
+@@ -14,22 +14,22 @@ readme = "README.md"
+ wrapped-client = []
+ 
+ [dependencies]
+-aws-config = "1.5.15"
+-aws-lc-rs = "=1.12.2"
+-aws-lc-sys = "=0.25.1"
+-aws-sdk-dynamodb = "1.62.0"
+-aws-sdk-kms = "1.57.0"
+-aws-smithy-runtime-api = {version = "1.7.3", features = ["client"] }
+-aws-smithy-types = "1.2.12"
+-chrono = "0.4.39"
++aws-config = "1.6.2"
++aws-lc-rs = "=1.13.0"
++aws-lc-sys = "=0.28.2"
++aws-sdk-dynamodb = "1.73.0"
++aws-sdk-kms = "1.67.0"
++aws-smithy-runtime-api = {version = "1.8.0", features = ["client"] }
++aws-smithy-types = "1.3.1"
++chrono = "0.4.41"
+ cpu-time = "1.0.0"
+ dafny_runtime = { path = "../../../mpl/smithy-dafny/TestModels/dafny-dependencies/dafny_runtime_rust", features = ["sync","small-int"]}
+ dashmap = "6.1.0"
+-pem = "3.0.4"
+-rand = "0.9.0"
+-tokio = {version = "1.43.0", features = ["full"] }
+-uuid = { version = "1.12.1", features = ["v4"] }
+-ring = "=0.17.8"
++pem = "3.0.5"
++rand = "0.9.1"
++tokio = {version = "1.45.0", features = ["full"] }
++uuid = { version = "1.16.0", features = ["v4"] }
++ring = "=0.17.14"
+ 
+ [dev-dependencies]
+ aws-esdk-test-vectors = { path = ".", features = ["wrapped-client"] }
+diff --git a/mpl b/mpl
+index 1c29322..571e3c5 160000
+--- a/mpl
++++ b/mpl
+@@ -1 +1 @@
+-Subproject commit 1c293223efb2bc9643a45e482daf37a87eeae197
++Subproject commit 571e3c564f1989e3c3df1fd765f4939326bc0893

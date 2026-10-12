@@ -1,0 +1,23 @@
+{
+  "repo": "fast_float",
+  "commit": "cda25408bcb1473a3684ae9de1d63036c3579c21",
+  "parent": "2d57c09530445f1c4c98d6b128ef953767207e8e",
+  "selected_from": "history-eq/results/pinned-samples.json",
+  "performance_intent": "Adds an SSE2 eight-digit char16_t parser in digit_comparison.h",
+  "commit_verdict": "UNVERIFIED_SOURCE_LEVEL_SHARED_UB",
+  "checked_scope": "Eight arbitrary char16_t code units, eight validated ASCII decimal digits, guarded accumulator, and one public from_chars<double,char16_t> input with FASTFLOAT_SSE2=1",
+  "checker": "Bidirectional Alive2 on LLVM IR from exact historical headers; native historical public binaries and UBSan",
+  "compiler": "Clang 20.1.8 C++20 -O2 -msse2 -DFASTFLOAT_SSE2=1 for IR; GCC 11.4.0 C++20 -O2 -msse2 -DFASTFLOAT_SSE2=1 for public runtime",
+  "old_ir_sha256": "2dbc9ad8fe388ba5395de18b29336aa0c8169694a7f861ee8e97e795541c1401",
+  "new_ir_sha256": "86de2a824d6963c016c4d9e327e021811961dd89a7fe509bb5b6f9783ea34f9c",
+  "source_diff_sha256": "abff526c1f51b45f5555a4128c686585ef3faf2b078d38dbc907e61494c59f9e",
+  "result": {
+    "alive2_valid_digits": "Both directions refute target_raw_valid; old 76640200 and new 2550200 for one valid eight-digit input in the forward counterexample",
+    "alive2_guarded": "Two guarded parse_if_eight_digits_unrolled outputs prove equal in both directions",
+    "public_native_sse2": "For decimal text 17763508237772000257, both accept and consume 20 char16_t units; old double bits 43eed0951411a402, new bits 43c1b229b788ddfc",
+    "public_native_default": "With FASTFLOAT_SSE2 undefined, both return bits 43eed0951411a402",
+    "sanitizer": "Both SSE2 historical binaries report a common out-of-bounds 16-byte load from an 8-byte static mask array in fast_read_u64<char16_t>"
+  },
+  "official_performance_score": null,
+  "limitations": "The IR-level counterexample is real under the compiled LLVM model, but the shared historical source-level out-of-bounds load prevents a defined-C++ public equivalence or inequivalence verdict. The SSE2 path requires explicit FASTFLOAT_SSE2=1 here. No official before/after benchmark score was measured."
+}

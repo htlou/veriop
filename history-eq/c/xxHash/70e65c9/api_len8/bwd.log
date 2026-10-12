@@ -1,0 +1,72 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/api_len8/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/api_len8/old.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761401
+  %#4 = load i32, ptr nowrite noundef %#0, align 4
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#5, %#3
+  %#7 = fshl i32 %#6, i32 %#6, i32 17
+  %#8 = mul i32 %#7, 668265263
+  %#9 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#10 = load i32, ptr %#9, align 4
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#11, %#8
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = lshr i32 %#14, 15
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 2246822519
+  %#18 = lshr i32 %#17, 13
+  %#19 = xor i32 %#18, %#17
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = lshr i32 %#20, 16
+  %#22 = xor i32 %#21, %#20
+  ret i32 %#22
+}
+=>
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i64, ptr nowrite noundef %#0, align 1
+  %#8 = add i32 noundef %#1, 374761401
+  %#9 = trunc i64 %#7 to i32
+  %#10 = mul i32 %#9, 3266489917
+  %#11 = add i32 %#10, %#8
+  %#12 = fshl i32 %#11, i32 %#11, i32 17
+  %#13 = mul i32 %#12, 668265263
+  %#14 = lshr i64 %#7, 32
+  %#15 = trunc nuw i64 %#14 to i32
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = add i32 %#16, %#13
+  %#18 = fshl i32 %#17, i32 %#17, i32 17
+  %#19 = mul i32 %#18, 668265263
+  br label %#5
+
+#4:
+  %#20 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#21 = phi i32 [ %#19, %#3 ], [ %#20, %#4 ]
+  %#22 = lshr i32 %#21, 15
+  %#23 = xor i32 %#22, %#21
+  %#24 = mul i32 %#23, 2246822519
+  %#25 = lshr i32 %#24, 13
+  %#26 = xor i32 %#25, %#24
+  %#27 = mul i32 %#26, 3266489917
+  %#28 = lshr i32 %#27, 16
+  %#29 = xor i32 %#28, %#27
+  ret i32 %#29
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

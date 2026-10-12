@@ -1,0 +1,329 @@
+{
+  "repo": "flash-attention",
+  "pin": "94e22c906678e5483fa0e9e24d8e787bc2c0ed4c",
+  "screening_basis": "seeded draw, full commit message, and changed-path tree",
+  "checker_runs": 0,
+  "selected": [
+    {
+      "draw": 153,
+      "commit": "4c8819d8c68e8021cb82cf5b2df38c5eb5340531",
+      "subject": "Rename Mma0->MmaQK, Mma1->MmaPV, use Cluster only if hdimV >= 192",
+      "changed_paths": [
+        "hopper/flash_fwd_kernel_sm90.h",
+        "hopper/flash_fwd_launch_template.h",
+        "hopper/mainloop_fwd_sm90_tma_gmma_ws.hpp",
+        "hopper/tile_size.h"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Changes the existing SM90 forward cluster eligibility from Q head dimension to V head dimension; the upstream source comments identify cluster choice as a measured performance decision.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/4c8819d8c68e8021cb82cf5b2df38c5eb5340531",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 118,
+      "commit": "dec4f2e9101f88f8beffabc9d0f0379323748973",
+      "subject": "[FusedDense] Set workspace size to 32M for Hopper and 4M for others",
+      "changed_paths": [
+        "csrc/fused_dense_lib/fused_dense_cuda.cu"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Tunes the existing fused-dense workspace size by GPU generation.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/dec4f2e9101f88f8beffabc9d0f0379323748973",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 201,
+      "commit": "42e4e3e88ea0846cecf225c4ceb1edaaea621d25",
+      "subject": "[Cute,Bwd,Sm90] Fix bwd dK & dV, more async",
+      "changed_paths": [
+        "flash_attn/cute/block_info.py",
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_postprocess.py",
+        "flash_attn/cute/flash_bwd_sm90.py",
+        "flash_attn/cute/flash_fwd.py",
+        "flash_attn/cute/interface.py",
+        "hopper/mainloop_bwd_sm90_tma_gmma_ws.hpp"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Makes the existing SM90 backward dK/dV path more asynchronous while fixing it.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/42e4e3e88ea0846cecf225c4ceb1edaaea621d25",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 203,
+      "commit": "5badfb78485adf1333f04c46510d99ac56a17622",
+      "subject": "Implement attention kernel that splits the batch into two",
+      "changed_paths": [
+        "csrc/flash_attn/fmha_api.cpp",
+        "csrc/flash_attn/src/fmha.h",
+        "csrc/flash_attn/src/fmha_fprop_kernel_1xN.h",
+        "csrc/flash_attn/src/static_switch.h",
+        "flash_attn/flash_attn_interface.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Adds a split-batch implementation of the existing attention operation.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/5badfb78485adf1333f04c46510d99ac56a17622",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 511,
+      "commit": "343492ec305d474bcf6e45bc05893bbc040fcc30",
+      "subject": "Make nccl operations async in CrossEntropyLossParallel",
+      "changed_paths": [
+        "flash_attn/losses/cross_entropy_parallel.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Makes NCCL collectives asynchronous in the existing parallel cross-entropy operator; this multi-device schedule is outside a single-PTX-kernel comparison.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNSUPPORTED",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/343492ec305d474bcf6e45bc05893bbc040fcc30",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 474,
+      "commit": "d79f9b41a84a7bc39b77e2f2938f5dc637f93ab0",
+      "subject": "[CrossEntropy] Use online softmax to simplify implementation",
+      "changed_paths": [
+        "flash_attn/ops/triton/cross_entropy.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Replaces the existing cross-entropy softmax with an online calculation.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/d79f9b41a84a7bc39b77e2f2938f5dc637f93ab0",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 588,
+      "commit": "ab59ec3590394d108bb19ed70849eafd0cd3ee03",
+      "subject": "remove swizzle part of `sV.data()` to get a completely non-swizzle `sVtNoSwizzle` (#984)",
+      "changed_paths": [
+        "csrc/flash_attn/src/flash_fwd_kernel.h"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Removes shared-memory swizzling from the existing forward V path.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/ab59ec3590394d108bb19ed70849eafd0cd3ee03",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 679,
+      "commit": "a86442f0f35c135c8ed8d7af760b1bd6a832ec07",
+      "subject": "[Gen] Use flash_attn_with_kvcache in generation",
+      "changed_paths": [
+        "flash_attn/layers/rotary.py",
+        "flash_attn/modules/mha.py",
+        "flash_attn/utils/generation.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Uses the KV-cache attention operation in generation; host/operator composition is outside a single-PTX-kernel comparison.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNSUPPORTED",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/a86442f0f35c135c8ed8d7af760b1bd6a832ec07",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 883,
+      "commit": "21876951ef2aa3ae7cc94c6bc79428fd7b4ce8c0",
+      "subject": "[Cute,Bwd,Sm100] Try direct atomicadd rmem -> gmem",
+      "changed_paths": [
+        "flash_attn/cute/copy_utils.py",
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Tries direct register-to-global atomic addition in the existing SM100 backward kernel.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/21876951ef2aa3ae7cc94c6bc79428fd7b4ce8c0",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 931,
+      "commit": "a03f6f8e9ea6692568d98411b464034c22304afd",
+      "subject": "Enable CUDA graphs (#386)",
+      "changed_paths": [
+        "csrc/flash_attn/flash_api.cpp",
+        "csrc/flash_attn/src/flash.h",
+        "csrc/flash_attn/src/flash_bwd_kernel.h",
+        "csrc/flash_attn/src/flash_fwd_kernel.h",
+        "flash_attn/flash_attn_interface.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Enables CUDA graph replay for existing attention calls; launch/capture behavior is outside a single-PTX-kernel comparison.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNSUPPORTED",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/a03f6f8e9ea6692568d98411b464034c22304afd",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 936,
+      "commit": "81643fa0ea63908064e26251b573cd315ca434fe",
+      "subject": "For each batch, if num_splits=1, write to O instead of O_partial",
+      "changed_paths": [
+        "hopper/epilogue_fwd.hpp",
+        "hopper/flash_api.cpp",
+        "hopper/flash_fwd_combine_kernel.h",
+        "hopper/flash_fwd_combine_launch_template.h",
+        "hopper/flash_fwd_kernel_sm80.h",
+        "hopper/flash_fwd_kernel_sm90.h",
+        "hopper/flash_fwd_launch_template.h",
+        "hopper/flash_prepare_scheduler.cu",
+        "hopper/test_flash_attn.py",
+        "hopper/tile_scheduler.hpp"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Writes directly to the final attention output when a batch has one split, avoiding the partial-output path.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/81643fa0ea63908064e26251b573cd315ca434fe",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 981,
+      "commit": "65b4064b2acf24436a1d057f81f88f62992b75db",
+      "subject": "[FusedDense] Kick off input all_gather before weight dtype conversion",
+      "changed_paths": [
+        "flash_attn/modules/mha.py",
+        "flash_attn/ops/fused_dense.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Starts an all-gather earlier in the existing fused-dense operator; communication overlap is outside a single-PTX-kernel comparison.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNSUPPORTED",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/65b4064b2acf24436a1d057f81f88f62992b75db",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 1014,
+      "commit": "419bdb7e3ace3811e0710cf0705b5fdd579e3576",
+      "subject": "[Cute,Bwd,Sm100] Try LPTBwdScheduler",
+      "changed_paths": [
+        "flash_attn/cute/flash_bwd_sm100.py",
+        "flash_attn/cute/tile_scheduler.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Tries a different SM100 backward tile scheduler.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/419bdb7e3ace3811e0710cf0705b5fdd579e3576",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 1068,
+      "commit": "63170625d1adf36ec59def5daefb6b14e9657781",
+      "subject": "[Fwd,Sm90] Implement PipelineAsync with elect_one for commit/release",
+      "changed_paths": [
+        "flash_attn/cute/flash_fwd_sm90.py",
+        "flash_attn/cute/pipeline.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Uses an asynchronous elect-one commit/release pipeline in the existing SM90 forward kernel.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/63170625d1adf36ec59def5daefb6b14e9657781",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 1095,
+      "commit": "91f14ca07b792645b72efbb05b233907a831c898",
+      "subject": "[Cute,Bwd,Sm100] Try gemm_ptx",
+      "changed_paths": [
+        "flash_attn/cute/blackwell_helpers.py",
+        "flash_attn/cute/flash_bwd_sm100.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Tries a PTX GEMM path in the existing SM100 backward kernel.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/91f14ca07b792645b72efbb05b233907a831c898",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    },
+    {
+      "draw": 1010,
+      "commit": "5c7711e49bd64483ed6c2d339d78683c23860e11",
+      "subject": "refine bwd swizzle when deterministic (#2390)",
+      "changed_paths": [
+        "flash_attn/cute/tile_scheduler.py"
+      ],
+      "screen": "confirmed_optimization",
+      "selected_by": "seeded-nonkeyword",
+      "reason": "Accounts for dQ accumulation bytes when calculating deterministic backward head swizzle against the L2 budget.",
+      "source_status": "missing_changed_blob",
+      "checker_target": "Volta",
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "commit-message and changed-path intent screen; exact historical old/new source unavailable",
+      "upstream_url": "https://github.com/Dao-AILab/flash-attention/commit/5c7711e49bd64483ed6c2d339d78683c23860e11",
+      "evidence": "history-eq/results/flash-attention-nonkeyword-late-explicit.json"
+    }
+  ]
+}

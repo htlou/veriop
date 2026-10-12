@@ -1,0 +1,52 @@
+
+----------------------------------------
+define {i64, i64} @target(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2, i64 noundef %#3, i1 noundef zeroext %#4) nofree willreturn memory(none) {
+#5:
+  %#6 = lshr i64 noundef %#3, 40
+  %#7 = zext i64 noundef %#1 to i128
+  %#8 = zext i64 noundef %#0 to i128
+  %#9 = zext nneg i64 %#6 to i128
+  %#10 = shl nuw i128 %#9, 104
+  %#11 = shl i128 %#7, 80
+  %#12 = shl nsw nuw i128 %#8, 16
+  %#13 = or disjoint i128 %#11, %#12
+  %#14 = and i128 %#13, 20282409603651670422847739658240
+  %#15 = or disjoint i128 %#10, %#14
+  %#16 = and i64 noundef %#2, 1099511627775
+  %#17 = trunc i128 %#14 to i64
+  %#18 = or disjoint i64 %#16, %#17
+  %#19 = lshr i128 %#15, 64
+  %#20 = trunc nuw i128 %#19 to i64
+  %#21 = insertvalue {i64, i64} poison, i64 %#18, 0
+  %#22 = insertvalue {i64, i64} %#21, i64 %#20, 1
+  ret {i64, i64} %#22
+}
+=>
+define {i64, i64} @target(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2, i64 noundef %#3, i1 noundef zeroext %#4) nofree willreturn memory(none) {
+#5:
+  %#6 = zext i64 noundef %#1 to i128
+  %#7 = zext i64 noundef %#0 to i128
+  %#8 = lshr i64 noundef %#3, 40
+  %#9 = zext nneg i64 %#8 to i128
+  %#10 = shl nuw i128 %#9, 104
+  %#11 = shl i128 %#6, 80
+  %#12 = shl nsw nuw i128 %#7, 16
+  %#13 = or disjoint i128 %#11, %#12
+  %#14 = and i128 %#13, 20282409603651670422847739658240
+  %#15 = or disjoint i128 %#10, %#14
+  %#16 = and i64 noundef %#2, 1099511627775
+  %#17 = trunc i128 %#14 to i64
+  %#18 = or disjoint i64 %#16, %#17
+  %#19 = lshr i128 %#15, 64
+  %#20 = trunc nuw i128 %#19 to i64
+  %#21 = insertvalue {i64, i64} poison, i64 %#18, 0
+  %#22 = insertvalue {i64, i64} %#21, i64 %#20, 1
+  ret {i64, i64} %#22
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

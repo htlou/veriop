@@ -1,0 +1,1 @@
+#define XXH_INLINE_ALL

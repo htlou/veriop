@@ -1,0 +1,273 @@
+commit 7c6fac72b72bac71b563ae9d8781daafbef8b5d6
+Author:     Everett Hildenbrandt <everett.hildenbrandt@gmail.com>
+AuthorDate: Wed Jan 24 00:02:48 2024 -0700
+Commit:     GitHub <noreply@github.com>
+CommitDate: Wed Jan 24 00:02:48 2024 -0700
+
+    Improvements to proof-loading speed on reruns (#308)
+    
+    * .flake8, pyproject: ignore python files in forge submodule
+    
+    * .gitignore: ignore generate foundry files
+    
+    * pyproject.toml: exclude foundry test data in autoflake
+    
+    * kontrol/foundry: avoid opening all versions of proofs when only one called for
+    
+    * kontrol/foundry: more debugging information, variable renames, expanded logic for matching test ids
+    
+    * kontrol/{solc_to_k,prove}: add properties {Method,Constructor}.is_{test,testfail,setup}
+    
+    * kontrol/prove: rename internal function run_prover => _run_prover to avoid confusion
+    
+    * kontrol/prove: remove deadcode
+    
+    * kontrol/prove: avoid setting up kore-server for proofs that are loaded and already passed
+    
+    * Set Version: 0.1.126
+    
+    * kontrol/prove: formatting
+    
+    * Set Version: 0.1.127
+    
+    * Set Version: 0.1.128
+    
+    * Revert "kontrol/{solc_to_k,prove}: add properties {Method,Constructor}.is_{test,testfail,setup}"
+    
+    This reverts commit c723be5f908633900f328e325772253c91ca98ae.
+    
+    * kontrol/foundry: correctly interpret % in proof directory name
+    
+    * Set Version: 0.1.129
+    
+    * Set Version: 0.1.129
+    
+    * Set Version: 0.1.130
+    
+    ---------
+    
+    Co-authored-by: devops <devops@runtimeverification.com>
+    Co-authored-by: Andrei Văcaru <16517508+anvacaru@users.noreply.github.com>
+
+diff --git a/.flake8 b/.flake8
+index a518873..b360e71 100644
+--- a/.flake8
++++ b/.flake8
+@@ -5,3 +5,5 @@ extend-ignore = B950,E,W1,W2,W3,W4,W5
+ per-file-ignores =
+     */__init__.py: F401
+ type-checking-strict = true
++exclude =
++    src/tests/integration/test-data
+diff --git a/.gitignore b/.gitignore
+index 98fe5a7..6b454b3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,6 @@
+ /dist/
+ __pycache__/
+ .coverage
++src/tests/integration/test-data/foundry/cache
++src/tests/integration/test-data/foundry/lib
++src/tests/integration/test-data/foundry/out
+diff --git a/package/version b/package/version
+index aab9b57..d0c4abc 100644
+--- a/package/version
++++ b/package/version
+@@ -1 +1 @@
+-0.1.129
++0.1.130
+diff --git a/pyproject.toml b/pyproject.toml
+index 4985657..f002582 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
+ 
+ [tool.poetry]
+ name = "kontrol"
+-version = "0.1.129"
++version = "0.1.130"
+ description = "Foundry integration for KEVM"
+ authors = [
+     "Runtime Verification, Inc. <contact@runtimeverification.com>",
+@@ -48,6 +48,7 @@ remove-all-unused-imports = true
+ ignore-init-module-imports = true
+ remove-duplicate-keys = true
+ remove-unused-variables = true
++exclude = "src/tests/integration/test-data"
+ 
+ [tool.black]
+ line-length = 120
+@@ -55,3 +56,4 @@ skip-string-normalization = true
+ 
+ [tool.mypy]
+ disallow_untyped_defs = true
++exclude = "src/tests/integration/test-data"
+diff --git a/src/kontrol/__init__.py b/src/kontrol/__init__.py
+index 2d7c80d..f173baa 100644
+--- a/src/kontrol/__init__.py
++++ b/src/kontrol/__init__.py
+@@ -5,4 +5,4 @@ from typing import TYPE_CHECKING
+ if TYPE_CHECKING:
+     from typing import Final
+ 
+-VERSION: Final = '0.1.129'
++VERSION: Final = '0.1.130'
+diff --git a/src/kontrol/foundry.py b/src/kontrol/foundry.py
+index 8232cfc..e24e081 100644
+--- a/src/kontrol/foundry.py
++++ b/src/kontrol/foundry.py
+@@ -303,22 +303,15 @@ class Foundry:
+         test_sigs = self.matching_tests([test])
+         return test_sigs
+ 
+-    def get_test_id(self, test: str, id: int | None) -> str:
+-        matching_proofs = self.proofs_with_test(test)
+-        if not matching_proofs:
+-            raise ValueError(f'Found no matching proofs for {test}.')
+-        if id is None:
+-            if len(matching_proofs) > 1:
+-                raise ValueError(
+-                    f'Found {len(matching_proofs)} matching proofs for {test}. Use the --version flag to choose one.'
+-                )
+-            test_id = single(matching_proofs).id
+-            return test_id
+-        else:
+-            for proof in matching_proofs:
+-                if proof.id.endswith(str(id)):
+-                    return proof.id
+-            raise ValueError('No proof matching this predicate.')
++    def get_test_id(self, test: str, version: int | None) -> str:
++        matching_proof_ids = self.proof_ids_with_test(test, version)
++        if len(matching_proof_ids) == 0:
++            raise ValueError(f'Found no matching proofs for {test}:{version}.')
++        if len(matching_proof_ids) > 1:
++            raise ValueError(
++                f'Found {len(matching_proof_ids)} matching proofs for {test}:{version}. Use the --version flag to choose one.'
++            )
++        return single(matching_proof_ids)
+ 
+     @staticmethod
+     def success(s: KInner, dst: KInner, r: KInner, c: KInner, e1: KInner, e2: KInner) -> KApply:
+@@ -379,13 +372,19 @@ class Foundry:
+         )
+         return res_lines
+ 
+-    def proofs_with_test(self, test: str) -> list[Proof]:
+-        proofs = [
+-            self.get_optional_proof(pid)
+-            for pid in listdir(self.proofs_dir)
+-            if re.search(single(self._escape_brackets([test])), pid.split(':')[0])
++    def proof_ids_with_test(self, test: str, version: int | None = None) -> list[str]:
++        regex = single(self._escape_brackets([test]))
++        all_proof_ids: list[tuple[str, str, int]] = []
++        for pid in listdir(self.proofs_dir):
++            proof_dir = '%'.join(pid.split('%')[0:-1])
++            proof_name = pid.split('%')[1].split(':')[0]
++            proof_version = int(pid.split(':')[1])
++            all_proof_ids.append((proof_dir, proof_name, proof_version))
++        proof_ids = [
++            (pd, pn, pv) for pd, pn, pv in all_proof_ids if re.search(regex, pn) and (version is None or version == pv)
+         ]
+-        return [proof for proof in proofs if proof is not None]
++        _LOGGER.info(f'Found {len(proof_ids)} matching proofs for {regex}:{version}: {proof_ids}')
++        return [f'{pd}%{pn}:{pv}' for pd, pn, pv in proof_ids]
+ 
+     def get_apr_proof(self, test_id: str) -> APRProof:
+         proof = Proof.read_proof_data(self.proofs_dir, test_id)
+diff --git a/src/kontrol/prove.py b/src/kontrol/prove.py
+index 61b87d0..9d89ab1 100644
+--- a/src/kontrol/prove.py
++++ b/src/kontrol/prove.py
+@@ -86,9 +86,9 @@ def foundry_prove(
+     for test in constructor_tests:
+         test.method.update_digest(foundry.digest_file)
+ 
+-    def run_prover(test_suite: list[FoundryTest]) -> list[APRProof]:
++    def _run_prover(_test_suite: list[FoundryTest]) -> list[APRProof]:
+         return _run_cfg_group(
+-            tests=test_suite,
++            tests=_test_suite,
+             foundry=foundry,
+             prove_options=prove_options,
+             rpc_options=rpc_options,
+@@ -96,20 +96,20 @@ def foundry_prove(
+ 
+     if prove_options.run_constructor:
+         _LOGGER.info(f'Running initialization code for contracts in parallel: {constructor_names}')
+-        results = run_prover(constructor_tests)
++        results = _run_prover(constructor_tests)
+         failed = [proof for proof in results if not proof.passed]
+         if failed:
+             raise ValueError(f'Running initialization code failed for {len(failed)} contracts: {failed}')
+ 
+     _LOGGER.info(f'Running setup functions in parallel: {setup_method_names}')
+-    results = run_prover(setup_method_tests)
++    results = _run_prover(setup_method_tests)
+ 
+     failed = [proof for proof in results if not proof.passed]
+     if failed:
+         raise ValueError(f'Running setUp method failed for {len(failed)} contracts: {failed}')
+ 
+     _LOGGER.info(f'Running test functions in parallel: {test_names}')
+-    results = run_prover(test_suite)
++    results = _run_prover(test_suite)
+     return results
+ 
+ 
+@@ -186,6 +186,10 @@ def _run_cfg_group(
+     rpc_options: RPCOptions,
+ ) -> list[APRProof]:
+     def init_and_run_proof(test: FoundryTest) -> APRFailureInfo | None:
++        if Proof.proof_data_exists(test.id, foundry.proofs_dir):
++            apr_proof = foundry.get_apr_proof(test.id)
++            if apr_proof.passed:
++                return None
+         start_server = rpc_options.port is None
+         with legacy_explore(
+             foundry.kevm,
+@@ -600,8 +604,6 @@ def _init_cterm(
+         'STORAGESLOTSET_CELL': KApply('.Set'),
+     }
+ 
+-    constraints = None
+-
+     if calldata is not None:
+         init_subst['CALLDATA_CELL'] = calldata
+ 
+@@ -616,12 +618,7 @@ def _init_cterm(
+     init_term = Subst(init_subst)(empty_config)
+     init_cterm = CTerm.from_kast(init_term)
+     init_cterm = KEVM.add_invariant(init_cterm)
+-    if constraints is None:
+-        return init_cterm
+-    else:
+-        for constraint in constraints:
+-            init_cterm = init_cterm.add_constraint(constraint)
+-        return init_cterm
++    return init_cterm
+ 
+ 
+ def _final_cterm(
+diff --git a/src/tests/integration/test_foundry_prove.py b/src/tests/integration/test_foundry_prove.py
+index 9184f53..40f4202 100644
+--- a/src/tests/integration/test_foundry_prove.py
++++ b/src/tests/integration/test_foundry_prove.py
+@@ -308,7 +308,7 @@ def test_foundry_merge_nodes(foundry: Foundry, bug_report: BugReport | None, ser
+ 
+ 
+ def check_pending(foundry: Foundry, test: str, pending: list[int]) -> None:
+-    proofs = foundry.proofs_with_test(test)
++    proofs = [foundry.get_optional_proof(pid) for pid in foundry.proof_ids_with_test(test)]
+     apr_proofs: list[APRProof] = [proof for proof in proofs if type(proof) is APRProof]
+     proof = single(apr_proofs)
+     assert [node.id for node in proof.pending] == pending
+@@ -378,7 +378,7 @@ def test_foundry_remove_node(
+         node=4,
+     )
+ 
+-    proof = single(foundry.proofs_with_test(test))
++    proof = foundry.get_optional_proof(single(foundry.proof_ids_with_test(test)))
+     assert type(proof) is APRProof
+     assert proof.pending
+ 

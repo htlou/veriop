@@ -1,0 +1,385 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+index 13686ea9..68066ad8 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+@@ -424,6 +424,12 @@ public final class ArrayContainer extends Container implements Cloneable {
+     return new ArrayContainerShortIterator(this);
+   }
+ 
++  @Override
++  public PeekableShortRankIterator getShortRankIterator() {
++    // for ArrayContainer there is no additional work, pos is known in advance
++    return new ArrayContainerShortIterator(this);
++  }
++
+   @Override
+   public ContainerBatchIterator getBatchIterator() {
+     return new ArrayBatchIterator(this);
+@@ -1295,7 +1301,7 @@ public final class ArrayContainer extends Container implements Cloneable {
+ }
+ 
+ 
+-final class ArrayContainerShortIterator implements PeekableShortIterator {
++final class ArrayContainerShortIterator implements PeekableShortRankIterator {
+   int pos;
+   ArrayContainer parent;
+ 
+@@ -1310,11 +1316,15 @@ final class ArrayContainerShortIterator implements PeekableShortIterator {
+     pos = Util.advanceUntil(parent.content, pos - 1, parent.cardinality, minval);
+   }
+ 
++  @Override
++  public short peekNextRank() {
++    return (short) (pos + 1);
++  }
+ 
+   @Override
+-  public PeekableShortIterator clone() {
++  public PeekableShortRankIterator clone() {
+     try {
+-      return (PeekableShortIterator) super.clone();
++      return (PeekableShortRankIterator) super.clone();
+     } catch (CloneNotSupportedException e) {
+       return null;// will not happen
+     }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index 4ea819bc..7006ce1c 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -12,7 +12,7 @@ import java.nio.LongBuffer;
+ import java.util.Arrays;
+ import java.util.Iterator;
+ 
+-import static java.lang.Long.numberOfLeadingZeros;
++import static java.lang.Long.bitCount;
+ import static java.lang.Long.numberOfTrailingZeros;
+ 
+ 
+@@ -505,6 +505,11 @@ public final class BitmapContainer extends Container implements Cloneable {
+     return new BitmapContainerShortIterator(this.bitmap);
+   }
+ 
++  @Override
++  public PeekableShortRankIterator getShortRankIterator() {
++    return new BitmapContainerShortRankIterator(this.bitmap);
++  }
++
+   @Override
+   public ContainerBatchIterator getBatchIterator() {
+     return new BitmapBatchIterator(this);
+@@ -1371,7 +1376,7 @@ public final class BitmapContainer extends Container implements Cloneable {
+ }
+ 
+ 
+-final class BitmapContainerShortIterator implements PeekableShortIterator {
++class BitmapContainerShortIterator implements PeekableShortIterator {
+ 
+   long w;
+   int x;
+@@ -1459,6 +1464,57 @@ final class BitmapContainerShortIterator implements PeekableShortIterator {
+   }
+ }
+ 
++final class BitmapContainerShortRankIterator extends BitmapContainerShortIterator
++    implements PeekableShortRankIterator {
++  short nextRank = 1;
++
++  public BitmapContainerShortRankIterator(long[] p) {
++    super(p);
++  }
++
++  @Override
++  public short peekNextRank() {
++    return nextRank;
++  }
++
++  @Override
++  public short next() {
++    ++nextRank;
++    return super.next();
++  }
++
++  @Override
++  public void advanceIfNeeded(short minval) {
++    if (Util.toIntUnsigned(minval) >= (x + 1) * 64) {
++
++      int nextX = Util.toIntUnsigned(minval) / 64;
++      nextRank += bitCount(w);
++      for(x = x + 1; x < nextX; ++x) {
++        w = bitmap[x];
++        nextRank += bitCount(w);
++      }
++
++      x = nextX;
++      w = bitmap[x];
++
++      while (w == 0) {
++        ++x;
++        if (x == bitmap.length) {
++          return;
++        }
++        w = bitmap[x];
++      }
++    }
++    while (hasNext() && (Util.toIntUnsigned(peekNext()) < Util.toIntUnsigned(minval))) {
++      next(); // could be optimized
++    }
++  }
++
++  @Override
++  public PeekableShortRankIterator clone() {
++    return (PeekableShortRankIterator) super.clone();
++  }
++}
+ 
+ final class ReverseBitmapContainerShortIterator implements ShortIterator {
+ 
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+index 8ece6db9..8970b9df 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+@@ -321,6 +321,13 @@ public abstract class Container implements Iterable<Short>, Cloneable, Externali
+    */
+   public abstract PeekableShortIterator getShortIterator();
+ 
++  /**
++   * Iterator to visit the short values in container and pre-compute ranks
++   *
++   * @return iterator
++   */
++  public abstract PeekableShortRankIterator getShortRankIterator();
++
+   /**
+    * Gets an iterator to visit the contents of the container in batches
+    * @return iterator
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java
+index f3f8965f..e1fe3f43 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java
+@@ -252,4 +252,93 @@ public class FastRankRoaringBitmap extends RoaringBitmap {
+ 
+     return value;
+   }
++
++  /**
++   * Get a special iterator that allows .peekNextRank efficiently
++   *
++   * @return iterator with fast rank access
++   */
++  public PeekableIntRankIterator getIntRankIterator() {
++    preComputeCardinalities();
++    return new FastRoaringIntRankIterator();
++  }
++
++  private class FastRoaringIntRankIterator implements PeekableIntRankIterator {
++    private int hs = 0;
++
++    private PeekableShortRankIterator iter;
++
++    private int pos = 0;
++
++    private FastRoaringIntRankIterator() {
++      nextContainer();
++    }
++
++    @Override
++    public int peekNextRank() {
++      int iterRank = Util.toIntUnsigned(iter.peekNextRank());
++      if (pos > 0) {
++        return FastRankRoaringBitmap.this.highToCumulatedCardinality[pos - 1] + iterRank;
++      } else {
++        return iterRank;
++      }
++    }
++
++    @Override
++    public PeekableIntRankIterator clone() {
++      try {
++        FastRoaringIntRankIterator x =
++            (FastRoaringIntRankIterator) super.clone();
++        if (this.iter != null) {
++          x.iter = this.iter.clone();
++        }
++        return x;
++      } catch (CloneNotSupportedException e) {
++        return null;// will not happen
++      }
++    }
++
++    @Override
++    public boolean hasNext() {
++      return pos < FastRankRoaringBitmap.this.highLowContainer.size();
++    }
++
++    @Override
++    public int next() {
++      final int x = iter.nextAsInt() | hs;
++      if (!iter.hasNext()) {
++        ++pos;
++        nextContainer();
++      }
++      return x;
++    }
++
++    private void nextContainer() {
++      if (pos < FastRankRoaringBitmap.this.highLowContainer.size()) {
++        iter = FastRankRoaringBitmap.this.highLowContainer.getContainerAtIndex(pos)
++                                                          .getShortRankIterator();
++        hs = FastRankRoaringBitmap.this.highLowContainer.getKeyAtIndex(pos) << 16;
++      }
++    }
++
++    @Override
++    public void advanceIfNeeded(int minval) {
++      while (hasNext() && ((hs >>> 16) < (minval >>> 16))) {
++        ++pos;
++        nextContainer();
++      }
++      if (hasNext() && ((hs >>> 16) == (minval >>> 16))) {
++        iter.advanceIfNeeded(Util.lowbits(minval));
++        if (!iter.hasNext()) {
++          ++pos;
++          nextContainer();
++        }
++      }
++    }
++
++    @Override
++    public int peekNext() {
++      return Util.toIntUnsigned(iter.peekNext()) | hs;
++    }
++  }
+ }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/PeekableIntRankIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/PeekableIntRankIterator.java
+new file mode 100644
+index 00000000..c8b1561d
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/PeekableIntRankIterator.java
+@@ -0,0 +1,18 @@
++package org.roaringbitmap;
++
++/**
++ * PeekableIntIterator that calculates the next value rank during iteration
++ */
++public interface PeekableIntRankIterator extends PeekableIntIterator {
++  /**
++   * Look at rank of the next value without advancing
++   *
++   * @return rank of next value
++   */
++  int peekNextRank();
++
++  @Override
++  PeekableIntRankIterator clone();
++}
++
++
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/PeekableShortRankIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/PeekableShortRankIterator.java
+new file mode 100644
+index 00000000..864e6b71
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/PeekableShortRankIterator.java
+@@ -0,0 +1,16 @@
++package org.roaringbitmap;
++
++/**
++ * PeekableShortIterator that calculates the next value rank during iteration
++ */
++public interface PeekableShortRankIterator extends PeekableShortIterator {
++
++  /**
++   * peek in-container rank of the next value
++   * @return rank of the next value
++   */
++  short peekNextRank();
++
++  @Override
++  PeekableShortRankIterator clone();
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+index a98e08c1..4abe7d4f 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+@@ -1058,6 +1058,11 @@ public final class RunContainer extends Container implements Cloneable {
+     return new RunContainerShortIterator(this);
+   }
+ 
++  @Override
++  public PeekableShortRankIterator getShortRankIterator() {
++    return new RunContainerShortRankIterator(this);
++  }
++
+   @Override
+   public ContainerBatchIterator getBatchIterator() {
+     return new RunBatchIterator(this);
+@@ -2568,7 +2573,7 @@ public final class RunContainer extends Container implements Cloneable {
+ }
+ 
+ 
+-final class RunContainerShortIterator implements PeekableShortIterator {
++class RunContainerShortIterator implements PeekableShortIterator {
+   int pos;
+   int le = 0;
+   int maxlength;
+@@ -2668,6 +2673,61 @@ final class RunContainerShortIterator implements PeekableShortIterator {
+ 
+ }
+ 
++class RunContainerShortRankIterator extends RunContainerShortIterator
++    implements PeekableShortRankIterator {
++
++  short nextRank = 1;
++
++  public RunContainerShortRankIterator(RunContainer p) {
++    super(p);
++  }
++
++  @Override
++  public short next() {
++    ++nextRank;
++    return super.next();
++  }
++
++  @Override
++  public int nextAsInt() {
++    ++nextRank;
++    return super.nextAsInt();
++  }
++
++  @Override
++  public void advanceIfNeeded(short minval) {
++    while (base + maxlength < toIntUnsigned(minval)) {
++      nextRank += maxlength - le + 1;
++
++      pos++;
++      le = 0;
++      if (pos < parent.nbrruns) {
++        maxlength = toIntUnsigned(parent.getLength(pos));
++        base = toIntUnsigned(parent.getValue(pos));
++      } else {
++        return;
++      }
++    }
++
++    if (base > toIntUnsigned(minval)) {
++      return;
++    }
++    int nextLe = toIntUnsigned(minval) - base;
++
++    nextRank += nextLe - le;
++    le = nextLe;
++  }
++
++  @Override
++  public short peekNextRank() {
++    return nextRank;
++  }
++
++  @Override
++  public RunContainerShortRankIterator clone() {
++    return (RunContainerShortRankIterator) super.clone();
++  }
++}
+ 
+ 
+ final class ReverseRunContainerShortIterator implements ShortIterator {

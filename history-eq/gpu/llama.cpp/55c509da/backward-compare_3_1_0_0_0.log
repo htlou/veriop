@@ -1,0 +1,40 @@
+
+----------------------------------------
+define void @compare_3_1_0_0_0(ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0) nofree willreturn memory(argmem: readwrite) {
+#1:
+  %#2 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 512
+  %#3 = load float, ptr %#2, align 16
+  store float %#3, ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, align 16
+  %#4 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 528
+  %#5 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 4
+  %#6 = load float, ptr %#4, align 16
+  store float %#6, ptr %#5, align 4
+  %#7 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 544
+  %#8 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 8
+  %#9 = load float, ptr %#7, align 16
+  store float %#9, ptr %#8, align 8
+  ret void
+}
+=>
+define void @compare_3_1_0_0_0(ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0) nofree willreturn memory(argmem: readwrite) {
+#1:
+  %#2 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 512
+  %#3 = load float, ptr %#2, align 16
+  store float %#3, ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, align 16
+  %#4 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 528
+  %#5 = load float, ptr %#4, align 16
+  %#6 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 4
+  store float %#5, ptr %#6, align 4
+  %#7 = gep ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 544
+  %#8 = load float, ptr %#7, align 16
+  %#9 = gep inbounds nuw ptr nonnull dereferenceable(768) noundef align(16) initializes((0, 12)) %#0, 1 x i64 8
+  store float %#8, ptr %#9, align 8
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

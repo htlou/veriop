@@ -1,0 +1,67 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/5176062/pre_aligned8_xxh32_len4/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/5176062/pre_aligned8_xxh32_len4/old.ll
+
+----------------------------------------
+define i32 @target_oneshot(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#5 = ptrtoint ptr noundef %#0 to i64
+  %#6 = and i64 %#5, 7
+  %#7 = icmp eq i64 %#6, 0
+  br i1 %#7, label %#3, label %#4
+
+#3:
+  %#8 = add i32 noundef %#1, 374761397
+  %#9 = load i32, ptr noundef %#0, align 4
+  %#10 = mul i32 %#9, 3266489917
+  %#11 = add i32 %#8, %#10
+  %#12 = fshl i32 %#11, i32 %#11, i32 17
+  %#13 = mul i32 %#12, 668265263
+  %#14 = lshr i32 %#13, 15
+  %#15 = xor i32 %#14, %#13
+  %#16 = mul i32 %#15, 2246822519
+  %#17 = lshr i32 %#16, 13
+  %#18 = xor i32 %#17, %#16
+  %#19 = mul i32 %#18, 3266489917
+  %#20 = lshr i32 %#19, 16
+  %#21 = xor i32 %#20, %#19
+  br label %#4
+
+#4:
+  %#22 = phi i32 [ %#21, %#3 ], [ 0, %#2 ]
+  ret i32 %#22
+}
+=>
+define i32 @target_oneshot(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#5 = ptrtoint ptr noundef %#0 to i64
+  %#6 = and i64 %#5, 7
+  %#7 = icmp eq i64 %#6, 0
+  br i1 %#7, label %#3, label %#4
+
+#3:
+  %#8 = load i32, ptr noundef %#0, align 1
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = add i32 noundef %#1, 374761397
+  %#11 = add i32 %#9, %#10
+  %#12 = fshl i32 %#11, i32 %#11, i32 17
+  %#13 = mul i32 %#12, 668265263
+  %#14 = lshr i32 %#13, 15
+  %#15 = xor i32 %#14, %#13
+  %#16 = mul i32 %#15, 2246822519
+  %#17 = lshr i32 %#16, 13
+  %#18 = xor i32 %#17, %#16
+  %#19 = mul i32 %#18, 3266489917
+  %#20 = lshr i32 %#19, 16
+  %#21 = xor i32 %#20, %#19
+  br label %#4
+
+#4:
+  %#22 = phi i32 [ %#21, %#3 ], [ 0, %#2 ]
+  ret i32 %#22
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

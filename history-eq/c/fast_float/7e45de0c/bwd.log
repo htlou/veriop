@@ -1,0 +1,639 @@
+
+----------------------------------------
+define i1 @target_char_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 223
+  %#9 = icmp eq i32 %#8, 78
+  %#10 = and i32 noundef %#1, 223
+  %#11 = icmp eq i32 %#10, 65
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 223
+  %#14 = icmp eq i32 %#13, 78
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = trunc i32 noundef %#0 to i24
+  %#7 = and i24 %#6, 223
+  %#8 = trunc i32 noundef %#1 to i24
+  %#9 = shl i24 %#8, 8
+  %#10 = and i24 %#9, 57088
+  %#11 = or disjoint i24 %#10, %#7
+  %#12 = trunc i32 noundef %#2 to i24
+  %#13 = shl i24 %#12, 16
+  %#14 = and i24 %#13, 14614528
+  %#15 = or disjoint i24 %#11, %#14
+  %#16 = icmp eq i24 %#15, 5128526
+  ret i1 %#16
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 223
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 223
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 223
+  %#14 = icmp eq i32 %#13, 70
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = trunc i32 noundef %#0 to i24
+  %#7 = and i24 %#6, 223
+  %#8 = trunc i32 noundef %#1 to i24
+  %#9 = shl i24 %#8, 8
+  %#10 = and i24 %#9, 57088
+  %#11 = or disjoint i24 %#10, %#7
+  %#12 = trunc i32 noundef %#2 to i24
+  %#13 = shl i24 %#12, 16
+  %#14 = and i24 %#13, 14614528
+  %#15 = or disjoint i24 %#11, %#14
+  %#16 = icmp eq i24 %#15, 4607561
+  ret i1 %#16
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 223
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 223
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  %#13 = and i32 noundef %#2, 223
+  %#14 = icmp eq i32 %#13, 73
+  %#15 = and i1 %#12, %#14
+  %#16 = and i32 noundef %#3, 223
+  %#17 = icmp eq i32 %#16, 84
+  %#18 = and i1 %#15, %#17
+  br i1 %#18, label %#6, label %#7
+
+#6:
+  %#19 = and i32 noundef %#4, 223
+  %#20 = icmp eq i32 %#19, 89
+  br label %#7
+
+#7:
+  %#21 = phi i1 [ 0, %#5 ], [ %#20, %#6 ]
+  ret i1 %#21
+}
+=>
+define i1 @target_char_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = and i32 noundef %#4, 223
+  %#7 = zext nneg i32 %#6 to i40
+  %#8 = shl nuw i40 %#7, 32
+  %#9 = shl i32 noundef %#3, 24
+  %#10 = shl i32 noundef %#2, 16
+  %#11 = and i32 %#10, 14614528
+  %#12 = zext nneg i32 %#11 to i40
+  %#13 = shl i32 noundef %#1, 8
+  %#14 = and i32 %#13, 57088
+  %#15 = zext nneg i32 %#14 to i40
+  %#16 = and i32 noundef %#0, 223
+  %#17 = zext nneg i32 %#16 to i40
+  %#18 = and i32 %#9, 3741319168
+  %#19 = zext i32 %#18 to i40
+  %#20 = or disjoint i40 %#8, %#19
+  %#21 = or disjoint i40 %#20, %#12
+  %#22 = or disjoint i40 %#21, %#15
+  %#23 = or disjoint i40 %#22, %#17
+  %#24 = icmp eq i40 %#23, 383666179657
+  ret i1 %#24
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char8_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 223
+  %#9 = icmp eq i32 %#8, 78
+  %#10 = and i32 noundef %#1, 223
+  %#11 = icmp eq i32 %#10, 65
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 223
+  %#14 = icmp eq i32 %#13, 78
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char8_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = trunc i32 noundef %#0 to i24
+  %#7 = and i24 %#6, 223
+  %#8 = trunc i32 noundef %#1 to i24
+  %#9 = shl i24 %#8, 8
+  %#10 = and i24 %#9, 57088
+  %#11 = or disjoint i24 %#10, %#7
+  %#12 = trunc i32 noundef %#2 to i24
+  %#13 = shl i24 %#12, 16
+  %#14 = and i24 %#13, 14614528
+  %#15 = or disjoint i24 %#11, %#14
+  %#16 = icmp eq i24 %#15, 5128526
+  ret i1 %#16
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char8_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 223
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 223
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 223
+  %#14 = icmp eq i32 %#13, 70
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char8_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = trunc i32 noundef %#0 to i24
+  %#7 = and i24 %#6, 223
+  %#8 = trunc i32 noundef %#1 to i24
+  %#9 = shl i24 %#8, 8
+  %#10 = and i24 %#9, 57088
+  %#11 = or disjoint i24 %#10, %#7
+  %#12 = trunc i32 noundef %#2 to i24
+  %#13 = shl i24 %#12, 16
+  %#14 = and i24 %#13, 14614528
+  %#15 = or disjoint i24 %#11, %#14
+  %#16 = icmp eq i24 %#15, 4607561
+  ret i1 %#16
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char8_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 223
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 223
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  %#13 = and i32 noundef %#2, 223
+  %#14 = icmp eq i32 %#13, 73
+  %#15 = and i1 %#12, %#14
+  %#16 = and i32 noundef %#3, 223
+  %#17 = icmp eq i32 %#16, 84
+  %#18 = and i1 %#15, %#17
+  br i1 %#18, label %#6, label %#7
+
+#6:
+  %#19 = and i32 noundef %#4, 223
+  %#20 = icmp eq i32 %#19, 89
+  br label %#7
+
+#7:
+  %#21 = phi i1 [ 0, %#5 ], [ %#20, %#6 ]
+  ret i1 %#21
+}
+=>
+define i1 @target_char8_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = and i32 noundef %#4, 223
+  %#7 = zext nneg i32 %#6 to i40
+  %#8 = shl nuw i40 %#7, 32
+  %#9 = shl i32 noundef %#3, 24
+  %#10 = shl i32 noundef %#2, 16
+  %#11 = and i32 %#10, 14614528
+  %#12 = zext nneg i32 %#11 to i40
+  %#13 = shl i32 noundef %#1, 8
+  %#14 = and i32 %#13, 57088
+  %#15 = zext nneg i32 %#14 to i40
+  %#16 = and i32 noundef %#0, 223
+  %#17 = zext nneg i32 %#16 to i40
+  %#18 = and i32 %#9, 3741319168
+  %#19 = zext i32 %#18 to i40
+  %#20 = or disjoint i40 %#8, %#19
+  %#21 = or disjoint i40 %#20, %#12
+  %#22 = or disjoint i40 %#21, %#15
+  %#23 = or disjoint i40 %#22, %#17
+  %#24 = icmp eq i40 %#23, 383666179657
+  ret i1 %#24
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char16_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 65503
+  %#9 = icmp eq i32 %#8, 78
+  %#10 = and i32 noundef %#1, 65503
+  %#11 = icmp eq i32 %#10, 65
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 65503
+  %#14 = icmp eq i32 %#13, 78
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char16_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = shl i32 noundef %#1, 16
+  %#7 = and i32 noundef %#0, 65503
+  %#8 = and i32 noundef %#2, 65503
+  %#9 = zext nneg i32 %#8 to i48
+  %#10 = shl nuw i48 %#9, 32
+  %#11 = and i32 %#6, 4292804608
+  %#12 = or disjoint i32 %#11, %#7
+  %#13 = zext i32 %#12 to i48
+  %#14 = or disjoint i48 %#10, %#13
+  %#15 = icmp eq i48 %#14, 335011709006
+  ret i1 %#15
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char16_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 65503
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 65503
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 65503
+  %#14 = icmp eq i32 %#13, 70
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char16_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = shl i32 noundef %#1, 16
+  %#7 = and i32 noundef %#0, 65503
+  %#8 = and i32 noundef %#2, 65503
+  %#9 = zext nneg i32 %#8 to i48
+  %#10 = shl nuw i48 %#9, 32
+  %#11 = and i32 %#6, 4292804608
+  %#12 = or disjoint i32 %#11, %#7
+  %#13 = zext i32 %#12 to i48
+  %#14 = or disjoint i48 %#10, %#13
+  %#15 = icmp eq i48 %#14, 300652822601
+  ret i1 %#15
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char16_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 65503
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 65503
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  %#13 = and i32 noundef %#2, 65503
+  %#14 = icmp eq i32 %#13, 73
+  %#15 = and i1 %#12, %#14
+  %#16 = and i32 noundef %#3, 65503
+  %#17 = icmp eq i32 %#16, 84
+  %#18 = and i1 %#15, %#17
+  br i1 %#18, label %#6, label %#7
+
+#6:
+  %#19 = and i32 noundef %#4, 65503
+  %#20 = icmp eq i32 %#19, 89
+  br label %#7
+
+#7:
+  %#21 = phi i1 [ 0, %#5 ], [ %#20, %#6 ]
+  ret i1 %#21
+}
+=>
+define i1 @target_char16_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = shl i32 noundef %#1, 16
+  %#7 = and i32 noundef %#0, 65503
+  %#8 = and i32 noundef %#2, 65503
+  %#9 = zext nneg i32 %#8 to i64
+  %#10 = shl nsw nuw i64 %#9, 32
+  %#11 = and i32 noundef %#3, 65503
+  %#12 = zext nneg i32 %#11 to i64
+  %#13 = shl nuw i64 %#12, 48
+  %#14 = and i32 %#6, 4292804608
+  %#15 = or disjoint i32 %#14, %#7
+  %#16 = zext i32 %#15 to i64
+  %#17 = or disjoint i64 %#10, %#16
+  %#18 = or disjoint i64 %#17, %#13
+  %#19 = icmp eq i64 %#18, 23644211581419593
+  %#20 = and i32 noundef %#4, 65503
+  %#21 = icmp eq i32 %#20, 89
+  %#22 = and i1 %#21, %#19
+  ret i1 %#22
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char32_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 4294967263
+  %#9 = icmp eq i32 %#8, 78
+  %#10 = and i32 noundef %#1, 4294967263
+  %#11 = icmp eq i32 %#10, 65
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 4294967263
+  %#14 = icmp eq i32 %#13, 78
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char32_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = zext i32 noundef %#0 to i64
+  %#7 = zext i32 noundef %#1 to i64
+  %#8 = shl nuw i64 %#7, 32
+  %#9 = or disjoint i64 %#8, %#6
+  %#10 = and i64 %#9, -137438953505
+  %#11 = icmp eq i64 %#10, 279172874318
+  %#12 = and i32 noundef %#2, 4294967263
+  %#13 = icmp eq i32 %#12, 78
+  %#14 = and i1 %#13, %#11
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char32_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 4294967263
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 4294967263
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 4294967263
+  %#14 = icmp eq i32 %#13, 70
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_char32_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = zext i32 noundef %#0 to i64
+  %#7 = zext i32 noundef %#1 to i64
+  %#8 = shl nuw i64 %#7, 32
+  %#9 = or disjoint i64 %#8, %#6
+  %#10 = and i64 %#9, -137438953505
+  %#11 = icmp eq i64 %#10, 335007449161
+  %#12 = and i32 noundef %#2, 4294967263
+  %#13 = icmp eq i32 %#12, 70
+  %#14 = and i1 %#13, %#11
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char32_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 4294967263
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 4294967263
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  %#13 = and i32 noundef %#2, 4294967263
+  %#14 = icmp eq i32 %#13, 73
+  %#15 = and i1 %#12, %#14
+  %#16 = and i32 noundef %#3, 4294967263
+  %#17 = icmp eq i32 %#16, 84
+  %#18 = and i1 %#15, %#17
+  br i1 %#18, label %#6, label %#7
+
+#6:
+  %#19 = and i32 noundef %#4, 4294967263
+  %#20 = icmp eq i32 %#19, 89
+  br label %#7
+
+#7:
+  %#21 = phi i1 [ 0, %#5 ], [ %#20, %#6 ]
+  ret i1 %#21
+}
+=>
+define i1 @target_char32_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree noundef willreturn zeroext memory(none) {
+#5:
+  %#8 = zext i32 noundef %#0 to i64
+  %#9 = zext i32 noundef %#1 to i64
+  %#10 = shl nuw i64 %#9, 32
+  %#11 = or disjoint i64 %#10, %#8
+  %#12 = zext i32 noundef %#2 to i64
+  %#13 = zext i32 noundef %#3 to i64
+  %#14 = shl nuw i64 %#13, 32
+  %#15 = or disjoint i64 %#14, %#12
+  %#16 = and i64 %#11, -137438953505
+  %#17 = icmp eq i64 %#16, 335007449161
+  %#18 = and i64 %#15, -137438953505
+  %#19 = icmp eq i64 %#18, 360777252937
+  %#20 = select i1 %#17, i1 %#19, i1 0
+  br i1 %#20, label %#6, label %#7
+
+#6:
+  %#21 = and i32 noundef %#4, 4294967263
+  %#22 = icmp eq i32 %#21, 89
+  br label %#7
+
+#7:
+  %#23 = phi i1 [ %#22, %#6 ], [ 0, %#5 ]
+  ret i1 %#23
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_wchar_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 4294967263
+  %#9 = icmp eq i32 %#8, 78
+  %#10 = and i32 noundef %#1, 4294967263
+  %#11 = icmp eq i32 %#10, 65
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 4294967263
+  %#14 = icmp eq i32 %#13, 78
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_wchar_nan(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = zext i32 noundef %#0 to i64
+  %#7 = zext i32 noundef %#1 to i64
+  %#8 = shl nuw i64 %#7, 32
+  %#9 = or disjoint i64 %#8, %#6
+  %#10 = and i64 %#9, -137438953505
+  %#11 = icmp eq i64 %#10, 279172874318
+  %#12 = and i32 noundef %#2, 4294967263
+  %#13 = icmp eq i32 %#12, 78
+  %#14 = and i1 %#13, %#11
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_wchar_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 4294967263
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 4294967263
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  br i1 %#12, label %#6, label %#7
+
+#6:
+  %#13 = and i32 noundef %#2, 4294967263
+  %#14 = icmp eq i32 %#13, 70
+  br label %#7
+
+#7:
+  %#15 = phi i1 [ 0, %#5 ], [ %#14, %#6 ]
+  ret i1 %#15
+}
+=>
+define i1 @target_wchar_inf(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#6 = zext i32 noundef %#0 to i64
+  %#7 = zext i32 noundef %#1 to i64
+  %#8 = shl nuw i64 %#7, 32
+  %#9 = or disjoint i64 %#8, %#6
+  %#10 = and i64 %#9, -137438953505
+  %#11 = icmp eq i64 %#10, 335007449161
+  %#12 = and i32 noundef %#2, 4294967263
+  %#13 = icmp eq i32 %#12, 70
+  %#14 = and i1 %#13, %#11
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_wchar_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree willreturn zeroext memory(none) {
+#5:
+  %#8 = and i32 noundef %#0, 4294967263
+  %#9 = icmp eq i32 %#8, 73
+  %#10 = and i32 noundef %#1, 4294967263
+  %#11 = icmp eq i32 %#10, 78
+  %#12 = and i1 %#9, %#11
+  %#13 = and i32 noundef %#2, 4294967263
+  %#14 = icmp eq i32 %#13, 73
+  %#15 = and i1 %#12, %#14
+  %#16 = and i32 noundef %#3, 4294967263
+  %#17 = icmp eq i32 %#16, 84
+  %#18 = and i1 %#15, %#17
+  br i1 %#18, label %#6, label %#7
+
+#6:
+  %#19 = and i32 noundef %#4, 4294967263
+  %#20 = icmp eq i32 %#19, 89
+  br label %#7
+
+#7:
+  %#21 = phi i1 [ 0, %#5 ], [ %#20, %#6 ]
+  ret i1 %#21
+}
+=>
+define i1 @target_wchar_inity(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3, i32 noundef %#4) nofree noundef willreturn zeroext memory(none) {
+#5:
+  %#8 = zext i32 noundef %#0 to i64
+  %#9 = zext i32 noundef %#1 to i64
+  %#10 = shl nuw i64 %#9, 32
+  %#11 = or disjoint i64 %#10, %#8
+  %#12 = zext i32 noundef %#2 to i64
+  %#13 = zext i32 noundef %#3 to i64
+  %#14 = shl nuw i64 %#13, 32
+  %#15 = or disjoint i64 %#14, %#12
+  %#16 = and i64 %#11, -137438953505
+  %#17 = icmp eq i64 %#16, 335007449161
+  %#18 = and i64 %#15, -137438953505
+  %#19 = icmp eq i64 %#18, 360777252937
+  %#20 = select i1 %#17, i1 %#19, i1 0
+  br i1 %#20, label %#6, label %#7
+
+#6:
+  %#21 = and i32 noundef %#4, 4294967263
+  %#22 = icmp eq i32 %#21, 89
+  br label %#7
+
+#7:
+  %#23 = phi i1 [ %#22, %#6 ], [ 0, %#5 ]
+  ret i1 %#23
+}
+Transformation seems to be correct!
+
+Summary:
+  15 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

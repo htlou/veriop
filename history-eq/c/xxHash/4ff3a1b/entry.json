@@ -1,0 +1,52 @@
+{
+  "commit": "4ff3a1b",
+  "date": "2023-02-25",
+  "subject": "XXH_ASSUME macro using `__builtin_assume` if supported (clang only for now).",
+  "selected_by": "manual-scan",
+  "perf_evidence": "Commit uses a compiler assumption intrinsic to improve Clang optimization of internal bounds.",
+  "change_summary": "Selects Clang __builtin_assume in XXH_ASSUME, changing generated optimization assumptions.",
+  "units": [
+    {
+      "name": "raw XXH3 short-input helper length classes",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4ff3a1b/r_raw",
+      "evidence": "Four short-input helper targets pass Alive2 in both directions."
+    },
+    {
+      "name": "public XXH32/XXH64/XXH3 fixed-length matrix",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4ff3a1b/r_api2",
+      "evidence": "Short XXH32/XXH64/XXH3 public cases pass in r_api; value-input reruns resolve the two fixed long-case timeouts."
+    },
+    {
+      "name": "longer and arbitrary-length paths affected by assumptions",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4ff3a1b/r_api",
+      "evidence": "The initial XXH32 length-20 and XXH3 length-200 pointer-input targets time out. Value-input reruns prove those selected fixed instances, but do not settle arbitrary lengths or every assumption site."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "A non-target helper in r_api2 reports unsupported noalias; target-level fixed-instance proofs remain valid only where the changed body is visible. The macro's full set of callers and GCC behavior are not proved."
+}

@@ -1,0 +1,25 @@
+diff --git a/private/app/helper.go b/private/app/helper.go
+index afd92bf9..cbd834da 100644
+--- a/private/app/helper.go
++++ b/private/app/helper.go
+@@ -16,6 +16,7 @@ package app
+ 
+ import (
+ 	"context"
++	"io"
+ 	"os"
+ 	"os/signal"
+ 	"syscall"
+@@ -106,3 +107,12 @@ func (c *Cleanup) Do() error {
+ 	}
+ 	return errs.ToError()
+ }
++
++// ReadFileOrStdin reads the content of a file or stdin if the path is "-".
++// It returns the content as a byte slice.
++func ReadFileOrStdin(path string) ([]byte, error) {
++	if path == "-" {
++		return io.ReadAll(os.Stdin)
++	}
++	return os.ReadFile(path)
++}

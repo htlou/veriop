@@ -1,0 +1,7 @@
+(set-logic QF_LIA)
+(declare-const a Int) (declare-const b Int)
+(assert (and (<= 0 a) (< a 32) (<= 0 b) (< b 32) (not (= a b))))
+(assert (= a 0)) (assert (= b 1))
+(assert (< (div a 2) 16)) (assert (< (div b 2) 16))
+(assert (= (div a 2) (div b 2)))
+(check-sat)

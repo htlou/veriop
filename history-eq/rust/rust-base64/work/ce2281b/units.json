@@ -1,0 +1,34 @@
+[
+  {
+    "name": "engine::general_purpose::GeneralPurpose::internal_encode (Engine impl; old monolithic body vs new encode_helper(&self.encode_table, .., |_, _| (0, 0)) + encode_scalar_tail)",
+    "level": "api",
+    "verdict": "EQUIV",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/Cce2281b",
+    "evidence": "Cce2281bProof.gp_internal_encode_equiv: for all old engines eO, new engines eN with eO.encode_table = eN.encode_table, and all input/output slices, Old.__histeq_gp_internal_encode eO input output = New.__histeq_gp_internal_encode eN input output (plain Result equality incl. panics/divergence); corollary gp_internal_encode_equiv_same_fields for engO_to_new (field-wise copy). Built from loop0_eq/loop1_eq/loop2_eq (induction on remaining-iterations measure), new_internal_encode_eq (closure returns (0,0), the four debug_assert massert's hold) and old_internal_encode_eq.",
+    "hypotheses": [
+      "eO.encode_table = eN.encode_table (relates the two namespaced copies of the GeneralPurpose struct; the only field internal_encode reads). No hypotheses on external functions needed."
+    ],
+    "notes": "Extraction tag gpenc, harness harness/ce2281b.rs (__histeq_gp_internal_encode calls Engine::internal_encode), charon --monomorphize-mut=except-types --remove-adt-clauses '--remove-associated-types=*' --include core::convert --opaque base64::engine::Engine --opaque base64::engine::general_purpose::decode --opaque base64::engine::general_purpose::decode_suffix --start-from base64::__histeq_gp_internal_encode; cargo --no-default-features --features std. raw = api here (internal_encode is the trait method of the public engine). The perf intent (encode_scalar_tail not monomorphized per engine = code size) is invisible in the model; the closure is monomorphized by Charon to a concrete FnOnce instance. Lean check ~25 s.",
+    "primary": true
+  },
+  {
+    "name": "engine::general_purpose::GeneralPurpose::internal_decode (decode_helper refactor with |_, _, _| (0, 0) SIMD-prefix closure)",
+    "level": "api",
+    "verdict": "UNSUPPORTED",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": "aeneas-error",
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/work/ce2281b",
+    "evidence": "Aeneas (both sides): \"[Error] Breaks to outer loops are not supported yet\" — old: decode_helper (src/engine/general_purpose/decode.rs 35:0-121:1), new: decode_complete_quads (decode.rs 100:0-178:1); also decode_suffix (decode_suffix.rs 11:0-165:1) on both sides. Logs work/ce2281b/GpdecOld-aeneas.log, GpdecNew-aeneas.log.",
+    "hypotheses": [],
+    "notes": "Harness __histeq_gp_internal_decode(e, input, output) { let est = GeneralPurposeEstimate::new(input.len()); Engine::internal_decode(e, input, output, est) } (identical on both sides; = what internal_decoded_len_estimate returns). With the sibling recipe flags (--monomorphize-mut=except-types --remove-adt-clauses --remove-associated-types=*) Charon itself panics on both sides: 'used `substitute` on an item coming from a trait; use `substitute_with_self` or `substitute_inner_binder` instead' (src/ast/type_level/substitute.rs:120:37), also when the harness called Engine::internal_decoded_len_estimate. Without those flags (charon --include core::convert --opaque base64::engine::Engine --start-from base64::__histeq_gp_internal_decode) Charon succeeds and Aeneas fails as above.",
+    "primary": true
+  }
+]

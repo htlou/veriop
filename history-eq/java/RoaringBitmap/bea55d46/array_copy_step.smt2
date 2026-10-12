@@ -1,0 +1,28 @@
+(set-logic QF_AUFBV)
+(set-option :produce-models true)
+; One loop step in the old temporary bitmap and the new destination slice.
+; Both start with equal corresponding words. x is any Java char (0..65535).
+(declare-const x (_ BitVec 16))
+(declare-const j (_ BitVec 32))
+(declare-const position (_ BitVec 32))
+(declare-const old_before (Array (_ BitVec 32) (_ BitVec 64)))
+(declare-const new_before (Array (_ BitVec 32) (_ BitVec 64)))
+(define-fun index () (_ BitVec 32) (bvudiv ((_ zero_extend 16) x) #x00000040))
+(define-fun mask () (_ BitVec 64) (bvshl #x0000000000000001 ((_ zero_extend 48) (bvand x #x003f))))
+(define-fun old_after () (Array (_ BitVec 32) (_ BitVec 64))
+  (store old_before index (bvor (select old_before index) mask)))
+(define-fun new_index () (_ BitVec 32) (bvadd position index))
+(define-fun new_after () (Array (_ BitVec 32) (_ BitVec 64))
+  (store new_before new_index (bvor (select new_before new_index) mask)))
+(assert (= (select old_before j) (select new_before (bvadd position j))))
+; A counterexample would break the pointwise induction invariant.
+(push 1)
+(assert (not (= (select old_after j) (select new_after (bvadd position j)))))
+(check-sat)
+(pop 1)
+; Negative control: writing one word later must admit a counterexample.
+(define-fun wrong_index () (_ BitVec 32) (bvadd new_index #x00000001))
+(define-fun wrong_after () (Array (_ BitVec 32) (_ BitVec 64))
+  (store new_before wrong_index (bvor (select new_before wrong_index) mask)))
+(assert (not (= (select old_after j) (select wrong_after (bvadd position j)))))
+(check-sat)

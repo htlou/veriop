@@ -1,0 +1,891 @@
+op_len() {
+   14:	
+   13:	EAX = int8s[EDI + 0]; 
+   12:	if (EAX ==s 92) goto 11 else goto 7
+   11:	EDX = int8s[EDI + 1]; 
+   10:	
+    9:	if (EDX ==s 120) goto 8 else goto 6
+    8:	EAX = 4; goto 2
+    7:	
+    6:	EAX = 2; 
+    5:	ECX = 1; 
+    4:	ESI = int8s[EDI + 0]; 
+    3:	EAX = ESI ==s 92 ?int EAX : ECX; 
+    2:	
+    1:	return
+}
+
+get_op_len() {
+   27:	
+   26:	R8 = int8s[EDI + 0]; 
+   25:	if (R8 ==s 91) goto 24 else goto 1
+   24:	EBP = EDI + 1 (long); 
+   23:	EBX = ESI + -1 (int); 
+   22:	
+   21:	
+   20:	R12 = 0; 
+   19:	if (R12 <s EBX) goto 18 else goto 10
+   18:	ECX = long32signed(R12); 
+   17:	EDI = int8s[EBP + ECX + 0]; 
+   16:	
+   15:	if (EDI !=s 93) goto 14 else goto 9
+   14:	
+   13:	EDI = EBP + ECX + 0 (long); 
+   12:	call "op_len"; 
+   11:	R12 = R12 + EAX + 0 (int); goto 19
+   10:	
+    9:	EAX = R12 + 1 (int); 
+    8:	R8 = -1; 
+    7:	EAX = R12 <=s EBX ?int EAX : R8; 
+    6:	
+    5:	
+    4:	EAX = EAX + 1 (int); 
+    3:	
+    2:	return
+    1:	tailcall "op_len"
+}
+
+is_quantifier() {
+   12:	
+   11:	EAX = int8s[EDI + 0]; 
+   10:	if (EAX ==s 42) goto 4 else goto 9
+    9:	
+    8:	
+    7:	if (EAX ==s 43) goto 3 else goto 6
+    6:	
+    5:	EAX = EAX ==s 63; goto 2
+    4:	
+    3:	EAX = 1; 
+    2:	
+    1:	return
+}
+
+toi() {
+   10:	EBX = EDI; 
+    9:	call "__ctype_b_loc"; 
+    8:	ECX = EBX + -48 (int); 
+    7:	EDI = EBX + -87 (int); 
+    6:	ESI = int64[EAX + 0]; 
+    5:	EDX = long32signed(EBX); 
+    4:	ESI = int16u[ESI + EDX * 2 + 0]; 
+    3:	ECX = ESI & 0x800 != 0 ?int ECX : EDI; 
+    2:	EAX = ECX; 
+    1:	return
+}
+
+match_op() {
+   78:	EBP = ESI; 
+   77:	
+   76:	ECX = int8u[EDI + 0]; 
+   75:	if (ECX <u 92) goto 74 else goto 69
+   74:	if (ECX ==s 36) goto 71 else goto 73
+   73:	if (ECX ==s 46) goto 72 else goto 65
+   72:	EAX = 1; goto 2
+   71:	
+   70:	EAX = -1; goto 1
+   69:	if (ECX ==s 92) goto 52 else goto 68
+   68:	if (ECX ==s 124) goto 67 else goto 65
+   67:	
+   66:	EAX = -4; goto 1
+   65:	R10 = int32[EDX + 4028]; 
+   64:	if (R10 & 0x1 != 0) goto 63 else goto 57
+   63:	EDI = int8u[EDI + 0]; 
+   62:	call "tolower"; EBX = EAX; 
+   61:	EDI = int8u[EBP + 0]; 
+   60:	call "tolower"; 
+   59:	if (EBX !=s EAX) goto 58 else goto 53
+   58:	EAX = -1; goto 1
+   57:	EDX = int8u[EDI + 0]; 
+   56:	EDI = int8u[EBP + 0]; 
+   55:	if (EDX !=s EDI) goto 54 else goto 53
+   54:	EAX = -1; goto 1
+   53:	EAX = 1; goto 2
+   52:	R11 = int8u[EDI + 1]; 
+   51:	if (R11 <u 115) goto 50 else goto 32
+   50:	if (R11 ==s 83) goto 40 else goto 49
+   49:	if (R11 ==s 100) goto 48 else goto 15
+   48:	call "__ctype_b_loc"; 
+   47:	R10 = int64[EAX + 0]; 
+   46:	EDX = int8u[EBP + 0]; 
+   45:	ECX = long32signed(EDX); 
+   44:	EAX = int16u[R10 + ECX * 2 + 0]; 
+   43:	if (EAX & 0x800 == 0) goto 42 else goto 41
+   42:	EAX = -1; goto 1
+   41:	EAX = 1; goto 2
+   40:	call "__ctype_b_loc"; 
+   39:	EDI = int64[EAX + 0]; 
+   38:	R9 = int8u[EBP + 0]; 
+   37:	R8 = long32signed(R9); 
+   36:	EAX = int16u[EDI + R8 * 2 + 0]; 
+   35:	if (EAX & 0x2000 != 0) goto 34 else goto 33
+   34:	EAX = -1; goto 1
+   33:	EAX = 1; goto 2
+   32:	if (R11 ==s 115) goto 10 else goto 31
+   31:	if (R11 ==s 120) goto 30 else goto 15
+   30:	R12 = EDI + 2 (long); 
+   29:	
+   28:	EDI = int8u[EDI + 2]; 
+   27:	call "tolower"; 
+   26:	EDI = EAX; call "toi"; EBX = EAX; 
+   25:	EDI = int8u[R12 + 1]; 
+   24:	call "tolower"; EDI = EAX; 
+   23:	call "toi"; 
+   22:	EBX = EBX << 4; 
+   21:	EBX = EBX | EAX; 
+   20:	
+   19:	R8 = int8u[EBP + 0]; 
+   18:	if (EBX !=s R8) goto 17 else goto 16
+   17:	EAX = -1; goto 1
+   16:	EAX = 1; goto 2
+   15:	R9 = int8u[EDI + 1]; 
+   14:	R11 = int8u[EBP + 0]; 
+   13:	if (R9 !=s R11) goto 12 else goto 11
+   12:	EAX = -1; goto 1
+   11:	EAX = 1; goto 2
+   10:	call "__ctype_b_loc"; 
+    9:	ECX = int64[EAX + 0]; 
+    8:	EAX = int8u[EBP + 0]; 
+    7:	ESI = long32signed(EAX); 
+    6:	EAX = int16u[ECX + ESI * 2 + 0]; 
+    5:	if (EAX & 0x2000 == 0) goto 4 else goto 3
+    4:	EAX = -1; goto 1
+    3:	EAX = 1; 
+    2:	
+    1:	return
+}
+
+bar() {
+  344:	local(3,int) = R9; local(0,long) = R8; local(2,int) = ECX; local(10,long) = EDX; R12 = ESI; R15 = EDI; 
+  343:	
+  342:	R14 = 0; 
+  341:	EBP = 0; 
+  340:	if (EBP <s R12) goto 338 else goto 339
+  339:	goto 2
+  338:	
+  337:	R10 = local(2,int); if (R14 <=s R10) goto 336 else goto 2
+  336:	ESI = long32signed(EBP); 
+  335:	EAX = int8s[R15 + ESI + 0]; 
+  334:	if (EAX ==s 40) goto 328 else goto 333
+  333:	
+  332:	EDI = R15 + ESI + 0 (long); 
+  331:	ESI = R12; ESI = ESI - EBP; 
+  330:	call "get_op_len"; 
+  329:	goto 322
+  328:	R9 = local(3,int); ESI = R9 + 1 (int); 
+  327:	R11 = long32signed(ESI); 
+  326:	EAX = R11; EAX = EAX <<l 4; 
+  325:	R8 = EAX + R11 * 8 + 0 (long); 
+  324:	ESI = local(0,long); R11 = int32[ESI + R8 + 8]; 
+  323:	EAX = R11 + 2 (int); 
+  322:	R13 = EAX; 
+  321:	R11 = long32signed(EBP); 
+  320:	EDI = R15 + R11 + 0 (long); 
+  319:	call "is_quantifier"; 
+  318:	if (EAX !=u 0) goto 317 else goto 316
+  317:	EAX = -2; goto 1
+  316:	if (R13 <=s 0) goto 315 else goto 314
+  315:	EAX = -5; goto 1
+  314:	R11 = EBP + R13 + 0 (int); 
+  313:	if (R11 <s R12) goto 312 else goto 193
+  312:	R11 = long32signed(EBP); 
+  311:	EDI = R15 + R11 + 0 (long); 
+  310:	R10 = long32signed(R13); 
+  309:	EDI = EDI + R10 + 0 (long); 
+  308:	call "is_quantifier"; 
+  307:	
+  306:	if (EAX !=u 0) goto 305 else goto 192
+  305:	ECX = EBP + R13 + 0 (int); 
+  304:	ECX = long32signed(ECX); 
+  303:	R8 = int8s[R15 + ECX + 0]; 
+  302:	if (R8 ==s 63) goto 204 else goto 301
+  301:	
+  300:	
+  299:	
+  298:	if (R8 ==s 43) goto 292 else goto 297
+  297:	
+  296:	
+  295:	
+  294:	
+  293:	if (R8 ==s 42) goto 291 else goto 3
+  292:	
+  291:	local(4,int) = R14; 
+  290:	local(7,int) = R14; 
+  289:	ESI = -1; local(5,int) = ESI; 
+  288:	R9 = 0; local(8,int) = R9; 
+  287:	EBX = EBP + R13 + 1 (int); 
+  286:	if (EBX <s R12) goto 285 else goto 278
+  285:	R11 = long32signed(EBX); 
+  284:	EAX = int8s[R15 + R11 + 0]; 
+  283:	
+  282:	if (EAX ==s 63) goto 281 else goto 279
+  281:	ESI = 1; local(8,int) = ESI; 
+  280:	EBX = EBP + R13 + 2 (int); goto 277
+  279:	goto 277
+  278:	
+  277:	EDX = long32signed(EBP); 
+  276:	EDI = R15 + EDX + 0 (long); 
+  275:	ESI = local(4,int); EDX = long32signed(ESI); 
+  274:	R8 = local(10,long); EDX = R8 + EDX + 0 (long); 
+  273:	ECX = local(2,int); ECX = ECX - ESI; 
+  272:	R9 = local(3,int); R8 = local(0,long); ESI = R13; call "bar"; 
+  271:	
+  270:	EDX = EAX; local(6,int) = EDX; 
+  269:	ECX = local(4,int); R9 = ECX + EDX + 0 (int); 
+  268:	R9 = EAX >s 0 ?int R9 : ECX; local(4,int) = R9; 
+  267:	EDX = EBP + R13 + 0 (int); 
+  266:	R8 = long32signed(EDX); 
+  265:	EDI = int8s[R15 + R8 + 0]; 
+  264:	if (EDI ==s 43) goto 262 else goto 263
+  263:	goto 260
+  262:	
+  261:	R11 = local(6,int); if (R11 <s 0) goto 241 else goto 260
+  260:	if (EBX >=s R12) goto 248 else goto 259
+  259:	R8 = long32signed(EBX); 
+  258:	EDI = R15 + R8 + 0 (long); 
+  257:	ESI = R12; ESI = ESI - EBX; 
+  256:	R10 = local(4,int); EAX = long32signed(R10); 
+  255:	R11 = local(10,long); EDX = R11 + EAX + 0 (long); 
+  254:	ECX = local(2,int); ECX = ECX - R10; 
+  253:	R9 = local(3,int); R8 = local(0,long); call "bar"; 
+  252:	
+  251:	local(5,int) = EAX; 
+  250:	R11 = local(4,int); R10 = R11 + EAX + 0 (int); 
+  249:	R11 = local(7,int); R10 = EAX >=s 0 ?int R10 : R11; local(7,int) = R10; goto 247
+  248:	R8 = local(4,int); local(7,int) = R8; 
+  247:	EDX = local(7,int); if (EDX >s R14) goto 245 else goto 246
+  246:	goto 243
+  245:	EDX = local(8,int); ESI = EDX; 
+  244:	if (EDX !=u 0) goto 241 else goto 243
+  243:	ECX = local(6,int); if (ECX >s 0) goto 242 else goto 241
+  242:	goto 277
+  241:	R10 = local(6,int); if (R10 <s 0) goto 240 else goto 225
+  240:	ECX = EBP + R13 + 0 (int); 
+  239:	EDI = long32signed(ECX); 
+  238:	ESI = int8s[R15 + EDI + 0]; 
+  237:	
+  236:	if (ESI ==s 42) goto 235 else goto 224
+  235:	R8 = long32signed(EBX); 
+  234:	EDI = R15 + R8 + 0 (long); 
+  233:	ESI = R12; ESI = ESI - EBX; 
+  232:	R9 = long32signed(R14); 
+  231:	R8 = local(10,long); R8 = R8 + R9 + 0 (long); 
+  230:	EDX = local(2,int); EDX = EDX - R14; 
+  229:	R9 = local(3,int); ECX = EDX; EDX = R8; R8 = local(0,long); call "bar"; 
+  228:	
+  227:	local(5,int) = EAX; 
+  226:	R11 = EAX >s 0; goto 223
+  225:	
+  224:	R11 = 0; 
+  223:	R9 = local(5,int); EAX = R14 + R9 + 0 (int); 
+  222:	R10 = local(7,int); EAX = R11 !=u 0 ?int EAX : R10; 
+  221:	EDX = EBP + R13 + 0 (int); 
+  220:	R11 = long32signed(EDX); 
+  219:	EDI = int8s[R15 + R11 + 0]; 
+  218:	if (EDI ==s 43) goto 216 else goto 217
+  217:	goto 213
+  216:	
+  215:	if (EAX ==s R14) goto 214 else goto 213
+  214:	EAX = -1; goto 1
+  213:	if (EAX ==s R14) goto 211 else goto 212
+  212:	goto 209
+  211:	
+  210:	if (EBX <s R12) goto 208 else goto 209
+  209:	goto 205
+  208:	
+  207:	R11 = local(5,int); if (R11 <s 0) goto 206 else goto 205
+  206:	EAX = -1; goto 1
+  205:	goto 1
+  204:	R9 = long32signed(EBP); 
+  203:	EDI = R15 + R9 + 0 (long); 
+  202:	R9 = long32signed(R14); 
+  201:	R8 = local(10,long); EDX = R8 + R9 + 0 (long); 
+  200:	ECX = local(2,int); ECX = ECX - R14; 
+  199:	R9 = local(3,int); R8 = local(0,long); ESI = R13; call "bar"; 
+  198:	
+  197:	R10 = 0; 
+  196:	EAX = EAX >s 0 ?int EAX : R10; 
+  195:	R14 = R14 + EAX + 0 (int); 
+  194:	EBP = EBP + 1 (int); goto 3
+  193:	
+  192:	EAX = long32signed(EBP); 
+  191:	R9 = int8s[R15 + EAX + 0]; 
+  190:	if (R9 ==s 91) goto 107 else goto 189
+  189:	
+  188:	
+  187:	if (R9 ==s 40) goto 186 else goto 128
+  186:	EBX = -1; 
+  185:	R10 = local(3,int); R9 = R10 + 1 (int); local(3,int) = R9; 
+  184:	ECX = local(0,long); R10 = int32[ECX + 2400]; 
+  183:	if (R9 >=s R10) goto 182 else goto 181
+  182:	EAX = -4; goto 1
+  181:	ECX = EBP + R13 + 0 (int); 
+  180:	R8 = R12; R8 = R8 - ECX; 
+  179:	if (R8 <=s 0) goto 150 else goto 178
+  178:	ESI = 0; local(4,int) = ESI; 
+  177:	ECX = local(2,int); ECX = ECX - R14; 
+  176:	EDX = local(4,int); if (EDX <=s ECX) goto 175 else goto 145
+  175:	R8 = long32signed(R14); 
+  174:	ESI = local(10,long); EDI = ESI + R8 + 0 (long); 
+  173:	ECX = local(4,int); EAX = R14 + ECX + 0 (int); 
+  172:	ESI = local(2,int); ESI = ESI - EAX; 
+  171:	ECX = local(3,int); EDX = local(0,long); call "doh"; 
+  170:	EBX = EAX; 
+  169:	
+  168:	if (EBX >=s 0) goto 167 else goto 152
+  167:	R9 = long32signed(EBP); 
+  166:	EAX = R15 + R9 + 0 (long); 
+  165:	R10 = long32signed(R13); 
+  164:	EDI = EAX + R10 + 0 (long); 
+  163:	EDX = EBP + R13 + 0 (int); 
+  162:	ESI = R12; ESI = ESI - EDX; 
+  161:	EDX = long32signed(R14); 
+  160:	ECX = local(10,long); R8 = ECX + EDX + 0 (long); 
+  159:	ECX = long32signed(EBX); 
+  158:	EDX = R8 + ECX + 0 (long); 
+  157:	R8 = R14 + EBX + 0 (int); 
+  156:	ECX = local(2,int); ECX = ECX - R8; 
+  155:	R9 = local(3,int); R8 = local(0,long); call "bar"; 
+  154:	
+  153:	if (EAX >=s 0) goto 145 else goto 151
+  152:	
+  151:	EDI = local(4,int); R10 = EDI + 1 (int); local(4,int) = R10; goto 177
+  150:	ESI = long32signed(R14); 
+  149:	EDX = local(10,long); EDI = EDX + ESI + 0 (long); 
+  148:	ESI = local(2,int); ESI = ESI - R14; 
+  147:	ECX = local(3,int); EDX = local(0,long); call "doh"; 
+  146:	EBX = EAX; 
+  145:	if (EBX <s 0) goto 144 else goto 143
+  144:	EAX = EBX; goto 1
+  143:	R11 = local(0,long); EDX = int64[R11 + 4016]; 
+  142:	if (EDX !=lu 0) goto 141 else goto 129
+  141:	
+  140:	EAX = local(3,int); ESI = EAX + -1 (int); 
+  139:	R10 = long32signed(ESI); 
+  138:	R10 = R10 <<l 4; 
+  137:	R11 = long32signed(R14); 
+  136:	EDI = local(10,long); ESI = EDI + R11 + 0 (long); 
+  135:	int64[EDX + R10 + 0] = ESI; 
+  134:	R9 = local(0,long); R9 = int64[R9 + 4016]; 
+  133:	
+  132:	
+  131:	
+  130:	int32[R9 + R10 + 8] = EBX; 
+  129:	R14 = R14 + EBX + 0 (int); goto 3
+  128:	
+  127:	
+  126:	if (R9 ==s 94) goto 109 else goto 125
+  125:	
+  124:	
+  123:	if (R9 ==s 36) goto 111 else goto 122
+  122:	ESI = local(2,int); if (R14 >=s ESI) goto 121 else goto 120
+  121:	EAX = -1; goto 1
+  120:	
+  119:	EDI = R15 + EAX + 0 (long); 
+  118:	R9 = long32signed(R14); 
+  117:	R8 = local(10,long); ESI = R8 + R9 + 0 (long); 
+  116:	EDX = local(0,long); call "match_op"; 
+  115:	
+  114:	if (EAX <=s 0) goto 113 else goto 112
+  113:	goto 1
+  112:	R14 = R14 + EAX + 0 (int); goto 3
+  111:	R8 = local(2,int); if (R14 !=s R8) goto 110 else goto 3
+  110:	EAX = -1; goto 1
+  109:	if (R14 !=s 0) goto 108 else goto 3
+  108:	EAX = -1; goto 1
+  107:	EDI = EAX; 
+  106:	EAX = R15 + EDI + 1 (long); R10 = EAX; 
+  105:	R8 = R12; R8 = R8 - EBP; 
+  104:	R9 = R8 + -2 (int); R11 = R9; 
+  103:	ECX = long32signed(R14); 
+  102:	EAX = local(10,long); EAX = EAX + ECX + 0 (long); 
+  101:	ECX = local(0,long); local(14,long) = ECX; 
+  100:	local(8,long) = EAX; 
+   99:	local(12,int) = R11; 
+   98:	local(4,long) = R10; 
+   97:	EBX = 0; 
+   96:	R9 = -1; local(6,int) = R9; 
+   95:	ESI = int8s[R15 + EDI + 1]; 
+   94:	R9 = ESI ==s 94; local(7,int) = R9; 
+   93:	if (ESI ==s 94) goto 92 else goto 90
+   92:	R9 = R15 + EDI + 2 (long); local(4,long) = R9; 
+   91:	ECX = R8 + -3 (int); local(12,int) = ECX; goto 89
+   90:	
+   89:	EDX = local(12,int); if (EBX <=s EDX) goto 88 else goto 23
+   88:	R9 = long32signed(EBX); 
+   87:	R10 = local(4,long); ECX = int8s[R10 + R9 + 0]; 
+   86:	
+   85:	if (ECX !=s 93) goto 84 else goto 22
+   84:	
+   83:	EDX = local(6,int); if (EDX <=s 0) goto 82 else goto 21
+   82:	
+   81:	R8 = ECX; 
+   80:	if (R8 !=s 45) goto 79 else goto 34
+   79:	R9 = EBX + 1 (int); 
+   78:	ESI = long32signed(R9); 
+   77:	EDI = local(4,long); R10 = int8s[EDI + ESI + 0]; 
+   76:	
+   75:	if (R10 ==s 45) goto 74 else goto 33
+   74:	EAX = EBX + 2 (int); 
+   73:	ESI = long32signed(EAX); 
+   72:	EDI = local(4,long); EDI = int8s[EDI + ESI + 0]; 
+   71:	
+   70:	if (EDI !=s 93) goto 69 else goto 32
+   69:	
+   68:	
+   67:	
+   66:	
+   65:	if (EDI !=s 0) goto 64 else goto 31
+   64:	R9 = local(14,long); R10 = int32[R9 + 4028]; 
+   63:	if (R10 !=u 0) goto 47 else goto 62
+   62:	
+   61:	EAX = local(8,long); EDI = int8s[EAX + 0]; 
+   60:	call "tolower"; local(6,int) = EAX; 
+   59:	R10 = long32signed(EBX); 
+   58:	R11 = local(4,long); EDI = int8s[R11 + R10 + 0]; 
+   57:	call "tolower"; 
+   56:	EDX = local(6,int); if (EDX >=s EAX) goto 55 else goto 48
+   55:	ECX = local(8,long); EDI = int8s[ECX + 0]; 
+   54:	call "tolower"; local(6,int) = EAX; 
+   53:	R11 = EBX + 2 (int); 
+   52:	R11 = long32signed(R11); 
+   51:	EAX = local(4,long); EDI = int8s[EAX + R11 + 0]; 
+   50:	call "tolower"; 
+   49:	R8 = local(6,int); R9 = R8 <=s EAX; goto 36
+   48:	R9 = 0; goto 36
+   47:	
+   46:	R9 = local(8,long); ESI = int8s[R9 + 0]; 
+   45:	
+   44:	
+   43:	if (ESI >=s R8) goto 42 else goto 37
+   42:	
+   41:	
+   40:	
+   39:	
+   38:	R9 = ESI <=s EDI; goto 36
+   37:	R9 = 0; 
+   36:	local(6,int) = R9; 
+   35:	EBX = EBX + 3 (int); goto 89
+   34:	
+   33:	
+   32:	
+   31:	ESI = long32signed(EBX); 
+   30:	EDI = local(4,long); EDI = EDI + ESI + 0 (long); 
+   29:	EDX = local(14,long); ESI = local(8,long); call "match_op"; 
+   28:	local(6,int) = EAX; 
+   27:	EAX = long32signed(EBX); 
+   26:	ECX = local(4,long); EDI = ECX + EAX + 0 (long); 
+   25:	call "op_len"; 
+   24:	EBX = EBX + EAX + 0 (int); goto 89
+   23:	
+   22:	
+   21:	R11 = local(7,int); if (R11 ==u 0) goto 19 else goto 20
+   20:	goto 17
+   19:	
+   18:	R11 = local(6,int); if (R11 >s 0) goto 13 else goto 17
+   17:	R8 = local(7,int); if (R8 !=u 0) goto 16 else goto 14
+   16:	EDX = local(6,int); R10 = EDX <=s 0; 
+   15:	goto 12
+   14:	R10 = 0; goto 12
+   13:	R10 = 1; 
+   12:	EDI = 1; 
+   11:	EAX = -1; 
+   10:	EDI = R10 !=u 0 ?int EDI : EAX; 
+    9:	
+    8:	
+    7:	
+    6:	if (EDI <=s 0) goto 5 else goto 4
+    5:	EAX = -1; goto 1
+    4:	R14 = R14 + EDI + 0 (int); 
+    3:	EBP = EBP + R13 + 0 (int); goto 340
+    2:	EAX = R14; 
+    1:	return
+}
+
+doh() {
+   45:	EBP = ECX; R15 = EDX; R12 = ESI; R13 = EDI; 
+   44:	EDI = long32signed(EBP); 
+   43:	R8 = EDI; R8 = R8 <<l 4; 
+   42:	ESI = R8 + EDI * 8 + 0 (long); 
+   41:	R14 = R15 + ESI + 0 (long); 
+   40:	EBX = 0; 
+   39:	EDI = int64[R14 + 0]; 
+   38:	
+   37:	ESI = int32[R14 + 16]; 
+   36:	if (ESI ==s 0) goto 22 else goto 35
+   35:	
+   34:	if (EBX ==s ESI) goto 27 else goto 33
+   33:	R10 = int32[R14 + 12]; 
+   32:	R11 = R10 + EBX + 0 (int); 
+   31:	EDX = long32signed(R11); 
+   30:	EDX = EDX <<l 4; 
+   29:	ESI = int64[R15 + EDX + 2416]; 
+   28:	ESI = ESI -l EDI; goto 20
+   27:	R11 = int64[R14 + 0]; 
+   26:	R9 = int32[R14 + 8]; 
+   25:	R8 = long32signed(R9); 
+   24:	ESI = R11 + R8 + 0 (long); 
+   23:	ESI = ESI -l EDI; goto 20
+   22:	R9 = int32[R14 + 8]; 
+   21:	ESI = long32signed(R9); 
+   20:	ESI = lowlong(ESI); 
+   19:	R9 = EBP; R8 = R15; ECX = R12; EDX = R13; call "bar"; 
+   18:	
+   17:	if (EAX <=s 0) goto 16 else goto 3
+   16:	ECX = EBX; 
+   15:	EBX = ECX + 1 (int); 
+   14:	EDX = int32[R14 + 16]; 
+   13:	
+   12:	if (ECX <s EDX) goto 11 else goto 2
+   11:	
+   10:	if (EBX ==s 0) goto 39 else goto 9
+    9:	R10 = int32[R14 + 12]; 
+    8:	EDI = R10 + EBX + -1 (int); 
+    7:	ECX = long32signed(EDI); 
+    6:	ECX = ECX <<l 4; 
+    5:	EDX = int64[R15 + ECX + 2416]; 
+    4:	EDI = EDX + 1 (long); goto 38
+    3:	
+    2:	
+    1:	return
+}
+
+slre_match() {
+  285:	R13 = EDX; local(0,long) = ESI; EBX = EDI; 
+  284:	EDX = 0; 
+  283:	int32[stack(4008)] = EDX; 
+  282:	EDX = 0; 
+  281:	int32[stack(2400)] = EDX; 
+  280:	int32[stack(4028)] = EDX; 
+  279:	int32[stack(4024)] = R8; 
+  278:	int64[stack(4016)] = ECX; 
+  277:	ESI = __stringlit_2 + 0 (long); 
+  276:	EDX = 4L; 
+  275:	EDI = EBX; call "memcmp"; 
+  274:	if (EAX ==s 0) goto 273 else goto 269
+  273:	
+  272:	R8 = 1; 
+  271:	int32[stack(4028)] = R8; 
+  270:	EBX = EBX + 4 (long); 
+  269:	EDI = EBX; call "strlen"; 
+  268:	R15 = EAX; R15 = lowlong(R15); 
+  267:	
+  266:	R14 = stack(0) (long); 
+  265:	
+  264:	
+  263:	
+  262:	EBP = EBX; 
+  261:	R12 = 0; 
+  260:	int64[stack(0)] = EBP; 
+  259:	int32[stack(8)] = R15; 
+  258:	R10 = 1; 
+  257:	int32[stack(2400)] = R10; 
+  256:	EBX = 0; 
+  255:	if (EBX <s R15) goto 254 else goto 94
+  254:	ESI = long32signed(EBX); 
+  253:	EDI = EBP + ESI + 0 (long); 
+  252:	ESI = R15; ESI = ESI - EBX; 
+  251:	call "get_op_len"; 
+  250:	local(2,int) = EAX; 
+  249:	R9 = long32signed(EBX); 
+  248:	EAX = int8s[EBP + R9 + 0]; 
+  247:	if (EAX ==s 124) goto 121 else goto 246
+  246:	
+  245:	
+  244:	if (EAX ==s 92) goto 243 else goto 190
+  243:	EAX = R15 + -1 (int); 
+  242:	if (EBX >=s EAX) goto 241 else goto 240
+  241:	EAX = -6; goto 92
+  240:	EDX = EBX + 1 (int); 
+  239:	EDX = long32signed(EDX); 
+  238:	R11 = int8s[EBP + EDX + 0]; 
+  237:	if (R11 ==s 120) goto 236 else goto 200
+  236:	
+  235:	
+  234:	
+  233:	if (R11 ==s 120) goto 232 else goto 228
+  232:	R10 = R15 + -3 (int); 
+  231:	
+  230:	if (EBX >=s R10) goto 229 else goto 227
+  229:	EAX = -6; goto 92
+  228:	
+  227:	R11 = EBX + 1 (int); 
+  226:	R9 = long32signed(R11); 
+  225:	R8 = int8s[EBP + R9 + 0]; 
+  224:	if (R8 ==s 120) goto 223 else goto 201
+  223:	call "__ctype_b_loc"; 
+  222:	EDI = int64[EAX + 0]; 
+  221:	R8 = EBX + 2 (int); 
+  220:	R9 = long32signed(R8); 
+  219:	ECX = int8s[EBP + R9 + 0]; 
+  218:	R11 = int8unsigned(ECX); 
+  217:	EAX = long32signed(R11); 
+  216:	R11 = int16u[EDI + EAX * 2 + 0]; 
+  215:	if (R11 & 0x1000 != 0) goto 214 else goto 205
+  214:	call "__ctype_b_loc"; 
+  213:	R11 = int64[EAX + 0]; 
+  212:	R10 = EBX + 3 (int); 
+  211:	EDI = long32signed(R10); 
+  210:	ESI = int8s[EBP + EDI + 0]; 
+  209:	R8 = int8unsigned(ESI); 
+  208:	EAX = long32signed(R8); 
+  207:	R10 = int16u[R11 + EAX * 2 + 0]; 
+  206:	ECX = R10 & 0x1000 != 0; goto 204
+  205:	ECX = 0; 
+  204:	
+  203:	if (ECX !=s 1) goto 202 else goto 95
+  202:	EAX = -6; goto 92
+  201:	goto 95
+  200:	
+  199:	
+  198:	
+  197:	EDI = int64[metacharacters + 0]; 
+  196:	ESI = int8u[EBP + R9 + 1]; 
+  195:	call "strchr"; 
+  194:	
+  193:	
+  192:	if (EAX ==lu 0) goto 191 else goto 95
+  191:	EAX = -6; goto 92
+  190:	
+  189:	
+  188:	if (EAX ==s 40) goto 150 else goto 187
+  187:	
+  186:	
+  185:	if (EAX ==s 41) goto 184 else goto 95
+  184:	EAX = int32[stack(2400)]; 
+  183:	R8 = EAX + -1 (int); 
+  182:	EDX = long32signed(R8); 
+  181:	ESI = EDX; ESI = ESI <<l 4; 
+  180:	R9 = ESI + EDX * 8 + 0 (long); 
+  179:	R11 = int32[R14 + R9 + 8]; 
+  178:	if (R11 ==s -1) goto 177 else goto 175
+  177:	
+  176:	goto 174
+  175:	R8 = R12; 
+  174:	
+  173:	ESI = long32signed(R8); 
+  172:	EDI = ESI; EDI = EDI <<l 4; 
+  171:	ESI = EDI + ESI * 8 + 0 (long); 
+  170:	R9 = long32signed(EBX); 
+  169:	EDX = EBP + R9 + 0 (long); 
+  168:	
+  167:	
+  166:	
+  165:	EAX = int64[R14 + ESI + 0]; 
+  164:	EDX = EDX -l EAX; 
+  163:	EDX = lowlong(EDX); 
+  162:	int32[R14 + ESI + 8] = EDX; 
+  161:	R12 = R12 + -1 (int); 
+  160:	if (R12 <s 0) goto 159 else goto 158
+  159:	EAX = -3; goto 92
+  158:	if (EBX >s 0) goto 157 else goto 151
+  157:	ESI = EBX + -1 (int); 
+  156:	EAX = long32signed(ESI); 
+  155:	EAX = int8s[EBP + EAX + 0]; 
+  154:	
+  153:	if (EAX ==s 40) goto 152 else goto 95
+  152:	EAX = -1; goto 92
+  151:	goto 95
+  150:	R8 = int32[stack(2400)]; 
+  149:	if (R8 >=s 100) goto 148 else goto 147
+  148:	EAX = -9; goto 92
+  147:	R12 = R12 + 1 (int); 
+  146:	
+  145:	ESI = long32signed(R8); 
+  144:	EDI = ESI; EDI = EDI <<l 4; 
+  143:	R8 = EDI + ESI * 8 + 0 (long); 
+  142:	
+  141:	R9 = EBP + R9 + 1 (long); 
+  140:	int64[R14 + R8 + 0] = R9; 
+  139:	EAX = int32[stack(2400)]; 
+  138:	R9 = long32signed(EAX); 
+  137:	R10 = R9; R10 = R10 <<l 4; 
+  136:	EDI = R10 + R9 * 8 + 0 (long); 
+  135:	ESI = -1; 
+  134:	int32[R14 + EDI + 8] = ESI; 
+  133:	EDI = int32[stack(2400)]; 
+  132:	ECX = EDI + 1 (int); 
+  131:	int32[stack(2400)] = ECX; 
+  130:	R8 = int32[stack(4024)]; 
+  129:	if (R8 >s 0) goto 128 else goto 122
+  128:	
+  127:	ECX = ECX + -1 (int); 
+  126:	
+  125:	
+  124:	if (ECX >s R8) goto 123 else goto 95
+  123:	EAX = -7; goto 92
+  122:	goto 95
+  121:	R10 = int32[stack(4008)]; 
+  120:	if (R10 >=s 100) goto 119 else goto 118
+  119:	EAX = -8; goto 92
+  118:	ESI = int32[stack(2400)]; 
+  117:	EDI = ESI + -1 (int); 
+  116:	R8 = long32signed(EDI); 
+  115:	R9 = R8; R9 = R9 <<l 4; 
+  114:	R11 = R9 + R8 * 8 + 0 (long); 
+  113:	EDX = int32[R14 + R11 + 8]; 
+  112:	if (EDX ==s -1) goto 111 else goto 109
+  111:	
+  110:	goto 108
+  109:	EDI = R12; 
+  108:	R10 = int32[stack(4008)]; 
+  107:	R10 = long32signed(R10); 
+  106:	R10 = R10 <<l 4; 
+  105:	int32[R14 + R10 + 2408] = EDI; 
+  104:	ECX = int32[stack(4008)]; 
+  103:	ESI = long32signed(ECX); 
+  102:	ESI = ESI <<l 4; 
+  101:	EDI = long32signed(EBX); 
+  100:	EAX = EBP + EDI + 0 (long); 
+   99:	int64[R14 + ESI + 2416] = EAX; 
+   98:	EDX = int32[stack(4008)]; 
+   97:	EDX = EDX + 1 (int); 
+   96:	int32[stack(4008)] = EDX; 
+   95:	EAX = local(2,int); EBX = EBX + EAX + 0 (int); goto 255
+   94:	if (R12 !=s 0) goto 93 else goto 91
+   93:	EAX = -3; 
+   92:	goto 2
+   91:	
+   90:	ESI = stack(0) (long); 
+   89:	R10 = 0; 
+   88:	EDI = int32[stack(4008)]; 
+   87:	if (R10 <s EDI) goto 86 else goto 59
+   86:	EDI = R10 + 1 (int); 
+   85:	R9 = int32[stack(4008)]; 
+   84:	if (EDI <s R9) goto 83 else goto 60
+   83:	R9 = long32signed(R10); 
+   82:	R9 = R9 <<l 4; 
+   81:	R8 = int32[ESI + R9 + 2408]; 
+   80:	R11 = long32signed(EDI); 
+   79:	R11 = R11 <<l 4; 
+   78:	EAX = int32[ESI + R11 + 2408]; 
+   77:	if (R8 >s EAX) goto 76 else goto 61
+   76:	
+   75:	
+   74:	EAX = ESI + R9 + 2408 (long); 
+   73:	_ = memcpy size 16 align 8 (sp + 4032, EAX); 
+   72:	
+   71:	
+   70:	
+   69:	
+   68:	
+   67:	EDX = ESI + R11 + 2408 (long); 
+   66:	_ = memcpy size 16 align 8 (EAX, EDX); 
+   65:	
+   64:	
+   63:	
+   62:	EAX = EDX; _ = memcpy size 16 align 8 (EAX, sp + 4032); 
+   61:	EDI = EDI + 1 (int); goto 85
+   60:	R10 = R10 + 1 (int); goto 88
+   59:	
+   58:	R8 = 0; 
+   57:	EDI = 0; 
+   56:	R9 = int32[stack(2400)]; 
+   55:	if (EDI <s R9) goto 54 else goto 25
+   54:	EAX = long32signed(EDI); 
+   53:	ECX = EAX; ECX = ECX <<l 4; 
+   52:	R11 = ECX + EAX * 8 + 0 (long); 
+   51:	R9 = 0; 
+   50:	int32[ESI + R11 + 16] = R9; 
+   49:	
+   48:	
+   47:	
+   46:	int32[ESI + R11 + 12] = R8; 
+   45:	
+   44:	EDX = int32[stack(4008)]; 
+   43:	if (R8 <s EDX) goto 42 else goto 27
+   42:	R11 = long32signed(R8); 
+   41:	R11 = R11 <<l 4; 
+   40:	R9 = int32[ESI + R11 + 2408]; 
+   39:	
+   38:	if (R9 ==s EDI) goto 37 else goto 26
+   37:	EAX = long32signed(EDI); 
+   36:	ECX = EAX; ECX = ECX <<l 4; 
+   35:	EDX = ECX + EAX * 8 + 0 (long); 
+   34:	
+   33:	
+   32:	
+   31:	R9 = int32[ESI + EDX + 16]; 
+   30:	R10 = R9 + 1 (int); 
+   29:	int32[ESI + EDX + 16] = R10; 
+   28:	R8 = R8 + 1 (int); goto 44
+   27:	
+   26:	EDI = EDI + 1 (int); goto 56
+   25:	
+   24:	
+   23:	EBP = stack(0) (long); 
+   22:	
+   21:	EBX = local(0,long); 
+   20:	R10 = -1; 
+   19:	R9 = int64[stack(0)]; 
+   18:	R11 = int8s[R9 + 0]; 
+   17:	R14 = R11 ==s 94; 
+   16:	R12 = 0; 
+   15:	if (R12 <=s R13) goto 14 else goto 4
+   14:	EDI = long32signed(R12); 
+   13:	EDI = EBX + EDI + 0 (long); 
+   12:	ESI = R13; ESI = ESI - R12; 
+   11:	ECX = 0; 
+   10:	EDX = EBP; call "doh"; R10 = EAX; 
+    9:	
+    8:	if (R10 >=s 0) goto 7 else goto 6
+    7:	R10 = R10 + R12 + 0 (int); goto 4
+    6:	if (R14 !=u 0) goto 4 else goto 5
+    5:	R12 = R12 + 1 (int); goto 15
+    4:	EAX = R10; 
+    3:	
+    2:	
+    1:	return
+}
+
+initialise_benchmark() {
+    2:	
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 110; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   25:	EBP = EDI; 
+   24:	R13 = 0; 
+   23:	if (R13 <s EBP) goto 22 else goto 3
+   22:	EDI = text + 0 (long); 
+   21:	call "strlen"; 
+   20:	EBX = EAX; EBX = lowlong(EBX); 
+   19:	EDX = 0; 
+   18:	_ = volatile store int32(sp + 0, EDX); 
+   17:	R12 = 0; 
+   16:	EAX = regexes + 0 (long); 
+   15:	R8 = long32signed(R12); 
+   14:	EDI = int64[EAX + R8 * 8 + 0]; 
+   13:	ESI = text + 0 (long); 
+   12:	ECX = stack(8) (long); 
+   11:	R8 = 1; 
+   10:	EDX = EBX; call "slre_match"; 
+    9:	EDI = volatile load int32(sp + 0); 
+    8:	ESI = EDI + EAX + 0 (int); 
+    7:	_ = volatile store int32(sp + 0, ESI); 
+    6:	R12 = R12 + 1 (int); 
+    5:	if (R12 <s 4) goto 16 else goto 4
+    4:	R13 = R13 + 1 (int); goto 23
+    3:	EAX = volatile load int32(sp + 0); 
+    2:	
+    1:	return
+}
+
+verify_benchmark() {
+    3:	
+    2:	EAX = EDI ==s 102; 
+    1:	return
+}
+

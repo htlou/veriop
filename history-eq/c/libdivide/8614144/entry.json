@@ -1,0 +1,52 @@
+{
+  "commit": "8614144",
+  "date": "2018-01-17",
+  "subject": "Minor u64 recover speedup",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit subject explicitly identifies a u64 recovery speedup.",
+  "change_summary": "Rewrites the 128-by-128 quotient/remainder calculation used by unsigned-64 divisor recovery.",
+  "units": [
+    {
+      "name": "raw 128-by-128 high-remainder helper, unrestricted inputs",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "artifact_dir": "c/libdivide/8614144/all",
+      "evidence": "Alive2 finds high-remainder mismatches outside the documented 64-bit-quotient domain in both directions."
+    },
+    {
+      "name": "raw helper with nonzero denominator and 64-bit quotient precondition",
+      "level": "precond",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "(vh != 0) || (vl != 0 && uh < vl)",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/8614144/all",
+      "evidence": "Quotient and low remainder pass both directions; high remainder times out both directions."
+    },
+    {
+      "name": "public unsigned-64 branchfull and branchfree generator then recover",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "d != 0 for branchfull; d >= 2 for branchfree",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/8614144/all",
+      "evidence": "Both public recovery targets time out in both directions at the 600-second SMT limit."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The raw mismatch does not establish a public API mismatch: its example lies outside the helper's documented quotient-fit precondition. The public caller check remains inconclusive."
+}

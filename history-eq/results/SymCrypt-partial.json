@@ -1,0 +1,45 @@
+{
+  "repo": "SymCrypt/SymCRust",
+  "pin": "c2e575ace0ea4b6b7a4184c1f19b81d1d5b2b5be",
+  "tool": "Charon/Aeneas/Lean",
+  "selection_status": "complete for this pinned SymCRust scope: all 17 source commits screened; 3 production performance commits, 1 experimental-only optimized alternative, 13 excluded",
+  "commits": [
+    {
+      "commit": "a28bce2e087ef80ab2360628ac7f017ce2274dfd",
+      "parent": "9319fe3abd3bdd92c0b995cde06479d0cf0969dc",
+      "performance_intent": "Reduce kernel stack usage by initializing large ML-KEM values directly in zeroed heap allocations.",
+      "commit_verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "unsafe-raw-pointers",
+      "unit": "mlkem::key::key_allocate; old and new Charon extraction passed, old Aeneas translation passed, new Aeneas reported Unsupported operation: &raw mut ((*ptr)).params and generated sorry in BoxDefault::box_default",
+      "artifact_dir": "rust/SymCrypt/a28bce2"
+    },
+    {
+      "commit": "b1dadd6ba90285973c5806a12d2c80e7a0c64322",
+      "parent": "4774f27280f4ef5fe9dffb4d99be661d9d563cbf",
+      "performance_intent": "The commit message explicitly cites in-place cryptographic operations for performance; it changes the existing AES-GCM stitched FFI path.",
+      "commit_verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "unsafe-raw-pointers",
+      "unit": "aes::ffi::SymCryptAesGcmEncryptStitchedXmm; old and new Charon extraction passed, but both Aeneas translations generated partial Lean files with raw-pointer errors",
+      "artifact_dir": "rust/SymCrypt/b1dadd6"
+    },
+    {
+      "commit": "1298a643521da2b999eabd34e16f09b88daccdc2",
+      "parent": "23d45b67c51838da3b924c35fed4adbbf9b57ad5",
+      "performance_intent": "The commit adds x86/NEON ML-KEM NTT intrinsics in place of the previous generic path.",
+      "commit_verdict": "UNSUPPORTED",
+      "coverage": "partial",
+      "unsupported_reason": "unsafe-raw-pointers",
+      "unit": "old ntt::poly_element_ntt versus new mlkem::ntt::poly_element_ntt; old and new Charon extraction passed, old Aeneas translation passed, new Aeneas reported raw-pointer casts and dereferences in the vector path",
+      "artifact_dir": "rust/SymCrypt/1298a64"
+    }
+  ],
+  "supplementary": {
+    "commit": "c2e575ace0ea4b6b7a4184c1f19b81d1d5b2b5be",
+    "relation": "Pre-commit textbook Keccak permutation equals newly introduced optimized scalar permutation in the Aeneas model.",
+    "evidence": "rust/SymCrypt/c2e575a/check_bridge.py matches all 15 old extracted definitions to the post-commit textbook model after renaming; the re-extracted post-commit model matches the published model; keccak_permute_textbook_eq_opt is kernel-checked with only propext, Classical.choice, Quot.sound.",
+    "counted_as_commit_level_optimization_result": false,
+    "reason": "The optimized variant is marked experimental and is not called by the production SHA3 path in this commit; this does not establish a user-visible optimization of the old public API."
+  }
+}

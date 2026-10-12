@@ -1,0 +1,52 @@
+{
+  "commit": "e876423",
+  "date": "2023-12-07",
+  "subject": "fixed XXH64_finalize() not being inlined",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says the finalizer is forced inline because GCC 11 had failed to inline it in XXH_INLINE_ALL mode.",
+  "change_summary": "Changes XXH64_finalize from plain static to force-inline.",
+  "units": [
+    {
+      "name": "public XXH64 one-shot and streaming fixed-length matrix, four inline configurations",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/e876423/r_hints_dflt_u4",
+      "evidence": "Nine fixed-length targets pass both directions under default hints; threshold and no-hints runs also pass the same targets."
+    },
+    {
+      "name": "public XXH64 one-shot with symbolic length",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/e876423/r_sym_dflt",
+      "evidence": "The symbolic-length target times out in both directions despite unroll 4."
+    },
+    {
+      "name": "Raw XXH64_finalize, all 32 tail residues and both alignments",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "valid tail bytes and 8-byte alignment when XXH_aligned",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/e876423/finalize-residues",
+      "evidence": "finalize-proof-audit.json: 64 bidirectional Alive2 checks, no IR loops"
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The only source change is the XXH64_finalize inline annotation. The exact raw finalizer is proved for every len&31 residue, both alignments, and arbitrary initial hash/input bytes under valid-memory preconditions. Public symbolic-length API and GCC 11 codegen/performance remain unchecked."
+}

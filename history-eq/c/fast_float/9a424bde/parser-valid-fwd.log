@@ -1,0 +1,71 @@
+
+----------------------------------------
+define i32 @target_parser_valid(i8 noundef zeroext %#0) nofree willreturn memory(none) {
+#1:
+  switch i8 noundef zeroext %#0, label %#2 [
+    i8 45, label %#3
+    i8 43, label %#3
+  ]
+
+#2:
+  %#4 = and i8 noundef zeroext %#0, 48
+  %#5 = icmp eq i8 %#4, 48
+  %#6 = zext i1 %#5 to i32
+  br label %#3
+
+#3:
+  %#7 = phi i32 [ 0, %#1 ], [ 0, %#1 ], [ %#6, %#2 ]
+  %#range_0_%#7 = !range i32 %#7, i32 0, i32 2
+  ret i32 %#range_0_%#7
+}
+=>
+define i32 @target_parser_valid(i8 noundef zeroext %#0) nofree willreturn memory(none) {
+#1:
+  switch i8 noundef zeroext %#0, label %#2 [
+    i8 45, label %#3
+    i8 43, label %#3
+  ]
+
+#2:
+  %#4 = add i8 noundef zeroext %#0, 208
+  %#5 = icmp ult i8 %#4, 10
+  %#6 = zext i1 %#5 to i32
+  br label %#3
+
+#3:
+  %#7 = phi i32 [ 0, %#1 ], [ 0, %#1 ], [ %#6, %#2 ]
+  %#range_0_%#7 = !range i32 %#7, i32 0, i32 2
+  ret i32 %#range_0_%#7
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i8 noundef zeroext %#0 = #x7a (122)
+
+Source:
+  >> Jump to %#2
+i8 %#4 = #x30 (48)
+i1 %#5 = #x1 (1)
+i32 %#6 = #x00000001 (1)
+  >> Jump to %#3
+i32 %#7 = #x00000001 (1)
+i32 %#range_0_%#7 = #x00000001 (1)
+
+Target:
+  >> Jump to %#2
+i8 %#4 = #x4a (74)
+i1 %#5 = #x0 (0)
+i32 %#6 = #x00000000 (0)
+  >> Jump to %#3
+i32 %#7 = #x00000000 (0)
+i32 %#range_0_%#7 = #x00000000 (0)
+Source value: #x00000001 (1)
+Target value: #x00000000 (0)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

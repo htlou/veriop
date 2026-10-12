@@ -1,0 +1,24 @@
+val BIGNUM_MUL_SUBROUTINE_CORRECT : thm =
+  |- forall p m n z x y a b pc stackpointer returnaddress.
+         nonoverlapping (z,8 * val p) (word_sub stackpointer (word 48),56) /\
+         ALLPAIRS nonoverlapping
+         [z,8 * val p; word_sub stackpointer (word 48),56]
+         [word pc,129; x,8 * val m; y,8 * val n]
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_mc /\
+                  read RIP s = word pc /\
+                  read RSP s = stackpointer /\
+                  read (memory :> bytes64 stackpointer) s = returnaddress /\
+                  C_ARGUMENTS [p; z; m; x; n; y] s /\
+                  bignum_from_memory (x,val m) s = a /\
+                  bignum_from_memory (y,val n) s = b)
+             (\s.
+                  read RIP s = returnaddress /\
+                  read RSP s = word_add stackpointer (word 8) /\
+                  bignum_from_memory (z,val p) s = lowdigits (a * b) (val p))
+             (MAYCHANGE [RIP; RSP; R10; R11; RAX; RDI; RDX; RSI] ,,
+              MAYCHANGE SOME_FLAGS ,,
+              MAYCHANGE
+              [memory :> bignum (z,val p);
+               memory :> bytes (word_sub stackpointer (word 48),56)])

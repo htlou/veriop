@@ -1,0 +1,5 @@
+# `ca484406`: RISC-V RVV FP16→FP32 row conversion
+
+**Checker verdict: `UNSUPPORTED` (no equivalence or counterexample result).** This optimization adds an RVV/Zvfh vector loop to `ggml_cpu_fp16_to_fp32`; the prior RISC-V path converts elements one at a time. [Reproduce](reproduce.py) extracts the complete row function and unchanged scalar helper from the exact parent/child Git blobs, then cross-compiles both as RISC-V `rv64gcv_zvfh` LLVM IR and objects with Clang 20. Both object builds succeed.
+
+The Alive2 probe fixes `n=8`, repeats one symbolic FP16 word across the input, and compares the first FP32 output bit pattern. Only RISC-V module flags, TBAA, and loop-hint metadata are removed symmetrically from the IR. [Alive2 rejects](alive2.log) the new path's scalable `<vscale x 4 x half>` type before checking the transformation. The [result](result.json) records source-blob IDs, build hashes, and the exact diagnostic. This does not establish equality or inequality for any input, other lengths, or the complete commit; no official historical benchmark score was measured.

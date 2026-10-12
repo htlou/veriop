@@ -1,0 +1,9 @@
+# llama.cpp `b9102008`: PowerPC BF16 tiled GEMM
+
+The exact historical parent and child `sgemm.cpp` files and their production diff are audited in `check_build.py` and `result.json`. Both files include `<array>` and select their PowerPC MMA code under `__MMA__`.
+
+**Verdict: `UNKNOWN` (unverified).** The installed LLVM 20 cross compiler cannot resolve `<array>` for `powerpc64le-linux-gnu`, and this workspace has no PowerPC C++ sysroot. Exact historical PowerPC LLVM IR was therefore not generated, so Alive2 did not compare the old `mnpack` path with the new tiled path. The new code also changes packing behavior; a source-only comparison is insufficient for a matrix-output verdict. No official historical before/after performance score was measured.
+
+There is now a reproducible **private-helper counterexample** in [`check_packnormal.py`](check_packnormal.py). It extracts both exact historical `packNormal` and the unchanged `vector_permute_store` bodies, models the three AltiVec byte operations on a scalar host, and runs with ASan and UBSan. With `TA=uint16_t`, `lda=16`, eight rows, and a 256-element initialized backing array, the eight-column control agrees. At 16 columns, the first 128 packed bytes agree but the second block differs: its first word is **129 before versus 9 after**. [Alive2's fixed-input check](packnormal-alive2.log) finds the same 129-versus-9 result with one incorrect transformation, zero errors, and no approximation; [the result file](packnormal-result.json) locks both source Git objects.
+
+This does not change the selected `UNKNOWN` category. The historical parent calls this private helper with four or eight columns in its non-tiled GEMM path; the 16-column direct-helper case does not prove a reachable public matrix-output difference. The exact PowerPC GEMM pair and official performance score are still unchecked.

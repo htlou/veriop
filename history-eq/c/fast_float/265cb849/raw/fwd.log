@@ -1,0 +1,124 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=30000 --always-verify history-eq/c/fast_float/265cb849/raw/old.ll history-eq/c/fast_float/265cb849/raw/new.ll
+
+----------------------------------------
+define i1 @target_raw_u8(i32 noundef %#0, i32 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = lshr i32 noundef %#0, 8
+  %#6 = trunc i32 %#5 to i8
+  %#7 = lshr i32 noundef %#0, 16
+  %#8 = trunc i32 %#7 to i8
+  %#9 = lshr i32 noundef %#0, 24
+  %#10 = trunc nuw i32 %#9 to i8
+  %#11 = lshr i32 noundef %#1, 8
+  %#12 = trunc i32 %#11 to i8
+  %#13 = lshr i32 noundef %#1, 16
+  %#14 = trunc i32 %#13 to i8
+  %#15 = lshr i32 noundef %#1, 24
+  %#16 = trunc nuw i32 %#15 to i8
+  %#17 = trunc i32 noundef %#1 to i8
+  %#18 = trunc i32 noundef %#0 to i8
+  %#19 = or i8 %#18, 32
+  %#20 = icmp eq i8 %#19, %#17
+  %#21 = or i8 %#6, 32
+  %#22 = icmp eq i8 %#21, %#12
+  %#23 = and i1 %#20, %#22
+  %#24 = or i8 %#8, 32
+  %#25 = icmp eq i8 %#24, %#14
+  %#26 = and i1 %#23, %#25
+  br i1 %#26, label %#3, label %#4
+
+#3:
+  %#27 = or i8 %#10, 32
+  %#28 = icmp eq i8 %#27, %#16
+  br label %#4
+
+#4:
+  %#29 = phi i1 [ 0, %#2 ], [ %#28, %#3 ]
+  ret i1 %#29
+}
+=>
+define i1 @target_raw_u8(i32 noundef %#0, i32 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#3 = xor i32 noundef %#0, noundef %#1
+  %#4 = and i32 %#3, 3755991007
+  %#5 = icmp eq i32 %#4, 0
+  ret i1 %#5
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i32 noundef %#1 = #x00000000 (0)
+
+Source:
+i32 %#5 = #x00000000 (0)
+i8 %#6 = #x00 (0)
+i32 %#7 = #x00000000 (0)
+i8 %#8 = #x00 (0)
+i32 %#9 = #x00000000 (0)
+i8 %#10 = #x00 (0)
+i32 %#11 = #x00000000 (0)
+i8 %#12 = #x00 (0)
+i32 %#13 = #x00000000 (0)
+i8 %#14 = #x00 (0)
+i32 %#15 = #x00000000 (0)
+i8 %#16 = #x00 (0)
+i8 %#17 = #x00 (0)
+i8 %#18 = #x00 (0)
+i8 %#19 = #x20 (32)
+i1 %#20 = #x0 (0)
+i8 %#21 = #x20 (32)
+i1 %#22 = #x0 (0)
+i1 %#23 = #x0 (0)
+i8 %#24 = #x20 (32)
+i1 %#25 = #x0 (0)
+i1 %#26 = #x0 (0)
+  >> Jump to %#4
+i1 %#29 = #x0 (0)
+
+Target:
+i32 %#3 = #x00000000 (0)
+i32 %#4 = #x00000000 (0)
+i1 %#5 = #x1 (1)
+Source value: #x0 (0)
+Target value: #x1 (1)
+
+
+----------------------------------------
+define i1 @target_literal_inf(i32 noundef %#0) nofree willreturn zeroext memory(none) {
+#1:
+  %#4 = and i32 noundef %#0, 223
+  %#5 = icmp eq i32 %#4, 73
+  %#6 = and i32 noundef %#0, 57088
+  %#7 = icmp eq i32 %#6, 19968
+  %#8 = and i1 %#5, %#7
+  %#9 = and i32 noundef %#0, 14614528
+  %#10 = icmp eq i32 %#9, 4587520
+  %#11 = and i1 %#8, %#10
+  br i1 %#11, label %#2, label %#3
+
+#2:
+  %#12 = and i32 noundef %#0, 3741319168
+  %#13 = icmp eq i32 %#12, 1224736768
+  br label %#3
+
+#3:
+  %#14 = phi i1 [ 0, %#1 ], [ %#13, %#2 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_literal_inf(i32 noundef %#0) nofree willreturn zeroext memory(none) {
+#1:
+  %#2 = and i32 noundef %#0, 3755991007
+  %#3 = icmp eq i32 %#2, 1229344329
+  ret i1 %#3
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

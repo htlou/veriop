@@ -1,0 +1,100 @@
+{
+ "commit": "777ec65",
+ "date": "2020-02-21",
+ "subject": "Implement alternative byteshift load",
+ "selected_by": "keyword",
+ "perf_evidence": "Commit message / doc comment: 'XXH_FORCE_MEMORY_ACCESS==3 will use a byteshift operation. This is preferred on older compilers which don't inline memcpy() or some big-endian systems without a native byteswap' ('can generate the best code on old compilers').",
+ "change_summary": "New opt-in XXH_FORCE_MEMORY_ACCESS==3: XXH_readLE32/BE32/LE64/BE64 implemented as endian-independent byte loads + shifts (previously value 3 fell through to the default memcpy-based XXH_read32/64 + conditional bswap). Also XXH_ALIGN_MEMBER puts alignas before the type in C11 mode (build fix) and a typo fix.",
+ "units": [
+  {
+   "name": "XXH_readLE32 / XXH_readLE64 with XXH_FORCE_MEMORY_ACCESS=3",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_raw_fma3",
+   "evidence": "correct fwd+bwd; IR identical (clang folds the byteshift into one unaligned load)"
+  },
+  {
+   "name": "XXH_readBE32 / XXH_readBE64 with XXH_FORCE_MEMORY_ACCESS=3",
+   "level": "raw",
+   "verdict": "REFINES",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_raw_fma3",
+   "evidence": "fwd (new refines old) correct; bwd fails only on memory holding pointer/poison bytes: old load i32 + bswap has a noundef result (UB on poison), new byte loads give poison ('Source is more defined than target')"
+  },
+  {
+   "name": "XXH32_hashFromCanonical / XXH64_hashFromCanonical (canonical by pointer), FMA=3",
+   "level": "api",
+   "verdict": "REFINES",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_api_canon_fma3",
+   "evidence": "fwd correct, bwd fails only with pointer/poison bytes in the canonical buffer (same reason as raw readBE)"
+  },
+  {
+   "name": "XXH32/XXH64/XXH128_hashFromCanonical with canonical bytes by value, FMA=3",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_api_canon_fma3",
+   "evidence": "3 targets correct fwd+bwd; IR differs (load+bswap vs byte loads)"
+  },
+  {
+   "name": "XXH32 len 0..15, XXH64 len 0..31, XXH3_64bits_withSeed len 0..128, XXH3_128bits_withSeed len 0..16 (symbolic len), FMA=3",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_api_fma3",
+   "evidence": "4 targets correct fwd+bwd; IR identical"
+  },
+  {
+   "name": "XXH32 len 16/31, XXH64 len 32/63 (main loops), FMA=3",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_api_fixed_fma3",
+   "evidence": "XXH64 targets correct fwd+bwd; XXH32 len16/31 alive-tv timed out (300 s) but xx_notes shows old/new IR identical, so equal by construction"
+  },
+  {
+   "name": "default configuration (no XXH_FORCE_MEMORY_ACCESS): raw readers, api, canonical decoders",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/777ec65/r_api",
+   "evidence": "correct; IR identical (r_raw, r_api, r_api_canon)"
+  }
+ ],
+ "commit_verdict": "REFINES",
+ "raw_verdict": "REFINES",
+ "coverage": "partial",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "Opt-in configuration change checked with -DXXH_FORCE_MEMORY_ACCESS=3 on both sides (old falls back to its memcpy reader) and in the default configuration. For initialized input bytes the new byteshift readers are equivalent (by-value api EQUIV, all hash entry points IR-identical under clang -O3); the only difference Alive2 finds is that the old memcpy+bswap path is LESS defined (UB via noundef bswap result) when the read memory contains poison/pointer bytes, so new strictly refines old (REFINES at raw readBE and pointer-level canonical api). With value args (no uninitialized bytes) the verdict would be EQUIV. Old side (before this commit's XXH_ALIGN_MEMBER fix) does not compile in clang's default gnu17 mode, so ALL runs use -std=gnu99 on both sides. Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. Coverage partial: XXH3 long inputs (>240, hashLong/accumulate) and streaming APIs not checked (expected IR-identical since readLE folds to a load). The perf benefit (old compilers not inlining memcpy / big-endian without bswap) is not observable with clang x86-64. Native sanity (native_x86_64/, native_fma3/, -std=gnu99): all outputs len 0..256 identical."
+}

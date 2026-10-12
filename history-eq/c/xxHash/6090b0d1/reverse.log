@@ -1,0 +1,116 @@
+
+----------------------------------------
+declare void @XXH3_accumulate_512_avx512(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_avx512(noundef ptr, noundef ptr)
+declare i32 @XXH3_update(noundef ptr, noundef ptr, noundef i64, noundef i32, noundef ptr, noundef ptr)
+declare void @XXH3_accumulate_512_avx2(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_avx2(noundef ptr, noundef ptr)
+declare void @XXH3_accumulate_512_sse2(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_sse2(noundef ptr, noundef ptr)
+declare void @XXH3_accumulate_512_scalar(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_scalar(noundef ptr, noundef ptr)
+
+@XXH3_accumulate_512_avx512 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx512 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_sse2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_sse2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_scalar = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_scalar = constant ? bytes, exec, align 8
+
+define i32 @target_update(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2, i32 noundef %#3) {
+#4:
+  %#11 = icmp ult i32 noundef %#3, 4
+  assume i1 %#11
+  switch i32 noundef %#3, label %#10 [
+    i32 0, label %#8
+    i32 1, label %#7
+    i32 2, label %#6
+    i32 3, label %#5
+  ]
+
+#5:
+  %#12 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_avx512, nonnull noundef ptr @XXH3_scrambleAcc_avx512)
+  br label %#9
+
+#6:
+  %#13 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_avx2, nonnull noundef ptr @XXH3_scrambleAcc_avx2)
+  br label %#9
+
+#7:
+  %#14 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_sse2, nonnull noundef ptr @XXH3_scrambleAcc_sse2)
+  br label %#9
+
+#8:
+  %#15 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_scalar, nonnull noundef ptr @XXH3_scrambleAcc_scalar)
+  br label %#9
+
+#9:
+  %#16 = phi i32 [ %#12, %#5 ], [ %#13, %#6 ], [ %#14, %#7 ], [ %#15, %#8 ]
+  ret i32 %#16
+
+#10:
+  assume i1 0
+}
+=>
+declare void @XXH3_accumulate_512_avx512(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_avx512(noundef ptr, noundef ptr)
+declare i32 @XXH3_update(noundef ptr, noundef ptr, noundef i64, noundef i32, noundef ptr, noundef ptr)
+declare void @XXH3_accumulate_512_avx2(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_avx2(noundef ptr, noundef ptr)
+declare void @XXH3_accumulate_512_sse2(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_sse2(noundef ptr, noundef ptr)
+declare void @XXH3_accumulate_512_scalar(noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare void @XXH3_scrambleAcc_scalar(noundef ptr, noundef ptr)
+
+@XXH3_accumulate_512_avx512 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx512 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_sse2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_sse2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_scalar = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_scalar = constant ? bytes, exec, align 8
+
+define i32 @target_update(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2, i32 noundef %#3) {
+#4:
+  %#11 = icmp ult i32 noundef %#3, 4
+  assume i1 %#11
+  switch i32 noundef %#3, label %#10 [
+    i32 0, label %#8
+    i32 1, label %#7
+    i32 2, label %#6
+    i32 3, label %#5
+  ]
+
+#5:
+  %#12 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_avx512, nonnull noundef ptr @XXH3_scrambleAcc_avx512)
+  br label %#9
+
+#6:
+  %#13 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_avx2, nonnull noundef ptr @XXH3_scrambleAcc_avx2)
+  br label %#9
+
+#7:
+  %#14 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_sse2, nonnull noundef ptr @XXH3_scrambleAcc_sse2)
+  br label %#9
+
+#8:
+  %#15 = tail call i32 @XXH3_update(noundef ptr noundef %#0, noundef ptr noundef %#1, noundef i64 noundef %#2, noundef i32 1, nonnull noundef ptr @XXH3_accumulate_512_scalar, nonnull noundef ptr @XXH3_scrambleAcc_scalar)
+  br label %#9
+
+#9:
+  %#16 = phi i32 [ %#12, %#5 ], [ %#13, %#6 ], [ %#14, %#7 ], [ %#15, %#8 ]
+  ret i32 %#16
+
+#10:
+  assume i1 0
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

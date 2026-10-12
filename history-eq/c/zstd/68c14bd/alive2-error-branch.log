@@ -1,0 +1,43 @@
+
+----------------------------------------
+define i32 @old_error_branch(i32 noundef returned %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree noundef willreturn memory(inaccessiblemem: write) {
+#4:
+  %#5 = add i32 noundef %#3, 1
+  %#6 = icmp ugt i32 noundef %#2, %#5
+  assume i1 %#6
+  ret i32 noundef returned %#0
+}
+=>
+define i32 @new_error_branch(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn memory(inaccessiblemem: write) {
+#4:
+  %#5 = add i32 noundef %#3, 1
+  %#6 = icmp ugt i32 noundef %#2, %#5
+  assume i1 %#6
+  %#7 = icmp ne i32 noundef %#1, 0
+  %#8 = zext i1 %#7 to i32
+  %#range_0_%#8 = !range i32 %#8, i32 0, i32 2
+  ret i32 %#range_0_%#8
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef returned %#0 = #x00000000 (0)
+i32 noundef %#1 = #x00000001 (1)
+i32 noundef %#2 = #x00000002 (2)
+i32 noundef %#3 = #x00000000 (0)
+
+Source:
+i32 %#5 = #x00000001 (1)
+i1 %#6 = #x1 (1)
+
+Target:
+i32 %#5 = #x00000001 (1)
+i1 %#6 = #x1 (1)
+i1 %#7 = #x1 (1)
+i32 %#8 = #x00000001 (1)
+i32 %#range_0_%#8 = #x00000001 (1)
+Source value: #x00000000 (0)
+Target value: #x00000001 (1)
+

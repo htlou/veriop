@@ -1,0 +1,52 @@
+{
+  "commit": "947f8b2",
+  "date": "2017-06-28",
+  "subject": "Pack divider structs",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit explicitly packs divider structs to reduce storage and improve memory-intensive workloads.",
+  "change_summary": "Applies one-byte packing to public divider structs, changing their size and alignment.",
+  "units": [
+    {
+      "name": "public sizeof(libdivide_u32_t)",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/libdivide/947f8b2/all",
+      "evidence": "Alive2 rejects both directions: sizeof returns 8 before and 5 after the packing change, with a concrete value-mismatch witness."
+    },
+    {
+      "name": "generated signed-32, signed-64 and unsigned-64 division results",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/947f8b2/all",
+      "evidence": "The three named generated-division targets pass Alive2 in both directions; unsigned-32 generation remains inconclusive in this run."
+    },
+    {
+      "name": "generated unsigned-32 division result",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/947f8b2/all",
+      "evidence": "The target_u32_api proof timed out in both directions in the retained all-target run."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": "intended-output-change",
+  "notes": "The semantic difference is the documented public memory layout, not a proved division-result change. The raw do_ptr comparisons use different struct pointer types and are not promoted to an API verdict. Other packed struct types and the pending long unsigned-32 proof are not needed to establish this counterexample. The wrapper disables unchanged x86 inline assembly on both sides."
+}

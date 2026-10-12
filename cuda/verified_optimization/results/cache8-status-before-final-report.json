@@ -1,0 +1,207 @@
+{
+  "candidate": "cache8",
+  "mechanism": "register reuse with statically unrolled per-thread tile",
+  "source_domain": "unscaled non-fused RMSNorm, original 1024-thread path, 1024 <= ncols <= 8192; scalar input alignment unchanged; generic fallback otherwise",
+  "expected_effect": "Remove the second global input-load pass without changing reduction block size",
+  "resource_evidence": {
+    "baseline": {
+      "ptx_sha256": "b014d8d1afbdcfcac9ca026cb4c6b0b3d4add4ec7404433785ea889a8cb8532a",
+      "kernel": "_Z12rms_norm_f32ILi1024ELb0ELb0ELb0EEvPKfPfilllfS1_lll5uint3S3_S3_S3_S1_lllS3_S3_S3_S3_f",
+      "block": 1024,
+      "dynamic_shared_bytes": 128,
+      "cuda_visible_devices": "5",
+      "registers_per_thread": 32,
+      "static_shared_bytes": 0,
+      "local_bytes": 0,
+      "max_active_blocks_per_sm": 2,
+      "theoretical_occupancy": 1.0
+    },
+    "candidate": {
+      "ptx_sha256": "8dd5dff86c956d38c1638bb733727d231227bddab03faca0d3bbdef52a62f1e5",
+      "kernel": "_Z12rms_norm_f32ILi1024ELb0ELb0ELb0ELi8EEvPKfPfilllfS1_lll5uint3S3_S3_S3_S1_lllS3_S3_S3_S3_f",
+      "block": 1024,
+      "dynamic_shared_bytes": 128,
+      "cuda_visible_devices": "5",
+      "registers_per_thread": 25,
+      "static_shared_bytes": 0,
+      "local_bytes": 0,
+      "max_active_blocks_per_sm": 2,
+      "theoretical_occupancy": 1.0
+    }
+  },
+  "profile_scope": "JIT resource metadata, not performance timing or hardware counters",
+  "native_benchmark_resource_note": "Existing harness prints uncached default-specialization attributes. Use this selected-cache-kernel JIT report for cache8 resource claims.",
+  "status": "Primary timings show improvements; held-out timing run live",
+  "previous_goal_turn": "progress: builds, proofs and paired timings produced authoritative evidence",
+  "repository_tests": 101,
+  "formal_instances": 22,
+  "safety_analyses": 44,
+  "performance_handle": 5677,
+  "primary_shape_count": 16,
+  "primary_timing_processes": 320,
+  "primary_gpu": "6",
+  "max_primary_ulp": 0,
+  "heldout_performance_handle": 72483,
+  "primary_speedups": [
+    {
+      "ncols": 256,
+      "nrows": 1,
+      "paired_speedup": {
+        "median": 1.001147303700476,
+        "p5": 0.995101382065795,
+        "p95": 1.0069417747852238,
+        "stdev": 0.004457197089796195
+      }
+    },
+    {
+      "ncols": 256,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.0001028824439055,
+        "p5": 0.9985422257769564,
+        "p95": 1.005390999606156,
+        "stdev": 0.0025869655266084657
+      }
+    },
+    {
+      "ncols": 256,
+      "nrows": 2048,
+      "paired_speedup": {
+        "median": 0.9946491366053933,
+        "p5": 0.9768468858578764,
+        "p95": 1.0199430282269895,
+        "stdev": 0.015331891631407205
+      }
+    },
+    {
+      "ncols": 4096,
+      "nrows": 1,
+      "paired_speedup": {
+        "median": 1.0716947941054022,
+        "p5": 1.0689727376350855,
+        "p95": 1.0778168267536323,
+        "stdev": 0.0033799963444898704
+      }
+    },
+    {
+      "ncols": 4096,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.0873567020063877,
+        "p5": 1.0718816003406886,
+        "p95": 1.1016491426681312,
+        "stdev": 0.010444107641325986
+      }
+    },
+    {
+      "ncols": 4096,
+      "nrows": 2048,
+      "paired_speedup": {
+        "median": 1.083202133426675,
+        "p5": 1.0777032230331194,
+        "p95": 1.1194770136228454,
+        "stdev": 0.018214186987637607
+      }
+    },
+    {
+      "ncols": 8192,
+      "nrows": 1,
+      "paired_speedup": {
+        "median": 1.0795906031559235,
+        "p5": 1.0666518263299054,
+        "p95": 1.0834294275310659,
+        "stdev": 0.006417054195404579
+      }
+    },
+    {
+      "ncols": 8192,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.4575082419765635,
+        "p5": 1.44334032162497,
+        "p95": 1.4817861296762351,
+        "stdev": 0.01388814372135128
+      }
+    },
+    {
+      "ncols": 8192,
+      "nrows": 2048,
+      "paired_speedup": {
+        "median": 1.0417809434448306,
+        "p5": 1.0351558194658768,
+        "p95": 1.0441956885879873,
+        "stdev": 0.003419658002432107
+      }
+    },
+    {
+      "ncols": 16384,
+      "nrows": 1,
+      "paired_speedup": {
+        "median": 1.0002975805151006,
+        "p5": 0.9987339798095481,
+        "p95": 1.005108219845824,
+        "stdev": 0.0023307722314272923
+      }
+    },
+    {
+      "ncols": 16384,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.0045026607053897,
+        "p5": 0.8159685458468061,
+        "p95": 1.2267686596529916,
+        "stdev": 0.1522840977324142
+      }
+    },
+    {
+      "ncols": 16384,
+      "nrows": 2048,
+      "paired_speedup": {
+        "median": 0.9971848933191756,
+        "p5": 0.9349814803269524,
+        "p95": 1.0017629201897553,
+        "stdev": 0.03203012527215914
+      }
+    },
+    {
+      "ncols": 1024,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.16013990389455,
+        "p5": 1.1526702546058842,
+        "p95": 1.2571078089437946,
+        "stdev": 0.047643054376141844
+      }
+    },
+    {
+      "ncols": 2048,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.13143112116199,
+        "p5": 0.8633226744687011,
+        "p95": 1.2081031511322524,
+        "stdev": 0.15838461280251384
+      }
+    },
+    {
+      "ncols": 3072,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.1398288041435698,
+        "p5": 1.1231284663156735,
+        "p95": 1.1487803002939525,
+        "stdev": 0.009821637491328337
+      }
+    },
+    {
+      "ncols": 6144,
+      "nrows": 128,
+      "paired_speedup": {
+        "median": 1.5471204275848072,
+        "p5": 1.5266586818865104,
+        "p95": 1.5725528315421393,
+        "stdev": 0.01799900014738478
+      }
+    }
+  ]
+}

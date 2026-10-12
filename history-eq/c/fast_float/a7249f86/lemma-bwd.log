@@ -1,0 +1,1560 @@
+
+----------------------------------------
+define i1 @target_base2_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  ret i1 0
+}
+=>
+define i1 @target_base2_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  ret i1 0
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base3_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 2
+  %#8 = icmp ult i64 noundef %#1, -6289078614652622815
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -6289078614652622815
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -6289078614652622815
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base3_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 2
+  %#7 = icmp ult i64 noundef %#1, -6289078614652622815
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 12157665459056928801
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base4_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  ret i1 0
+}
+=>
+define i1 @target_base4_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  ret i1 0
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base5_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 4
+  %#8 = icmp ult i64 noundef %#1, 7450580596923828125
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 2
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 7450580596923828125
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 2
+  %#14 = icmp ult i64 %#12, -3545582879861895366
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base5_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 4
+  %#7 = icmp ult i64 noundef %#1, 7450580596923828125
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 7450580596923828125
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base6_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 5
+  %#8 = icmp ult i64 noundef %#1, 4738381338321616896
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 3
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 4738381338321616896
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 3
+  %#14 = icmp ult i64 %#12, -4231600058744700928
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base6_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 5
+  %#7 = icmp ult i64 noundef %#1, 4738381338321616896
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 4738381338321616896
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base7_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 6
+  %#8 = icmp ult i64 noundef %#1, 3909821048582988049
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 4
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 3909821048582988049
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 4
+  %#14 = icmp ult i64 %#12, -2807459879377599420
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base7_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 6
+  %#7 = icmp ult i64 noundef %#1, 3909821048582988049
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 3909821048582988049
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base8_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#3 = add i64 noundef %#0, -1
+  %#4 = icmp ult i64 %#3, 7
+  %#5 = icmp sgt i64 noundef %#1, -1
+  %#6 = and i1 %#4, %#5
+  %#7 = icmp samesign ugt i64 noundef %#0, 1
+  %#8 = select i1 %#6, i1 %#7, i1 0
+  ret i1 %#8
+}
+=>
+define i1 @target_base8_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  %#3 = icmp sgt i64 noundef %#1, -1
+  %#4 = add i64 noundef %#0, -2
+  %#5 = icmp ult i64 %#4, 6
+  %#6 = and i1 %#5, %#3
+  ret i1 %#6
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base9_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 8
+  %#8 = icmp ult i64 noundef %#1, -6289078614652622815
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -6289078614652622815
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -6289078614652622815
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base9_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 8
+  %#7 = icmp ult i64 noundef %#1, -6289078614652622815
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 12157665459056928801
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base10_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 9
+  %#8 = icmp ult i64 noundef %#1, -8446744073709551616
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -8446744073709551616
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -8446744073709551616
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base10_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 9
+  %#7 = icmp ult i64 noundef %#1, -8446744073709551616
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 10000000000000000000
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base11_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 10
+  %#8 = icmp ult i64 noundef %#1, 5559917313492231481
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 3
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 5559917313492231481
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 3
+  %#14 = icmp ult i64 %#12, -1766992133232857173
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base11_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 10
+  %#7 = icmp ult i64 noundef %#1, 5559917313492231481
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 5559917313492231481
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base12_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 11
+  %#8 = icmp ult i64 noundef %#1, 2218611106740436992
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 8
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 2218611106740436992
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 8
+  %#14 = icmp ult i64 %#12, -697855219786055680
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base12_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 11
+  %#7 = icmp ult i64 noundef %#1, 2218611106740436992
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 2218611106740436992
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base13_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 12
+  %#8 = icmp ult i64 noundef %#1, 8650415919381337933
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 2
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 8650415919381337933
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 2
+  %#14 = icmp ult i64 %#12, -1145912234946875750
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base13_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 12
+  %#7 = icmp ult i64 noundef %#1, 8650415919381337933
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 8650415919381337933
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base14_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 13
+  %#8 = icmp ult i64 noundef %#1, 2177953337809371136
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 8
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 2177953337809371136
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 8
+  %#14 = icmp ult i64 %#12, -1023117371234582528
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base14_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 13
+  %#7 = icmp ult i64 noundef %#1, 2177953337809371136
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 2177953337809371136
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base15_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 14
+  %#8 = icmp ult i64 noundef %#1, 6568408355712890625
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 2
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 6568408355712890625
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 2
+  %#14 = icmp ult i64 %#12, -5309927362283770366
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base15_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 14
+  %#7 = icmp ult i64 noundef %#1, 6568408355712890625
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 6568408355712890625
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base16_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  ret i1 0
+}
+=>
+define i1 @target_base16_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  ret i1 0
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base17_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 16
+  %#8 = icmp ult i64 noundef %#1, 2862423051509815793
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 6
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 2862423051509815793
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 6
+  %#14 = icmp ult i64 %#12, -1272205764650656858
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base17_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 16
+  %#7 = icmp ult i64 noundef %#1, 2862423051509815793
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 2862423051509815793
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base18_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 17
+  %#8 = icmp ult i64 noundef %#1, 6746640616477458432
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 2
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 6746640616477458432
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 2
+  %#14 = icmp ult i64 %#12, -4953462840754634752
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base18_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 17
+  %#7 = icmp ult i64 noundef %#1, 6746640616477458432
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 6746640616477458432
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base19_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 18
+  %#8 = icmp ult i64 noundef %#1, -3265617043834753317
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -3265617043834753317
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -3265617043834753317
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base19_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 18
+  %#7 = icmp ult i64 noundef %#1, -3265617043834753317
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 15181127029874798299
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base20_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 19
+  %#8 = icmp ult i64 noundef %#1, 1638400000000000000
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 11
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 1638400000000000000
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 11
+  %#14 = icmp ult i64 %#12, -424344073709551616
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base20_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 19
+  %#7 = icmp ult i64 noundef %#1, 1638400000000000000
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 1638400000000000000
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base21_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 20
+  %#8 = icmp ult i64 noundef %#1, 3243919932521508681
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 5
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 3243919932521508681
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 5
+  %#14 = icmp ult i64 %#12, -2227144411102008211
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base21_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 20
+  %#7 = icmp ult i64 noundef %#1, 3243919932521508681
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 3243919932521508681
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base22_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 21
+  %#8 = icmp ult i64 noundef %#1, 6221821273427820544
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 2
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 6221821273427820544
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 2
+  %#14 = icmp ult i64 %#12, -6003101526853910528
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base22_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 21
+  %#7 = icmp ult i64 noundef %#1, 6221821273427820544
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 6221821273427820544
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base23_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 22
+  %#8 = icmp ult i64 noundef %#1, -6853907749170801807
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -6853907749170801807
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -6853907749170801807
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base23_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 22
+  %#7 = icmp ult i64 noundef %#1, -6853907749170801807
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 11592836324538749809
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base24_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 23
+  %#8 = icmp ult i64 noundef %#1, 876488338465357824
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 21
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 876488338465357824
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 21
+  %#14 = icmp ult i64 %#12, -40488965937037312
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base24_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 23
+  %#7 = icmp ult i64 noundef %#1, 876488338465357824
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 876488338465357824
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base25_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 24
+  %#8 = icmp ult i64 noundef %#1, 1490116119384765625
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 12
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 1490116119384765625
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 12
+  %#14 = icmp ult i64 %#12, -565350641092364116
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base25_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 24
+  %#7 = icmp ult i64 noundef %#1, 1490116119384765625
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 1490116119384765625
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base26_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 25
+  %#8 = icmp ult i64 noundef %#1, 2481152873203736576
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 7
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 2481152873203736576
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 7
+  %#14 = icmp ult i64 %#12, -1078673961283395584
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base26_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 25
+  %#7 = icmp ult i64 noundef %#1, 2481152873203736576
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 2481152873203736576
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base27_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 26
+  %#8 = icmp ult i64 noundef %#1, 4052555153018976267
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 4
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 4052555153018976267
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 4
+  %#14 = icmp ult i64 %#12, -2236523461633646548
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base27_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 26
+  %#7 = icmp ult i64 noundef %#1, 4052555153018976267
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 4052555153018976267
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base28_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 27
+  %#8 = icmp ult i64 noundef %#1, 6502111422497947648
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 2
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 6502111422497947648
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 2
+  %#14 = icmp ult i64 %#12, -5442521228713656320
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base28_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 27
+  %#7 = icmp ult i64 noundef %#1, 6502111422497947648
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 6502111422497947648
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base29_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 28
+  %#8 = icmp ult i64 noundef %#1, -8186115360750949427
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -8186115360750949427
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -8186115360750949427
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base29_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 28
+  %#7 = icmp ult i64 noundef %#1, -8186115360750949427
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 10260628712958602189
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base30_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 29
+  %#8 = icmp ult i64 noundef %#1, -2503514073709551616
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 1
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nsw nuw i64 noundef %#0, -2503514073709551616
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp ult i64 %#12, -2503514073709551616
+  br label %#5
+
+#5:
+  %#14 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#13, %#4 ]
+  ret i1 %#14
+}
+=>
+define i1 @target_base30_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 29
+  %#7 = icmp ult i64 noundef %#1, -2503514073709551616
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 15943230000000000000
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base31_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 30
+  %#8 = icmp ult i64 noundef %#1, 787662783788549761
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 23
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 787662783788549761
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 23
+  %#14 = icmp ult i64 %#12, -330500046572907113
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base31_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 30
+  %#7 = icmp ult i64 noundef %#1, 787662783788549761
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 787662783788549761
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base32_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 31
+  %#8 = icmp ult i64 noundef %#1, 1152921504606846976
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 15
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = shl nuw i64 noundef %#0, 60
+  %#12 = or disjoint i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 15
+  %#14 = icmp ult i64 %#12, -1152921504606846976
+  %#15 = select i1 %#13, i1 %#14, i1 0
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base32_overflow(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  %#3 = icmp ult i64 noundef %#1, 1152921504606846976
+  %#4 = and i64 noundef %#0, -16
+  %#5 = icmp eq i64 %#4, 16
+  %#6 = and i1 %#5, %#3
+  ret i1 %#6
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base33_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 32
+  %#8 = icmp ult i64 noundef %#1, 1667889514952984961
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 11
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 1667889514952984961
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 11
+  %#14 = icmp ult i64 %#12, -99959409226717045
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base33_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 32
+  %#7 = icmp ult i64 noundef %#1, 1667889514952984961
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 1667889514952984961
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base34_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 33
+  %#8 = icmp ult i64 noundef %#1, 2386420683693101056
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 7
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 2386420683693101056
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 7
+  %#14 = icmp ult i64 %#12, -1741799287857844224
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base34_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 33
+  %#7 = icmp ult i64 noundef %#1, 2386420683693101056
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 2386420683693101056
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base35_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 34
+  %#8 = icmp ult i64 noundef %#1, 3379220508056640625
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 5
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 3379220508056640625
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 5
+  %#14 = icmp ult i64 %#12, -1550641533426348491
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base35_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 34
+  %#7 = icmp ult i64 noundef %#1, 3379220508056640625
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 3379220508056640625
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_base36_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#6 = add i64 noundef %#0, -1
+  %#7 = icmp ult i64 %#6, 35
+  %#8 = icmp ult i64 noundef %#1, 4738381338321616896
+  %#9 = and i1 %#7, %#8
+  br i1 %#9, label %#3, label %#5
+
+#3:
+  %#10 = icmp samesign ugt i64 noundef %#0, 3
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = mul nuw i64 noundef %#0, 4738381338321616896
+  %#12 = add i64 %#11, noundef %#1
+  %#13 = icmp eq i64 noundef %#0, 3
+  %#14 = icmp ult i64 %#12, -4231600058744700928
+  %#15 = and i1 %#13, %#14
+  br label %#5
+
+#5:
+  %#16 = phi i1 [ 0, %#2 ], [ 1, %#3 ], [ %#15, %#4 ]
+  ret i1 %#16
+}
+=>
+define i1 @target_base36_overflow(i64 noundef %#0, i64 noundef %#1) nofree willreturn zeroext memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, -1
+  %#6 = icmp ult i64 %#5, 35
+  %#7 = icmp ult i64 noundef %#1, 4738381338321616896
+  %#8 = and i1 %#6, %#7
+  br i1 %#8, label %#3, label %#4
+
+#3:
+  %#9 = zext nneg i64 noundef %#0 to i128
+  %#10 = mul nsw nuw i128 %#9, 4738381338321616896
+  %#11 = zext nneg i64 noundef %#1 to i128
+  %#12 = add nsw nuw i128 %#10, %#11
+  %#13 = icmp samesign ugt i128 %#12, 18446744073709551615
+  br label %#4
+
+#4:
+  %#14 = phi i1 [ %#13, %#3 ], [ 0, %#2 ]
+  ret i1 %#14
+}
+Transformation seems to be correct!
+
+Summary:
+  35 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

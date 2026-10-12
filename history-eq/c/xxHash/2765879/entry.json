@@ -1,0 +1,40 @@
+{
+ "commit": "2765879",
+ "date": "2023-01-06",
+ "subject": "Add __attribute__((noescape)) on pointers in public API",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Message: 'Add __attribute__((noescape)) on pointers in public API ... Without LTO its the only way to inform the compiler that the pointer does not become globally visible due to the function call.' - lets callers keep values in registers / avoid reloads (codegen intent).",
+ "change_summary": "Defines XXH_NOESCAPE (__attribute__((noescape)) when supported, i.e. clang) and annotates pointer parameters of the public API declarations/definitions (XXH32/XXH64/XXH3 one-shot, state, canonical functions). No body changes.",
+ "units": [
+  {
+   "name": "library implementation (XXH_INLINE_ALL; XXH32/XXH64/XXH3/XXH128, XXH32 streaming, hashFromCanonical)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": true,
+   "unroll": 8,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/2765879/r_impl",
+   "evidence": "IR identical for all 7 targets after normalization; Alive2 EQUIV both directions (XXH32 len20 (value args), XXH32 stream 10+10 (value args), XXH64 len40, XXH3 len20/200, XXH3_128bits len20, hashFromCanonical)"
+  },
+  {
+   "name": "separately compiled client: local buffer passed to XXH64 / XXH64_update / XXH3_64bits_update, then an unknown ext() call, then the buffer is re-read",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/2765879/r_client",
+   "evidence": "clang emits 'nocapture' on the call arguments/declarations in new (the only IR effect; no downstream optimization appeared in these clients). The Alive2 pin cannot parse 'nocapture', so the shared runner strips it on both sides; Alive2 then reports EQUIV for the 3 targets, but that check no longer contains the change itself"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "EQUIV",
+ "coverage": "partial",
+ "unsupported_reason": "other",
+ "not_equiv_kind": null,
+ "notes": "Implementation-level IR is identical (EQUIV). The attribute's effect is a cross-TU contract that becomes LLVM 'nocapture' at call sites/declarations; tools/alive_check.py's normalization removes ' nocapture' (Alive2 cannot parse it), so Alive2 cannot see or check the change: the r_client EQUIV is recorded but only proves the clients equal modulo the stripped attribute -> unit UNSUPPORTED(other). Commit verdict by METHOD aggregation -> UNSUPPORTED; library semantics unchanged."
+}

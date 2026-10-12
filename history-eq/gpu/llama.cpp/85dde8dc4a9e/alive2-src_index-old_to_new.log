@@ -1,0 +1,78 @@
+
+----------------------------------------
+define i64 @src_index(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2) nofree willreturn memory(inaccessiblemem: write) {
+#3:
+  %#4 = icmp ult i32 noundef %#0, 8192
+  assume i1 %#4
+  %#5 = and i32 noundef %#0, 1
+  %#6 = icmp eq i32 %#5, 0
+  assume i1 %#6
+  %#7 = add i32 noundef %#2, 4294967264
+  %#8 = icmp ult i32 %#7, 8161
+  assume i1 %#8
+  %#9 = and i32 noundef %#2, 31
+  %#10 = icmp eq i32 %#9, 0
+  assume i1 %#10
+  %#11 = icmp sgt i32 noundef %#1, 4294967295
+  assume i1 %#11
+  %#12 = icmp samesign ult i32 noundef %#1, noundef %#2
+  assume i1 %#12
+  %#13 = and i32 noundef %#1, 31
+  %#14 = icmp eq i32 %#13, 0
+  assume i1 %#14
+  %#15 = lshr exact i32 noundef %#2, 5
+  %#16 = lshr i32 noundef %#0, 5
+  %#17 = lshr exact i32 noundef %#1, 5
+  %#18 = mul nsw nuw i32 %#15, %#16
+  %#19 = add nsw nuw i32 %#18, %#17
+  %#20 = shl nsw nuw i32 %#19, 10
+  %#21 = shl nsw nuw i32 noundef %#0, 5
+  %#22 = and i32 %#21, 960
+  %#23 = or disjoint i32 %#20, %#22
+  %#24 = zext nneg i32 %#23 to i64
+  %#range_0_%#24 = !range i64 %#24, i64 0, i64 67108801
+  ret i64 %#range_0_%#24
+}
+=>
+define i64 @src_index(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2) nofree willreturn memory(inaccessiblemem: write) {
+#3:
+  %#4 = icmp ult i32 noundef %#0, 8192
+  assume i1 %#4
+  %#5 = and i32 noundef %#0, 1
+  %#6 = icmp eq i32 %#5, 0
+  assume i1 %#6
+  %#7 = add i32 noundef %#2, 4294967264
+  %#8 = icmp ult i32 %#7, 8161
+  assume i1 %#8
+  %#9 = and i32 noundef %#2, 31
+  %#10 = icmp eq i32 %#9, 0
+  assume i1 %#10
+  %#11 = icmp sgt i32 noundef %#1, 4294967295
+  assume i1 %#11
+  %#12 = icmp samesign ult i32 noundef %#1, noundef %#2
+  assume i1 %#12
+  %#13 = and i32 noundef %#1, 31
+  %#14 = icmp eq i32 %#13, 0
+  assume i1 %#14
+  %#15 = shl nsw nuw i32 noundef %#2, 5
+  %#16 = zext nneg i32 %#15 to i64
+  %#17 = zext nneg i32 noundef %#0 to i64
+  %#18 = lshr i64 %#17, 5
+  %#19 = lshr exact i32 noundef %#1, 5
+  %#20 = zext nneg i32 %#19 to i64
+  %#21 = mul nsw nuw i64 %#18, %#16
+  %#22 = shl nsw nuw i64 %#20, 10
+  %#23 = add nsw nuw i64 %#21, %#22
+  %#24 = shl nsw nuw i64 %#17, 5
+  %#25 = and i64 %#24, 960
+  %#26 = or disjoint i64 %#23, %#25
+  %#range_0_%#26 = !range i64 %#26, i64 0, i64 67108801
+  ret i64 %#range_0_%#26
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

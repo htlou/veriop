@@ -1,0 +1,33 @@
+
+----------------------------------------
+define void @zstd_old_copy16(ptr noundef %#0, ptr noundef %#1) {
+#2:
+  %#3 = alloca i64 4, align 4
+  %#4 = alloca i64 4, align 4
+  store ptr noundef %#0, ptr %#3, align 4
+  store ptr noundef %#1, ptr %#4, align 4
+  %#5 = load ptr, ptr %#3, align 4
+  %#6 = load ptr, ptr %#4, align 4
+  memmove ptr %#5 align 1, ptr %#6 align 1, i32 16
+  ret void
+}
+=>
+define void @zstd_new_copy16(ptr noundef %#0, ptr noundef %#1) {
+#2:
+  %#3 = alloca i64 4, align 4
+  %#4 = alloca i64 4, align 4
+  %#5 = alloca i64 16, align 1
+  store ptr noundef %#0, ptr %#3, align 4
+  store ptr noundef %#1, ptr %#4, align 4
+  %#6 = gep inbounds ptr %#5, 16 x i32 0, 1 x i32 0
+  %#7 = load ptr, ptr %#4, align 4
+  memcpy ptr %#6 align 1, ptr %#7 align 1, i32 16
+  %#8 = load ptr, ptr %#3, align 4
+  %#9 = gep inbounds ptr %#5, 16 x i32 0, 1 x i32 0
+  memcpy ptr %#8 align 1, ptr %#9 align 1, i32 16
+  ret void
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

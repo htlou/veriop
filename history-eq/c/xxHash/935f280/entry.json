@@ -1,0 +1,64 @@
+{
+ "commit": "935f280",
+ "date": "2020-02-24",
+ "subject": "xxh128: speedup len [4,8]",
+ "selected_by": "keyword",
+ "perf_evidence": "Subject 'xxh128: speedup len [4,8]': XXH3_len_4to8_128b replaces two independent 64-bit mixing chains (4 multiplies + 2 avalanches) by one 64x64->128 multiply plus cheap shifts.",
+ "change_summary": "Pre-v0.8.0 output change of XXH3_len_4to8_128b (seed folded with swap32, single XXH_mult64to128(keyed, PRIME64_1), len added/subtracted to the halves, xor/shift cross-mix, avalanche both). Secondary hunk: new XXH_xorshift64 helper used in XXH3_avalanche, XXH3_len_4to8_64b and scalar XXH3_scrambleAcc (pure refactor).",
+ "units": [
+  {
+   "name": "XXH3_len_4to8_128b (len fixed 4 and 8, secret = 64 zero bytes)",
+   "level": "raw",
+   "verdict": "NOT_EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": "intended-output-change",
+   "artifact_dir": "c/xxHash/935f280/r_rawcex",
+   "evidence": "len=4, in0=0, in1=3, seed=0: low64 old 0xb72e62365044ad15 vs new 0x3cf21067c66ff783 (Mismatch in memory of the out struct)"
+  },
+  {
+   "name": "XXH3_len_4to8_128b fully symbolic (len 4..8, secret by value)",
+   "level": "raw",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/935f280/r_raw",
+   "evidence": "SMT timeout (300 s) both directions"
+  },
+  {
+   "name": "XXH3_128bits / _withSeed / _withSecret, len 4..8",
+   "level": "api",
+   "verdict": "NOT_EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": "intended-output-change",
+   "artifact_dir": "c/xxHash/935f280/r_api",
+   "evidence": "XXH3_128bits(p, 8) with defined input bytes: stored hash byte differs (old 0x0b vs new 0x7b at out+12); all 3 targets incorrect fwd and bwd"
+  },
+  {
+   "name": "XXH_xorshift64 refactor: XXH3_64bits_withSeed len 4..8 and 9..16, scalar XXH3_scrambleAcc (XXH_VECTOR=0, by value)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/935f280/r_refactor_scalar",
+   "evidence": "3 targets correct fwd+bwd; IR identical (refactor)"
+  }
+ ],
+ "commit_verdict": "NOT_EQUIV",
+ "raw_verdict": "NOT_EQUIV",
+ "coverage": "full",
+ "unsupported_reason": null,
+ "not_equiv_kind": "intended-output-change",
+ "notes": "Intentional pre-v0.8.0 change of the XXH128 4..8-byte formula. Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. Raw targets pass input (16 B) and secret (64 B) as noundef scalar args copied into fresh local buffers (no aliasing/poison). Api targets: input pointer + symbolic len bounded to the length class, seed symbolic; _withSecret targets take a secret pointer with secretSize>=136. 128-bit results are written through an out pointer; the api counterexample uses defined (non-poison) input bytes in a separate block, so it is not an aliasing/poison artefact; the raw counterexample (r_rawcex) uses only value args. Native sanity (native_x86_64/): over len 0..256 only XXH3_128bits for len 4..8 differs; XXH3_64bits/XXH32/XXH64 unchanged."
+}

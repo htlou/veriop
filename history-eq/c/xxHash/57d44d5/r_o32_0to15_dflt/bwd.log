@@ -1,0 +1,1096 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/57d44d5/r_o32_0to15_dflt/new.ll c/xxHash/57d44d5/r_o32_0to15_dflt/old.ll
+
+----------------------------------------
+define i32 @target_xxh32_len0(ptr noread nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i32 noundef %#1, 374761393
+  %#4 = lshr i32 %#3, 15
+  %#5 = xor i32 %#4, %#3
+  %#6 = mul i32 %#5, 2246822519
+  %#7 = lshr i32 %#6, 13
+  %#8 = xor i32 %#7, %#6
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = lshr i32 %#9, 16
+  %#11 = xor i32 %#10, %#9
+  ret i32 %#11
+}
+=>
+define i32 @target_xxh32_len0(ptr noread nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i32 noundef %#1, 374761393
+  %#4 = lshr i32 %#3, 15
+  %#5 = xor i32 %#4, %#3
+  %#6 = mul i32 %#5, 2246822519
+  %#7 = lshr i32 %#6, 13
+  %#8 = xor i32 %#7, %#6
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = lshr i32 %#9, 16
+  %#11 = xor i32 %#10, %#9
+  ret i32 %#11
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len1(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761394
+  %#4 = load i8, ptr nowrite noundef %#0, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = add i32 %#6, %#3
+  %#8 = fshl i32 %#7, i32 %#7, i32 11
+  %#9 = mul i32 %#8, 2654435761
+  %#10 = lshr i32 %#9, 15
+  %#11 = xor i32 %#10, %#9
+  %#12 = mul i32 %#11, 2246822519
+  %#13 = lshr i32 %#12, 13
+  %#14 = xor i32 %#13, %#12
+  %#15 = mul i32 %#14, 3266489917
+  %#16 = lshr i32 %#15, 16
+  %#17 = xor i32 %#16, %#15
+  ret i32 %#17
+}
+=>
+define i32 @target_xxh32_len1(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761394
+  %#4 = load i8, ptr nowrite noundef %#0, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = add i32 %#3, %#6
+  %#8 = fshl i32 %#7, i32 %#7, i32 11
+  %#9 = mul i32 %#8, 2654435761
+  %#10 = lshr i32 %#9, 15
+  %#11 = xor i32 %#10, %#9
+  %#12 = mul i32 %#11, 2246822519
+  %#13 = lshr i32 %#12, 13
+  %#14 = xor i32 %#13, %#12
+  %#15 = mul i32 %#14, 3266489917
+  %#16 = lshr i32 %#15, 16
+  %#17 = xor i32 %#16, %#15
+  ret i32 %#17
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len2(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761395
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i32
+  %#7 = mul i32 %#6, 374761393
+  %#8 = add i32 %#7, %#3
+  %#9 = fshl i32 %#8, i32 %#8, i32 11
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = load i8, ptr %#4, align 1
+  %#12 = zext i8 %#11 to i32
+  %#13 = mul i32 %#12, 374761393
+  %#14 = add i32 %#13, %#10
+  %#15 = fshl i32 %#14, i32 %#14, i32 11
+  %#16 = mul i32 %#15, 2654435761
+  %#17 = lshr i32 %#16, 15
+  %#18 = xor i32 %#17, %#16
+  %#19 = mul i32 %#18, 2246822519
+  %#20 = lshr i32 %#19, 13
+  %#21 = xor i32 %#20, %#19
+  %#22 = mul i32 %#21, 3266489917
+  %#23 = lshr i32 %#22, 16
+  %#24 = xor i32 %#23, %#22
+  ret i32 %#24
+}
+=>
+define i32 @target_xxh32_len2(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761395
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i32
+  %#7 = mul i32 %#6, 374761393
+  %#8 = add i32 %#3, %#7
+  %#9 = fshl i32 %#8, i32 %#8, i32 11
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = load i8, ptr %#4, align 1
+  %#12 = zext i8 %#11 to i32
+  %#13 = mul i32 %#12, 374761393
+  %#14 = add i32 %#10, %#13
+  %#15 = fshl i32 %#14, i32 %#14, i32 11
+  %#16 = mul i32 %#15, 2654435761
+  %#17 = lshr i32 %#16, 15
+  %#18 = xor i32 %#17, %#16
+  %#19 = mul i32 %#18, 2246822519
+  %#20 = lshr i32 %#19, 13
+  %#21 = xor i32 %#20, %#19
+  %#22 = mul i32 %#21, 3266489917
+  %#23 = lshr i32 %#22, 16
+  %#24 = xor i32 %#23, %#22
+  ret i32 %#24
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len3(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761396
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i32
+  %#7 = mul i32 %#6, 374761393
+  %#8 = add i32 %#7, %#3
+  %#9 = fshl i32 %#8, i32 %#8, i32 11
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#12 = load i8, ptr %#4, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = add i32 %#14, %#10
+  %#16 = fshl i32 %#15, i32 %#15, i32 11
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = load i8, ptr %#11, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#20, %#17
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+=>
+define i32 @target_xxh32_len3(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761396
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i32
+  %#7 = mul i32 %#6, 374761393
+  %#8 = add i32 %#3, %#7
+  %#9 = fshl i32 %#8, i32 %#8, i32 11
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#12 = load i8, ptr %#4, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = add i32 %#10, %#14
+  %#16 = fshl i32 %#15, i32 %#15, i32 11
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = load i8, ptr %#11, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#17, %#20
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len4(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761397
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#5, %#3
+  %#7 = fshl i32 %#6, i32 %#6, i32 17
+  %#8 = mul i32 %#7, 668265263
+  %#9 = lshr i32 %#8, 15
+  %#10 = xor i32 %#9, %#8
+  %#11 = mul i32 %#10, 2246822519
+  %#12 = lshr i32 %#11, 13
+  %#13 = xor i32 %#12, %#11
+  %#14 = mul i32 %#13, 3266489917
+  %#15 = lshr i32 %#14, 16
+  %#16 = xor i32 %#15, %#14
+  ret i32 %#16
+}
+=>
+define i32 @target_xxh32_len4(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761397
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = fshl i32 %#6, i32 %#6, i32 17
+  %#8 = mul i32 %#7, 668265263
+  %#9 = lshr i32 %#8, 15
+  %#10 = xor i32 %#9, %#8
+  %#11 = mul i32 %#10, 2246822519
+  %#12 = lshr i32 %#11, 13
+  %#13 = xor i32 %#12, %#11
+  %#14 = mul i32 %#13, 3266489917
+  %#15 = lshr i32 %#14, 16
+  %#16 = xor i32 %#15, %#14
+  ret i32 %#16
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len5(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 4
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = mul i32 %#7, 3266489917
+  %#9 = add i32 noundef %#1, 374761398
+  %#10 = add i32 %#8, %#9
+  %#11 = fshl i32 %#10, i32 %#10, i32 17
+  %#12 = mul i32 %#11, 668265263
+  %#13 = add i32 %#6, %#12
+  %#14 = fshl i32 %#13, i32 %#13, i32 11
+  %#15 = mul i32 %#14, 2654435761
+  %#16 = lshr i32 %#15, 15
+  %#17 = xor i32 %#16, %#15
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = lshr i32 %#18, 13
+  %#20 = xor i32 %#19, %#18
+  %#21 = mul i32 %#20, 3266489917
+  %#22 = lshr i32 %#21, 16
+  %#23 = xor i32 %#22, %#21
+  ret i32 %#23
+}
+=>
+define i32 @target_xxh32_len5(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761398
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i8, ptr %#7, align 1
+  %#11 = zext i8 %#10 to i32
+  %#12 = mul i32 %#11, 374761393
+  %#13 = add i32 %#9, %#12
+  %#14 = fshl i32 %#13, i32 %#13, i32 11
+  %#15 = mul i32 %#14, 2654435761
+  %#16 = lshr i32 %#15, 15
+  %#17 = xor i32 %#16, %#15
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = lshr i32 %#18, 13
+  %#20 = xor i32 %#19, %#18
+  %#21 = mul i32 %#20, 3266489917
+  %#22 = lshr i32 %#21, 16
+  %#23 = xor i32 %#22, %#21
+  ret i32 %#23
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len6(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 5
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = load i8, ptr %#7, align 1
+  %#9 = zext i8 %#8 to i32
+  %#10 = mul i32 %#9, 374761393
+  %#11 = load i32, ptr nowrite noundef %#0, align 1
+  %#12 = mul i32 %#11, 3266489917
+  %#13 = add i32 noundef %#1, 374761399
+  %#14 = add i32 %#12, %#13
+  %#15 = fshl i32 %#14, i32 %#14, i32 17
+  %#16 = mul i32 %#15, 668265263
+  %#17 = add i32 %#10, %#16
+  %#18 = fshl i32 %#17, i32 %#17, i32 11
+  %#19 = mul i32 %#18, 2654435761
+  %#20 = add i32 %#6, %#19
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  %#23 = lshr i32 %#22, 15
+  %#24 = xor i32 %#23, %#22
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = lshr i32 %#25, 13
+  %#27 = xor i32 %#26, %#25
+  %#28 = mul i32 %#27, 3266489917
+  %#29 = lshr i32 %#28, 16
+  %#30 = xor i32 %#29, %#28
+  ret i32 %#30
+}
+=>
+define i32 @target_xxh32_len6(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761399
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#11 = load i8, ptr %#7, align 1
+  %#12 = zext i8 %#11 to i32
+  %#13 = mul i32 %#12, 374761393
+  %#14 = add i32 %#9, %#13
+  %#15 = fshl i32 %#14, i32 %#14, i32 11
+  %#16 = mul i32 %#15, 2654435761
+  %#17 = load i8, ptr %#10, align 1
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#16, %#19
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  %#23 = lshr i32 %#22, 15
+  %#24 = xor i32 %#23, %#22
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = lshr i32 %#25, 13
+  %#27 = xor i32 %#26, %#25
+  %#28 = mul i32 %#27, 3266489917
+  %#29 = lshr i32 %#28, 16
+  %#30 = xor i32 %#29, %#28
+  ret i32 %#30
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len7(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 6
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep ptr nowrite noundef %#0, 1 x i64 5
+  %#8 = load i8, ptr %#7, align 1
+  %#9 = zext i8 %#8 to i32
+  %#10 = mul i32 %#9, 374761393
+  %#11 = gep ptr nowrite noundef %#0, 1 x i64 4
+  %#12 = load i8, ptr %#11, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = load i32, ptr nowrite noundef %#0, align 1
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = add i32 noundef %#1, 374761400
+  %#18 = add i32 %#16, %#17
+  %#19 = fshl i32 %#18, i32 %#18, i32 17
+  %#20 = mul i32 %#19, 668265263
+  %#21 = add i32 %#14, %#20
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = add i32 %#10, %#23
+  %#25 = fshl i32 %#24, i32 %#24, i32 11
+  %#26 = mul i32 %#25, 2654435761
+  %#27 = add i32 %#6, %#26
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = lshr i32 %#29, 15
+  %#31 = xor i32 %#30, %#29
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = lshr i32 %#32, 13
+  %#34 = xor i32 %#33, %#32
+  %#35 = mul i32 %#34, 3266489917
+  %#36 = lshr i32 %#35, 16
+  %#37 = xor i32 %#36, %#35
+  ret i32 %#37
+}
+=>
+define i32 @target_xxh32_len7(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761400
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#11 = load i8, ptr %#7, align 1
+  %#12 = zext i8 %#11 to i32
+  %#13 = mul i32 %#12, 374761393
+  %#14 = add i32 %#9, %#13
+  %#15 = fshl i32 %#14, i32 %#14, i32 11
+  %#16 = mul i32 %#15, 2654435761
+  %#17 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 6
+  %#18 = load i8, ptr %#10, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#16, %#20
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = load i8, ptr %#17, align 1
+  %#25 = zext i8 %#24 to i32
+  %#26 = mul i32 %#25, 374761393
+  %#27 = add i32 %#23, %#26
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = lshr i32 %#29, 15
+  %#31 = xor i32 %#30, %#29
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = lshr i32 %#32, 13
+  %#34 = xor i32 %#33, %#32
+  %#35 = mul i32 %#34, 3266489917
+  %#36 = lshr i32 %#35, 16
+  %#37 = xor i32 %#36, %#35
+  ret i32 %#37
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len8(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761401
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#5, %#3
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#11, %#9
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = lshr i32 %#14, 15
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 2246822519
+  %#18 = lshr i32 %#17, 13
+  %#19 = xor i32 %#18, %#17
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = lshr i32 %#20, 16
+  %#22 = xor i32 %#21, %#20
+  ret i32 %#22
+}
+=>
+define i32 @target_xxh32_len8(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761401
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = lshr i32 %#14, 15
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 2246822519
+  %#18 = lshr i32 %#17, 13
+  %#19 = xor i32 %#18, %#17
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = lshr i32 %#20, 16
+  %#22 = xor i32 %#21, %#20
+  ret i32 %#22
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len9(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 8
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = load i32, ptr %#7, align 1
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = load i32, ptr nowrite noundef %#0, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 noundef %#1, 374761402
+  %#13 = add i32 %#11, %#12
+  %#14 = fshl i32 %#13, i32 %#13, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = add i32 %#9, %#15
+  %#17 = fshl i32 %#16, i32 %#16, i32 17
+  %#18 = mul i32 %#17, 668265263
+  %#19 = add i32 %#6, %#18
+  %#20 = fshl i32 %#19, i32 %#19, i32 11
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = lshr i32 %#21, 15
+  %#23 = xor i32 %#22, %#21
+  %#24 = mul i32 %#23, 2246822519
+  %#25 = lshr i32 %#24, 13
+  %#26 = xor i32 %#25, %#24
+  %#27 = mul i32 %#26, 3266489917
+  %#28 = lshr i32 %#27, 16
+  %#29 = xor i32 %#28, %#27
+  ret i32 %#29
+}
+=>
+define i32 @target_xxh32_len9(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761402
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = load i8, ptr %#13, align 1
+  %#17 = zext i8 %#16 to i32
+  %#18 = mul i32 %#17, 374761393
+  %#19 = add i32 %#15, %#18
+  %#20 = fshl i32 %#19, i32 %#19, i32 11
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = lshr i32 %#21, 15
+  %#23 = xor i32 %#22, %#21
+  %#24 = mul i32 %#23, 2246822519
+  %#25 = lshr i32 %#24, 13
+  %#26 = xor i32 %#25, %#24
+  %#27 = mul i32 %#26, 3266489917
+  %#28 = lshr i32 %#27, 16
+  %#29 = xor i32 %#28, %#27
+  ret i32 %#29
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len10(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 9
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep ptr nowrite noundef %#0, 1 x i64 8
+  %#8 = load i8, ptr %#7, align 1
+  %#9 = zext i8 %#8 to i32
+  %#10 = mul i32 %#9, 374761393
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#12 = load i32, ptr %#11, align 1
+  %#13 = mul i32 %#12, 3266489917
+  %#14 = load i32, ptr nowrite noundef %#0, align 1
+  %#15 = mul i32 %#14, 3266489917
+  %#16 = add i32 noundef %#1, 374761403
+  %#17 = add i32 %#15, %#16
+  %#18 = fshl i32 %#17, i32 %#17, i32 17
+  %#19 = mul i32 %#18, 668265263
+  %#20 = add i32 %#13, %#19
+  %#21 = fshl i32 %#20, i32 %#20, i32 17
+  %#22 = mul i32 %#21, 668265263
+  %#23 = add i32 %#10, %#22
+  %#24 = fshl i32 %#23, i32 %#23, i32 11
+  %#25 = mul i32 %#24, 2654435761
+  %#26 = add i32 %#6, %#25
+  %#27 = fshl i32 %#26, i32 %#26, i32 11
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = lshr i32 %#28, 15
+  %#30 = xor i32 %#29, %#28
+  %#31 = mul i32 %#30, 2246822519
+  %#32 = lshr i32 %#31, 13
+  %#33 = xor i32 %#32, %#31
+  %#34 = mul i32 %#33, 3266489917
+  %#35 = lshr i32 %#34, 16
+  %#36 = xor i32 %#35, %#34
+  ret i32 %#36
+}
+=>
+define i32 @target_xxh32_len10(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761403
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 9
+  %#17 = load i8, ptr %#13, align 1
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#15, %#19
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  %#23 = load i8, ptr %#16, align 1
+  %#24 = zext i8 %#23 to i32
+  %#25 = mul i32 %#24, 374761393
+  %#26 = add i32 %#22, %#25
+  %#27 = fshl i32 %#26, i32 %#26, i32 11
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = lshr i32 %#28, 15
+  %#30 = xor i32 %#29, %#28
+  %#31 = mul i32 %#30, 2246822519
+  %#32 = lshr i32 %#31, 13
+  %#33 = xor i32 %#32, %#31
+  %#34 = mul i32 %#33, 3266489917
+  %#35 = lshr i32 %#34, 16
+  %#36 = xor i32 %#35, %#34
+  ret i32 %#36
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len11(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 10
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep ptr nowrite noundef %#0, 1 x i64 9
+  %#8 = load i8, ptr %#7, align 1
+  %#9 = zext i8 %#8 to i32
+  %#10 = mul i32 %#9, 374761393
+  %#11 = gep ptr nowrite noundef %#0, 1 x i64 8
+  %#12 = load i8, ptr %#11, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#16 = load i32, ptr %#15, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = load i32, ptr nowrite noundef %#0, align 1
+  %#19 = mul i32 %#18, 3266489917
+  %#20 = add i32 noundef %#1, 374761404
+  %#21 = add i32 %#19, %#20
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  %#24 = add i32 %#17, %#23
+  %#25 = fshl i32 %#24, i32 %#24, i32 17
+  %#26 = mul i32 %#25, 668265263
+  %#27 = add i32 %#14, %#26
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = add i32 %#10, %#29
+  %#31 = fshl i32 %#30, i32 %#30, i32 11
+  %#32 = mul i32 %#31, 2654435761
+  %#33 = add i32 %#6, %#32
+  %#34 = fshl i32 %#33, i32 %#33, i32 11
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = lshr i32 %#35, 15
+  %#37 = xor i32 %#36, %#35
+  %#38 = mul i32 %#37, 2246822519
+  %#39 = lshr i32 %#38, 13
+  %#40 = xor i32 %#39, %#38
+  %#41 = mul i32 %#40, 3266489917
+  %#42 = lshr i32 %#41, 16
+  %#43 = xor i32 %#42, %#41
+  ret i32 %#43
+}
+=>
+define i32 @target_xxh32_len11(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761404
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 9
+  %#17 = load i8, ptr %#13, align 1
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#15, %#19
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 10
+  %#24 = load i8, ptr %#16, align 1
+  %#25 = zext i8 %#24 to i32
+  %#26 = mul i32 %#25, 374761393
+  %#27 = add i32 %#22, %#26
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = load i8, ptr %#23, align 1
+  %#31 = zext i8 %#30 to i32
+  %#32 = mul i32 %#31, 374761393
+  %#33 = add i32 %#29, %#32
+  %#34 = fshl i32 %#33, i32 %#33, i32 11
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = lshr i32 %#35, 15
+  %#37 = xor i32 %#36, %#35
+  %#38 = mul i32 %#37, 2246822519
+  %#39 = lshr i32 %#38, 13
+  %#40 = xor i32 %#39, %#38
+  %#41 = mul i32 %#40, 3266489917
+  %#42 = lshr i32 %#41, 16
+  %#43 = xor i32 %#42, %#41
+  ret i32 %#43
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len12(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761405
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#5, %#3
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#11, %#9
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = load i32, ptr %#13, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = add i32 %#17, %#15
+  %#19 = fshl i32 %#18, i32 %#18, i32 17
+  %#20 = mul i32 %#19, 668265263
+  %#21 = lshr i32 %#20, 15
+  %#22 = xor i32 %#21, %#20
+  %#23 = mul i32 %#22, 2246822519
+  %#24 = lshr i32 %#23, 13
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 3266489917
+  %#27 = lshr i32 %#26, 16
+  %#28 = xor i32 %#27, %#26
+  ret i32 %#28
+}
+=>
+define i32 @target_xxh32_len12(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761405
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = load i32, ptr %#13, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = add i32 %#15, %#17
+  %#19 = fshl i32 %#18, i32 %#18, i32 17
+  %#20 = mul i32 %#19, 668265263
+  %#21 = lshr i32 %#20, 15
+  %#22 = xor i32 %#21, %#20
+  %#23 = mul i32 %#22, 2246822519
+  %#24 = lshr i32 %#23, 13
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 3266489917
+  %#27 = lshr i32 %#26, 16
+  %#28 = xor i32 %#27, %#26
+  ret i32 %#28
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len13(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 12
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#8 = load i32, ptr %#7, align 1
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = mul i32 %#11, 3266489917
+  %#13 = load i32, ptr nowrite noundef %#0, align 1
+  %#14 = mul i32 %#13, 3266489917
+  %#15 = add i32 noundef %#1, 374761406
+  %#16 = add i32 %#14, %#15
+  %#17 = fshl i32 %#16, i32 %#16, i32 17
+  %#18 = mul i32 %#17, 668265263
+  %#19 = add i32 %#12, %#18
+  %#20 = fshl i32 %#19, i32 %#19, i32 17
+  %#21 = mul i32 %#20, 668265263
+  %#22 = add i32 %#9, %#21
+  %#23 = fshl i32 %#22, i32 %#22, i32 17
+  %#24 = mul i32 %#23, 668265263
+  %#25 = add i32 %#6, %#24
+  %#26 = fshl i32 %#25, i32 %#25, i32 11
+  %#27 = mul i32 %#26, 2654435761
+  %#28 = lshr i32 %#27, 15
+  %#29 = xor i32 %#28, %#27
+  %#30 = mul i32 %#29, 2246822519
+  %#31 = lshr i32 %#30, 13
+  %#32 = xor i32 %#31, %#30
+  %#33 = mul i32 %#32, 3266489917
+  %#34 = lshr i32 %#33, 16
+  %#35 = xor i32 %#34, %#33
+  ret i32 %#35
+}
+=>
+define i32 @target_xxh32_len13(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761406
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = load i32, ptr %#13, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = add i32 %#15, %#17
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#20 = fshl i32 %#18, i32 %#18, i32 17
+  %#21 = mul i32 %#20, 668265263
+  %#22 = load i8, ptr %#19, align 1
+  %#23 = zext i8 %#22 to i32
+  %#24 = mul i32 %#23, 374761393
+  %#25 = add i32 %#21, %#24
+  %#26 = fshl i32 %#25, i32 %#25, i32 11
+  %#27 = mul i32 %#26, 2654435761
+  %#28 = lshr i32 %#27, 15
+  %#29 = xor i32 %#28, %#27
+  %#30 = mul i32 %#29, 2246822519
+  %#31 = lshr i32 %#30, 13
+  %#32 = xor i32 %#31, %#30
+  %#33 = mul i32 %#32, 3266489917
+  %#34 = lshr i32 %#33, 16
+  %#35 = xor i32 %#34, %#33
+  ret i32 %#35
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len14(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 13
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep ptr nowrite noundef %#0, 1 x i64 12
+  %#8 = load i8, ptr %#7, align 1
+  %#9 = zext i8 %#8 to i32
+  %#10 = mul i32 %#9, 374761393
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#12 = load i32, ptr %#11, align 1
+  %#13 = mul i32 %#12, 3266489917
+  %#14 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#15 = load i32, ptr %#14, align 1
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = load i32, ptr nowrite noundef %#0, align 1
+  %#18 = mul i32 %#17, 3266489917
+  %#19 = add i32 noundef %#1, 374761407
+  %#20 = add i32 %#18, %#19
+  %#21 = fshl i32 %#20, i32 %#20, i32 17
+  %#22 = mul i32 %#21, 668265263
+  %#23 = add i32 %#16, %#22
+  %#24 = fshl i32 %#23, i32 %#23, i32 17
+  %#25 = mul i32 %#24, 668265263
+  %#26 = add i32 %#13, %#25
+  %#27 = fshl i32 %#26, i32 %#26, i32 17
+  %#28 = mul i32 %#27, 668265263
+  %#29 = add i32 %#10, %#28
+  %#30 = fshl i32 %#29, i32 %#29, i32 11
+  %#31 = mul i32 %#30, 2654435761
+  %#32 = add i32 %#6, %#31
+  %#33 = fshl i32 %#32, i32 %#32, i32 11
+  %#34 = mul i32 %#33, 2654435761
+  %#35 = lshr i32 %#34, 15
+  %#36 = xor i32 %#35, %#34
+  %#37 = mul i32 %#36, 2246822519
+  %#38 = lshr i32 %#37, 13
+  %#39 = xor i32 %#38, %#37
+  %#40 = mul i32 %#39, 3266489917
+  %#41 = lshr i32 %#40, 16
+  %#42 = xor i32 %#41, %#40
+  ret i32 %#42
+}
+=>
+define i32 @target_xxh32_len14(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761407
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = load i32, ptr %#13, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = add i32 %#15, %#17
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#20 = fshl i32 %#18, i32 %#18, i32 17
+  %#21 = mul i32 %#20, 668265263
+  %#22 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#23 = load i8, ptr %#19, align 1
+  %#24 = zext i8 %#23 to i32
+  %#25 = mul i32 %#24, 374761393
+  %#26 = add i32 %#21, %#25
+  %#27 = fshl i32 %#26, i32 %#26, i32 11
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = load i8, ptr %#22, align 1
+  %#30 = zext i8 %#29 to i32
+  %#31 = mul i32 %#30, 374761393
+  %#32 = add i32 %#28, %#31
+  %#33 = fshl i32 %#32, i32 %#32, i32 11
+  %#34 = mul i32 %#33, 2654435761
+  %#35 = lshr i32 %#34, 15
+  %#36 = xor i32 %#35, %#34
+  %#37 = mul i32 %#36, 2246822519
+  %#38 = lshr i32 %#37, 13
+  %#39 = xor i32 %#38, %#37
+  %#40 = mul i32 %#39, 3266489917
+  %#41 = lshr i32 %#40, 16
+  %#42 = xor i32 %#41, %#40
+  ret i32 %#42
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len15(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep ptr nowrite noundef %#0, 1 x i64 14
+  %#4 = load i8, ptr %#3, align 1
+  %#5 = zext i8 %#4 to i32
+  %#6 = mul i32 %#5, 374761393
+  %#7 = gep ptr nowrite noundef %#0, 1 x i64 13
+  %#8 = load i8, ptr %#7, align 1
+  %#9 = zext i8 %#8 to i32
+  %#10 = mul i32 %#9, 374761393
+  %#11 = gep ptr nowrite noundef %#0, 1 x i64 12
+  %#12 = load i8, ptr %#11, align 1
+  %#13 = zext i8 %#12 to i32
+  %#14 = mul i32 %#13, 374761393
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#16 = load i32, ptr %#15, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#19 = load i32, ptr %#18, align 1
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = load i32, ptr nowrite noundef %#0, align 1
+  %#22 = mul i32 %#21, 3266489917
+  %#23 = add i32 noundef %#1, 374761408
+  %#24 = add i32 %#22, %#23
+  %#25 = fshl i32 %#24, i32 %#24, i32 17
+  %#26 = mul i32 %#25, 668265263
+  %#27 = add i32 %#20, %#26
+  %#28 = fshl i32 %#27, i32 %#27, i32 17
+  %#29 = mul i32 %#28, 668265263
+  %#30 = add i32 %#17, %#29
+  %#31 = fshl i32 %#30, i32 %#30, i32 17
+  %#32 = mul i32 %#31, 668265263
+  %#33 = add i32 %#14, %#32
+  %#34 = fshl i32 %#33, i32 %#33, i32 11
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = add i32 %#10, %#35
+  %#37 = fshl i32 %#36, i32 %#36, i32 11
+  %#38 = mul i32 %#37, 2654435761
+  %#39 = add i32 %#6, %#38
+  %#40 = fshl i32 %#39, i32 %#39, i32 11
+  %#41 = mul i32 %#40, 2654435761
+  %#42 = lshr i32 %#41, 15
+  %#43 = xor i32 %#42, %#41
+  %#44 = mul i32 %#43, 2246822519
+  %#45 = lshr i32 %#44, 13
+  %#46 = xor i32 %#45, %#44
+  %#47 = mul i32 %#46, 3266489917
+  %#48 = lshr i32 %#47, 16
+  %#49 = xor i32 %#48, %#47
+  ret i32 %#49
+}
+=>
+define i32 @target_xxh32_len15(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i32 noundef %#1, 374761408
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = mul i32 %#4, 3266489917
+  %#6 = add i32 %#3, %#5
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#8 = fshl i32 %#6, i32 %#6, i32 17
+  %#9 = mul i32 %#8, 668265263
+  %#10 = load i32, ptr %#7, align 1
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#14 = fshl i32 %#12, i32 %#12, i32 17
+  %#15 = mul i32 %#14, 668265263
+  %#16 = load i32, ptr %#13, align 1
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = add i32 %#15, %#17
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#20 = fshl i32 %#18, i32 %#18, i32 17
+  %#21 = mul i32 %#20, 668265263
+  %#22 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#23 = load i8, ptr %#19, align 1
+  %#24 = zext i8 %#23 to i32
+  %#25 = mul i32 %#24, 374761393
+  %#26 = add i32 %#21, %#25
+  %#27 = fshl i32 %#26, i32 %#26, i32 11
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 14
+  %#30 = load i8, ptr %#22, align 1
+  %#31 = zext i8 %#30 to i32
+  %#32 = mul i32 %#31, 374761393
+  %#33 = add i32 %#28, %#32
+  %#34 = fshl i32 %#33, i32 %#33, i32 11
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = load i8, ptr %#29, align 1
+  %#37 = zext i8 %#36 to i32
+  %#38 = mul i32 %#37, 374761393
+  %#39 = add i32 %#35, %#38
+  %#40 = fshl i32 %#39, i32 %#39, i32 11
+  %#41 = mul i32 %#40, 2654435761
+  %#42 = lshr i32 %#41, 15
+  %#43 = xor i32 %#42, %#41
+  %#44 = mul i32 %#43, 2246822519
+  %#45 = lshr i32 %#44, 13
+  %#46 = xor i32 %#45, %#44
+  %#47 = mul i32 %#46, 3266489917
+  %#48 = lshr i32 %#47, 16
+  %#49 = xor i32 %#48, %#47
+  ret i32 %#49
+}
+Transformation seems to be correct!
+
+Summary:
+  16 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

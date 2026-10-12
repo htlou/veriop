@@ -1,0 +1,52 @@
+{
+ "commit": "c477d6c",
+ "date": "2024-03-05",
+ "subject": "disable XXH64 autovectorization",
+ "selected_by": "keyword",
+ "perf_evidence": "Message: 'disable XXH64 autovectorization using a compiler fence (like XXH32). XXH64 has been reported to be auto-vectorized on AVX512 ... it's generally a bad idea to vectorize XXH64.' Code comment: 'Autovectorization of XXH64 tends to be detrimental'.",
+ "change_summary": "Adds XXH_COMPILER_GUARD(acc) (empty asm volatile with \"+r\") at the end of XXH64_round when __AVX512F__ is defined and XXH_ENABLE_AUTOVECTORIZE is not; comment-only change in XXH32_round.",
+ "units": [
+  {
+   "name": "asm barrier placement (XXH_COMPILER_GUARD in XXH64_round under AVX512F)",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "inline-asm",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c477d6c/r_avx512_o64_val",
+   "evidence": "The perf change itself is an empty inline-asm optimization barrier; Alive2 cannot model inline asm (only analysable after the runner's asm->freeze rewrite, see next unit)"
+  },
+  {
+   "name": "XXH64(p,len,seed) one-shot + XXH64 streaming (reset/update/update/digest), -mavx512f, guard modeled as freeze",
+   "level": "api",
+   "verdict": "EQUIV_BOUNDED",
+   "bounded": true,
+   "unroll": 8,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c477d6c/r_avx512_o64_val",
+   "evidence": "all 15 targets EQUIV both directions: XXH64 len 0,8,31,32,33,40,63,64,95,96,128 and streaming splits 10+30,40+23,32+32,5+70; asm rewrites old=0 new=148; ir differs for 14/15; no residual calls"
+  },
+  {
+   "name": "same targets, default x86-64-v3 (no AVX512F): change does not bite",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c477d6c/r_x86v3_o64",
+   "evidence": "IR identical for all 15 targets (guard compiled out without __AVX512F__); Alive2 EQUIV"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "inline-asm",
+ "not_equiv_kind": null,
+ "notes": "Per BRIEF rule 7: the entire perf change is an asm barrier -> unit 'asm barrier placement' is UNSUPPORTED(inline-asm); the C-semantics unit (empty asm '=r,0' rewritten to freeze on both sides by xx_alive.py, i.e. modeled as opaque identity) is EQUIV_BOUNDED at fixed lengths only (no symbolic len). Flags: -O3 -march=x86-64-v3 -mavx512f -fno-vectorize -fno-slp-vectorize -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000, --unroll 8 (streaming finalize loops). Inputs passed BY VALUE (U8ARGS, 128 bytes copied to a local buffer): the first attempt with a raw input pointer (r_avx512_o64) gave REFINES (bwd 'Target is more poisonous than source') only because Alive2 chose poison input bytes, which the new freeze absorbs while the old code propagates poison - not a C-level difference (C callers cannot pass poison). Commit verdict follows METHOD aggregation (UNSUPPORTED dominates)."
+}

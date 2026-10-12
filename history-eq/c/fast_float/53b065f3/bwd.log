@@ -1,0 +1,240 @@
+
+----------------------------------------
+define i1 @target_char16_success(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn zeroext memory(none) {
+#3:
+  %#4 = insertelement <2 x i64> poison, i64 noundef %#0, i64 0
+  %#5 = insertelement <2 x i64> %#4, i64 noundef %#1, i64 1
+  %#6 = bitcast <2 x i64> %#5 to <8 x i16>
+  %#7 = add <8 x i16> %#6, { 65456, 65456, 65456, 65456, 65456, 65456, 65456, 65456 }
+  %#8 = icmp sgt <8 x i16> %#7, { 65417, 65417, 65417, 65417, 65417, 65417, 65417, 65417 }
+  %#9 = sext <8 x i1> %#8 to <8 x i16>
+  %#10 = bitcast <8 x i16> %#9 to <16 x i8>
+  %#11 = icmp slt <16 x i8> %#10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#12 = bitcast <16 x i1> %#11 to i16
+  %#13 = icmp eq i16 %#12, 0
+  ret i1 %#13
+}
+=>
+define i1 @target_char16_success(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn zeroext memory(none) {
+#3:
+  %#4 = insertelement <2 x i64> poison, i64 noundef %#0, i64 0
+  %#5 = insertelement <2 x i64> %#4, i64 noundef %#1, i64 1
+  %#6 = bitcast <2 x i64> %#5 to <8 x i16>
+  %#7 = add <8 x i16> %#6, { 65456, 65456, 65456, 65456, 65456, 65456, 65456, 65456 }
+  %#8 = icmp sgt <8 x i16> %#7, { 65417, 65417, 65417, 65417, 65417, 65417, 65417, 65417 }
+  %#9 = sext <8 x i1> %#8 to <8 x i16>
+  %#10 = bitcast <8 x i16> %#9 to <16 x i8>
+  %#11 = icmp slt <16 x i8> %#10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#12 = bitcast <16 x i1> %#11 to i16
+  %#13 = icmp eq i16 %#12, 0
+  ret i1 %#13
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_char16_value(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(none) {
+#3:
+  %#6 = insertelement <2 x i64> poison, i64 noundef %#0, i64 0
+  %#7 = insertelement <2 x i64> %#6, i64 noundef %#1, i64 1
+  %#8 = bitcast <2 x i64> %#7 to <8 x i16>
+  %#9 = add <8 x i16> %#8, { 65456, 65456, 65456, 65456, 65456, 65456, 65456, 65456 }
+  %#10 = icmp sgt <8 x i16> %#9, { 65417, 65417, 65417, 65417, 65417, 65417, 65417, 65417 }
+  %#11 = sext <8 x i1> %#10 to <8 x i16>
+  %#12 = bitcast <8 x i16> %#11 to <16 x i8>
+  %#13 = icmp slt <16 x i8> %#12, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#14 = bitcast <16 x i1> %#13 to i16
+  %#15 = icmp eq i16 %#14, 0
+  br i1 %#15, label %#4, label %#5
+
+#4:
+  %#16 = and <8 x i16> %#8, { 255, 255, 255, 255, 255, 255, 255, 255 }
+  %#17 = x86_sse2_packuswb_128 <8 x i16> %#16, <8 x i16> poison
+  %#18 = bitcast <16 x i8> %#17 to <2 x i64>
+  %#19 = extractelement <2 x i64> %#18, i64 0
+  %#20 = mul i64 noundef %#2, 100000000
+  %#21 = add i64 %#19, -3472328296227680304
+  %#22 = mul i64 %#21, 10
+  %#23 = lshr i64 %#21, 8
+  %#24 = add i64 %#22, %#23
+  %#25 = and i64 %#24, 1095216660735
+  %#26 = mul i64 %#25, 4294967296000100
+  %#27 = lshr i64 %#24, 16
+  %#28 = and i64 %#27, 1095216660735
+  %#29 = mul i64 %#28, 42949672960001
+  %#30 = add i64 %#29, %#26
+  %#31 = lshr i64 %#30, 32
+  %#32 = add i64 %#31, %#20
+  br label %#5
+
+#5:
+  %#33 = phi i64 [ %#32, %#4 ], [ noundef %#2, %#3 ]
+  ret i64 %#33
+}
+=>
+define i64 @target_char16_value(i64 noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(none) {
+#3:
+  %#6 = insertelement <2 x i64> poison, i64 noundef %#0, i64 0
+  %#7 = insertelement <2 x i64> %#6, i64 noundef %#1, i64 1
+  %#8 = bitcast <2 x i64> %#7 to <8 x i16>
+  %#9 = add <8 x i16> %#8, { 65456, 65456, 65456, 65456, 65456, 65456, 65456, 65456 }
+  %#10 = icmp sgt <8 x i16> %#9, { 65417, 65417, 65417, 65417, 65417, 65417, 65417, 65417 }
+  %#11 = sext <8 x i1> %#10 to <8 x i16>
+  %#12 = bitcast <8 x i16> %#11 to <16 x i8>
+  %#13 = icmp slt <16 x i8> %#12, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#14 = bitcast <16 x i1> %#13 to i16
+  %#15 = icmp eq i16 %#14, 0
+  br i1 %#15, label %#4, label %#5
+
+#4:
+  %#16 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#17 = bitcast <2 x i64> %#6 to <8 x i16>
+  %#18 = and <8 x i16> %#17, { 255, 255, 255, 255, poison, poison, poison, poison }
+  %#19 = bitcast <2 x i64> %#16 to <8 x i16>
+  %#20 = and <8 x i16> %#19, { 255, 255, 255, 255, poison, poison, poison, poison }
+  %#21 = x86_sse2_packuswb_128 <8 x i16> %#18, <8 x i16> %#20
+  %#22 = bitcast <16 x i8> %#21 to <4 x i32>
+  %#23 = shufflevector <4 x i32> %#22, <4 x i32> poison, 0, 2, 4294967295, 4294967295
+  %#24 = bitcast <4 x i32> %#23 to <2 x i64>
+  %#25 = extractelement <2 x i64> %#24, i64 0
+  %#26 = mul i64 noundef %#2, 100000000
+  %#27 = add i64 %#25, -3472328296227680304
+  %#28 = mul i64 %#27, 10
+  %#29 = lshr i64 %#27, 8
+  %#30 = add i64 %#28, %#29
+  %#31 = and i64 %#30, 1095216660735
+  %#32 = mul i64 %#31, 4294967296000100
+  %#33 = lshr i64 %#30, 16
+  %#34 = and i64 %#33, 1095216660735
+  %#35 = mul i64 %#34, 42949672960001
+  %#36 = add i64 %#35, %#32
+  %#37 = lshr i64 %#36, 32
+  %#38 = add i64 %#37, %#26
+  br label %#5
+
+#5:
+  %#39 = phi i64 [ %#38, %#4 ], [ noundef %#2, %#3 ]
+  ret i64 %#39
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_char16_packed(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = insertelement <2 x i64> poison, i64 noundef %#0, i64 0
+  %#4 = insertelement <2 x i64> %#3, i64 noundef %#1, i64 1
+  %#5 = bitcast <2 x i64> %#4 to <8 x i16>
+  %#6 = and <8 x i16> %#5, { 255, 255, 255, 255, 255, 255, 255, 255 }
+  %#7 = x86_sse2_packuswb_128 <8 x i16> %#6, <8 x i16> poison
+  %#8 = bitcast <16 x i8> %#7 to <2 x i64>
+  %#9 = extractelement <2 x i64> %#8, i64 0
+  ret i64 %#9
+}
+=>
+define i64 @target_char16_packed(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = insertelement <2 x i64> poison, i64 noundef %#0, i64 0
+  %#4 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#5 = bitcast <2 x i64> %#3 to <8 x i16>
+  %#6 = and <8 x i16> %#5, { 255, 255, 255, 255, poison, poison, poison, poison }
+  %#7 = bitcast <2 x i64> %#4 to <8 x i16>
+  %#8 = and <8 x i16> %#7, { 255, 255, 255, 255, poison, poison, poison, poison }
+  %#9 = x86_sse2_packuswb_128 <8 x i16> %#6, <8 x i16> %#8
+  %#10 = bitcast <16 x i8> %#9 to <4 x i32>
+  %#11 = shufflevector <4 x i32> %#10, <4 x i32> poison, 0, 2, 4294967295, 4294967295
+  %#12 = bitcast <4 x i32> %#11 to <2 x i64>
+  %#13 = extractelement <2 x i64> %#12, i64 0
+  ret i64 %#13
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @target_char_success(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  %#3 = add i64 noundef %#0, 5063812098665367110
+  %#4 = add i64 noundef %#0, -3472328296227680304
+  %#5 = or i64 %#3, %#4
+  %#6 = and i64 %#5, -9187201950435737472
+  %#7 = icmp eq i64 %#6, 0
+  ret i1 %#7
+}
+=>
+define i1 @target_char_success(i64 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  %#3 = add i64 noundef %#0, 5063812098665367110
+  %#4 = add i64 noundef %#0, -3472328296227680304
+  %#5 = or i64 %#3, %#4
+  %#6 = and i64 %#5, -9187201950435737472
+  %#7 = icmp eq i64 %#6, 0
+  ret i1 %#7
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_char_value(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, 5063812098665367110
+  %#6 = add i64 noundef %#0, -3472328296227680304
+  %#7 = or i64 %#5, %#6
+  %#8 = and i64 %#7, -9187201950435737472
+  %#9 = icmp eq i64 %#8, 0
+  br i1 %#9, label %#3, label %#4
+
+#3:
+  %#10 = mul i64 noundef %#1, 100000000
+  %#11 = mul i64 %#6, 10
+  %#12 = lshr i64 %#6, 8
+  %#13 = add i64 %#11, %#12
+  %#14 = and i64 %#13, 1095216660735
+  %#15 = mul i64 %#14, 4294967296000100
+  %#16 = lshr i64 %#13, 16
+  %#17 = and i64 %#16, 1095216660735
+  %#18 = mul i64 %#17, 42949672960001
+  %#19 = add i64 %#18, %#15
+  %#20 = lshr i64 %#19, 32
+  %#21 = add i64 %#20, %#10
+  br label %#4
+
+#4:
+  %#22 = phi i64 [ %#21, %#3 ], [ noundef %#1, %#2 ]
+  ret i64 %#22
+}
+=>
+define i64 @target_char_value(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#5 = add i64 noundef %#0, 5063812098665367110
+  %#6 = add i64 noundef %#0, -3472328296227680304
+  %#7 = or i64 %#5, %#6
+  %#8 = and i64 %#7, -9187201950435737472
+  %#9 = icmp eq i64 %#8, 0
+  br i1 %#9, label %#3, label %#4
+
+#3:
+  %#10 = mul i64 noundef %#1, 100000000
+  %#11 = mul i64 %#6, 10
+  %#12 = lshr i64 %#6, 8
+  %#13 = add i64 %#11, %#12
+  %#14 = and i64 %#13, 1095216660735
+  %#15 = mul i64 %#14, 4294967296000100
+  %#16 = lshr i64 %#13, 16
+  %#17 = and i64 %#16, 1095216660735
+  %#18 = mul i64 %#17, 42949672960001
+  %#19 = add i64 %#18, %#15
+  %#20 = lshr i64 %#19, 32
+  %#21 = add i64 %#20, %#10
+  br label %#4
+
+#4:
+  %#22 = phi i64 [ %#21, %#3 ], [ noundef %#1, %#2 ]
+  ret i64 %#22
+}
+Transformation seems to be correct!
+
+Summary:
+  5 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

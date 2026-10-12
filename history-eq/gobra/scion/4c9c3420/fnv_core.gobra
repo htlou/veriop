@@ -1,0 +1,38 @@
+package fnvcore
+
+// Models the unchanged FNV-1a state update used by hash/fnv.New32a.Write
+// and the new hashFNV1a helper. The seed is already pre-hashed.
+decreases
+pure func step(state uint32, c byte) uint32 {
+    return (state ^ uint32(c)) * 16777619
+}
+
+requires 0 <= addrLen && addrLen <= 48
+func sameSuffix(seed uint32, flow [3]byte, address [48]byte, addrLen int) {
+    oldFlow := flow
+    oldFlow[0] = oldFlow[0] & 0xf
+    assert oldFlow[0] == flow[0] & 0xf
+    assert oldFlow[1] == flow[1] && oldFlow[2] == flow[2]
+
+    oldState := seed
+    oldState = step(oldState, oldFlow[0])
+    oldState = step(oldState, oldFlow[1])
+    oldState = step(oldState, oldFlow[2])
+
+    newState := seed
+    newState = step(newState, flow[0] & 0xf)
+    newState = step(newState, flow[1])
+    newState = step(newState, flow[2])
+    assert oldState == newState
+
+    i := 0
+    invariant 0 <= i && i <= addrLen
+    invariant oldState == newState
+    decreases addrLen - i
+    for i < addrLen {
+        oldState = step(oldState, address[i])
+        newState = step(newState, address[i])
+        i++
+    }
+    assert oldState == newState
+}

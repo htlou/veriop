@@ -1,0 +1,7 @@
+# llama.cpp `0c6ee1ca`: table-based CPU Quick GELU
+
+The exact historical parent `2dd84169` computes each f16 Quick GELU output through fp16→fp32 conversion, `expf`, and fp32→fp16 conversion. Child `0c6ee1ca` instead reads `ggml_table_gelu_quick_f16` by the input's 16-bit pattern ([production diff](../source-screening/0c6ee1ca.source.diff)). The unchanged CPU initialization loop populates that table from `ggml_gelu_quick_f32` for all 65,536 bit patterns; proving the call relation also requires this initialization invariant and the relevant conversion semantics.
+
+The [reproduction script](reproduce.py) archives each revision's actual `ggml/` source tree and compiles the same one-element [wrapper](wrapper.cpp) against its historical `vec.h` with LLVM 20. The resulting [old](old.ll) and [new](new.ll) IR and [bidirectional Alive2 output](alive2-result.json) are saved. Alive2 rejects both directions as unsupported interprocedural transformations: the forward check introduces the non-constant `ggml_table_gelu_quick_f16` global; the reverse check introduces `ggml_table_f32_f16`. It reports zero correct, zero incorrect, and one failed-to-prove transformation in each direction.
+
+**Fixed-sample verdict: `UNSUPPORTED` by this direct Alive2 comparison.** No equivalence or counterexample follows. The table-initialization relation is a separate obligation, and this record does not assert whole-backend equivalence or an official historical benchmark delta.

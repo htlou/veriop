@@ -1,0 +1,18 @@
+{
+  "base": "verify_rms.py",
+  "base_sha256": "ffd0e2fffa5ef929c5248c70a508bb5f67d2903b04e706ea758d1be49ee3571f",
+  "generated": "verify_cache8.py",
+  "generated_sha256": "e062bd676805fa7b9b1da1ab0f1cf60c1e78d4cb5ee8a14c12f4aa6c960062f4",
+  "replacements": {
+    "'results/launch256-tests.json'": "'results/cache8-tests.json'",
+    "'candidate/compile-audit.json'": "'candidate/cache8-compile-audit.json'",
+    "'ptx/llama-norm-launch256.ptx'": "'ptx/llama-norm-cache8.ptx'",
+    "for n in [256, 1024, 2048, 3072, 4096, 6144, 8192, 16384]:": "for n in [256, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8191, 8192, 16384]:",
+    "b2 = 256 if n <= 8192 else 1024": "b2 = b1",
+    "        def symbol(block):\n            return (f'_Z12rms_norm_f32ILi{block}ELb0ELb0ELb0EEvPKfPfilllf'\n                    'S1_lll5uint3S3_S3_S3_S1_lllS3_S3_S3_S3_f')": "        def old_symbol(block):\n            return (f'_Z12rms_norm_f32ILi{block}ELb0ELb0ELb0EEvPKfPfilllf'\n                    'S1_lll5uint3S3_S3_S3_S1_lllS3_S3_S3_S3_f')\n        def symbol(block):\n            cache = 8 if 1024 <= n <= 8192 else 0\n            return (f'_Z12rms_norm_f32ILi{block}ELb0ELb0ELb0ELi{cache}EEvPKfPfilllf'\n                    'S1_lll5uint3S3_S3_S3_S1_lllS3_S3_S3_S3_f')",
+    "name = f'launch256-{n}-'": "name = f'cache8-{n}-'",
+    "symbol(b1)": "old_symbol(b1)",
+    "'-k', symbol(block), '-b', str(block), *config,": "'-k', old_symbol(block) if label == 'reference' else symbol(block), '-b', str(block), *config,",
+    "'volta/launch256-summary.json'": "'volta/cache8-summary.json'"
+  }
+}

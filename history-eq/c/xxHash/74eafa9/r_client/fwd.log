@@ -1,0 +1,83 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/74eafa9/r_client/old.ll c/xxHash/74eafa9/r_client/new.ll
+
+----------------------------------------
+declare i32 @XXH_versionNumber()
+
+define i32 @target_client_version_twice() {
+#0:
+  %#1 = tail call i32 @XXH_versionNumber()
+  %#2 = tail call i32 @XXH_versionNumber()
+  %#3 = sub i32 %#1, %#2
+  ret i32 %#3
+}
+=>
+define i32 @target_client_version_twice() nofree noundef willreturn memory(none) {
+#0:
+  ret i32 0
+}
+Transformation doesn't verify!
+
+ERROR: Source and target don't have the same return domain
+
+Example:
+
+Source:
+i32 %#1 = function did not return!
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+
+
+
+----------------------------------------
+declare i32 @XXH_versionNumber()
+
+@g = global 4 bytes, align 4
+
+define i32 @target_client_version_mem() {
+#0:
+  store i32 1, ptr @g, align 4
+  %#1 = tail call i32 @XXH_versionNumber()
+  %#2 = load i32, ptr @g, align 4
+  ret i32 %#2
+}
+=>
+@g = global 4 bytes, align 4
+
+define i32 @target_client_version_mem() nofree noundef willreturn memory(globals: write, errno: write, other: write) {
+#0:
+  store i32 1, ptr @g, align 4
+  ret i32 1
+}
+Transformation doesn't verify!
+
+ERROR: Source and target don't have the same return domain
+
+Example:
+
+Source:
+i32 %#1 = function did not return!
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 4	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 4	align: 4	alloc type: 0	alive: true	address: 8
+Contents:
+poison
+
+Block 2 >	size: 0	align: 8	alloc type: 0	alive: true	address: 8
+
+Target:
+
+
+Summary:
+  0 correct transformations
+  2 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

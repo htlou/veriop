@@ -1,0 +1,5 @@
+# llama.cpp `d1e35564`: CUB argsort offset iterator
+
+Run `python3 -B history-eq/gpu/llama.cpp/d1e35564/check_toolchain.py` from the project root. The [result](toolchain-result.json) locks all four historical changed Git blobs. The old code allocates an offset buffer and launches `init_offsets`; the new code passes `cuda::make_strided_iterator(cuda::make_counting_iterator(0), ncols)` to four CUB segmented-sort calls.
+
+The installed CUDA 12.8 compiler builds a [CUB iterator control](control-compile.log), but a minimal client containing the exact new expression fails at both `cuda::make_*_iterator` names ([compiler log](target-compile.log)). This is a confirmed local toolchain capability gap. It does not establish that the historical commit fails with its intended CUDA/CCCL version, and it gives **no old/new equivalence or counterexample**. The selected `UNSUPPORTED` category remains a Volta scope classification: its one-kernel comparison cannot represent the old offset-init kernel plus CUB sort against the new iterator-backed CUB call. The equivalence checker remains `not_run`; no official historical performance score is inferred.

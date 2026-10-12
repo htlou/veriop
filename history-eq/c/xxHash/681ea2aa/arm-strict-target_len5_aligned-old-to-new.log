@@ -1,0 +1,86 @@
+
+----------------------------------------
+define i32 @target_len5_aligned(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#2:
+  %#5 = ptrtoint ptr noundef %#0 to i32
+  %#6 = and i32 %#5, 3
+  %#7 = icmp eq i32 %#6, 0
+  assume i1 %#7
+  %#8 = gep inbounds nuw ptr noundef %#0, 1 x i32 5
+  %#9 = add i32 noundef %#1, 374761398
+  %#10 = load i32, ptr noundef %#0, align 4
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = gep ptr noundef %#0, 1 x i32 4
+  %#16 = icmp ult ptr %#15, %#8
+  br i1 %#16, label %#3, label %#4
+
+#3:
+  %#17 = load i8, ptr %#15, align 4
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#19, %#14
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  br label %#4
+
+#4:
+  %#23 = phi i32 [ %#14, %#2 ], [ %#22, %#3 ]
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+=>
+define i32 @target_len5_aligned(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read, inaccessiblemem: write) {
+#2:
+  %#5 = ptrtoint ptr noundef %#0 to i32
+  %#6 = and i32 %#5, 3
+  %#7 = icmp eq i32 %#6, 0
+  assume i1 %#7
+  %#8 = gep inbounds nuw ptr noundef %#0, 1 x i32 5
+  %#9 = add i32 noundef %#1, 374761398
+  %#10 = load i32, ptr noundef %#0, align 4
+  %#11 = mul i32 %#10, 3266489917
+  %#12 = add i32 %#9, %#11
+  %#13 = fshl i32 %#12, i32 %#12, i32 17
+  %#14 = mul i32 %#13, 668265263
+  %#15 = gep ptr noundef %#0, 1 x i32 4
+  %#16 = icmp ult ptr %#15, %#8
+  br i1 %#16, label %#3, label %#4
+
+#3:
+  %#17 = load i8, ptr %#15, align 4
+  %#18 = zext i8 %#17 to i32
+  %#19 = mul i32 %#18, 374761393
+  %#20 = add i32 %#19, %#14
+  %#21 = fshl i32 %#20, i32 %#20, i32 11
+  %#22 = mul i32 %#21, 2654435761
+  br label %#4
+
+#4:
+  %#23 = phi i32 [ %#14, %#2 ], [ %#22, %#3 ]
+  %#24 = lshr i32 %#23, 15
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = lshr i32 %#26, 13
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 3266489917
+  %#30 = lshr i32 %#29, 16
+  %#31 = xor i32 %#30, %#29
+  ret i32 %#31
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

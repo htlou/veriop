@@ -1,0 +1,61 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/pre_nonnull_aligned8_len0/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/70e65c9/pre_nonnull_aligned8_len0/new.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#5 = icmp ne ptr noundef %#0, null
+  %#6 = ptrtoint ptr noundef %#0 to i64
+  %#7 = and i64 %#6, 7
+  %#8 = icmp eq i64 %#7, 0
+  %#9 = and i1 %#5, %#8
+  br i1 %#9, label %#3, label %#4
+
+#3:
+  %#10 = add i32 noundef %#1, 374761393
+  %#11 = lshr i32 %#10, 15
+  %#12 = xor i32 %#11, %#10
+  %#13 = mul i32 %#12, 2246822519
+  %#14 = lshr i32 %#13, 13
+  %#15 = xor i32 %#14, %#13
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = lshr i32 %#16, 16
+  %#18 = xor i32 %#17, %#16
+  br label %#4
+
+#4:
+  %#19 = phi i32 [ %#18, %#3 ], [ 0, %#2 ]
+  ret i32 %#19
+}
+=>
+define i32 @target_xxh32(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#5 = icmp ne ptr noundef %#0, null
+  %#6 = ptrtoint ptr noundef %#0 to i64
+  %#7 = and i64 %#6, 7
+  %#8 = icmp eq i64 %#7, 0
+  %#9 = and i1 %#5, %#8
+  br i1 %#9, label %#3, label %#4
+
+#3:
+  %#10 = add i32 noundef %#1, 374761393
+  %#11 = lshr i32 %#10, 15
+  %#12 = xor i32 %#11, %#10
+  %#13 = mul i32 %#12, 2246822519
+  %#14 = lshr i32 %#13, 13
+  %#15 = xor i32 %#14, %#13
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = lshr i32 %#16, 16
+  %#18 = xor i32 %#17, %#16
+  br label %#4
+
+#4:
+  %#19 = phi i32 [ %#18, %#3 ], [ 0, %#2 ]
+  ret i32 %#19
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,43 @@
+{
+  "target": "llama.cpp RMSNorm",
+  "candidate": "launch256",
+  "decision": "REJECT as a general optimization; retain evidence of shape-specific gains",
+  "reason": "8192 columns x 2048 rows regresses to 0.681x, failing the no-disproportionate-regression gate",
+  "formal_equivalence": {
+    "accepted": true,
+    "instances": 16,
+    "safety_analyses": 32,
+    "model": "Volta supported PTX / real-valued semantics"
+  },
+  "repository_tests": {
+    "baseline": 101,
+    "candidate": 101,
+    "scope": "official RMS_NORM,NORM CUDA versus CPU tests"
+  },
+  "performance": {
+    "shapes": 16,
+    "pairs_per_shape": 10,
+    "timing_processes": 320,
+    "launches_per_process": 1000,
+    "warmup_per_process": 200,
+    "best_observed": {
+      "ncols": 6144,
+      "nrows": 128,
+      "speedup": 1.4348920712665865
+    }
+  },
+  "numerical": {
+    "max_abs": 2.384185791015625e-07,
+    "max_rel": 2.383935422050139e-07,
+    "max_ulp": 3,
+    "nmse": 1.4293667244353805e-15
+  },
+  "profiler": "Nsight hardware counters denied (ERR_NVGPUCTRPERM); user input pending",
+  "goal_complete": false,
+  "next": [
+    "Assess threshold refinement against unseen column counts and row counts; do not promote the current broad dispatch",
+    "Evaluate input reuse at the original block size if launch tuning does not generalize",
+    "Obtain performance counters if access becomes available",
+    "Complete final accepted-candidate audit and provenance"
+  ]
+}

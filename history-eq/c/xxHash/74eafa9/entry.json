@@ -1,0 +1,40 @@
+{
+ "commit": "74eafa9",
+ "date": "2021-12-11",
+ "subject": "added __attribute__((const))",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Adds __attribute__((const)) (XXH_CONSTF) to XXH_versionNumber(); message: 'doesn't affect much ... but is a good starting point towards more function attributes' - attribute for compiler optimization (codegen intent).",
+ "change_summary": "Moves the XXH_PUBLIC_API definition block into a new 'Compiler specifics' section, defines XXH_CONSTF (__attribute__((const)) on GNUC) and applies it to the XXH_versionNumber declaration. No function body changes.",
+ "units": [
+  {
+   "name": "library implementation (XXH_INLINE_ALL; XXH_versionNumber + hashing API)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": true,
+   "unroll": 8,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/74eafa9/r_impl",
+   "evidence": "IR identical for all 8 targets after normalization; Alive2 EQUIV both directions (XXH_versionNumber, XXH32 len20 (value args), XXH32 stream 10+10 (value args), XXH64 len40, XXH3 len20/200, XXH3_128bits len20, hashFromCanonical)"
+  },
+  {
+   "name": "separately compiled client: XXH_versionNumber() - XXH_versionNumber(); global store/reload around the call",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/74eafa9/r_client",
+   "evidence": "client IR differs (new folds the two const calls / keeps g across the call). Alive2 fwd 'Source and target don't have the same return domain' (source: 'function did not return!') - CE requires the opaque extern XXH_versionNumber to diverge or write memory, impossible for the real implementation (returns a constant); declaration contract not checkable by Alive2"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "EQUIV",
+ "coverage": "partial",
+ "unsupported_reason": "other",
+ "not_equiv_kind": null,
+ "notes": "Declaration-only attribute. Implementation compiled with XXH_INLINE_ALL: IR identical -> EQUIV (XXH32 targets by value; --unroll 8 only for the identical streaming loops). The optimization only exists for separately compiled callers, where Alive2 models the extern function as arbitrary; its counterexample (non-returning/impure XXH_versionNumber) is not realizable with the real library -> UNSUPPORTED(other) for that unit; commit verdict by METHOD aggregation. Library semantics unchanged."
+}

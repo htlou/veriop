@@ -1,0 +1,58 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=300000 --always-verify r_raw/old.ll r_raw/new.ll
+
+----------------------------------------
+define i64 @target_raw_mult32to64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = and i64 noundef %#0, 4294967295
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = mul nuw i64 %#4, %#3
+  %#range_0_%#5 = !range i64 %#5, i64 0, i64 -8589934590
+  ret i64 %#range_0_%#5
+}
+=>
+define i64 @target_raw_mult32to64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = and i64 noundef %#0, 4294967295
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = mul nuw i64 %#4, %#3
+  %#range_0_%#5 = !range i64 %#5, i64 0, i64 -8589934590
+  ret i64 %#range_0_%#5
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define void @target_raw_mult64to128(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = zext i64 noundef %#0 to i128
+  %#5 = zext i64 noundef %#1 to i128
+  %#6 = mul nuw i128 %#5, %#4
+  %#7 = trunc i128 %#6 to i64
+  %#8 = lshr i128 %#6, 64
+  %#9 = trunc nuw i128 %#8 to i64
+  store i64 %#7, ptr noread noundef initializes((0, 16)) %#2, align 8
+  %#10 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i64 8
+  store i64 %#9, ptr %#10, align 8
+  ret void
+}
+=>
+define void @target_raw_mult64to128(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = zext i64 noundef %#0 to i128
+  %#5 = zext i64 noundef %#1 to i128
+  %#6 = mul nuw i128 %#5, %#4
+  %#7 = trunc i128 %#6 to i64
+  %#8 = lshr i128 %#6, 64
+  %#9 = trunc nuw i128 %#8 to i64
+  store i64 %#7, ptr noread noundef initializes((0, 16)) %#2, align 8
+  %#10 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i64 8
+  store i64 %#9, ptr %#10, align 8
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  2 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,7 @@
+# llama.cpp `0ed235ea`: CUDA pitched-copy fast path
+
+**Verdict: `EQUIV_PARTIAL`.** The commit adds `cudaMemcpy2DAsync` for same-type, same-shape copies with a contiguous prefix and a pitched row dimension. It also changes an OpenVINO support guard and adds backend tests. For the commit's F32 test with shape `{128,2,3,1}` and destination allocation `{128,4,3,1}`, [Alive2 proves both directions](alive-old_to_new.log) of the old scalar-kernel versus new 2D-copy **byte-address mapping** for every one of the 3,072 logical bytes. The reverse [log](alive-new_to_old.log) also reports one correct transformation and zero errors.
+
+Run `python3 -B history-eq/gpu/llama.cpp/0ed235ea/reproduce.py` from the project root. The script locks the three changed Git blobs on both sides and the archived [production diff](../source-screening/0ed235ea.source.diff), extracts the old scalar offset formulas and the new eligibility helper from the historical CUDA source, and uses the exact new upstream F32 test shape. The [result](result.json) records source and generated-model hashes. `-O3` folds the fixed test shape before Alive2 compares the models.
+
+The proof establishes which bytes each path addresses under that test shape. It does not model CUDA runtime execution, float value transfer, aliasing, other shapes or types, the OpenVINO guard, or complete commit behavior. The current host cannot access an NVIDIA driver, so the official backend test was not run here. No official before/after performance score was measured.

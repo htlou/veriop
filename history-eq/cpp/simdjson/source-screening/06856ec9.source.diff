@@ -1,0 +1,190 @@
+diff --git a/include/simdjson/generic/ondemand/object-inl.h b/include/simdjson/generic/ondemand/object-inl.h
+index d533047b..c8cb6bbd 100644
+--- a/include/simdjson/generic/ondemand/object-inl.h
++++ b/include/simdjson/generic/ondemand/object-inl.h
+@@ -412,6 +412,29 @@ simdjson_inline simdjson_result<bool> object::reset() & noexcept {
+   return iter.reset_object();
+ }
+ 
++simdjson_inline object_position object::get_current_position() const noexcept {
++  return object_position{iter.position(), iter.json_iter().depth()};
++}
++
++simdjson_inline error_code object::revert_position(object_position position) noexcept {
++#if SIMDJSON_DEVELOPMENT_CHECKS
++  if (locked) return OUT_OF_ORDER_ITERATION;
++#endif
++  // json_iterator::reenter_child() requires the live depth to be exactly
++  // one level shallower than the target (matching how every other depth
++  // transition in this iterator works), and under SIMDJSON_DEVELOPMENT_CHECKS
++  // additionally validates against the parser's per-depth container-start
++  // bookkeeping. Neither applies here: depending on what was captured and
++  // what has happened since (a scalar field fully consumed, a compound
++  // value left open, a find_field() miss that scanned past everything),
++  // the live depth when reverting can be any number of levels away from
++  // the captured one, and the captured depth is not necessarily a
++  // container's own start. reenter_at() moves directly, matching how
++  // reset_object() itself repositions without going through reenter_child().
++  iter.reenter_at(position.position, position.depth);
++  return SUCCESS;
++}
++
+ #if SIMDJSON_DEVELOPMENT_CHECKS
+ simdjson_inline void object::set_locked(bool _locked) noexcept {
+   locked = _locked;
+@@ -571,6 +594,16 @@ inline simdjson_result<bool> simdjson_result<SIMDJSON_IMPLEMENTATION::ondemand::
+   return first.reset();
+ }
+ 
++inline simdjson_result<SIMDJSON_IMPLEMENTATION::ondemand::object_position> simdjson_result<SIMDJSON_IMPLEMENTATION::ondemand::object>::get_current_position() noexcept {
++  if (error()) { return error(); }
++  return first.get_current_position();
++}
++
++inline error_code simdjson_result<SIMDJSON_IMPLEMENTATION::ondemand::object>::revert_position(SIMDJSON_IMPLEMENTATION::ondemand::object_position position) noexcept {
++  if (error()) { return error(); }
++  return first.revert_position(position);
++}
++
+ inline simdjson_result<bool> simdjson_result<SIMDJSON_IMPLEMENTATION::ondemand::object>::is_empty() noexcept {
+   if (error()) { return error(); }
+   return first.is_empty();
+diff --git a/include/simdjson/generic/ondemand/object.h b/include/simdjson/generic/ondemand/object.h
+index 2a96e252..68b9facb 100644
+--- a/include/simdjson/generic/ondemand/object.h
++++ b/include/simdjson/generic/ondemand/object.h
+@@ -86,6 +86,44 @@ inline constexpr bool nothrow_field_handlers_v =
+ } // namespace key_selector_for_each_detail
+ #endif
+ 
++/**
++ * An opaque snapshot of an object's scanning position, obtained from
++ * object::get_current_position() and consumed by object::revert_position().
++ *
++ * This bundles the raw token position with the iteration depth that was
++ * live at the moment of capture: a scalar field value (e.g. a number)
++ * unwinds back to the object's own depth once fully consumed, while a
++ * compound value (array/object) not yet fully consumed stays one level
++ * deeper. The correct depth to restore to therefore depends on what was
++ * live when the snapshot was taken, not on the object itself, which is
++ * why both pieces travel together here rather than being recomputed later.
++ *
++ * The members are private and only constructible by object itself: a
++ * hand-built value here would let revert_position() jump to an arbitrary,
++ * unvalidated position and depth, and this type carries no way to check
++ * that a given snapshot still refers to a live object. Only ever pass
++ * along a value you got from get_current_position(), and only back to the
++ * same object, before that object has been reset() or the parser has
++ * iterate()d a new document: neither invalidates a snapshot in a way this
++ * type can detect.
++ */
++struct object_position {
++  /**
++   * Default-constructed so a variable can be declared and assigned later,
++   * matching e.g. document()/object(). Not a valid position to revert to.
++   */
++  simdjson_inline object_position() noexcept = default;
++
++private:
++  token_position position{};
++  depth_t depth{};
++
++  simdjson_inline object_position(token_position position_, depth_t depth_) noexcept
++    : position(position_), depth(depth_) {}
++
++  friend class object;
++};
++
+ /**
+  * A forward-only JSON object field iterator.
+  */
+@@ -364,6 +402,34 @@ public:
+    * @returns true if the object contains some elements (not empty)
+    */
+   inline simdjson_result<bool> reset() & noexcept;
++  /**
++   * Get an opaque token representing the object's current scanning position.
++   * Pass it to revert_position() to return to this exact point later, without
++   * paying the cost of a full reset() and re-scan from the beginning.
++   *
++   * A typical use is an optional field that may or may not be next: capture
++   * the position, attempt find_field(), and on NO_SUCH_FIELD, revert_position()
++   * instead of reset() so that fields already consumed are not rescanned.
++   *
++   * The returned token is only valid for this object, and only until it is
++   * reset() or the parser iterate()s a new document; using it after either
++   * is undefined behavior (see object_position).
++   *
++   * @returns An opaque position token.
++   */
++  simdjson_inline object_position get_current_position() const noexcept;
++  /**
++   * Return the object's scanning position to a snapshot previously obtained
++   * from get_current_position(). Unlike reset(), this does not rescan the
++   * object from the beginning: fields before the captured position remain
++   * consumed, and scanning resumes exactly where the snapshot was captured.
++   *
++   * @param position A snapshot previously returned by get_current_position(),
++   *        for this same object.
++   * @returns SUCCESS, or OUT_OF_ORDER_ITERATION if called during active
++   *          iteration (SIMDJSON_DEVELOPMENT_CHECKS builds only).
++   */
++  simdjson_inline error_code revert_position(object_position position) noexcept;
+   /**
+    * This method scans the beginning of the object and checks whether the
+    * object is empty.
+@@ -518,6 +584,8 @@ public:
+ #endif
+   simdjson_inline error_code for_each_at_path_with_wildcard(std::string_view json_path, Func&& callback) noexcept;
+   inline simdjson_result<bool> reset() noexcept;
++  inline simdjson_result<SIMDJSON_IMPLEMENTATION::ondemand::object_position> get_current_position() noexcept;
++  inline error_code revert_position(SIMDJSON_IMPLEMENTATION::ondemand::object_position position) noexcept;
+   inline simdjson_result<bool> is_empty() noexcept;
+   inline simdjson_result<size_t> count_fields() & noexcept;
+   inline simdjson_result<std::string_view> raw_json() noexcept;
+diff --git a/include/simdjson/generic/ondemand/value_iterator-inl.h b/include/simdjson/generic/ondemand/value_iterator-inl.h
+index aebae4a6..540765be 100644
+--- a/include/simdjson/generic/ondemand/value_iterator-inl.h
++++ b/include/simdjson/generic/ondemand/value_iterator-inl.h
+@@ -1116,6 +1116,21 @@ simdjson_inline void value_iterator::move_at_container_start() noexcept {
+   _json_iter->token.set_position(_start_position + 1);
+ }
+ 
++simdjson_inline void value_iterator::reenter_at(token_position position, depth_t depth) noexcept {
++  // Unlike reenter_child(), this does not require the live depth to be
++  // exactly one level shallower than depth, nor does it validate against
++  // the parser's per-depth container-start bookkeeping: neither holds in
++  // general for a caller-supplied snapshot (see object_position). What
++  // must still always hold, regardless of what was captured or how far
++  // the live iterator has since moved, is that position and depth are
++  // themselves sane values -- this is the same bound reenter_child()
++  // itself applies unconditionally.
++  SIMDJSON_ASSUME(position != nullptr);
++  SIMDJSON_ASSUME(depth >= 1 && depth < INT32_MAX);
++  _json_iter->_depth = depth;
++  _json_iter->token.set_position(position);
++}
++
+ simdjson_inline simdjson_result<bool> value_iterator::reset_array() noexcept {
+   if(error()) { return error(); }
+   move_at_container_start();
+diff --git a/include/simdjson/generic/ondemand/value_iterator.h b/include/simdjson/generic/ondemand/value_iterator.h
+index 1bc8b14c..eca36b15 100644
+--- a/include/simdjson/generic/ondemand/value_iterator.h
++++ b/include/simdjson/generic/ondemand/value_iterator.h
+@@ -478,6 +478,15 @@ protected:
+ 
+   /** @copydoc error_code json_iterator::position() const noexcept; */
+   simdjson_inline token_position position() const noexcept;
++  /**
++   * Move the live iterator directly to the given position and depth, without
++   * validating against the parser's per-depth container-start bookkeeping
++   * (unlike json_iterator::reenter_child()). Used to restore a previously
++   * captured mid-container position (see object::revert_position()): that
++   * bookkeeping only tracks each container's own start, not every position
++   * a caller might later capture and revert to, so it does not apply here.
++   */
++  simdjson_inline void reenter_at(token_position position, depth_t depth) noexcept;
+   /** @copydoc error_code json_iterator::end_position() const noexcept; */
+   simdjson_inline token_position last_position() const noexcept;
+   /** @copydoc error_code json_iterator::end_position() const noexcept; */

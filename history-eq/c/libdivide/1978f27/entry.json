@@ -1,0 +1,52 @@
+{
+  "commit": "1978f27",
+  "date": "2022-02-12",
+  "subject": "Implement 16-bit SSE2 & AVX2 vector division (#94)",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit replaces per-lane scalar fallback with SIMD division algorithms for 16-bit vectors.",
+  "change_summary": "Implements 128-bit SSE2 and 256-bit AVX2 signed/unsigned 16-bit division paths.",
+  "units": [
+    {
+      "name": "public 128-bit vector division, four signed/unsigned modes with generated dividers",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "nonzero divisor; unsigned branchfree divisor >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/1978f27/api128",
+      "evidence": "Unsigned branchfull passes both directions; the other three generated-divider API targets time out."
+    },
+    {
+      "name": "public 256-bit vector division, four signed/unsigned modes with generated dividers",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "nonzero divisor; unsigned branchfree divisor >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/1978f27/api256",
+      "evidence": "Signed branchfree passes both directions; the other three generated-divider API targets time out."
+    },
+    {
+      "name": "raw 16-bit vector division with arbitrary divider fields",
+      "level": "raw",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/1978f27/raw128",
+      "evidence": "One raw signed branchfree mode passes; two unsigned raw modes have only a one-way proof and another times out. This does not establish a generated-divider API result."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "UNKNOWN",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "All four API modes at each vector width were attempted, but six of eight API proofs remain inconclusive. The scalar per-lane implementation existed before the commit, so this is a changed implementation of an existing API rather than a new API."
+}

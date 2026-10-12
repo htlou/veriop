@@ -1,0 +1,24 @@
+[
+  {
+    "name": "base64::encode::encode_config",
+    "level": "api",
+    "verdict": "EQUIV",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/Cfa6a11f",
+    "evidence": "Proof.lean: encode_config_equiv : New.encode_config asRef input (cfgMap config) = Old.encode_config asRef input config (plain =, all inputs, kernel-checked); extraction tag ecfgo with --opaque base64::encode::encode_with_padding --include core::convert",
+    "hypotheses": [
+      "hand_then : @Old.core.option.Option.and_then = @New.core.option.Option.and_then (same external fn)",
+      "hunreach : @Old.core.panicking.unreachable_display = @New.core.panicking.unreachable_display (same external fn)",
+      "hfmt1/hfmt2 : the two copies of <&T as Display>::fmt and <str as Display>::fmt are equal (same external fns; only reachable in encoded_size's unreachable!() arm)",
+      "hewp : New.encode_with_padding i (cfgMap c) n o = Old.encode_with_padding i c n o (opaque helper, source byte-identical in old/new: git diff fa6a11f^ fa6a11f only touches encode_config)",
+      "hlen : Old.encode_with_padding i c n o = ok r -> r.length = o.length (Rust fact for any implementation: a &mut [u8] argument keeps its length)",
+      "hutf : New.String.from_utf8 b = Old.String.from_utf8 b >>= ok o (map Err by phi) for some phi : Old.FromUtf8Error -> New.FromUtf8Error (same external fn; FromUtf8Error is an opaque type duplicated by Aeneas)",
+      "Config mapping cfgMap (field-wise, CharacterSet by cases); AsRef impl shared"
+    ],
+    "notes": "Plain extraction from encode_config fails in Aeneas: 'Error Unreachable' at src/encode.rs 148:59-148:89 (config.char_set.encode_table() in encode_with_padding), so encode_with_padding was made opaque (it is unchanged by the commit). --include core::convert gives the real body of <[T] as AsRef<[T]>>::as_ref (identity), needed by the old path encode_config_slice(input.as_ref(), ..). The proof shows: old re-computation of encoded_size yields the same Some(n) as the first call, output[0..n] on the n-length buffer is the whole buffer, the write-back via setSlice! is the identity (given hlen), and the old debug_assert_eq!(encoded_len, buf.len()) always holds (massert succeeds) — so no panic-kind difference. Coverage: the perf-relevant change (encode_config) is fully checked; encode_with_padding/encode_to_slice bodies are opaque but identical on both sides. Proof time ~20 min."
+  }
+]

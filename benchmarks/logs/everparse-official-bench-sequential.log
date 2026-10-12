@@ -1,0 +1,74 @@
+make: Entering directory '/srv/home/hantaolou/code/veriop/benchmarks/repos/everparse/src/cddl/tests/unit'
+make: Circular /srv/home/hantaolou/code/veriop/benchmarks/repos/everparse/src/cddl/pulse/CDDL.Pulse.AST.Parse.fst.checked <- /srv/home/hantaolou/code/veriop/benchmarks/repos/everparse/src/cddl/pulse/CDDL.Pulse.AST.Parse.fst.checked dependency dropped.
+# Override the CFLAGS to use -O3, for a more fair comparison
+make -C QCBOR CFLAGS="-I inc -I test -O3 -fPIC"
+make[1]: Entering directory '/srv/home/hantaolou/code/veriop/benchmarks/repos/everparse/src/cddl/tests/unit/QCBOR'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/srv/home/hantaolou/code/veriop/benchmarks/repos/everparse/src/cddl/tests/unit/QCBOR'
+./_output/Test_BenchFlat.exe
+This test benchmarks serializing and parsing a flat structure
+using EverCDDL, TinyCBOR, and QCBOR.
+ >>> EVERCDDL SERIALIZATION OF RECORD TAKES: 1.089365 us
+ >>> EVERCDDL PARSING OF RECORD TAKES: 4.407518 us
+ >>> QCBOR SERIALIZATION OF RECORD TAKES: 0.312705 us
+a8 62 66 31 1b 78 89 c3 ed 48 f9 e9 76 62 66 32 1b 34 f9 4b 43 7a a0 d2 de 62 66 33 1b 9c 33 60 dd 5e 03 1a 4a 62 66 34 1b 7c f9 e3 ca 17 18 d7 07 62 66 35 1b f5 8a f8 35 38 45 df 00 62 66 36 1b c8 fc a5 5e 76 ff 89 d6 62 66 37 1b 27 0d 04 cc c7 d6 e7 41 62 66 38 1b 6b 3f f9 62 d7 2d 2a c7 
+ >>> QCBOR (SPIFFY) PARSING OF RECORD TAKES: 3.162828 us
+ >>> TINYCBOR SERIALIZATION OF RECORD TAKES: 0.464259 us
+a8 62 66 31 1b 46 1f ad de 54 3d cf dc 62 66 32 1b ae f6 01 7e 54 d8 ac 0b 62 66 33 1b d8 52 c7 9b 24 65 40 dc 62 66 34 1b 81 02 b5 b8 95 8b 35 1d 62 66 35 1b 4a fd cb 4c 75 83 c2 77 62 66 36 1b 83 93 d1 cf 95 30 6c 84 62 66 37 1b 68 96 e1 39 fb f7 34 95 62 66 38 1b 2c 6c 73 b7 d7 c7 b5 ad 
+ >>> TINYCBOR PARSING OF RECORD TAKES: 6.105042 us
+./_output/Test_BenchMap.exe
+This test benchmarks lookups in a CBOR map with EverCDDL,
+EverCBOR (i.e. without the CDDL layer), QCBOR and TinyCBOR.
+The maps are filled with big random numbers, so most lookups miss.
+Serialized 144003 bytes
+b9 1f 40 1b 00 04 58 af 81 8b d6 4c 1b 44 a4 22 1e e4 30 c8 ... 
+ >>> SERIALIZATION BANDWIDTH: 0.409582 MB/s
+ >>> EVERCDDL VALIDATION TOOK 1031.370019 us
+ NFOUND = 0
+ >>> EVERCDDL LOOKUP: 611.999702 us
+ >>> EVERCDDL LOOKUP (NO SHORT): 1222.674656 us
+ >>> EVERCBOR LOOKUP: 176.990521 us
+ >>> QCBOR LOOKUP: 489.939785 us
+ >>> TINYCBOR lOOKUP: 507.708406 us
+./_output/Test_BenchArray.exe
+This test is purely EverCDDL.
+ >>> Time to build the array in memory: 0.323161s
+Serialized 100030003 bytes.
+99 27 10 99 27 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ... 
+ >>> SERIALIZATION BANDWIDTH: 22.512196 MB/s
+ >>> SERIALIZATION BANDWIDTH (COMBINED): 20.985916 MB/s
+ >>> PARSING BANDWIDTH: 25.578006 MB/s
+./_output/Test_BenchArray__Interop1.exe
+This test serializes the array with EverCDDL and parses it back with QCBOR.
+ >>> Time to build the array in memory: 0.385041s
+Serialized 100030003 bytes
+99 27 10 99 27 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ... 
+ >>> SERIALIZATION BANDWIDTH: 22.210352 MB/s
+ >>> SERIALIZATION BANDWIDTH (COMBINED): 20.461068 MB/s
+QCBOR parsed 100030003 bytes
+ >>> QCBOR VALIDATION BANDWIDTH: 22.111756 MB/s
+QCBOR parsed 100030003 bytes
+ >>> QCBOR PARSING BANDWIDTH: 22.407626 MB/s
+ >>> QCBOR COMBINED BANDWIDTH: 11.129353 MB/s
+./_output/Test_BenchArray__Interop2.exe
+This tests serializes an array with QCBOR and parses it back
+with EverCDDL.
+ >>> QCBOR SERIALIZATION BANDWITH : 81.726367 MB/s
+99 27 10 99 27 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+ >>> EVERCDDL VALIDATION BANDWIDTH: 23.289924 MB/s
+ >>> EVERCDDL PARSING BANDWIDTH: 12.496830 MB/s
+ >>> EVERCDDL COMBINED BANDWIDTH: 8.132903 MB/s
+./_output/Test_BenchArray__Interop3.exe
+This test serializes an array using TinyCBOR, then parses it
+back both with TinyCBOR and EverCDDL.
+Encoded in 100030003 bytes
+ >>> TINYCBOR SERIALIZATION BANDWITH : 48.539475 MB/s
+99 27 10 99 27 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ... 
+ >>> VALIDATION BANDWIDTH: 24.453264 MB/s
+ >>> EVERCDDL PARSING BANDWIDTH: 12.475159 MB/s
+ >>> EVERCDDL COMBINED BANDWIDTH: 8.260801 MB/s
+ >>> TINYCBOR VALIDATION BANDWIDTH: 22.587026 MB/s
+ >>> TINYCBOR PARSING BANDWIDTH: 22.587026 MB/s
+ >>> TINYCBOR COMBINED BANDWIDTH: 11.529009 MB/s
+Done
+make: Leaving directory '/srv/home/hantaolou/code/veriop/benchmarks/repos/everparse/src/cddl/tests/unit'

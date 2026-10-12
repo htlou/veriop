@@ -1,0 +1,7 @@
+# llama.cpp `85dde8dc4a9e` — Hexagon HMX output-address hoisting
+
+**Verdict: `EQUIV_PARTIAL` for the selected FP16-tile output-transfer addresses.** The commit rewrites `transfer_output_chunk_fp16_to_fp32` to compute row and tile bases once. The historical constants are 32 rows, 32 columns, and 1,024 FP16 elements per HMX tile. Under the recorded loop bounds (`r` even and below 8,192; `n_cols` a positive multiple of 32 and at most 8,192; `c` a valid 32-column tile start; `n` at most 8,192), [Alive2 proves both directions](alive2-src_index-old_to_new.log) for the source vector address and the two destination row addresses. All six function-pair checks report `1 correct transformations`, zero incorrect, and zero failed to prove. [result.json](result.json) records the exact historical source blob IDs and each result.
+
+Run `python3 -B history-eq/gpu/llama.cpp/85dde8dc4a9e/reproduce.py` from the project root. The script checks the old and new source expressions and tile constants by exact Git blobs, compiles their bounded address projections to LLVM IR, then runs Alive2 in both directions. The reverse source-address check needs a 60-second SMT allowance; it completed in about 13 seconds here after the default 10-second allowance timed out.
+
+This does not verify the HMX instructions, FP16-to-FP32 conversion, moved HMX lock scope, concurrent behavior, or whole commit. No official before/after benchmark score was measured.

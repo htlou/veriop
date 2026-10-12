@@ -1,0 +1,89 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/292ddc3/cex/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/292ddc3/cex/new.ll
+
+----------------------------------------
+define i32 @target_cex() nofree noundef willreturn memory(none) {
+#0:
+  ret i32 3937239301
+}
+=>
+define i32 @target_cex() nofree noundef willreturn memory(none) {
+#0:
+  ret i32 3937239300
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+
+Source:
+
+Target:
+Source value: #xeaad8105 (3937239301, -357727995)
+Target value: #xeaad8104 (3937239300, -357727996)
+
+
+----------------------------------------
+define i32 @target_cex_n(i32 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = sext i32 noundef %#0 to i64
+  %#3 = mul nsw i64 %#2, -1431655765
+  %#4 = lshr i64 %#3, 32
+  %#5 = trunc nuw i64 %#4 to i32
+  %#6 = add nsw i32 noundef %#0, %#5
+  %#7 = ashr i32 %#6, 1
+  %#8 = lshr i32 %#7, 31
+  %#9 = add nsw i32 %#8, %#7
+  %#range_0_%#9 = !range i32 %#9, i32 3221225472, i32 1073741825
+  ret i32 %#range_0_%#9
+}
+=>
+define i32 @target_cex_n(i32 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = sext i32 noundef %#0 to i64
+  %#3 = mul nsw i64 %#2, -1431655765
+  %#4 = lshr i64 %#3, 32
+  %#5 = trunc nuw i64 %#4 to i32
+  %#6 = add nsw i32 noundef %#0, %#5
+  %#7 = lshr i32 %#6, 31
+  %#8 = add nsw i32 %#7, %#6
+  %#9 = ashr i32 %#8, 1
+  %#range_0_%#9 = !range i32 %#9, i32 3221225472, i32 1073741824
+  ret i32 %#range_0_%#9
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #xe01082d0 (3759178448, -535788848)
+
+Source:
+i64 %#2 = #xffffffffe01082d0 (18446744073173762768, -535788848)
+i64 %#3 = #x0aa529baa00580f0 (767065193061908720)
+i64 %#4 = #x000000000aa529ba (178596282)
+i32 %#5 = #x0aa529ba (178596282)
+i32 %#6 = #xeab5ac8a (3937774730, -357192566)
+i32 %#7 = #xf55ad645 (4116371013, -178596283)
+i32 %#8 = #x00000001 (1)
+i32 %#9 = #xf55ad646 (4116371014, -178596282)
+i32 %#range_0_%#9 = #xf55ad646 (4116371014, -178596282)
+
+Target:
+i64 %#2 = #xffffffffe01082d0 (18446744073173762768, -535788848)
+i64 %#3 = #x0aa529baa00580f0 (767065193061908720)
+i64 %#4 = #x000000000aa529ba (178596282)
+i32 %#5 = #x0aa529ba (178596282)
+i32 %#6 = #xeab5ac8a (3937774730, -357192566)
+i32 %#7 = #x00000001 (1)
+i32 %#8 = #xeab5ac8b (3937774731, -357192565)
+i32 %#9 = #xf55ad645 (4116371013, -178596283)
+i32 %#range_0_%#9 = #xf55ad645 (4116371013, -178596283)
+Source value: #xf55ad646 (4116371014, -178596282)
+Target value: #xf55ad645 (4116371013, -178596283)
+
+Summary:
+  0 correct transformations
+  2 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

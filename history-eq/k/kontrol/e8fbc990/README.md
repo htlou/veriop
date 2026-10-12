@@ -1,0 +1,7 @@
+# Kontrol `e8fbc990`: recompilation cache decision
+
+The historical optimization removes `foundry.up_to_date()` from the gate that calls `kevm_kompile`, and adds an options digest to that gate. Both exact `src/kontrol/kompile.py` Git blobs are checked by [the replay script](check_rekompile.py). It extracts the original nested decision functions from each Python AST, runs them against the same cache states, and asks Z3 to prove their Boolean decision relation. [Z3 returns `unsat`](decision-relation.log) for a violation of that relation.
+
+The [result](result.json) contains two concrete decision counterexamples. With contracts changed but the generated K text and options digests unchanged, the old code recompiles and the new code skips. With contracts unchanged but options changed, the old code skips and the new code recompiles. The extracted old/new functions return these opposite values, and the source audit confirms their result gates the `kevm_kompile` call.
+
+**Verdict: scoped `NOT_EQUIV` for the recompilation decision.** Both differences are intended cache-policy changes. The check does not compare produced K definitions, compiler output, or proof results, so it is not a whole-build semantic inequality or equivalence verdict. `kprove` does not accept this Python orchestration code; the executed relation check uses exact-source Python AST and Z3. No official historical before/after benchmark score was measured. Reproduce from the project root with `python3 -B history-eq/k/kontrol/e8fbc990/check_rekompile.py`.

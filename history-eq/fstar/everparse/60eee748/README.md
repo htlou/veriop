@@ -1,0 +1,7 @@
+# EverParse `60eee748`: constant-size validator/jumper optimization
+
+The sampled historical optimization commit `60eee74821554e01ac0391af9ed445a417d8ce3c` changes exactly one file, `src/rfc_fstar_compiler.ml`, an **OCaml code generator**. Its parent is `b20d71eb5b1410c306bfed1a6b557adf73bd3371`. The exact historical versions are `old.ml` (SHA-256 `017eee8a7e35b5a4489153ff8dcbb8e3e9b40bca9c2058ef0c77f85ba5420c15`) and `new.ml` (SHA-256 `2a1dfecc80561f85ffded5b7c2a5031e11a43870580a1a123bc98d8c144f966b`). The change omits or specializes generated F* validators and jumpers when parser sizes are constant.
+
+**Verdict: unsupported by the selected F* checker for this commit's optimized source.** The installed EverParse F* executable rejects both historical `.ml` inputs with Error 151, “Not a valid FStar file” (`fstar-old.log`, `fstar-new.log`). `ocamlc -stop-after parsing` accepts both (`ocaml-parse-{old,new}.log`), which establishes only OCaml syntax. No before/after generator-output equivalence proof, verified compiler transformation, or counterexample is available from these checks. Verifying some generated F* modules separately would show those modules typecheck, not that the old and new generators always emit equivalent programs.
+
+The workspace's official EverParse SMT benchmark is a pinned baseline on a later revision. It does not supply an official before/after score for this 2018 commit, so no performance delta is claimed.

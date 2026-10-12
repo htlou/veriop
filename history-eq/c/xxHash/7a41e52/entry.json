@@ -1,0 +1,28 @@
+{
+ "commit": "7a41e52",
+ "date": "2021-08-23",
+ "subject": "added memory access method 1 for mips on gcc",
+ "selected_by": "manual-scan",
+ "perf_evidence": "XXH_FORCE_MEMORY_ACCESS=1 (__packed__ struct loads) is documented in xxhash.h as the faster unaligned-read method for some GCC targets; the commit extends the 'prefer __packed__ structures (method 1) for gcc' default to MIPS (recommended by an external user).",
+ "change_summary": "Default XXH_FORCE_MEMORY_ACCESS=1 (packed-struct reads instead of memcpy) for GCC on MIPS (pre-R6 ISA, not plain mips16); other hunks are whitespace-only.",
+ "units": [
+  {
+   "name": "unaligned read helpers via public APIs (XXH32/XXH64/XXH3_64/XXH3_128, fixed lengths, misaligned buf+1), mips-linux-gnu, GCC view emulated with -U__clang__",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/7a41e52/r_mips_gccview",
+   "evidence": "IR identical old/new for all 15 targets; 13 fwd+bwd correct at default, len129/len180 correct with --unroll 16 (r_mips_gccview_u16); old XXH_FORCE_MEMORY_ACCESS unset(=0) vs new 1 (macro_check.txt)"
+  }
+ ],
+ "commit_verdict": "EQUIV",
+ "raw_verdict": "EQUIV",
+ "coverage": "partial",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). Plain clang never takes the new branch (it requires !defined(__clang__)); emulating GCC's preprocessor view with -U__clang__ (clang keeps __GNUC__=4; __mips=32/64, __mips_isa_rev=2) does select XXH_FORCE_MEMORY_ACCESS=1 on the new side, yet clang lowers both memcpy-based and packed-struct reads to the same unaligned 'load ..., align 1', so whole modules are identical (except !srcloc) on mips-linux-gnu, mipsel-linux-gnu and mips64el-linux-gnuabi64 (ident_mips*_{clang,gccview}/, fullmodule line counts in macro_check.txt). Verdict EQUIV = IR identical (Alive2 runs are trivially correct). Coverage partial: the intended effect is on GCC's codegen, which this clang-based pipeline cannot observe. Flags: --target mips-linux-gnu -O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -nostdlibinc -isystem _work2020/cross_sysinc -Dstatic_assert=_Static_assert -U__clang__ -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 (static_assert define needed because the freestanding assert.h shim lacks it)."
+}

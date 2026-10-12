@@ -1,0 +1,269 @@
+
+----------------------------------------
+define i32 @target_q4_0(i64 %#0, i32 %#1) {
+#2:
+  %#3 = alloca i64 12, align 2
+  %#4 = alloca i64 16, align 2
+  %#5 = alloca i64 4, align 4
+  %#6 = alloca i64 8, align 8
+  %#7 = alloca i64 4, align 2
+  %#8 = alloca i64 4, align 4
+  %#9 = gep inbounds nuw ptr %#4, 16 x i32 0, 1 x i64 0
+  store i64 %#0, ptr %#9, align 2
+  %#10 = gep inbounds nuw ptr %#4, 16 x i32 0, 1 x i64 8
+  store i32 %#1, ptr %#10, align 2
+  memcpy ptr %#3 align 2, ptr %#4 align 2, i64 12
+  store i32 0, ptr %#5, align 4
+  %#11 = gep inbounds nuw ptr %#3, 12 x i32 0, 1 x i64 0
+  %#12 = gep inbounds ptr %#11, 12 x i64 0, 2 x i64 0
+  store ptr %#12, ptr %#6, align 8
+  store i32 0, ptr %#8, align 4
+  %#13 = load ptr, ptr %#6, align 8
+  %#14 = gep inbounds ptr %#13, 2 x i64 0
+  %#15 = load i16, ptr %#14, align 2
+  %#16 = zext i16 %#15 to i32
+  %#17 = and i32 %#16, 16191
+  %#18 = trunc i32 %#17 to i16
+  %#19 = gep inbounds ptr %#7, 4 x i64 0, 2 x i64 0
+  store i16 %#18, ptr %#19, align 2
+  %#20 = load ptr, ptr %#6, align 8
+  %#21 = gep inbounds ptr %#20, 2 x i64 2
+  %#22 = load i16, ptr %#21, align 2
+  %#23 = zext i16 %#22 to i32
+  %#24 = and i32 %#23, 16191
+  %#25 = trunc i32 %#24 to i16
+  %#26 = gep inbounds ptr %#7, 4 x i64 0, 2 x i64 1
+  store i16 %#25, ptr %#26, align 2
+  %#27 = gep inbounds ptr %#7, 4 x i64 0, 2 x i64 0
+  %#28 = load i16, ptr %#27, align 2
+  %#29 = zext i16 %#28 to i32
+  %#30 = gep inbounds ptr %#7, 4 x i64 0, 2 x i64 1
+  %#31 = load i16, ptr %#30, align 2
+  %#32 = zext i16 %#31 to i32
+  %#33 = shl i32 %#32, 16
+  %#34 = or i32 %#29, %#33
+  ret i32 %#34
+}
+=>
+define i32 @target_q4_0(i64 %#0, i32 %#1) {
+#2:
+  %#3 = alloca i64 12, align 2
+  %#4 = alloca i64 16, align 2
+  %#5 = alloca i64 4, align 4
+  %#6 = alloca i64 8, align 8
+  %#7 = alloca i64 4, align 4
+  %#8 = alloca i64 4, align 4
+  %#9 = alloca i64 4, align 4
+  %#10 = alloca i64 4, align 4
+  %#11 = alloca i64 4, align 4
+  %#12 = alloca i64 4, align 4
+  %#13 = alloca i64 4, align 2
+  %#14 = gep inbounds nuw ptr %#4, 16 x i32 0, 1 x i64 0
+  store i64 %#0, ptr %#14, align 2
+  %#15 = gep inbounds nuw ptr %#4, 16 x i32 0, 1 x i64 8
+  store i32 %#1, ptr %#15, align 2
+  memcpy ptr %#3 align 2, ptr %#4 align 2, i64 12
+  store i32 0, ptr %#5, align 4
+  %#16 = gep inbounds nuw ptr %#3, 12 x i32 0, 1 x i64 0
+  %#17 = gep inbounds ptr %#16, 12 x i64 0, 2 x i64 0
+  store ptr %#17, ptr %#6, align 8
+  store i32 0, ptr %#7, align 4
+  store i32 0, ptr %#8, align 4
+  %#18 = load ptr, ptr %#6, align 8
+  %#19 = gep inbounds ptr %#18, 2 x i64 0
+  %#20 = load i16, ptr %#19, align 2
+  %#21 = zext i16 %#20 to i32
+  store i32 %#21, ptr %#9, align 4
+  %#22 = load ptr, ptr %#6, align 8
+  %#23 = gep inbounds ptr %#22, 2 x i64 2
+  %#24 = load i16, ptr %#23, align 2
+  %#25 = zext i16 %#24 to i32
+  store i32 %#25, ptr %#10, align 4
+  %#26 = load ptr, ptr %#6, align 8
+  %#27 = gep inbounds ptr %#26, 2 x i64 4
+  %#28 = load i16, ptr %#27, align 2
+  %#29 = zext i16 %#28 to i32
+  store i32 %#29, ptr %#11, align 4
+  store i32 0, ptr %#12, align 4
+  %#30 = load i32, ptr %#9, align 4
+  %#31 = and i32 %#30, 16191
+  %#32 = and i32 %#31, 4294967295
+  %#33 = load i32, ptr %#11, align 4
+  %#34 = lshr i32 %#33, 0
+  %#35 = and i32 %#34, 3855
+  %#36 = load i32, ptr %#9, align 4
+  %#37 = and i32 %#36, 49344
+  %#38 = lshr i32 %#37, 2
+  %#39 = or i32 %#35, %#38
+  %#40 = and i32 %#39, 0
+  %#41 = or i32 %#32, %#40
+  %#42 = trunc i32 %#41 to i16
+  %#43 = gep inbounds ptr %#13, 4 x i64 0, 2 x i64 0
+  store i16 %#42, ptr %#43, align 2
+  %#44 = load i32, ptr %#10, align 4
+  %#45 = and i32 %#44, 16191
+  %#46 = and i32 %#45, 4294967295
+  %#47 = load i32, ptr %#11, align 4
+  %#48 = lshr i32 %#47, 4
+  %#49 = and i32 %#48, 3855
+  %#50 = load i32, ptr %#10, align 4
+  %#51 = and i32 %#50, 49344
+  %#52 = lshr i32 %#51, 2
+  %#53 = or i32 %#49, %#52
+  %#54 = and i32 %#53, 0
+  %#55 = or i32 %#46, %#54
+  %#56 = trunc i32 %#55 to i16
+  %#57 = gep inbounds ptr %#13, 4 x i64 0, 2 x i64 1
+  store i16 %#56, ptr %#57, align 2
+  %#58 = gep inbounds ptr %#13, 4 x i64 0, 2 x i64 0
+  %#59 = load i16, ptr %#58, align 2
+  %#60 = zext i16 %#59 to i32
+  %#61 = gep inbounds ptr %#13, 4 x i64 0, 2 x i64 1
+  %#62 = load i16, ptr %#61, align 2
+  %#63 = zext i16 %#62 to i32
+  %#64 = shl i32 %#63, 16
+  %#65 = or i32 %#60, %#64
+  ret i32 %#65
+}
+Transformation doesn't verify!
+
+ERROR: Target is more poisonous than source
+
+Example:
+i64 %#0 = #x0000000000000003 (3)	[based on undef]
+i32 %#1 = poison
+
+Source:
+ptr %#3 = pointer(local, block_id=0, offset=0) / Address=#x11e
+ptr %#4 = pointer(local, block_id=1, offset=0) / Address=#x108
+ptr %#5 = pointer(local, block_id=2, offset=0) / Address=#x138
+ptr %#6 = pointer(local, block_id=3, offset=0) / Address=#x130
+ptr %#7 = pointer(local, block_id=4, offset=0) / Address=#x118
+ptr %#8 = pointer(local, block_id=5, offset=0) / Address=#x100
+ptr %#9 = pointer(local, block_id=1, offset=0) / Address=#x108
+ptr %#10 = pointer(local, block_id=1, offset=8) / Address=#x110
+ptr %#11 = pointer(local, block_id=0, offset=0) / Address=#x11e
+ptr %#12 = pointer(local, block_id=0, offset=0) / Address=#x11e
+ptr %#13 = pointer(local, block_id=0, offset=0) / Address=#x11e
+ptr %#14 = pointer(local, block_id=0, offset=0) / Address=#x11e
+i16 %#15 = #x0003 (3)	[based on undef]
+i32 %#16 = #x00000003 (3)	[based on undef]
+i32 %#17 = #x00000003 (3)	[based on undef]
+i16 %#18 = #x0003 (3)	[based on undef]
+ptr %#19 = pointer(local, block_id=4, offset=0) / Address=#x118
+ptr %#20 = pointer(local, block_id=0, offset=0) / Address=#x11e
+ptr %#21 = pointer(local, block_id=0, offset=4) / Address=#x122
+i16 %#22 = #x0000 (0)	[based on undef]
+i32 %#23 = #x00000000 (0)	[based on undef]
+i32 %#24 = #x00000000 (0)	[based on undef]
+i16 %#25 = #x0000 (0)	[based on undef]
+ptr %#26 = pointer(local, block_id=4, offset=2) / Address=#x11a
+ptr %#27 = pointer(local, block_id=4, offset=0) / Address=#x118
+i16 %#28 = #x0003 (3)	[based on undef]
+i32 %#29 = #x00000003 (3)	[based on undef]
+ptr %#30 = pointer(local, block_id=4, offset=2) / Address=#x11a
+i16 %#31 = #x0000 (0)	[based on undef]
+i32 %#32 = #x00000000 (0)	[based on undef]
+i32 %#33 = #x00000000 (0)	[based on undef]
+i32 %#34 = #x00000003 (3)	[based on undef]
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+
+LOCAL BLOCKS:
+Block 16 >	size: 12	align: 2	alloc type: 1	alive: true	address: 286
+Block 17 >	size: 16	align: 2	alloc type: 1	alive: true	address: 264
+Block 18 >	size: 4	align: 4	alloc type: 1	alive: true	address: 312
+Block 19 >	size: 8	align: 8	alloc type: 1	alive: true	address: 304
+Block 20 >	size: 4	align: 2	alloc type: 1	alive: true	address: 280
+Block 21 >	size: 4	align: 4	alloc type: 1	alive: true	address: 256
+
+Target:
+ptr %#3 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#4 = pointer(local, block_id=1, offset=0) / Address=#x11c
+ptr %#5 = pointer(local, block_id=2, offset=0) / Address=#x100
+ptr %#6 = pointer(local, block_id=3, offset=0) / Address=#x160
+ptr %#7 = pointer(local, block_id=4, offset=0) / Address=#x12c
+ptr %#8 = pointer(local, block_id=5, offset=0) / Address=#x10c
+ptr %#9 = pointer(local, block_id=6, offset=0) / Address=#x138
+ptr %#10 = pointer(local, block_id=7, offset=0) / Address=#x104
+ptr %#11 = pointer(local, block_id=8, offset=0) / Address=#x134
+ptr %#12 = pointer(local, block_id=9, offset=0) / Address=#x130
+ptr %#13 = pointer(local, block_id=10, offset=0) / Address=#x108
+ptr %#14 = pointer(local, block_id=1, offset=0) / Address=#x11c
+ptr %#15 = pointer(local, block_id=1, offset=8) / Address=#x124
+ptr %#16 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#17 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#18 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#19 = pointer(local, block_id=0, offset=0) / Address=#x110
+i16 %#20 = #x0003 (3)	[based on undef]
+i32 %#21 = #x00000003 (3)	[based on undef]
+ptr %#22 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#23 = pointer(local, block_id=0, offset=4) / Address=#x114
+i16 %#24 = #x0000 (0)	[based on undef]
+i32 %#25 = #x00000000 (0)	[based on undef]
+ptr %#26 = pointer(local, block_id=0, offset=0) / Address=#x110
+ptr %#27 = pointer(local, block_id=0, offset=8) / Address=#x118
+i16 %#28 = poison
+i32 %#29 = poison
+i32 %#30 = #x00000003 (3)	[based on undef]
+i32 %#31 = #x00000003 (3)	[based on undef]
+i32 %#32 = #x00000003 (3)	[based on undef]
+i32 %#33 = poison
+i32 %#34 = poison
+i32 %#35 = poison
+i32 %#36 = #x00000003 (3)	[based on undef]
+i32 %#37 = #x00000000 (0)	[based on undef]
+i32 %#38 = #x00000000 (0)	[based on undef]
+i32 %#39 = poison
+i32 %#40 = poison
+i32 %#41 = poison
+i16 %#42 = poison
+ptr %#43 = pointer(local, block_id=10, offset=0) / Address=#x108
+i32 %#44 = #x00000000 (0)	[based on undef]
+i32 %#45 = #x00000000 (0)	[based on undef]
+i32 %#46 = #x00000000 (0)	[based on undef]
+i32 %#47 = poison
+i32 %#48 = poison
+i32 %#49 = poison
+i32 %#50 = #x00000000 (0)	[based on undef]
+i32 %#51 = #x00000000 (0)	[based on undef]
+i32 %#52 = #x00000000 (0)	[based on undef]
+i32 %#53 = poison
+i32 %#54 = poison
+i32 %#55 = poison
+i16 %#56 = poison
+ptr %#57 = pointer(local, block_id=10, offset=2) / Address=#x10a
+ptr %#58 = pointer(local, block_id=10, offset=0) / Address=#x108
+i16 %#59 = poison
+i32 %#60 = poison
+ptr %#61 = pointer(local, block_id=10, offset=2) / Address=#x10a
+i16 %#62 = poison
+i32 %#63 = poison
+i32 %#64 = poison
+i32 %#65 = poison
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 16 >	size: 12	align: 2	alloc type: 1	alive: true	address: 272
+Block 17 >	size: 16	align: 2	alloc type: 1	alive: true	address: 284
+Block 18 >	size: 4	align: 4	alloc type: 1	alive: true	address: 256
+Block 19 >	size: 8	align: 8	alloc type: 1	alive: true	address: 352
+Block 20 >	size: 4	align: 4	alloc type: 1	alive: true	address: 300
+Block 21 >	size: 4	align: 4	alloc type: 1	alive: true	address: 268
+Block 22 >	size: 4	align: 4	alloc type: 1	alive: true	address: 312
+Block 23 >	size: 4	align: 4	alloc type: 1	alive: true	address: 260
+Block 24 >	size: 4	align: 4	alloc type: 1	alive: true	address: 308
+Block 25 >	size: 4	align: 4	alloc type: 1	alive: true	address: 304
+Block 26 >	size: 4	align: 2	alloc type: 1	alive: true	address: 264
+Source value: #x00000003 (3)	[based on undef]
+Target value: poison
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

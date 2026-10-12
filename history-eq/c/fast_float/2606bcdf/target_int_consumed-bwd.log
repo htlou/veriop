@@ -1,0 +1,56 @@
+
+----------------------------------------
+declare {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(noundef ptr, noundef ptr, nonnull dereferenceable(8) noundef align(8) ptr, i64, i64)
+
+define i64 @target_int_consumed(i64 noundef %#0) {
+#1:
+  %#2 = alloca i64 9, align 8, dead
+  %#3 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#2
+  store i64 noundef %#0, ptr %#2, align 8
+  %#4 = gep inbounds nuw ptr %#2, 1 x i64 8
+  store i8 0, ptr %#4, align 8
+  start_lifetime ptr %#3
+  store i64 123, ptr %#3, align 8
+  %#5 = call {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(nonnull noundef ptr %#2, nonnull noundef ptr %#4, nonnull dereferenceable(8) noundef align(8) ptr %#3, i64 5, i64 42949673006)
+  %#6 = extractvalue {ptr, i32, i32} %#5, 0
+  %#7 = icmp eq ptr %#6, null
+  %#8 = ptrtoint ptr %#6 to i64
+  %#9 = ptrtoint ptr %#2 to i64
+  %#10 = sub i64 %#8, %#9
+  %#11 = select i1 %#7, i64 -1, i64 %#10
+  end_lifetime ptr %#3
+  end_lifetime ptr %#2
+  ret i64 %#11
+}
+=>
+declare {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(noundef ptr, noundef ptr, nonnull dereferenceable(8) noundef align(8) ptr, i64, i64)
+
+define i64 @target_int_consumed(i64 noundef %#0) {
+#1:
+  %#2 = alloca i64 9, align 8, dead
+  %#3 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#2
+  store i64 noundef %#0, ptr %#2, align 8
+  %#4 = gep inbounds nuw ptr %#2, 1 x i64 8
+  store i8 0, ptr %#4, align 8
+  start_lifetime ptr %#3
+  store i64 123, ptr %#3, align 8
+  %#5 = call {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(nonnull noundef ptr %#2, nonnull noundef ptr %#4, nonnull dereferenceable(8) noundef align(8) ptr %#3, i64 5, i64 42949673006)
+  %#6 = extractvalue {ptr, i32, i32} %#5, 0
+  %#7 = icmp eq ptr %#6, null
+  %#8 = ptrtoint ptr %#6 to i64
+  %#9 = ptrtoint ptr %#2 to i64
+  %#10 = sub i64 %#8, %#9
+  %#11 = select i1 %#7, i64 -1, i64 %#10
+  end_lifetime ptr %#3
+  end_lifetime ptr %#2
+  ret i64 %#11
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

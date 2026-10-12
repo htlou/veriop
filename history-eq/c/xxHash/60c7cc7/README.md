@@ -1,0 +1,9 @@
+# xxHash `60c7cc7`: Emscripten loop-unroll hint
+
+**Verdict: scoped functional `EQUIV`.** The exact historical commit changes only `xxh3.h`: its one `#pragma clang loop unroll(enable)` is disabled when `__EMSCRIPTEN__` is defined; the remaining edits are a comment and blank line. `xxhash.c` and `xxhash.h` are byte-identical across the commit. The [recheck script](check_pragma.py) confirms Git blob IDs and this complete header edit.
+
+For a complete `xxhash.c` translation unit, Clang 20 preprocessing is byte-identical without Emscripten. With Emscripten on x86 or the actual `wasm32-unknown-emscripten` target, the old and new preprocessed units differ by exactly that single pragma. [Clang documents `#pragma clang loop unroll(enable)` as a loop optimization hint](https://clang.llvm.org/docs/AttributeReference.html#pragma-clang-loop-unroll-enable); the executable C statements are unchanged.
+
+Clang 20 emitted 60 functions from the historical wasm32 Emscripten translation unit at `-O0`. Alive2 checked all 60 in **both directions**, each with 60 correct transformations, zero incorrect, zero failed-to-prove, and zero errors. The recheck removes the same Alive2-unsupported `sret` and alias-scope annotations from both IR files; it retains the old side's loop metadata. The full logs are [forward](alive-forward.log.gz) and [backward](alive-backward.log.gz); hashes, source IDs, and checks are in [pragma-proof.json](pragma-proof.json). Run `python3 -B history-eq/c/xxHash/60c7cc7/check_pragma.py` to regenerate them.
+
+This establishes equal functional outputs and memory writes for defined C executions of these 60 definitions in the checked build. The source edit is solely an optimization hint, supporting the same source-level conclusion in other build modes. The result does not assert identical machine code, timing, or compiler diagnostics. No official before/after benchmark score was measured for this historical pair.

@@ -1,0 +1,1 @@
+old.ll/new.ll = r_msvc_i686_sse2/{old,new}.ll with the runner's asm->freeze rewrite fixed (param attributes such as 'nonnull' were copied into 'freeze ptr nonnull %x', which is invalid IR) -> 'freeze ptr %x'

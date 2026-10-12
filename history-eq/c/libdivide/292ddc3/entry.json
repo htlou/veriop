@@ -1,0 +1,40 @@
+{
+  "commit": "292ddc3",
+  "date": "2016-03-28",
+  "subject": "Initial pass at branchfree s32 implementation",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit introduces a branchfree signed-32 division path for speed.",
+  "change_summary": "Introduces signed-32 branchfree generation/division and changes shared generator logic.",
+  "units": [
+    {
+      "name": "new signed-32 branchfree division result versus previous branchfull division result",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d not in {-1,0,1}",
+      "unsupported_reason": null,
+      "not_equiv_kind": "bug",
+      "artifact_dir": "c/libdivide/292ddc3/bfx_long",
+      "evidence": "Alive2 gives valid n=-1599033344, d=13: old branchfull returns -123002564 (the C truncated quotient), new branchfree returns -123002565. The separately compiled constant-input cex reproduces a one-off mismatch."
+    },
+    {
+      "name": "existing signed/unsigned 32/64-bit branchfull generated division",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/292ddc3/bfull",
+      "evidence": "All four existing branchfull API targets pass both Alive2 directions."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": "bug",
+  "notes": "The signed branchfree API did not exist before this commit. The comparison uses the old branchfull API as a same-result quotient specification, not as a same-interface refinement. The valid-output witness is sufficient to show the introduced optimization changes the arithmetic result."
+}

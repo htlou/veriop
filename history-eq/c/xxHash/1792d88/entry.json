@@ -1,0 +1,52 @@
+{
+ "commit": "1792d88",
+ "date": "2021-12-11",
+ "subject": "added __attribute__((malloc))",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Adds __attribute__((malloc)) (XXH_MALLOCF) to XXH32/XXH64/XXH3_createState and XXH_malloc/XXH_alignedMalloc (and __attribute__((const)) to the XXH_NO_STDLIB XXH_malloc stub): tells compilers the returned pointer aliases nothing - alias-analysis/codegen intent.",
+ "change_summary": "Defines XXH_MALLOCF (__attribute__((malloc)) on GNUC); annotates the createState declarations, XXH_malloc and XXH_alignedMalloc; XXH_malloc stub under XXH_NO_STDLIB gets XXH_CONSTF. No body changes.",
+ "units": [
+  {
+   "name": "library implementation (XXH_INLINE_ALL): hashing API targets",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": true,
+   "unroll": 8,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1792d88/r_impl",
+   "evidence": "IR identical for all 8 targets; Alive2 EQUIV for 7 (XXH32 len20 + stream 10+10 by value, XXH64 len40, XXH3 len20/200, XXH128 len20, hashFromCanonical); the pointer-input heap target in this run timed out (UNKNOWN, identical IR) and was redone by value in r_heap"
+  },
+  {
+   "name": "XXH64_createState -> reset -> update(40 bytes) -> digest -> freeState (malloc-annotated path), input by value",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 8,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1792d88/r_heap",
+   "evidence": "target_heap_state_len40 and target_heap_state_len0: IR identical, Alive2 EQUIV both directions (calloc/free kept as library calls on both sides)"
+  },
+  {
+   "name": "separately compiled client: store to *q, createState, store through the new state, reload *q",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "alive2-crash-or-parse-error",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1792d88/r_client",
+   "evidence": "client IR differs (new: declaration 'noalias ptr @XXH64_createState', reload of *q folded). Alive2 fwd: 'ERROR: Invalid expr' (Alive2 internal error); bwd: 'Source is more defined than target' (expected one-directional effect of the added contract)"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "EQUIV",
+ "coverage": "partial",
+ "unsupported_reason": "alive2-crash-or-parse-error",
+ "not_equiv_kind": null,
+ "notes": "Declaration-level attribute. Implementation compiled with XXH_INLINE_ALL: IR identical -> EQUIV (XXH32 / heap targets with value inputs; --unroll 8 only because of identical streaming loops). The optimization it enables lives in separately compiled callers; Alive2 crashed ('Invalid expr') on the fwd direction of the client check, and in any case it cannot verify that the declaration contract (fresh, non-aliasing pointer) is honoured by the separately compiled implementation. The XXH_NO_STDLIB XXH_malloc(const) stub was not built. Commit verdict by METHOD aggregation -> UNSUPPORTED; library semantics unchanged."
+}

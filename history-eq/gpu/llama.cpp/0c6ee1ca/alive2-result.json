@@ -1,0 +1,90 @@
+{
+  "commit": "0c6ee1cadee96d3ba6e06afb0c001d33f413a0b0",
+  "parent": "2dd84169d1225c2a56ddd1902d718f4514d7536a",
+  "builds": {
+    "old": {
+      "revision": "2dd84169d1225c2a56ddd1902d718f4514d7536a",
+      "vec_header_sha256": "ff40e8241c6f55d327500fffbead982a92c157dddbc9c9c330a7512d1b28832e",
+      "ir_sha256": "c94b7745e49a49a9d4a7b7a056be6bdbc1a3c1c67a0b2a6e2c8d973053081539",
+      "compile": {
+        "command": [
+          "/srv/home/hantaolou/code/veriop/alive2/toolchain/usr/lib/llvm-20/bin/clang++",
+          "-std=c++17",
+          "-O2",
+          "-march=x86-64-v3",
+          "-fno-strict-aliasing",
+          "-isystem",
+          "/usr/include/c++/11",
+          "-isystem",
+          "/usr/include/x86_64-linux-gnu/c++/11",
+          "-S",
+          "-emit-llvm",
+          "-I/tmp/veriop-llama-gelu-old/ggml/src",
+          "-I/tmp/veriop-llama-gelu-old/ggml/src/ggml-cpu",
+          "-I/tmp/veriop-llama-gelu-old/ggml/include",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/wrapper.cpp",
+          "-o",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/old.ll"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "new": {
+      "revision": "0c6ee1cadee96d3ba6e06afb0c001d33f413a0b0",
+      "vec_header_sha256": "b2e107dd86583ea29300e37884f91ed1e0df9aceb5c35babb6bc48d0510dbe57",
+      "ir_sha256": "9307ee85fdfba8be8862840bc2d470307677603a257ceb000ab50953101ce3b7",
+      "compile": {
+        "command": [
+          "/srv/home/hantaolou/code/veriop/alive2/toolchain/usr/lib/llvm-20/bin/clang++",
+          "-std=c++17",
+          "-O2",
+          "-march=x86-64-v3",
+          "-fno-strict-aliasing",
+          "-isystem",
+          "/usr/include/c++/11",
+          "-isystem",
+          "/usr/include/x86_64-linux-gnu/c++/11",
+          "-S",
+          "-emit-llvm",
+          "-I/tmp/veriop-llama-gelu-new/ggml/src",
+          "-I/tmp/veriop-llama-gelu-new/ggml/src/ggml-cpu",
+          "-I/tmp/veriop-llama-gelu-new/ggml/include",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/wrapper.cpp",
+          "-o",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/new.ll"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  },
+  "checks": {
+    "forward": {
+      "command": [
+        "/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv",
+        "--smt-to=10000",
+        "--always-verify",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/old.ll",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/new.ll"
+      ],
+      "returncode": 0,
+      "stdout": "\n----------------------------------------\ndeclare float @expf(noundef float) nofree willreturn memory(write)\n\n@ggml_table_f32_f16 = global 262144 bytes, align 16\n\ndefine i16 @target_gelu_quick_f16(i16 noundef zeroext %#0) nofree willreturn zeroext memory(write) {\n#1:\n  %#2 = zext i16 noundef zeroext %#0 to i64\n  %#3 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#2\n  %#4 = load float, ptr %#3, align 4\n  %#5 = fmul float %#4, -1.702000\n  %#6 = tail call float @expf(noundef float %#5) nofree willreturn memory(write)\n  %#7 = fadd float %#6, 1.000000\n  %#8 = fdiv float 1.000000, %#7\n  %#9 = fmul float %#4, %#8\n  %#10 = fabs float %#9\n  %#11 = fmul float %#10, 5192296858534827628530496329220096.000000\n  %#12 = fmul float %#11, 0.000000\n  %#13 = bitcast float %#9 to i32\n  %#14 = shl i32 %#13, 1\n  %#15 = umax i32 %#14, 1895825408\n  %#16 = lshr exact i32 %#15, 1\n  %#17 = and i32 %#16, 2139095040\n  %#18 = add nuw i32 %#17, 125829120\n  %#19 = bitcast i32 %#18 to float\n  %#20 = fadd float %#12, %#19\n  %#21 = bitcast float %#20 to i32\n  %#22 = lshr i32 %#21, 13\n  %#23 = and i32 %#22, 31744\n  %#24 = and i32 %#21, 4095\n  %#25 = add nsw nuw i32 %#23, %#24\n  %#26 = lshr i32 %#13, 16\n  %#27 = and i32 %#26, 32768\n  %#28 = icmp ugt i32 %#14, 4278190080\n  %#29 = select i1 %#28, i32 32256, i32 %#25\n  %#30 = or i32 %#29, %#27\n  %#31 = trunc nuw i32 %#30 to i16\n  ret i16 %#31\n}\n=>\n@ggml_table_gelu_quick_f16 = global 131072 bytes, align 16\n@ggml_table_f32_f16 = global 262144 bytes, align 16\n\ndefine i16 @target_gelu_quick_f16(i16 noundef zeroext %#0) nofree willreturn zeroext memory(globals: read, errno: read, other: read) {\n#1:\n  %#2 = zext i16 noundef zeroext %#0 to i64\n  %#3 = gep inbounds nuw ptr @ggml_table_gelu_quick_f16, 131072 x i64 0, 2 x i64 %#2\n  %#4 = load i16, ptr %#3, align 2\n  ret i16 %#4\n}\nERROR: Unsupported interprocedural transformation: non-constant global variable @ggml_table_gelu_quick_f16 is introduced in target\n\nSummary:\n  0 correct transformations\n  0 incorrect transformations\n  1 failed-to-prove transformations\n  0 Alive2 errors\n",
+      "stderr": ""
+    },
+    "reverse": {
+      "command": [
+        "/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv",
+        "--smt-to=10000",
+        "--always-verify",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/new.ll",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/0c6ee1ca/old.ll"
+      ],
+      "returncode": 0,
+      "stdout": "\n----------------------------------------\n@ggml_table_gelu_quick_f16 = global 131072 bytes, align 16\n\ndefine i16 @target_gelu_quick_f16(i16 noundef zeroext %#0) nofree willreturn zeroext memory(globals: read, errno: read, other: read) {\n#1:\n  %#2 = zext i16 noundef zeroext %#0 to i64\n  %#3 = gep inbounds nuw ptr @ggml_table_gelu_quick_f16, 131072 x i64 0, 2 x i64 %#2\n  %#4 = load i16, ptr %#3, align 2\n  ret i16 %#4\n}\n=>\ndeclare float @expf(noundef float) nofree willreturn memory(write)\n\n@ggml_table_f32_f16 = global 262144 bytes, align 16\n@ggml_table_gelu_quick_f16 = global 131072 bytes, align 16\n\ndefine i16 @target_gelu_quick_f16(i16 noundef zeroext %#0) nofree willreturn zeroext memory(write) {\n#1:\n  %#2 = zext i16 noundef zeroext %#0 to i64\n  %#3 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#2\n  %#4 = load float, ptr %#3, align 4\n  %#5 = fmul float %#4, -1.702000\n  %#6 = tail call float @expf(noundef float %#5) nofree willreturn memory(write)\n  %#7 = fadd float %#6, 1.000000\n  %#8 = fdiv float 1.000000, %#7\n  %#9 = fmul float %#4, %#8\n  %#10 = fabs float %#9\n  %#11 = fmul float %#10, 5192296858534827628530496329220096.000000\n  %#12 = fmul float %#11, 0.000000\n  %#13 = bitcast float %#9 to i32\n  %#14 = shl i32 %#13, 1\n  %#15 = umax i32 %#14, 1895825408\n  %#16 = lshr exact i32 %#15, 1\n  %#17 = and i32 %#16, 2139095040\n  %#18 = add nuw i32 %#17, 125829120\n  %#19 = bitcast i32 %#18 to float\n  %#20 = fadd float %#12, %#19\n  %#21 = bitcast float %#20 to i32\n  %#22 = lshr i32 %#21, 13\n  %#23 = and i32 %#22, 31744\n  %#24 = and i32 %#21, 4095\n  %#25 = add nsw nuw i32 %#23, %#24\n  %#26 = lshr i32 %#13, 16\n  %#27 = and i32 %#26, 32768\n  %#28 = icmp ugt i32 %#14, 4278190080\n  %#29 = select i1 %#28, i32 32256, i32 %#25\n  %#30 = or i32 %#29, %#27\n  %#31 = trunc nuw i32 %#30 to i16\n  ret i16 %#31\n}\nERROR: Unsupported interprocedural transformation: non-constant global variable @ggml_table_f32_f16 is introduced in target\n\nSummary:\n  0 correct transformations\n  0 incorrect transformations\n  1 failed-to-prove transformations\n  0 Alive2 errors\n",
+      "stderr": ""
+    }
+  }
+}

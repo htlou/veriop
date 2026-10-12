@@ -1,0 +1,33 @@
+package bitwriter
+
+// The two historical nbytes/error updates after the same Write result.
+func sameFlush(n int, threshold int, initialErr bool, writeErr bool) {
+    oldNbytes := n
+    oldErr := initialErr
+    oldN := n
+    if oldN >= threshold {
+        oldErr = writeErr
+        oldN = 0
+    }
+    oldNbytes = oldN
+
+    newNbytes := n
+    newErr := initialErr
+    if n >= threshold {
+        newErr = writeErr
+        newNbytes = 0
+    } else {
+        newNbytes = n
+    }
+    assert oldNbytes == newNbytes
+    assert oldErr == newErr
+}
+
+// hcode values created by the unchanged toCode/set constructor store an
+// eight-bit code length above the low sixteen code bits.
+func sameConstructedCodeBits(code uint16, bits uint8) {
+    h := uint32(code) | uint32(bits) << 16
+    oldBits := uint(uint8(h >> 16))
+    newBits := uint(h >> 16)
+    assert oldBits == newBits
+}

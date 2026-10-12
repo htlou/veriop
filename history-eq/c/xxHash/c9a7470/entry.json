@@ -1,0 +1,100 @@
+{
+ "commit": "c9a7470",
+ "date": "2023-03-14",
+ "subject": "[WASM] Support SIMD128 via XXH_NEON (from EMSDK's SIMDe polyfill)",
+ "selected_by": "keyword",
+ "perf_evidence": "Message: SIMD128 'can reach full speed with little modification (As a matter of fact I was able to make it slightly faster)' and 'I found an optimization to scrambleAcc which should have been obvious.'",
+ "change_summary": "(a) On wasm32 with simd128 and an <arm_neon.h> available (Emscripten's SIMDe polyfill), XXH_VECTOR=XXH_NEON; NEON accumulate gets XXH_COMPILER_GUARD(xsecret) on wasm and scrambleAcc uses a native u64x2 multiply there; XXH_COMPILER_GUARD_W disabled on wasm. (b) NEON scrambleAcc on ARM: hi-part product now vmulq_u32(data_key, {0,P,0,P}) reinterpreted as u64 (no vshrn/vmull/vshl) + one vmlal_u32 for the low part. Unrelated hunk: xxh_x86dispatch.c __APPLEv__ typo fix (build config).",
+ "units": [
+  {
+   "name": "WASM SIMD128 path with plain clang (no SIMDe)",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_wasm_plain",
+   "evidence": "new side does not compile: __has_include(<arm_neon.h>) finds clang's ARM-only header -> 'unknown type name uint64x2_t' (Emscripten's SIMDe arm_neon.h required)"
+  },
+  {
+   "name": "XXH3_scrambleAcc scalar -> NEON-via-SIMDe, wasm32 -msimd128",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_wasm_simde_fix",
+   "evidence": "fwd+bwd correct; SIMDe lowers to generic vector IR (mul <2 x i64> by PRIME32_1), no target intrinsics"
+  },
+  {
+   "name": "XXH3_accumulate_512 scalar -> NEON-via-SIMDe, wasm32, as compiled",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_wasm_simde_fix",
+   "evidence": "fwd failed-to-prove: llvm.wasm.shuffle approximated as unknown libcall (bwd stopped)"
+  },
+  {
+   "name": "XXH3_accumulate_512 scalar -> NEON-via-SIMDe, wasm32, llvm.wasm.shuffle modeled as shufflevector",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_wasm_simde_model",
+   "evidence": "fwd+bwd correct (4 i8x16.shuffle calls replaced by the identical shufflevector, wasm_model.py)"
+  },
+  {
+   "name": "XXH3_64bits(p,256) wasm32 scalar -> SIMDe NEON, shuffle modeled (+O2)",
+   "level": "api",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_wasm_api_model_O2",
+   "evidence": "Timeout (600 s) both directions, also without O2 (r_wasm_api_model)"
+  },
+  {
+   "name": "XXH3_scrambleAcc_neon old -> new (the 'obvious' optimization), aarch64-linux-gnu, as compiled",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_neon",
+   "evidence": "failed-to-prove: 'Unknown libcall: @llvm.aarch64.neon.umull.v2i64' (old calls umull twice per vector, new once + generic mul <4 x i32>)"
+  },
+  {
+   "name": "XXH3_scrambleAcc_neon old -> new, aarch64, umull modeled (XXH3_NEON_LANES 6 and 8)",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/c9a7470/r_neon_umullmodel",
+   "evidence": "fwd+bwd correct with umull = mul nuw(zext,zext) for default lanes=6 (r_neon_umullmodel) and lanes=8 (r_neon_l8_umullmodel)"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "non-x86-target-intrinsics",
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). aarch64 NEON accumulate_512 IR identical old/new (r_neon: target_acc512_neon identical). WASM: Emscripten is not installed; its compat arm_neon.h (SIMDe with native NEON aliases) was emulated by c9a7470/simde_inc/arm_neon.h + SIMDe v0.7.4-rc2 (2023-02-12, closest SIMDe tag before the commit; Emscripten's bundled SIMDe version at that time is unknown - results depend on SIMDe's lowering). Flags wasm: --target wasm32-unknown-unknown -O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -nostdlibinc -isystem _work2020/cross_sysinc -isystem c9a7470/simde_inc -msimd128 -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000. The runner's empty-asm->freeze rewrite produced invalid 'freeze ptr nonnull readonly %x' and missed guards on constant-expression operands; fixed identically on both sides (r_wasm_simde_fix/README.txt, asmfix.py) - same freeze modeling assumption. aarch64 flags: --target aarch64-linux-gnu, -nostdlibinc cross_sysinc, -DXXH_VECTOR=XXH_NEON (+ -DXXH3_NEON_LANES=8 for r_neon_l8). Inputs as value args in local arrays. Summary modulo stated models (SIMDe stand-in, wasm shuffle = shufflevector, UMULL = zext-mul): every changed kernel is EQUIV raw-level; the 256-byte API check timed out. Commit verdict UNSUPPORTED per METHOD aggregation because Alive2 alone cannot analyse the code as compiled (and plain clang cannot even build the WASM path)."
+}

@@ -1,0 +1,62 @@
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index 02a2feea..52cd96a4 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -941,13 +941,11 @@ public final class BitmapContainer extends Container implements Cloneable {
+       }
+       return ac;
+     }
+-    BitmapContainer bc = new BitmapContainer(maxcardinality, this.bitmap);
++    long[] newBitmap = new long[MAX_CAPACITY / 64];
++    BitmapContainer bc = new BitmapContainer(newBitmap, maxcardinality);
+     int s = (select(maxcardinality));
+     int usedwords = (s + 63) / 64;
+-    int todelete = this.bitmap.length - usedwords;
+-    for (int k = 0; k < todelete; ++k) {
+-      bc.bitmap[bc.bitmap.length - 1 - k] = 0;
+-    }
++    System.arraycopy(this.bitmap, 0, newBitmap, 0, usedwords);
+     int lastword = s % 64;
+     if (lastword != 0) {
+       bc.bitmap[s / 64] &= (0xFFFFFFFFFFFFFFFFL >>> (64 - lastword));
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+index b54f99a2..d9fd3669 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+@@ -1249,13 +1249,18 @@ public final class MappeableBitmapContainer extends MappeableContainer implement
+       }
+       return ac;
+     }
+-    MappeableBitmapContainer bc = new MappeableBitmapContainer(maxcardinality, this.bitmap);
++    LongBuffer newBitmap = LongBuffer.allocate(MAX_CAPACITY / 64);
++    MappeableBitmapContainer bc = new MappeableBitmapContainer(newBitmap, maxcardinality);
+     int s = (select(maxcardinality));
+     int usedwords = (s + 63) >>> 6;
+-    int len = this.bitmap.limit();
+-    int todelete = len - usedwords;
+-    for (int k = 0; k < todelete; ++k) {
+-      bc.bitmap.put(len - 1 - k, 0);
++    if (this.isArrayBacked()) {
++      long[] source = this.bitmap.array();
++      long[] dest = newBitmap.array();
++      System.arraycopy(source, 0, dest, 0, usedwords);
++    } else {
++      for (int k = 0; k < usedwords; ++k) {
++        bc.bitmap.put(k, this.bitmap.get(k));
++      }
+     }
+     int lastword = s % 64;
+     if (lastword != 0) {
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
+index cf9948e7..210f5f76 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
+@@ -394,7 +394,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+       if (isBitmap[k]) {
+         long[] array = new long[MappeableBitmapContainer.MAX_CAPACITY / 64];
+         buffer.asLongBuffer().get(array);
+-        container = new MappeableBitmapContainer(cardinalities[k], LongBuffer.wrap(array));
++        container = new MappeableBitmapContainer(LongBuffer.wrap(array), cardinalities[k]);
+         buffer.position(buffer.position() + 1024 * 8);
+       } else if (bitmapOfRunContainers != null
+               && ((bitmapOfRunContainers[k / 8] & (1 << (k & 7))) != 0)) {

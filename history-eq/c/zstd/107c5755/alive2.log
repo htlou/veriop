@@ -1,0 +1,171 @@
+
+----------------------------------------
+declare void @ZSTD_copy8(noundef ptr, noundef ptr)
+
+define void @zstd_old_wildcopy(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2) {
+#3:
+  %#7 = alloca i64 8, align 8
+  %#8 = alloca i64 8, align 8
+  %#9 = alloca i64 8, align 8
+  %#10 = alloca i64 8, align 8
+  %#11 = alloca i64 8, align 8
+  %#12 = alloca i64 8, align 8
+  store ptr noundef %#0, ptr %#7, align 8
+  store ptr noundef %#1, ptr %#8, align 8
+  store i64 noundef %#2, ptr %#9, align 8
+  %#13 = load ptr, ptr %#8, align 8
+  store ptr %#13, ptr %#10, align 8
+  %#14 = load ptr, ptr %#7, align 8
+  store ptr %#14, ptr %#11, align 8
+  %#15 = load ptr, ptr %#11, align 8
+  %#16 = load i64, ptr %#9, align 8
+  %#17 = gep inbounds nuw ptr %#15, 1 x i64 %#16
+  store ptr %#17, ptr %#12, align 8
+  br label %#4
+
+#4:
+  %#18 = load ptr, ptr %#11, align 8
+  %#19 = load ptr, ptr %#12, align 8
+  %#20 = icmp ult ptr %#18, %#19
+  br i1 %#20, label %#5, label %#6
+
+#5:
+  %#21 = load ptr, ptr %#11, align 8
+  %#22 = load ptr, ptr %#10, align 8
+  call void @ZSTD_copy8(noundef ptr %#21, noundef ptr %#22)
+  %#23 = load ptr, ptr %#11, align 8
+  %#24 = gep inbounds ptr %#23, 1 x i64 8
+  store ptr %#24, ptr %#11, align 8
+  %#25 = load ptr, ptr %#10, align 8
+  %#26 = gep inbounds ptr %#25, 1 x i64 8
+  store ptr %#26, ptr %#10, align 8
+  br label %#4
+
+#6:
+  ret void
+}
+=>
+declare void @ZSTD_copy8(noundef ptr, noundef ptr)
+
+define void @zstd_new_wildcopy(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2) {
+#3:
+  %#7 = alloca i64 8, align 8
+  %#8 = alloca i64 8, align 8
+  %#9 = alloca i64 8, align 8
+  %#10 = alloca i64 8, align 8
+  %#11 = alloca i64 8, align 8
+  %#12 = alloca i64 8, align 8
+  store ptr noundef %#0, ptr %#7, align 8
+  store ptr noundef %#1, ptr %#8, align 8
+  store i64 noundef %#2, ptr %#9, align 8
+  %#13 = load ptr, ptr %#8, align 8
+  store ptr %#13, ptr %#10, align 8
+  %#14 = load ptr, ptr %#7, align 8
+  store ptr %#14, ptr %#11, align 8
+  %#15 = load ptr, ptr %#11, align 8
+  %#16 = load i64, ptr %#9, align 8
+  %#17 = gep inbounds nuw ptr %#15, 1 x i64 %#16
+  store ptr %#17, ptr %#12, align 8
+  br label %#4
+
+#4:
+  %#18 = load ptr, ptr %#11, align 8
+  %#19 = load ptr, ptr %#10, align 8
+  call void @ZSTD_copy8(noundef ptr %#18, noundef ptr %#19)
+  %#20 = load ptr, ptr %#11, align 8
+  %#21 = gep inbounds ptr %#20, 1 x i64 8
+  store ptr %#21, ptr %#11, align 8
+  %#22 = load ptr, ptr %#10, align 8
+  %#23 = gep inbounds ptr %#22, 1 x i64 8
+  store ptr %#23, ptr %#10, align 8
+  br label %#5
+
+#5:
+  %#24 = load ptr, ptr %#11, align 8
+  %#25 = load ptr, ptr %#12, align 8
+  %#26 = icmp ult ptr %#24, %#25
+  br i1 %#26, label %#4, label %#6
+
+#6:
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noundef %#0 = null
+ptr noundef %#1 = null
+i64 noundef %#2 = #x0000000000000000 (0)
+
+Source:
+ptr %#7 = pointer(local, block_id=0, offset=0) / Address=#x8000000000000010
+ptr %#8 = pointer(local, block_id=1, offset=0) / Address=#x8000000000000000
+ptr %#9 = pointer(local, block_id=2, offset=0) / Address=#x8000000000000008
+ptr %#10 = pointer(local, block_id=3, offset=0) / Address=#x8000000000000040
+ptr %#11 = pointer(local, block_id=4, offset=0) / Address=#x8000000000000078
+ptr %#12 = pointer(local, block_id=5, offset=0) / Address=#x8000000000000020
+ptr %#13 = null
+ptr %#14 = null
+ptr %#15 = null
+i64 %#16 = #x0000000000000000 (0)
+ptr %#17 = null
+  >> Jump to %#4
+ptr %#18 = null
+ptr %#19 = null
+i1 %#20 = #x0 (0)
+  >> Jump to %#6
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 8	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 6
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 4
+Block 3 >	size: 0	align: 1	alloc type: 0	alive: true	address: 5
+
+LOCAL BLOCKS:
+Block 8 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775824
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775808
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775816
+Block 11 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775872
+Block 12 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775928
+Block 13 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775840
+
+Target:
+ptr %#7 = pointer(local, block_id=0, offset=0) / Address=#x8000000000000010
+ptr %#8 = pointer(local, block_id=1, offset=0) / Address=#x8000000000000060
+ptr %#9 = pointer(local, block_id=2, offset=0) / Address=#x8000000000000030
+ptr %#10 = pointer(local, block_id=3, offset=0) / Address=#x8000000000000040
+ptr %#11 = pointer(local, block_id=4, offset=0) / Address=#x8000000000000000
+ptr %#12 = pointer(local, block_id=5, offset=0) / Address=#x8000000000000020
+ptr %#13 = null
+ptr %#14 = null
+ptr %#15 = null
+i64 %#16 = #x0000000000000000 (0)
+ptr %#17 = null
+  >> Jump to %#4
+ptr %#18 = null
+ptr %#19 = null
+Function @ZSTD_copy8 returned
+ptr %#20 = null
+ptr %#21 = poison
+ptr %#22 = null
+ptr %#23 = poison
+  >> Jump to %#5
+ptr %#24 = poison
+ptr %#25 = null
+i1 %#26 = poison
+UB triggered on br
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 8 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775824
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775904
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775856
+Block 11 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775872
+Block 12 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775808
+Block 13 >	size: 8	align: 8	alloc type: 1	alive: true	address: 9223372036854775840
+
+

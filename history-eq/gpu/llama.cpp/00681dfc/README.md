@@ -1,0 +1,7 @@
+# llama.cpp `00681dfc`: CUDA bin-broadcast fast division
+
+The parent `4f658855` and child `00681dfc` are the exact historical pair. The child replaces integer division/modulo inside both `k_bin_bcast` and `k_bin_bcast_unravel` with precomputed `uint3` fast-division parameters; the full [production diff](../source-screening/00681dfc.source.diff) also changes the host launch arguments. This is a confirmed performance-motivated optimization.
+
+The [reproduction script](reproduce.py) archives each revision's `ggml/` source tree by Git object ID and compiles its actual `binbcast.cu` with `nvcc -std=c++17 -arch=compute_80 --ptx -O3 -DGGML_BACKEND_BUILD`, using that revision's own headers. Both builds return zero, and Volta parses both [old PTX](old.ptx) and [new PTX](new.ptx), each with 97 kernel entries. The [result record](volta-result.json) contains exact commands, exit codes, source/PTX SHA-256 hashes, and Volta output.
+
+The attempted comparison selects the `k_bin_bcast` float `op_repeat` specialization on each side. Volta stops while lowering the **optimized** kernel: `ld.param ...__param_10+8` is rejected because `param loads with nonzero offsets are not supported`. The new `uint3` parameter is accessed through an offset; this is a Volta input-model limitation. **Verdict: `UNSUPPORTED` for this selected historical kernel pair.** No equivalence, counterexample, whole-commit result, Kuiper proof, or measured official benchmark delta follows from this run. The commit message's 1–3% end-to-end claim is upstream's claim only.

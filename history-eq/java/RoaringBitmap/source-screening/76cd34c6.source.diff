@@ -1,0 +1,46 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
+index 59ec299f..7720ee85 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
+@@ -177,6 +177,17 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+     this.size = 0;
+   }
+ 
++  /**
++   * If possible, recover wasted memory.
++   */
++  public void trim() {
++    keys = Arrays.copyOf(keys, size);
++    values = Arrays.copyOf(values, size);
++    for (MappeableContainer c : values) {
++      c.trim();
++    }
++  }
++
+   @Override
+   public MutableRoaringArray clone() {
+     MutableRoaringArray sa;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
+index 280b6a17..b82761d6 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
+@@ -1401,18 +1401,14 @@ public class MutableRoaringBitmap extends ImmutableRoaringBitmap
+ 
+   }
+ 
+-
+   /**
+    * Recover allocated but unused memory.
+    */
+   @Override
+   public void trim() {
+-    for (int i = 0; i < this.highLowContainer.size(); i++) {
+-      this.highLowContainer.getContainerAtIndex(i).trim();
+-    }
++    getMappeableRoaringArray().trim();
+   }
+ 
+-
+   @Override
+   public void writeExternal(ObjectOutput out) throws IOException {
+     getMappeableRoaringArray().writeExternal(out);

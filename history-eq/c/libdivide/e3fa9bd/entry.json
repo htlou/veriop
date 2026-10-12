@@ -1,0 +1,52 @@
+{
+  "commit": "e3fa9bd",
+  "date": "2019-05-28",
+  "subject": "Optimize libdivide_128_div_64_to_64() using __uint128_t",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit replaces the portable long-division implementation with native unsigned-128 arithmetic.",
+  "change_summary": "Selects __uint128_t for 128-by-64 division on compilers that support it.",
+  "units": [
+    {
+      "name": "raw 128-by-64 quotient and remainder with arbitrary inputs",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "artifact_dir": "c/libdivide/e3fa9bd/div_u4",
+      "evidence": "Alive2 gives counterexamples outside the helper's quotient-fit domain for raw quotient/remainder."
+    },
+    {
+      "name": "128-by-64 helper under its documented quotient-fit contract",
+      "level": "precond",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "hi < den",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/e3fa9bd/div_u4",
+      "evidence": "Both preconditioned quotient and remainder checks time out in both directions."
+    },
+    {
+      "name": "public signed/unsigned 64-bit generator fields and generated division",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/e3fa9bd/gen_u4",
+      "evidence": "All six generator/API targets time out in both directions."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The raw counterexamples are not promoted to public API non-equivalence because they violate the helper's documented quotient-fit contract. The wrapper disables unchanged x86 inline assembly on both sides."
+}

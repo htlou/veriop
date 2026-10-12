@@ -1,0 +1,7 @@
+# llama.cpp `c262beddf`: Gemma vector FlashAttention dispatch
+
+**Whole-commit output verdict: `UNKNOWN`.** The commit deletes the precision/head-dimension restriction from `can_use_vector_kernel` in `ggml_cuda_flash_attn_ext`. [The reproducer](reproduce.py) extracts that predicate from the exact parent and child `fattn.cu` blobs, checks the unchanged surrounding branch condition, and compiles the source-mapped gates with Clang 20. It fixes the NVIDIA warp size at 32 and uses the historical precision enum values `GGML_PREC_DEFAULT=0`, `GGML_PREC_F32=1`.
+
+[Alive2 finds a gate mismatch](alive2.log) for `head_dim=192`, one query token, FP32 precision, and `mma_faster_for_bs1=false`: old=0, new=1. A [native witness](witness.log) confirms the same change at the Gemma-relevant `head_dim=256`. [A second Alive2 check](implication-alive2.log) proves `old gate => new gate` for all scalar inputs in this source-mapped model. The [source hashes and selected witness](result.json) identify the exact scope.
+
+The proof establishes a one-way **dispatch-predicate** relation. It does not compare the vector kernel with the previously selected kernel, prove equivalent output tensors, or measure the upstream 12% performance claim. Volta's one-PTX-kernel comparison cannot express this host selection relation, and Kuiper was not used. No official historical before/after benchmark score was measured. Reproduce with `python3 -B history-eq/gpu/llama.cpp/c262beddf/reproduce.py` from the project root.

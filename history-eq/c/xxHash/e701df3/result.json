@@ -1,0 +1,64 @@
+{
+  "commit": "e701df3908cfd64cb7536aacd80b6074bbc5ea5f",
+  "source_blobs": {
+    "old": "fd9254e9453c101b03c3b2962d99b16f31f74ee1",
+    "new": "73948c4f61dd51f818d0f7823d4c21d437d6022d"
+  },
+  "scope": "XXH3_accumulate_512_neon complete 64-byte accumulator output, Clang 20 -O3 AArch64, XXH3_NEON_LANES=4 or 6, arbitrary initialized accumulator/input/secret bytes",
+  "modeling_assumptions": [
+    "existing shared NEON model replaces unsigned widening multiplication intrinsics with zero-extended vector multiplication",
+    "empty tied-register compiler guards are identity on initialized inputs",
+    "AArch64 UMADDL computes acc + zeroextend32(lhs)*zeroextend32(rhs)",
+    "AArch64 UMLAL/UMLAL2 accumulate unsigned 32-bit products into the low/high pair of 64-bit vector lanes",
+    "LLVM opt instcombine,simplifycfg preserves program semantics"
+  ],
+  "raw_alive2_diagnostic": "unmodeled nonempty inline assembly caused Alive2 to report source-more-defined-than-target; this is not treated as a source counterexample",
+  "checks": {
+    "4": {
+      "named_asm_modeled": {
+        "umaddl": 4,
+        "umlal": 1,
+        "umlal2": 1
+      },
+      "empty_guard_modeled": [
+        2,
+        0
+      ],
+      "ir_sha256": {
+        "old.ll": "551c7e710e5372b91476c2a302978cd4d0c15ed7b1fb61b62b400b79c78154b9",
+        "new.ll": "b95a14235fcf8f946c8e0a8785976764e6d755d66ebf4144d6390d43525a1088",
+        "new-modeled.ll": "770485f008e8a0119758468a47e11b22f0bdaa48a79450a59112e389a59b9a50",
+        "old-opt.ll": "1165bd21077d82bbefa0efd54f6f3e57544fb640749828c9f2c714bb0a0ec493",
+        "new-modeled-opt.ll": "d57074767eed027d9a4a724e096d7cdde2a7e81d0e9cee9551a04bb166546544"
+      },
+      "checks": {
+        "old_to_new": "correct",
+        "new_to_old": "correct"
+      }
+    },
+    "6": {
+      "named_asm_modeled": {
+        "umaddl": 2,
+        "umlal": 1,
+        "umlal2": 1
+      },
+      "empty_guard_modeled": [
+        3,
+        1
+      ],
+      "ir_sha256": {
+        "old.ll": "d2eb0a0316d2f6730338015020b4c60de4029ad7f9661022d9bf3f3d69cbd334",
+        "new.ll": "40d2d8b8eb66dab7d1331cae54a240c83f2e67dbd177998aa165f97d3b2a4f6f",
+        "new-modeled.ll": "486f30ab6ad1564e3166b150112bc53c84d63f35a747133eaf3b01a70d2d739e",
+        "old-opt.ll": "1ff03a3d8e64bc9a2cb32b6a20a4c07068f2a744c7f622c5122e8a46b653936a",
+        "new-modeled-opt.ll": "9623bd82991b019fb26b27d1718d83c76bb2061e38cbe30781bd20d5ec744c9b"
+      },
+      "checks": {
+        "old_to_new": "correct",
+        "new_to_old": "correct"
+      }
+    }
+  },
+  "verdict": "EQUIV_PARTIAL",
+  "whole_commit_verdict": "UNKNOWN"
+}

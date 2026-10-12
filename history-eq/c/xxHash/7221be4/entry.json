@@ -1,0 +1,64 @@
+{
+ "commit": "7221be4",
+ "date": "2022-11-08",
+ "subject": "Speedup size hash for 17to128 by using independent accumulators.",
+ "selected_by": "keyword",
+ "perf_evidence": "Commit message: 'Faster (better IPC) to make computation slightly more independent' with benchmark table (5-17% improvement for 17..128 byte inputs).",
+ "change_summary": "XXH3_len_17to128_64b (default XXH_SIZE_OPT=0 path): mix16B contributions of the input head go to acc and those of the input tail to a second accumulator acc_end, evaluated outer-to-inner; result XXH3_avalanche(acc + acc_end). XXH_SIZE_OPT>=1 path only gains acc_end = 0.",
+ "units": [
+  {
+   "name": "XXH3_len_17to128_64b, symbolic len per branch class 17..32/33..64/65..96/97..128",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/7221be4/r_raw_cls",
+   "evidence": "all 4 class targets correct fwd+bwd, loop-free; IR differs for 33..128 classes (17..32 identical: same two mix16B adds)"
+  },
+  {
+   "name": "XXH3_64bits / _withSeed / _withSecret, symbolic len per class 17..32/33..64/65..96/97..128",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/7221be4/r_api_cls",
+   "evidence": "6 targets correct fwd+bwd, no loops; ir differs for 33..128"
+  },
+  {
+   "name": "XXH3_64bits_withSeed at fixed lengths 17,32,33,64,65,96,97,128",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/7221be4/r_api_fixed",
+   "evidence": "8 targets correct fwd+bwd"
+  },
+  {
+   "name": "XXH_SIZE_OPT=1 configuration (loop path), same class targets",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/7221be4/r_api_cls_sizeopt",
+   "evidence": "6 targets correct; IR identical (acc_end=0 folds away)"
+  }
+ ],
+ "commit_verdict": "EQUIV",
+ "raw_verdict": "EQUIV",
+ "coverage": "full",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "Post-v0.8.0 commit, output must be (and is) preserved. Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. Raw: input (128 B) and secret (first 128 B of a 192 B zero-filled buffer, secretSize=192) passed as noundef scalar args into fresh locals. Api: input pointer, symbolic len, seed symbolic; _withSecret with secret pointer and secretSize>=136 (XXH_ASSERT is (void)0 here). A single symbolic-len target over the whole 17..128 range timed out (300 s, mixed 64x64->128 multiplies under nested len branches; runs moved to _superseded/ for the api, r_raw = UNKNOWN for raw); splitting the length range at the branch boundaries (union = 17..128, each class loop-free) makes Z3 prove the reassociated sums in ~1 s, so the result is unbounded EQUIV for the whole class. Native sanity (native_x86_64/, native_sizeopt1/): XXH3/XXH32/XXH64 outputs for len 0..256 identical old vs new."
+}

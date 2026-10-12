@@ -1,0 +1,7 @@
+# llama.cpp `230d1169`: CUDA transposed copy
+
+The [exact historical diff](../source-screening/230d1169.source.diff) adds `cpy_flt_transpose<T>` and dispatches eligible transposed F32, F16, and BF16 copies to it instead of the existing `cpy_flt` kernel. The parent is `a44d77126c911d105f7f800c17da21b2a5b112d1`; the optimized commit is `230d1169e5bfe04a013b2e20f4662ee56c2454b0`.
+
+Run `python3 history-eq/gpu/llama.cpp/230d1169/reproduce.py` from the project root. It archives the exact old and new `ggml/` source trees, compiles each `cpy.cu` for SM80 with NVCC, parses both [old](old.ptx) and [new](new.ptx) PTX with Volta, and checks the old F32/F16/BF16 `cpy_flt` against the corresponding new transpose kernel. The [result record](volta-result.json) includes commands, output, exit codes, and source/PTX SHA-256 hashes.
+
+All 18 comparisons return `EQUIVALENT` for every output element: three data types across six shapes, `8×8`, `7×9`, `16×4`, `4×16`, `32×2`, and `2×32`. Each shape fits in one old 64-thread CTA and one new 32×8-thread CTA, with the original host dispatch's transposed source strides and contiguous destination strides. The 7×9 case exercises bounds at a non-power-of-two edge. **Verdict: `EQUIV_PARTIAL`**: selected complete one-CTA copies are equal under Volta's model; larger grids, other tensor layouts, dispatcher behavior, and the whole commit remain unproved. No official before/after benchmark score is measured here.

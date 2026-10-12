@@ -1,0 +1,29 @@
+{
+ "repo": "llama.cpp",
+ "commit": "bc81d47aba663383dc8827bd3bc8c4a35f735d16",
+ "checker": "Volta (PTX parse) + per-function PTX identity (nvcc 12.8)",
+ "checker_ran": true,
+ "verdict": "EQUIV_PARTIAL",
+ "scope": "device code: mmvq.cu and ggml-cuda.cu translation units, sm_80, 265 kernels PTX-identical; new host predicate ggml_cuda_should_use_mmvq and its two call sites in ggml_cuda_mul_mat are source-argued only",
+ "build_config": "nvcc 12.8 --ptx -O3 -std=c++17 -arch=compute_80 --extended-lambda -DGGML_BACKEND_BUILD, ggml/src + ggml/include of the respective revision",
+ "units": [
+  {
+   "name": "mmvq kernels",
+   "file": "ggml/src/ggml-cuda/mmvq.cu",
+   "result": "EQUIV",
+   "detail": "whole PTX files identical for both TUs"
+  },
+  {
+   "name": "ggml_cuda_should_use_mmvq (host)",
+   "file": "ggml/src/ggml-cuda/mmvq.cu",
+   "result": "UNKNOWN",
+   "detail": "for non-CDNA devices returns ne11 <= MMVQ_MAX_BATCH_SIZE, a bound already in the initial use_mul_mat_vec_q condition (source inspection only, not checker-proved); for CDNA it adds new thresholds"
+  }
+ ],
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "not_equiv_level": null,
+ "counterexample": null,
+ "evidence_dir": "history-eq/gh/work/llama.cpp/bc81d47a",
+ "notes": "AMD CDNA routing change. NVIDIA PTX is identical; the host routing predicate is by inspection unchanged for NVIDIA but was not run through a checker, so the verdict is EQUIV_PARTIAL."
+}

@@ -1,0 +1,76 @@
+{
+  "commit": "2422199",
+  "date": "2019-06-14",
+  "subject": "Speed up unsigned branchfull divider",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit removes redundant shift masks from unsigned branchfull scalar and SIMD division paths.",
+  "change_summary": "Uses the generated shift field directly for unsigned-32/64 branchfull scalar, SSE2, AVX2 and AVX512 division.",
+  "units": [
+    {
+      "name": "public generated unsigned-32/64 scalar division",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/2422199/api",
+      "evidence": "Both scalar generated-divider API targets pass Alive2 in both directions."
+    },
+    {
+      "name": "public generated unsigned-32/64 SSE2 vector division",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/2422199/sse2",
+      "evidence": "Both SSE2 generated-divider API targets pass bidirectional Alive2."
+    },
+    {
+      "name": "public generated unsigned-32/64 AVX2 vector division",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/2422199/avx2_u64api_long",
+      "evidence": "Unsigned-32 passes in the avx2 run; the previously timed-out unsigned-64 target passes both directions in the long AVX2 run."
+    },
+    {
+      "name": "public generated unsigned-32/64 AVX512 vector division",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/2422199/avx512_u64api_long",
+      "evidence": "Unsigned-32 passes in the avx512 run; the previously timed-out unsigned-64 target passes both directions in the long AVX512 run."
+    },
+    {
+      "name": "raw division with arbitrary magic/more fields",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "artifact_dir": "c/libdivide/2422199/raw",
+      "evidence": "Alive2 gives raw scalar counterexamples when more contains bits that a generated divider never stores; corresponding SIMD raw targets also differ."
+    }
+  ],
+  "commit_verdict": "EQUIV",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "full",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The helper-level difference concerns arbitrary fabricated divider fields; the generated-divider public scalar and three SIMD variants all have bidirectional proof. The wrapper disables unchanged x86 generator assembly on both sides."
+}

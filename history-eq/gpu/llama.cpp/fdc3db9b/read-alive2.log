@@ -1,0 +1,109 @@
+
+----------------------------------------
+define void @transfer(ptr noundef %#0) nofree {
+#1:
+  %#4 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#5 = load i32, ptr noundef %#0, align 1
+  br label %#2
+
+#2:
+  %#6 = phi i64 [ 0, %#1 ], [ %#9, %#2 ]
+  %#7 = shl nsw nuw i64 %#6, 2
+  %#8 = gep inbounds nuw ptr %#4, 1 x i64 %#7
+  store i32 %#5, ptr %#8, align 1
+  %#9 = add nsw nuw i64 %#6, 1
+  %#10 = icmp eq i64 %#6, 0
+  br i1 %#10, label %#2#2, label %#3
+
+#2#2:
+  %#6#2 = phi i64 [ %#9, %#2 ]
+  %#7#2 = shl nsw nuw i64 %#6#2, 2
+  %#8#2 = gep inbounds nuw ptr %#4, 1 x i64 %#7#2
+  store i32 %#5, ptr %#8#2, align 1
+  %#9#2 = add nsw nuw i64 %#6#2, 1
+  %#10#2 = icmp eq i64 %#6#2, 0
+  br i1 %#10#2, label %#2#3, label %#3
+
+#2#3:
+  %#6#3 = phi i64 [ %#9#2, %#2#2 ]
+  %#7#3 = shl nsw nuw i64 %#6#3, 2
+  %#8#3 = gep inbounds nuw ptr %#4, 1 x i64 %#7#3
+  store i32 %#5, ptr %#8#3, align 1
+  %#9#3 = add nsw nuw i64 %#6#3, 1
+  %#10#3 = icmp eq i64 %#6#3, 0
+  br i1 %#10#3, label %#2#4, label %#3
+
+#2#4:
+  %#6#4 = phi i64 [ %#9#3, %#2#3 ]
+  %#7#4 = shl nsw nuw i64 %#6#4, 2
+  %#8#4 = gep inbounds nuw ptr %#4, 1 x i64 %#7#4
+  store i32 %#5, ptr %#8#4, align 1
+  %#9#4 = add nsw nuw i64 %#6#4, 1
+  %#10#4 = icmp eq i64 %#6#4, 0
+  br i1 %#10#4, label #sink, label %#3
+
+#3:
+  ret void
+}
+=>
+define void @transfer(ptr noundef %#0) nofree willreturn {
+#1:
+  %#2 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#3 = load i64, ptr noundef %#0, align 1
+  store i64 %#3, ptr %#2, align 1
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Mismatch in memory
+
+Example:
+ptr noundef %#0 = pointer(non-local, block_id=1, offset=0) / Address=#x0000000000000001
+
+Source:
+ptr %#4 = pointer(non-local, block_id=1, offset=4) / Address=#x0000000000000005
+i32 %#5 = #x02020200 (33686016)
+  >> Jump to %#2
+i64 %#6 = #x0000000000000000 (0)
+i64 %#7 = #x0000000000000000 (0)
+ptr %#8 = pointer(non-local, block_id=1, offset=4) / Address=#x0000000000000005
+i64 %#9 = #x0000000000000001 (1)
+i1 %#10 = #x1 (1)
+  >> Jump to %#2#2
+i64 %#6#2 = #x0000000000000001 (1)
+i64 %#7#2 = #x0000000000000004 (4)
+ptr %#8#2 = pointer(non-local, block_id=1, offset=8) / Address=#x0000000000000009
+i64 %#9#2 = #x0000000000000002 (2)
+i1 %#10#2 = #x0 (0)
+  >> Jump to %#3
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 13	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+6: poison
+4: #x10
+0: #x00
+3: #x02
+5: #x00
+7: #x80
+2: #x02
+1: #x02
+*: poison
+
+
+Target:
+ptr %#2 = pointer(non-local, block_id=1, offset=4) / Address=#x0000000000000005
+i64 %#3 = poison
+
+Mismatch in pointer(non-local, block_id=1, offset=4)
+Source value: #x00
+Target value: poison
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

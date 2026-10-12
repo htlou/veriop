@@ -1,0 +1,26 @@
+import Std.Tactic.BVDecide
+
+/- Direct fixed-width model of the portable unsigned 64-bit high-multiply
+   helper in libdivide.h. This is a pilot for the i386 timeout. -/
+namespace LibdivideHighMul
+
+private def mask : BitVec 64 := 0xffffffff#64
+
+private def hi32 (x y : BitVec 32) : BitVec 32 :=
+  ((x.zeroExtend 64 * y.zeroExtend 64) >>> 32).truncate 32
+
+private def fallback (x y : BitVec 64) : BitVec 64 :=
+  let x0 := (x &&& mask).truncate 32
+  let x1 := (x >>> 32).truncate 32
+  let y0 := (y &&& mask).truncate 32
+  let y1 := (y >>> 32).truncate 32
+  let cross := x1.zeroExtend 64 * y0.zeroExtend 64 + (hi32 x0 y0).zeroExtend 64
+  x1.zeroExtend 64 * y1.zeroExtend 64 + (cross >>> 32) +
+    (((cross &&& mask) + x0.zeroExtend 64 * y1.zeroExtend 64) >>> 32)
+
+theorem fallback_symmetric (x y : BitVec 64) :
+    fallback x y = fallback y x := by
+  unfold fallback hi32 mask
+  bv_decide (config := { timeout := 60, acNf := true })
+
+end LibdivideHighMul

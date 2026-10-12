@@ -1,0 +1,7 @@
+# llama.cpp `f549b000`: Vulkan cross-device buffer write
+
+**Verdict: `EQUIV_PARTIAL`.** The commit replaces the destination staging-buffer copy with `ggml_vk_buffer_write_2d(..., spitch=0, width=size, height=1)` after the source device has copied its bytes into its staging buffer. For an eight-byte transfer from source offset 3 to destination offset 5, [Alive2 proves both directions](alive-old_to_new.log) over arbitrary 16-byte initial source and destination contents. The model covers both host-visible destinations, where `write_2d` performs one direct `memcpy`, and device-local destinations, where it stages the same bytes before a Vulkan buffer copy. The [reverse log](alive-new_to_old.log) also reports one correct transformation and zero errors.
+
+Run `python3 -B history-eq/gpu/llama.cpp/f549b000/reproduce.py` from the project root. The script locks the exact historical source blobs and archived [diff](../source-screening/f549b000.source.diff), checks the changed call and the two unchanged `write_2d` branches, then compares the final destination bytes. The [result](result.json) records source/model hashes and proof outcomes.
+
+The check assumes the source staging pointer is not separately registered as pinned memory on the destination device. It models the final byte contents for this fixed size and offsets, not Vulkan synchronization, memory-coherence failures, other sizes, or full backend behavior. No official before/after benchmark score was measured.

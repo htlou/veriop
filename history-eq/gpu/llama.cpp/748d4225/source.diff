@@ -1,0 +1,57 @@
+diff --git a/ggml/src/ggml-cuda/fattn-common.cuh b/ggml/src/ggml-cuda/fattn-common.cuh
+index 6d1ce52db..a19491821 100644
+--- a/ggml/src/ggml-cuda/fattn-common.cuh
++++ b/ggml/src/ggml-cuda/fattn-common.cuh
+@@ -418,0 +419,5 @@ static __device__ __forceinline__ void dequantize_V_q4_0(const void * __restrict
++#if defined(GGML_USE_HIP)
++    // Keep this VMEM read close to its packed-byte dequantization. Hoisting it too far
++    // increases VGPR pressure substantially in some FlashAttention vector kernels.
++    __builtin_amdgcn_sched_group_barrier(0x20, 1, 0);
++#endif // defined(GGML_USE_HIP)
+@@ -421 +426 @@ static __device__ __forceinline__ void dequantize_V_q4_0(const void * __restrict
+-    q = __vsubss4(q, 0x08080808);
++    q = __vsub4(q, 0x08080808);
+@@ -511 +516 @@ static __device__ __forceinline__ void dequantize_V_q5_0(const void * __restrict
+-    q = __vsubss4(q, 0x10101010);
++    q = __vsub4(q, 0x10101010);
+diff --git a/ggml/src/ggml-cuda/mmq-load-tiles.cuh b/ggml/src/ggml-cuda/mmq-load-tiles.cuh
+index e19f4f24d..d5654868b 100644
+--- a/ggml/src/ggml-cuda/mmq-load-tiles.cuh
++++ b/ggml/src/ggml-cuda/mmq-load-tiles.cuh
+@@ -221,2 +221,2 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-        x_qs[i*sram_stride + kbx*(2*QI4_0) + kqsx + 0]     = __vsubss4((qs0 >> 0) & 0x0F0F0F0F, 0x08080808);
+-        x_qs[i*sram_stride + kbx*(2*QI4_0) + kqsx + QI4_0] = __vsubss4((qs0 >> 4) & 0x0F0F0F0F, 0x08080808);
++        x_qs[i*sram_stride + kbx*(2*QI4_0) + kqsx + 0]     = __vsub4((qs0 >> 0) & 0x0F0F0F0F, 0x08080808);
++        x_qs[i*sram_stride + kbx*(2*QI4_0) + kqsx + QI4_0] = __vsub4((qs0 >> 4) & 0x0F0F0F0F, 0x08080808);
+@@ -353 +353 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-        qs0     = __vsubss4(qs0, 0x10101010); // subtract 16
++        qs0     = __vsub4(qs0, 0x10101010); // subtract 16
+@@ -360 +360 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-        qs1     = __vsubss4(qs1, 0x10101010); // subtract 16
++        qs1     = __vsub4(qs1, 0x10101010); // subtract 16
+@@ -639 +639 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-            const int x_qs_k = __vsubss4(x_ql_k | x_qh_k, 0x04040404);
++            const int x_qs_k = __vsub4(x_ql_k | x_qh_k, 0x04040404);
+@@ -670 +670 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-        const int sc = __vsubss4(sc_low | sc_high, 0x20202020);
++        const int sc = __vsub4(sc_low | sc_high, 0x20202020);
+@@ -990,2 +990,2 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-        x_qs[i*sram_stride + kq0] = __vsubss4(ql0 | qh0, 0x20202020);
+-        x_qs[i*sram_stride + kq1] = __vsubss4(ql1 | qh1, 0x20202020);
++        x_qs[i*sram_stride + kq0] = __vsub4(ql0 | qh0, 0x20202020);
++        x_qs[i*sram_stride + kq1] = __vsub4(ql1 | qh1, 0x20202020);
+@@ -993,2 +993,2 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
+-        x_qs[i*(2*MMQ_TILE_NE_K + 1) + kq0] = __vsubss4(ql0 | qh0, 0x20202020);
+-        x_qs[i*(2*MMQ_TILE_NE_K + 1) + kq1] = __vsubss4(ql1 | qh1, 0x20202020);
++        x_qs[i*(2*MMQ_TILE_NE_K + 1) + kq0] = __vsub4(ql0 | qh0, 0x20202020);
++        x_qs[i*(2*MMQ_TILE_NE_K + 1) + kq1] = __vsub4(ql1 | qh1, 0x20202020);
+diff --git a/ggml/src/ggml-cuda/vecdotq.cuh b/ggml/src/ggml-cuda/vecdotq.cuh
+index f2a6f2009..f65fe530e 100644
+--- a/ggml/src/ggml-cuda/vecdotq.cuh
++++ b/ggml/src/ggml-cuda/vecdotq.cuh
+@@ -474 +474 @@ static __device__ __forceinline__ float vec_dot_q3_K_q8_1_impl_mmvq(
+-        const int vi = __vsubss4(vil, vih);
++        const int vi = __vsub4(vil, vih);
+@@ -641 +641 @@ static __device__ __forceinline__ float vec_dot_q6_K_q8_1_impl_mmvq(
+-        const int vi = __vsubss4((vil | vih), 0x20202020); // vi = (vil | vih) - 32
++        const int vi = __vsub4((vil | vih), 0x20202020); // vi = (vil | vih) - 32

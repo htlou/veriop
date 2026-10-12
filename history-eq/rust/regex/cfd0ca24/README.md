@@ -1,0 +1,7 @@
+# regex `cfd0ca24`: conditional prefilter inlining
+
+The sampled optimization changes only `regex-automata/src/meta/strategy.rs`. [`verify.py`](verify.py) reconstructs its missing child from the available parent and checks both exact historical Git blob IDs: parent `ea6c6ab576fb26add334853e911495f7fc1cb387`, child `5b96d888a0be4176bc76f9ab96d00a2bcce66b60`. The [audit log](verification.log) and byte comparison show **exactly six added lines**, each `#[cfg_attr(feature = "perf-inline", inline(always))]` on a `Pre<P>` strategy method. No expression, signature, branch, or data definition changes.
+
+**Verdict: `EQUIV` for Rust-level matching behavior across this complete one-file commit.** The [Rust Reference on `cfg_attr`](https://doc.rust-lang.org/reference/conditional-compilation.html#the-cfg_attr-attribute) says the inner attribute is included only when its predicate holds. The [Rust Reference on `inline`](https://doc.rust-lang.org/reference/attributes/codegen.html#the-inline-attribute) defines it as a code-generation hint that the compiler may ignore. With `perf-inline` off, the compiled source bodies are identical; with it on, they still have identical source bodies and differ only in inlining hints. This is an exact-source semantic argument, **not an Aeneas translation or an Alive2 verdict**. It does not claim identical machine code, timing, addresses, or panic backtraces.
+
+Run `python3 -B history-eq/rust/regex/cfd0ca24/verify.py` from the project root. No official historical before/after benchmark score was measured here.

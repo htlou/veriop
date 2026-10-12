@@ -1,0 +1,71 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/3bb5bb6/api_stream32_len4/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/3bb5bb6/api_stream32_len4/new.ll
+
+----------------------------------------
+define i32 @target_stream(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = mul i32 %#7, 3266489917
+  %#9 = add i32 noundef %#1, 374761397
+  %#10 = add i32 %#8, %#9
+  %#11 = fshl i32 %#10, i32 %#10, i32 17
+  %#12 = mul i32 %#11, 668265263
+  br label %#5
+
+#4:
+  %#13 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#14 = phi i32 [ %#12, %#3 ], [ %#13, %#4 ]
+  %#15 = lshr i32 %#14, 15
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 2246822519
+  %#18 = lshr i32 %#17, 13
+  %#19 = xor i32 %#18, %#17
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = lshr i32 %#20, 16
+  %#22 = xor i32 %#21, %#20
+  ret i32 %#22
+}
+=>
+define i32 @target_stream(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = mul i32 %#7, 3266489917
+  %#9 = add i32 noundef %#1, 374761397
+  %#10 = add i32 %#8, %#9
+  %#11 = fshl i32 %#10, i32 %#10, i32 17
+  %#12 = mul i32 %#11, 668265263
+  br label %#5
+
+#4:
+  %#13 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#14 = phi i32 [ %#12, %#3 ], [ %#13, %#4 ]
+  %#15 = lshr i32 %#14, 15
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 2246822519
+  %#18 = lshr i32 %#17, 13
+  %#19 = xor i32 %#18, %#17
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = lshr i32 %#20, 16
+  %#22 = xor i32 %#21, %#20
+  ret i32 %#22
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

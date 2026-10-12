@@ -1,0 +1,16 @@
+[
+  {
+    "name": "encode_to_slice",
+    "level": "raw",
+    "verdict": "UNKNOWN",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/Ceeb9f5c",
+    "evidence": "Translation OK (tag etsinc, both typecheck, no external axioms); Lean equivalence proof unfinished within the 45-min budget. Proof.lean holds sorry-free partial lemmas (old_tl/new_tl: old and new 3-byte remainder loops both equal `tri` when oi+4k <= output.len; tri_add; tobe (write_u64 byte decomposition); old_read_u64_spec). Native differential test (harness/eeb9f5c_native.rs, 190500 cases, len 0..299, output len 0..need+11): no mismatch; both Ok with identical (count, output) iff output.len >= encoded len, else both panic.",
+    "hypotheses": [],
+    "notes": "Charon args `--start-from base64::encode_to_slice --include byteorder`, no cargo args; byteorder is the version cargo resolves today (1.5.0, old repo has no Cargo.lock), translated, so no external axioms (only Aeneas' pre-existing opaque core.fmt.Formatter shows up via Result::unwrap in read_u64). Expected verdict if finished: EQUIV modulo panic kind (old remainder loop fails with arrayOutOfBounds via Slice.update, new with panic via subslice index_mut; old fast loop overflow vs new range check can also differ in kind), or plain = under the precondition 4*(input.len()/3) <= output.len(), which encode_config_buf guarantees (it resizes to encoded_size). Remaining Lean work: (1) old fast-body spec (8 table lookups OR-ed into a u64, write_u64 -> emitWord; needs scalar_byte_bind-style rewriting, tobe lemma is done), (2) new fast-body spec (4 words -> emitFour, as in sibling Base64GroupProof.scalar4_body_spec), (3) emitWord = two emitTriples (sibling Base64RemainderProof.emitWord_at / word_indices), (4) induction lemmas for both loop0s (result = tri out 0 0 (2m) / (8m)), (5) top-level assembly (rem/sor are pure, tails identical). Unfinished skeleton in lean/Ceeb9f5c/Attempt.lean (contains sorry; not evidence). Public API encode_config_buf not extractable (line_wrap / &'static table refs) -> api level not checked. Proof time ~50 min."
+  }
+]

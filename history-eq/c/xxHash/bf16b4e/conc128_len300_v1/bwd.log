@@ -1,0 +1,46 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/bf16b4e/conc128_len300_v1/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/bf16b4e/conc128_len300_v1/old.ll
+
+----------------------------------------
+define void @target_xxh128(ptr noread noundef initializes((0, 16)) %#0) nofree willreturn memory(argmem: write) {
+#1:
+  store i64 3929231290373380834, ptr noread noundef initializes((0, 16)) %#0, align 8
+  %#2 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#0, 1 x i64 8
+  store i64 -3143105782486714819, ptr %#2, align 8
+  ret void
+}
+=>
+define void @target_xxh128(ptr noread noundef initializes((0, 16)) %#0) nofree willreturn memory(argmem: write) {
+#1:
+  store i64 4009736504274130068, ptr noread noundef initializes((0, 16)) %#0, align 8
+  %#2 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#0, 1 x i64 8
+  store i64 1045506766438182112, ptr %#2, align 8
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Mismatch in memory
+
+Example:
+ptr noread noundef initializes((0, 16)) %#0 = pointer(non-local, block_id=1, offset=31, attrs=3) / Address=#x20
+
+Source:
+ptr %#2 = pointer(non-local, block_id=1, offset=39, attrs=3) / Address=#x28
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 8	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 128	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+ptr %#2 = pointer(non-local, block_id=1, offset=39, attrs=3) / Address=#x28
+
+Mismatch in pointer(non-local, block_id=1, offset=32)
+Source value: #xd46171f19767363d
+Target value: #x0e8262dd5fd0ace0
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,66 @@
+uv run -- pytest src/tests/profiling --maxfail=1 --verbose --durations=0 --numprocesses=4 --dist=worksteal 
+warning: The `requires-python` specifier (`~=3.10`) in `kontrol` uses the tilde specifier (`~=`) without a patch version. This will be interpreted as `>=3.10, <4`. Did you mean `~=3.10.0` to constrain the version as `>=3.10.0, <3.11`? We recommend only using the tilde specifier with a patch version to avoid ambiguity.
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.1.1, pluggy-1.6.0 -- /srv/home/hantaolou/code/veriop/benchmarks/repos/kontrol/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /srv/home/hantaolou/code/veriop/benchmarks/repos/kontrol
+configfile: pyproject.toml
+plugins: xdist-3.8.0, kframework-7.1.337, hypothesis-6.155.6, cov-5.0.0, mock-3.15.1, timeout-2.4.0
+created: 4/4 workers
+4 workers [1 item]
+
+scheduling tests via WorkStealingScheduling
+
+src/tests/profiling/test_foundry_prove.py::test_foundy_prove 
+[gw3] [100%] FAILED src/tests/profiling/test_foundry_prove.py::test_foundy_prove 
+
+=================================== FAILURES ===================================
+______________________________ test_foundy_prove _______________________________
+[gw3] linux -- Python 3.10.12 /srv/home/hantaolou/code/veriop/benchmarks/repos/kontrol/.venv/bin/python
+
+profile = <pyk.testing._profiler.Profiler object at 0x7f9059085f60>
+bug_report = None
+tmp_path = PosixPath('/tmp/pytest-of-hantaolou/pytest-1/popen-gw3/test_foundy_prove0')
+force_sequential = False
+
+    def test_foundy_prove(profile: Profiler, bug_report: BugReport | None, tmp_path: Path, force_sequential: bool) -> None:
+        foundry_root = tmp_path / 'foundry'
+        foundry = forge_build(TEST_DATA_DIR, foundry_root)
+    
+        with profile('kompile.prof', sort_keys=('cumtime', 'tottime'), limit=15):
+>           foundry_kompile(
+                BuildOptions(
+                    {'includes': (), 'metadata': False},
+                ),
+                foundry=foundry,
+            )
+
+src/tests/profiling/test_foundry_prove.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/kontrol/kompile.py:116: in foundry_kompile
+    kevm = KEVM(kdist.get('kontrol.base'))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = KDist(kdist_dir=PosixPath('/srv/home/hantaolou/.cache/kdist-0d814be'))
+target_id = TargetId(plugin_name='kontrol', target_name='base')
+
+    def get(self, target_id: str | TargetId) -> Path:
+        if isinstance(target_id, str):
+            target_id = TargetId.parse(target_id)
+        res = self._target_dir(target_id)
+        if not res.exists():
+>           raise ValueError(f'Target undefined or not built: {target_id.full_name}')
+E           ValueError: Target undefined or not built: kontrol.base
+
+.venv/lib/python3.10/site-packages/pyk/kdist/_kdist.py:74: ValueError
+============================== slowest durations ===============================
+12.01s call     src/tests/profiling/test_foundry_prove.py::test_foundy_prove
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED src/tests/profiling/test_foundry_prove.py::test_foundy_prove - ValueEr...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!!!
+============================== 1 failed in 14.35s ==============================
+make: *** [Makefile:58: profile] Error 2

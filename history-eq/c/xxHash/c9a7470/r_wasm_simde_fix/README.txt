@@ -1,0 +1,1 @@
+new.ll = r_wasm_simde/new.ll with the runner's asm->freeze rewrite fixed: 'freeze ptr nonnull readonly %26' -> 'freeze ptr %26' (param attributes of the asm operand were copied into the freeze, which is not valid IR)

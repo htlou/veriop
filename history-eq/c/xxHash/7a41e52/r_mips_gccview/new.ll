@@ -1,0 +1,1527 @@
+; ModuleID = '/srv/home/hantaolou/code/veriop/history-eq/c/xxHash/7a41e52/wrap_api.c'
+source_filename = "/srv/home/hantaolou/code/veriop/history-eq/c/xxHash/7a41e52/wrap_api.c"
+target datalayout = "E-m:m-p:32:32-i8:8:32-i16:16:32-i64:64-n32-S64"
+target triple = "mips-unknown-linux-gnu"
+
+@XXH3_kSecret = internal unnamed_addr constant [192 x i8] c"\B8\FEl9#\A4K\BE|\01\81,\F7!\AD\1C\DE\D4m\E9\83\90\97\DBr@\A4\A4\B7\B3g\1F\CBy\E6N\CC\C0\E5x\82Z\D0}\CC\FFr!\B8\08Ft\F7C$\8E\E05\90\E6\81:&L<(R\BB\91\C3\00\CB\88\D0e\8B\1BS.\A3qdH\97\A2\0D\F9N8\19\EFF\A9\DE\AC\D8\A8\FAv?\E3\9C4?\F9\DC\BB\C7\C7\0BO\1D\8AQ\E0K\CD\B4Y1\C8\9F~\C9\D9xsd\EA\C5\AC\834\D3\EB\C3\C5\81\A0\FF\FA\13c\EB\17\0D\DDQ\B7\F0\DAI\D3\16U&)\D4h\9E+\16\BEX}G\A1\FC\8F\F8\B8\D1z\D01\CEE\CB:\8F\95\16\04(\AF\D7\FB\CA\BBK@~", align 64
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i32 @target_xxh32_len3(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i32 noundef signext %24) local_unnamed_addr #0 {
+  %26 = alloca [192 x i8], align 1
+  call void @llvm.lifetime.start.p0(i64 192, ptr nonnull %26) #7
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %28 = ptrtoint ptr %27 to i32
+  %29 = and i32 %28, 3
+  %30 = icmp eq i32 %29, 0
+  %31 = lshr i64 %0, 48
+  %32 = lshr i64 %0, 40
+  %33 = lshr i64 %0, 32
+  br i1 %30, label %34, label %48
+
+34:                                               ; preds = %25
+  %35 = trunc nuw i64 %33 to i32
+  %36 = trunc nuw nsw i64 %32 to i32
+  %37 = trunc nuw nsw i64 %31 to i32
+  %38 = add i32 %24, 374761396
+  %39 = and i32 %37, 255
+  %40 = mul i32 %39, 374761393
+  %41 = add i32 %38, %40
+  %42 = call i32 @llvm.fshl.i32(i32 %41, i32 %41, i32 11)
+  %43 = mul i32 %42, -1640531535
+  %44 = and i32 %36, 255
+  %45 = mul i32 %44, 374761393
+  %46 = add i32 %43, %45
+  %47 = call i32 @llvm.fshl.i32(i32 %46, i32 %46, i32 11)
+  br label %62
+
+48:                                               ; preds = %25
+  %49 = add i32 %24, 374761396
+  %50 = trunc nuw nsw i64 %31 to i32
+  %51 = and i32 %50, 255
+  %52 = mul i32 %51, 374761393
+  %53 = add i32 %49, %52
+  %54 = call i32 @llvm.fshl.i32(i32 %53, i32 %53, i32 11)
+  %55 = mul i32 %54, -1640531535
+  %56 = trunc nuw nsw i64 %32 to i32
+  %57 = and i32 %56, 255
+  %58 = mul i32 %57, 374761393
+  %59 = add i32 %55, %58
+  %60 = call i32 @llvm.fshl.i32(i32 %59, i32 %59, i32 11)
+  %61 = trunc nuw i64 %33 to i32
+  br label %62
+
+62:                                               ; preds = %34, %48
+  %63 = phi i32 [ %35, %34 ], [ %61, %48 ]
+  %64 = phi i32 [ %47, %34 ], [ %60, %48 ]
+  %65 = mul i32 %64, -1640531535
+  %66 = and i32 %63, 255
+  %67 = mul i32 %66, 374761393
+  %68 = add i32 %65, %67
+  %69 = call i32 @llvm.fshl.i32(i32 %68, i32 %68, i32 11)
+  %70 = mul i32 %69, -1640531535
+  %71 = lshr i32 %70, 15
+  %72 = xor i32 %71, %70
+  %73 = mul i32 %72, -2048144777
+  %74 = lshr i32 %73, 13
+  %75 = xor i32 %74, %73
+  %76 = mul i32 %75, -1028477379
+  %77 = lshr i32 %76, 16
+  %78 = xor i32 %77, %76
+  call void @llvm.lifetime.end.p0(i64 192, ptr nonnull %26) #7
+  ret i32 %78
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.lifetime.start.p0(i64 immarg, ptr) #1
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.lifetime.end.p0(i64 immarg, ptr) #1
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i32 @target_xxh32_len7(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i32 noundef signext %24) local_unnamed_addr #0 {
+  %26 = alloca [192 x i8], align 1
+  call void @llvm.lifetime.start.p0(i64 192, ptr nonnull %26) #7
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %28 = ptrtoint ptr %27 to i32
+  %29 = and i32 %28, 3
+  %30 = icmp eq i32 %29, 0
+  %31 = lshr i64 %0, 24
+  %32 = trunc i64 %31 to i32
+  %33 = lshr i64 %0, 16
+  %34 = lshr i64 %0, 8
+  br i1 %30, label %35, label %54
+
+35:                                               ; preds = %25
+  %36 = trunc i64 %0 to i32
+  %37 = trunc i64 %34 to i32
+  %38 = trunc i64 %33 to i32
+  %39 = add i32 %24, 374761400
+  %40 = call noundef i32 @llvm.bswap.i32(i32 %32)
+  %41 = mul i32 %40, -1028477379
+  %42 = add i32 %39, %41
+  %43 = call i32 @llvm.fshl.i32(i32 %42, i32 %42, i32 17)
+  %44 = mul i32 %43, 668265263
+  %45 = and i32 %38, 255
+  %46 = mul i32 %45, 374761393
+  %47 = add i32 %44, %46
+  %48 = call i32 @llvm.fshl.i32(i32 %47, i32 %47, i32 11)
+  %49 = mul i32 %48, -1640531535
+  %50 = and i32 %37, 255
+  %51 = mul i32 %50, 374761393
+  %52 = add i32 %49, %51
+  %53 = call i32 @llvm.fshl.i32(i32 %52, i32 %52, i32 11)
+  br label %73
+
+54:                                               ; preds = %25
+  %55 = add i32 %24, 374761400
+  %56 = call noundef i32 @llvm.bswap.i32(i32 %32)
+  %57 = mul i32 %56, -1028477379
+  %58 = add i32 %55, %57
+  %59 = call i32 @llvm.fshl.i32(i32 %58, i32 %58, i32 17)
+  %60 = mul i32 %59, 668265263
+  %61 = trunc i64 %33 to i32
+  %62 = and i32 %61, 255
+  %63 = mul i32 %62, 374761393
+  %64 = add i32 %60, %63
+  %65 = call i32 @llvm.fshl.i32(i32 %64, i32 %64, i32 11)
+  %66 = mul i32 %65, -1640531535
+  %67 = trunc i64 %34 to i32
+  %68 = and i32 %67, 255
+  %69 = mul i32 %68, 374761393
+  %70 = add i32 %66, %69
+  %71 = call i32 @llvm.fshl.i32(i32 %70, i32 %70, i32 11)
+  %72 = trunc i64 %0 to i32
+  br label %73
+
+73:                                               ; preds = %35, %54
+  %74 = phi i32 [ %36, %35 ], [ %72, %54 ]
+  %75 = phi i32 [ %53, %35 ], [ %71, %54 ]
+  %76 = mul i32 %75, -1640531535
+  %77 = and i32 %74, 255
+  %78 = mul i32 %77, 374761393
+  %79 = add i32 %76, %78
+  %80 = call i32 @llvm.fshl.i32(i32 %79, i32 %79, i32 11)
+  %81 = mul i32 %80, -1640531535
+  %82 = lshr i32 %81, 15
+  %83 = xor i32 %82, %81
+  %84 = mul i32 %83, -2048144777
+  %85 = lshr i32 %84, 13
+  %86 = xor i32 %85, %84
+  %87 = mul i32 %86, -1028477379
+  %88 = lshr i32 %87, 16
+  %89 = xor i32 %88, %87
+  call void @llvm.lifetime.end.p0(i64 192, ptr nonnull %26) #7
+  ret i32 %89
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i32 @target_xxh32_len16(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i32 noundef signext %24) local_unnamed_addr #0 {
+  %26 = alloca [24 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 24, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = lshr i64 %1, 24
+  %30 = trunc i64 %29 to i32
+  %31 = lshr i64 %0, 24
+  %32 = trunc i64 %31 to i32
+  %33 = add i32 %24, 606290984
+  %34 = add i32 %24, -2048144777
+  %35 = add i32 %24, 1640531535
+  %36 = getelementptr inbounds nuw i8, ptr %26, i32 13
+  %37 = load i32, ptr %36, align 1
+  %38 = tail call noundef i32 @llvm.bswap.i32(i32 %37)
+  %39 = mul i32 %38, -2048144777
+  %40 = add i32 %35, %39
+  %41 = tail call i32 @llvm.fshl.i32(i32 %40, i32 %40, i32 13)
+  %42 = mul i32 %41, -1640531535
+  %43 = tail call noundef i32 @llvm.bswap.i32(i32 %30)
+  %44 = mul i32 %43, -2048144777
+  %45 = add i32 %44, %24
+  %46 = tail call i32 @llvm.fshl.i32(i32 %45, i32 %45, i32 13)
+  %47 = mul i32 %46, -1640531535
+  %48 = getelementptr inbounds nuw i8, ptr %26, i32 5
+  %49 = load i32, ptr %48, align 1
+  %50 = tail call noundef i32 @llvm.bswap.i32(i32 %49)
+  %51 = mul i32 %50, -2048144777
+  %52 = add i32 %34, %51
+  %53 = tail call i32 @llvm.fshl.i32(i32 %52, i32 %52, i32 13)
+  %54 = mul i32 %53, -1640531535
+  %55 = tail call noundef i32 @llvm.bswap.i32(i32 %32)
+  %56 = mul i32 %55, -2048144777
+  %57 = add i32 %33, %56
+  %58 = tail call i32 @llvm.fshl.i32(i32 %57, i32 %57, i32 13)
+  %59 = mul i32 %58, -1640531535
+  %60 = tail call i32 @llvm.fshl.i32(i32 %59, i32 %59, i32 1)
+  %61 = tail call i32 @llvm.fshl.i32(i32 %54, i32 %54, i32 7)
+  %62 = tail call i32 @llvm.fshl.i32(i32 %47, i32 %47, i32 12)
+  %63 = tail call i32 @llvm.fshl.i32(i32 %42, i32 %42, i32 18)
+  %64 = add i32 %62, %63
+  %65 = add i32 %64, %61
+  %66 = add i32 %65, %60
+  %67 = add i32 %66, 16
+  %68 = lshr i32 %67, 15
+  %69 = xor i32 %68, %67
+  %70 = mul i32 %69, -2048144777
+  %71 = lshr i32 %70, 13
+  %72 = xor i32 %71, %70
+  %73 = mul i32 %72, -1028477379
+  %74 = lshr i32 %73, 16
+  %75 = xor i32 %74, %73
+  call void @llvm.lifetime.end.p0(i64 24, ptr nonnull %26)
+  ret i32 %75
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i32 @target_xxh32_len35(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i32 noundef signext %24) local_unnamed_addr #0 {
+  %26 = alloca [40 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 40, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = getelementptr inbounds nuw i8, ptr %26, i32 24
+  store i64 %3, ptr %29, align 8
+  %30 = getelementptr inbounds nuw i8, ptr %26, i32 32
+  store i64 %4, ptr %30, align 8
+  %31 = lshr i64 %4, 32
+  %32 = lshr i64 %4, 40
+  %33 = lshr i64 %4, 48
+  %34 = lshr i64 %0, 24
+  %35 = trunc i64 %34 to i32
+  %36 = lshr i64 %1, 24
+  %37 = trunc i64 %36 to i32
+  %38 = lshr i64 %2, 24
+  %39 = trunc i64 %38 to i32
+  %40 = lshr i64 %3, 24
+  %41 = trunc i64 %40 to i32
+  %42 = add i32 %24, 606290984
+  %43 = add i32 %24, -2048144777
+  %44 = add i32 %24, 1640531535
+  %45 = tail call noundef i32 @llvm.bswap.i32(i32 %35)
+  %46 = mul i32 %45, -2048144777
+  %47 = add i32 %46, %42
+  %48 = tail call i32 @llvm.fshl.i32(i32 %47, i32 %47, i32 13)
+  %49 = mul i32 %48, -1640531535
+  %50 = getelementptr inbounds nuw i8, ptr %26, i32 5
+  %51 = load i32, ptr %50, align 1
+  %52 = tail call noundef i32 @llvm.bswap.i32(i32 %51)
+  %53 = mul i32 %52, -2048144777
+  %54 = add i32 %53, %43
+  %55 = tail call i32 @llvm.fshl.i32(i32 %54, i32 %54, i32 13)
+  %56 = mul i32 %55, -1640531535
+  %57 = tail call noundef i32 @llvm.bswap.i32(i32 %37)
+  %58 = mul i32 %57, -2048144777
+  %59 = add i32 %58, %24
+  %60 = tail call i32 @llvm.fshl.i32(i32 %59, i32 %59, i32 13)
+  %61 = mul i32 %60, -1640531535
+  %62 = getelementptr inbounds nuw i8, ptr %26, i32 13
+  %63 = load i32, ptr %62, align 1
+  %64 = tail call noundef i32 @llvm.bswap.i32(i32 %63)
+  %65 = mul i32 %64, -2048144777
+  %66 = add i32 %65, %44
+  %67 = tail call i32 @llvm.fshl.i32(i32 %66, i32 %66, i32 13)
+  %68 = mul i32 %67, -1640531535
+  %69 = tail call noundef i32 @llvm.bswap.i32(i32 %39)
+  %70 = mul i32 %69, -2048144777
+  %71 = add i32 %70, %49
+  %72 = tail call i32 @llvm.fshl.i32(i32 %71, i32 %71, i32 13)
+  %73 = mul i32 %72, -1640531535
+  %74 = getelementptr inbounds nuw i8, ptr %26, i32 21
+  %75 = load i32, ptr %74, align 1
+  %76 = tail call noundef i32 @llvm.bswap.i32(i32 %75)
+  %77 = mul i32 %76, -2048144777
+  %78 = add i32 %77, %56
+  %79 = tail call i32 @llvm.fshl.i32(i32 %78, i32 %78, i32 13)
+  %80 = mul i32 %79, -1640531535
+  %81 = tail call noundef i32 @llvm.bswap.i32(i32 %41)
+  %82 = mul i32 %81, -2048144777
+  %83 = add i32 %82, %61
+  %84 = tail call i32 @llvm.fshl.i32(i32 %83, i32 %83, i32 13)
+  %85 = mul i32 %84, -1640531535
+  %86 = getelementptr inbounds nuw i8, ptr %26, i32 29
+  %87 = load i32, ptr %86, align 1
+  %88 = tail call noundef i32 @llvm.bswap.i32(i32 %87)
+  %89 = mul i32 %88, -2048144777
+  %90 = add i32 %89, %68
+  %91 = tail call i32 @llvm.fshl.i32(i32 %90, i32 %90, i32 13)
+  %92 = mul i32 %91, -1640531535
+  %93 = tail call i32 @llvm.fshl.i32(i32 %73, i32 %73, i32 1)
+  %94 = tail call i32 @llvm.fshl.i32(i32 %80, i32 %80, i32 7)
+  %95 = tail call i32 @llvm.fshl.i32(i32 %85, i32 %85, i32 12)
+  %96 = tail call i32 @llvm.fshl.i32(i32 %92, i32 %92, i32 18)
+  %97 = trunc nuw nsw i64 %33 to i32
+  %98 = and i32 %97, 255
+  %99 = mul i32 %98, 374761393
+  %100 = add i32 %93, 35
+  %101 = add i32 %100, %94
+  %102 = add i32 %101, %95
+  %103 = add i32 %102, %96
+  %104 = add i32 %103, %99
+  %105 = tail call i32 @llvm.fshl.i32(i32 %104, i32 %104, i32 11)
+  %106 = mul i32 %105, -1640531535
+  %107 = trunc nuw nsw i64 %32 to i32
+  %108 = and i32 %107, 255
+  %109 = mul i32 %108, 374761393
+  %110 = add i32 %106, %109
+  %111 = tail call i32 @llvm.fshl.i32(i32 %110, i32 %110, i32 11)
+  %112 = trunc nuw i64 %31 to i32
+  %113 = mul i32 %111, -1640531535
+  %114 = and i32 %112, 255
+  %115 = mul i32 %114, 374761393
+  %116 = add i32 %113, %115
+  %117 = tail call i32 @llvm.fshl.i32(i32 %116, i32 %116, i32 11)
+  %118 = mul i32 %117, -1640531535
+  %119 = lshr i32 %118, 15
+  %120 = xor i32 %119, %118
+  %121 = mul i32 %120, -2048144777
+  %122 = lshr i32 %121, 13
+  %123 = xor i32 %122, %121
+  %124 = mul i32 %123, -1028477379
+  %125 = lshr i32 %124, 16
+  %126 = xor i32 %125, %124
+  call void @llvm.lifetime.end.p0(i64 40, ptr nonnull %26)
+  ret i32 %126
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh64_len5(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = lshr i64 %0, 24
+  %27 = trunc i64 %26 to i32
+  %28 = lshr i64 %0, 16
+  %29 = add i64 %24, 2870177450012600266
+  %30 = tail call noundef i32 @llvm.bswap.i32(i32 %27)
+  %31 = zext i32 %30 to i64
+  %32 = mul i64 %31, -7046029288634856825
+  %33 = xor i64 %32, %29
+  %34 = tail call i64 @llvm.fshl.i64(i64 %33, i64 %33, i64 23)
+  %35 = mul i64 %34, -4417276706812531889
+  %36 = add i64 %35, 1609587929392839161
+  %37 = and i64 %28, 255
+  %38 = mul i64 %37, 2870177450012600261
+  %39 = xor i64 %38, %36
+  %40 = tail call i64 @llvm.fshl.i64(i64 %39, i64 %39, i64 11)
+  %41 = mul i64 %40, -7046029288634856825
+  %42 = lshr i64 %41, 33
+  %43 = xor i64 %42, %41
+  %44 = mul i64 %43, -4417276706812531889
+  %45 = lshr i64 %44, 29
+  %46 = xor i64 %45, %44
+  %47 = mul i64 %46, 1609587929392839161
+  %48 = lshr i64 %47, 32
+  %49 = xor i64 %48, %47
+  ret i64 %49
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh64_len12(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = alloca [16 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 16, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = lshr i64 %1, 24
+  %29 = trunc i64 %28 to i32
+  %30 = tail call noundef i32 @llvm.bswap.i32(i32 %29)
+  %31 = zext i32 %30 to i64
+  %32 = mul i64 %31, -7046029288634856825
+  %33 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %34 = load i64, ptr %33, align 1
+  %35 = tail call noundef i64 @llvm.bswap.i64(i64 %34)
+  %36 = mul i64 %35, -4417276706812531889
+  %37 = tail call i64 @llvm.fshl.i64(i64 %36, i64 %36, i64 31)
+  %38 = mul i64 %37, -7046029288634856825
+  %39 = add i64 %24, 2870177450012600273
+  %40 = xor i64 %38, %39
+  %41 = tail call i64 @llvm.fshl.i64(i64 %40, i64 %40, i64 27)
+  %42 = mul i64 %41, -7046029288634856825
+  %43 = add i64 %42, -8796714831421723037
+  %44 = xor i64 %32, %43
+  %45 = tail call i64 @llvm.fshl.i64(i64 %44, i64 %44, i64 23)
+  %46 = mul i64 %45, -4417276706812531889
+  %47 = add i64 %46, 1609587929392839161
+  %48 = lshr i64 %47, 33
+  %49 = xor i64 %48, %47
+  %50 = mul i64 %49, -4417276706812531889
+  %51 = lshr i64 %50, 29
+  %52 = xor i64 %51, %50
+  %53 = mul i64 %52, 1609587929392839161
+  %54 = lshr i64 %53, 32
+  %55 = xor i64 %54, %53
+  call void @llvm.lifetime.end.p0(i64 16, ptr nonnull %26)
+  ret i64 %55
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh64_len32(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = alloca [40 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 40, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = getelementptr inbounds nuw i8, ptr %26, i32 24
+  store i64 %3, ptr %29, align 8
+  %30 = getelementptr inbounds nuw i8, ptr %26, i32 32
+  store i64 %4, ptr %30, align 8
+  %31 = add i64 %24, 6983438078262162902
+  %32 = add i64 %24, -4417276706812531889
+  %33 = add i64 %24, 7046029288634856825
+  %34 = getelementptr inbounds nuw i8, ptr %26, i32 25
+  %35 = load i64, ptr %34, align 1
+  %36 = tail call noundef i64 @llvm.bswap.i64(i64 %35)
+  %37 = mul i64 %36, -4417276706812531889
+  %38 = add i64 %33, %37
+  %39 = tail call i64 @llvm.fshl.i64(i64 %38, i64 %38, i64 31)
+  %40 = mul i64 %39, -7046029288634856825
+  %41 = getelementptr inbounds nuw i8, ptr %26, i32 17
+  %42 = load i64, ptr %41, align 1
+  %43 = tail call noundef i64 @llvm.bswap.i64(i64 %42)
+  %44 = mul i64 %43, -4417276706812531889
+  %45 = add i64 %44, %24
+  %46 = tail call i64 @llvm.fshl.i64(i64 %45, i64 %45, i64 31)
+  %47 = mul i64 %46, -7046029288634856825
+  %48 = getelementptr inbounds nuw i8, ptr %26, i32 9
+  %49 = load i64, ptr %48, align 1
+  %50 = tail call noundef i64 @llvm.bswap.i64(i64 %49)
+  %51 = mul i64 %50, -4417276706812531889
+  %52 = add i64 %32, %51
+  %53 = tail call i64 @llvm.fshl.i64(i64 %52, i64 %52, i64 31)
+  %54 = mul i64 %53, -7046029288634856825
+  %55 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %56 = load i64, ptr %55, align 1
+  %57 = tail call noundef i64 @llvm.bswap.i64(i64 %56)
+  %58 = mul i64 %57, -4417276706812531889
+  %59 = add i64 %31, %58
+  %60 = tail call i64 @llvm.fshl.i64(i64 %59, i64 %59, i64 31)
+  %61 = mul i64 %60, -7046029288634856825
+  %62 = tail call i64 @llvm.fshl.i64(i64 %61, i64 %61, i64 1)
+  %63 = tail call i64 @llvm.fshl.i64(i64 %54, i64 %54, i64 7)
+  %64 = tail call i64 @llvm.fshl.i64(i64 %47, i64 %47, i64 12)
+  %65 = tail call i64 @llvm.fshl.i64(i64 %40, i64 %40, i64 18)
+  %66 = add i64 %64, %65
+  %67 = add i64 %66, %63
+  %68 = add i64 %67, %62
+  %69 = mul i64 %60, -2381459717836149591
+  %70 = tail call i64 @llvm.fshl.i64(i64 %69, i64 %69, i64 31)
+  %71 = mul i64 %70, -7046029288634856825
+  %72 = xor i64 %68, %71
+  %73 = mul i64 %72, -7046029288634856825
+  %74 = add i64 %73, -8796714831421723037
+  %75 = mul i64 %53, -2381459717836149591
+  %76 = tail call i64 @llvm.fshl.i64(i64 %75, i64 %75, i64 31)
+  %77 = mul i64 %76, -7046029288634856825
+  %78 = xor i64 %74, %77
+  %79 = mul i64 %78, -7046029288634856825
+  %80 = add i64 %79, -8796714831421723037
+  %81 = mul i64 %46, -2381459717836149591
+  %82 = tail call i64 @llvm.fshl.i64(i64 %81, i64 %81, i64 31)
+  %83 = mul i64 %82, -7046029288634856825
+  %84 = xor i64 %80, %83
+  %85 = mul i64 %84, -7046029288634856825
+  %86 = add i64 %85, -8796714831421723037
+  %87 = mul i64 %39, -2381459717836149591
+  %88 = tail call i64 @llvm.fshl.i64(i64 %87, i64 %87, i64 31)
+  %89 = mul i64 %88, -7046029288634856825
+  %90 = xor i64 %86, %89
+  %91 = mul i64 %90, -7046029288634856825
+  %92 = add i64 %91, -8796714831421723005
+  %93 = lshr i64 %92, 33
+  %94 = xor i64 %93, %92
+  %95 = mul i64 %94, -4417276706812531889
+  %96 = lshr i64 %95, 29
+  %97 = xor i64 %96, %95
+  %98 = mul i64 %97, 1609587929392839161
+  %99 = lshr i64 %98, 32
+  %100 = xor i64 %99, %98
+  call void @llvm.lifetime.end.p0(i64 40, ptr nonnull %26)
+  ret i64 %100
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh64_len45(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = alloca [48 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 48, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = getelementptr inbounds nuw i8, ptr %26, i32 24
+  store i64 %3, ptr %29, align 8
+  %30 = getelementptr inbounds nuw i8, ptr %26, i32 32
+  store i64 %4, ptr %30, align 8
+  %31 = getelementptr inbounds nuw i8, ptr %26, i32 40
+  store i64 %5, ptr %31, align 8
+  %32 = lshr i64 %5, 24
+  %33 = trunc i64 %32 to i32
+  %34 = getelementptr inbounds nuw i8, ptr %26, i32 33
+  %35 = load i64, ptr %34, align 1
+  %36 = tail call noundef i64 @llvm.bswap.i64(i64 %35)
+  %37 = mul i64 %36, -4417276706812531889
+  %38 = tail call i64 @llvm.fshl.i64(i64 %37, i64 %37, i64 31)
+  %39 = mul i64 %38, -7046029288634856825
+  %40 = getelementptr inbounds nuw i8, ptr %26, i32 17
+  %41 = load i64, ptr %40, align 1
+  %42 = tail call noundef i64 @llvm.bswap.i64(i64 %41)
+  %43 = mul i64 %42, -4417276706812531889
+  %44 = add i64 %43, %24
+  %45 = tail call i64 @llvm.fshl.i64(i64 %44, i64 %44, i64 31)
+  %46 = mul i64 %45, -7046029288634856825
+  %47 = tail call i64 @llvm.fshl.i64(i64 %46, i64 %46, i64 12)
+  %48 = add i64 %24, 7046029288634856825
+  %49 = getelementptr inbounds nuw i8, ptr %26, i32 25
+  %50 = load i64, ptr %49, align 1
+  %51 = tail call noundef i64 @llvm.bswap.i64(i64 %50)
+  %52 = mul i64 %51, -4417276706812531889
+  %53 = add i64 %48, %52
+  %54 = tail call i64 @llvm.fshl.i64(i64 %53, i64 %53, i64 31)
+  %55 = mul i64 %54, -7046029288634856825
+  %56 = tail call i64 @llvm.fshl.i64(i64 %55, i64 %55, i64 18)
+  %57 = add i64 %47, %56
+  %58 = add i64 %24, -4417276706812531889
+  %59 = getelementptr inbounds nuw i8, ptr %26, i32 9
+  %60 = load i64, ptr %59, align 1
+  %61 = tail call noundef i64 @llvm.bswap.i64(i64 %60)
+  %62 = mul i64 %61, -4417276706812531889
+  %63 = add i64 %58, %62
+  %64 = tail call i64 @llvm.fshl.i64(i64 %63, i64 %63, i64 31)
+  %65 = mul i64 %64, -7046029288634856825
+  %66 = tail call i64 @llvm.fshl.i64(i64 %65, i64 %65, i64 7)
+  %67 = add i64 %57, %66
+  %68 = add i64 %24, 6983438078262162902
+  %69 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %70 = load i64, ptr %69, align 1
+  %71 = tail call noundef i64 @llvm.bswap.i64(i64 %70)
+  %72 = mul i64 %71, -4417276706812531889
+  %73 = add i64 %68, %72
+  %74 = tail call i64 @llvm.fshl.i64(i64 %73, i64 %73, i64 31)
+  %75 = mul i64 %74, -7046029288634856825
+  %76 = tail call i64 @llvm.fshl.i64(i64 %75, i64 %75, i64 1)
+  %77 = add i64 %67, %76
+  %78 = mul i64 %74, -2381459717836149591
+  %79 = tail call i64 @llvm.fshl.i64(i64 %78, i64 %78, i64 31)
+  %80 = mul i64 %79, -7046029288634856825
+  %81 = xor i64 %77, %80
+  %82 = mul i64 %81, -7046029288634856825
+  %83 = add i64 %82, -8796714831421723037
+  %84 = mul i64 %64, -2381459717836149591
+  %85 = tail call i64 @llvm.fshl.i64(i64 %84, i64 %84, i64 31)
+  %86 = mul i64 %85, -7046029288634856825
+  %87 = xor i64 %83, %86
+  %88 = mul i64 %87, -7046029288634856825
+  %89 = add i64 %88, -8796714831421723037
+  %90 = mul i64 %45, -2381459717836149591
+  %91 = tail call i64 @llvm.fshl.i64(i64 %90, i64 %90, i64 31)
+  %92 = mul i64 %91, -7046029288634856825
+  %93 = xor i64 %89, %92
+  %94 = mul i64 %93, -7046029288634856825
+  %95 = add i64 %94, -8796714831421723037
+  %96 = mul i64 %54, -2381459717836149591
+  %97 = tail call i64 @llvm.fshl.i64(i64 %96, i64 %96, i64 31)
+  %98 = mul i64 %97, -7046029288634856825
+  %99 = xor i64 %95, %98
+  %100 = mul i64 %99, -7046029288634856825
+  %101 = add i64 %100, -8796714831421722992
+  %102 = xor i64 %39, %101
+  %103 = tail call i64 @llvm.fshl.i64(i64 %102, i64 %102, i64 27)
+  %104 = mul i64 %103, -7046029288634856825
+  %105 = add i64 %104, -8796714831421723037
+  %106 = tail call noundef i32 @llvm.bswap.i32(i32 %33)
+  %107 = zext i32 %106 to i64
+  %108 = mul i64 %107, -7046029288634856825
+  %109 = xor i64 %108, %105
+  %110 = tail call i64 @llvm.fshl.i64(i64 %109, i64 %109, i64 23)
+  %111 = mul i64 %110, -4417276706812531889
+  %112 = add i64 %111, 1609587929392839161
+  %113 = getelementptr inbounds nuw i8, ptr %26, i32 45
+  %114 = load i8, ptr %113, align 1
+  %115 = zext i8 %114 to i64
+  %116 = mul i64 %115, 2870177450012600261
+  %117 = xor i64 %116, %112
+  %118 = tail call i64 @llvm.fshl.i64(i64 %117, i64 %117, i64 11)
+  %119 = mul i64 %118, -7046029288634856825
+  %120 = lshr i64 %119, 33
+  %121 = xor i64 %120, %119
+  %122 = mul i64 %121, -4417276706812531889
+  %123 = lshr i64 %122, 29
+  %124 = xor i64 %123, %122
+  %125 = mul i64 %124, 1609587929392839161
+  %126 = lshr i64 %125, 32
+  %127 = xor i64 %126, %125
+  call void @llvm.lifetime.end.p0(i64 48, ptr nonnull %26)
+  ret i64 %127
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh3_len3(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = lshr i64 %0, 32
+  %27 = trunc nuw i64 %26 to i32
+  %28 = lshr i64 %0, 16
+  %29 = trunc i64 %28 to i32
+  %30 = and i32 %29, -16777216
+  %31 = and i32 %27, 16711935
+  %32 = or disjoint i32 %30, %31
+  %33 = or disjoint i32 %32, 768
+  %34 = add i64 %24, 2267503259
+  %35 = zext i32 %33 to i64
+  %36 = lshr i64 %34, 33
+  %37 = xor i64 %36, %35
+  %38 = xor i64 %37, %34
+  %39 = mul i64 %38, -4417276706812531889
+  %40 = lshr i64 %39, 29
+  %41 = xor i64 %40, %39
+  %42 = mul i64 %41, 1609587929392839161
+  %43 = lshr i64 %42, 32
+  %44 = xor i64 %43, %42
+  ret i64 %44
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh3_len8(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = alloca [16 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 16, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = trunc i64 %24 to i32
+  %29 = tail call noundef i32 @llvm.bswap.i32(i32 %28)
+  %30 = zext i32 %29 to i64
+  %31 = shl nuw i64 %30, 32
+  %32 = xor i64 %31, %24
+  %33 = lshr i64 %0, 24
+  %34 = getelementptr inbounds nuw i8, ptr %26, i32 5
+  %35 = load i32, ptr %34, align 1
+  %36 = sub i64 -4090762196417718878, %32
+  %37 = and i64 %33, 4294967295
+  %38 = zext i32 %35 to i64
+  %39 = shl nuw i64 %38, 32
+  %40 = or disjoint i64 %39, %37
+  %41 = tail call i64 @llvm.bswap.i64(i64 %40)
+  %42 = xor i64 %41, %36
+  %43 = tail call i64 @llvm.fshl.i64(i64 %42, i64 %42, i64 49)
+  %44 = tail call i64 @llvm.fshl.i64(i64 %42, i64 %42, i64 24)
+  %45 = xor i64 %44, %43
+  %46 = xor i64 %45, %42
+  %47 = mul i64 %46, -6939452855193903323
+  %48 = lshr i64 %47, 35
+  %49 = add nuw nsw i64 %48, 8
+  %50 = xor i64 %49, %47
+  %51 = mul i64 %50, -6939452855193903323
+  %52 = lshr i64 %51, 28
+  %53 = xor i64 %52, %51
+  call void @llvm.lifetime.end.p0(i64 16, ptr nonnull %26)
+  ret i64 %53
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh3_len16(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = alloca [24 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 24, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = add i64 %24, 7458650908927343033
+  %30 = sub i64 -5812251307325107654, %24
+  %31 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %32 = load i64, ptr %31, align 1
+  %33 = tail call noundef i64 @llvm.bswap.i64(i64 %32)
+  %34 = xor i64 %33, %29
+  %35 = getelementptr inbounds nuw i8, ptr %26, i32 9
+  %36 = load i64, ptr %35, align 1
+  %37 = tail call noundef i64 @llvm.bswap.i64(i64 %36)
+  %38 = xor i64 %37, %30
+  %39 = tail call noundef i64 @llvm.bswap.i64(i64 %34)
+  %40 = add i64 %39, 16
+  %41 = add i64 %40, %38
+  %42 = and i64 %34, 4294967295
+  %43 = and i64 %38, 4294967295
+  %44 = mul nuw i64 %43, %42
+  %45 = lshr i64 %34, 32
+  %46 = mul nuw i64 %43, %45
+  %47 = lshr i64 %38, 32
+  %48 = mul nuw i64 %47, %42
+  %49 = mul nuw i64 %47, %45
+  %50 = lshr i64 %44, 32
+  %51 = and i64 %46, 4294967295
+  %52 = add nuw i64 %51, %48
+  %53 = add nuw i64 %52, %50
+  %54 = lshr i64 %46, 32
+  %55 = lshr i64 %53, 32
+  %56 = add nuw i64 %54, %49
+  %57 = add nuw i64 %56, %55
+  %58 = shl i64 %53, 32
+  %59 = and i64 %44, 4294967295
+  %60 = or disjoint i64 %58, %59
+  %61 = xor i64 %60, %57
+  %62 = add i64 %41, %61
+  %63 = lshr i64 %62, 37
+  %64 = xor i64 %63, %62
+  %65 = mul i64 %64, 1609587791953885689
+  %66 = lshr i64 %65, 32
+  %67 = xor i64 %66, %65
+  call void @llvm.lifetime.end.p0(i64 24, ptr nonnull %26)
+  ret i64 %67
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none)
+define dso_local i64 @target_xxh3_len100(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #0 {
+  %26 = alloca [104 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 104, ptr nonnull %26)
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = getelementptr inbounds nuw i8, ptr %26, i32 24
+  store i64 %3, ptr %29, align 8
+  %30 = getelementptr inbounds nuw i8, ptr %26, i32 32
+  store i64 %4, ptr %30, align 8
+  %31 = getelementptr inbounds nuw i8, ptr %26, i32 40
+  store i64 %5, ptr %31, align 8
+  %32 = getelementptr inbounds nuw i8, ptr %26, i32 48
+  store i64 %6, ptr %32, align 8
+  %33 = getelementptr inbounds nuw i8, ptr %26, i32 56
+  store i64 %7, ptr %33, align 8
+  %34 = getelementptr inbounds nuw i8, ptr %26, i32 64
+  store i64 %8, ptr %34, align 8
+  %35 = getelementptr inbounds nuw i8, ptr %26, i32 72
+  store i64 %9, ptr %35, align 8
+  %36 = getelementptr inbounds nuw i8, ptr %26, i32 80
+  store i64 %10, ptr %36, align 8
+  %37 = getelementptr inbounds nuw i8, ptr %26, i32 88
+  store i64 %11, ptr %37, align 8
+  %38 = getelementptr inbounds nuw i8, ptr %26, i32 96
+  store i64 %12, ptr %38, align 8
+  %39 = getelementptr inbounds nuw i8, ptr %26, i32 49
+  %40 = load i64, ptr %39, align 1
+  %41 = getelementptr inbounds nuw i8, ptr %26, i32 57
+  %42 = load i64, ptr %41, align 1
+  %43 = tail call noundef i64 @llvm.bswap.i64(i64 %40)
+  %44 = tail call noundef i64 @llvm.bswap.i64(i64 %42)
+  %45 = add i64 %24, 4554437623014685352
+  %46 = xor i64 %43, %45
+  %47 = sub i64 2111919702937427193, %24
+  %48 = xor i64 %44, %47
+  %49 = and i64 %46, 4294967295
+  %50 = and i64 %48, 4294967295
+  %51 = mul nuw i64 %50, %49
+  %52 = lshr i64 %46, 32
+  %53 = mul nuw i64 %50, %52
+  %54 = lshr i64 %48, 32
+  %55 = mul nuw i64 %54, %49
+  %56 = mul nuw i64 %54, %52
+  %57 = lshr i64 %51, 32
+  %58 = and i64 %53, 4294967295
+  %59 = add nuw i64 %58, %55
+  %60 = add nuw i64 %59, %57
+  %61 = lshr i64 %53, 32
+  %62 = lshr i64 %60, 32
+  %63 = add nuw i64 %61, %56
+  %64 = add nuw i64 %63, %62
+  %65 = shl i64 %60, 32
+  %66 = and i64 %51, 4294967295
+  %67 = or disjoint i64 %65, %66
+  %68 = xor i64 %67, %64
+  %69 = add i64 %68, -3626654062522721092
+  %70 = getelementptr inbounds nuw i8, ptr %26, i32 37
+  %71 = load i64, ptr %70, align 1
+  %72 = getelementptr inbounds nuw i8, ptr %26, i32 45
+  %73 = load i64, ptr %72, align 1
+  %74 = tail call noundef i64 @llvm.bswap.i64(i64 %71)
+  %75 = tail call noundef i64 @llvm.bswap.i64(i64 %73)
+  %76 = add i64 %24, 3556072174620004746
+  %77 = xor i64 %74, %76
+  %78 = sub i64 7238261902898274248, %24
+  %79 = xor i64 %75, %78
+  %80 = and i64 %77, 4294967295
+  %81 = and i64 %79, 4294967295
+  %82 = mul nuw i64 %81, %80
+  %83 = lshr i64 %77, 32
+  %84 = mul nuw i64 %81, %83
+  %85 = lshr i64 %79, 32
+  %86 = mul nuw i64 %85, %80
+  %87 = mul nuw i64 %85, %83
+  %88 = lshr i64 %82, 32
+  %89 = and i64 %84, 4294967295
+  %90 = add nuw i64 %89, %86
+  %91 = add nuw i64 %90, %88
+  %92 = lshr i64 %84, 32
+  %93 = lshr i64 %91, 32
+  %94 = add nuw i64 %92, %87
+  %95 = add nuw i64 %94, %93
+  %96 = shl i64 %91, 32
+  %97 = and i64 %82, 4294967295
+  %98 = or disjoint i64 %96, %97
+  %99 = xor i64 %98, %95
+  %100 = add i64 %69, %99
+  %101 = getelementptr inbounds nuw i8, ptr %26, i32 33
+  %102 = load i64, ptr %101, align 1
+  %103 = getelementptr inbounds nuw i8, ptr %26, i32 41
+  %104 = load i64, ptr %103, align 1
+  %105 = tail call noundef i64 @llvm.bswap.i64(i64 %102)
+  %106 = tail call noundef i64 @llvm.bswap.i64(i64 %104)
+  %107 = add i64 %24, -3818837453329782724
+  %108 = xor i64 %105, %107
+  %109 = sub i64 -6688317018830679928, %24
+  %110 = xor i64 %106, %109
+  %111 = and i64 %108, 4294967295
+  %112 = and i64 %110, 4294967295
+  %113 = mul nuw i64 %112, %111
+  %114 = lshr i64 %108, 32
+  %115 = mul nuw i64 %112, %114
+  %116 = lshr i64 %110, 32
+  %117 = mul nuw i64 %116, %111
+  %118 = mul nuw i64 %116, %114
+  %119 = lshr i64 %113, 32
+  %120 = and i64 %115, 4294967295
+  %121 = add nuw i64 %120, %117
+  %122 = add nuw i64 %121, %119
+  %123 = lshr i64 %115, 32
+  %124 = lshr i64 %122, 32
+  %125 = add nuw i64 %123, %118
+  %126 = add nuw i64 %125, %124
+  %127 = shl i64 %122, 32
+  %128 = and i64 %113, 4294967295
+  %129 = or disjoint i64 %127, %128
+  %130 = xor i64 %129, %126
+  %131 = add i64 %100, %130
+  %132 = getelementptr inbounds nuw i8, ptr %26, i32 53
+  %133 = load i64, ptr %132, align 1
+  %134 = getelementptr inbounds nuw i8, ptr %26, i32 61
+  %135 = load i64, ptr %134, align 1
+  %136 = tail call noundef i64 @llvm.bswap.i64(i64 %133)
+  %137 = tail call noundef i64 @llvm.bswap.i64(i64 %135)
+  %138 = add i64 %24, 5690594596133299313
+  %139 = xor i64 %136, %138
+  %140 = sub i64 -2833645246901970632, %24
+  %141 = xor i64 %137, %140
+  %142 = and i64 %139, 4294967295
+  %143 = and i64 %141, 4294967295
+  %144 = mul nuw i64 %143, %142
+  %145 = lshr i64 %139, 32
+  %146 = mul nuw i64 %143, %145
+  %147 = lshr i64 %141, 32
+  %148 = mul nuw i64 %147, %142
+  %149 = mul nuw i64 %147, %145
+  %150 = lshr i64 %144, 32
+  %151 = and i64 %146, 4294967295
+  %152 = add nuw i64 %151, %148
+  %153 = add nuw i64 %152, %150
+  %154 = lshr i64 %146, 32
+  %155 = lshr i64 %153, 32
+  %156 = add nuw i64 %154, %149
+  %157 = add nuw i64 %156, %155
+  %158 = shl i64 %153, 32
+  %159 = and i64 %144, 4294967295
+  %160 = or disjoint i64 %158, %159
+  %161 = xor i64 %160, %157
+  %162 = add i64 %131, %161
+  %163 = getelementptr inbounds nuw i8, ptr %26, i32 17
+  %164 = load i64, ptr %163, align 1
+  %165 = getelementptr inbounds nuw i8, ptr %26, i32 25
+  %166 = load i64, ptr %165, align 1
+  %167 = tail call noundef i64 @llvm.bswap.i64(i64 %164)
+  %168 = tail call noundef i64 @llvm.bswap.i64(i64 %166)
+  %169 = add i64 %24, 8711581037947681227
+  %170 = xor i64 %167, %169
+  %171 = sub i64 2410270004345854594, %24
+  %172 = xor i64 %168, %171
+  %173 = and i64 %170, 4294967295
+  %174 = and i64 %172, 4294967295
+  %175 = mul nuw i64 %174, %173
+  %176 = lshr i64 %170, 32
+  %177 = mul nuw i64 %174, %176
+  %178 = lshr i64 %172, 32
+  %179 = mul nuw i64 %178, %173
+  %180 = mul nuw i64 %178, %176
+  %181 = lshr i64 %175, 32
+  %182 = and i64 %177, 4294967295
+  %183 = add nuw i64 %182, %179
+  %184 = add nuw i64 %183, %181
+  %185 = lshr i64 %177, 32
+  %186 = lshr i64 %184, 32
+  %187 = add nuw i64 %185, %180
+  %188 = add nuw i64 %187, %186
+  %189 = shl i64 %184, 32
+  %190 = and i64 %175, 4294967295
+  %191 = or disjoint i64 %189, %190
+  %192 = xor i64 %191, %188
+  %193 = add i64 %162, %192
+  %194 = getelementptr inbounds nuw i8, ptr %26, i32 69
+  %195 = load i64, ptr %194, align 1
+  %196 = getelementptr inbounds nuw i8, ptr %26, i32 77
+  %197 = load i64, ptr %196, align 1
+  %198 = tail call noundef i64 @llvm.bswap.i64(i64 %195)
+  %199 = tail call noundef i64 @llvm.bswap.i64(i64 %197)
+  %200 = add i64 %24, -8204357891075471176
+  %201 = xor i64 %198, %200
+  %202 = sub i64 5487137525590930912, %24
+  %203 = xor i64 %199, %202
+  %204 = and i64 %201, 4294967295
+  %205 = and i64 %203, 4294967295
+  %206 = mul nuw i64 %205, %204
+  %207 = lshr i64 %201, 32
+  %208 = mul nuw i64 %205, %207
+  %209 = lshr i64 %203, 32
+  %210 = mul nuw i64 %209, %204
+  %211 = mul nuw i64 %209, %207
+  %212 = lshr i64 %206, 32
+  %213 = and i64 %208, 4294967295
+  %214 = add nuw i64 %213, %210
+  %215 = add nuw i64 %214, %212
+  %216 = lshr i64 %208, 32
+  %217 = lshr i64 %215, 32
+  %218 = add nuw i64 %216, %211
+  %219 = add nuw i64 %218, %217
+  %220 = shl i64 %215, 32
+  %221 = and i64 %206, 4294967295
+  %222 = or disjoint i64 %220, %221
+  %223 = xor i64 %222, %219
+  %224 = add i64 %193, %223
+  %225 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  %226 = load i64, ptr %225, align 1
+  %227 = getelementptr inbounds nuw i8, ptr %26, i32 9
+  %228 = load i64, ptr %227, align 1
+  %229 = tail call noundef i64 @llvm.bswap.i64(i64 %226)
+  %230 = tail call noundef i64 @llvm.bswap.i64(i64 %228)
+  %231 = add i64 %24, -4734510112055689544
+  %232 = xor i64 %229, %231
+  %233 = sub i64 2066345149520216444, %24
+  %234 = xor i64 %230, %233
+  %235 = and i64 %232, 4294967295
+  %236 = and i64 %234, 4294967295
+  %237 = mul nuw i64 %236, %235
+  %238 = lshr i64 %232, 32
+  %239 = mul nuw i64 %236, %238
+  %240 = lshr i64 %234, 32
+  %241 = mul nuw i64 %240, %235
+  %242 = mul nuw i64 %240, %238
+  %243 = lshr i64 %237, 32
+  %244 = and i64 %239, 4294967295
+  %245 = add nuw i64 %244, %241
+  %246 = add nuw i64 %245, %243
+  %247 = lshr i64 %239, 32
+  %248 = lshr i64 %246, 32
+  %249 = add nuw i64 %247, %242
+  %250 = add nuw i64 %249, %248
+  %251 = shl i64 %246, 32
+  %252 = and i64 %237, 4294967295
+  %253 = or disjoint i64 %251, %252
+  %254 = xor i64 %253, %250
+  %255 = add i64 %224, %254
+  %256 = getelementptr inbounds nuw i8, ptr %26, i32 85
+  %257 = load i64, ptr %256, align 1
+  %258 = getelementptr inbounds nuw i8, ptr %26, i32 93
+  %259 = load i64, ptr %258, align 1
+  %260 = tail call noundef i64 @llvm.bswap.i64(i64 %257)
+  %261 = tail call noundef i64 @llvm.bswap.i64(i64 %259)
+  %262 = add i64 %24, -2623469361688619810
+  %263 = xor i64 %260, %262
+  %264 = sub i64 2262974939099578482, %24
+  %265 = xor i64 %261, %264
+  %266 = and i64 %263, 4294967295
+  %267 = and i64 %265, 4294967295
+  %268 = mul nuw i64 %267, %266
+  %269 = lshr i64 %263, 32
+  %270 = mul nuw i64 %267, %269
+  %271 = lshr i64 %265, 32
+  %272 = mul nuw i64 %271, %266
+  %273 = mul nuw i64 %271, %269
+  %274 = lshr i64 %268, 32
+  %275 = and i64 %270, 4294967295
+  %276 = add nuw i64 %275, %272
+  %277 = add nuw i64 %276, %274
+  %278 = lshr i64 %270, 32
+  %279 = lshr i64 %277, 32
+  %280 = add nuw i64 %278, %273
+  %281 = add nuw i64 %280, %279
+  %282 = shl i64 %277, 32
+  %283 = and i64 %268, 4294967295
+  %284 = or disjoint i64 %282, %283
+  %285 = xor i64 %284, %281
+  %286 = add i64 %255, %285
+  %287 = lshr i64 %286, 37
+  %288 = xor i64 %287, %286
+  %289 = mul i64 %288, 1609587791953885689
+  %290 = lshr i64 %289, 32
+  %291 = xor i64 %290, %289
+  call void @llvm.lifetime.end.p0(i64 104, ptr nonnull %26)
+  ret i64 %291
+}
+
+; Function Attrs: nofree norecurse nosync nounwind memory(inaccessiblemem: readwrite)
+define dso_local i64 @target_xxh3_len129(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #2 {
+  %26 = alloca [192 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 192, ptr nonnull %26) #7
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = getelementptr inbounds nuw i8, ptr %26, i32 24
+  store i64 %3, ptr %29, align 8
+  %30 = getelementptr inbounds nuw i8, ptr %26, i32 32
+  store i64 %4, ptr %30, align 8
+  %31 = getelementptr inbounds nuw i8, ptr %26, i32 40
+  store i64 %5, ptr %31, align 8
+  %32 = getelementptr inbounds nuw i8, ptr %26, i32 48
+  store i64 %6, ptr %32, align 8
+  %33 = getelementptr inbounds nuw i8, ptr %26, i32 56
+  store i64 %7, ptr %33, align 8
+  %34 = getelementptr inbounds nuw i8, ptr %26, i32 64
+  store i64 %8, ptr %34, align 8
+  %35 = getelementptr inbounds nuw i8, ptr %26, i32 72
+  store i64 %9, ptr %35, align 8
+  %36 = getelementptr inbounds nuw i8, ptr %26, i32 80
+  store i64 %10, ptr %36, align 8
+  %37 = getelementptr inbounds nuw i8, ptr %26, i32 88
+  store i64 %11, ptr %37, align 8
+  %38 = getelementptr inbounds nuw i8, ptr %26, i32 96
+  store i64 %12, ptr %38, align 8
+  %39 = getelementptr inbounds nuw i8, ptr %26, i32 104
+  store i64 %13, ptr %39, align 8
+  %40 = getelementptr inbounds nuw i8, ptr %26, i32 112
+  store i64 %14, ptr %40, align 8
+  %41 = getelementptr inbounds nuw i8, ptr %26, i32 120
+  store i64 %15, ptr %41, align 8
+  %42 = getelementptr inbounds nuw i8, ptr %26, i32 128
+  store i64 %16, ptr %42, align 8
+  %43 = getelementptr inbounds nuw i8, ptr %26, i32 136
+  store i64 %17, ptr %43, align 8
+  %44 = getelementptr inbounds nuw i8, ptr %26, i32 144
+  store i64 %18, ptr %44, align 8
+  %45 = getelementptr inbounds nuw i8, ptr %26, i32 152
+  store i64 %19, ptr %45, align 8
+  %46 = getelementptr inbounds nuw i8, ptr %26, i32 160
+  store i64 %20, ptr %46, align 8
+  %47 = getelementptr inbounds nuw i8, ptr %26, i32 168
+  store i64 %21, ptr %47, align 8
+  %48 = getelementptr inbounds nuw i8, ptr %26, i32 176
+  store i64 %22, ptr %48, align 8
+  %49 = getelementptr inbounds nuw i8, ptr %26, i32 184
+  store i64 %23, ptr %49, align 8
+  %50 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  br label %51
+
+51:                                               ; preds = %51, %25
+  %52 = phi i32 [ 0, %25 ], [ %92, %51 ]
+  %53 = phi i64 [ -5047318622128501241, %25 ], [ %91, %51 ]
+  %54 = shl nuw nsw i32 %52, 4
+  %55 = getelementptr inbounds nuw i8, ptr %50, i32 %54
+  %56 = getelementptr inbounds nuw i8, ptr @XXH3_kSecret, i32 %54
+  %57 = load i64, ptr %55, align 1
+  %58 = getelementptr i8, ptr %55, i32 8
+  %59 = load i64, ptr %58, align 1
+  %60 = load i64, ptr %56, align 16
+  %61 = getelementptr i8, ptr %56, i32 8
+  %62 = load i64, ptr %61, align 8
+  %63 = tail call noundef i64 @llvm.bswap.i64(i64 %57)
+  %64 = tail call noundef i64 @llvm.bswap.i64(i64 %59)
+  %65 = tail call noundef i64 @llvm.bswap.i64(i64 %60)
+  %66 = add i64 %65, %24
+  %67 = xor i64 %66, %63
+  %68 = tail call noundef i64 @llvm.bswap.i64(i64 %62)
+  %69 = sub i64 %68, %24
+  %70 = xor i64 %69, %64
+  %71 = and i64 %67, 4294967295
+  %72 = and i64 %70, 4294967295
+  %73 = mul nuw i64 %72, %71
+  %74 = lshr i64 %67, 32
+  %75 = mul nuw i64 %72, %74
+  %76 = lshr i64 %70, 32
+  %77 = mul nuw i64 %76, %71
+  %78 = mul nuw i64 %76, %74
+  %79 = lshr i64 %73, 32
+  %80 = and i64 %75, 4294967295
+  %81 = add nuw i64 %80, %77
+  %82 = add nuw i64 %81, %79
+  %83 = lshr i64 %75, 32
+  %84 = lshr i64 %82, 32
+  %85 = add nuw i64 %83, %78
+  %86 = add nuw i64 %85, %84
+  %87 = shl i64 %82, 32
+  %88 = and i64 %73, 4294967295
+  %89 = or disjoint i64 %87, %88
+  %90 = xor i64 %89, %86
+  %91 = add i64 %90, %53
+  %92 = add nuw nsw i32 %52, 1
+  %93 = icmp eq i32 %92, 8
+  br i1 %93, label %94, label %51
+
+94:                                               ; preds = %51
+  %95 = lshr i64 %91, 37
+  %96 = xor i64 %95, %91
+  %97 = mul i64 %96, 1609587791953885689
+  %98 = lshr i64 %97, 32
+  %99 = xor i64 %98, %97
+  %100 = getelementptr inbounds nuw i8, ptr %26, i32 114
+  %101 = load i64, ptr %100, align 2
+  %102 = getelementptr inbounds nuw i8, ptr %26, i32 122
+  %103 = load i64, ptr %102, align 2
+  %104 = tail call noundef i64 @llvm.bswap.i64(i64 %101)
+  %105 = tail call noundef i64 @llvm.bswap.i64(i64 %103)
+  %106 = add i64 %24, 8320639771003045937
+  %107 = xor i64 %104, %106
+  %108 = sub i64 -1453760514566526364, %24
+  %109 = xor i64 %105, %108
+  %110 = and i64 %107, 4294967295
+  %111 = and i64 %109, 4294967295
+  %112 = mul nuw i64 %111, %110
+  %113 = lshr i64 %107, 32
+  %114 = mul nuw i64 %111, %113
+  %115 = lshr i64 %109, 32
+  %116 = mul nuw i64 %115, %110
+  %117 = mul nuw i64 %115, %113
+  %118 = lshr i64 %112, 32
+  %119 = and i64 %114, 4294967295
+  %120 = add nuw i64 %119, %116
+  %121 = add nuw i64 %120, %118
+  %122 = lshr i64 %114, 32
+  %123 = lshr i64 %121, 32
+  %124 = add nuw i64 %122, %117
+  %125 = add nuw i64 %124, %123
+  %126 = shl i64 %121, 32
+  %127 = and i64 %112, 4294967295
+  %128 = or disjoint i64 %126, %127
+  %129 = xor i64 %128, %125
+  %130 = add i64 %129, %99
+  %131 = lshr i64 %130, 37
+  %132 = xor i64 %131, %130
+  %133 = mul i64 %132, 1609587791953885689
+  %134 = lshr i64 %133, 32
+  %135 = xor i64 %134, %133
+  call void @llvm.lifetime.end.p0(i64 192, ptr nonnull %26) #7
+  ret i64 %135
+}
+
+; Function Attrs: nofree norecurse nosync nounwind memory(inaccessiblemem: readwrite)
+define dso_local i64 @target_xxh3_len180(i64 noundef zeroext %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24) local_unnamed_addr #2 {
+  %26 = alloca [192 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 192, ptr nonnull %26) #7
+  store i64 %0, ptr %26, align 8
+  %27 = getelementptr inbounds nuw i8, ptr %26, i32 8
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %26, i32 16
+  store i64 %2, ptr %28, align 8
+  %29 = getelementptr inbounds nuw i8, ptr %26, i32 24
+  store i64 %3, ptr %29, align 8
+  %30 = getelementptr inbounds nuw i8, ptr %26, i32 32
+  store i64 %4, ptr %30, align 8
+  %31 = getelementptr inbounds nuw i8, ptr %26, i32 40
+  store i64 %5, ptr %31, align 8
+  %32 = getelementptr inbounds nuw i8, ptr %26, i32 48
+  store i64 %6, ptr %32, align 8
+  %33 = getelementptr inbounds nuw i8, ptr %26, i32 56
+  store i64 %7, ptr %33, align 8
+  %34 = getelementptr inbounds nuw i8, ptr %26, i32 64
+  store i64 %8, ptr %34, align 8
+  %35 = getelementptr inbounds nuw i8, ptr %26, i32 72
+  store i64 %9, ptr %35, align 8
+  %36 = getelementptr inbounds nuw i8, ptr %26, i32 80
+  store i64 %10, ptr %36, align 8
+  %37 = getelementptr inbounds nuw i8, ptr %26, i32 88
+  store i64 %11, ptr %37, align 8
+  %38 = getelementptr inbounds nuw i8, ptr %26, i32 96
+  store i64 %12, ptr %38, align 8
+  %39 = getelementptr inbounds nuw i8, ptr %26, i32 104
+  store i64 %13, ptr %39, align 8
+  %40 = getelementptr inbounds nuw i8, ptr %26, i32 112
+  store i64 %14, ptr %40, align 8
+  %41 = getelementptr inbounds nuw i8, ptr %26, i32 120
+  store i64 %15, ptr %41, align 8
+  %42 = getelementptr inbounds nuw i8, ptr %26, i32 128
+  store i64 %16, ptr %42, align 8
+  %43 = getelementptr inbounds nuw i8, ptr %26, i32 136
+  store i64 %17, ptr %43, align 8
+  %44 = getelementptr inbounds nuw i8, ptr %26, i32 144
+  store i64 %18, ptr %44, align 8
+  %45 = getelementptr inbounds nuw i8, ptr %26, i32 152
+  store i64 %19, ptr %45, align 8
+  %46 = getelementptr inbounds nuw i8, ptr %26, i32 160
+  store i64 %20, ptr %46, align 8
+  %47 = getelementptr inbounds nuw i8, ptr %26, i32 168
+  store i64 %21, ptr %47, align 8
+  %48 = getelementptr inbounds nuw i8, ptr %26, i32 176
+  store i64 %22, ptr %48, align 8
+  %49 = getelementptr inbounds nuw i8, ptr %26, i32 184
+  store i64 %23, ptr %49, align 8
+  %50 = getelementptr inbounds nuw i8, ptr %26, i32 1
+  br label %51
+
+51:                                               ; preds = %51, %25
+  %52 = phi i32 [ 0, %25 ], [ %92, %51 ]
+  %53 = phi i64 [ 4540069131684833004, %25 ], [ %91, %51 ]
+  %54 = shl nuw nsw i32 %52, 4
+  %55 = getelementptr inbounds nuw i8, ptr %50, i32 %54
+  %56 = getelementptr inbounds nuw i8, ptr @XXH3_kSecret, i32 %54
+  %57 = load i64, ptr %55, align 1
+  %58 = getelementptr i8, ptr %55, i32 8
+  %59 = load i64, ptr %58, align 1
+  %60 = load i64, ptr %56, align 16
+  %61 = getelementptr i8, ptr %56, i32 8
+  %62 = load i64, ptr %61, align 8
+  %63 = tail call noundef i64 @llvm.bswap.i64(i64 %57)
+  %64 = tail call noundef i64 @llvm.bswap.i64(i64 %59)
+  %65 = tail call noundef i64 @llvm.bswap.i64(i64 %60)
+  %66 = add i64 %65, %24
+  %67 = xor i64 %66, %63
+  %68 = tail call noundef i64 @llvm.bswap.i64(i64 %62)
+  %69 = sub i64 %68, %24
+  %70 = xor i64 %69, %64
+  %71 = and i64 %67, 4294967295
+  %72 = and i64 %70, 4294967295
+  %73 = mul nuw i64 %72, %71
+  %74 = lshr i64 %67, 32
+  %75 = mul nuw i64 %72, %74
+  %76 = lshr i64 %70, 32
+  %77 = mul nuw i64 %76, %71
+  %78 = mul nuw i64 %76, %74
+  %79 = lshr i64 %73, 32
+  %80 = and i64 %75, 4294967295
+  %81 = add nuw i64 %80, %77
+  %82 = add nuw i64 %81, %79
+  %83 = lshr i64 %75, 32
+  %84 = lshr i64 %82, 32
+  %85 = add nuw i64 %83, %78
+  %86 = add nuw i64 %85, %84
+  %87 = shl i64 %82, 32
+  %88 = and i64 %73, 4294967295
+  %89 = or disjoint i64 %87, %88
+  %90 = xor i64 %89, %86
+  %91 = add i64 %90, %53
+  %92 = add nuw nsw i32 %52, 1
+  %93 = icmp eq i32 %92, 8
+  br i1 %93, label %94, label %51
+
+94:                                               ; preds = %51
+  %95 = lshr i64 %91, 37
+  %96 = xor i64 %95, %91
+  %97 = mul i64 %96, 1609587791953885689
+  %98 = lshr i64 %97, 32
+  %99 = xor i64 %98, %97
+  %100 = getelementptr inbounds nuw i8, ptr %26, i32 129
+  %101 = load i64, ptr %100, align 1
+  %102 = getelementptr inbounds nuw i8, ptr %26, i32 137
+  %103 = load i64, ptr %102, align 1
+  %104 = tail call noundef i64 @llvm.bswap.i64(i64 %101)
+  %105 = tail call noundef i64 @llvm.bswap.i64(i64 %103)
+  %106 = add i64 %24, -9150895811085458631
+  %107 = xor i64 %106, %104
+  %108 = sub i64 7914194659941938988, %24
+  %109 = xor i64 %108, %105
+  %110 = and i64 %107, 4294967295
+  %111 = and i64 %109, 4294967295
+  %112 = mul nuw i64 %111, %110
+  %113 = lshr i64 %107, 32
+  %114 = mul nuw i64 %111, %113
+  %115 = lshr i64 %109, 32
+  %116 = mul nuw i64 %115, %110
+  %117 = mul nuw i64 %115, %113
+  %118 = lshr i64 %112, 32
+  %119 = and i64 %114, 4294967295
+  %120 = add nuw i64 %119, %116
+  %121 = add nuw i64 %120, %118
+  %122 = lshr i64 %114, 32
+  %123 = lshr i64 %121, 32
+  %124 = add nuw i64 %122, %117
+  %125 = add nuw i64 %124, %123
+  %126 = shl i64 %121, 32
+  %127 = and i64 %112, 4294967295
+  %128 = or disjoint i64 %126, %127
+  %129 = xor i64 %128, %125
+  %130 = add i64 %129, %99
+  %131 = getelementptr inbounds nuw i8, ptr %26, i32 145
+  %132 = load i64, ptr %131, align 1
+  %133 = getelementptr inbounds nuw i8, ptr %26, i32 153
+  %134 = load i64, ptr %133, align 1
+  %135 = tail call noundef i64 @llvm.bswap.i64(i64 %132)
+  %136 = tail call noundef i64 @llvm.bswap.i64(i64 %134)
+  %137 = add i64 %24, -6611157965513653271
+  %138 = xor i64 %137, %135
+  %139 = sub i64 -1839215637059881052, %24
+  %140 = xor i64 %139, %136
+  %141 = and i64 %138, 4294967295
+  %142 = and i64 %140, 4294967295
+  %143 = mul nuw i64 %142, %141
+  %144 = lshr i64 %138, 32
+  %145 = mul nuw i64 %142, %144
+  %146 = lshr i64 %140, 32
+  %147 = mul nuw i64 %146, %141
+  %148 = mul nuw i64 %146, %144
+  %149 = lshr i64 %143, 32
+  %150 = and i64 %145, 4294967295
+  %151 = add nuw i64 %150, %147
+  %152 = add nuw i64 %151, %149
+  %153 = lshr i64 %145, 32
+  %154 = lshr i64 %152, 32
+  %155 = add nuw i64 %153, %148
+  %156 = add nuw i64 %155, %154
+  %157 = shl i64 %152, 32
+  %158 = and i64 %143, 4294967295
+  %159 = or disjoint i64 %157, %158
+  %160 = xor i64 %159, %156
+  %161 = add i64 %160, %130
+  %162 = getelementptr inbounds nuw i8, ptr %26, i32 161
+  %163 = load i64, ptr %162, align 1
+  %164 = getelementptr inbounds nuw i8, ptr %26, i32 169
+  %165 = load i64, ptr %164, align 1
+  %166 = tail call noundef i64 @llvm.bswap.i64(i64 %163)
+  %167 = tail call noundef i64 @llvm.bswap.i64(i64 %165)
+  %168 = add i64 %24, -3433288310154277810
+  %169 = xor i64 %168, %166
+  %170 = sub i64 5046485836271438973, %24
+  %171 = xor i64 %170, %167
+  %172 = and i64 %169, 4294967295
+  %173 = and i64 %171, 4294967295
+  %174 = mul nuw i64 %173, %172
+  %175 = lshr i64 %169, 32
+  %176 = mul nuw i64 %173, %175
+  %177 = lshr i64 %171, 32
+  %178 = mul nuw i64 %177, %172
+  %179 = mul nuw i64 %177, %175
+  %180 = lshr i64 %174, 32
+  %181 = and i64 %176, 4294967295
+  %182 = add nuw i64 %181, %178
+  %183 = add nuw i64 %182, %180
+  %184 = lshr i64 %176, 32
+  %185 = lshr i64 %183, 32
+  %186 = add nuw i64 %184, %179
+  %187 = add nuw i64 %186, %185
+  %188 = shl i64 %183, 32
+  %189 = and i64 %174, 4294967295
+  %190 = or disjoint i64 %188, %189
+  %191 = xor i64 %190, %187
+  %192 = add i64 %191, %161
+  %193 = getelementptr inbounds nuw i8, ptr %26, i32 165
+  %194 = load i64, ptr %193, align 1
+  %195 = getelementptr inbounds nuw i8, ptr %26, i32 173
+  %196 = load i64, ptr %195, align 1
+  %197 = tail call noundef i64 @llvm.bswap.i64(i64 %194)
+  %198 = tail call noundef i64 @llvm.bswap.i64(i64 %196)
+  %199 = add i64 %24, 8320639771003045937
+  %200 = xor i64 %197, %199
+  %201 = sub i64 -1453760514566526364, %24
+  %202 = xor i64 %198, %201
+  %203 = and i64 %200, 4294967295
+  %204 = and i64 %202, 4294967295
+  %205 = mul nuw i64 %204, %203
+  %206 = lshr i64 %200, 32
+  %207 = mul nuw i64 %204, %206
+  %208 = lshr i64 %202, 32
+  %209 = mul nuw i64 %208, %203
+  %210 = mul nuw i64 %208, %206
+  %211 = lshr i64 %205, 32
+  %212 = and i64 %207, 4294967295
+  %213 = add nuw i64 %212, %209
+  %214 = add nuw i64 %213, %211
+  %215 = lshr i64 %207, 32
+  %216 = lshr i64 %214, 32
+  %217 = add nuw i64 %215, %210
+  %218 = add nuw i64 %217, %216
+  %219 = shl i64 %214, 32
+  %220 = and i64 %205, 4294967295
+  %221 = or disjoint i64 %219, %220
+  %222 = xor i64 %221, %218
+  %223 = add i64 %222, %192
+  %224 = lshr i64 %223, 37
+  %225 = xor i64 %224, %223
+  %226 = mul i64 %225, 1609587791953885689
+  %227 = lshr i64 %226, 32
+  %228 = xor i64 %227, %226
+  call void @llvm.lifetime.end.p0(i64 192, ptr nonnull %26) #7
+  ret i64 %228
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: write)
+define dso_local void @target_xxh128_len12(ptr noundef writeonly initializes((0, 16)) %0, i64 noundef zeroext %1, i64 noundef zeroext %2, i64 noundef zeroext %3, i64 noundef zeroext %4, i64 noundef zeroext %5, i64 noundef zeroext %6, i64 noundef zeroext %7, i64 noundef zeroext %8, i64 noundef zeroext %9, i64 noundef zeroext %10, i64 noundef zeroext %11, i64 noundef zeroext %12, i64 noundef zeroext %13, i64 noundef zeroext %14, i64 noundef zeroext %15, i64 noundef zeroext %16, i64 noundef zeroext %17, i64 noundef zeroext %18, i64 noundef zeroext %19, i64 noundef zeroext %20, i64 noundef zeroext %21, i64 noundef zeroext %22, i64 noundef zeroext %23, i64 noundef zeroext %24, i64 noundef zeroext %25) local_unnamed_addr #3 {
+  %27 = alloca [16 x i8], align 8
+  call void @llvm.lifetime.start.p0(i64 16, ptr nonnull %27)
+  store i64 %1, ptr %27, align 8
+  %28 = getelementptr inbounds nuw i8, ptr %27, i32 8
+  store i64 %2, ptr %28, align 8
+  %29 = sub i64 6455697860950631241, %25
+  %30 = add i64 %25, -4466874330221494952
+  %31 = getelementptr inbounds nuw i8, ptr %27, i32 1
+  %32 = load i64, ptr %31, align 1
+  %33 = tail call noundef i64 @llvm.bswap.i64(i64 %32)
+  %34 = getelementptr inbounds nuw i8, ptr %27, i32 5
+  %35 = load i64, ptr %34, align 1
+  %36 = tail call noundef i64 @llvm.bswap.i64(i64 %35)
+  %37 = xor i64 %33, %29
+  %38 = xor i64 %37, %36
+  %39 = and i64 %38, 4294967295
+  %40 = mul nuw i64 %39, 2246822535
+  %41 = lshr i64 %38, 32
+  %42 = mul nuw i64 %41, 2246822535
+  %43 = mul nuw i64 %39, 2654435761
+  %44 = mul nuw i64 %41, 2654435761
+  %45 = lshr i64 %40, 32
+  %46 = and i64 %42, 4294967295
+  %47 = add nuw i64 %46, %43
+  %48 = add nuw i64 %47, %45
+  %49 = lshr i64 %42, 32
+  %50 = lshr i64 %48, 32
+  %51 = shl i64 %48, 32
+  %52 = and i64 %40, 4294967295
+  %53 = or disjoint i64 %52, 198158383604301824
+  %54 = add i64 %53, %51
+  %55 = xor i64 %36, %30
+  %56 = and i64 %55, -4294967296
+  %57 = and i64 %55, 4294967295
+  %58 = mul nuw i64 %57, 2246822519
+  %59 = add i64 %58, %56
+  %60 = add i64 %59, %44
+  %61 = add i64 %60, %49
+  %62 = add i64 %61, %50
+  %63 = tail call noundef i64 @llvm.bswap.i64(i64 %62)
+  %64 = xor i64 %63, %54
+  %65 = and i64 %64, 4294967295
+  %66 = mul nuw nsw i64 %65, 668265295
+  %67 = lshr i64 %64, 32
+  %68 = mul nuw nsw i64 %67, 668265295
+  %69 = mul nuw i64 %65, 3266489917
+  %70 = mul nuw i64 %67, 3266489917
+  %71 = lshr i64 %66, 32
+  %72 = and i64 %68, 4294967295
+  %73 = add nuw i64 %72, %69
+  %74 = add nuw i64 %73, %71
+  %75 = lshr i64 %68, 32
+  %76 = lshr i64 %74, 32
+  %77 = shl i64 %74, 32
+  %78 = and i64 %66, 4294967295
+  %79 = or disjoint i64 %77, %78
+  %80 = mul i64 %62, -4417276706812531889
+  %81 = add i64 %70, %80
+  %82 = add i64 %81, %75
+  %83 = add i64 %82, %76
+  %84 = lshr i64 %77, 37
+  %85 = xor i64 %84, %79
+  %86 = mul i64 %85, 1609587791953885689
+  %87 = lshr i64 %86, 32
+  %88 = xor i64 %87, %86
+  %89 = lshr i64 %83, 37
+  %90 = xor i64 %89, %83
+  %91 = mul i64 %90, 1609587791953885689
+  %92 = lshr i64 %91, 32
+  %93 = xor i64 %92, %91
+  store i64 %88, ptr %0, align 8
+  %94 = getelementptr inbounds nuw i8, ptr %0, i32 8
+  store i64 %93, ptr %94, align 8
+  call void @llvm.lifetime.end.p0(i64 16, ptr nonnull %27)
+  ret void
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i32 @llvm.fshl.i32(i32, i32, i32) #4
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.fshl.i64(i64, i64, i64) #4
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i32 @llvm.bswap.i32(i32) #5
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.bswap.i64(i64) #5
+
+; Function Attrs: nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: readwrite)
+declare void @llvm.experimental.noalias.scope.decl(metadata) #6
+
+attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(none) "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #1 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
+attributes #2 = { nofree norecurse nosync nounwind memory(inaccessiblemem: readwrite) "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #3 = { mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: write) "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mips32r2" "target-features"="+fpxx,+mips32r2,+nooddspreg,-noabicalls" }
+attributes #4 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #5 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #6 = { nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: readwrite) }
+attributes #7 = { nounwind }
+
+!llvm.module.flags = !{!0, !1, !2}
+!llvm.ident = !{!3}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 1}
+!2 = !{i32 7, !"PIE Level", i32 1}
+!3 = !{!"Ubuntu clang version 20.1.8 (++20250708082409+6fb913d3e2ec-1~exp1~20250708202428.132)"}
+!4 = !{!5}
+!5 = distinct !{!5, !6, !"XXH3_64bits_internal: argument 0"}
+!6 = distinct !{!6, !"XXH3_64bits_internal"}
+!7 = !{!8}
+!8 = distinct !{!8, !9, !"XXH3_64bits_internal: argument 0"}
+!9 = distinct !{!9, !"XXH3_64bits_internal"}
+!10 = !{!11, !13}
+!11 = distinct !{!11, !12, !"XXH3_len_17to128_64b: argument 0"}
+!12 = distinct !{!12, !"XXH3_len_17to128_64b"}
+!13 = distinct !{!13, !14, !"XXH3_64bits_internal: argument 0"}
+!14 = distinct !{!14, !"XXH3_64bits_internal"}
+!15 = !{!16}
+!16 = distinct !{!16, !17, !"XXH3_64bits_internal: argument 0"}
+!17 = distinct !{!17, !"XXH3_64bits_internal"}
+!18 = !{!19}
+!19 = distinct !{!19, !20, !"XXH3_len_129to240_64b: argument 0"}
+!20 = distinct !{!20, !"XXH3_len_129to240_64b"}
+!21 = !{!19, !16}
+!22 = distinct !{!22, !23}
+!23 = !{!"llvm.loop.mustprogress"}
+!24 = !{!25}
+!25 = distinct !{!25, !26, !"XXH3_64bits_internal: argument 0"}
+!26 = distinct !{!26, !"XXH3_64bits_internal"}
+!27 = !{!28}
+!28 = distinct !{!28, !29, !"XXH3_len_129to240_64b: argument 0"}
+!29 = distinct !{!29, !"XXH3_len_129to240_64b"}
+!30 = !{!28, !25}
+!31 = !{!32, !34, !36, !38}
+!32 = distinct !{!32, !33, !"XXH3_len_9to16_128b: argument 0"}
+!33 = distinct !{!33, !"XXH3_len_9to16_128b"}
+!34 = distinct !{!34, !35, !"XXH3_len_0to16_128b: argument 0"}
+!35 = distinct !{!35, !"XXH3_len_0to16_128b"}
+!36 = distinct !{!36, !37, !"XXH3_128bits_internal: argument 0"}
+!37 = distinct !{!37, !"XXH3_128bits_internal"}
+!38 = distinct !{!38, !39, !"XXH_INLINE_XXH3_128bits_withSeed: argument 0"}
+!39 = distinct !{!39, !"XXH_INLINE_XXH3_128bits_withSeed"}

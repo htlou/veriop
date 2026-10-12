@@ -1,0 +1,52 @@
+{
+  "commit": "acfcfa9",
+  "date": "2022-07-08",
+  "subject": "Remove stream loads and slightly improve avx512 seed generation",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit removes streaming-load hints that hinder instruction fusion and changes AVX512 secret initialization.",
+  "change_summary": "Removes non-temporal load metadata from AVX512 seed generation and changes SIMD seed arithmetic.",
+  "units": [
+    {
+      "name": "public XXH3 fixed 256/320-byte AVX2 paths",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "withSecret secret size 136 or 192",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/acfcfa9/r_api_avx2",
+      "evidence": "Five AVX2 public targets and the raw custom-secret initializer pass Alive2 in both directions."
+    },
+    {
+      "name": "exact AVX512 nontemporal-load IR, public seeded and raw initializer paths",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "alive2-crash-or-parse-error",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/acfcfa9/r_api_avx512",
+      "evidence": "Alive2 rejects the old-side nontemporal metadata for the seeded AVX512 public target; the raw AVX512 initializer has the same translation failure."
+    },
+    {
+      "name": "AVX512 seed generation after removing unsupported nontemporal metadata from old IR",
+      "level": "precond",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "old-side !nontemporal load metadata removed for Alive2 translation",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/acfcfa9/r_api_avx512_nt",
+      "evidence": "All five AVX512 public targets pass both directions after the old-side metadata is removed; the corresponding raw initializer also passes in r_raw_avx512_nt."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": "UNSUPPORTED",
+  "coverage": "partial",
+  "unsupported_reason": "alive2-crash-or-parse-error",
+  "not_equiv_kind": null,
+  "notes": "The normalized rerun is conditional evidence about computations after deleting exactly the old !nontemporal annotations; it is not counted as a direct Alive2 proof of the exact performance-relevant LLVM IR. Four other AVX512 public cases pass without normalization."
+}

@@ -1,0 +1,22 @@
+{
+  "repo": "fast_float",
+  "commit": "d0af1cfdbd7dfa781f2e40c89bd6b85d886a538a",
+  "parent": "36d3441dc03d1551d48aa424c55905b6c9e5c14d",
+  "selected_from": "history-eq/results/pinned-samples.json",
+  "performance_intent": "Adds a base-ten uint16_t fast path",
+  "commit_verdict": "VERIFIED_INEQUAL_UNRESTRICTED_PUBLIC_WIDE_CHAR",
+  "checked_scope": "Public from_chars<uint16_t> on one char16_t, char32_t, or wchar_t code unit; symbolic one-code-unit char16_t parse_int_string error and consumed fields",
+  "checker": "Alive2 in both directions on exact historical parser IR; native historical public API binaries",
+  "compiler": "Clang 20.1.8 -std=c++23 -O2, x86-64; libstdc++ 11 headers and library",
+  "old_ir_sha256": "bbf878d3d3a4ce8a486e2d656d8f3429034ecc5e11d5e9246cb1fce5dbdc776c",
+  "new_ir_sha256": "44e4388075145a1312f3c0ac79b556a0c87f8b2f560c29cf7427bd55c3f471eb",
+  "source_diff_sha256": "c93c362575a7305297144d220271f6415c9daacffcd0efb49dc480d5703bb295",
+  "result": {
+    "old_to_new": "2 incorrect (error and consumed), 1 failed-to-prove (value: large constant initializer approximated), 0 Alive2 errors",
+    "new_to_old": "2 incorrect (error and consumed), 1 failed-to-prove (value: large constant initializer approximated), 0 Alive2 errors",
+    "public_native": "For code unit U+0130, old returns invalid_argument, consumes 0, and leaves 123; new succeeds, consumes 1, and writes 0 for char16_t, char32_t, and wchar_t. Plain char '0' matches."
+  },
+  "sanitizers": "Both historical public witnesses rerun with AddressSanitizer and UndefinedBehaviorSanitizer and produced the same results without diagnostics",
+  "official_performance_score": null,
+  "limitations": "Counterexample is a non-ASCII code unit, not a valid ASCII decimal digit. No whole-function Alive2 proof for the public API; public difference is shown by historical native binaries and corroborated at the parser boundary. GCC 11 cannot compile the child header because its constexpr function declares a static local, while Clang 20 C++23 builds both. No official historical before/after benchmark score measured."
+}

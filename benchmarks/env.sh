@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Source this file before running the pinned benchmarks and checkers.
+export VERIOP_BENCH_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+export JAVA_HOME="$VERIOP_BENCH_ROOT/tools/java21/usr/lib/jvm/java-21-openjdk-amd64"
+export JAVA17_HOME="$VERIOP_BENCH_ROOT/tools/java17/jdk-17.0.20.1+1"
+export DAFNY410_HOME="$VERIOP_BENCH_ROOT/tools/dafny-4.10.0/dafny"
+export CARGO_HOME="$VERIOP_BENCH_ROOT/../aeneas/env/cargo"
+export RUSTUP_HOME="$VERIOP_BENCH_ROOT/../aeneas/env/rustup"
+export CAML_LD_LIBRARY_PATH="$VERIOP_BENCH_ROOT/../aeneas/env/opam/5.3.0/lib/stublibs"
+export LD_LIBRARY_PATH="$VERIOP_BENCH_ROOT/tools/kframework-7.1.337/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
+export LIBRARY_PATH="$VERIOP_BENCH_ROOT/../aeneas/env/gmp/usr/lib/x86_64-linux-gnu${LIBRARY_PATH:+:$LIBRARY_PATH}"
+export Z3_EXE="$VERIOP_BENCH_ROOT/../alive2/.venv/bin/z3"
+export KEY_JAR="$VERIOP_BENCH_ROOT/tools/key-3.0.0/key-3.0.0-exe.jar"
+export VOLTA_BIN="$VERIOP_BENCH_ROOT/../cuda/repos/volta/target/release/volta"
+export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=$JAVA_HOME/lib/security/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
+export PATH="$JAVA_HOME/bin:$VERIOP_BENCH_ROOT/tools/go1.26.4/bin:$VERIOP_BENCH_ROOT/tools/bazel-9.1.1:$VERIOP_BENCH_ROOT/tools/foundry:$VERIOP_BENCH_ROOT/tools/dafny-4.9.0/dafny:$VERIOP_BENCH_ROOT/tools/kframework-7.1.337/usr/bin:$VERIOP_BENCH_ROOT/../alive2/.venv/bin:$VERIOP_BENCH_ROOT/../aeneas/env/cargo/bin:$VERIOP_BENCH_ROOT/../aeneas/env/opam/5.3.0/bin:$PATH"

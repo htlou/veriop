@@ -1,0 +1,36 @@
+
+----------------------------------------
+declare void @tma_load_3d(noundef ptr, noundef ptr, noundef ptr, noundef i32, noundef i32, noundef i32)
+
+define void @target_copy3(ptr noundef %desc, ptr noundef %barrier, ptr nowrite noundef %args, ptr noundef %smem, i32 noundef %c0, i32 noundef %c1, i32 noundef %c2) {
+entry:
+  %cmp = icmp ne ptr nowrite noundef %args, null
+  assume i1 %cmp
+  %block_table = gep inbounds nuw ptr nowrite noundef %args, 1 x i64 16
+  %#0 = load ptr, ptr %block_table, align 8
+  %cmp1 = icmp eq ptr %#0, null
+  assume i1 %cmp1
+  tail call void @tma_load_3d(noundef ptr noundef %desc, noundef ptr noundef %barrier, noundef ptr noundef %smem, noundef i32 noundef %c0, noundef i32 noundef %c1, noundef i32 noundef %c2)
+  ret void
+}
+=>
+declare void @tma_load_3d(noundef ptr, noundef ptr, noundef ptr, noundef i32, noundef i32, noundef i32)
+
+define void @target_copy3(ptr noundef %desc, ptr noundef %barrier, ptr nowrite noundef %args, ptr noundef %smem, i32 noundef %c0, i32 noundef %c1, i32 noundef %c2) {
+entry:
+  %cmp = icmp ne ptr nowrite noundef %args, null
+  assume i1 %cmp
+  %block_table = gep inbounds nuw ptr nowrite noundef %args, 1 x i64 16
+  %#0 = load ptr, ptr %block_table, align 8
+  %cmp1 = icmp eq ptr %#0, null
+  assume i1 %cmp1
+  tail call void @tma_load_3d(noundef ptr noundef %desc, noundef ptr noundef %barrier, noundef ptr noundef %smem, noundef i32 noundef %c0, noundef i32 noundef %c1, noundef i32 noundef %c2)
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

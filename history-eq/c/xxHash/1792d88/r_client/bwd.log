@@ -1,0 +1,80 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/1792d88/r_client/new.ll c/xxHash/1792d88/r_client/old.ll
+
+----------------------------------------
+declare ptr @XXH64_createState() noalias
+declare i32 @XXH64_freeState(noundef ptr)
+
+define i32 @target_client_create(ptr noundef initializes((0, 4)) %#0) {
+#1:
+  store i32 1, ptr noundef initializes((0, 4)) %#0, align 4
+  %#4 = tail call ptr @XXH64_createState() noalias
+  %#5 = icmp eq ptr %#4, null
+  br i1 %#5, label %#3, label %#2
+
+#2:
+  store i32 2, ptr %#4, align 4
+  %#6 = load i32, ptr noundef initializes((0, 4)) %#0, align 4
+  %#7 = tail call i32 @XXH64_freeState(nonnull noundef ptr %#4)
+  br label %#3
+
+#3:
+  %#8 = phi i32 [ %#6, %#2 ], [ 4294967295, %#1 ]
+  ret i32 %#8
+}
+=>
+declare ptr @XXH64_createState()
+declare i32 @XXH64_freeState(noundef ptr)
+
+define i32 @target_client_create(ptr noundef initializes((0, 4)) %#0) {
+#1:
+  store i32 1, ptr noundef initializes((0, 4)) %#0, align 4
+  %#4 = tail call ptr @XXH64_createState()
+  %#5 = icmp eq ptr %#4, null
+  br i1 %#5, label %#3, label %#2
+
+#2:
+  store i32 2, ptr %#4, align 4
+  %#6 = load i32, ptr noundef initializes((0, 4)) %#0, align 4
+  %#7 = tail call i32 @XXH64_freeState(nonnull noundef ptr %#4)
+  br label %#3
+
+#3:
+  %#8 = phi i32 [ %#6, %#2 ], [ 4294967295, %#1 ]
+  ret i32 %#8
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noundef initializes((0, 4)) %#0 = pointer(non-local, block_id=1, offset=0) / Address=#x004
+
+Source:
+ptr %#4 = pointer(local, block_id=0, offset=8) / Address=#x108
+i1 %#5 = #x0 (0)
+  >> Jump to %#2
+i32 %#6 = poison
+i32 %#7 = function did not return!
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 4	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 8	align: 1	alloc type: 0	alive: true	address: 4
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+LOCAL BLOCKS:
+Block 4 >	size: 12	align: 16	alloc type: 2	alive: true	address: 256
+
+Target:
+ptr %#4 = pointer(non-local, block_id=0, offset=8) / Address=#x008
+i1 %#5 = #x0 (0)
+  >> Jump to %#2
+void = UB triggered!
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

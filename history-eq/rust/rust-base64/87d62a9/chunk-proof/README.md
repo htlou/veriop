@@ -1,0 +1,9 @@
+# rust-base64 `87d62a9`: one eight-byte decode chunk
+
+The exact historical `src/lib.rs` blobs are `1708872f7065b8e571c93b373ca5ebce7dc8113b` (parent) and `636dd2bcf729dfa0305d1710bdeffc31fbd9392d` (child). The old loop decodes eight input bytes one at a time with `decode_table_entry`; the new loop reads a big-endian `u64` and extracts those same bytes before lookup. The decode table blob is unchanged (`c377375aaf29617b6eb9f76c7b6b437a1684bd29`, with invalid marker 255).
+
+The [replay script](verify.py) checks these Git objects and the exact eight-byte code shapes, then asks Z3 two universal questions over eight arbitrary input bytes and an arbitrary 256-entry decode table. Both queries are unsatisfiable: the first invalid byte and its offset agree; when no byte is invalid, the packed `u64` accumulator agrees. A negative control that reverses the byte order is satisfiable. The [SMT query](chunk.smt2) and [solver output](z3.log) are retained. `BigEndian::read_u64` is modeled as concatenating the eight bytes, matching the checked local byteorder 1.5.0 implementation (`u64::from_be_bytes`), a valid resolution of the historical `byteorder = "1.0.0"` dependency.
+
+**Verdict: `EQUIV_PARTIAL` for one valid eight-byte chunk under that byteorder resolution.** The original `BigEndian::write_u64` call is unchanged and receives the same accumulator. This proof does not cover loop bounds, buffer capacity and mutation, non-full chunks, trailing/padding logic, whole-function errors, or the public decode API. Aeneas generated only an axiom for the historical `decode_mode_buf` because it rejects returns inside the loop; this Z3 check is **not an Aeneas/Lean proof** of that function. No official historical benchmark delta was measured.
+
+Run `python3 -B history-eq/rust/rust-base64/87d62a9/chunk-proof/verify.py` from the project root.

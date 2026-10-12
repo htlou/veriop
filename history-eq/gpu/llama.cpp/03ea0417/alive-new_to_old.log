@@ -1,0 +1,30 @@
+
+----------------------------------------
+define i32 @target(i32 noundef returned %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  ret i32 noundef returned %#0
+}
+=>
+define i32 @target(i32 noundef %#0, i32 noundef returned %#1) nofree noundef willreturn memory(none) {
+#2:
+  ret i32 noundef returned %#1
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef returned %#0 = #x00000000 (0)
+i32 noundef %#1 = #x00000001 (1)
+
+Source:
+
+Target:
+Source value: #x00000000 (0)
+Target value: #x00000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

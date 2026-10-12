@@ -1,0 +1,88 @@
+
+----------------------------------------
+define {i64, i64} @old_umul128(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = lshr i64 noundef %#0, 32
+  %#4 = lshr i64 noundef %#1, 32
+  %#5 = mul nuw i64 %#4, %#3
+  %#6 = and i64 noundef %#0, 4294967295
+  %#7 = mul nuw i64 %#4, %#6
+  %#8 = and i64 noundef %#1, 4294967295
+  %#9 = mul nuw i64 %#8, %#3
+  %#10 = mul nuw i64 %#8, %#6
+  %#11 = lshr i64 %#10, 32
+  %#12 = and i64 %#9, 4294967295
+  %#13 = add nsw nuw i64 %#11, %#12
+  %#14 = and i64 %#7, 4294967295
+  %#15 = add nsw nuw i64 %#13, %#14
+  %#16 = lshr i64 %#15, 32
+  %#17 = lshr i64 %#9, 32
+  %#18 = lshr i64 %#7, 32
+  %#19 = add nuw i64 %#17, %#5
+  %#20 = add nuw i64 %#19, %#18
+  %#21 = add nuw i64 %#20, %#16
+  %#22 = shl i64 %#15, 32
+  %#23 = and i64 %#10, 4294967295
+  %#24 = or disjoint i64 %#22, %#23
+  %#25 = insertvalue {i64, i64} poison, i64 %#21, 0
+  %#26 = insertvalue {i64, i64} %#25, i64 %#24, 1
+  ret {i64, i64} %#26
+}
+=>
+define {i64, i64} @new_umul128(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = zext i64 noundef %#0 to i128
+  %#4 = zext i64 noundef %#1 to i128
+  %#5 = mul nuw i128 %#4, %#3
+  %#6 = lshr i128 %#5, 64
+  %#7 = trunc nuw i128 %#6 to i64
+  %#8 = trunc i128 %#5 to i64
+  %#9 = insertvalue {i64, i64} poison, i64 %#7, 0
+  %#10 = insertvalue {i64, i64} %#9, i64 %#8, 1
+  ret {i64, i64} %#10
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i64 @old_umul128_upper64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = lshr i64 noundef %#0, 32
+  %#4 = lshr i64 noundef %#1, 32
+  %#5 = mul nuw i64 %#4, %#3
+  %#6 = and i64 noundef %#0, 4294967295
+  %#7 = mul nuw i64 %#4, %#6
+  %#8 = and i64 noundef %#1, 4294967295
+  %#9 = mul nuw i64 %#8, %#3
+  %#10 = mul nuw i64 %#8, %#6
+  %#11 = lshr i64 %#10, 32
+  %#12 = and i64 %#9, 4294967295
+  %#13 = add nsw nuw i64 %#11, %#12
+  %#14 = and i64 %#7, 4294967295
+  %#15 = add nsw nuw i64 %#13, %#14
+  %#16 = lshr i64 %#15, 32
+  %#17 = lshr i64 %#9, 32
+  %#18 = lshr i64 %#7, 32
+  %#19 = add nuw i64 %#17, %#5
+  %#20 = add nuw i64 %#19, %#18
+  %#21 = add nuw i64 %#20, %#16
+  ret i64 %#21
+}
+=>
+define i64 @new_umul128_upper64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = zext i64 noundef %#0 to i128
+  %#4 = zext i64 noundef %#1 to i128
+  %#5 = mul nuw i128 %#4, %#3
+  %#6 = lshr i128 %#5, 64
+  %#7 = trunc nuw i128 %#6 to i64
+  %#range_0_%#7 = !range i64 %#7, i64 0, i64 -1
+  ret i64 %#range_0_%#7
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  2 failed-to-prove transformations
+  0 Alive2 errors

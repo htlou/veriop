@@ -1,0 +1,35 @@
+{
+ "repo": "llama.cpp",
+ "commit": "f3dd7b8e680e37342649024c0ee282c5d60b83da",
+ "checker": "Volta (PTX parse) + per-function PTX identity (nvcc 12.8)",
+ "checker_ran": true,
+ "verdict": "EQUIV_PARTIAL",
+ "scope": "all 61 translation units that include the changed headers/sources (mma.cuh, mmf.cuh, mmf.cu) for sm_80: 2999 pre-existing kernels PTX-identical; 1152 added kernel instantiations (new rows_per_block template parameter for CDNA) have no old counterpart; host dispatch in mmf.cu not covered",
+ "build_config": "nvcc 12.8 --ptx -O3 -std=c++17 -arch=compute_80 --extended-lambda -DGGML_BACKEND_BUILD, ggml/src + ggml/include of the respective revision",
+ "units": [
+  {
+   "name": "pre-existing mul_mat_f / mul_mat_f_ids / fattn-mma / mmq kernels",
+   "file": "ggml/src/ggml-cuda/mma.cuh",
+   "result": "EQUIV",
+   "detail": "2999 kernels identical across 61 TUs"
+  },
+  {
+   "name": "new rows_per_block=64 (CDNA) instantiations",
+   "file": "ggml/src/ggml-cuda/mmf.cuh",
+   "result": "UNKNOWN",
+   "detail": "new code for AMD CDNA; no old counterpart, not reachable on NVIDIA devices by host dispatch"
+  },
+  {
+   "name": "ggml_cuda_should_use_mmf / mmf_get_rows_per_block",
+   "file": "ggml/src/ggml-cuda/mmf.cu",
+   "result": "UNKNOWN",
+   "detail": "host dispatch; not modelled"
+  }
+ ],
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "not_equiv_level": null,
+ "counterexample": null,
+ "evidence_dir": "history-eq/gh/work/llama.cpp/f3dd7b8e",
+ "notes": "AMD CDNA (MFMA) enablement. Every kernel that existed before is compiled to byte-identical PTX for sm_80; the commit adds new template instantiations and host routing that are not compared."
+}

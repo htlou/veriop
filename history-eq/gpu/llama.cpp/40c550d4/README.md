@@ -1,0 +1,9 @@
+# llama.cpp `40c550d4`: Vulkan SSM_CONV workgroup layout
+
+**Verdict: `EQUIV_PARTIAL` at GLSL source level for `nc != 4`; the whole commit is unverified.** The [reproduction script](reproduce.py) extracts the exact [old](old-shader.comp) and [new](new-shader.comp) historical shaders plus their [old](old-pipeline.txt) and [new](new-pipeline.txt) pipeline settings. The unchanged caller dispatches `elements = {nr, n_t, n_s}`. The old pipeline uses one local y lane per workgroup; the new one uses 16 and dispatches `ceil(n_t/16)` y workgroups.
+
+The [three direct Z3 queries](layout.smt2) return [three `unsat` results](layout.log): every old token index maps to one new `(workgroup_y, local_y)` pair, that pair is dispatched, and no two new pairs map to the same token index. The model assumes `0 < n_t <= 2^32 - 16` so the padded new y index cannot overflow the shader's 32-bit `uint`. The x and z coordinates and the source/destination index formulas are unchanged after substituting that token index. For `nc != 4`, both shaders start `sum` at zero and execute the same ordered multiply-add loop over the same elements. Thus their source-level outputs agree when the addressed buffers are in bounds and input/output storage does not alias.
+
+For `nc == 4`, the new shader uses GLSL `dot(vec4, vec4)` in place of the old sequential sum. Its compiled SPIR-V and floating-point results have not been compared; neither the full Vulkan operation nor an official historical benchmark score is established. Z3 was invoked directly from the Kuiper package; **Kuiper did not verify this pair**. Volta's NVIDIA PTX checker does not accept these Vulkan GLSL shaders.
+
+Run `python3 -B history-eq/gpu/llama.cpp/40c550d4/reproduce.py` from the project root to regenerate the historical shader evidence and Z3 result.

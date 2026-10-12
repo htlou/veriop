@@ -1,0 +1,52 @@
+{
+  "commit": "ef645e2",
+  "date": "2021-07-07",
+  "subject": "Apply LIBDIVIDE_INLINE to all functions (#81)",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit applies forced inlining to three division helpers, aiming to remove call overhead.",
+  "change_summary": "Changes inline annotations on portable 32-by-16, 128-by-64 and 128-by-128 helper functions.",
+  "units": [
+    {
+      "name": "public signed/unsigned 16/64-bit division and recovery under -Os",
+      "level": "api",
+      "verdict": "REFINES",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/ef645e2/Os",
+      "evidence": "All nine checked targets pass old-to-new; five 64-bit helper/API targets fail the reverse direction with source-more-defined-than-target witnesses."
+    },
+    {
+      "name": "public signed/unsigned 16/64-bit division and recovery under -O3 default x86 path",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/ef645e2/default",
+      "evidence": "Eight targets pass both directions; unsigned-64 recovery times out in both directions."
+    },
+    {
+      "name": "public signed/unsigned 16/64-bit division and recovery with no-assembly model",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "d != 0; unchanged x86 inline-assembly branch disabled equally",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/ef645e2/noasm",
+      "evidence": "All nine targets pass bidirectional Alive2 in the -O3 no-assembly model; -O1 and -Os inline variants also pass."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "REFINES",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The one-way -Os result is compiler-configuration-specific and does not settle the default configuration's unsigned-64 recovery timeout. No commit-wide equivalence or refinement is claimed."
+}

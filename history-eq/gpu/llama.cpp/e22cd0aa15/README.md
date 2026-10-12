@@ -1,0 +1,5 @@
+# llama.cpp `e22cd0aa15` — Metal small-batch mat-vec dispatch
+
+**Verdict: `NOT_EQUIV` for the small-batch dispatch predicate, not for tensor values.** The exact historical `ggml_metal_op_mul_mat` condition adds BF16, Q2_K, and Q3_K. With an F32 right operand, `ne00 = 128`, and `ne11 = 4`, Alive2 reports an incorrect old-to-new transformation for the symbolic predicate and separately for each of the three concrete types: the parent declines the small-batch path and the child selects it. A separate Alive2 check proves that every old accepted `(type_a, type_b, ne00, ne11)` remains accepted after the change.
+
+[reproduce.py](reproduce.py) extracts the condition from both exact Git revisions, checks that the three added lines are the only predicate change, reads the enum values from the historical `ggml.h`, compiles the extracted C with Clang 20, and runs Alive2. Logs and generated IR are retained here. This proves a dispatch decision and monotonic path extension; it does not compare either Metal kernel's numerical output or establish a benchmark speedup. No official before/after performance score was measured. Kuiper and Volta were not used.

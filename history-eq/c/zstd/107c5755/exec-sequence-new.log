@@ -1,0 +1,58 @@
+compiler=Ubuntu clang version 14.0.0-1ubuntu1.1
+exit=1
+stdout:
+stderr:
+=================================================================
+==16==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffd55341d08 at pc 0x55f2669c2477 bp 0x7ffd55341690 sp 0x7ffd55340e60
+READ of size 8 at 0x7ffd55341d08 thread T0
+    #0 0x55f2669c2476 in __asan_memcpy (/tmp/zstd-107c-exec-lpldgzfm/new+0xa0476) (BuildId: cb4619b3fafed37eb5b8e5f8e46de26ea58eac2b)
+    #1 0x55f266a004f1 in ZSTD_copy8 /srv/home/hantaolou/code/veriop/history-eq/c/zstd/107c5755/exec-sequence-new.c:11:56
+    #2 0x55f266a00355 in ZSTD_wildcopy /srv/home/hantaolou/code/veriop/history-eq/c/zstd/107c5755/exec-sequence-new.c:18:8
+    #3 0x55f2669fedb1 in ZSTD_execSequence /srv/home/hantaolou/code/veriop/history-eq/c/zstd/107c5755/exec-sequence-new.c:40:9
+    #4 0x55f2669fe47d in main /srv/home/hantaolou/code/veriop/history-eq/c/zstd/107c5755/exec-sequence-new.c:94:11
+    #5 0x7fec1e230d8f in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #6 0x7fec1e230e3f in __libc_start_main csu/../csu/libc-start.c:392:3
+    #7 0x55f266940304 in _start (/tmp/zstd-107c-exec-lpldgzfm/new+0x1e304) (BuildId: cb4619b3fafed37eb5b8e5f8e46de26ea58eac2b)
+
+Address 0x7ffd55341d08 is located in stack of thread T0 at offset 72 in frame
+    #0 0x55f2669fdeaf in main /srv/home/hantaolou/code/veriop/history-eq/c/zstd/107c5755/exec-sequence-new.c:88
+
+  This frame has 3 object(s):
+    [32, 72) 'arena' (line 89) <== Memory access at offset 72 overflows this variable
+    [112, 120) 'lit' (line 92)
+    [144, 168) 's' (line 93)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow (/tmp/zstd-107c-exec-lpldgzfm/new+0xa0476) (BuildId: cb4619b3fafed37eb5b8e5f8e46de26ea58eac2b) in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x10002aa60350: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa60360: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa60370: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa60380: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa60390: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00 00
+=>0x10002aa603a0: 00[f2]f2 f2 f2 f2 00 f2 f2 f2 00 00 00 f3 f3 f3
+  0x10002aa603b0: f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa603c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa603d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa603e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10002aa603f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==16==ABORTING

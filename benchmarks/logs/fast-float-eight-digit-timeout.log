@@ -1,0 +1,79 @@
+
+----------------------------------------
+define i32 @fast_float_eight_scalar(i64 noundef %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = add i64 noundef %#0, 5063812098665367110
+  %#3 = add i64 noundef %#0, -3472328296227680304
+  %#4 = or i64 %#2, %#3
+  %#5 = and i64 %#4, -9187201950435737472
+  %#6 = icmp eq i64 %#5, 0
+  assume i1 %#6
+  %#7 = trunc i64 noundef %#0 to i32
+  %#8 = and i32 %#7, 255
+  %#9 = mul nsw nuw i32 %#8, 10
+  %#10 = trunc i64 noundef %#0 to i32
+  %#11 = lshr i32 %#10, 8
+  %#12 = and i32 %#11, 255
+  %#13 = add nsw i32 %#9, 4294966768
+  %#14 = add nsw i32 %#13, %#12
+  %#15 = mul nsw i32 %#14, 10
+  %#16 = trunc i64 noundef %#0 to i32
+  %#17 = lshr i32 %#16, 16
+  %#18 = and i32 %#17, 255
+  %#19 = add nsw i32 %#15, 4294967248
+  %#20 = add nsw i32 %#19, %#18
+  %#21 = mul nsw i32 %#20, 10
+  %#22 = trunc i64 noundef %#0 to i32
+  %#23 = lshr i32 %#22, 24
+  %#24 = add nsw i32 %#21, 4294967248
+  %#25 = add nsw i32 %#24, %#23
+  %#26 = mul nsw i32 %#25, 10
+  %#27 = lshr i64 noundef %#0, 32
+  %#28 = trunc nuw i64 %#27 to i32
+  %#29 = and i32 %#28, 255
+  %#30 = add nsw i32 %#26, 4294967248
+  %#31 = add nsw i32 %#30, %#29
+  %#32 = mul nsw i32 %#31, 10
+  %#33 = lshr i64 noundef %#0, 40
+  %#34 = trunc nsw nuw i64 %#33 to i32
+  %#35 = and i32 %#34, 255
+  %#36 = add nsw i32 %#32, 4294967248
+  %#37 = add nsw i32 %#36, %#35
+  %#38 = mul nsw i32 %#37, 10
+  %#39 = lshr i64 noundef %#0, 48
+  %#40 = trunc nsw nuw i64 %#39 to i32
+  %#41 = and i32 %#40, 255
+  %#42 = add nsw i32 %#38, 4294967248
+  %#43 = add nsw i32 %#42, %#41
+  %#44 = mul i32 %#43, 10
+  %#45 = lshr i64 noundef %#0, 56
+  %#46 = trunc nsw nuw i64 %#45 to i32
+  %#47 = add i32 %#44, 4294967248
+  %#48 = add i32 %#47, %#46
+  %#range_0_%#48 = !range i32 %#48, i32 3761633968, i32 2299999978
+  ret i32 %#range_0_%#48
+}
+=>
+define i32 @fast_float_eight_packed(i64 noundef %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = add i64 noundef %#0, 5063812098665367110
+  %#3 = add i64 noundef %#0, -3472328296227680304
+  %#4 = or i64 %#2, %#3
+  %#5 = and i64 %#4, -9187201950435737472
+  %#6 = icmp eq i64 %#5, 0
+  assume i1 %#6
+  %#7 = mul i64 %#3, 10
+  %#8 = lshr i64 %#3, 8
+  %#9 = add i64 %#7, %#8
+  %#10 = and i64 %#9, 1095216660735
+  %#11 = mul i64 %#10, 4294967296000100
+  %#12 = lshr i64 %#9, 16
+  %#13 = and i64 %#12, 1095216660735
+  %#14 = mul i64 %#13, 42949672960001
+  %#15 = add i64 %#14, %#11
+  %#16 = lshr i64 %#15, 32
+  %#17 = trunc nuw i64 %#16 to i32
+  ret i32 %#17
+}
+ERROR: Timeout
+

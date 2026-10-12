@@ -1,0 +1,37 @@
+
+----------------------------------------
+define i1 @check(i32 noundef %#0, i1 noundef zeroext %#1, i1 noundef zeroext %#2) nofree noundef willreturn zeroext memory(inaccessiblemem: write) {
+#3:
+  %#4 = icmp eq i32 noundef %#0, 0
+  assume i1 %#4
+  ret i1 1
+}
+=>
+define i1 @check(i32 noundef %#0, i1 noundef returned zeroext %#1, i1 noundef zeroext %#2) nofree noundef willreturn zeroext memory(inaccessiblemem: write) {
+#3:
+  %#4 = icmp eq i32 noundef %#0, 0
+  assume i1 %#4
+  ret i1 noundef returned zeroext %#1
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i1 noundef zeroext %#1 = #x0 (0)
+i1 noundef zeroext %#2 = #x1 (1)
+
+Source:
+i1 %#4 = #x1 (1)
+
+Target:
+i1 %#4 = #x1 (1)
+Source value: #x1 (1)
+Target value: #x0 (0)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

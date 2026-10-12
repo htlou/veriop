@@ -1,0 +1,7 @@
+# llama.cpp `225e7a14`: high-throughput flash-attention mode
+
+**Fixed-sample verdict: `UNSUPPORTED` by the selected Volta comparison.** The [historical diff](../source-screening/225e7a14.source.diff) extends flash-attention indexing and launch dimensions to multiple sequences. The old launcher asserts `Q->ne[3] == 1`; the new code removes that assertion. The new multi-sequence mode therefore has no old valid-input counterpart at the public launcher.
+
+For the shared one-sequence domain, [reproduce.py](reproduce.py) archives each exact historical `ggml/` tree, compiles `fattn-tile-f32.cu` to `compute_80` PTX with its own headers, and parses both PTX files. [The result record](volta-result.json) includes the commands, source object IDs, hashes, and outputs. It attempts a full-output one-CTA comparison of `flash_attn_combine_results<64>` with `parallel_blocks=2`, one 64-thread block, 16 bytes of dynamic shared memory, 128 input floats, two `float2` metadata values, and 64 output floats. Volta stops while lowering the **parent** at an unsupported `Ex2(Float32, ftz=true)` instruction, before a semantic decision.
+
+No equality, refinement, or counterexample is established for that kernel, other changed kernels, or the multi-sequence launcher. No official before/after benchmark score was measured. Kuiper was not used. Reproduce with `python3 -B history-eq/gpu/llama.cpp/225e7a14/reproduce.py`.

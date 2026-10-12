@@ -1,0 +1,70 @@
+
+----------------------------------------
+define i1 @old_eight_digits(i64 noundef %#0) nofree willreturn zeroext memory(none) {
+#1:
+  %#4 = trunc i64 noundef %#0 to i32
+  %#5 = shl i32 %#4, 24
+  %#6 = ashr exact i32 %#5, 24
+  %#7 = add nsw i32 %#6, 4294967248
+  %#8 = icmp ult i32 %#7, 10
+  %#9 = shl i32 %#4, 16
+  %#10 = ashr i32 %#9, 24
+  %#11 = add nsw i32 %#10, 4294967248
+  %#12 = icmp ult i32 %#11, 10
+  %#13 = and i1 %#8, %#12
+  %#14 = shl i32 %#4, 8
+  %#15 = ashr i32 %#14, 24
+  %#16 = add nsw i32 %#15, 4294967248
+  %#17 = icmp ult i32 %#16, 10
+  %#18 = and i1 %#17, %#13
+  %#19 = ashr i32 %#4, 24
+  %#20 = add nsw i32 %#19, 4294967248
+  %#21 = icmp ult i32 %#20, 10
+  %#22 = and i1 %#21, %#18
+  %#23 = lshr i64 noundef %#0, 8
+  %#24 = trunc i64 %#23 to i32
+  %#25 = ashr i32 %#24, 24
+  %#26 = add nsw i32 %#25, 4294967248
+  %#27 = icmp ult i32 %#26, 10
+  %#28 = and i1 %#27, %#22
+  %#29 = lshr i64 noundef %#0, 16
+  %#30 = trunc i64 %#29 to i32
+  %#31 = ashr i32 %#30, 24
+  %#32 = add nsw i32 %#31, 4294967248
+  %#33 = icmp ult i32 %#32, 10
+  %#34 = and i1 %#33, %#28
+  %#35 = lshr i64 noundef %#0, 24
+  %#36 = trunc i64 %#35 to i32
+  %#37 = ashr i32 %#36, 24
+  %#38 = add nsw i32 %#37, 4294967248
+  %#39 = icmp ult i32 %#38, 10
+  %#40 = and i1 %#39, %#34
+  br i1 %#40, label %#2, label %#3
+
+#2:
+  %#41 = lshr i64 noundef %#0, 32
+  %#42 = trunc nuw i64 %#41 to i32
+  %#43 = ashr i32 %#42, 24
+  %#44 = add nsw i32 %#43, 4294967248
+  %#45 = icmp ult i32 %#44, 10
+  br label %#3
+
+#3:
+  %#46 = phi i1 [ 0, %#1 ], [ %#45, %#2 ]
+  ret i1 %#46
+}
+=>
+define i1 @new_eight_digits_word(i64 noundef %#0) nofree willreturn zeroext memory(none) {
+#1:
+  %#2 = and i64 noundef %#0, -1085102592571150096
+  %#3 = add i64 noundef %#0, 434041037028460038
+  %#4 = lshr i64 %#3, 4
+  %#5 = and i64 %#4, 1085102592571150095
+  %#6 = or disjoint i64 %#5, %#2
+  %#7 = icmp eq i64 %#6, 3689348814741910323
+  ret i1 %#7
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

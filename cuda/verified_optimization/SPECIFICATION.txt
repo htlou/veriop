@@ -1,0 +1,744 @@
+You are working on a verified CUDA optimization task.
+
+Your goal is to optimize a specific production CUDA kernel for performance while obtaining a machine-checkable functional-equivalence result between the original and optimized PTX using Volta.
+
+This is not merely a benchmarking task.
+
+A candidate optimization is successful only if:
+
+1. it is integrated into the real repository;
+2. it measurably improves a meaningful GPU-performance metric;
+3. the original and optimized kernels both compile to PTX under the same toolchain and flags;
+4. Volta proves the relevant outputs equivalent;
+5. Volta reports no race or deadlock introduced by the optimization;
+6. normal repository correctness tests still pass.
+
+Do not weaken verification to make an optimization pass.
+
+---
+
+# Repository target
+
+Use ONE of the following configurations.
+
+## Target A — preferred first experiment
+
+Repository:
+
+```text
+https://github.com/Dao-AILab/causal-conv1d
+```
+
+Pin:
+
+```text
+cd81f0413cad2fc1e6f17e785ac39f59aae690cd
+```
+
+Primary source:
+
+```text
+csrc/causal_conv1d_fwd.cu
+```
+
+Primary kernel:
+
+```cpp
+causal_conv1d_fwd_kernel<Ktraits>
+```
+
+Start with the specialization:
+
+```text
+input_t     = float
+weight_t    = float
+kWidth      = 4
+kNThreads   = 128
+kIsVecLoad  = true
+silu_activation = false
+```
+
+After the basic case succeeds, test:
+
+```text
+width = 2, 3, 4
+silu_activation = false, true
+```
+
+Do not begin with the channel-last / sequence-index variants.
+
+---
+
+## Target B
+
+Repository:
+
+```text
+https://github.com/ggml-org/llama.cpp
+```
+
+Pin:
+
+```text
+11fe02151f79c41d0d4af7da708755d73b9c0da6
+```
+
+Primary source:
+
+```text
+ggml/src/ggml-cuda/norm.cu
+```
+
+Targets:
+
+```cpp
+norm_f32<block_size>
+```
+
+and preferably:
+
+```cpp
+rms_norm_f32<
+    block_size,
+    false, // do_multiply
+    false, // do_add
+    false  // do_scale
+>
+```
+
+Begin with contiguous input and output.
+
+Representative hidden dimensions:
+
+```text
+ncols = 4096
+ncols = 8192
+```
+
+You may initially use a smaller dimension such as 256 or 512 while bringing up Volta, but the final result must include a realistic large hidden dimension.
+
+Use a pre-Hopper CUDA target such as SM80 initially so that optional programmatic-dependent-launch functionality does not introduce unrelated unsupported PTX features.
+
+---
+
+## Target C
+
+Repository:
+
+```text
+https://github.com/bitsandbytes-foundation/bitsandbytes
+```
+
+Pin:
+
+```text
+833649043474794b8fe7a4136e0c40faf077b2e0
+```
+
+Primary source:
+
+```text
+csrc/kernels.cu
+```
+
+Target:
+
+```cpp
+kOptimizer32bit2State<float, ADAM>
+```
+
+For the initial verification configuration freeze:
+
+```text
+OPTIMIZER    = ADAM
+T            = float
+skip_zeros   = false
+max_unorm    = 0
+weight_decay = 0
+```
+
+Use fixed representative scalar optimizer parameters.
+
+This restriction is deliberate: first evaluate memory/layout optimization without introducing symbolic-input-dependent control flow.
+
+Do not start from the 8-bit quantization kernels. Their data-dependent lookup behavior is an interesting verifier-gap case, but it is not the best first success case.
+
+---
+
+## Target D — optional harder case
+
+Repository:
+
+```text
+https://github.com/NVIDIA/apex
+```
+
+Pin:
+
+```text
+575968bc1f9127ccd61003a681472a83af4ff1a1
+```
+
+Primary source:
+
+```text
+csrc/layer_norm_cuda_kernel.cu
+```
+
+Start from the FP32 LayerNorm or RMSNorm path.
+
+Initially fix `rms_only` to one value rather than attempting to verify both branches simultaneously.
+
+The main interesting mechanisms here are:
+
+```text
+Welford reduction
+warp shuffle
+shared-memory aggregation
+vectorized loads
+number of warps per row
+```
+
+---
+
+# Critical correctness rule
+
+Do NOT consider ordinary tests to be the equivalence proof.
+
+The proof gate must be:
+
+```text
+original CUDA
+      ↓ same nvcc configuration
+reference PTX
+      │
+      │
+      ├──────────┐
+      │          │
+optimized CUDA   │
+      ↓          │
+optimized PTX    │
+      │          │
+      └── Volta compare
+                 ↓
+          proved equivalent
+```
+
+Use the public Volta implementation corresponding to:
+
+```text
+https://github.com/willtunnels/volta
+```
+
+Pin its exact commit in the experiment log.
+
+---
+
+# Important semantic qualification
+
+Volta's functional-equivalence model treats floating-point values as real numbers.
+
+Therefore, do not describe a successful Volta result as:
+
+```text
+bit-exact IEEE-754 equivalence
+```
+
+unless an independent bit-exact proof exists.
+
+The formal claim for this task is:
+
+```text
+equivalent under Volta's supported PTX / real-valued semantic model
+```
+
+In addition, perform actual floating-point differential tests on GPU and report:
+
+```text
+maximum absolute error
+maximum relative error
+maximum ULP difference when practical
+```
+
+using the repository's accepted numerical tolerance.
+
+Do not introduce lower precision, fast approximations, or relaxed numerical semantics merely to improve performance unless explicitly studied as a separate experiment.
+
+---
+
+# Verification integrity rules
+
+You MAY NOT:
+
+- modify Volta's semantics to make the candidate pass;
+- remove output arrays from the comparison merely because they disagree;
+- compare only a convenient subset of outputs when the remaining outputs are part of the kernel contract;
+- replace formal equivalence with random testing;
+- reduce the valid input domain without recording it;
+- hard-code benchmark inputs;
+- specialize the optimized implementation to secret benchmark values;
+- alter the reference PTX;
+- change compilation flags between baseline and candidate;
+- suppress race/deadlock findings;
+- silently accept `unknown`, `unsupported`, timeout, parse failure, or partial verification as proof success.
+
+A Volta result counts as VERIFIED only when the requested complete output footprint is successfully proven equivalent.
+
+Record the exact Volta command and stdout/stderr.
+
+---
+
+# Phase 1 — Baseline reconstruction
+
+Before modifying anything:
+
+1. build the repository cleanly;
+2. locate the actual kernel instantiation and launch path;
+3. create a minimal reproducible kernel benchmark;
+4. determine the exact template specialization;
+5. generate baseline PTX;
+6. establish a working Volta invocation;
+7. make Volta compare the baseline PTX against itself.
+
+Self-equivalence must succeed before optimization work begins.
+
+If baseline self-equivalence fails, stop optimization work and classify the reason:
+
+```text
+PTX parser limitation
+unsupported instruction
+unsupported synchronization primitive
+data-dependent memory address
+dynamic control-flow limitation
+unsupported mathematical operator
+unsupported launch structure
+tool bug
+incorrect harness
+```
+
+Do NOT patch around this invisibly.
+
+Write the finding down.
+
+---
+
+# Phase 2 — Freeze the proof configuration
+
+Volta requires many launch and array properties to be concrete.
+
+Create explicit verification instances.
+
+For every instance record:
+
+```text
+kernel symbol
+grid dimensions
+block dimensions
+dynamic shared-memory size
+input arrays
+output arrays
+inout arrays
+array sizes
+scalar parameters
+CUDA architecture
+nvcc version
+nvcc flags
+Volta commit
+```
+
+For a real optimization result, prove more than one representative configuration when practical.
+
+For example:
+
+### causal-conv1d
+
+Development verification:
+
+```text
+width = 4
+seqlen = 256
+float32
+SiLU = false
+```
+
+Final verification should attempt several of:
+
+```text
+width = 2, 3, 4
+seqlen = 256, 512, 1024
+SiLU = false / true
+```
+
+### llama.cpp RMSNorm
+
+Attempt:
+
+```text
+ncols = 4096
+ncols = 8192
+```
+
+with the actual block size selected by the repository.
+
+### bitsandbytes Adam
+
+Use multiple parameter-vector sizes, e.g.:
+
+```text
+4096
+16384
+65536
+```
+
+where feasible for verification.
+
+Keep performance benchmarking broader than the formal verification instances, but clearly distinguish the two.
+
+---
+
+# Phase 3 — Understand the baseline
+
+Profile before optimizing.
+
+Use appropriate tools such as:
+
+```text
+CUDA events
+Nsight Compute
+nvcc resource-usage output
+cuobjdump / PTX inspection
+```
+
+Record at least:
+
+```text
+kernel latency
+registers/thread
+shared-memory usage
+occupancy
+global-memory load/store behavior
+achieved memory bandwidth
+warp execution efficiency
+number of synchronization operations
+```
+
+Identify the dominant bottleneck.
+
+Do not optimize blindly.
+
+---
+
+# Phase 4 — Generate multiple optimization hypotheses
+
+Propose at least 4 materially distinct optimization mechanisms before implementing all of them.
+
+Possible mechanisms include:
+
+```text
+vectorized memory access
+better coalescing
+fewer shared-memory round trips
+fewer __syncthreads()
+warp-shuffle replacement for shared-memory reduction
+loop unrolling
+multiple elements per thread
+register caching
+load/store fusion
+better block size
+reduced temporary storage
+reduced register pressure
+shared-memory bank-conflict reduction
+reuse of invariant weights / parameters
+better producer-consumer scheduling
+```
+
+Also consider cache and memory-hierarchy effects, not only arithmetic instruction count.
+
+For every idea write:
+
+```text
+hypothesis
+targeted bottleneck
+expected performance mechanism
+expected PTX-level change
+expected Volta difficulty
+```
+
+Rank them before implementation.
+
+---
+
+# Phase 5 — Iterative verified optimization
+
+For each candidate:
+
+1. implement the optimization;
+2. compile it;
+3. run repository tests;
+4. generate PTX using exactly the same configuration as the baseline;
+5. run Volta;
+6. only if proof succeeds, benchmark performance;
+7. retain the candidate if it improves the Pareto frontier.
+
+Use the loop:
+
+```text
+proposal
+  ↓
+compile
+  ↓
+tests
+  ↓
+PTX
+  ↓
+Volta
+  ↓
+verified?
+  ├── no → classify failure and revise
+  └── yes
+        ↓
+     benchmark
+        ↓
+     keep / reject
+```
+
+Do not wait until the end to run verification.
+
+The verifier should be inside the optimization loop.
+
+---
+
+# Proof-failure taxonomy
+
+Every failed candidate must be classified as one of:
+
+```text
+A. actual semantic inequivalence
+B. introduced race
+C. introduced deadlock
+D. unsupported PTX instruction
+E. unsupported synchronization feature
+F. data-dependent control flow
+G. data-dependent memory addressing
+H. equivalent but outside Volta's decision procedure
+I. verification timeout / scalability
+J. compiler/harness/tooling issue
+K. unknown
+```
+
+Preserve minimal reproductions of interesting D-I cases.
+
+These are research results, not merely failed experiments.
+
+---
+
+# Do not automatically patch Volta
+
+If a candidate looks semantically correct but Volta cannot verify it:
+
+1. minimize the failing PTX feature;
+2. determine whether the limitation is fundamental or implementation-specific;
+3. record the optimization that triggered it;
+4. continue searching for a verifiable alternative.
+
+Only after the baseline study should you consider extending Volta.
+
+Any Volta extension must be a separate commit and a separate experiment.
+
+Never mix:
+
+```text
+kernel optimization
+```
+
+and
+
+```text
+verification-system modification
+```
+
+into one opaque patch.
+
+---
+
+# Performance benchmark protocol
+
+Use the actual repository implementation, not only a stripped-down verification harness.
+
+Use fixed representative problem sizes.
+
+For each measurement:
+
+- run sufficient warm-up iterations;
+- use CUDA events or an equivalent GPU-side timing method;
+- batch tiny kernels across repeated launches if necessary;
+- report median;
+- also report dispersion such as p5/p95 or standard deviation;
+- run baseline and candidate interleaved when possible;
+- use identical clocks, GPU state and build flags.
+
+A reasonable initial protocol is:
+
+```text
+100-200 warmup launches
+at least 1000 measured launches for small kernels
+repeat the entire measurement 10-30 times
+report median run
+```
+
+Do not require an arbitrary target such as 2x.
+
+Even a moderate improvement is useful if the mechanism is nontrivial and the proof is strong.
+
+---
+
+# Optimization acceptance gate
+
+A candidate may be called a successful verified optimization only when all are true:
+
+```text
+[ ] real repository builds
+[ ] repository tests pass
+[ ] same source-level API / kernel contract
+[ ] baseline PTX archived
+[ ] candidate PTX archived
+[ ] same nvcc flags
+[ ] Volta successfully parses both
+[ ] Volta race check passes
+[ ] Volta deadlock check passes
+[ ] all contractually relevant output arrays compared
+[ ] Volta returns proved equivalent
+[ ] GPU numerical differential tests pass
+[ ] performance measured reproducibly
+[ ] candidate improves at least one meaningful performance metric
+[ ] no disproportionate regression on held-out shapes
+```
+
+---
+
+# Required deliverables
+
+Create an experiment directory such as:
+
+```text
+verified_optimization/
+```
+
+containing:
+
+```text
+README.md
+baseline/
+candidate/
+ptx/
+volta/
+bench/
+results/
+```
+
+Save:
+
+```text
+baseline commit
+candidate commit
+Volta commit
+CUDA version
+GPU model
+nvcc command
+baseline PTX
+candidate PTX
+Volta command
+Volta output
+benchmark commands
+raw timing results
+Nsight results where used
+```
+
+---
+
+# Final report
+
+Produce a concise report with this structure.
+
+## 1. Target
+
+Explain why the kernel matters in the repository.
+
+## 2. Baseline bottleneck
+
+Explain the performance mechanism limiting it.
+
+## 3. Optimization
+
+Explain exactly what was changed.
+
+Do not merely say "optimized CUDA."
+
+Classify the mechanism, e.g.:
+
+```text
+memory-layout optimization
+synchronization elimination
+vectorization
+warp-level reduction
+register reuse
+launch-configuration optimization
+```
+
+## 4. Formal verification
+
+State exactly:
+
+```text
+what PTX kernels were compared
+what launch configuration was verified
+what arrays were compared
+whether races/deadlocks were checked
+the exact Volta verdict
+```
+
+Use the wording:
+
+```text
+Volta proves equivalence under its modeled real-valued semantics
+```
+
+rather than claiming IEEE bit equivalence.
+
+## 5. Performance
+
+Give baseline and candidate latency plus speedup for every shape.
+
+## 6. Generalization
+
+Report held-out shapes separately.
+
+## 7. Verification limitations
+
+Describe any optimizations that were correct-looking but unverifiable and why.
+
+## 8. Research insight
+
+Answer:
+
+> Which CUDA optimization mechanisms are naturally expressible inside Volta's current verification envelope, and which performance opportunities require verification-system extensions?
+
+---
+
+# Priority
+
+Do not optimize the entire repository.
+
+Get one complete, credible result first:
+
+```text
+one real kernel
++
+one nontrivial optimization
++
+one reproducible speed improvement
++
+one complete Volta equivalence result
+```
+
+Only after that succeeds should you broaden the task.

@@ -1,0 +1,109 @@
+
+----------------------------------------
+define i64 @xxh_old_round(i64 noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 8, align 8
+  %#4 = alloca i64 8, align 8
+  store i64 noundef %#0, ptr %#3, align 8
+  store i64 noundef %#1, ptr %#4, align 8
+  %#5 = load i64, ptr %#4, align 8
+  %#6 = mul i64 %#5, -4417276706812531889
+  %#7 = load i64, ptr %#3, align 8
+  %#8 = add i64 %#7, %#6
+  store i64 %#8, ptr %#3, align 8
+  %#9 = load i64, ptr %#3, align 8
+  %#10 = shl i64 %#9, 31
+  %#11 = load i64, ptr %#3, align 8
+  %#12 = lshr i64 %#11, 33
+  %#13 = or i64 %#10, %#12
+  store i64 %#13, ptr %#3, align 8
+  %#14 = load i64, ptr %#3, align 8
+  %#15 = mul i64 %#14, -7046029288634856825
+  store i64 %#15, ptr %#3, align 8
+  %#16 = load i64, ptr %#3, align 8
+  ret i64 %#16
+}
+=>
+define i64 @xxh_new_round(i64 noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 8, align 8
+  %#4 = alloca i64 8, align 8
+  store i64 noundef %#0, ptr %#3, align 8
+  store i64 noundef %#1, ptr %#4, align 8
+  %#5 = load i64, ptr %#4, align 8
+  %#6 = mul i64 %#5, -4417276706812531889
+  %#7 = load i64, ptr %#3, align 8
+  %#8 = add i64 %#7, %#6
+  store i64 %#8, ptr %#3, align 8
+  %#9 = load i64, ptr %#3, align 8
+  %#10 = shl i64 %#9, 31
+  %#11 = load i64, ptr %#3, align 8
+  %#12 = lshr i64 %#11, 33
+  %#13 = or i64 %#10, %#12
+  store i64 %#13, ptr %#3, align 8
+  %#14 = load i64, ptr %#3, align 8
+  %#15 = mul i64 %#14, -7046029288634856825
+  store i64 %#15, ptr %#3, align 8
+  %#16 = load i64, ptr %#3, align 8
+  %#17 = call i64 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i64 %#16) nofree nothrow memory(none)
+  store i64 %#17, ptr %#3, align 8
+  %#18 = load i64, ptr %#3, align 8
+  ret i64 %#18
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+i64 noundef %#0 = #x0000000000000003 (3)
+i64 noundef %#1 = #x0000000000000003 (3)
+
+Source:
+ptr %#3 = pointer(local, block_id=0, offset=0) / Address=#x100
+ptr %#4 = pointer(local, block_id=1, offset=0) / Address=#x178
+i64 %#5 = #x0000000000000003 (3)
+i64 %#6 = #x48180ab7777ec1ed (5194913953271955949)
+i64 %#7 = #x0000000000000003 (3)
+i64 %#8 = #x48180ab7777ec1f0 (5194913953271955952)
+i64 %#9 = #x48180ab7777ec1f0 (5194913953271955952)
+i64 %#10 = #xbbbf60f800000000 (13528638423912415232, -4918105649797136384)
+i64 %#11 = #x48180ab7777ec1f0 (5194913953271955952)
+i64 %#12 = #x00000000240c055b (604767579)
+i64 %#13 = #xbbbf60f8240c055b (13528638424517182811, -4918105649192368805)
+i64 %#14 = #xbbbf60f8240c055b (13528638424517182811, -4918105649192368805)
+i64 %#15 = #xde57fc08b019a0fd (16021551313638236413, -2425192760071315203)
+i64 %#16 = #xde57fc08b019a0fd (16021551313638236413, -2425192760071315203)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 8	alloc type: 0	alive: false	address: 0
+
+LOCAL BLOCKS:
+Block 2 >	size: 8	align: 8	alloc type: 1	alive: true	address: 256
+Block 3 >	size: 8	align: 8	alloc type: 1	alive: true	address: 376
+
+Target:
+ptr %#3 = pointer(local, block_id=0, offset=0) / Address=#x178
+ptr %#4 = pointer(local, block_id=1, offset=0) / Address=#x100
+i64 %#5 = #x0000000000000003 (3)
+i64 %#6 = #x48180ab7777ec1ed (5194913953271955949)
+i64 %#7 = #x0000000000000003 (3)
+i64 %#8 = #x48180ab7777ec1f0 (5194913953271955952)
+i64 %#9 = #x48180ab7777ec1f0 (5194913953271955952)
+i64 %#10 = #xbbbf60f800000000 (13528638423912415232, -4918105649797136384)
+i64 %#11 = #x48180ab7777ec1f0 (5194913953271955952)
+i64 %#12 = #x00000000240c055b (604767579)
+i64 %#13 = #xbbbf60f8240c055b (13528638424517182811, -4918105649192368805)
+i64 %#14 = #xbbbf60f8240c055b (13528638424517182811, -4918105649192368805)
+i64 %#15 = #xde57fc08b019a0fd (16021551313638236413, -2425192760071315203)
+i64 %#16 = #xde57fc08b019a0fd (16021551313638236413, -2425192760071315203)
+Function asm , =r,0,~{dirflag},~{fpsr},~{flags} triggered UB
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 2 >	size: 8	align: 8	alloc type: 1	alive: true	address: 376
+Block 3 >	size: 8	align: 8	alloc type: 1	alive: true	address: 256
+
+

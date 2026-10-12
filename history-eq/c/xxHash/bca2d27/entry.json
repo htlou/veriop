@@ -1,0 +1,52 @@
+{
+  "commit": "bca2d27",
+  "date": "2023-02-22",
+  "subject": "Modernize XXH32/XXH64",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit extracts inline accumulator steps, changes state buffers and rerolls XXH64 on 32-bit targets; the message explicitly discusses performance.",
+  "change_summary": "Refactors XXH32/XXH64 processing and state buffers; XXH64_update also narrows its length increment to 32 bits.",
+  "units": [
+    {
+      "name": "public XXH64_state_s.total_len after reset and one update",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "input must designate at least len readable bytes",
+      "unsupported_reason": null,
+      "not_equiv_kind": "bug",
+      "artifact_dir": "c/xxHash/bca2d27/r_totlen",
+      "evidence": "Alive2 gives len=2^62: old total_len is 2^62, new total_len is 0. Source diff confirms new XXH64_update adds (XXH32_hash_t)len into the documented 64-bit total_len field."
+    },
+    {
+      "name": "public XXH32/XXH64 one-shot fixed-length x86 and i386 matrices",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/bca2d27/r_i386_o64_val",
+      "evidence": "The fixed one-shot matrices pass both directions: 12 XXH32 and 10 XXH64 lengths on i386, with corresponding x86 runs also passing."
+    },
+    {
+      "name": "public XXH32/XXH64 streaming fixed-segment matrices",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/bca2d27/r_x86_s32_val",
+      "evidence": "Eight of nine XXH32 streaming segment pairs pass, one times out; the nine checked XXH64 pairs pass separately in r_x86_s64_val."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": "bug",
+  "notes": "The state field is part of the public XXH_STATIC_LINKING_ONLY interface. The Alive2 witness uses a very large length; a valid concrete call would require a buffer of that size. Common fixed-size hash-output proofs do not cover the 64-bit length counter."
+}

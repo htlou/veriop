@@ -1,0 +1,6 @@
+(set-logic QF_LIA)
+(declare-const n Int) (declare-const s Int) (declare-const a Int) (declare-const b Int)
+(assert (and (>= n 16) (> s 0) (<= (* 2 s) n)))
+(assert (and (<= 0 a) (< a s) (<= 0 b) (< b s)))
+(assert (= a (+ b s)))
+(check-sat)

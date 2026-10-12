@@ -1,0 +1,190 @@
+{
+  "commit": "9ef7523ee99e13fe57a3da5cd600c206ed997630",
+  "parent": "00de615345c9d3ead161c15bf0cc313e46f4def6",
+  "builds": {
+    "old": {
+      "revision": "00de615345c9d3ead161c15bf0cc313e46f4def6",
+      "source_sha256": "c765aeff314c351c9ae9418492cdac6351843671fda4979824ff4bd93971880c",
+      "ptx_sha256": "3df531cc6d16527e9296e58b773e7b26e6cced853f22ec9a989d18c6bd640f65",
+      "build": {
+        "command": [
+          "nvcc",
+          "-std=c++17",
+          "-arch=compute_80",
+          "--ptx",
+          "-O3",
+          "-DGGML_BACKEND_BUILD",
+          "-I/tmp/veriop-llama-ssm-old/ggml/src",
+          "-I/tmp/veriop-llama-ssm-old/ggml/include",
+          "/tmp/veriop-llama-ssm-old/ggml/src/ggml-cuda/ssm-conv.cu",
+          "-o",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/old.ptx"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "parse": {
+        "command": [
+          "/srv/home/hantaolou/code/veriop/cuda/repos/volta/target/release/volta",
+          "parse",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/old.ptx"
+        ],
+        "returncode": 0,
+        "stdout": "Parsed successfully: /srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/old.ptx\n  Entries (kernels): 12\n",
+        "stderr": "log: volta-logs/1791602852-14-parse.log\n"
+      }
+    },
+    "new": {
+      "revision": "9ef7523ee99e13fe57a3da5cd600c206ed997630",
+      "source_sha256": "960e83b2bb91291fd0c2ea2f819d5375db54b8baf8e7a9f0117f70b480fa2f2c",
+      "ptx_sha256": "37498ab7bb9fc3ff800c4b2027b2984d25ac0a0b348ea5669fc11e98b5199ee8",
+      "build": {
+        "command": [
+          "nvcc",
+          "-std=c++17",
+          "-arch=compute_80",
+          "--ptx",
+          "-O3",
+          "-DGGML_BACKEND_BUILD",
+          "-I/tmp/veriop-llama-ssm-new/ggml/src",
+          "-I/tmp/veriop-llama-ssm-new/ggml/include",
+          "/tmp/veriop-llama-ssm-new/ggml/src/ggml-cuda/ssm-conv.cu",
+          "-o",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/new.ptx"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "parse": {
+        "command": [
+          "/srv/home/hantaolou/code/veriop/cuda/repos/volta/target/release/volta",
+          "parse",
+          "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/new.ptx"
+        ],
+        "returncode": 0,
+        "stdout": "Parsed successfully: /srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/new.ptx\n  Entries (kernels): 12\n",
+        "stderr": "log: volta-logs/1791602854-25-parse.log\n"
+      }
+    }
+  },
+  "comparisons": {
+    "sample_128_numeric": {
+      "command": [
+        "/srv/home/hantaolou/code/veriop/cuda/repos/volta/target/release/volta",
+        "compare",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/old.ptx",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/new.ptx",
+        "--kernel1",
+        "_Z23ssm_conv_long_token_f32ILb0ELm128ELm3ELl32EEvPKfS1_iiiiPfiiil",
+        "--kernel2",
+        "_Z23ssm_conv_long_token_f32ILb0ELm128ELm3ELl32EEvPKfS1_iiiiPfiiil",
+        "-b",
+        "128",
+        "-g",
+        "1,1,2",
+        "--dyn-shared",
+        "17408",
+        "--no-log-file",
+        "--array",
+        "src0:0x10000:4:8448:in",
+        "--array",
+        "src1:0x20000:4:384:in",
+        "--array",
+        "dst:0x30000:4:8192:out",
+        "--check-array",
+        "dst",
+        "--param",
+        "ptr:src0",
+        "--param",
+        "ptr:src1",
+        "--param",
+        "int:4",
+        "--param",
+        "int:264",
+        "--param",
+        "int:33792",
+        "--param",
+        "int:12",
+        "--param",
+        "ptr:dst",
+        "--param",
+        "int:4",
+        "--param",
+        "int:512",
+        "--param",
+        "int:32768",
+        "--param",
+        "int:64",
+        "--sample",
+        "128",
+        "--verify-numeric"
+      ],
+      "returncode": 0,
+      "stdout": "reference instruction profile:\n  BinOp                 65408  ( 45.0%)\n  Fma                   12288  (  8.5%)\n  Mov                    9984  (  6.9%)\n  Mad                    8832  (  6.1%)\n  Store                  8448  (  5.8%)\n  Bra                    7424  (  5.1%)\n  Setp                   7424  (  5.1%)\n  Load                   6784  (  4.7%)\n  MulHi                  5760  (  4.0%)\n  MulWide                4480  (  3.1%)\n  Cvt                    3456  (  2.4%)\n  LoadVec                3072  (  2.1%)\n  LoadParam              1408  (  1.0%)\n  Cvta                    384  (  0.3%)\n  BarSync                 128  (  0.1%)\n  Ret                     128  (  0.1%)\noptimized instruction profile:\n  BinOp                 59008  ( 41.5%)\n  Fma                   12288  (  8.6%)\n  Bra                    9984  (  7.0%)\n  Setp                   9984  (  7.0%)\n  Mov                    9472  (  6.7%)\n  Mad                    8832  (  6.2%)\n  Store                  8448  (  5.9%)\n  Load                   6784  (  4.8%)\n  MulWide                4608  (  3.2%)\n  MulHi                  4352  (  3.1%)\n  Cvt                    3328  (  2.3%)\n  LoadVec                3072  (  2.2%)\n  LoadParam              1408  (  1.0%)\n  Cvta                    384  (  0.3%)\n  BarSync                 128  (  0.1%)\n  Ret                     128  (  0.1%)\nExec: 0.080s  instructions: 287616  block syncs: 128  warp syncs: 0\nVC check: 0.004s (decision procedure 0.002s)  elements: 128/4096\nEQUIVALENT\n",
+      "stderr": ""
+    },
+    "full_output": {
+      "command": [
+        "/srv/home/hantaolou/code/veriop/cuda/repos/volta/target/release/volta",
+        "compare",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/old.ptx",
+        "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/new.ptx",
+        "--kernel1",
+        "_Z23ssm_conv_long_token_f32ILb0ELm128ELm3ELl32EEvPKfS1_iiiiPfiiil",
+        "--kernel2",
+        "_Z23ssm_conv_long_token_f32ILb0ELm128ELm3ELl32EEvPKfS1_iiiiPfiiil",
+        "-b",
+        "128",
+        "-g",
+        "1,1,2",
+        "--dyn-shared",
+        "17408",
+        "--no-log-file",
+        "--array",
+        "src0:0x10000:4:8448:in",
+        "--array",
+        "src1:0x20000:4:384:in",
+        "--array",
+        "dst:0x30000:4:8192:out",
+        "--check-array",
+        "dst",
+        "--param",
+        "ptr:src0",
+        "--param",
+        "ptr:src1",
+        "--param",
+        "int:4",
+        "--param",
+        "int:264",
+        "--param",
+        "int:33792",
+        "--param",
+        "int:12",
+        "--param",
+        "ptr:dst",
+        "--param",
+        "int:4",
+        "--param",
+        "int:512",
+        "--param",
+        "int:32768",
+        "--param",
+        "int:64"
+      ],
+      "returncode": 1,
+      "stdout": "reference instruction profile:\n  BinOp                 65408  ( 45.0%)\n  Fma                   12288  (  8.5%)\n  Mov                    9984  (  6.9%)\n  Mad                    8832  (  6.1%)\n  Store                  8448  (  5.8%)\n  Bra                    7424  (  5.1%)\n  Setp                   7424  (  5.1%)\n  Load                   6784  (  4.7%)\n  MulHi                  5760  (  4.0%)\n  MulWide                4480  (  3.1%)\n  Cvt                    3456  (  2.4%)\n  LoadVec                3072  (  2.1%)\n  LoadParam              1408  (  1.0%)\n  Cvta                    384  (  0.3%)\n  BarSync                 128  (  0.1%)\n  Ret                     128  (  0.1%)\noptimized instruction profile:\n  BinOp                 59008  ( 41.5%)\n  Fma                   12288  (  8.6%)\n  Bra                    9984  (  7.0%)\n  Setp                   9984  (  7.0%)\n  Mov                    9472  (  6.7%)\n  Mad                    8832  (  6.2%)\n  Store                  8448  (  5.9%)\n  Load                   6784  (  4.8%)\n  MulWide                4608  (  3.2%)\n  MulHi                  4352  (  3.1%)\n  Cvt                    3328  (  2.3%)\n  LoadVec                3072  (  2.2%)\n  LoadParam              1408  (  1.0%)\n  Cvta                    384  (  0.3%)\n  BarSync                 128  (  0.1%)\n  Ret                     128  (  0.1%)\nExec: 0.076s  instructions: 287616  block syncs: 128  warp syncs: 0\n",
+      "stderr": "error: equivalence check failed: cannot check equivalence of undefined values\n"
+    }
+  },
+  "load_loop_lemma": {
+    "command": [
+      "/srv/home/hantaolou/code/veriop/benchmarks/tools/kuiper-package/inst/lib/fstar/z3-4.13.3/bin/z3",
+      "/srv/home/hantaolou/code/veriop/history-eq/gpu/llama.cpp/9ef7523e/load-loop.smt2"
+    ],
+    "returncode": 0,
+    "stdout": "unsat\nunsat\nunsat\n",
+    "stderr": ""
+  }
+}

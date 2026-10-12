@@ -1,0 +1,40 @@
+{
+  "commit": "5d3ed49",
+  "date": "2025-04-28",
+  "subject": "Prefer NEON over SVE",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit reports NEON performing 25% to 40% better than SVE and changes the default vector-dispatch priority.",
+  "change_summary": "Changes AArch64 default XXH3 vector dispatch from SVE to NEON when both are available.",
+  "units": [
+    {
+      "name": "public XXH3_64bits, 256 bytes, AArch64 SVE+NEON default dispatch",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/5d3ed49/r_api256_sve",
+      "evidence": "Alive2 rejects the old SVE body at llvm.aarch64.sve.ptrue.nxv2i1 in both directions; no refinement comparison is possible for the changed dispatch."
+    },
+    {
+      "name": "AArch64 without SVE and x86 unaffected controls",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/5d3ed49/r_apix_a64",
+      "evidence": "The unaffected AArch64 and x86 XXH64 length-64 control targets pass both Alive2 directions."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": "non-x86-target-intrinsics",
+  "not_equiv_kind": null,
+  "notes": "The controls do not prove the SVE-to-NEON dispatch change; Alive2 lacks the scalable-vector instruction needed on the old side."
+}

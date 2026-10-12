@@ -1,0 +1,9 @@
+# RoaringBitmap `c8204540`: node type field to getter
+
+**Fixed-sample verdict: `EQUIV_PARTIAL`.** This historical optimization removes `BranchNode.nodeType`. The four concrete node constructors previously stored `NODE4`, `NODE16`, `NODE48`, or `NODE256`; the new corresponding `nodeType()` methods return those same constants. Both `serializeHeader` overloads changed from `this.nodeType.ordinal()` to `this.nodeType().ordinal()`.
+
+[The source audit](check_source.py) checks the exact parent/child Git IDs, the complete archived six-file production diff, both `serializeHeader` expressions, all four constructor/getter mappings, and the unchanged `NodeType` enum order. Its [record](source-audit.json) contains the exact historical blob IDs. [The KeY relation](NodeTypeSerializationRelation.java) then proves that the serialized type byte is the same for all four node kinds: [0 open goals, Proved](key.log), with a [saved proof](NodeTypeSerializationRelation.java.auto.proof). A [mutant](NodeTypeSerializationNegative.java) giving `Node48` the wrong ordinal leaves [1 open goal](key-negative.log), showing that this obligation detects a changed type byte.
+
+This is a source-mapped proof of the **type-byte component** of serialization. The KeY model uses the audited constructor/getter constants; it does not load the full historical ART classes, prove virtual dispatch, compare insertion/rebalancing, or establish whole-commit equivalence. No official historical before/after benchmark score is claimed.
+
+Reproduce from the project root with `python3 history-eq/java/RoaringBitmap/c8204540/check_source.py`. From this directory, run KeY 3.0.0 on `NodeTypeSerializationRelation.java` and select contract `0`; run it on `NodeTypeSerializationNegative.java` and select contract `1`. The archived logs identify both selected obligations explicitly.

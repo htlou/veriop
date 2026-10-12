@@ -1,0 +1,64 @@
+{
+ "commit": "f4e2de6",
+ "date": "2023-01-13",
+ "subject": "Annotate xxh_x86dispatch with XXH_NOESCAPE",
+ "selected_by": "manual-scan",
+ "perf_evidence": "\"The pointers don't escape.\" -- adds XXH_NOESCAPE (__attribute__((noescape))) to every pointer parameter of the dispatcher entry points, per-ISA wrappers and function-pointer typedefs, an optimisation hint (lets the compiler assume no capture).",
+ "change_summary": "Attribute-only change in xxh_x86dispatch.c/.h: XXH_NOESCAPE on pointer parameters (clang lowers it to `nocapture`); no statement changes.",
+ "units": [
+  {
+   "name": "dispatcher TU, all functions (attribute-only diff)",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f4e2de6/ir_tu",
+   "evidence": "whole xxh_x86dispatch.c compiled old/new (clang20 -O3 -march=x86-64-v3): 11 of 32 functions differ ONLY by `nocapture` on params/call args; after stripping nocapture all 32 bodies identical (ir_tu/compare.txt). Alive2 did not verify the changed attribute."
+  },
+  {
+   "name": "XXH3_64bits_update_dispatch + reset/digest (AVX2 CPU model, dispatcher initialised)",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": true,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f4e2de6/r_upd64_cpu2",
+   "evidence": "Alive2 fwd+bwd correct only after stripping the changed nocapture attribute; fixed lengths 100+200; CPU model AVX2, XXH_setDispatch() called first"
+  },
+  {
+   "name": "XXH3_128bits_update_dispatch + reset/digest (AVX2 CPU model)",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": true,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f4e2de6/r_upd128_cpu2",
+   "evidence": "Alive2 fwd+bwd correct only after stripping the changed nocapture attribute; lengths 100+200"
+  },
+  {
+   "name": "XXH3_64bits_dispatch(p,300) (AVX2 CPU model)",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": true,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f4e2de6/r_hash64_cpu2",
+   "evidence": "Alive2 fwd+bwd correct only after stripping the changed nocapture attribute; len 300"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "other",
+ "not_equiv_kind": null,
+ "notes": "The only IR effect of the commit is the `nocapture` parameter/call-site attribute (from XXH_NOESCAPE). This Alive2 pin does not support `nocapture`: the shared normaliser strips it on both sides. The original changed contract is therefore outside this proof. The model without that attribute has identical function bodies and bounded Alive2 checks, but those are partial evidence only. Harness: wrap_disp.c includes xxh_x86dispatch_model.c = xxh_x86dispatch.c with cpuid/xgetbv inline-asm bodies replaced by a fixed CPU model (mk_model.py in c/xxHash/c1d70f5); -DXXH_X86DISPATCH_ALLOW_AVX and -march=x86-64-v3 so target(\"avx2\") functions inline; runner = c/xxHash/4f43b71/xx_alive_d.py with alive-tv --func=<target>. Empty asm guards rewritten to freeze (brief assumption)."
+}

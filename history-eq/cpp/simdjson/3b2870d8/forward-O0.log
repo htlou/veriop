@@ -1,0 +1,292 @@
+
+----------------------------------------
+declare i1 @_ZL11four_digitsj(noundef i32) noundef zeroext
+
+define i1 @target_guard(i32 noundef %#0) zeroext {
+#1:
+  %#2 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#2, align 4
+  %#3 = load i32, ptr %#2, align 4
+  %#4 = call i1 @_ZL11four_digitsj(noundef i32 %#3) noundef zeroext
+  ret i1 %#4
+}
+=>
+declare i1 @_ZL11four_digitsj(noundef i32) noundef zeroext
+
+define i1 @target_guard(i32 noundef %#0) zeroext {
+#1:
+  %#2 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#2, align 4
+  %#3 = load i32, ptr %#2, align 4
+  %#4 = call i1 @_ZL11four_digitsj(noundef i32 %#3) noundef zeroext
+  ret i1 %#4
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i1 @_ZL11four_digitsj(i32 noundef %#0) noundef zeroext {
+#1:
+  %#9 = alloca i64 1, align 1
+  %#10 = alloca i64 4, align 4
+  %#11 = alloca i64 4, align 4
+  %#12 = alloca i64 1, align 1
+  store i32 noundef %#0, ptr %#10, align 4
+  store i32 0, ptr %#11, align 4
+  br label %#2
+
+#2:
+  %#13 = load i32, ptr %#11, align 4
+  %#14 = icmp ult i32 %#13, 4
+  br i1 %#14, label %#3, label %#7
+
+#3:
+  %#15 = load i32, ptr %#10, align 4
+  %#16 = load i32, ptr %#11, align 4
+  %#17 = mul i32 8, %#16
+  %#18 = lshr i32 %#15, %#17
+  %#19 = sub i32 %#18, 48
+  %#20 = trunc i32 %#19 to i8
+  store i8 %#20, ptr %#12, align 1
+  %#21 = load i8, ptr %#12, align 1
+  %#22 = zext i8 %#21 to i32
+  %#23 = icmp sgt i32 %#22, 9
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  store i1 0, ptr %#9, align 1
+  br label %#8
+
+#5:
+  br label %#6
+
+#6:
+  %#24 = load i32, ptr %#11, align 4
+  %#25 = add i32 %#24, 1
+  store i32 %#25, ptr %#11, align 4
+  br label %#2
+
+#7:
+  store i1 1, ptr %#9, align 1
+  br label %#8
+
+#8:
+  %#26 = load i1, ptr %#9, align 1
+  ret i1 %#26
+}
+=>
+define i1 @_ZL11four_digitsj(i32 noundef %#0) noundef zeroext {
+#1:
+  %#2 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#2, align 4
+  %#3 = load i32, ptr %#2, align 4
+  %#4 = add i32 %#3, 1179010630
+  %#5 = load i32, ptr %#2, align 4
+  %#6 = sub i32 %#5, 808464432
+  %#7 = or i32 %#4, %#6
+  %#8 = and i32 %#7, 2155905152
+  %#9 = icmp ne i32 %#8, 0
+  %#10 = xor i1 %#9, 1
+  ret i1 %#10
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare i1 @_ZL11four_digitsj(noundef i32) noundef zeroext
+
+define i32 @target_value(i32 noundef %#0) {
+#1:
+  %#9 = alloca i64 4, align 4
+  %#10 = alloca i64 4, align 4
+  %#11 = alloca i64 4, align 4
+  %#12 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#10, align 4
+  %#13 = load i32, ptr %#10, align 4
+  %#14 = call i1 @_ZL11four_digitsj(noundef i32 %#13) noundef zeroext
+  br i1 %#14, label %#3, label %#2
+
+#2:
+  store i32 0, ptr %#9, align 4
+  br label %#8
+
+#3:
+  store i32 0, ptr %#11, align 4
+  store i32 0, ptr %#12, align 4
+  br label %#4
+
+#4:
+  %#15 = load i32, ptr %#12, align 4
+  %#16 = icmp ult i32 %#15, 4
+  br i1 %#16, label %#5, label %#7
+
+#5:
+  %#17 = load i32, ptr %#11, align 4
+  %#18 = mul i32 %#17, 10
+  %#19 = load i32, ptr %#10, align 4
+  %#20 = load i32, ptr %#12, align 4
+  %#21 = mul i32 8, %#20
+  %#22 = lshr i32 %#19, %#21
+  %#23 = sub i32 %#22, 48
+  %#24 = trunc i32 %#23 to i8
+  %#25 = zext i8 %#24 to i32
+  %#26 = add i32 %#18, %#25
+  store i32 %#26, ptr %#11, align 4
+  br label %#6
+
+#6:
+  %#27 = load i32, ptr %#12, align 4
+  %#28 = add i32 %#27, 1
+  store i32 %#28, ptr %#12, align 4
+  br label %#4
+
+#7:
+  %#29 = load i32, ptr %#11, align 4
+  store i32 %#29, ptr %#9, align 4
+  br label %#8
+
+#8:
+  %#30 = load i32, ptr %#9, align 4
+  ret i32 %#30
+}
+=>
+declare i1 @_ZL11four_digitsj(noundef i32) noundef zeroext
+
+define i32 @target_value(i32 noundef %#0) {
+#1:
+  %#5 = alloca i64 4, align 4
+  %#6 = alloca i64 4, align 4
+  %#7 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#6, align 4
+  %#8 = load i32, ptr %#6, align 4
+  %#9 = call i1 @_ZL11four_digitsj(noundef i32 %#8) noundef zeroext
+  br i1 %#9, label %#3, label %#2
+
+#2:
+  store i32 0, ptr %#5, align 4
+  br label %#4
+
+#3:
+  %#10 = load i32, ptr %#6, align 4
+  %#11 = sub i32 %#10, 808464432
+  store i32 %#11, ptr %#7, align 4
+  %#12 = load i32, ptr %#7, align 4
+  %#13 = mul i32 %#12, 10
+  %#14 = load i32, ptr %#7, align 4
+  %#15 = lshr i32 %#14, 8
+  %#16 = add i32 %#13, %#15
+  store i32 %#16, ptr %#7, align 4
+  %#17 = load i32, ptr %#7, align 4
+  %#18 = and i32 %#17, 16711935
+  %#19 = mul i32 %#18, 6553601
+  %#20 = lshr i32 %#19, 16
+  %#21 = and i32 %#20, 65535
+  store i32 %#21, ptr %#5, align 4
+  br label %#4
+
+#4:
+  %#22 = load i32, ptr %#5, align 4
+  ret i32 %#22
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare i1 @_ZL11four_digitsj(noundef i32) noundef zeroext
+
+define i64 @target_update(i32 noundef %#0, i64 noundef %#1) {
+#2:
+  %#10 = alloca i64 8, align 8
+  %#11 = alloca i64 4, align 4
+  %#12 = alloca i64 8, align 8
+  %#13 = alloca i64 4, align 4
+  store i32 noundef %#0, ptr %#11, align 4
+  store i64 noundef %#1, ptr %#12, align 8
+  %#14 = load i32, ptr %#11, align 4
+  %#15 = call i1 @_ZL11four_digitsj(noundef i32 %#14) noundef zeroext
+  br i1 %#15, label %#4, label %#3
+
+#3:
+  %#16 = load i64, ptr %#12, align 8
+  store i64 %#16, ptr %#10, align 8
+  br label %#9
+
+#4:
+  store i32 0, ptr %#13, align 4
+  br label %#5
+
+#5:
+  %#17 = load i32, ptr %#13, align 4
+  %#18 = icmp ult i32 %#17, 4
+  br i1 %#18, label %#6, label %#8
+
+#6:
+  %#19 = load i64, ptr %#12, align 8
+  %#20 = mul i64 %#19, 10
+  %#21 = load i32, ptr %#11, align 4
+  %#22 = load i32, ptr %#13, align 4
+  %#23 = mul i32 8, %#22
+  %#24 = lshr i32 %#21, %#23
+  %#25 = sub i32 %#24, 48
+  %#26 = trunc i32 %#25 to i8
+  %#27 = zext i8 %#26 to i64
+  %#28 = add i64 %#20, %#27
+  store i64 %#28, ptr %#12, align 8
+  br label %#7
+
+#7:
+  %#29 = load i32, ptr %#13, align 4
+  %#30 = add i32 %#29, 1
+  store i32 %#30, ptr %#13, align 4
+  br label %#5
+
+#8:
+  %#31 = load i64, ptr %#12, align 8
+  store i64 %#31, ptr %#10, align 8
+  br label %#9
+
+#9:
+  %#32 = load i64, ptr %#10, align 8
+  ret i64 %#32
+}
+=>
+declare i1 @_ZL11four_digitsj(noundef i32) noundef zeroext
+declare i32 @target_value(noundef i32)
+
+define i64 @target_update(i32 noundef %#0, i64 noundef %#1) {
+#2:
+  %#6 = alloca i64 8, align 8
+  %#7 = alloca i64 4, align 4
+  %#8 = alloca i64 8, align 8
+  store i32 noundef %#0, ptr %#7, align 4
+  store i64 noundef %#1, ptr %#8, align 8
+  %#9 = load i32, ptr %#7, align 4
+  %#10 = call i1 @_ZL11four_digitsj(noundef i32 %#9) noundef zeroext
+  br i1 %#10, label %#4, label %#3
+
+#3:
+  %#11 = load i64, ptr %#8, align 8
+  store i64 %#11, ptr %#6, align 8
+  br label %#5
+
+#4:
+  %#12 = load i64, ptr %#8, align 8
+  %#13 = mul i64 %#12, 10000
+  %#14 = load i32, ptr %#7, align 4
+  %#15 = call i32 @target_value(noundef i32 %#14)
+  %#16 = zext i32 %#15 to i64
+  %#17 = add i64 %#13, %#16
+  store i64 %#17, ptr %#6, align 8
+  br label %#5
+
+#5:
+  %#18 = load i64, ptr %#6, align 8
+  ret i64 %#18
+}
+Transformation seems to be correct!
+
+Summary:
+  4 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

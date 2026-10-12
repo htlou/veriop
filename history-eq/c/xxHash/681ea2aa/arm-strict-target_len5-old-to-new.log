@@ -1,0 +1,93 @@
+
+----------------------------------------
+define i32 @target_len5(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#5 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 5
+  %#6 = add i32 noundef %#1, 374761398
+  %#7 = load i32, ptr nowrite noundef %#0, align 4
+  %#8 = mul i32 %#7, 3266489917
+  %#9 = add i32 %#6, %#8
+  %#10 = fshl i32 %#9, i32 %#9, i32 17
+  %#11 = mul i32 %#10, 668265263
+  %#12 = gep ptr nowrite noundef %#0, 1 x i32 4
+  %#13 = icmp ult ptr %#12, %#5
+  br i1 %#13, label %#3, label %#4
+
+#3:
+  %#14 = load i8, ptr %#12, align 1
+  %#15 = zext i8 %#14 to i32
+  %#16 = mul i32 %#15, 374761393
+  %#17 = add i32 %#16, %#11
+  %#18 = fshl i32 %#17, i32 %#17, i32 11
+  %#19 = mul i32 %#18, 2654435761
+  br label %#4
+
+#4:
+  %#20 = phi i32 [ %#11, %#2 ], [ %#19, %#3 ]
+  %#21 = lshr i32 %#20, 15
+  %#22 = xor i32 %#21, %#20
+  %#23 = mul i32 %#22, 2246822519
+  %#24 = lshr i32 %#23, 13
+  %#25 = xor i32 %#24, %#23
+  %#26 = mul i32 %#25, 3266489917
+  %#27 = lshr i32 %#26, 16
+  %#28 = xor i32 %#27, %#26
+  ret i32 %#28
+}
+=>
+define i32 @target_len5(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#7 = gep inbounds nuw ptr noundef %#0, 1 x i32 5
+  %#8 = ptrtoint ptr noundef %#0 to i32
+  %#9 = and i32 %#8, 3
+  %#10 = icmp eq i32 %#9, 0
+  %#11 = add i32 noundef %#1, 374761398
+  %#12 = gep ptr noundef %#0, 1 x i32 4
+  %#13 = icmp ult ptr %#12, %#7
+  br i1 %#10, label %#4, label %#3
+
+#3:
+  %#14 = load i32, ptr noundef %#0, align 1
+  %#15 = mul i32 %#14, 3266489917
+  %#16 = add i32 %#11, %#15
+  %#17 = fshl i32 %#16, i32 %#16, i32 17
+  %#18 = mul i32 %#17, 668265263
+  br i1 %#13, label %#5, label %#6
+
+#4:
+  %#19 = load i32, ptr noundef %#0, align 4
+  %#20 = mul i32 %#19, 3266489917
+  %#21 = add i32 %#11, %#20
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  br i1 %#13, label %#5, label %#6
+
+#5:
+  %#24 = phi i32 [ %#23, %#4 ], [ %#18, %#3 ]
+  %#25 = load i8, ptr %#12, align 1
+  %#26 = zext i8 %#25 to i32
+  %#27 = mul i32 %#26, 374761393
+  %#28 = add i32 %#27, %#24
+  %#29 = fshl i32 %#28, i32 %#28, i32 11
+  %#30 = mul i32 %#29, 2654435761
+  br label %#6
+
+#6:
+  %#31 = phi i32 [ %#23, %#4 ], [ %#18, %#3 ], [ %#30, %#5 ]
+  %#32 = lshr i32 %#31, 15
+  %#33 = xor i32 %#32, %#31
+  %#34 = mul i32 %#33, 2246822519
+  %#35 = lshr i32 %#34, 13
+  %#36 = xor i32 %#35, %#34
+  %#37 = mul i32 %#36, 3266489917
+  %#38 = lshr i32 %#37, 16
+  %#39 = xor i32 %#38, %#37
+  ret i32 %#39
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

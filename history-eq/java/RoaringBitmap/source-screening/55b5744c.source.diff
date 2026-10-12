@@ -1,0 +1,63 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java
+index 5fac3e79..44acdf0b 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java
+@@ -47,16 +47,6 @@ public interface RoaringBitmapWriter<T extends BitmapDataProvider> extends Suppl
+       return this;
+     }
+ 
+-    /**
+-     * Choose this option if the bitmap is expected to be mostly dense but unlikely to be RLE
+-     * compressible
+-     * @return this
+-     */
+-    public Wizard<C, T> optimiseForBitmaps() {
+-      containerSupplier = bitmapSupplier();
+-      return this;
+-    }
+-
+     /**
+      *
+      * @param count how many values are expected to fall within any 65536 bit range.
+@@ -68,7 +58,7 @@ public interface RoaringBitmapWriter<T extends BitmapDataProvider> extends Suppl
+       if (count < ArrayContainer.DEFAULT_MAX_SIZE) {
+         return optimiseForArrays();
+       } else if (count < 1 << 14) {
+-        return optimiseForBitmaps();
++        return constantMemory();
+       } else {
+         return optimiseForRuns();
+       }
+@@ -137,8 +127,6 @@ public interface RoaringBitmapWriter<T extends BitmapDataProvider> extends Suppl
+ 
+     protected abstract Supplier<C> arraySupplier();
+ 
+-    protected abstract Supplier<C> bitmapSupplier();
+-
+     protected abstract Supplier<C> runSupplier();
+ 
+     protected abstract T createUnderlying(int initialCapacity);
+@@ -172,11 +160,6 @@ public interface RoaringBitmapWriter<T extends BitmapDataProvider> extends Suppl
+       return () -> new MappeableArrayContainer(expectedContainerSize);
+     }
+ 
+-    @Override
+-    protected Supplier<MappeableContainer> bitmapSupplier() {
+-      return MappeableBitmapContainer::new;
+-    }
+-
+     @Override
+     protected Supplier<MappeableContainer> runSupplier() {
+       return MappeableRunContainer::new;
+@@ -195,11 +178,6 @@ public interface RoaringBitmapWriter<T extends BitmapDataProvider> extends Suppl
+       return () -> new ArrayContainer(expectedContainerSize);
+     }
+ 
+-    @Override
+-    protected Supplier<Container> bitmapSupplier() {
+-      return BitmapContainer::new;
+-    }
+-
+     @Override
+     protected Supplier<Container> runSupplier() {
+       return RunContainer::new;

@@ -1,0 +1,76 @@
+{
+ "commit": "1456dc5",
+ "date": "2022-08-21",
+ "subject": "Avoid signed truncation in hash 17to128 and 129to240",
+ "selected_by": "keyword",
+ "perf_evidence": "Commit message: 'Signed truncation of len gets worse codegen so keep it unsigned' with x86-64-v4 assembly of the loop bound before (cmovns/sar) and after (lea/shr).",
+ "change_summary": "Loop counters/bounds computed as unsigned int instead of size_t/int: XXH3_len_17to128_{64b,128b} XXH_SIZE_OPT>=1 loop start i=(unsigned)(len-1)/32; XXH3_len_129to240_{64b,128b} nbRounds=(unsigned)len/16 resp. /32 with unsigned i.",
+ "units": [
+  {
+   "name": "XXH3_len_129to240_64b/128b raw, symbolic len per trip-count class, input/secret pointers (read-only), secretSize=136",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1456dc5/r_raw_cls",
+   "evidence": "12 class targets correct fwd+bwd, loop-free; IR identical"
+  },
+  {
+   "name": "XXH3_len_17to128_64b/128b raw, XXH_SIZE_OPT=1, symbolic len per trip-count class",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1456dc5/r_raw17_sizeopt_cls",
+   "evidence": "8 class targets correct fwd+bwd; IR identical"
+  },
+  {
+   "name": "XXH3_len_129to240_64b/128b via XXH3_64bits_withSeed / XXH3_128bits_withSeed, symbolic len split by loop trip count (129..143,...,240 / 129..159,...,224..240)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1456dc5/r_api_cls64a",
+   "evidence": "12 class targets (r_api_cls64a, r_api_cls64b, r_api_cls128) correct fwd+bwd, loop-free; IR identical within each class"
+  },
+  {
+   "name": "XXH3_len_17to128_64b/128b XXH_SIZE_OPT=1 loop path, symbolic len per trip-count class 17..32/33..64/65..96/97..128 (+ fixed lengths 17,32,33,64,65,96,97,128)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1456dc5/r_17to128_sizeopt_cls",
+   "evidence": "8 class targets correct fwd+bwd (fixed lengths: r_17to128_sizeopt_fixed, 16 targets correct); IR identical"
+  },
+  {
+   "name": "default config XXH3_len_17to128 (unchanged path, control)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/1456dc5/r_17to128_default",
+   "evidence": "correct; IR identical as expected"
+  }
+ ],
+ "commit_verdict": "EQUIV",
+ "raw_verdict": "EQUIV",
+ "coverage": "full",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "Codegen-only change (signedness of a loop-bound computation for len <= 240). Whenever clang knows the length class it emits identical IR; the only IR difference with a single full-range symbolic len (r_129to240, len 129..240, 64b+128b) is nuw on a shl, and that run is EQUIV_BOUNDED with --unroll 8 (>= max trip count 7, so exhaustive for the range; fwd+bwd correct). A full-range symbolic 17..128 run under XXH_SIZE_OPT=1 timed out (moved to _superseded/). The class-split runs cover every length 17..240 without loop bounds, hence unbounded EQUIV. Flags: -O3 -march=x86-64-v3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 -mllvm -inline-cold-callsite-threshold=100000 (the cold-callsite threshold is needed: XXH_likely/__builtin_expect branch weights make some call sites 'cold' (threshold 45) so e.g. XXH3_len_4to8_64b stayed out of line and both sides only compared calls to it -> fake 'correct'; xx_notes.json shows no residual calls in any target). Runner c/xxHash/_work2020/xx_alive.py, --smt-to 300000. Api: input pointer, seed symbolic, kSecret. XXH_SIZE_OPT=1 runs add -DXXH_SIZE_OPT=1 on both sides. Native sanity (native_x86_64/, native_sizeopt1/): outputs len 0..256 identical."
+}

@@ -1,0 +1,16 @@
+# native differential run (NOT checker evidence): base64::decode on dfb2864^ (old) vs dfb2864 (new); program src/main.rs below
+fn main() {
+    for s in ["AAAAAAAAAAAA", "AAAAAAABAAAA", "QUJDREVGR0hJSktM", "aGVsbG8gd29ybGQh"] {
+        println!("{:?} -> {:?}", s, base64::decode(s));
+    }
+}
+== old
+"AAAAAAAAAAAA" -> Ok([0, 0, 0, 0, 0, 0, 0, 0, 0])
+"AAAAAAABAAAA" -> Ok([0, 0, 0, 0, 0, 1, 0, 0, 0])
+"QUJDREVGR0hJSktM" -> Ok([65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76])
+"aGVsbG8gd29ybGQh" -> Ok([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33])
+== new
+"AAAAAAAAAAAA" -> Ok([0, 0, 0, 0, 0, 0, 0, 0, 0])
+"AAAAAAABAAAA" -> Ok([0, 0, 0, 0, 0, 1, 0, 0, 0])
+"QUJDREVGR0hJSktM" -> Ok([65, 66, 67, 68, 65, 6, 71, 72, 73, 74, 75, 76])
+"aGVsbG8gd29ybGQh" -> Ok([104, 101, 108, 108, 97, 160, 119, 111, 114, 108, 100, 33])

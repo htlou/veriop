@@ -1,0 +1,65 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=900000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/5176062/api_xxh32_len4_nw/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/5176062/api_xxh32_len4_nw/old.ll
+
+----------------------------------------
+define i32 @target_oneshot(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i64 -5 to ptr
+  %#5 = icmp ugt ptr nowrite noundef %#0, %__constexpr_0
+  br i1 %#5, label %#4, label %#3
+
+#3:
+  %#6 = add i32 noundef %#1, 374761397
+  %#7 = load i32, ptr nowrite noundef %#0, align 4
+  %#8 = mul i32 %#7, 3266489917
+  %#9 = add i32 %#6, %#8
+  %#10 = fshl i32 %#9, i32 %#9, i32 17
+  %#11 = mul i32 %#10, 668265263
+  %#12 = lshr i32 %#11, 15
+  %#13 = xor i32 %#12, %#11
+  %#14 = mul i32 %#13, 2246822519
+  %#15 = lshr i32 %#14, 13
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = lshr i32 %#17, 16
+  %#19 = xor i32 %#18, %#17
+  br label %#4
+
+#4:
+  %#20 = phi i32 [ %#19, %#3 ], [ 0, %#2 ]
+  ret i32 %#20
+}
+=>
+define i32 @target_oneshot(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i64 -5 to ptr
+  %#5 = icmp ugt ptr nowrite noundef %#0, %__constexpr_0
+  br i1 %#5, label %#4, label %#3
+
+#3:
+  %#6 = load i32, ptr nowrite noundef %#0, align 1
+  %#7 = mul i32 %#6, 3266489917
+  %#8 = add i32 noundef %#1, 374761397
+  %#9 = add i32 %#7, %#8
+  %#10 = fshl i32 %#9, i32 %#9, i32 17
+  %#11 = mul i32 %#10, 668265263
+  %#12 = lshr i32 %#11, 15
+  %#13 = xor i32 %#12, %#11
+  %#14 = mul i32 %#13, 2246822519
+  %#15 = lshr i32 %#14, 13
+  %#16 = xor i32 %#15, %#14
+  %#17 = mul i32 %#16, 3266489917
+  %#18 = lshr i32 %#17, 16
+  %#19 = xor i32 %#18, %#17
+  br label %#4
+
+#4:
+  %#20 = phi i32 [ %#19, %#3 ], [ 0, %#2 ]
+  ret i32 %#20
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,63 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify r2/new.ll r2/old.ll
+
+----------------------------------------
+define i64 @target_f(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = mul i64 noundef %#0, 3
+  %#3 = add i64 %#2, 1
+  ret i64 %#3
+}
+=>
+define i64 @target_f(i64 noundef %#0) {
+#1:
+  %#2 = mul i64 noundef %#0, 3
+  %#3 = tail call i64 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i64 %#2) nothrow
+  %#4 = add i64 %#3, 1
+  ret i64 %#4
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+i64 noundef %#0 = #x0000000000000003 (3)
+
+Source:
+i64 %#2 = #x0000000000000009 (9)
+i64 %#3 = #x000000000000000a (10)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 8
+
+Target:
+i64 %#2 = #x0000000000000009 (9)
+Function asm , =r,0,~{dirflag},~{fpsr},~{flags} triggered UB
+
+
+
+----------------------------------------
+define i64 @target_g(i64 noundef %#0) {
+#1:
+  %#2 = mul i64 noundef %#0, 3
+  %#3 = tail call i64 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i64 %#2) nothrow
+  %#4 = add i64 %#3, 1
+  ret i64 %#4
+}
+=>
+define i64 @target_g(i64 noundef %#0) {
+#1:
+  %#2 = mul i64 noundef %#0, 3
+  %#3 = tail call i64 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i64 %#2) nothrow
+  %#4 = add i64 %#3, 1
+  ret i64 %#4
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

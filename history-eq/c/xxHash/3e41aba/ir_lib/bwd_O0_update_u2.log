@@ -1,0 +1,942 @@
+
+----------------------------------------
+declare ptr @XXH_memcpy(noundef ptr, noundef ptr, noundef i64)
+declare void @XXH3_consumeStripes(noundef ptr, noundef ptr, noundef i64, noundef ptr, noundef i64, noundef ptr, noundef i64, noundef ptr, noundef ptr)
+declare void @XXH3_accumulate(noundef ptr, noundef ptr, noundef ptr, noundef i64, noundef ptr)
+
+define i32 @XXH3_update(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2, ptr noundef %#3, ptr noundef %#4) {
+#5:
+  %#29 = alloca i64 4, align 4
+  %#30 = alloca i64 8, align 8
+  %#31 = alloca i64 8, align 8
+  %#32 = alloca i64 8, align 8
+  %#33 = alloca i64 8, align 8
+  %#34 = alloca i64 8, align 8
+  %#35 = alloca i64 8, align 8
+  %#36 = alloca i64 8, align 8
+  %#37 = alloca i64 64, align 32
+  %#38 = alloca i64 8, align 8
+  %#39 = alloca i64 8, align 8
+  %#40 = alloca i64 8, align 8
+  %#41 = alloca i64 8, align 8
+  store ptr noundef %#0, ptr %#30, align 8
+  store ptr noundef %#1, ptr %#31, align 8
+  store i64 noundef %#2, ptr %#32, align 8
+  store ptr noundef %#3, ptr %#33, align 8
+  store ptr noundef %#4, ptr %#34, align 8
+  %#42 = load ptr, ptr %#31, align 8
+  %#43 = icmp eq ptr %#42, null
+  br i1 %#43, label %#27, label %#6
+
+#6:
+  %#44 = load ptr, ptr %#31, align 8
+  %#45 = load i64, ptr %#32, align 8
+  %#46 = gep inbounds nuw ptr %#44, 1 x i64 %#45
+  store ptr %#46, ptr %#35, align 8
+  %#47 = load ptr, ptr %#30, align 8
+  %#48 = gep inbounds nuw ptr %#47, 576 x i32 0, 1 x i64 568
+  %#49 = load ptr, ptr %#48, align 8
+  %#50 = icmp eq ptr %#49, null
+  br i1 %#50, label %#7, label %#8
+
+#7:
+  %#51 = load ptr, ptr %#30, align 8
+  %#52 = gep inbounds nuw ptr %#51, 576 x i32 0, 1 x i64 64
+  %#53 = gep inbounds ptr %#52, 192 x i64 0, 1 x i64 0
+  br label %#9
+
+#8:
+  %#54 = load ptr, ptr %#30, align 8
+  %#55 = gep inbounds nuw ptr %#54, 576 x i32 0, 1 x i64 568
+  %#56 = load ptr, ptr %#55, align 8
+  br label %#9
+
+#9:
+  %#57 = phi ptr [ %#53, %#7 ], [ %#56, %#8 ]
+  store ptr %#57, ptr %#36, align 8
+  %#58 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#59 = load ptr, ptr %#30, align 8
+  %#60 = gep inbounds nuw ptr %#59, 576 x i32 0, 1 x i64 0
+  %#61 = gep inbounds ptr %#60, 64 x i64 0, 8 x i64 0
+  memcpy ptr %#58 align 32, ptr %#61 align 64, i64 64
+  %#62 = load i64, ptr %#32, align 8
+  %#63 = load ptr, ptr %#30, align 8
+  %#64 = gep inbounds nuw ptr %#63, 576 x i32 0, 1 x i64 528
+  %#65 = load i64, ptr %#64, align 16
+  %#66 = add i64 %#65, %#62
+  store i64 %#66, ptr %#64, align 16
+  %#67 = load ptr, ptr %#30, align 8
+  %#68 = gep inbounds nuw ptr %#67, 576 x i32 0, 1 x i64 512
+  %#69 = load i32, ptr %#68, align 64
+  %#70 = zext i32 %#69 to i64
+  %#71 = load i64, ptr %#32, align 8
+  %#72 = add i64 %#70, %#71
+  %#73 = icmp ule i64 %#72, 256
+  br i1 %#73, label %#10, label %#11
+
+#10:
+  %#74 = load ptr, ptr %#30, align 8
+  %#75 = gep inbounds nuw ptr %#74, 576 x i32 0, 1 x i64 256
+  %#76 = gep inbounds ptr %#75, 256 x i64 0, 1 x i64 0
+  %#77 = load ptr, ptr %#30, align 8
+  %#78 = gep inbounds nuw ptr %#77, 576 x i32 0, 1 x i64 512
+  %#79 = load i32, ptr %#78, align 64
+  %#80 = zext i32 %#79 to i64
+  %#81 = gep inbounds nuw ptr %#76, 1 x i64 %#80
+  %#82 = load ptr, ptr %#31, align 8
+  %#83 = load i64, ptr %#32, align 8
+  %#84 = call ptr @XXH_memcpy(noundef ptr %#81, noundef ptr %#82, noundef i64 %#83)
+  %#85 = load i64, ptr %#32, align 8
+  %#86 = trunc i64 %#85 to i32
+  %#87 = load ptr, ptr %#30, align 8
+  %#88 = gep inbounds nuw ptr %#87, 576 x i32 0, 1 x i64 512
+  %#89 = load i32, ptr %#88, align 64
+  %#90 = add i32 %#89, %#86
+  store i32 %#90, ptr %#88, align 64
+  store i32 0, ptr %#29, align 4
+  br label %#28
+
+#11:
+  br label %#12
+
+#12:
+  br label %#13
+
+#13:
+  %#91 = load ptr, ptr %#30, align 8
+  %#92 = gep inbounds nuw ptr %#91, 576 x i32 0, 1 x i64 512
+  %#93 = load i32, ptr %#92, align 64
+  %#94 = icmp ne i32 %#93, 0
+  br i1 %#94, label %#14, label %#15
+
+#14:
+  %#95 = load ptr, ptr %#30, align 8
+  %#96 = gep inbounds nuw ptr %#95, 576 x i32 0, 1 x i64 512
+  %#97 = load i32, ptr %#96, align 64
+  %#98 = sub i32 256, %#97
+  %#99 = zext i32 %#98 to i64
+  store i64 %#99, ptr %#38, align 8
+  %#100 = load ptr, ptr %#30, align 8
+  %#101 = gep inbounds nuw ptr %#100, 576 x i32 0, 1 x i64 256
+  %#102 = gep inbounds ptr %#101, 256 x i64 0, 1 x i64 0
+  %#103 = load ptr, ptr %#30, align 8
+  %#104 = gep inbounds nuw ptr %#103, 576 x i32 0, 1 x i64 512
+  %#105 = load i32, ptr %#104, align 64
+  %#106 = zext i32 %#105 to i64
+  %#107 = gep inbounds nuw ptr %#102, 1 x i64 %#106
+  %#108 = load ptr, ptr %#31, align 8
+  %#109 = load i64, ptr %#38, align 8
+  %#110 = call ptr @XXH_memcpy(noundef ptr %#107, noundef ptr %#108, noundef i64 %#109)
+  %#111 = load i64, ptr %#38, align 8
+  %#112 = load ptr, ptr %#31, align 8
+  %#113 = gep inbounds nuw ptr %#112, 1 x i64 %#111
+  store ptr %#113, ptr %#31, align 8
+  %#114 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#115 = load ptr, ptr %#30, align 8
+  %#116 = gep inbounds nuw ptr %#115, 576 x i32 0, 1 x i64 520
+  %#117 = load ptr, ptr %#30, align 8
+  %#118 = gep inbounds nuw ptr %#117, 576 x i32 0, 1 x i64 536
+  %#119 = load i64, ptr %#118, align 8
+  %#120 = load ptr, ptr %#30, align 8
+  %#121 = gep inbounds nuw ptr %#120, 576 x i32 0, 1 x i64 256
+  %#122 = gep inbounds ptr %#121, 256 x i64 0, 1 x i64 0
+  %#123 = load ptr, ptr %#36, align 8
+  %#124 = load ptr, ptr %#30, align 8
+  %#125 = gep inbounds nuw ptr %#124, 576 x i32 0, 1 x i64 544
+  %#126 = load i64, ptr %#125, align 32
+  %#127 = load ptr, ptr %#33, align 8
+  %#128 = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#114, noundef ptr %#116, noundef i64 %#119, noundef ptr %#122, noundef i64 4, noundef ptr %#123, noundef i64 %#126, noundef ptr %#127, noundef ptr %#128)
+  %#129 = load ptr, ptr %#30, align 8
+  %#130 = gep inbounds nuw ptr %#129, 576 x i32 0, 1 x i64 512
+  store i32 0, ptr %#130, align 64
+  br label %#15
+
+#15:
+  %#131 = load ptr, ptr %#35, align 8
+  %#132 = load ptr, ptr %#31, align 8
+  %#133 = ptrtoint ptr %#131 to i64
+  %#134 = ptrtoint ptr %#132 to i64
+  %#135 = sub i64 %#133, %#134
+  %#136 = load ptr, ptr %#30, align 8
+  %#137 = gep inbounds nuw ptr %#136, 576 x i32 0, 1 x i64 536
+  %#138 = load i64, ptr %#137, align 8
+  %#139 = mul i64 %#138, 64
+  %#140 = icmp ugt i64 %#135, %#139
+  br i1 %#140, label %#16, label %#20
+
+#16:
+  %#141 = load ptr, ptr %#35, align 8
+  %#142 = gep inbounds ptr %#141, 1 x i64 -1
+  %#143 = load ptr, ptr %#31, align 8
+  %#144 = ptrtoint ptr %#142 to i64
+  %#145 = ptrtoint ptr %#143 to i64
+  %#146 = sub i64 %#144, %#145
+  %#147 = udiv i64 %#146, 64
+  store i64 %#147, ptr %#39, align 8
+  %#148 = load ptr, ptr %#30, align 8
+  %#149 = gep inbounds nuw ptr %#148, 576 x i32 0, 1 x i64 536
+  %#150 = load i64, ptr %#149, align 8
+  %#151 = load ptr, ptr %#30, align 8
+  %#152 = gep inbounds nuw ptr %#151, 576 x i32 0, 1 x i64 520
+  %#153 = load i64, ptr %#152, align 8
+  %#154 = sub i64 %#150, %#153
+  store i64 %#154, ptr %#40, align 8
+  %#155 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#156 = load ptr, ptr %#31, align 8
+  %#157 = load ptr, ptr %#36, align 8
+  %#158 = load ptr, ptr %#30, align 8
+  %#159 = gep inbounds nuw ptr %#158, 576 x i32 0, 1 x i64 520
+  %#160 = load i64, ptr %#159, align 8
+  %#161 = mul i64 %#160, 8
+  %#162 = gep inbounds nuw ptr %#157, 1 x i64 %#161
+  %#163 = load i64, ptr %#40, align 8
+  %#164 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#155, noundef ptr %#156, noundef ptr %#162, noundef i64 %#163, noundef ptr %#164)
+  %#165 = load ptr, ptr %#34, align 8
+  %#166 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#167 = load ptr, ptr %#36, align 8
+  %#168 = load ptr, ptr %#30, align 8
+  %#169 = gep inbounds nuw ptr %#168, 576 x i32 0, 1 x i64 544
+  %#170 = load i64, ptr %#169, align 32
+  %#171 = gep inbounds nuw ptr %#167, 1 x i64 %#170
+  call void %#165(noundef ptr %#166, noundef ptr %#171)
+  %#172 = load ptr, ptr %#30, align 8
+  %#173 = gep inbounds nuw ptr %#172, 576 x i32 0, 1 x i64 520
+  store i64 0, ptr %#173, align 8
+  %#174 = load i64, ptr %#40, align 8
+  %#175 = mul i64 %#174, 64
+  %#176 = load ptr, ptr %#31, align 8
+  %#177 = gep inbounds nuw ptr %#176, 1 x i64 %#175
+  store ptr %#177, ptr %#31, align 8
+  %#178 = load i64, ptr %#40, align 8
+  %#179 = load i64, ptr %#39, align 8
+  %#180 = sub i64 %#179, %#178
+  store i64 %#180, ptr %#39, align 8
+  br label %#17
+
+#17:
+  %#181 = load i64, ptr %#39, align 8
+  %#182 = load ptr, ptr %#30, align 8
+  %#183 = gep inbounds nuw ptr %#182, 576 x i32 0, 1 x i64 536
+  %#184 = load i64, ptr %#183, align 8
+  %#185 = icmp uge i64 %#181, %#184
+  br i1 %#185, label %#18, label %#19
+
+#18:
+  %#186 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#187 = load ptr, ptr %#31, align 8
+  %#188 = load ptr, ptr %#36, align 8
+  %#189 = load ptr, ptr %#30, align 8
+  %#190 = gep inbounds nuw ptr %#189, 576 x i32 0, 1 x i64 536
+  %#191 = load i64, ptr %#190, align 8
+  %#192 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#186, noundef ptr %#187, noundef ptr %#188, noundef i64 %#191, noundef ptr %#192)
+  %#193 = load ptr, ptr %#34, align 8
+  %#194 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#195 = load ptr, ptr %#36, align 8
+  %#196 = load ptr, ptr %#30, align 8
+  %#197 = gep inbounds nuw ptr %#196, 576 x i32 0, 1 x i64 544
+  %#198 = load i64, ptr %#197, align 32
+  %#199 = gep inbounds nuw ptr %#195, 1 x i64 %#198
+  call void %#193(noundef ptr %#194, noundef ptr %#199)
+  %#200 = load ptr, ptr %#30, align 8
+  %#201 = gep inbounds nuw ptr %#200, 576 x i32 0, 1 x i64 536
+  %#202 = load i64, ptr %#201, align 8
+  %#203 = mul i64 %#202, 64
+  %#204 = load ptr, ptr %#31, align 8
+  %#205 = gep inbounds nuw ptr %#204, 1 x i64 %#203
+  store ptr %#205, ptr %#31, align 8
+  %#206 = load ptr, ptr %#30, align 8
+  %#207 = gep inbounds nuw ptr %#206, 576 x i32 0, 1 x i64 536
+  %#208 = load i64, ptr %#207, align 8
+  %#209 = load i64, ptr %#39, align 8
+  %#210 = sub i64 %#209, %#208
+  store i64 %#210, ptr %#39, align 8
+  br label %#17#2
+
+#17#2:
+  %#181#2 = load i64, ptr %#39, align 8
+  %#182#2 = load ptr, ptr %#30, align 8
+  %#183#2 = gep inbounds nuw ptr %#182#2, 576 x i32 0, 1 x i64 536
+  %#184#2 = load i64, ptr %#183#2, align 8
+  %#185#2 = icmp uge i64 %#181#2, %#184#2
+  br i1 %#185#2, label %#18#2, label %#19
+
+#18#2:
+  %#186#2 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#187#2 = load ptr, ptr %#31, align 8
+  %#188#2 = load ptr, ptr %#36, align 8
+  %#189#2 = load ptr, ptr %#30, align 8
+  %#190#2 = gep inbounds nuw ptr %#189#2, 576 x i32 0, 1 x i64 536
+  %#191#2 = load i64, ptr %#190#2, align 8
+  %#192#2 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#186#2, noundef ptr %#187#2, noundef ptr %#188#2, noundef i64 %#191#2, noundef ptr %#192#2)
+  %#193#2 = load ptr, ptr %#34, align 8
+  %#194#2 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#195#2 = load ptr, ptr %#36, align 8
+  %#196#2 = load ptr, ptr %#30, align 8
+  %#197#2 = gep inbounds nuw ptr %#196#2, 576 x i32 0, 1 x i64 544
+  %#198#2 = load i64, ptr %#197#2, align 32
+  %#199#2 = gep inbounds nuw ptr %#195#2, 1 x i64 %#198#2
+  call void %#193#2(noundef ptr %#194#2, noundef ptr %#199#2)
+  %#200#2 = load ptr, ptr %#30, align 8
+  %#201#2 = gep inbounds nuw ptr %#200#2, 576 x i32 0, 1 x i64 536
+  %#202#2 = load i64, ptr %#201#2, align 8
+  %#203#2 = mul i64 %#202#2, 64
+  %#204#2 = load ptr, ptr %#31, align 8
+  %#205#2 = gep inbounds nuw ptr %#204#2, 1 x i64 %#203#2
+  store ptr %#205#2, ptr %#31, align 8
+  %#206#2 = load ptr, ptr %#30, align 8
+  %#207#2 = gep inbounds nuw ptr %#206#2, 576 x i32 0, 1 x i64 536
+  %#208#2 = load i64, ptr %#207#2, align 8
+  %#209#2 = load i64, ptr %#39, align 8
+  %#210#2 = sub i64 %#209#2, %#208#2
+  store i64 %#210#2, ptr %#39, align 8
+  br label %#17#exit
+
+#17#exit:
+  %#181#exit = load i64, ptr %#39, align 8
+  %#182#exit = load ptr, ptr %#30, align 8
+  %#183#exit = gep inbounds nuw ptr %#182#exit, 576 x i32 0, 1 x i64 536
+  %#184#exit = load i64, ptr %#183#exit, align 8
+  %#185#exit = icmp uge i64 %#181#exit, %#184#exit
+  br i1 %#185#exit, label #sink, label %#19
+
+#19:
+  %#211 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#212 = load ptr, ptr %#31, align 8
+  %#213 = load ptr, ptr %#36, align 8
+  %#214 = load i64, ptr %#39, align 8
+  %#215 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#211, noundef ptr %#212, noundef ptr %#213, noundef i64 %#214, noundef ptr %#215)
+  %#216 = load i64, ptr %#39, align 8
+  %#217 = mul i64 %#216, 64
+  %#218 = load ptr, ptr %#31, align 8
+  %#219 = gep inbounds nuw ptr %#218, 1 x i64 %#217
+  store ptr %#219, ptr %#31, align 8
+  %#220 = load i64, ptr %#39, align 8
+  %#221 = load ptr, ptr %#30, align 8
+  %#222 = gep inbounds nuw ptr %#221, 576 x i32 0, 1 x i64 520
+  store i64 %#220, ptr %#222, align 8
+  %#223 = load ptr, ptr %#30, align 8
+  %#224 = gep inbounds nuw ptr %#223, 576 x i32 0, 1 x i64 256
+  %#225 = gep inbounds ptr %#224, 256 x i64 0, 1 x i64 0
+  %#226 = gep inbounds nuw ptr %#225, 1 x i64 256
+  %#227 = gep inbounds ptr %#226, 1 x i64 -64
+  %#228 = load ptr, ptr %#31, align 8
+  %#229 = gep inbounds ptr %#228, 1 x i64 -64
+  %#230 = call ptr @XXH_memcpy(noundef ptr %#227, noundef ptr %#229, noundef i64 64)
+  br label %#26
+
+#20:
+  %#231 = load ptr, ptr %#35, align 8
+  %#232 = load ptr, ptr %#31, align 8
+  %#233 = ptrtoint ptr %#231 to i64
+  %#234 = ptrtoint ptr %#232 to i64
+  %#235 = sub i64 %#233, %#234
+  %#236 = icmp sgt i64 %#235, 256
+  br i1 %#236, label %#21, label %#25
+
+#21:
+  %#237 = load ptr, ptr %#35, align 8
+  %#238 = gep inbounds ptr %#237, 1 x i64 -256
+  store ptr %#238, ptr %#41, align 8
+  br label %#22
+
+#22:
+  %#239 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#240 = load ptr, ptr %#30, align 8
+  %#241 = gep inbounds nuw ptr %#240, 576 x i32 0, 1 x i64 520
+  %#242 = load ptr, ptr %#30, align 8
+  %#243 = gep inbounds nuw ptr %#242, 576 x i32 0, 1 x i64 536
+  %#244 = load i64, ptr %#243, align 8
+  %#245 = load ptr, ptr %#31, align 8
+  %#246 = load ptr, ptr %#36, align 8
+  %#247 = load ptr, ptr %#30, align 8
+  %#248 = gep inbounds nuw ptr %#247, 576 x i32 0, 1 x i64 544
+  %#249 = load i64, ptr %#248, align 32
+  %#250 = load ptr, ptr %#33, align 8
+  %#251 = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#239, noundef ptr %#241, noundef i64 %#244, noundef ptr %#245, noundef i64 4, noundef ptr %#246, noundef i64 %#249, noundef ptr %#250, noundef ptr %#251)
+  %#252 = load ptr, ptr %#31, align 8
+  %#253 = gep inbounds ptr %#252, 1 x i64 256
+  store ptr %#253, ptr %#31, align 8
+  br label %#23
+
+#23:
+  %#254 = load ptr, ptr %#31, align 8
+  %#255 = load ptr, ptr %#41, align 8
+  %#256 = icmp ult ptr %#254, %#255
+  br i1 %#256, label %#22#2, label %#24
+
+#22#2:
+  %#239#2 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#240#2 = load ptr, ptr %#30, align 8
+  %#241#2 = gep inbounds nuw ptr %#240#2, 576 x i32 0, 1 x i64 520
+  %#242#2 = load ptr, ptr %#30, align 8
+  %#243#2 = gep inbounds nuw ptr %#242#2, 576 x i32 0, 1 x i64 536
+  %#244#2 = load i64, ptr %#243#2, align 8
+  %#245#2 = load ptr, ptr %#31, align 8
+  %#246#2 = load ptr, ptr %#36, align 8
+  %#247#2 = load ptr, ptr %#30, align 8
+  %#248#2 = gep inbounds nuw ptr %#247#2, 576 x i32 0, 1 x i64 544
+  %#249#2 = load i64, ptr %#248#2, align 32
+  %#250#2 = load ptr, ptr %#33, align 8
+  %#251#2 = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#239#2, noundef ptr %#241#2, noundef i64 %#244#2, noundef ptr %#245#2, noundef i64 4, noundef ptr %#246#2, noundef i64 %#249#2, noundef ptr %#250#2, noundef ptr %#251#2)
+  %#252#2 = load ptr, ptr %#31, align 8
+  %#253#2 = gep inbounds ptr %#252#2, 1 x i64 256
+  store ptr %#253#2, ptr %#31, align 8
+  br label %#23#2
+
+#23#2:
+  %#254#2 = load ptr, ptr %#31, align 8
+  %#255#2 = load ptr, ptr %#41, align 8
+  %#256#2 = icmp ult ptr %#254#2, %#255#2
+  br i1 %#256#2, label %#22#exit, label %#24
+
+#22#exit:
+  %#239#exit = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#240#exit = load ptr, ptr %#30, align 8
+  %#241#exit = gep inbounds nuw ptr %#240#exit, 576 x i32 0, 1 x i64 520
+  %#242#exit = load ptr, ptr %#30, align 8
+  %#243#exit = gep inbounds nuw ptr %#242#exit, 576 x i32 0, 1 x i64 536
+  %#244#exit = load i64, ptr %#243#exit, align 8
+  %#245#exit = load ptr, ptr %#31, align 8
+  %#246#exit = load ptr, ptr %#36, align 8
+  %#247#exit = load ptr, ptr %#30, align 8
+  %#248#exit = gep inbounds nuw ptr %#247#exit, 576 x i32 0, 1 x i64 544
+  %#249#exit = load i64, ptr %#248#exit, align 32
+  %#250#exit = load ptr, ptr %#33, align 8
+  %#251#exit = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#239#exit, noundef ptr %#241#exit, noundef i64 %#244#exit, noundef ptr %#245#exit, noundef i64 4, noundef ptr %#246#exit, noundef i64 %#249#exit, noundef ptr %#250#exit, noundef ptr %#251#exit)
+  %#252#exit = load ptr, ptr %#31, align 8
+  %#253#exit = gep inbounds ptr %#252#exit, 1 x i64 256
+  store ptr %#253#exit, ptr %#31, align 8
+  br label #sink
+
+#24:
+  %#257 = load ptr, ptr %#30, align 8
+  %#258 = gep inbounds nuw ptr %#257, 576 x i32 0, 1 x i64 256
+  %#259 = gep inbounds ptr %#258, 256 x i64 0, 1 x i64 0
+  %#260 = gep inbounds nuw ptr %#259, 1 x i64 256
+  %#261 = gep inbounds ptr %#260, 1 x i64 -64
+  %#262 = load ptr, ptr %#31, align 8
+  %#263 = gep inbounds ptr %#262, 1 x i64 -64
+  %#264 = call ptr @XXH_memcpy(noundef ptr %#261, noundef ptr %#263, noundef i64 64)
+  br label %#25
+
+#25:
+  br label %#26
+
+#26:
+  %#265 = load ptr, ptr %#30, align 8
+  %#266 = gep inbounds nuw ptr %#265, 576 x i32 0, 1 x i64 256
+  %#267 = gep inbounds ptr %#266, 256 x i64 0, 1 x i64 0
+  %#268 = load ptr, ptr %#31, align 8
+  %#269 = load ptr, ptr %#35, align 8
+  %#270 = load ptr, ptr %#31, align 8
+  %#271 = ptrtoint ptr %#269 to i64
+  %#272 = ptrtoint ptr %#270 to i64
+  %#273 = sub i64 %#271, %#272
+  %#274 = call ptr @XXH_memcpy(noundef ptr %#267, noundef ptr %#268, noundef i64 %#273)
+  %#275 = load ptr, ptr %#35, align 8
+  %#276 = load ptr, ptr %#31, align 8
+  %#277 = ptrtoint ptr %#275 to i64
+  %#278 = ptrtoint ptr %#276 to i64
+  %#279 = sub i64 %#277, %#278
+  %#280 = trunc i64 %#279 to i32
+  %#281 = load ptr, ptr %#30, align 8
+  %#282 = gep inbounds nuw ptr %#281, 576 x i32 0, 1 x i64 512
+  store i32 %#280, ptr %#282, align 64
+  %#283 = load ptr, ptr %#30, align 8
+  %#284 = gep inbounds nuw ptr %#283, 576 x i32 0, 1 x i64 0
+  %#285 = gep inbounds ptr %#284, 64 x i64 0, 8 x i64 0
+  %#286 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  memcpy ptr %#285 align 64, ptr %#286 align 32, i64 64
+  store i32 0, ptr %#29, align 4
+  br label %#28
+
+#27:
+  store i32 0, ptr %#29, align 4
+  br label %#28
+
+#28:
+  %#287 = load i32, ptr %#29, align 4
+  ret i32 %#287
+}
+=>
+declare ptr @XXH_memcpy(noundef ptr, noundef ptr, noundef i64)
+declare void @XXH3_consumeStripes(noundef ptr, noundef ptr, noundef i64, noundef ptr, noundef i64, noundef ptr, noundef i64, noundef ptr, noundef ptr)
+declare void @XXH3_accumulate(noundef ptr, noundef ptr, noundef ptr, noundef i64, noundef ptr)
+
+define i32 @XXH3_update(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2, ptr noundef %#3, ptr noundef %#4) {
+#5:
+  %#29 = alloca i64 4, align 4
+  %#30 = alloca i64 8, align 8
+  %#31 = alloca i64 8, align 8
+  %#32 = alloca i64 8, align 8
+  %#33 = alloca i64 8, align 8
+  %#34 = alloca i64 8, align 8
+  %#35 = alloca i64 8, align 8
+  %#36 = alloca i64 8, align 8
+  %#37 = alloca i64 64, align 16
+  %#38 = alloca i64 8, align 8
+  %#39 = alloca i64 8, align 8
+  %#40 = alloca i64 8, align 8
+  %#41 = alloca i64 8, align 8
+  store ptr noundef %#0, ptr %#30, align 8
+  store ptr noundef %#1, ptr %#31, align 8
+  store i64 noundef %#2, ptr %#32, align 8
+  store ptr noundef %#3, ptr %#33, align 8
+  store ptr noundef %#4, ptr %#34, align 8
+  %#42 = load ptr, ptr %#31, align 8
+  %#43 = icmp eq ptr %#42, null
+  br i1 %#43, label %#27, label %#6
+
+#6:
+  %#44 = load ptr, ptr %#31, align 8
+  %#45 = load i64, ptr %#32, align 8
+  %#46 = gep inbounds nuw ptr %#44, 1 x i64 %#45
+  store ptr %#46, ptr %#35, align 8
+  %#47 = load ptr, ptr %#30, align 8
+  %#48 = gep inbounds nuw ptr %#47, 576 x i32 0, 1 x i64 568
+  %#49 = load ptr, ptr %#48, align 8
+  %#50 = icmp eq ptr %#49, null
+  br i1 %#50, label %#7, label %#8
+
+#7:
+  %#51 = load ptr, ptr %#30, align 8
+  %#52 = gep inbounds nuw ptr %#51, 576 x i32 0, 1 x i64 64
+  %#53 = gep inbounds ptr %#52, 192 x i64 0, 1 x i64 0
+  br label %#9
+
+#8:
+  %#54 = load ptr, ptr %#30, align 8
+  %#55 = gep inbounds nuw ptr %#54, 576 x i32 0, 1 x i64 568
+  %#56 = load ptr, ptr %#55, align 8
+  br label %#9
+
+#9:
+  %#57 = phi ptr [ %#53, %#7 ], [ %#56, %#8 ]
+  store ptr %#57, ptr %#36, align 8
+  %#58 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#59 = load ptr, ptr %#30, align 8
+  %#60 = gep inbounds nuw ptr %#59, 576 x i32 0, 1 x i64 0
+  %#61 = gep inbounds ptr %#60, 64 x i64 0, 8 x i64 0
+  memcpy ptr %#58 align 16, ptr %#61 align 64, i64 64
+  %#62 = load i64, ptr %#32, align 8
+  %#63 = load ptr, ptr %#30, align 8
+  %#64 = gep inbounds nuw ptr %#63, 576 x i32 0, 1 x i64 528
+  %#65 = load i64, ptr %#64, align 16
+  %#66 = add i64 %#65, %#62
+  store i64 %#66, ptr %#64, align 16
+  %#67 = load ptr, ptr %#30, align 8
+  %#68 = gep inbounds nuw ptr %#67, 576 x i32 0, 1 x i64 512
+  %#69 = load i32, ptr %#68, align 64
+  %#70 = zext i32 %#69 to i64
+  %#71 = load i64, ptr %#32, align 8
+  %#72 = add i64 %#70, %#71
+  %#73 = icmp ule i64 %#72, 256
+  br i1 %#73, label %#10, label %#11
+
+#10:
+  %#74 = load ptr, ptr %#30, align 8
+  %#75 = gep inbounds nuw ptr %#74, 576 x i32 0, 1 x i64 256
+  %#76 = gep inbounds ptr %#75, 256 x i64 0, 1 x i64 0
+  %#77 = load ptr, ptr %#30, align 8
+  %#78 = gep inbounds nuw ptr %#77, 576 x i32 0, 1 x i64 512
+  %#79 = load i32, ptr %#78, align 64
+  %#80 = zext i32 %#79 to i64
+  %#81 = gep inbounds nuw ptr %#76, 1 x i64 %#80
+  %#82 = load ptr, ptr %#31, align 8
+  %#83 = load i64, ptr %#32, align 8
+  %#84 = call ptr @XXH_memcpy(noundef ptr %#81, noundef ptr %#82, noundef i64 %#83)
+  %#85 = load i64, ptr %#32, align 8
+  %#86 = trunc i64 %#85 to i32
+  %#87 = load ptr, ptr %#30, align 8
+  %#88 = gep inbounds nuw ptr %#87, 576 x i32 0, 1 x i64 512
+  %#89 = load i32, ptr %#88, align 64
+  %#90 = add i32 %#89, %#86
+  store i32 %#90, ptr %#88, align 64
+  store i32 0, ptr %#29, align 4
+  br label %#28
+
+#11:
+  br label %#12
+
+#12:
+  br label %#13
+
+#13:
+  %#91 = load ptr, ptr %#30, align 8
+  %#92 = gep inbounds nuw ptr %#91, 576 x i32 0, 1 x i64 512
+  %#93 = load i32, ptr %#92, align 64
+  %#94 = icmp ne i32 %#93, 0
+  br i1 %#94, label %#14, label %#15
+
+#14:
+  %#95 = load ptr, ptr %#30, align 8
+  %#96 = gep inbounds nuw ptr %#95, 576 x i32 0, 1 x i64 512
+  %#97 = load i32, ptr %#96, align 64
+  %#98 = sub i32 256, %#97
+  %#99 = zext i32 %#98 to i64
+  store i64 %#99, ptr %#38, align 8
+  %#100 = load ptr, ptr %#30, align 8
+  %#101 = gep inbounds nuw ptr %#100, 576 x i32 0, 1 x i64 256
+  %#102 = gep inbounds ptr %#101, 256 x i64 0, 1 x i64 0
+  %#103 = load ptr, ptr %#30, align 8
+  %#104 = gep inbounds nuw ptr %#103, 576 x i32 0, 1 x i64 512
+  %#105 = load i32, ptr %#104, align 64
+  %#106 = zext i32 %#105 to i64
+  %#107 = gep inbounds nuw ptr %#102, 1 x i64 %#106
+  %#108 = load ptr, ptr %#31, align 8
+  %#109 = load i64, ptr %#38, align 8
+  %#110 = call ptr @XXH_memcpy(noundef ptr %#107, noundef ptr %#108, noundef i64 %#109)
+  %#111 = load i64, ptr %#38, align 8
+  %#112 = load ptr, ptr %#31, align 8
+  %#113 = gep inbounds nuw ptr %#112, 1 x i64 %#111
+  store ptr %#113, ptr %#31, align 8
+  %#114 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#115 = load ptr, ptr %#30, align 8
+  %#116 = gep inbounds nuw ptr %#115, 576 x i32 0, 1 x i64 520
+  %#117 = load ptr, ptr %#30, align 8
+  %#118 = gep inbounds nuw ptr %#117, 576 x i32 0, 1 x i64 536
+  %#119 = load i64, ptr %#118, align 8
+  %#120 = load ptr, ptr %#30, align 8
+  %#121 = gep inbounds nuw ptr %#120, 576 x i32 0, 1 x i64 256
+  %#122 = gep inbounds ptr %#121, 256 x i64 0, 1 x i64 0
+  %#123 = load ptr, ptr %#36, align 8
+  %#124 = load ptr, ptr %#30, align 8
+  %#125 = gep inbounds nuw ptr %#124, 576 x i32 0, 1 x i64 544
+  %#126 = load i64, ptr %#125, align 32
+  %#127 = load ptr, ptr %#33, align 8
+  %#128 = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#114, noundef ptr %#116, noundef i64 %#119, noundef ptr %#122, noundef i64 4, noundef ptr %#123, noundef i64 %#126, noundef ptr %#127, noundef ptr %#128)
+  %#129 = load ptr, ptr %#30, align 8
+  %#130 = gep inbounds nuw ptr %#129, 576 x i32 0, 1 x i64 512
+  store i32 0, ptr %#130, align 64
+  br label %#15
+
+#15:
+  %#131 = load ptr, ptr %#35, align 8
+  %#132 = load ptr, ptr %#31, align 8
+  %#133 = ptrtoint ptr %#131 to i64
+  %#134 = ptrtoint ptr %#132 to i64
+  %#135 = sub i64 %#133, %#134
+  %#136 = load ptr, ptr %#30, align 8
+  %#137 = gep inbounds nuw ptr %#136, 576 x i32 0, 1 x i64 536
+  %#138 = load i64, ptr %#137, align 8
+  %#139 = mul i64 %#138, 64
+  %#140 = icmp ugt i64 %#135, %#139
+  br i1 %#140, label %#16, label %#20
+
+#16:
+  %#141 = load ptr, ptr %#35, align 8
+  %#142 = gep inbounds ptr %#141, 1 x i64 -1
+  %#143 = load ptr, ptr %#31, align 8
+  %#144 = ptrtoint ptr %#142 to i64
+  %#145 = ptrtoint ptr %#143 to i64
+  %#146 = sub i64 %#144, %#145
+  %#147 = udiv i64 %#146, 64
+  store i64 %#147, ptr %#39, align 8
+  %#148 = load ptr, ptr %#30, align 8
+  %#149 = gep inbounds nuw ptr %#148, 576 x i32 0, 1 x i64 536
+  %#150 = load i64, ptr %#149, align 8
+  %#151 = load ptr, ptr %#30, align 8
+  %#152 = gep inbounds nuw ptr %#151, 576 x i32 0, 1 x i64 520
+  %#153 = load i64, ptr %#152, align 8
+  %#154 = sub i64 %#150, %#153
+  store i64 %#154, ptr %#40, align 8
+  %#155 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#156 = load ptr, ptr %#31, align 8
+  %#157 = load ptr, ptr %#36, align 8
+  %#158 = load ptr, ptr %#30, align 8
+  %#159 = gep inbounds nuw ptr %#158, 576 x i32 0, 1 x i64 520
+  %#160 = load i64, ptr %#159, align 8
+  %#161 = mul i64 %#160, 8
+  %#162 = gep inbounds nuw ptr %#157, 1 x i64 %#161
+  %#163 = load i64, ptr %#40, align 8
+  %#164 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#155, noundef ptr %#156, noundef ptr %#162, noundef i64 %#163, noundef ptr %#164)
+  %#165 = load ptr, ptr %#34, align 8
+  %#166 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#167 = load ptr, ptr %#36, align 8
+  %#168 = load ptr, ptr %#30, align 8
+  %#169 = gep inbounds nuw ptr %#168, 576 x i32 0, 1 x i64 544
+  %#170 = load i64, ptr %#169, align 32
+  %#171 = gep inbounds nuw ptr %#167, 1 x i64 %#170
+  call void %#165(noundef ptr %#166, noundef ptr %#171)
+  %#172 = load ptr, ptr %#30, align 8
+  %#173 = gep inbounds nuw ptr %#172, 576 x i32 0, 1 x i64 520
+  store i64 0, ptr %#173, align 8
+  %#174 = load i64, ptr %#40, align 8
+  %#175 = mul i64 %#174, 64
+  %#176 = load ptr, ptr %#31, align 8
+  %#177 = gep inbounds nuw ptr %#176, 1 x i64 %#175
+  store ptr %#177, ptr %#31, align 8
+  %#178 = load i64, ptr %#40, align 8
+  %#179 = load i64, ptr %#39, align 8
+  %#180 = sub i64 %#179, %#178
+  store i64 %#180, ptr %#39, align 8
+  br label %#17
+
+#17:
+  %#181 = load i64, ptr %#39, align 8
+  %#182 = load ptr, ptr %#30, align 8
+  %#183 = gep inbounds nuw ptr %#182, 576 x i32 0, 1 x i64 536
+  %#184 = load i64, ptr %#183, align 8
+  %#185 = icmp uge i64 %#181, %#184
+  br i1 %#185, label %#18, label %#19
+
+#18:
+  %#186 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#187 = load ptr, ptr %#31, align 8
+  %#188 = load ptr, ptr %#36, align 8
+  %#189 = load ptr, ptr %#30, align 8
+  %#190 = gep inbounds nuw ptr %#189, 576 x i32 0, 1 x i64 536
+  %#191 = load i64, ptr %#190, align 8
+  %#192 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#186, noundef ptr %#187, noundef ptr %#188, noundef i64 %#191, noundef ptr %#192)
+  %#193 = load ptr, ptr %#34, align 8
+  %#194 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#195 = load ptr, ptr %#36, align 8
+  %#196 = load ptr, ptr %#30, align 8
+  %#197 = gep inbounds nuw ptr %#196, 576 x i32 0, 1 x i64 544
+  %#198 = load i64, ptr %#197, align 32
+  %#199 = gep inbounds nuw ptr %#195, 1 x i64 %#198
+  call void %#193(noundef ptr %#194, noundef ptr %#199)
+  %#200 = load ptr, ptr %#30, align 8
+  %#201 = gep inbounds nuw ptr %#200, 576 x i32 0, 1 x i64 536
+  %#202 = load i64, ptr %#201, align 8
+  %#203 = mul i64 %#202, 64
+  %#204 = load ptr, ptr %#31, align 8
+  %#205 = gep inbounds nuw ptr %#204, 1 x i64 %#203
+  store ptr %#205, ptr %#31, align 8
+  %#206 = load ptr, ptr %#30, align 8
+  %#207 = gep inbounds nuw ptr %#206, 576 x i32 0, 1 x i64 536
+  %#208 = load i64, ptr %#207, align 8
+  %#209 = load i64, ptr %#39, align 8
+  %#210 = sub i64 %#209, %#208
+  store i64 %#210, ptr %#39, align 8
+  br label %#17#2
+
+#17#2:
+  %#181#2 = load i64, ptr %#39, align 8
+  %#182#2 = load ptr, ptr %#30, align 8
+  %#183#2 = gep inbounds nuw ptr %#182#2, 576 x i32 0, 1 x i64 536
+  %#184#2 = load i64, ptr %#183#2, align 8
+  %#185#2 = icmp uge i64 %#181#2, %#184#2
+  br i1 %#185#2, label %#18#2, label %#19
+
+#18#2:
+  %#186#2 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#187#2 = load ptr, ptr %#31, align 8
+  %#188#2 = load ptr, ptr %#36, align 8
+  %#189#2 = load ptr, ptr %#30, align 8
+  %#190#2 = gep inbounds nuw ptr %#189#2, 576 x i32 0, 1 x i64 536
+  %#191#2 = load i64, ptr %#190#2, align 8
+  %#192#2 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#186#2, noundef ptr %#187#2, noundef ptr %#188#2, noundef i64 %#191#2, noundef ptr %#192#2)
+  %#193#2 = load ptr, ptr %#34, align 8
+  %#194#2 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#195#2 = load ptr, ptr %#36, align 8
+  %#196#2 = load ptr, ptr %#30, align 8
+  %#197#2 = gep inbounds nuw ptr %#196#2, 576 x i32 0, 1 x i64 544
+  %#198#2 = load i64, ptr %#197#2, align 32
+  %#199#2 = gep inbounds nuw ptr %#195#2, 1 x i64 %#198#2
+  call void %#193#2(noundef ptr %#194#2, noundef ptr %#199#2)
+  %#200#2 = load ptr, ptr %#30, align 8
+  %#201#2 = gep inbounds nuw ptr %#200#2, 576 x i32 0, 1 x i64 536
+  %#202#2 = load i64, ptr %#201#2, align 8
+  %#203#2 = mul i64 %#202#2, 64
+  %#204#2 = load ptr, ptr %#31, align 8
+  %#205#2 = gep inbounds nuw ptr %#204#2, 1 x i64 %#203#2
+  store ptr %#205#2, ptr %#31, align 8
+  %#206#2 = load ptr, ptr %#30, align 8
+  %#207#2 = gep inbounds nuw ptr %#206#2, 576 x i32 0, 1 x i64 536
+  %#208#2 = load i64, ptr %#207#2, align 8
+  %#209#2 = load i64, ptr %#39, align 8
+  %#210#2 = sub i64 %#209#2, %#208#2
+  store i64 %#210#2, ptr %#39, align 8
+  br label %#17#exit
+
+#17#exit:
+  %#181#exit = load i64, ptr %#39, align 8
+  %#182#exit = load ptr, ptr %#30, align 8
+  %#183#exit = gep inbounds nuw ptr %#182#exit, 576 x i32 0, 1 x i64 536
+  %#184#exit = load i64, ptr %#183#exit, align 8
+  %#185#exit = icmp uge i64 %#181#exit, %#184#exit
+  br i1 %#185#exit, label #sink, label %#19
+
+#19:
+  %#211 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#212 = load ptr, ptr %#31, align 8
+  %#213 = load ptr, ptr %#36, align 8
+  %#214 = load i64, ptr %#39, align 8
+  %#215 = load ptr, ptr %#33, align 8
+  call void @XXH3_accumulate(noundef ptr %#211, noundef ptr %#212, noundef ptr %#213, noundef i64 %#214, noundef ptr %#215)
+  %#216 = load i64, ptr %#39, align 8
+  %#217 = mul i64 %#216, 64
+  %#218 = load ptr, ptr %#31, align 8
+  %#219 = gep inbounds nuw ptr %#218, 1 x i64 %#217
+  store ptr %#219, ptr %#31, align 8
+  %#220 = load i64, ptr %#39, align 8
+  %#221 = load ptr, ptr %#30, align 8
+  %#222 = gep inbounds nuw ptr %#221, 576 x i32 0, 1 x i64 520
+  store i64 %#220, ptr %#222, align 8
+  %#223 = load ptr, ptr %#30, align 8
+  %#224 = gep inbounds nuw ptr %#223, 576 x i32 0, 1 x i64 256
+  %#225 = gep inbounds ptr %#224, 256 x i64 0, 1 x i64 0
+  %#226 = gep inbounds nuw ptr %#225, 1 x i64 256
+  %#227 = gep inbounds ptr %#226, 1 x i64 -64
+  %#228 = load ptr, ptr %#31, align 8
+  %#229 = gep inbounds ptr %#228, 1 x i64 -64
+  %#230 = call ptr @XXH_memcpy(noundef ptr %#227, noundef ptr %#229, noundef i64 64)
+  br label %#26
+
+#20:
+  %#231 = load ptr, ptr %#35, align 8
+  %#232 = load ptr, ptr %#31, align 8
+  %#233 = ptrtoint ptr %#231 to i64
+  %#234 = ptrtoint ptr %#232 to i64
+  %#235 = sub i64 %#233, %#234
+  %#236 = icmp sgt i64 %#235, 256
+  br i1 %#236, label %#21, label %#25
+
+#21:
+  %#237 = load ptr, ptr %#35, align 8
+  %#238 = gep inbounds ptr %#237, 1 x i64 -256
+  store ptr %#238, ptr %#41, align 8
+  br label %#22
+
+#22:
+  %#239 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#240 = load ptr, ptr %#30, align 8
+  %#241 = gep inbounds nuw ptr %#240, 576 x i32 0, 1 x i64 520
+  %#242 = load ptr, ptr %#30, align 8
+  %#243 = gep inbounds nuw ptr %#242, 576 x i32 0, 1 x i64 536
+  %#244 = load i64, ptr %#243, align 8
+  %#245 = load ptr, ptr %#31, align 8
+  %#246 = load ptr, ptr %#36, align 8
+  %#247 = load ptr, ptr %#30, align 8
+  %#248 = gep inbounds nuw ptr %#247, 576 x i32 0, 1 x i64 544
+  %#249 = load i64, ptr %#248, align 32
+  %#250 = load ptr, ptr %#33, align 8
+  %#251 = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#239, noundef ptr %#241, noundef i64 %#244, noundef ptr %#245, noundef i64 4, noundef ptr %#246, noundef i64 %#249, noundef ptr %#250, noundef ptr %#251)
+  %#252 = load ptr, ptr %#31, align 8
+  %#253 = gep inbounds ptr %#252, 1 x i64 256
+  store ptr %#253, ptr %#31, align 8
+  br label %#23
+
+#23:
+  %#254 = load ptr, ptr %#31, align 8
+  %#255 = load ptr, ptr %#41, align 8
+  %#256 = icmp ult ptr %#254, %#255
+  br i1 %#256, label %#22#2, label %#24
+
+#22#2:
+  %#239#2 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#240#2 = load ptr, ptr %#30, align 8
+  %#241#2 = gep inbounds nuw ptr %#240#2, 576 x i32 0, 1 x i64 520
+  %#242#2 = load ptr, ptr %#30, align 8
+  %#243#2 = gep inbounds nuw ptr %#242#2, 576 x i32 0, 1 x i64 536
+  %#244#2 = load i64, ptr %#243#2, align 8
+  %#245#2 = load ptr, ptr %#31, align 8
+  %#246#2 = load ptr, ptr %#36, align 8
+  %#247#2 = load ptr, ptr %#30, align 8
+  %#248#2 = gep inbounds nuw ptr %#247#2, 576 x i32 0, 1 x i64 544
+  %#249#2 = load i64, ptr %#248#2, align 32
+  %#250#2 = load ptr, ptr %#33, align 8
+  %#251#2 = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#239#2, noundef ptr %#241#2, noundef i64 %#244#2, noundef ptr %#245#2, noundef i64 4, noundef ptr %#246#2, noundef i64 %#249#2, noundef ptr %#250#2, noundef ptr %#251#2)
+  %#252#2 = load ptr, ptr %#31, align 8
+  %#253#2 = gep inbounds ptr %#252#2, 1 x i64 256
+  store ptr %#253#2, ptr %#31, align 8
+  br label %#23#2
+
+#23#2:
+  %#254#2 = load ptr, ptr %#31, align 8
+  %#255#2 = load ptr, ptr %#41, align 8
+  %#256#2 = icmp ult ptr %#254#2, %#255#2
+  br i1 %#256#2, label %#22#exit, label %#24
+
+#22#exit:
+  %#239#exit = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  %#240#exit = load ptr, ptr %#30, align 8
+  %#241#exit = gep inbounds nuw ptr %#240#exit, 576 x i32 0, 1 x i64 520
+  %#242#exit = load ptr, ptr %#30, align 8
+  %#243#exit = gep inbounds nuw ptr %#242#exit, 576 x i32 0, 1 x i64 536
+  %#244#exit = load i64, ptr %#243#exit, align 8
+  %#245#exit = load ptr, ptr %#31, align 8
+  %#246#exit = load ptr, ptr %#36, align 8
+  %#247#exit = load ptr, ptr %#30, align 8
+  %#248#exit = gep inbounds nuw ptr %#247#exit, 576 x i32 0, 1 x i64 544
+  %#249#exit = load i64, ptr %#248#exit, align 32
+  %#250#exit = load ptr, ptr %#33, align 8
+  %#251#exit = load ptr, ptr %#34, align 8
+  call void @XXH3_consumeStripes(noundef ptr %#239#exit, noundef ptr %#241#exit, noundef i64 %#244#exit, noundef ptr %#245#exit, noundef i64 4, noundef ptr %#246#exit, noundef i64 %#249#exit, noundef ptr %#250#exit, noundef ptr %#251#exit)
+  %#252#exit = load ptr, ptr %#31, align 8
+  %#253#exit = gep inbounds ptr %#252#exit, 1 x i64 256
+  store ptr %#253#exit, ptr %#31, align 8
+  br label #sink
+
+#24:
+  %#257 = load ptr, ptr %#30, align 8
+  %#258 = gep inbounds nuw ptr %#257, 576 x i32 0, 1 x i64 256
+  %#259 = gep inbounds ptr %#258, 256 x i64 0, 1 x i64 0
+  %#260 = gep inbounds nuw ptr %#259, 1 x i64 256
+  %#261 = gep inbounds ptr %#260, 1 x i64 -64
+  %#262 = load ptr, ptr %#31, align 8
+  %#263 = gep inbounds ptr %#262, 1 x i64 -64
+  %#264 = call ptr @XXH_memcpy(noundef ptr %#261, noundef ptr %#263, noundef i64 64)
+  br label %#25
+
+#25:
+  br label %#26
+
+#26:
+  %#265 = load ptr, ptr %#30, align 8
+  %#266 = gep inbounds nuw ptr %#265, 576 x i32 0, 1 x i64 256
+  %#267 = gep inbounds ptr %#266, 256 x i64 0, 1 x i64 0
+  %#268 = load ptr, ptr %#31, align 8
+  %#269 = load ptr, ptr %#35, align 8
+  %#270 = load ptr, ptr %#31, align 8
+  %#271 = ptrtoint ptr %#269 to i64
+  %#272 = ptrtoint ptr %#270 to i64
+  %#273 = sub i64 %#271, %#272
+  %#274 = call ptr @XXH_memcpy(noundef ptr %#267, noundef ptr %#268, noundef i64 %#273)
+  %#275 = load ptr, ptr %#35, align 8
+  %#276 = load ptr, ptr %#31, align 8
+  %#277 = ptrtoint ptr %#275 to i64
+  %#278 = ptrtoint ptr %#276 to i64
+  %#279 = sub i64 %#277, %#278
+  %#280 = trunc i64 %#279 to i32
+  %#281 = load ptr, ptr %#30, align 8
+  %#282 = gep inbounds nuw ptr %#281, 576 x i32 0, 1 x i64 512
+  store i32 %#280, ptr %#282, align 64
+  %#283 = load ptr, ptr %#30, align 8
+  %#284 = gep inbounds nuw ptr %#283, 576 x i32 0, 1 x i64 0
+  %#285 = gep inbounds ptr %#284, 64 x i64 0, 8 x i64 0
+  %#286 = gep inbounds ptr %#37, 64 x i64 0, 8 x i64 0
+  memcpy ptr %#285 align 64, ptr %#286 align 16, i64 64
+  store i32 0, ptr %#29, align 4
+  br label %#28
+
+#27:
+  store i32 0, ptr %#29, align 4
+  br label %#28
+
+#28:
+  %#287 = load i32, ptr %#29, align 4
+  ret i32 %#287
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,118 @@
+diff --git a/ggml/src/ggml-cuda/common.cuh b/ggml/src/ggml-cuda/common.cuh
+index 33be16dc5..d27d8acb1 100644
+--- a/ggml/src/ggml-cuda/common.cuh
++++ b/ggml/src/ggml-cuda/common.cuh
+@@ -627,7 +627,8 @@ template <typename T> struct block_reduce_policy<block_reduce_method::MAX, T> {
+ };
+ 
+ template <block_reduce_method reduce_method_t, const unsigned int block_size_template = 0, typename T>
+-static __device__ T block_reduce(T val, T * shared_vals) {
++static __device__ T block_reduce(T val, [[maybe_unused]] T * shared_vals) {
++    // for multi-warp reductions, callers must not reuse shared_vals until all reads from this invocation have completed
+     val                           = block_reduce_policy<reduce_method_t, T>::reduce(val);
+     const unsigned int block_size = block_size_template == 0 ? blockDim.x : block_size_template;
+     if (block_size > WARP_SIZE) {
+diff --git a/ggml/src/ggml-cuda/norm.cu b/ggml/src/ggml-cuda/norm.cu
+index 09d9f3a7d..c3758cd50 100644
+--- a/ggml/src/ggml-cuda/norm.cu
++++ b/ggml/src/ggml-cuda/norm.cu
+@@ -64,7 +64,7 @@ static __global__ void group_norm_f32(const float * x, float * dst, const int gr
+         tmp += xi * xi;
+     }
+ 
+-    tmp = block_reduce<block_reduce_method::SUM, block_size>(tmp, s_sum);
++    tmp = block_reduce<block_reduce_method::SUM, block_size>(tmp, s_sum + 32);
+ 
+     const float variance = tmp / group_size;
+     const float scale = rsqrtf(variance + eps);
+@@ -297,7 +297,7 @@ static void group_norm_f32_cuda(
+         group_norm_f32<WARP_SIZE><<<num_groups, block_dims, 0, stream>>>(x, dst, group_size, ne_elements, eps);
+     } else {
+         const dim3 block_dims(1024, 1, 1);
+-        group_norm_f32<1024><<<num_groups, block_dims, block_dims.x > WARP_SIZE ? 32 * sizeof(float): 0, stream>>>(x, dst, group_size, ne_elements, eps);
++        group_norm_f32<1024><<<num_groups, block_dims, block_dims.x > WARP_SIZE ? 2 * 32 * sizeof(float): 0, stream>>>(x, dst, group_size, ne_elements, eps);
+     }
+ }
+ 
+diff --git a/ggml/src/ggml-cuda/softmax.cu b/ggml/src/ggml-cuda/softmax.cu
+index 285c0e954..f320c6f00 100644
+--- a/ggml/src/ggml-cuda/softmax.cu
++++ b/ggml/src/ggml-cuda/softmax.cu
+@@ -116,6 +116,11 @@ static __global__ void soft_max_f32(
+         vals[col] = val;
+     }
+ 
++    if (block_size > WARP_SIZE) {
++        // sync is needed as we reuse buf_iw across block_reduce invocations, see #26385
++        // for block_size <= WARP_SIZE, block_reduce does not access buf_iw
++        __syncthreads();
++    }
+     // find the sum of exps in the block
+     tmp = block_reduce<block_reduce_method::SUM, block_size_template>(tmp, buf_iw);
+ 
+@@ -142,6 +147,8 @@ static __device__ void soft_max_f32_parallelize_cols_single_row(const float * __
+                                                                 float * __restrict__ dst,
+                                                                 float * __restrict__ tmp_maxs,
+                                                                 float * __restrict__ tmp_sums,
++                                                                float * shared_vals_max,
++                                                                float * shared_vals_sum,
+                                                                 const soft_max_params p) {
+     namespace cg = cooperative_groups;
+ 
+@@ -154,7 +161,6 @@ static __device__ void soft_max_f32_parallelize_cols_single_row(const float * __
+     float     local_vals[n_elem_per_thread] = { -INFINITY, -INFINITY, -INFINITY, -INFINITY };
+     float     local_max                     = -INFINITY;
+     const int step_size                     = gridDim.x * blockDim.x;
+-    __shared__ float shared_vals[32];
+ 
+     // Compute thread-local max
+     for (int col = col_start; col < p.ncols;) {
+@@ -171,7 +177,7 @@ static __device__ void soft_max_f32_parallelize_cols_single_row(const float * __
+     }
+ 
+     // Compute CTA-level max
+-    local_max = block_reduce<block_reduce_method::MAX>(local_max, shared_vals);
++    local_max = block_reduce<block_reduce_method::MAX>(local_max, shared_vals_max);
+ 
+     // Store CTA-level max to GMEM
+     if (tid == 0) {
+@@ -186,7 +192,7 @@ static __device__ void soft_max_f32_parallelize_cols_single_row(const float * __
+     } else {
+         local_max = -INFINITY;
+     }
+-    local_max = block_reduce<block_reduce_method::MAX>(local_max, shared_vals);
++    local_max = block_reduce<block_reduce_method::MAX>(local_max, shared_vals_max);
+ 
+     // Compute softmax dividends, accumulate divisor
+     float tmp_expf = 0.0f;
+@@ -209,7 +215,7 @@ static __device__ void soft_max_f32_parallelize_cols_single_row(const float * __
+     }
+ 
+     // Reduce divisor within CTA
+-    tmp_expf = block_reduce<block_reduce_method::SUM>(tmp_expf, shared_vals);
++    tmp_expf = block_reduce<block_reduce_method::SUM>(tmp_expf, shared_vals_sum);
+ 
+     // Store CTA-level sum to GMEM
+     if (tid == 0) {
+@@ -223,7 +229,7 @@ static __device__ void soft_max_f32_parallelize_cols_single_row(const float * __
+     } else {
+         tmp_expf = 0.0f;
+     }
+-    tmp_expf = block_reduce<block_reduce_method::SUM>(tmp_expf, shared_vals);
++    tmp_expf = block_reduce<block_reduce_method::SUM>(tmp_expf, shared_vals_sum);
+ 
+     // Divide dividend by global sum + store data
+     for (int col = col_start; col < p.ncols;) {
+@@ -310,9 +316,11 @@ __launch_bounds__(8*WARP_SIZE, 1) static __global__ void soft_max_f32_paralleliz
+ // https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/device-callable-apis.html#grid-synchronization
+ // https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/device-callable-apis.html#class-cluster-group
+ {
++    __shared__ float shared_vals[2][32];
++
+     for (int rowx = 0; rowx < p.ne01 * p.ne02 * p.ne03; rowx++) {
+         soft_max_f32_parallelize_cols_single_row(x + int64_t(rowx) * p.ncols, dst + int64_t(rowx) * p.ncols, tmp_maxs,
+-                                                 tmp_sums, p);
++                                                 tmp_sums, shared_vals[0], shared_vals[1], p);
+     }
+ }
+ 

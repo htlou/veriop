@@ -1,0 +1,40 @@
+{
+  "commit": "a4ecded",
+  "date": "2021-08-26",
+  "subject": "improve _withSecret() performance",
+  "selected_by": "keyword",
+  "perf_evidence": "improve _withSecret() performance",
+  "change_summary": "improve _withSecret() performance",
+  "units": [
+    {
+      "name": "improve _withSecret() performance",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/a4ecded/r_newcheck",
+      "evidence": "The changed 256-byte withSecret target compiles to differing IR but Alive2 fails to prove either direction; helper calls remain opaque in other fixed targets."
+    },
+    {
+      "name": "scalar long-secret body and fixed 256-byte public specialization with neutralized inline hints",
+      "level": "api",
+      "verdict": "EQUIV_PARTIAL",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "XXH_VECTOR=0; XXH_NO_INLINE_HINTS=1 on both sides; 256-byte input and 192-byte secret for public wrapper",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "history-eq/c/xxHash/a4ecded/body-proof",
+      "evidence": "Clang 18 old/new -O0 and -O2 LLVM IR is byte-identical; Alive2 verifies wrapper, inline entry, and changed long-secret helper in both directions. Original differing inline hints are not compared end to end."
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "Exact-source partial proof for scalar long-secret body and fixed public specialization with both inline hints neutralized; original hint configurations and remaining public paths are unresolved."
+}

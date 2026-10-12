@@ -1,0 +1,111 @@
+diff --git a/ggml/src/ggml-sycl/fattn-common.hpp b/ggml/src/ggml-sycl/fattn-common.hpp
+index 82813f7a9..3c2d1a776 100644
+--- a/ggml/src/ggml-sycl/fattn-common.hpp
++++ b/ggml/src/ggml-sycl/fattn-common.hpp
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <sycl/sycl.hpp>
++#include <sycl/ext/intel/experimental/grf_size_properties.hpp>
+ #include "dpct/helper.hpp"
+ #include "common.hpp"
+ #include "convert.hpp"
+@@ -832,7 +833,7 @@ static void flash_attn_combine_results(const float * __restrict__ VKQ_parts,
+     dst[tid] = VKQ_numerator / VKQ_denominator;
+ }
+ 
+-template <fattn_kernel_t fattn_kernel, int warp_size>
++template <fattn_kernel_t fattn_kernel, int warp_size, bool use_large_grf = false>
+ static void lauch_kernel(
+     dpct::dim3 group_range,
+     dpct::dim3 local_range,
+@@ -876,23 +877,35 @@ static void lauch_kernel(
+     const int32_t nb32,
+     const int64_t nb33) {
+     GGML_UNUSED(local_mem_size);
++
++    const auto rng = sycl::nd_range<3>(
++        static_cast<sycl::range<3>>(group_range * local_range),
++        static_cast<sycl::range<3>>(local_range));
++
++    const auto kernel = [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(warp_size)]] {
++        GGML_UNUSED(item_ct1);
++        fattn_kernel(Q, K, V, mask, sinks, KV_max, dst, dst_meta, scale,
++                     max_bias, m0, m1, n_head_log2, logit_softcap, ne00,
++                     ne01, ne02, ne03, nb01, nb02, nb03, ne10, ne11,
++                     ne12, ne13, nb11, nb12, nb13, nb21, nb22, nb23,
++                     ne31, ne32, ne33, nb31, nb32, nb33);
++    };
++
+     q->submit([&](sycl::handler &cgh) {
+-        cgh.parallel_for(
+-            sycl::nd_range<3>(
+-                static_cast<sycl::range<3>>(group_range * local_range),
+-                static_cast<sycl::range<3>>(local_range)),
+-            [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(warp_size)]] {
+-                GGML_UNUSED(item_ct1);
+-                fattn_kernel(Q, K, V, mask, sinks, KV_max, dst, dst_meta, scale,
+-                             max_bias, m0, m1, n_head_log2, logit_softcap, ne00,
+-                             ne01, ne02, ne03, nb01, nb02, nb03, ne10, ne11,
+-                             ne12, ne13, nb11, nb12, nb13, nb21, nb22, nb23,
+-                             ne31, ne32, ne33, nb31, nb32, nb33);
+-            });
++        // grf_size_automatic lets the compiler use the large register file when the kernel needs it. grf_size<256> would say the same but is undefined on devices that do not have it.
++        if constexpr (use_large_grf) {
++            cgh.parallel_for(
++                rng,
++                sycl::ext::oneapi::experimental::properties{ sycl::ext::intel::experimental::grf_size_automatic },
++                kernel);
++        } else {
++            cgh.parallel_for(rng, kernel);
++        }
+     });
+ }
+ 
+-template <int DV, int ncols1, int ncols2, fattn_kernel_t fattn_kernel, int warp_size>
++// use_large_grf lets the compiler choose the large register file. Opt in where spilling limits the kernel, not thread occupancy.
++template <int DV, int ncols1, int ncols2, fattn_kernel_t fattn_kernel, int warp_size, bool use_large_grf = false>
+ void launch_fattn(
+     ggml_backend_sycl_context & ctx, ggml_tensor * dst, const int nwarps, const size_t nbytes_shared,
+     const int nbatch_fa, const bool need_f16_K, const bool need_f16_V, const bool stream_k) {
+@@ -1128,7 +1141,7 @@ void launch_fattn(
+ 
+     GGML_ASSERT(block_dim.x % warp_size == 0);
+ 
+-    lauch_kernel<fattn_kernel, warp_size>(
++    lauch_kernel<fattn_kernel, warp_size, use_large_grf>(
+         blocks_num, block_dim, main_stream, (unsigned int) nbytes_shared, (const char *) Q->data, K_data, V_data,
+         mask ? ((const char *) mask->data) : nullptr, sinks ? ((const char *) sinks->data) : nullptr, KV_max.ptr,
+         !stream_k && parallel_blocks > 1 ? dst_tmp.ptr : (float *) KQV->data, (sycl::float2 *)dst_tmp_meta.ptr, scale, max_bias, m0, m1,
+diff --git a/ggml/src/ggml-sycl/fattn-vec.hpp b/ggml/src/ggml-sycl/fattn-vec.hpp
+index 53ad0eaee..9ec88c287 100644
+--- a/ggml/src/ggml-sycl/fattn-vec.hpp
++++ b/ggml/src/ggml-sycl/fattn-vec.hpp
+@@ -589,6 +589,9 @@ void ggml_sycl_flash_attn_ext_vec_case_impl(ggml_backend_sycl_context & ctx, ggm
+     const bool need_f16_V = type_V == GGML_TYPE_F16;
+     constexpr size_t nbytes_shared = 0;
+ 
++    // D=512 does not fit the default register file; it spills up to 343 bytes per thread, against at most 57 for D <= 256. This kernel is decode only, so thread occupancy is not the limit. It is 1.9x faster at every KV depth on Battlemage.
++    constexpr bool use_large_grf = D >= 512;
++
+     const auto arch = ggml_sycl_info().devices[ctx.device].hw_info.arch;
+     const int nthreads = ggml_sycl_fattn_vec_get_nthreads_device(arch);
+     if constexpr (D <= 256) {
+@@ -597,7 +600,7 @@ void ggml_sycl_flash_attn_ext_vec_case_impl(ggml_backend_sycl_context & ctx, ggm
+             constexpr int nwarps = nthreads_hw / warp_size;
+             launch_fattn<D, cols_per_block, 1,
+                          flash_attn_ext_vec<D, cols_per_block, type_K, type_V,
+-                                            use_logit_softcap, warp_size, nthreads_hw>, warp_size>(
++                                            use_logit_softcap, warp_size, nthreads_hw>, warp_size, use_large_grf>(
+                 ctx, dst, nwarps, nbytes_shared, D, need_f16_K, need_f16_V, false);
+             return;
+         }
+@@ -607,7 +610,7 @@ void ggml_sycl_flash_attn_ext_vec_case_impl(ggml_backend_sycl_context & ctx, ggm
+     constexpr int nwarps = nthreads_hw / warp_size;
+     launch_fattn<D, cols_per_block, 1,
+                  flash_attn_ext_vec<D, cols_per_block, type_K, type_V,
+-                                    use_logit_softcap, warp_size, nthreads_hw>, warp_size>(
++                                    use_logit_softcap, warp_size, nthreads_hw>, warp_size, use_large_grf>(
+         ctx, dst, nwarps, nbytes_shared, D, need_f16_K, need_f16_V, false);
+ }
+ 

@@ -1,0 +1,40 @@
+{
+  "commit": "0bced63",
+  "date": "2020-05-27",
+  "subject": "vectorize XXH3_initCustomSecret  (#376)",
+  "selected_by": "keyword",
+  "perf_evidence": "vectorize XXH3_initCustomSecret  (#376)",
+  "change_summary": "vectorize XXH3_initCustomSecret  (#376)",
+  "units": [
+    {
+      "name": "vectorize XXH3_initCustomSecret  (#376)",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/0bced63/r_api_sse2",
+      "evidence": "Scalar and SSE2 raw custom-secret initialization checks include proofs, but SSE2 raw also gives a forward memory-mismatch witness at seed 2^63. Public XXH3 seeded targets time out or fail translation."
+    },
+    {
+      "name": "Public XXH3_64bits_withSeed: 256-byte SSE2 input, seed 2^63",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "Clang -O1 x86-64-v3, XXH_VECTOR=XXH_SSE2, XXH_OLD_NAMES",
+      "unsupported_reason": null,
+      "not_equiv_kind": "bug",
+      "artifact_dir": "c/xxHash/0bced63",
+      "evidence": "Old public call returns under UBSan; new public call reaches signed-min negation UB in historical xxh3.h."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": "bug",
+  "notes": "A valid 256-byte public seeded-hash call returns in the parent and reaches signed-overflow UB in the child SSE2 path at seed 2^63."
+}

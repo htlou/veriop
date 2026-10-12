@@ -1,0 +1,76 @@
+
+----------------------------------------
+declare void @tma_load_4d(noundef ptr, noundef ptr, noundef ptr, noundef i32, noundef i32, noundef i32, noundef i32)
+
+define void @target_copy4(ptr noundef %desc, ptr noundef %barrier, ptr nowrite noundef %args, ptr noundef %smem, i32 noundef %k, i32 noundef %m, i32 noundef %h, i32 noundef %b) {
+entry:
+  %cmp = icmp ne ptr nowrite noundef %args, null
+  assume i1 %cmp
+  %block_table = gep inbounds nuw ptr nowrite noundef %args, 1 x i64 16
+  %#0 = load ptr, ptr %block_table, align 8
+  %cmp1 = icmp eq ptr %#0, null
+  br i1 %cmp1, label %if.then, label %if.end
+
+if.end:
+  %page_block_size = gep inbounds nuw ptr nowrite noundef %args, 1 x i64 8
+  %#1 = load i32, ptr %page_block_size, align 8
+  %div = sdiv i32 noundef %m, %#1
+  %sub.recomposed = srem i32 noundef %m, %#1
+  %conv = sext i32 %div to i64
+  %conv4 = sext i32 noundef %b to i64
+  %#2 = load i64, ptr nowrite noundef %args, align 8
+  %mul5 = mul nsw i64 %#2, %conv4
+  %#3 = gep ptr %#0, 4 x i64 %mul5
+  %arrayidx = gep ptr %#3, 4 x i64 %conv
+  %#4 = load i32, ptr %arrayidx, align 4
+  tail call void @tma_load_4d(noundef ptr noundef %desc, noundef ptr noundef %barrier, noundef ptr noundef %smem, noundef i32 noundef %k, noundef i32 %sub.recomposed, noundef i32 noundef %h, noundef i32 %#4)
+  br label %return
+
+if.then:
+  tail call void @tma_load_4d(noundef ptr noundef %desc, noundef ptr noundef %barrier, noundef ptr noundef %smem, noundef i32 noundef %k, noundef i32 noundef %m, noundef i32 noundef %h, noundef i32 noundef %b)
+  br label %return
+
+return:
+  ret void
+}
+=>
+declare void @tma_load_4d(noundef ptr, noundef ptr, noundef ptr, noundef i32, noundef i32, noundef i32, noundef i32)
+
+define void @target_copy4(ptr noundef %desc, ptr noundef %barrier, ptr nowrite noundef %args, ptr noundef %smem, i32 noundef %k, i32 noundef %m, i32 noundef %h, i32 noundef %b) {
+entry:
+  %cmp = icmp ne ptr nowrite noundef %args, null
+  assume i1 %cmp
+  %block_table = gep inbounds nuw ptr nowrite noundef %args, 1 x i64 16
+  %#0 = load ptr, ptr %block_table, align 8
+  %cmp1 = icmp eq ptr %#0, null
+  br i1 %cmp1, label %if.then, label %if.end
+
+if.end:
+  %page_block_size3 = gep inbounds nuw ptr nowrite noundef %args, 1 x i64 8
+  %#1 = load i32, ptr %page_block_size3, align 8
+  %div = sdiv i32 noundef %m, %#1
+  %sub.recomposed = srem i32 noundef %m, %#1
+  %conv = sext i32 %div to i64
+  %conv5 = sext i32 noundef %b to i64
+  %#2 = load i64, ptr nowrite noundef %args, align 8
+  %mul6 = mul nsw i64 %#2, %conv5
+  %#3 = gep ptr %#0, 4 x i64 %mul6
+  %arrayidx = gep ptr %#3, 4 x i64 %conv
+  %#4 = load i32, ptr %arrayidx, align 4
+  tail call void @tma_load_4d(noundef ptr noundef %desc, noundef ptr noundef %barrier, noundef ptr noundef %smem, noundef i32 noundef %k, noundef i32 %sub.recomposed, noundef i32 noundef %h, noundef i32 %#4)
+  br label %cleanup
+
+if.then:
+  tail call void @tma_load_4d(noundef ptr noundef %desc, noundef ptr noundef %barrier, noundef ptr noundef %smem, noundef i32 noundef %k, noundef i32 noundef %m, noundef i32 noundef %h, noundef i32 noundef %b)
+  br label %cleanup
+
+cleanup:
+  ret void
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

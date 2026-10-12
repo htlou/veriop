@@ -1,0 +1,7 @@
+# llama.cpp `d209086157` — Q5_K SYCL DMMV launch coverage
+
+**Verdict: `NOT_EQUIV` for the selected output write-footprint, under the default `K_QUANTS_PER_ITERATION` and an enabled Q5_K reorder path.** For `row_diff = nrows = 2`, the parent generic Q5_K launch creates two z work-groups; the child reordered launch creates `ceil(2/2) = 1`. Both historical kernels set `row = item_ct1.get_group(2)` and only assign `dst[row]` from a work-item with local z ID zero. Thus the parent writes rows 0 and 1, while the child reordered launch can write only row 0. The parent did not enable Q5_K for DMMV reordering; the child does. The changed `presets.hpp` default is 2 before and 1 after, which supplies `ny = 2` to the child launch.
+
+This conclusion follows from exact parent/child source checks and the [SYCL definition of work-group count](https://github.khronos.org/SYCL_Reference/iface/nd_range.html) and [group ID](https://github.khronos.org/SYCL_Reference/iface/nd_item.html). [coverage.smt2](coverage.smt2) and [solver.log](solver.log) record the Z3 witness; [result.json](result.json) records the write sets. Run `python3 -B history-eq/gpu/llama.cpp/d209086157/reproduce.py` from the project root to regenerate them.
+
+The witness applies when the caller selects the reordered Q5_K DMMV path, with a two-row output and a valid multiple-of-256 column count. It does **not** compare numerical kernel outputs on a SYCL device or establish whole-commit behavior across all configurations. No Kuiper proof or official historical benchmark score was produced.

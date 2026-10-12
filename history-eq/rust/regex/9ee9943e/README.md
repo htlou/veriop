@@ -1,0 +1,7 @@
+# regex `9ee9943e`: zero-size DFA limit
+
+**Whole-commit/public matching verdict: `UNKNOWN`.** The historical commit adds `insts.dfa_size_limit == 0 ||` to `can_exec` in `src/dfa.rs`. `recover.py` removes those exact bytes from the available child blob, then confirms SHA-1 Git blob IDs against both historical trees (`91dc6a62...` before, `602631db...` after). The archived `dfa.old.rs` and `dfa.new.rs` are exact source blobs, despite the parent blob being absent from the local Git object store.
+
+`prepare.py` extracts the two unmodified `can_exec` bodies into `contract.rs`, changing only their names and supplying a minimal `Program`/`Inst` environment. Charon and Aeneas produce `lean/Contract.lean`; Lean checks `Equivalence.lean` without `sorry` or `admit`. It proves that the helpers return the same result whenever the DFA size limit is positive, and that the new helper returns `false` at zero limit. The native Rust witness checks that an empty instruction program at zero limit returns `(true, false)` before/after. This is an **internal engine-selection difference**, not a public regex-matching counterexample.
+
+The support types abstract the historical program, and the proof does not compare the DFA and fallback NFA matching results or runtime performance. No official historical regex benchmark score was measured. Run `bash history-eq/rust/regex/9ee9943e/verify.sh` from the project root to reproduce the source checks, witness, Aeneas translation, and Lean proof.

@@ -1,0 +1,614 @@
+diff --git a/crates/volta_analysis/src/eval/config.rs b/crates/volta_analysis/src/eval/config.rs
+index 1e5739f..0d44734 100644
+--- a/crates/volta_analysis/src/eval/config.rs
++++ b/crates/volta_analysis/src/eval/config.rs
+@@ -12,6 +12,8 @@ pub enum ParamValue {
+     SymFloat(String),
+     /// Pointer to a named array from `AnalysisConfig::arrays`
+     ArrayPtr(String),
++    /// Little-endian contents of a by-value aggregate kernel parameter.
++    Bytes(Vec<u8>),
+ }
+ 
+ /// Whether an array is a kernel input (pre-initialized with fresh symbols),
+diff --git a/crates/volta_analysis/src/eval/interp.rs b/crates/volta_analysis/src/eval/interp.rs
+index b2e695e..02531e0 100644
+--- a/crates/volta_analysis/src/eval/interp.rs
++++ b/crates/volta_analysis/src/eval/interp.rs
+@@ -95,6 +95,7 @@ struct MemRegions {
+     global: Vec<Region>,
+     shared: Vec<Region>,
+     local: Vec<Region>,
++    param: Vec<Region>,
+ }
+ 
+ /// Result of a completed analysis.
+@@ -120,6 +121,7 @@ pub struct Interpreter<'p> {
+     /// registers (see `read_reg`).
+     undefined: ExprId,
+     params: IdVec<ParamId, Value>,
++    param_blobs: IdVec<ParamId, Option<Vec<u8>>>,
+     pub(in crate::eval) threads: IdVec<ThreadId, ThreadState>,
+     pub(in crate::eval) global: Memory,
+     pub(in crate::eval) shared: Memory,
+@@ -162,7 +164,32 @@ impl<'p> Interpreter<'p> {
+             });
+         }
+         let mut params: IdVec<ParamId, Value> = IdVec::new();
+-        for value in &config.params {
++        let mut param_blobs: IdVec<ParamId, Option<Vec<u8>>> = IdVec::new();
++        for (info, value) in declared.values().zip(&config.params) {
++            if info.is_aggregate {
++                let ParamValue::Bytes(bytes) = value else {
++                    return Err(EvalError::Config {
++                        message: format!(
++                            "aggregate parameter '{}' requires bytes:<hex>",
++                            info.name
++                        ),
++                    });
++                };
++                if bytes.len() as u64 != info.size_bytes {
++                    return Err(EvalError::Config {
++                        message: format!(
++                            "aggregate parameter '{}' needs {} bytes, got {}",
++                            info.name,
++                            info.size_bytes,
++                            bytes.len()
++                        ),
++                    });
++                }
++                let _ = param_blobs.push(Some(bytes.clone()));
++                let _ = params.push(Value::Scalar(undefined));
++                continue;
++            }
++            let _ = param_blobs.push(None);
+             let v = match value {
+                 ParamValue::Int(v) => Value::Scalar(arena.int(*v)),
+                 // Exact ingestion; NaN was rejected by `config.validate()`
+@@ -180,6 +207,11 @@ impl<'p> Interpreter<'p> {
+                     })?;
+                     Value::Scalar(arena.int(array.base as i64))
+                 }
++                ParamValue::Bytes(_) => {
++                    return Err(EvalError::Config {
++                        message: format!("scalar parameter '{}' cannot use bytes:<hex>", info.name),
++                    });
++                }
+             };
+             let _ = params.push(v);
+         }
+@@ -287,6 +319,9 @@ impl<'p> Interpreter<'p> {
+                 "local variable",
+             )?;
+         }
++        for info in declared.values().filter(|info| info.is_aggregate) {
++            push_region(&mut regions.param, info.addr, info.size_bytes, "parameter")?;
++        }
+ 
+         // Input-array symbols are materialized lazily on first read (arrays
+         // can be huge - e.g. 4096x4096 matmul operands - while a single CTA
+@@ -328,6 +363,7 @@ impl<'p> Interpreter<'p> {
+             n_threads,
+             undefined,
+             params,
++            param_blobs,
+             threads,
+             global,
+             shared: Memory::new(),
+@@ -654,12 +690,8 @@ impl<'p> Interpreter<'p> {
+ 
+         let mut next_pc = InstrId(pc.0 + 1);
+         match &instr {
+-            // Parameter reads are interpreter-internal value bindings (an
+-            // `IdVec` lookup), not byte-addressed memory accesses, so the
+-            // natural-alignment rule for memory instructions has nothing to
+-            // apply to. Byte-addressed `.param`/`.const` accesses that do
+-            // reach `Load`/`Store` are rejected as unsupported in
+-            // `check_bounds`.
++            // Scalar parameters use direct bindings; aggregate parameters
++            // use byte-addressed .param loads below.
+             LoweredInstr::LoadParam { dst, param_id } => {
+                 let v = self.params[*param_id];
+                 self.threads[t].regs.write(*dst, v);
+@@ -673,7 +705,11 @@ impl<'p> Interpreter<'p> {
+                 ty,
+             } => {
+                 let addr = self.effective_addr(t, pc, base, *offset)?;
+-                let v = self.mem_read(t, pc, *space, addr, ty.size_bytes() as u64)?;
++                let v = if *space == MemSpace::Param {
++                    self.read_param(t, pc, addr, *ty)?
++                } else {
++                    self.mem_read(t, pc, *space, addr, ty.size_bytes() as u64)?
++                };
+                 let v = self.canon_loaded(t, pc, *ty, *dst, v)?;
+                 self.threads[t].regs.write(*dst, v);
+             }
+@@ -697,7 +733,11 @@ impl<'p> Interpreter<'p> {
+                 self.check_bounds(t, pc, *space, addr, dst.len() as u64 * width)?;
+                 self.check_alignment(t, pc, *space, addr, dst.len() as u64 * width)?;
+                 for (k, reg) in dst.iter().enumerate() {
+-                    let v = self.mem_read(t, pc, *space, addr + k as u64 * width, width)?;
++                    let v = if *space == MemSpace::Param {
++                        self.read_param(t, pc, addr + k as u64 * width, *ty)?
++                    } else {
++                        self.mem_read(t, pc, *space, addr + k as u64 * width, width)?
++                    };
+                     let v = self.canon_loaded(t, pc, *ty, *reg, v)?;
+                     self.threads[t].regs.write(*reg, v);
+                 }
+@@ -1010,6 +1050,12 @@ impl<'p> Interpreter<'p> {
+             LoweredInstr::Trap => {
+                 return Err(EvalError::TrapReached { thread: t, pc });
+             }
++            LoweredInstr::Unsupported { what } => {
++                return Err(EvalError::Unsupported {
++                    pc,
++                    what: what.clone(),
++                });
++            }
+         }
+ 
+         self.threads[t].pc = next_pc;
+@@ -1223,7 +1269,8 @@ impl<'p> Interpreter<'p> {
+             MemSpace::Global => &self.regions.global,
+             MemSpace::Shared => &self.regions.shared,
+             MemSpace::Local => &self.regions.local,
+-            MemSpace::Param | MemSpace::Const => {
++            MemSpace::Param => &self.regions.param,
++            MemSpace::Const => {
+                 return Err(EvalError::Unsupported {
+                     pc,
+                     what: format!("{:?}-space memory access", space),
+@@ -1294,6 +1341,56 @@ impl<'p> Interpreter<'p> {
+         }
+     }
+ 
++    fn read_param(
++        &mut self,
++        t: ThreadId,
++        pc: InstrId,
++        addr: u64,
++        ty: ScalarType,
++    ) -> EvalResult<Value> {
++        let width = ty.size_bytes() as u64;
++        self.check_bounds(t, pc, MemSpace::Param, addr, width)?;
++        self.check_alignment(t, pc, MemSpace::Param, addr, width)?;
++        if width > 8 {
++            return Err(EvalError::Unsupported {
++                pc,
++                what: format!("{}-byte parameter load", width),
++            });
++        }
++        let info = self
++            .program
++            .symbols
++            .params()
++            .values()
++            .find(|info| {
++                info.is_aggregate && addr >= info.addr && addr - info.addr < info.size_bytes
++            })
++            .expect("bounds-checked parameter has an owner");
++        let bytes = self.param_blobs[info.id]
++            .as_ref()
++            .expect("aggregate parameter has bytes");
++        let offset = (addr - info.addr) as usize;
++        let mut raw = 0u64;
++        for (i, byte) in bytes[offset..offset + width as usize].iter().enumerate() {
++            raw |= u64::from(*byte) << (8 * i);
++        }
++        let expr = match ty {
++            ScalarType::F32 => self.arena.float_from_f64(f32::from_bits(raw as u32) as f64),
++            ScalarType::F64 => self.arena.float_from_f64(f64::from_bits(raw)),
++            _ if ty.is_float() => {
++                return Err(EvalError::Unsupported {
++                    pc,
++                    what: format!("{:?} aggregate parameter load", ty),
++                });
++            }
++            _ => return Ok(Value::Scalar(self.arena.int(raw as i64))),
++        }
++        .map_err(|e| EvalError::Config {
++            message: format!("parameter float: {}", e),
++        })?;
++        Ok(Value::Scalar(expr))
++    }
++
+     /// Bounds-check, race-check, and read memory.
+     ///
+     /// Reading in-bounds shared/global bytes that were never written yields
+@@ -1310,6 +1407,12 @@ impl<'p> Interpreter<'p> {
+         addr: u64,
+         width: u64,
+     ) -> EvalResult<Value> {
++        if space == MemSpace::Param {
++            return Err(EvalError::Unsupported {
++                pc,
++                what: "untyped parameter load".to_string(),
++            });
++        }
+         self.check_bounds(t, pc, space, addr, width)?;
+         // Every program access flows through here (scalar ld/st directly;
+         // vector and tensor-core ops per element, after their own
+@@ -1436,6 +1539,12 @@ impl<'p> Interpreter<'p> {
+         width: u64,
+         value: Value,
+     ) -> EvalResult<()> {
++        if space == MemSpace::Param {
++            return Err(EvalError::Unsupported {
++                pc,
++                what: "parameter store".to_string(),
++            });
++        }
+         self.check_bounds(t, pc, space, addr, width)?;
+         // See `mem_read`: the write-side natural-alignment chokepoint.
+         self.check_alignment(t, pc, space, addr, width)?;
+diff --git a/crates/volta_analysis/src/lowered.rs b/crates/volta_analysis/src/lowered.rs
+index 49180a8..9f0b910 100644
+--- a/crates/volta_analysis/src/lowered.rs
++++ b/crates/volta_analysis/src/lowered.rs
+@@ -515,6 +515,10 @@ pub enum LoweredInstr {
+     /// Abort execution. Reaching this during evaluation is an analysis error.
+     Trap,
+ 
++    /// An unsupported PTX instruction retained only so a fixed launch can
++    /// prove its path unreachable. Reaching it always aborts analysis.
++    Unsupported { what: String },
++
+     /// No operation (placeholder)
+     Nop,
+ }
+@@ -599,6 +603,7 @@ define_instr_kinds!(
+     WmmaMma,
+     Activemask,
+     Trap,
++    Unsupported,
+     Nop,
+ );
+ 
+@@ -672,7 +677,12 @@ impl LoweredInstr {
+             Self::Cvt { src, .. } => from_op(src).into_iter().collect(),
+ 
+             // Control flow
+-            Self::Bra { .. } | Self::Ret | Self::Exit | Self::Trap | Self::Nop => vec![],
++            Self::Bra { .. }
++            | Self::Ret
++            | Self::Exit
++            | Self::Trap
++            | Self::Unsupported { .. }
++            | Self::Nop => vec![],
+ 
+             // Warp queries
+             Self::Activemask { .. } => vec![],
+@@ -780,6 +790,7 @@ impl LoweredInstr {
+             | Self::Ret
+             | Self::Exit
+             | Self::Trap
++            | Self::Unsupported { .. }
+             | Self::BarSync { .. }
+             | Self::BarWarpSync { .. }
+             | Self::Membar { .. }
+diff --git a/crates/volta_analysis/src/lowering.rs b/crates/volta_analysis/src/lowering.rs
+index ceb0d12..2f0c3d5 100644
+--- a/crates/volta_analysis/src/lowering.rs
++++ b/crates/volta_analysis/src/lowering.rs
+@@ -278,6 +278,9 @@ impl LoweringContext {
+         if let Some(info) = self.symbols.get_global_var(name) {
+             return Some(Operand::ImmU64(info.addr));
+         }
++        if let Some(info) = self.symbols.get_param(name) {
++            return Some(Operand::ImmU64(info.addr));
++        }
+         None
+     }
+ 
+@@ -637,10 +640,9 @@ impl LoweringContext {
+         })
+     }
+ 
+-    /// Convert AST memory space to lowered memory space. Generic (spaceless)
+-    /// accesses and unmodeled spaces are rejected: memory spaces have
+-    /// separate address spaces here, so silently defaulting to global would
+-    /// read/write the wrong memory.
++    /// Convert AST memory space to lowered memory space. Generic stores and
++    /// unmodeled spaces are rejected; generic loads have their own guarded
++    /// global-only path in `lower_load`.
+     fn convert_space(&self, space: Option<StateSpace>, instruction: &str) -> LowerResult<MemSpace> {
+         match space {
+             Some(StateSpace::Global) => Ok(MemSpace::Global),
+@@ -946,9 +948,22 @@ fn collect_declarations(
+     // Collect kernel parameters
+     for param in params {
+         let ty = param.ty.scalar;
+-        let size_bytes = ty.size_bytes() as u64;
+-        ctx.symbols
+-            .declare_param(&param.name.to_string(), ty, size_bytes)?;
++        let size_bytes = param
++            .array_dims
++            .iter()
++            .try_fold(ty.size_bytes() as u64, |size, dim| {
++                size.checked_mul(u64::from(*dim))
++            })
++            .ok_or_else(|| LowerError::VariableSizeOverflow {
++                what: format!("parameter '{}'", param.name),
++            })?;
++        ctx.symbols.declare_param(
++            &param.name.to_string(),
++            ty,
++            size_bytes,
++            param.align.map(u64::from).unwrap_or(ty.size_bytes() as u64),
++            !param.array_dims.is_empty(),
++        )?;
+     }
+ 
+     // Collect declarations from body
+@@ -1073,6 +1088,39 @@ fn lower_instruction(ctx: &mut LoweringContext, instr: &Instruction) -> LowerRes
+         None => None,
+     };
+ 
++    // CUTLASS's serial split-K=1 launch contains these semaphore operations
++    // in a branch guarded by grid_tiled_shape.k() > 1. Preserve each PC and
++    // predicate, but fail if execution reaches one: the acquire/release and
++    // reduction semantics are not in the structured-CTA model.
++    if let InstructionOp::Unparsed {
++        kind, modifiers, ..
++    } = &instr.op
++    {
++        let opcode = match kind {
++            InstrKind::Ld => "ld",
++            InstrKind::St => "st",
++            InstrKind::Bar => "bar",
++            _ => "",
++        };
++        if !opcode.is_empty() {
++            let spelling = format!(
++                "{}.{}",
++                opcode,
++                modifiers
++                    .iter()
++                    .map(ToString::to_string)
++                    .collect::<Vec<_>>()
++                    .join(".")
++            );
++            if matches!(
++                spelling.as_str(),
++                "ld.global.acquire.gpu.b32" | "bar.red.and.pred" | "st.global.release.gpu.b32"
++            ) {
++                return ctx.emit(LoweredInstr::Unsupported { what: spelling }, predicate);
++            }
++        }
++    }
++
+     match &instr.op {
+         InstructionOp::Parsed(parsed) => {
+             lower_parsed_instruction(ctx, parsed, predicate)?;
+@@ -1520,10 +1568,9 @@ fn lower_parsed_instruction(
+             //   (`cvta.<space>`) would be an absolute address in the
+             //   *wrong* space, and `cvta.to.<other-space>` would bless an
+             //   arbitrary value as a shared/local address. Spaceless
+-            //   ld/st is already rejected (`convert_space`), so no
+-            //   accepted instruction can consume a generic address
+-            //   derived from shared/local - rejecting the producers
+-            //   closes the loop.
++            //   loads can only reach declared global regions, and generic
++            //   stores are rejected. Rejecting shared/local producers
++            //   keeps that narrow generic-load model valid.
+             if *to_generic || *space != StateSpace::Global {
+                 let form = format!(
+                     "cvta{}.{}",
+@@ -3086,11 +3133,19 @@ fn lower_load(
+         return Err(unsupported("ld", ".unified modifier"));
+     }
+ 
+-    // Param-space loads read either a kernel parameter or a block-scope
+-    // `.param` slot (the callseq idiom); both are handled symbolically
+-    // rather than as memory accesses.
++    // Scalar parameters and block-scope call slots keep their existing
++    // symbolic path. Aggregate fields and register-derived addresses use
++    // byte-addressed parameter storage below.
+     if *space == Some(StateSpace::Param) {
+-        return lower_param_load(ctx, ld, predicate);
++        if let Ok((name, offset)) = param_addr_symbol(ctx, addr) {
++            let scalar_param = ctx
++                .symbols
++                .get_param(&name)
++                .is_some_and(|info| !info.is_aggregate && offset == 0 && vec.is_none());
++            if ctx.local_params.contains_key(&name) || scalar_param {
++                return lower_param_load(ctx, ld, predicate);
++            }
++        }
+     }
+ 
+     // Resolve the address operand
+@@ -3106,7 +3161,14 @@ fn lower_load(
+         }
+     };
+ 
+-    let space = ctx.convert_space(*space, "ld")?;
++    // The model maps global generic addresses identically and rejects
++    // shared/local generic-address producers. A spaceless load is accepted
++    // only in this global window: evaluation still requires the complete
++    // access to fit a declared global region. Generic stores remain rejected.
++    let space = match space {
++        None => MemSpace::Global,
++        explicit => ctx.convert_space(*explicit, "ld")?,
++    };
+     let instr_name = format!("ld.{:?}", ty);
+     check_vec_arity("ld", *vec, dst)?;
+ 
+@@ -4931,8 +4993,23 @@ mod tests {
+     }
+ 
+     #[test]
+-    fn test_reject_generic_ld_st() {
+-        assert_rejected("ld.u32 %r1, [%rd1];", "generic");
++    fn test_cutlass_semaphore_ops_deferred_but_not_dropped() {
++        for body in [
++            "ld.global.acquire.gpu.b32 %r1, [%rd1];",
++            "bar.red.and.pred %p2, 0, %p1;",
++            "st.global.release.gpu.b32 [%rd1], %r1;",
++        ] {
++            let program = lower_body(body).unwrap();
++            assert!(matches!(
++                program.instructions.values().next(),
++                Some(LoweredInstr::Unsupported { .. })
++            ));
++        }
++    }
++
++    #[test]
++    fn test_generic_global_ld_reject_st() {
++        assert_lowers("ld.u32 %r1, [%rd1];");
+         assert_rejected("st.u32 [%rd1], %r1;", "generic");
+         assert_lowers("ld.global.u32 %r1, [%rd1];");
+         assert_lowers("ld.volatile.shared.f32 %f1, [%r1];");
+diff --git a/crates/volta_analysis/src/symbols.rs b/crates/volta_analysis/src/symbols.rs
+index 9ad7176..6183ce8 100644
+--- a/crates/volta_analysis/src/symbols.rs
++++ b/crates/volta_analysis/src/symbols.rs
+@@ -234,6 +234,8 @@ pub struct ParamInfo {
+     pub name: String,
+     pub ty: ScalarType,
+     pub size_bytes: u64,
++    pub addr: u64,
++    pub is_aggregate: bool,
+ }
+ 
+ /// Information about a shared memory allocation
+@@ -299,6 +301,10 @@ pub struct GlobalVarInfo {
+ /// `Interpreter::new` rejects configs that do.
+ pub const MODULE_GLOBAL_BASE: u64 = 0x7000_0000_0000_0000;
+ 
++/// Synthetic byte addresses for kernel `.param` storage. Parameter space is
++/// separate from global memory; this base preserves register address math.
++pub const PARAM_BASE: u64 = 0x6000_0000_0000_0000;
++
+ /// Round `offset` up to the next multiple of `alignment` (a power of two),
+ /// or `None` when the rounded offset overflows u64 (checked arithmetic,
+ /// release-active: packing must reject hostile sizes loudly, not wrap).
+@@ -346,6 +352,7 @@ pub struct SymbolTable {
+     params: HashMap<String, ParamInfo>,
+     /// Parameters in declaration order
+     params_ordered: IdVec<ParamId, ParamInfo>,
++    param_mem_size: u64,
+ 
+     /// Label name → instruction PC
+     labels: HashMap<String, InstrId>,
+@@ -381,6 +388,7 @@ impl SymbolTable {
+             reg_counts: [0; RegClass::COUNT],
+             params: HashMap::new(),
+             params_ordered: IdVec::new(),
++            param_mem_size: 0,
+             labels: HashMap::new(),
+             shared_vars: HashMap::new(),
+             shared_mem_size: 0,
+@@ -465,18 +473,38 @@ impl SymbolTable {
+         name: &str,
+         ty: ScalarType,
+         size_bytes: u64,
++        alignment: u64,
++        is_aggregate: bool,
+     ) -> LowerResult<ParamId> {
+         self.reserve_name(name, SymbolKind::Parameter)?;
+ 
++        let offset = align_up(
++            self.param_mem_size,
++            alignment.max((ty.bits() as u64).div_ceil(8)),
++        )
++        .ok_or_else(|| size_overflow("parameter", name))?;
++        let end = offset
++            .checked_add(size_bytes)
++            .ok_or_else(|| size_overflow("parameter", name))?;
++        let addr = PARAM_BASE
++            .checked_add(offset)
++            .ok_or_else(|| size_overflow("parameter", name))?;
++        PARAM_BASE
++            .checked_add(end)
++            .ok_or_else(|| size_overflow("parameter", name))?;
++
+         let id = ParamId(self.params_ordered.len() as u32);
+         let info = ParamInfo {
+             id,
+             name: name.to_string(),
+             ty,
+             size_bytes,
++            addr,
++            is_aggregate,
+         };
+         self.params.insert(name.to_string(), info.clone());
+         let _ = self.params_ordered.push(info);
++        self.param_mem_size = end;
+         Ok(id)
+     }
+ 
+@@ -943,10 +971,12 @@ mod tests {
+     #[test]
+     fn test_duplicate_param_error() {
+         let mut symbols = SymbolTable::new();
+-        symbols.declare_param("ptr", ScalarType::U64, 8).unwrap();
++        symbols
++            .declare_param("ptr", ScalarType::U64, 8, 8, false)
++            .unwrap();
+ 
+         // Try to declare same param again
+-        let result = symbols.declare_param("ptr", ScalarType::U64, 8);
++        let result = symbols.declare_param("ptr", ScalarType::U64, 8, 8, false);
+         assert!(result.is_err());
+     }
+ 
+@@ -1195,7 +1225,9 @@ mod tests {
+     fn test_label_conflicts_with_param() {
+         use id_collections::Id;
+         let mut symbols = SymbolTable::new();
+-        symbols.declare_param("foo", ScalarType::U64, 8).unwrap();
++        symbols
++            .declare_param("foo", ScalarType::U64, 8, 8, false)
++            .unwrap();
+ 
+         // Label should conflict with param
+         let result = symbols.declare_label("foo", InstrId::from_index(0));
+@@ -1232,14 +1264,16 @@ mod tests {
+         symbols.declare_register("foo", ScalarType::U32, 1).unwrap();
+ 
+         // Param should conflict with register
+-        let result = symbols.declare_param("foo", ScalarType::U64, 8);
++        let result = symbols.declare_param("foo", ScalarType::U64, 8, 8, false);
+         assert!(result.is_err());
+     }
+ 
+     #[test]
+     fn test_shared_conflicts_with_param() {
+         let mut symbols = SymbolTable::new();
+-        symbols.declare_param("foo", ScalarType::U64, 8).unwrap();
++        symbols
++            .declare_param("foo", ScalarType::U64, 8, 8, false)
++            .unwrap();
+ 
+         // Shared should conflict with param
+         let result = symbols.declare_shared("foo", ScalarType::U32, 256, false, 4);
+diff --git a/crates/volta_cli/src/main.rs b/crates/volta_cli/src/main.rs
+index 904ce84..c918e75 100644
+--- a/crates/volta_cli/src/main.rs
++++ b/crates/volta_cli/src/main.rs
+@@ -351,6 +351,22 @@ fn parse_param(s: &str) -> Result<ParamValue, String> {
+         )),
+         "sym" => Ok(ParamValue::SymFloat(value.to_string())),
+         "ptr" => Ok(ParamValue::ArrayPtr(value.to_string())),
++        "bytes" => {
++            if value.len() % 2 != 0 {
++                return Err("bytes: parameter needs an even number of hex digits".to_string());
++            }
++            let bytes = value
++                .as_bytes()
++                .chunks_exact(2)
++                .map(|pair| {
++                    let hex = std::str::from_utf8(pair)
++                        .map_err(|_| "bytes: parameter must be ASCII hex".to_string())?;
++                    u8::from_str_radix(hex, 16)
++                        .map_err(|_| format!("invalid bytes: hex pair '{hex}'"))
++                })
++                .collect::<Result<Vec<_>, _>>()?;
++            Ok(ParamValue::Bytes(bytes))
++        }
+         other => Err(format!("unknown param kind '{}'", other)),
+     }
+ }

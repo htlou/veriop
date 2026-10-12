@@ -1,0 +1,7 @@
+# llama.cpp `892e3c33`: Intel Windows Vulkan MMVQ routing
+
+**Verdict: scoped `NOT_EQUIV`.** The commit changes only `ggml/src/ggml-vulkan/ggml-vulkan.cpp`. The [reproduction script](reproduce.py) loads both exact historical Git blobs, verifies that the complete file differs only in `ggml_vk_should_use_mmvq`, and extracts that entire function. The stand-in `Device` contains only the fields this helper reads; the `ggml_type` values come from the exact historical `ggml.h`. Vendor and driver labels preserve the source comparisons.
+
+With default `mmvq_mode`, Intel vendor, Intel proprietary Windows driver, `n=1`, `k=4096`, and `GGML_TYPE_Q8_0`, the parent returns **true** (select MMVQ) and the child returns **false**. Native builds of the extracted helper reproduce this witness. The `n=2` batch and non-Windows Intel controls both return true on both sides. Alive2 refutes equivalence of the complete helper in [both directions](alive-old_to_new.log); the [reverse log](alive-new_to_old.log) also records one incorrect transformation with zero checker errors. [result.json](result.json) records the source IDs, enum values, IR hashes, and outputs.
+
+This is a difference in the host dispatch decision, not a demonstrated difference in final tensor values. Volta's PTX-kernel relation does not accept this host helper. No official before/after llama.cpp benchmark score was measured for this commit.

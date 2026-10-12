@@ -1,0 +1,414 @@
+
+----------------------------------------
+define i64 @target_value(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#9 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#9
+  store i64 noundef %#0, ptr %#9, align 8
+  %#10 = and i64 noundef %#0, 255
+  %#11 = icmp eq i64 %#10, 45
+  %#12 = zext i1 %#11 to i64
+  %#13 = gep inbounds nuw ptr %#9, 1 x i64 %#12
+  %#14 = load i8, ptr %#13, align 1
+  %#15 = or i8 %#14, 32
+  switch i8 %#15, label %#8 [
+    i8 110, label %#5
+    i8 105, label %#2
+  ]
+
+#2:
+  %#16 = gep inbounds nuw ptr %#13, 1 x i64 1
+  %#17 = load i8, ptr %#16, align 1
+  %#18 = and i8 %#17, 223
+  %#19 = icmp eq i8 %#18, 78
+  br i1 %#19, label %#3, label %#8
+
+#3:
+  %#20 = gep inbounds nuw ptr %#13, 1 x i64 2
+  %#21 = load i8, ptr %#20, align 1
+  %#22 = and i8 %#21, 223
+  %#23 = icmp eq i8 %#22, 70
+  br i1 %#23, label %#4, label %#8
+
+#4:
+  %#24 = select i1 %#11, double -inf, double inf
+  br label %#8
+
+#5:
+  %#25 = gep inbounds nuw ptr %#13, 1 x i64 1
+  %#26 = load i8, ptr %#25, align 1
+  %#27 = and i8 %#26, 223
+  %#28 = icmp eq i8 %#27, 65
+  br i1 %#28, label %#6, label %#8
+
+#6:
+  %#29 = gep inbounds nuw ptr %#13, 1 x i64 2
+  %#30 = load i8, ptr %#29, align 1
+  %#31 = and i8 %#30, 223
+  %#32 = icmp eq i8 %#31, 78
+  br i1 %#32, label %#7, label %#8
+
+#7:
+  %#33 = select i1 %#11, double 0xfff8000000000000, double 0x7ff8000000000000
+  br label %#8
+
+#8:
+  %#34 = phi double [ 0.000000, %#1 ], [ %#24, %#4 ], [ 0.000000, %#3 ], [ 0.000000, %#2 ], [ 0.000000, %#6 ], [ 0.000000, %#5 ], [ %#33, %#7 ]
+  %#35 = bitcast double %#34 to i64
+  end_lifetime ptr %#9
+  ret i64 %#35
+}
+=>
+define i64 @target_value(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#5 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#5
+  store i64 noundef %#0, ptr %#5, align 8
+  %#6 = and i64 noundef %#0, 255
+  %#7 = icmp eq i64 %#6, 45
+  %#8 = zext i1 %#7 to i64
+  %#9 = gep inbounds nuw ptr %#5, 1 x i64 %#8
+  %#10 = load i24, ptr %#9, align 1
+  %#11 = and i24 %#10, 14671839
+  switch i24 %#11, label %#4 [
+    i24 5128526, label %#3
+    i24 4607561, label %#2
+  ]
+
+#2:
+  %#12 = select i1 %#7, double -inf, double inf
+  br label %#4
+
+#3:
+  %#13 = select i1 %#7, double 0xfff8000000000000, double 0x7ff8000000000000
+  br label %#4
+
+#4:
+  %#14 = phi double [ 0.000000, %#1 ], [ %#12, %#2 ], [ %#13, %#3 ]
+  %#15 = bitcast double %#14 to i64
+  end_lifetime ptr %#5
+  ret i64 %#15
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_offset(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#22 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#22
+  store i64 noundef %#0, ptr %#22, align 8
+  %#23 = and i64 noundef %#0, 255
+  %#24 = icmp eq i64 %#23, 45
+  %#25 = zext i1 %#24 to i64
+  %#26 = gep inbounds nuw ptr %#22, 1 x i64 %#25
+  %#27 = load i8, ptr %#26, align 1
+  %#28 = or i8 %#27, 32
+  switch i8 %#28, label %#21 [
+    i8 110, label %#12
+    i8 105, label %#2
+  ]
+
+#2:
+  %#29 = gep inbounds nuw ptr %#26, 1 x i64 1
+  %#30 = load i8, ptr %#29, align 1
+  %#31 = and i8 %#30, 223
+  %#32 = icmp eq i8 %#31, 78
+  br i1 %#32, label %#3, label %#21
+
+#3:
+  %#33 = gep inbounds nuw ptr %#26, 1 x i64 2
+  %#34 = load i8, ptr %#33, align 1
+  %#35 = and i8 %#34, 223
+  %#36 = icmp eq i8 %#35, 70
+  br i1 %#36, label %#4, label %#21
+
+#4:
+  br i1 %#24, label %#10, label %#5
+
+#5:
+  %#37 = gep inbounds nuw ptr %#26, 1 x i64 3
+  %#38 = load i8, ptr %#37, align 1
+  %#39 = and i8 %#38, 223
+  %#40 = icmp eq i8 %#39, 73
+  br i1 %#40, label %#6, label %#10
+
+#6:
+  %#41 = gep inbounds nuw ptr %#26, 1 x i64 4
+  %#42 = load i8, ptr %#41, align 1
+  %#43 = and i8 %#42, 223
+  %#44 = icmp eq i8 %#43, 78
+  br i1 %#44, label %#7, label %#10
+
+#7:
+  %#45 = gep inbounds nuw ptr %#26, 1 x i64 5
+  %#46 = load i8, ptr %#45, align 1
+  %#47 = and i8 %#46, 223
+  %#48 = icmp eq i8 %#47, 73
+  br i1 %#48, label %#8, label %#10
+
+#8:
+  %#49 = gep inbounds nuw ptr %#26, 1 x i64 6
+  %#50 = load i8, ptr %#49, align 1
+  %#51 = and i8 %#50, 223
+  %#52 = icmp eq i8 %#51, 84
+  br i1 %#52, label %#9, label %#10
+
+#9:
+  %#53 = gep inbounds nuw ptr %#26, 1 x i64 7
+  %#54 = load i8, ptr %#53, align 1
+  %#55 = and i8 %#54, 223
+  %#56 = icmp eq i8 %#55, 89
+  br i1 %#56, label %#11, label %#10
+
+#10:
+  br label %#11
+
+#11:
+  %#57 = phi i64 [ 3, %#10 ], [ 8, %#9 ]
+  %#58 = gep inbounds nuw ptr %#26, 1 x i64 %#57
+  br label %#21
+
+#12:
+  %#59 = gep inbounds nuw ptr %#26, 1 x i64 1
+  %#60 = load i8, ptr %#59, align 1
+  %#61 = and i8 %#60, 223
+  %#62 = icmp eq i8 %#61, 65
+  br i1 %#62, label %#13, label %#21
+
+#13:
+  %#63 = gep inbounds nuw ptr %#26, 1 x i64 2
+  %#64 = load i8, ptr %#63, align 1
+  %#65 = and i8 %#64, 223
+  %#66 = icmp eq i8 %#65, 78
+  br i1 %#66, label %#14, label %#21
+
+#14:
+  %#67 = select i1 %#24, i64 4, i64 3
+  %#68 = gep inbounds nuw ptr %#22, 1 x i64 %#67
+  %#69 = load i8, ptr %#68, align 1
+  %#70 = icmp eq i8 %#69, 40
+  br i1 %#70, label %#15, label %#21
+
+#15:
+  %#71 = select i1 %#24, i64 5, i64 4
+  %#72 = select i1 %#24, i64 40, i64 32
+  %#73 = lshr i64 noundef %#0, %#72
+  %#74 = trunc i64 %#73 to i8
+  %#75 = icmp eq i8 %#74, 41
+  br i1 %#75, label %#20, label %#16
+
+#16:
+  %#76 = phi i8 [ %#92, %#19 ], [ %#74, %#15 ]
+  %#77 = phi i64 [ %#90, %#19 ], [ %#71, %#15 ]
+  %#78 = and i8 %#76, 223
+  %#79 = add i8 %#78, 191
+  %#80 = icmp ult i8 %#79, 26
+  br i1 %#80, label %#17, label %#18
+
+#17:
+  %#81 = add nsw nuw i64 %#77, 1
+  %#82 = icmp samesign eq i64 %#81, 8
+  br i1 %#82, label %#21, label %#19
+
+#18:
+  %#83 = add i8 %#76, 198
+  %#84 = icmp ult i8 %#83, 246
+  %#85 = icmp ne i8 %#76, 95
+  %#86 = and i1 %#85, %#84
+  %#87 = add nsw nuw i64 %#77, 1
+  %#88 = icmp eq i64 %#87, 8
+  %#89 = select i1 %#86, i1 1, i1 %#88
+  br i1 %#89, label %#21, label %#19
+
+#19:
+  %#90 = phi i64 [ %#81, %#17 ], [ %#87, %#18 ]
+  %#91 = gep inbounds nuw ptr %#22, 1 x i64 %#90
+  %#92 = load i8, ptr %#91, align 1
+  %#93 = icmp eq i8 %#92, 41
+  br i1 %#93, label %#20, label %#16
+
+#20:
+  %#94 = phi i64 [ %#71, %#15 ], [ %#90, %#19 ]
+  %#95 = gep inbounds nuw ptr %#22, 1 x i64 %#94
+  %#96 = gep inbounds nuw ptr %#95, 1 x i64 1
+  br label %#21
+
+#21:
+  %#97 = phi ptr [ %#58, %#11 ], [ %#96, %#20 ], [ %#68, %#14 ], [ %#22, %#3 ], [ %#22, %#2 ], [ %#22, %#13 ], [ %#22, %#12 ], [ %#22, %#1 ], [ %#68, %#17 ], [ %#68, %#18 ]
+  %#98 = ptrtoint ptr %#97 to i64
+  %#99 = ptrtoint ptr %#22 to i64
+  %#100 = sub i64 %#98, %#99
+  end_lifetime ptr %#22
+  ret i64 %#100
+}
+=>
+define i64 @target_offset(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#14 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#14
+  store i64 noundef %#0, ptr %#14, align 8
+  %#15 = and i64 noundef %#0, 255
+  %#16 = icmp eq i64 %#15, 45
+  %#17 = zext i1 %#16 to i64
+  %#18 = gep inbounds nuw ptr %#14, 1 x i64 %#17
+  %#19 = load i24, ptr %#18, align 1
+  %#20 = and i24 %#19, 14671839
+  switch i24 %#20, label %#13 [
+    i24 5128526, label %#6
+    i24 4607561, label %#2
+  ]
+
+#2:
+  br i1 %#16, label %#4, label %#3
+
+#3:
+  %#21 = gep inbounds nuw ptr %#18, 1 x i64 3
+  %#22 = load i40, ptr %#21, align 1
+  %#23 = and i40 %#22, 961533698015
+  %#24 = icmp eq i40 %#23, 383666179657
+  br i1 %#24, label %#5, label %#4
+
+#4:
+  br label %#5
+
+#5:
+  %#25 = phi i64 [ 3, %#4 ], [ 8, %#3 ]
+  %#26 = gep inbounds nuw ptr %#18, 1 x i64 %#25
+  br label %#13
+
+#6:
+  %#27 = select i1 %#16, i64 4, i64 3
+  %#28 = gep inbounds nuw ptr %#14, 1 x i64 %#27
+  %#29 = load i8, ptr %#28, align 1
+  %#30 = icmp eq i8 %#29, 40
+  br i1 %#30, label %#7, label %#13
+
+#7:
+  %#31 = select i1 %#16, i64 5, i64 4
+  %#32 = select i1 %#16, i64 40, i64 32
+  %#33 = lshr i64 noundef %#0, %#32
+  %#34 = trunc i64 %#33 to i8
+  %#35 = icmp eq i8 %#34, 41
+  br i1 %#35, label %#12, label %#8
+
+#8:
+  %#36 = phi i8 [ %#52, %#11 ], [ %#34, %#7 ]
+  %#37 = phi i64 [ %#50, %#11 ], [ %#31, %#7 ]
+  %#38 = and i8 %#36, 223
+  %#39 = add i8 %#38, 191
+  %#40 = icmp ult i8 %#39, 26
+  br i1 %#40, label %#9, label %#10
+
+#9:
+  %#41 = add nsw nuw i64 %#37, 1
+  %#42 = icmp samesign eq i64 %#41, 8
+  br i1 %#42, label %#13, label %#11
+
+#10:
+  %#43 = add i8 %#36, 198
+  %#44 = icmp ult i8 %#43, 246
+  %#45 = icmp ne i8 %#36, 95
+  %#46 = and i1 %#45, %#44
+  %#47 = add nsw nuw i64 %#37, 1
+  %#48 = icmp eq i64 %#47, 8
+  %#49 = select i1 %#46, i1 1, i1 %#48
+  br i1 %#49, label %#13, label %#11
+
+#11:
+  %#50 = phi i64 [ %#41, %#9 ], [ %#47, %#10 ]
+  %#51 = gep inbounds nuw ptr %#14, 1 x i64 %#50
+  %#52 = load i8, ptr %#51, align 1
+  %#53 = icmp eq i8 %#52, 41
+  br i1 %#53, label %#12, label %#8
+
+#12:
+  %#54 = phi i64 [ %#31, %#7 ], [ %#50, %#11 ]
+  %#55 = gep inbounds nuw ptr %#14, 1 x i64 %#54
+  %#56 = gep inbounds nuw ptr %#55, 1 x i64 1
+  br label %#13
+
+#13:
+  %#57 = phi ptr [ %#26, %#5 ], [ %#56, %#12 ], [ %#28, %#6 ], [ %#14, %#1 ], [ %#28, %#9 ], [ %#28, %#10 ]
+  %#58 = ptrtoint ptr %#57 to i64
+  %#59 = ptrtoint ptr %#14 to i64
+  %#60 = sub i64 %#58, %#59
+  end_lifetime ptr %#14
+  ret i64 %#60
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_error(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#6 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#6
+  store i64 noundef %#0, ptr %#6, align 8
+  %#7 = and i64 noundef %#0, 255
+  %#8 = icmp eq i64 %#7, 45
+  %#9 = zext i1 %#8 to i64
+  %#10 = gep inbounds nuw ptr %#6, 1 x i64 %#9
+  %#11 = load i8, ptr %#10, align 1
+  %#12 = or i8 %#11, 32
+  switch i8 %#12, label %#5 [
+    i8 110, label %#3
+    i8 105, label %#2
+  ]
+
+#2:
+  %#13 = gep inbounds nuw ptr %#10, 1 x i64 1
+  %#14 = load i8, ptr %#13, align 1
+  %#15 = and i8 %#14, 223
+  %#16 = icmp eq i8 %#15, 78
+  br i1 %#16, label %#4, label %#5
+
+#3:
+  %#17 = gep inbounds nuw ptr %#10, 1 x i64 1
+  %#18 = load i8, ptr %#17, align 1
+  %#19 = and i8 %#18, 223
+  %#20 = icmp eq i8 %#19, 65
+  br i1 %#20, label %#4, label %#5
+
+#4:
+  %#21 = phi i8 [ 78, %#3 ], [ 70, %#2 ]
+  %#22 = gep inbounds nuw ptr %#10, 1 x i64 2
+  %#23 = load i8, ptr %#22, align 1
+  %#24 = and i8 %#23, 223
+  %#25 = icmp eq i8 %#24, %#21
+  %#26 = select i1 %#25, i64 0, i64 22
+  br label %#5
+
+#5:
+  %#27 = phi i64 [ 22, %#2 ], [ 22, %#3 ], [ 22, %#1 ], [ %#26, %#4 ]
+  end_lifetime ptr %#6
+  %#range_0_%#27 = !range i64 %#27, i64 0, i64 23
+  ret i64 %#range_0_%#27
+}
+=>
+define i64 @target_error(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#2
+  store i64 noundef %#0, ptr %#2, align 8
+  %#3 = and i64 noundef %#0, 255
+  %#4 = icmp eq i64 %#3, 45
+  %#5 = zext i1 %#4 to i64
+  %#6 = gep inbounds nuw ptr %#2, 1 x i64 %#5
+  %#7 = load i24, ptr %#6, align 1
+  %#8 = and i24 %#7, 14671839
+  %#9 = icmp eq i24 %#8, 5128526
+  %#10 = icmp eq i24 %#8, 4607561
+  %#11 = or i1 %#9, %#10
+  %#12 = select i1 %#11, i64 0, i64 22
+  end_lifetime ptr %#2
+  %#range_0_%#12 = !range i64 %#12, i64 0, i64 23
+  ret i64 %#range_0_%#12
+}
+Transformation seems to be correct!
+
+Summary:
+  3 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

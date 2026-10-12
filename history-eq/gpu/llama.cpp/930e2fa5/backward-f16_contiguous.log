@@ -1,0 +1,38 @@
+
+----------------------------------------
+define i64 @compare_f16_contiguous(i16 noundef zeroext %#0, i16 noundef zeroext %#1, i16 noundef zeroext %#2, i16 noundef zeroext %#3) nofree willreturn memory(none) {
+#4:
+  %#5 = zext i16 noundef zeroext %#3 to i64
+  %#6 = shl nuw i64 %#5, 48
+  %#7 = zext i16 noundef zeroext %#2 to i64
+  %#8 = shl nsw nuw i64 %#7, 32
+  %#9 = or disjoint i64 %#6, %#8
+  %#10 = zext i16 noundef zeroext %#1 to i64
+  %#11 = shl nsw nuw i64 %#10, 16
+  %#12 = or disjoint i64 %#9, %#11
+  %#13 = zext i16 noundef zeroext %#0 to i64
+  %#14 = or disjoint i64 %#12, %#13
+  ret i64 %#14
+}
+=>
+define i64 @compare_f16_contiguous(i16 noundef zeroext %#0, i16 noundef zeroext %#1, i16 noundef zeroext %#2, i16 noundef zeroext %#3) nofree willreturn memory(none) {
+#4:
+  %#5 = zext i16 noundef zeroext %#0 to i64
+  %#6 = zext i16 noundef zeroext %#1 to i64
+  %#7 = shl nsw nuw i64 %#6, 16
+  %#8 = or disjoint i64 %#7, %#5
+  %#9 = zext i16 noundef zeroext %#2 to i64
+  %#10 = shl nsw nuw i64 %#9, 32
+  %#11 = or disjoint i64 %#8, %#10
+  %#12 = zext i16 noundef zeroext %#3 to i64
+  %#13 = shl nuw i64 %#12, 48
+  %#14 = or disjoint i64 %#11, %#13
+  ret i64 %#14
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,44 @@
+
+----------------------------------------
+define void @zstd_old_copy16(ptr noread noundef initializes((0, 16)) %#0, ptr nowrite noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  tail memmove ptr noread noundef initializes((0, 16)) %#0 align 1, ptr nowrite noundef %#1 align 1, i32 16
+  ret void
+}
+=>
+define void @zstd_new_copy16(ptr noundef initializes((0, 16)) %#0, ptr nowrite noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  tail memmove ptr noundef initializes((0, 16)) %#0 align 1, ptr nowrite noundef %#1 align 1, i32 16
+  %#3 = load i8, ptr noundef initializes((0, 16)) %#0, align 1
+  %#4 = xor i8 %#3, 1
+  store i8 %#4, ptr noundef initializes((0, 16)) %#0, align 1
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Mismatch in memory
+
+Example:
+ptr noread noundef initializes((0, 16)) %#0 = pointer(non-local, block_id=1, offset=0, attrs=5) / Address=#x02
+ptr nowrite noundef %#1 = pointer(non-local, block_id=1, offset=0, attrs=6) / Address=#x02
+
+Source:
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 128	align: 2	alloc type: 0	alive: true	address: 2
+Contents:
+*: #x40
+
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+i8 %#3 = #x40 (64)
+i8 %#4 = #x41 (65)
+
+Mismatch in pointer(non-local, block_id=1, offset=0)
+Source value: #x40
+Target value: #x41
+

@@ -1,0 +1,113 @@
+quicksort() {
+   47:	EBX = EDX; R12 = ESI; 
+   46:	if (EDI <s R12) goto 45 else goto 1
+   45:	EBP = EDI; 
+   44:	EDX = R12; 
+   43:	EAX = long32signed(R12); 
+   42:	R11 = int32[EBX + EAX * 4 + 0]; 
+   41:	
+   40:	if (EBP <s EDX) goto 39 else goto 13
+   39:	
+   38:	if (EBP <s R12) goto 37 else goto 31
+   37:	EAX = long32signed(EBP); 
+   36:	R8 = int32[EBX + EAX * 4 + 0]; 
+   35:	
+   34:	if (R8 <=s R11) goto 33 else goto 32
+   33:	EBP = EBP + 1 (int); goto 38
+   32:	goto 30
+   31:	
+   30:	if (EDX >s EDI) goto 29 else goto 24
+   29:	R10 = long32signed(EDX); 
+   28:	R8 = int32[EBX + R10 * 4 + 0]; 
+   27:	
+   26:	if (R8 >=s R11) goto 25 else goto 23
+   25:	EDX = EDX + -1 (int); goto 30
+   24:	
+   23:	if (EBP <s EDX) goto 22 else goto 14
+   22:	ECX = long32signed(EBP); 
+   21:	ESI = int32[EBX + ECX * 4 + 0]; 
+   20:	
+   19:	EAX = long32signed(EDX); 
+   18:	R9 = int32[EBX + EAX * 4 + 0]; 
+   17:	int32[EBX + ECX * 4 + 0] = R9; 
+   16:	
+   15:	int32[EBX + EAX * 4 + 0] = ESI; 
+   14:	goto 40
+   13:	ESI = long32signed(EBP); 
+   12:	R11 = int32[EBX + ESI * 4 + 0]; 
+   11:	
+   10:	R8 = long32signed(R12); 
+    9:	R9 = int32[EBX + R8 * 4 + 0]; 
+    8:	int32[EBX + ESI * 4 + 0] = R9; 
+    7:	
+    6:	int32[EBX + R8 * 4 + 0] = R11; 
+    5:	ESI = EBP + -1 (int); 
+    4:	EDX = EBX; call "quicksort"; 
+    3:	EDI = EBP + 1 (int); 
+    2:	EDX = EBX; ESI = R12; tailcall "quicksort"
+    1:	return
+}
+
+cmpint() {
+    9:	
+    8:	ECX = int32[EDI + 0]; 
+    7:	EDX = int32[ESI + 0]; 
+    6:	if (ECX ==s EDX) goto 5 else goto 4
+    5:	EAX = 0; goto 1
+    4:	if (ECX <s EDX) goto 3 else goto 2
+    3:	EAX = -1; goto 1
+    2:	EAX = 1; 
+    1:	return
+}
+
+main() {
+   48:	
+   47:	if (EDI >=s 2) goto 46 else goto 43
+   46:	EDI = int64[ESI + 8]; 
+   45:	call "atoi"; 
+   44:	R12 = EAX; goto 42
+   43:	R12 = 100000; 
+   42:	EDI = long32signed(R12); 
+   41:	EDI = EDI * 4 + 0 (long); 
+   40:	call "malloc"; EBP = EAX; 
+   39:	
+   38:	EDX = long32signed(R12); 
+   37:	EDI = EDX * 4 + 0 (long); 
+   36:	call "malloc"; EBX = EAX; 
+   35:	
+   34:	R13 = 0; 
+   33:	R14 = 0; 
+   32:	if (R14 <s R12) goto 31 else goto 24
+   31:	call "rand"; 
+   30:	EAX = EAX & 65535; 
+   29:	ECX = long32signed(R14); 
+   28:	int32[EBP + ECX * 4 + 0] = EAX; 
+   27:	
+   26:	int32[EBX + ECX * 4 + 0] = EAX; 
+   25:	R14 = R14 + 1 (int); goto 32
+   24:	EDI = 0; 
+   23:	ESI = R12 + -1 (int); 
+   22:	EDX = EBP; call "quicksort"; 
+   21:	R13 = R13 + 1 (int); 
+   20:	if (R13 <s 10) goto 33 else goto 19
+   19:	ESI = long32signed(R12); 
+   18:	EDX = 4L; 
+   17:	ECX = cmpint + 0 (long); 
+   16:	EDI = EBX; call "qsort"; 
+   15:	R9 = 0; 
+   14:	if (R9 <s R12) goto 13 else goto 4
+   13:	EAX = long32signed(R9); 
+   12:	ECX = int32[EBP + EAX * 4 + 0]; 
+   11:	
+   10:	R10 = int32[EBX + EAX * 4 + 0]; 
+    9:	if (ECX !=s R10) goto 8 else goto 5
+    8:	EDI = __stringlit_1 + 0 (long); 
+    7:	call "printf"; 
+    6:	EAX = 2; goto 1
+    5:	R9 = R9 + 1 (int); goto 14
+    4:	EDI = __stringlit_2 + 0 (long); 
+    3:	call "printf"; 
+    2:	EAX = 0; 
+    1:	return
+}
+

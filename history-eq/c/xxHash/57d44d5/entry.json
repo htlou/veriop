@@ -1,0 +1,42 @@
+{
+  "commit": "57d44d5",
+  "date": "2021-11-28",
+  "subject": "change XXH_REROLL into XXH32_ENDJMP",
+  "selected_by": "keyword",
+  "perf_evidence": "XXH32 end-jump reroll",
+  "change_summary": "Changes XXH32 unroll/end-jump control flow.",
+  "units": [
+    {
+      "name": "raw XXH32_finalize, every len&15 residue and both pointer alignments",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "length_bound": "all 16 len&15 residues",
+      "precondition": "aligned branch requires a 4-byte-aligned pointer, as its caller contract does",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "config": "x86-64 clang-20; both old XXH_REROLL and new XXH32_ENDJMP branch settings",
+      "artifact_dir": "c/xxHash/57d44d5/finalizer_modes/old0_new0",
+      "evidence": "128 exact historical raw-function pairs pass Alive2 in both directions; the four mode directories and finalizer-proof-audit.json cover every branch combination"
+    },
+    {
+      "name": "Changes XXH32 unroll/end-jump control flow.",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/57d44d5/r_s32_val",
+      "evidence": "All 0..15-byte one-shot cases and 24 additional fixed 16..64-byte value-input cases prove bidirectionally. Four symbolic-length streaming targets time out."
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The changed raw XXH32 finalizer is covered for every len&15 residue, both pointer-alignment modes, and all old/new control-flow settings. Four symbolic-length streaming targets remain inconclusive, so the whole commit is only partially proved."
+}

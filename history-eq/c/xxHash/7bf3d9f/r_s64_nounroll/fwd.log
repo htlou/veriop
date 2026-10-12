@@ -1,0 +1,3196 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/7bf3d9f/r_s64/old.ll c/xxHash/7bf3d9f/r_s64/new.ll
+
+----------------------------------------
+define i64 @target_s64_0_0(ptr noread nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i64 noundef %#1, 2870177450012600261
+  %#4 = lshr i64 %#3, 33
+  %#5 = xor i64 %#4, %#3
+  %#6 = mul i64 %#5, -4417276706812531889
+  %#7 = lshr i64 %#6, 29
+  %#8 = xor i64 %#7, %#6
+  %#9 = mul i64 %#8, 1609587929392839161
+  %#10 = lshr i64 %#9, 32
+  %#11 = xor i64 %#10, %#9
+  ret i64 %#11
+}
+=>
+define i64 @target_s64_0_0(ptr noread nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i64 noundef %#1, 2870177450012600261
+  %#4 = lshr i64 %#3, 33
+  %#5 = xor i64 %#4, %#3
+  %#6 = mul i64 %#5, -4417276706812531889
+  %#7 = lshr i64 %#6, 29
+  %#8 = xor i64 %#7, %#6
+  %#9 = mul i64 %#8, 1609587929392839161
+  %#10 = lshr i64 %#9, 32
+  %#11 = xor i64 %#10, %#9
+  ret i64 %#11
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_1_0(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i8, ptr nowrite noundef %#0, align 1
+  %#8 = zext i8 %#7 to i64
+  %#9 = mul i64 %#8, 2870177450012600261
+  %#10 = add i64 noundef %#1, 2870177450012600262
+  %#11 = xor i64 %#9, %#10
+  %#12 = fshl i64 %#11, i64 %#11, i64 11
+  %#13 = mul i64 %#12, -7046029288634856825
+  br label %#5
+
+#4:
+  %#14 = add i64 noundef %#1, 2870177450012600261
+  br label %#5
+
+#5:
+  %#15 = phi i64 [ %#13, %#3 ], [ %#14, %#4 ]
+  %#16 = lshr i64 %#15, 33
+  %#17 = xor i64 %#16, %#15
+  %#18 = mul i64 %#17, -4417276706812531889
+  %#19 = lshr i64 %#18, 29
+  %#20 = xor i64 %#19, %#18
+  %#21 = mul i64 %#20, 1609587929392839161
+  %#22 = lshr i64 %#21, 32
+  %#23 = xor i64 %#22, %#21
+  ret i64 %#23
+}
+=>
+define i64 @target_s64_1_0(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i8, ptr nowrite noundef %#0, align 1
+  %#8 = zext i8 %#7 to i64
+  %#9 = mul i64 %#8, 2870177450012600261
+  %#10 = add i64 noundef %#1, 2870177450012600262
+  %#11 = xor i64 %#9, %#10
+  %#12 = fshl i64 %#11, i64 %#11, i64 11
+  %#13 = mul i64 %#12, -7046029288634856825
+  br label %#5
+
+#4:
+  %#14 = add i64 noundef %#1, 2870177450012600261
+  br label %#5
+
+#5:
+  %#15 = phi i64 [ %#14, %#4 ], [ %#13, %#3 ]
+  %#16 = lshr i64 %#15, 33
+  %#17 = xor i64 %#16, %#15
+  %#18 = mul i64 %#17, -4417276706812531889
+  %#19 = lshr i64 %#18, 29
+  %#20 = xor i64 %#19, %#18
+  %#21 = mul i64 %#20, 1609587929392839161
+  %#22 = lshr i64 %#21, 32
+  %#23 = xor i64 %#22, %#21
+  ret i64 %#23
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_7_8(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = alloca i64 15, align 8, dead
+  start_lifetime ptr %#6
+  memset ptr %#6 align 8, i8 0, i64 15
+  %#7 = icmp eq ptr nowrite noundef %#0, null
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 7
+  br i1 %#7, label %#4, label %#3
+
+#3:
+  memcpy ptr %#6 align 8, ptr nowrite noundef %#0 align 1, i64 7
+  %#9 = load i64, ptr %#8, align 1
+  %#10 = gep inbounds nuw ptr %#6, 1 x i64 7
+  store i64 %#9, ptr %#10, align 1
+  %#11 = add i64 noundef %#1, 2870177450012600276
+  %#12 = gep inbounds nuw ptr %#6, 1 x i64 13
+  %#13 = load i8, ptr %#12, align 1
+  %#14 = zext i8 %#13 to i64
+  %#15 = mul i64 %#14, 2870177450012600261
+  %#16 = gep inbounds nuw ptr %#6, 1 x i64 12
+  %#17 = load i8, ptr %#16, align 4
+  %#18 = zext i8 %#17 to i64
+  %#19 = mul i64 %#18, 2870177450012600261
+  %#20 = gep inbounds nuw ptr %#6, 1 x i64 8
+  %#21 = load i32, ptr %#20, align 8
+  %#22 = zext i32 %#21 to i64
+  %#23 = mul i64 %#22, -7046029288634856825
+  %#24 = load i64, ptr %#6, align 8
+  %#25 = mul i64 %#24, -4417276706812531889
+  %#26 = fshl i64 %#25, i64 %#25, i64 31
+  %#27 = mul i64 %#26, -7046029288634856825
+  %#28 = xor i64 %#27, %#11
+  %#29 = fshl i64 %#28, i64 %#28, i64 27
+  %#30 = mul i64 %#29, -7046029288634856825
+  %#31 = add i64 %#30, -8796714831421723037
+  %#32 = xor i64 %#23, %#31
+  %#33 = fshl i64 %#32, i64 %#32, i64 23
+  %#34 = mul i64 %#33, -4417276706812531889
+  %#35 = add i64 %#34, 1609587929392839161
+  %#36 = xor i64 %#19, %#35
+  %#37 = fshl i64 %#36, i64 %#36, i64 11
+  %#38 = mul i64 %#37, -7046029288634856825
+  %#39 = xor i64 %#15, %#38
+  %#40 = fshl i64 %#39, i64 %#39, i64 11
+  %#41 = mul i64 %#40, -7046029288634856825
+  %#42 = gep inbounds nuw ptr %#6, 1 x i64 14
+  %#43 = load i8, ptr %#42, align 2
+  %#44 = zext i8 %#43 to i64
+  %#45 = mul i64 %#44, 2870177450012600261
+  %#46 = xor i64 %#45, %#41
+  %#47 = fshl i64 %#46, i64 %#46, i64 11
+  %#48 = mul i64 %#47, -7046029288634856825
+  br label %#5
+
+#4:
+  %#49 = load i64, ptr %#8, align 1
+  store i64 %#49, ptr %#6, align 8
+  %#50 = add i64 noundef %#1, 2870177450012600269
+  %#51 = mul i64 %#49, -4417276706812531889
+  %#52 = fshl i64 %#51, i64 %#51, i64 31
+  %#53 = mul i64 %#52, -7046029288634856825
+  %#54 = xor i64 %#53, %#50
+  %#55 = fshl i64 %#54, i64 %#54, i64 27
+  %#56 = mul i64 %#55, -7046029288634856825
+  %#57 = add i64 %#56, -8796714831421723037
+  br label %#5
+
+#5:
+  %#58 = phi i64 [ %#57, %#4 ], [ %#48, %#3 ]
+  %#59 = lshr i64 %#58, 33
+  %#60 = xor i64 %#59, %#58
+  %#61 = mul i64 %#60, -4417276706812531889
+  %#62 = lshr i64 %#61, 29
+  %#63 = xor i64 %#62, %#61
+  %#64 = mul i64 %#63, 1609587929392839161
+  %#65 = lshr i64 %#64, 32
+  %#66 = xor i64 %#65, %#64
+  end_lifetime ptr %#6
+  ret i64 %#66
+}
+=>
+define i64 @target_s64_7_8(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#12 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#12
+  %#13 = add i64 noundef %#1, 6983438078262162902
+  %#14 = add i64 noundef %#1, -4417276706812531889
+  %#15 = add i64 noundef %#1, 7046029288634856825
+  %#16 = gep inbounds nuw ptr %#12, 1 x i64 8
+  store i64 %#13, ptr %#16, align 8
+  %#17 = gep inbounds nuw ptr %#12, 1 x i64 16
+  store i64 %#14, ptr %#17, align 8
+  %#18 = gep inbounds nuw ptr %#12, 1 x i64 24
+  store i64 noundef %#1, ptr %#18, align 8
+  %#19 = gep inbounds nuw ptr %#12, 1 x i64 32
+  store i64 %#15, ptr %#19, align 8
+  %#20 = gep inbounds nuw ptr %#12, 1 x i64 40
+  memset ptr %#20 align 8, i8 0, i64 40
+  %#21 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#21, label %#4, label %#3
+
+#3:
+  memcpy ptr %#20 align 8, ptr nowrite noundef %#0 align 1, i64 7
+  br label %#4
+
+#4:
+  %#22 = phi i32 [ 0, %#2 ], [ 7, %#3 ]
+  %#23 = phi i64 [ 8, %#2 ], [ 15, %#3 ]
+  store i64 %#23, ptr %#12, align 8
+  %#24 = gep inbounds nuw ptr %#12, 1 x i64 72
+  %#25 = zext nneg i32 %#22 to i64
+  %#26 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 7
+  %#27 = gep inbounds nuw ptr %#20, 1 x i64 %#25
+  %#28 = load i64, ptr %#26, align 1
+  store i64 %#28, ptr %#27, align 1
+  %#29 = or disjoint i32 %#22, 8
+  store i32 %#29, ptr %#24, align 8
+  %#30 = add i64 noundef %#1, 2870177450012600261
+  %#31 = add i64 %#30, %#23
+  %#32 = load i64, ptr %#20, align 8
+  %#33 = mul i64 %#32, -4417276706812531889
+  %#34 = fshl i64 %#33, i64 %#33, i64 31
+  %#35 = mul i64 %#34, -7046029288634856825
+  %#36 = gep inbounds nuw ptr %#12, 1 x i64 48
+  %#37 = xor i64 %#35, %#31
+  %#38 = fshl i64 %#37, i64 %#37, i64 27
+  %#39 = mul i64 %#38, -7046029288634856825
+  %#40 = add i64 %#39, -8796714831421723037
+  %#41 = add nsw i64 %#23, -8
+  %#42 = icmp samesign ugt i64 %#41, 3
+  br i1 %#42, label %#5, label %#6
+
+#5:
+  %#43 = load i32, ptr %#36, align 8
+  %#44 = zext i32 %#43 to i64
+  %#45 = mul i64 %#44, -7046029288634856825
+  %#46 = xor i64 %#45, %#40
+  %#47 = gep inbounds nuw ptr %#12, 1 x i64 52
+  %#48 = fshl i64 %#46, i64 %#46, i64 23
+  %#49 = mul i64 %#48, -4417276706812531889
+  %#50 = add i64 %#49, 1609587929392839161
+  %#51 = add nsw i64 %#23, -12
+  br label %#6
+
+#6:
+  %#52 = phi i64 [ %#51, %#5 ], [ %#41, %#4 ]
+  %#53 = phi ptr [ %#47, %#5 ], [ %#36, %#4 ]
+  %#54 = phi i64 [ %#50, %#5 ], [ %#40, %#4 ]
+  %#55 = icmp eq i64 %#52, 0
+  br i1 %#55, label %#11, label %#7
+
+#7:
+  %#56 = and i64 %#52, 7
+  %#57 = icmp eq i64 %#56, 0
+  br i1 %#57, label %#9, label %#8
+
+#8:
+  %#58 = phi i64 [ %#68, %#8 ], [ %#54, %#7 ]
+  %#59 = phi ptr [ %#62, %#8 ], [ %#53, %#7 ]
+  %#60 = phi i64 [ %#69, %#8 ], [ %#52, %#7 ]
+  %#61 = phi i64 [ %#70, %#8 ], [ 0, %#7 ]
+  %#62 = gep inbounds nuw ptr %#59, 1 x i64 1
+  %#63 = load i8, ptr %#59, align 1
+  %#64 = zext i8 %#63 to i64
+  %#65 = mul i64 %#64, 2870177450012600261
+  %#66 = xor i64 %#65, %#58
+  %#67 = fshl i64 %#66, i64 %#66, i64 11
+  %#68 = mul i64 %#67, -7046029288634856825
+  %#69 = add nsw i64 %#60, -1
+  %#70 = add i64 %#61, 1
+  %#71 = icmp eq i64 %#70, %#56
+  br i1 %#71, label %#9, label %#8
+
+#9:
+  %#72 = phi i64 [ poison, %#7 ], [ %#68, %#8 ]
+  %#73 = phi i64 [ %#54, %#7 ], [ %#68, %#8 ]
+  %#74 = phi ptr [ %#53, %#7 ], [ %#62, %#8 ]
+  %#75 = phi i64 [ %#52, %#7 ], [ %#69, %#8 ]
+  %#76 = icmp ult i64 %#52, 8
+  br i1 %#76, label %#11, label %#10
+
+#10:
+  %#77 = phi i64 [ %#135, %#10 ], [ %#73, %#9 ]
+  %#78 = phi ptr [ %#129, %#10 ], [ %#74, %#9 ]
+  %#79 = phi i64 [ %#136, %#10 ], [ %#75, %#9 ]
+  %#80 = gep inbounds nuw ptr %#78, 1 x i64 1
+  %#81 = load i8, ptr %#78, align 1
+  %#82 = zext i8 %#81 to i64
+  %#83 = mul i64 %#82, 2870177450012600261
+  %#84 = xor i64 %#83, %#77
+  %#85 = fshl i64 %#84, i64 %#84, i64 11
+  %#86 = mul i64 %#85, -7046029288634856825
+  %#87 = gep inbounds nuw ptr %#78, 1 x i64 2
+  %#88 = load i8, ptr %#80, align 1
+  %#89 = zext i8 %#88 to i64
+  %#90 = mul i64 %#89, 2870177450012600261
+  %#91 = xor i64 %#90, %#86
+  %#92 = fshl i64 %#91, i64 %#91, i64 11
+  %#93 = mul i64 %#92, -7046029288634856825
+  %#94 = gep inbounds nuw ptr %#78, 1 x i64 3
+  %#95 = load i8, ptr %#87, align 1
+  %#96 = zext i8 %#95 to i64
+  %#97 = mul i64 %#96, 2870177450012600261
+  %#98 = xor i64 %#97, %#93
+  %#99 = fshl i64 %#98, i64 %#98, i64 11
+  %#100 = mul i64 %#99, -7046029288634856825
+  %#101 = gep inbounds nuw ptr %#78, 1 x i64 4
+  %#102 = load i8, ptr %#94, align 1
+  %#103 = zext i8 %#102 to i64
+  %#104 = mul i64 %#103, 2870177450012600261
+  %#105 = xor i64 %#104, %#100
+  %#106 = fshl i64 %#105, i64 %#105, i64 11
+  %#107 = mul i64 %#106, -7046029288634856825
+  %#108 = gep inbounds nuw ptr %#78, 1 x i64 5
+  %#109 = load i8, ptr %#101, align 1
+  %#110 = zext i8 %#109 to i64
+  %#111 = mul i64 %#110, 2870177450012600261
+  %#112 = xor i64 %#111, %#107
+  %#113 = fshl i64 %#112, i64 %#112, i64 11
+  %#114 = mul i64 %#113, -7046029288634856825
+  %#115 = gep inbounds nuw ptr %#78, 1 x i64 6
+  %#116 = load i8, ptr %#108, align 1
+  %#117 = zext i8 %#116 to i64
+  %#118 = mul i64 %#117, 2870177450012600261
+  %#119 = xor i64 %#118, %#114
+  %#120 = fshl i64 %#119, i64 %#119, i64 11
+  %#121 = mul i64 %#120, -7046029288634856825
+  %#122 = gep inbounds nuw ptr %#78, 1 x i64 7
+  %#123 = load i8, ptr %#115, align 1
+  %#124 = zext i8 %#123 to i64
+  %#125 = mul i64 %#124, 2870177450012600261
+  %#126 = xor i64 %#125, %#121
+  %#127 = fshl i64 %#126, i64 %#126, i64 11
+  %#128 = mul i64 %#127, -7046029288634856825
+  %#129 = gep inbounds nuw ptr %#78, 1 x i64 8
+  %#130 = load i8, ptr %#122, align 1
+  %#131 = zext i8 %#130 to i64
+  %#132 = mul i64 %#131, 2870177450012600261
+  %#133 = xor i64 %#132, %#128
+  %#134 = fshl i64 %#133, i64 %#133, i64 11
+  %#135 = mul i64 %#134, -7046029288634856825
+  %#136 = add nsw i64 %#79, -8
+  %#137 = icmp eq i64 %#136, 0
+  br i1 %#137, label %#11, label %#10
+
+#11:
+  %#138 = phi i64 [ %#54, %#6 ], [ %#72, %#9 ], [ %#135, %#10 ]
+  %#139 = lshr i64 %#138, 33
+  %#140 = xor i64 %#139, %#138
+  %#141 = mul i64 %#140, -4417276706812531889
+  %#142 = lshr i64 %#141, 29
+  %#143 = xor i64 %#142, %#141
+  %#144 = mul i64 %#143, 1609587929392839161
+  %#145 = lshr i64 %#144, 32
+  %#146 = xor i64 %#145, %#144
+  end_lifetime ptr %#12
+  ret i64 %#146
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_5_10(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#8 = load i40, ptr nowrite noundef %#0, align 1
+  %#9 = zext i40 %#8 to i64
+  %#10 = load i24, ptr %#7, align 1
+  %#11 = zext i24 %#10 to i64
+  %#12 = shl nuw i64 %#11, 40
+  %#13 = or disjoint i64 %#12, %#9
+  %#14 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#15 = load i32, ptr %#14, align 1
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#17 = load i8, ptr %#16, align 1
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#19 = load i8, ptr %#18, align 1
+  %#20 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 14
+  %#21 = load i8, ptr %#20, align 1
+  %#22 = add i64 noundef %#1, 2870177450012600276
+  %#23 = zext i8 %#19 to i64
+  %#24 = mul i64 %#23, 2870177450012600261
+  %#25 = zext i8 %#17 to i64
+  %#26 = mul i64 %#25, 2870177450012600261
+  %#27 = zext i32 %#15 to i64
+  %#28 = mul i64 %#27, -7046029288634856825
+  %#29 = mul i64 %#13, -4417276706812531889
+  %#30 = fshl i64 %#29, i64 %#29, i64 31
+  %#31 = mul i64 %#30, -7046029288634856825
+  %#32 = xor i64 %#31, %#22
+  %#33 = fshl i64 %#32, i64 %#32, i64 27
+  %#34 = mul i64 %#33, -7046029288634856825
+  %#35 = add i64 %#34, -8796714831421723037
+  %#36 = xor i64 %#28, %#35
+  %#37 = fshl i64 %#36, i64 %#36, i64 23
+  %#38 = mul i64 %#37, -4417276706812531889
+  %#39 = add i64 %#38, 1609587929392839161
+  %#40 = xor i64 %#26, %#39
+  %#41 = fshl i64 %#40, i64 %#40, i64 11
+  %#42 = mul i64 %#41, -7046029288634856825
+  %#43 = xor i64 %#24, %#42
+  %#44 = fshl i64 %#43, i64 %#43, i64 11
+  %#45 = mul i64 %#44, -7046029288634856825
+  %#46 = zext i8 %#21 to i64
+  %#47 = mul i64 %#46, 2870177450012600261
+  %#48 = xor i64 %#47, %#45
+  %#49 = fshl i64 %#48, i64 %#48, i64 11
+  br label %#5
+
+#4:
+  %#50 = load i64, ptr %#7, align 1
+  %#51 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#52 = load i8, ptr %#51, align 1
+  %#53 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 14
+  %#54 = load i8, ptr %#53, align 1
+  %#55 = add i64 noundef %#1, 2870177450012600271
+  %#56 = mul i64 %#50, -4417276706812531889
+  %#57 = fshl i64 %#56, i64 %#56, i64 31
+  %#58 = mul i64 %#57, -7046029288634856825
+  %#59 = xor i64 %#58, %#55
+  %#60 = fshl i64 %#59, i64 %#59, i64 27
+  %#61 = mul i64 %#60, -7046029288634856825
+  %#62 = add i64 %#61, -8796714831421723037
+  %#63 = zext i8 %#52 to i64
+  %#64 = mul i64 %#63, 2870177450012600261
+  %#65 = xor i64 %#62, %#64
+  %#66 = fshl i64 %#65, i64 %#65, i64 11
+  %#67 = mul i64 %#66, -7046029288634856825
+  %#68 = zext i8 %#54 to i64
+  %#69 = mul i64 %#68, 2870177450012600261
+  %#70 = xor i64 %#67, %#69
+  %#71 = fshl i64 %#70, i64 %#70, i64 11
+  br label %#5
+
+#5:
+  %#72 = phi i64 [ %#71, %#4 ], [ %#49, %#3 ]
+  %#73 = mul i64 %#72, -7046029288634856825
+  %#74 = lshr i64 %#73, 33
+  %#75 = xor i64 %#74, %#73
+  %#76 = mul i64 %#75, -4417276706812531889
+  %#77 = lshr i64 %#76, 29
+  %#78 = xor i64 %#77, %#76
+  %#79 = mul i64 %#78, 1609587929392839161
+  %#80 = lshr i64 %#79, 32
+  %#81 = xor i64 %#80, %#79
+  ret i64 %#81
+}
+=>
+define i64 @target_s64_5_10(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#11 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#11
+  %#12 = add i64 noundef %#1, 6983438078262162902
+  %#13 = add i64 noundef %#1, -4417276706812531889
+  %#14 = add i64 noundef %#1, 7046029288634856825
+  %#15 = gep inbounds nuw ptr %#11, 1 x i64 8
+  store i64 %#12, ptr %#15, align 8
+  %#16 = gep inbounds nuw ptr %#11, 1 x i64 16
+  store i64 %#13, ptr %#16, align 8
+  %#17 = gep inbounds nuw ptr %#11, 1 x i64 24
+  store i64 noundef %#1, ptr %#17, align 8
+  %#18 = gep inbounds nuw ptr %#11, 1 x i64 32
+  store i64 %#14, ptr %#18, align 8
+  %#19 = gep inbounds nuw ptr %#11, 1 x i64 40
+  memset ptr %#19 align 8, i8 0, i64 40
+  %#20 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#20, label %#4, label %#3
+
+#3:
+  memcpy ptr %#19 align 8, ptr nowrite noundef %#0 align 1, i64 5
+  br label %#4
+
+#4:
+  %#21 = phi i32 [ 0, %#2 ], [ 5, %#3 ]
+  %#22 = phi i64 [ 10, %#2 ], [ 15, %#3 ]
+  store i64 %#22, ptr %#11, align 8
+  %#23 = gep inbounds nuw ptr %#11, 1 x i64 72
+  %#24 = zext nneg i32 %#21 to i64
+  %#25 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#26 = gep inbounds nuw ptr %#19, 1 x i64 %#24
+  memcpy ptr %#26 align 1, ptr %#25 align 1, i64 10
+  %#27 = or disjoint i32 %#21, 10
+  store i32 %#27, ptr %#23, align 8
+  %#28 = add i64 noundef %#1, 2870177450012600261
+  %#29 = add i64 %#28, %#22
+  %#30 = load i64, ptr %#19, align 8
+  %#31 = mul i64 %#30, -4417276706812531889
+  %#32 = fshl i64 %#31, i64 %#31, i64 31
+  %#33 = mul i64 %#32, -7046029288634856825
+  %#34 = gep inbounds nuw ptr %#11, 1 x i64 48
+  %#35 = xor i64 %#33, %#29
+  %#36 = fshl i64 %#35, i64 %#35, i64 27
+  %#37 = mul i64 %#36, -7046029288634856825
+  %#38 = add i64 %#37, -8796714831421723037
+  %#39 = add nsw i64 %#22, -8
+  %#40 = icmp samesign ugt i64 %#39, 3
+  br i1 %#40, label %#5, label %#6
+
+#5:
+  %#41 = load i32, ptr %#34, align 8
+  %#42 = zext i32 %#41 to i64
+  %#43 = mul i64 %#42, -7046029288634856825
+  %#44 = xor i64 %#43, %#38
+  %#45 = gep inbounds nuw ptr %#11, 1 x i64 52
+  %#46 = fshl i64 %#44, i64 %#44, i64 23
+  %#47 = mul i64 %#46, -4417276706812531889
+  %#48 = add i64 %#47, 1609587929392839161
+  %#49 = add nsw i64 %#22, -12
+  br label %#6
+
+#6:
+  %#50 = phi i64 [ %#38, %#4 ], [ %#48, %#5 ]
+  %#51 = phi ptr [ %#34, %#4 ], [ %#45, %#5 ]
+  %#52 = phi i64 [ %#39, %#4 ], [ %#49, %#5 ]
+  %#53 = add nsw i64 %#52, -1
+  %#54 = and i64 %#52, 7
+  %#55 = icmp eq i64 %#54, 0
+  br i1 %#55, label %#8, label %#7
+
+#7:
+  %#56 = phi i64 [ %#66, %#7 ], [ %#50, %#6 ]
+  %#57 = phi ptr [ %#60, %#7 ], [ %#51, %#6 ]
+  %#58 = phi i64 [ %#67, %#7 ], [ %#52, %#6 ]
+  %#59 = phi i64 [ %#68, %#7 ], [ 0, %#6 ]
+  %#60 = gep inbounds nuw ptr %#57, 1 x i64 1
+  %#61 = load i8, ptr %#57, align 1
+  %#62 = zext i8 %#61 to i64
+  %#63 = mul i64 %#62, 2870177450012600261
+  %#64 = xor i64 %#63, %#56
+  %#65 = fshl i64 %#64, i64 %#64, i64 11
+  %#66 = mul i64 %#65, -7046029288634856825
+  %#67 = add nsw i64 %#58, -1
+  %#68 = add i64 %#59, 1
+  %#69 = icmp eq i64 %#68, %#54
+  br i1 %#69, label %#8, label %#7
+
+#8:
+  %#70 = phi i64 [ poison, %#6 ], [ %#66, %#7 ]
+  %#71 = phi i64 [ %#50, %#6 ], [ %#66, %#7 ]
+  %#72 = phi ptr [ %#51, %#6 ], [ %#60, %#7 ]
+  %#73 = phi i64 [ %#52, %#6 ], [ %#67, %#7 ]
+  %#74 = icmp ult i64 %#53, 7
+  br i1 %#74, label %#10, label %#9
+
+#9:
+  %#75 = phi i64 [ %#133, %#9 ], [ %#71, %#8 ]
+  %#76 = phi ptr [ %#127, %#9 ], [ %#72, %#8 ]
+  %#77 = phi i64 [ %#134, %#9 ], [ %#73, %#8 ]
+  %#78 = gep inbounds nuw ptr %#76, 1 x i64 1
+  %#79 = load i8, ptr %#76, align 1
+  %#80 = zext i8 %#79 to i64
+  %#81 = mul i64 %#80, 2870177450012600261
+  %#82 = xor i64 %#81, %#75
+  %#83 = fshl i64 %#82, i64 %#82, i64 11
+  %#84 = mul i64 %#83, -7046029288634856825
+  %#85 = gep inbounds nuw ptr %#76, 1 x i64 2
+  %#86 = load i8, ptr %#78, align 1
+  %#87 = zext i8 %#86 to i64
+  %#88 = mul i64 %#87, 2870177450012600261
+  %#89 = xor i64 %#88, %#84
+  %#90 = fshl i64 %#89, i64 %#89, i64 11
+  %#91 = mul i64 %#90, -7046029288634856825
+  %#92 = gep inbounds nuw ptr %#76, 1 x i64 3
+  %#93 = load i8, ptr %#85, align 1
+  %#94 = zext i8 %#93 to i64
+  %#95 = mul i64 %#94, 2870177450012600261
+  %#96 = xor i64 %#95, %#91
+  %#97 = fshl i64 %#96, i64 %#96, i64 11
+  %#98 = mul i64 %#97, -7046029288634856825
+  %#99 = gep inbounds nuw ptr %#76, 1 x i64 4
+  %#100 = load i8, ptr %#92, align 1
+  %#101 = zext i8 %#100 to i64
+  %#102 = mul i64 %#101, 2870177450012600261
+  %#103 = xor i64 %#102, %#98
+  %#104 = fshl i64 %#103, i64 %#103, i64 11
+  %#105 = mul i64 %#104, -7046029288634856825
+  %#106 = gep inbounds nuw ptr %#76, 1 x i64 5
+  %#107 = load i8, ptr %#99, align 1
+  %#108 = zext i8 %#107 to i64
+  %#109 = mul i64 %#108, 2870177450012600261
+  %#110 = xor i64 %#109, %#105
+  %#111 = fshl i64 %#110, i64 %#110, i64 11
+  %#112 = mul i64 %#111, -7046029288634856825
+  %#113 = gep inbounds nuw ptr %#76, 1 x i64 6
+  %#114 = load i8, ptr %#106, align 1
+  %#115 = zext i8 %#114 to i64
+  %#116 = mul i64 %#115, 2870177450012600261
+  %#117 = xor i64 %#116, %#112
+  %#118 = fshl i64 %#117, i64 %#117, i64 11
+  %#119 = mul i64 %#118, -7046029288634856825
+  %#120 = gep inbounds nuw ptr %#76, 1 x i64 7
+  %#121 = load i8, ptr %#113, align 1
+  %#122 = zext i8 %#121 to i64
+  %#123 = mul i64 %#122, 2870177450012600261
+  %#124 = xor i64 %#123, %#119
+  %#125 = fshl i64 %#124, i64 %#124, i64 11
+  %#126 = mul i64 %#125, -7046029288634856825
+  %#127 = gep inbounds nuw ptr %#76, 1 x i64 8
+  %#128 = load i8, ptr %#120, align 1
+  %#129 = zext i8 %#128 to i64
+  %#130 = mul i64 %#129, 2870177450012600261
+  %#131 = xor i64 %#130, %#126
+  %#132 = fshl i64 %#131, i64 %#131, i64 11
+  %#133 = mul i64 %#132, -7046029288634856825
+  %#134 = add nsw i64 %#77, -8
+  %#135 = icmp eq i64 %#134, 0
+  br i1 %#135, label %#10, label %#9
+
+#10:
+  %#136 = phi i64 [ %#70, %#8 ], [ %#133, %#9 ]
+  %#137 = lshr i64 %#136, 33
+  %#138 = xor i64 %#137, %#136
+  %#139 = mul i64 %#138, -4417276706812531889
+  %#140 = lshr i64 %#139, 29
+  %#141 = xor i64 %#140, %#139
+  %#142 = mul i64 %#141, 1609587929392839161
+  %#143 = lshr i64 %#142, 32
+  %#144 = xor i64 %#143, %#142
+  end_lifetime ptr %#11
+  ret i64 %#144
+}
+ERROR: The target program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i64 @target_s64_31_0(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i64, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#9 = load i64, ptr %#8, align 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#11 = load i64, ptr %#10, align 1
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#13 = load i32, ptr %#12, align 1
+  %#14 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 28
+  %#15 = load i8, ptr %#14, align 1
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 29
+  %#17 = load i8, ptr %#16, align 1
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 30
+  %#19 = load i8, ptr %#18, align 1
+  %#20 = add i64 noundef %#1, 2870177450012600292
+  %#21 = mul i64 %#7, -4417276706812531889
+  %#22 = fshl i64 %#21, i64 %#21, i64 31
+  %#23 = mul i64 %#22, -7046029288634856825
+  %#24 = xor i64 %#23, %#20
+  %#25 = fshl i64 %#24, i64 %#24, i64 27
+  %#26 = mul i64 %#25, -7046029288634856825
+  %#27 = add i64 %#26, -8796714831421723037
+  %#28 = mul i64 %#9, -4417276706812531889
+  %#29 = fshl i64 %#28, i64 %#28, i64 31
+  %#30 = mul i64 %#29, -7046029288634856825
+  %#31 = xor i64 %#30, %#27
+  %#32 = fshl i64 %#31, i64 %#31, i64 27
+  %#33 = mul i64 %#32, -7046029288634856825
+  %#34 = add i64 %#33, -8796714831421723037
+  %#35 = mul i64 %#11, -4417276706812531889
+  %#36 = fshl i64 %#35, i64 %#35, i64 31
+  %#37 = mul i64 %#36, -7046029288634856825
+  %#38 = xor i64 %#37, %#34
+  %#39 = fshl i64 %#38, i64 %#38, i64 27
+  %#40 = mul i64 %#39, -7046029288634856825
+  %#41 = add i64 %#40, -8796714831421723037
+  %#42 = zext i32 %#13 to i64
+  %#43 = mul i64 %#42, -7046029288634856825
+  %#44 = xor i64 %#43, %#41
+  %#45 = fshl i64 %#44, i64 %#44, i64 23
+  %#46 = mul i64 %#45, -4417276706812531889
+  %#47 = add i64 %#46, 1609587929392839161
+  %#48 = zext i8 %#15 to i64
+  %#49 = mul i64 %#48, 2870177450012600261
+  %#50 = xor i64 %#49, %#47
+  %#51 = fshl i64 %#50, i64 %#50, i64 11
+  %#52 = mul i64 %#51, -7046029288634856825
+  %#53 = zext i8 %#17 to i64
+  %#54 = mul i64 %#53, 2870177450012600261
+  %#55 = xor i64 %#54, %#52
+  %#56 = fshl i64 %#55, i64 %#55, i64 11
+  %#57 = mul i64 %#56, -7046029288634856825
+  %#58 = zext i8 %#19 to i64
+  %#59 = mul i64 %#58, 2870177450012600261
+  %#60 = xor i64 %#59, %#57
+  %#61 = fshl i64 %#60, i64 %#60, i64 11
+  %#62 = mul i64 %#61, -7046029288634856825
+  br label %#5
+
+#4:
+  %#63 = add i64 noundef %#1, 2870177450012600261
+  br label %#5
+
+#5:
+  %#64 = phi i64 [ %#63, %#4 ], [ %#62, %#3 ]
+  %#65 = lshr i64 %#64, 33
+  %#66 = xor i64 %#65, %#64
+  %#67 = mul i64 %#66, -4417276706812531889
+  %#68 = lshr i64 %#67, 29
+  %#69 = xor i64 %#68, %#67
+  %#70 = mul i64 %#69, 1609587929392839161
+  %#71 = lshr i64 %#70, 32
+  %#72 = xor i64 %#71, %#70
+  ret i64 %#72
+}
+=>
+define i64 @target_s64_31_0(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#6 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#6
+  %#7 = add i64 noundef %#1, 6983438078262162902
+  %#8 = add i64 noundef %#1, -4417276706812531889
+  %#9 = add i64 noundef %#1, 7046029288634856825
+  %#10 = gep inbounds nuw ptr %#6, 1 x i64 8
+  store i64 %#7, ptr %#10, align 8
+  %#11 = gep inbounds nuw ptr %#6, 1 x i64 16
+  store i64 %#8, ptr %#11, align 8
+  %#12 = gep inbounds nuw ptr %#6, 1 x i64 24
+  store i64 noundef %#1, ptr %#12, align 8
+  %#13 = gep inbounds nuw ptr %#6, 1 x i64 32
+  store i64 %#9, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr %#6, 1 x i64 64
+  memset ptr %#14 align 8, i8 0, i64 16
+  %#15 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#15, label %#4, label %#3
+
+#3:
+  %#16 = gep inbounds nuw ptr %#6, 1 x i64 40
+  store i64 31, ptr %#6, align 8
+  %#17 = gep inbounds nuw ptr %#6, 1 x i64 72
+  memcpy ptr %#16 align 8, ptr nowrite noundef %#0 align 1, i64 31
+  store i32 31, ptr %#17, align 8
+  %#18 = gep inbounds nuw ptr %#6, 1 x i64 56
+  %#19 = load i64, ptr %#18, align 8
+  %#20 = mul i64 %#19, -4417276706812531889
+  %#21 = fshl i64 %#20, i64 %#20, i64 31
+  %#22 = mul i64 %#21, -7046029288634856825
+  %#23 = gep inbounds nuw ptr %#6, 1 x i64 48
+  %#24 = load i64, ptr %#23, align 8
+  %#25 = mul i64 %#24, -4417276706812531889
+  %#26 = fshl i64 %#25, i64 %#25, i64 31
+  %#27 = mul i64 %#26, -7046029288634856825
+  %#28 = load i64, ptr %#16, align 8
+  %#29 = mul i64 %#28, -4417276706812531889
+  %#30 = fshl i64 %#29, i64 %#29, i64 31
+  %#31 = mul i64 %#30, -7046029288634856825
+  %#32 = add i64 noundef %#1, 2870177450012600292
+  %#33 = xor i64 %#31, %#32
+  %#34 = fshl i64 %#33, i64 %#33, i64 27
+  %#35 = mul i64 %#34, -7046029288634856825
+  %#36 = add i64 %#35, -8796714831421723037
+  %#37 = xor i64 %#27, %#36
+  %#38 = fshl i64 %#37, i64 %#37, i64 27
+  %#39 = mul i64 %#38, -7046029288634856825
+  %#40 = add i64 %#39, -8796714831421723037
+  %#41 = xor i64 %#22, %#40
+  %#42 = fshl i64 %#41, i64 %#41, i64 27
+  %#43 = mul i64 %#42, -7046029288634856825
+  %#44 = add i64 %#43, -8796714831421723037
+  %#45 = gep inbounds nuw ptr %#6, 1 x i64 64
+  %#46 = load i32, ptr %#45, align 8
+  %#47 = zext i32 %#46 to i64
+  %#48 = mul i64 %#47, -7046029288634856825
+  %#49 = xor i64 %#48, %#44
+  %#50 = gep inbounds nuw ptr %#6, 1 x i64 68
+  %#51 = fshl i64 %#49, i64 %#49, i64 23
+  %#52 = mul i64 %#51, -4417276706812531889
+  %#53 = add i64 %#52, 1609587929392839161
+  %#54 = gep inbounds nuw ptr %#50, 1 x i64 1
+  %#55 = load i8, ptr %#50, align 4
+  %#56 = zext i8 %#55 to i64
+  %#57 = mul i64 %#56, 2870177450012600261
+  %#58 = xor i64 %#57, %#53
+  %#59 = fshl i64 %#58, i64 %#58, i64 11
+  %#60 = mul i64 %#59, -7046029288634856825
+  %#61 = gep inbounds nuw ptr %#50, 1 x i64 2
+  %#62 = load i8, ptr %#54, align 1
+  %#63 = zext i8 %#62 to i64
+  %#64 = mul i64 %#63, 2870177450012600261
+  %#65 = xor i64 %#64, %#60
+  %#66 = fshl i64 %#65, i64 %#65, i64 11
+  %#67 = mul i64 %#66, -7046029288634856825
+  %#68 = load i8, ptr %#61, align 2
+  %#69 = zext i8 %#68 to i64
+  %#70 = mul i64 %#69, 2870177450012600261
+  %#71 = xor i64 %#70, %#67
+  %#72 = fshl i64 %#71, i64 %#71, i64 11
+  %#73 = mul i64 %#72, -7046029288634856825
+  br label %#5
+
+#4:
+  %#74 = add i64 noundef %#1, 2870177450012600261
+  br label %#5
+
+#5:
+  %#75 = phi i64 [ %#74, %#4 ], [ %#73, %#3 ]
+  %#76 = lshr i64 %#75, 33
+  %#77 = xor i64 %#76, %#75
+  %#78 = mul i64 %#77, -4417276706812531889
+  %#79 = lshr i64 %#78, 29
+  %#80 = xor i64 %#79, %#78
+  %#81 = mul i64 %#80, 1609587929392839161
+  %#82 = lshr i64 %#81, 32
+  %#83 = xor i64 %#82, %#81
+  end_lifetime ptr %#6
+  ret i64 %#83
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_13_18(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#8 = load i64, ptr nowrite noundef %#0, align 1
+  %#9 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#10 = load i40, ptr %#9, align 1
+  %#11 = zext i40 %#10 to i64
+  %#12 = load i24, ptr %#7, align 1
+  %#13 = zext i24 %#12 to i64
+  %#14 = shl nuw i64 %#13, 40
+  %#15 = or disjoint i64 %#14, %#11
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#17 = load i64, ptr %#16, align 1
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#19 = load i32, ptr %#18, align 1
+  %#20 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 28
+  %#21 = load i8, ptr %#20, align 1
+  %#22 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 29
+  %#23 = load i8, ptr %#22, align 1
+  %#24 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 30
+  %#25 = load i8, ptr %#24, align 1
+  %#26 = add i64 noundef %#1, 2870177450012600292
+  %#27 = mul i64 %#8, -4417276706812531889
+  %#28 = fshl i64 %#27, i64 %#27, i64 31
+  %#29 = mul i64 %#28, -7046029288634856825
+  %#30 = xor i64 %#29, %#26
+  %#31 = fshl i64 %#30, i64 %#30, i64 27
+  %#32 = mul i64 %#31, -7046029288634856825
+  %#33 = add i64 %#32, -8796714831421723037
+  %#34 = zext i8 %#23 to i64
+  %#35 = mul i64 %#34, 2870177450012600261
+  %#36 = zext i8 %#21 to i64
+  %#37 = mul i64 %#36, 2870177450012600261
+  %#38 = zext i32 %#19 to i64
+  %#39 = mul i64 %#38, -7046029288634856825
+  %#40 = mul i64 %#17, -4417276706812531889
+  %#41 = fshl i64 %#40, i64 %#40, i64 31
+  %#42 = mul i64 %#41, -7046029288634856825
+  %#43 = mul i64 %#15, -4417276706812531889
+  %#44 = fshl i64 %#43, i64 %#43, i64 31
+  %#45 = mul i64 %#44, -7046029288634856825
+  %#46 = xor i64 %#45, %#33
+  %#47 = fshl i64 %#46, i64 %#46, i64 27
+  %#48 = mul i64 %#47, -7046029288634856825
+  %#49 = add i64 %#48, -8796714831421723037
+  %#50 = xor i64 %#42, %#49
+  %#51 = fshl i64 %#50, i64 %#50, i64 27
+  %#52 = mul i64 %#51, -7046029288634856825
+  %#53 = add i64 %#52, -8796714831421723037
+  %#54 = xor i64 %#39, %#53
+  %#55 = fshl i64 %#54, i64 %#54, i64 23
+  %#56 = mul i64 %#55, -4417276706812531889
+  %#57 = add i64 %#56, 1609587929392839161
+  %#58 = xor i64 %#37, %#57
+  %#59 = fshl i64 %#58, i64 %#58, i64 11
+  %#60 = mul i64 %#59, -7046029288634856825
+  %#61 = xor i64 %#35, %#60
+  %#62 = fshl i64 %#61, i64 %#61, i64 11
+  %#63 = mul i64 %#62, -7046029288634856825
+  %#64 = zext i8 %#25 to i64
+  %#65 = mul i64 %#64, 2870177450012600261
+  %#66 = xor i64 %#65, %#63
+  %#67 = fshl i64 %#66, i64 %#66, i64 11
+  br label %#5
+
+#4:
+  %#68 = load i64, ptr %#7, align 1
+  %#69 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 21
+  %#70 = load i64, ptr %#69, align 1
+  %#71 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 29
+  %#72 = load i8, ptr %#71, align 1
+  %#73 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 30
+  %#74 = load i8, ptr %#73, align 1
+  %#75 = add i64 noundef %#1, 2870177450012600279
+  %#76 = mul i64 %#68, -4417276706812531889
+  %#77 = fshl i64 %#76, i64 %#76, i64 31
+  %#78 = mul i64 %#77, -7046029288634856825
+  %#79 = xor i64 %#78, %#75
+  %#80 = fshl i64 %#79, i64 %#79, i64 27
+  %#81 = mul i64 %#80, -7046029288634856825
+  %#82 = add i64 %#81, -8796714831421723037
+  %#83 = mul i64 %#70, -4417276706812531889
+  %#84 = fshl i64 %#83, i64 %#83, i64 31
+  %#85 = mul i64 %#84, -7046029288634856825
+  %#86 = xor i64 %#85, %#82
+  %#87 = fshl i64 %#86, i64 %#86, i64 27
+  %#88 = mul i64 %#87, -7046029288634856825
+  %#89 = add i64 %#88, -8796714831421723037
+  %#90 = zext i8 %#72 to i64
+  %#91 = mul i64 %#90, 2870177450012600261
+  %#92 = xor i64 %#89, %#91
+  %#93 = fshl i64 %#92, i64 %#92, i64 11
+  %#94 = mul i64 %#93, -7046029288634856825
+  %#95 = zext i8 %#74 to i64
+  %#96 = mul i64 %#95, 2870177450012600261
+  %#97 = xor i64 %#94, %#96
+  %#98 = fshl i64 %#97, i64 %#97, i64 11
+  br label %#5
+
+#5:
+  %#99 = phi i64 [ %#98, %#4 ], [ %#67, %#3 ]
+  %#100 = mul i64 %#99, -7046029288634856825
+  %#101 = lshr i64 %#100, 33
+  %#102 = xor i64 %#101, %#100
+  %#103 = mul i64 %#102, -4417276706812531889
+  %#104 = lshr i64 %#103, 29
+  %#105 = xor i64 %#104, %#103
+  %#106 = mul i64 %#105, 1609587929392839161
+  %#107 = lshr i64 %#106, 32
+  %#108 = xor i64 %#107, %#106
+  ret i64 %#108
+}
+=>
+define i64 @target_s64_13_18(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#15 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#15
+  %#16 = add i64 noundef %#1, 6983438078262162902
+  %#17 = add i64 noundef %#1, -4417276706812531889
+  %#18 = add i64 noundef %#1, 7046029288634856825
+  %#19 = gep inbounds nuw ptr %#15, 1 x i64 8
+  store i64 %#16, ptr %#19, align 8
+  %#20 = gep inbounds nuw ptr %#15, 1 x i64 16
+  store i64 %#17, ptr %#20, align 8
+  %#21 = gep inbounds nuw ptr %#15, 1 x i64 24
+  store i64 noundef %#1, ptr %#21, align 8
+  %#22 = gep inbounds nuw ptr %#15, 1 x i64 32
+  store i64 %#18, ptr %#22, align 8
+  %#23 = gep inbounds nuw ptr %#15, 1 x i64 40
+  memset ptr %#23 align 8, i8 0, i64 40
+  %#24 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#24, label %#4, label %#3
+
+#3:
+  memcpy ptr %#23 align 8, ptr nowrite noundef %#0 align 1, i64 13
+  br label %#4
+
+#4:
+  %#25 = phi i32 [ 0, %#2 ], [ 13, %#3 ]
+  %#26 = phi i64 [ 18, %#2 ], [ 31, %#3 ]
+  store i64 %#26, ptr %#15, align 8
+  %#27 = gep inbounds nuw ptr %#15, 1 x i64 72
+  %#28 = zext nneg i32 %#25 to i64
+  %#29 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#30 = gep inbounds nuw ptr %#23, 1 x i64 %#28
+  memcpy ptr %#30 align 1, ptr %#29 align 1, i64 18
+  %#31 = or disjoint i32 %#25, 18
+  store i32 %#31, ptr %#27, align 8
+  %#32 = add i64 noundef %#1, 2870177450012600261
+  %#33 = add i64 %#32, %#26
+  %#34 = load i64, ptr %#23, align 8
+  %#35 = mul i64 %#34, -4417276706812531889
+  %#36 = fshl i64 %#35, i64 %#35, i64 31
+  %#37 = mul i64 %#36, -7046029288634856825
+  %#38 = gep inbounds nuw ptr %#15, 1 x i64 48
+  %#39 = xor i64 %#37, %#33
+  %#40 = fshl i64 %#39, i64 %#39, i64 27
+  %#41 = mul i64 %#40, -7046029288634856825
+  %#42 = add i64 %#41, -8796714831421723037
+  %#43 = add nsw i64 %#26, -8
+  %#44 = icmp samesign ugt i64 %#43, 7
+  br i1 %#44, label %#5, label %#7
+
+#5:
+  %#45 = load i64, ptr %#38, align 8
+  %#46 = mul i64 %#45, -4417276706812531889
+  %#47 = fshl i64 %#46, i64 %#46, i64 31
+  %#48 = mul i64 %#47, -7046029288634856825
+  %#49 = gep inbounds nuw ptr %#15, 1 x i64 56
+  %#50 = xor i64 %#48, %#42
+  %#51 = fshl i64 %#50, i64 %#50, i64 27
+  %#52 = mul i64 %#51, -7046029288634856825
+  %#53 = add i64 %#52, -8796714831421723037
+  %#54 = add nsw i64 %#26, -16
+  %#55 = icmp samesign ugt i64 %#54, 7
+  br i1 %#55, label %#6, label %#7
+
+#6:
+  %#56 = load i64, ptr %#49, align 8
+  %#57 = mul i64 %#56, -4417276706812531889
+  %#58 = fshl i64 %#57, i64 %#57, i64 31
+  %#59 = mul i64 %#58, -7046029288634856825
+  %#60 = gep inbounds nuw ptr %#15, 1 x i64 64
+  %#61 = xor i64 %#59, %#53
+  %#62 = fshl i64 %#61, i64 %#61, i64 27
+  %#63 = mul i64 %#62, -7046029288634856825
+  %#64 = add i64 %#63, -8796714831421723037
+  %#65 = add nsw i64 %#26, -24
+  br label %#7
+
+#7:
+  %#66 = phi ptr [ %#23, %#4 ], [ %#38, %#5 ], [ %#49, %#6 ]
+  %#67 = phi i64 [ %#26, %#4 ], [ %#43, %#5 ], [ %#54, %#6 ]
+  %#68 = phi ptr [ %#38, %#4 ], [ %#49, %#5 ], [ %#60, %#6 ]
+  %#69 = phi i64 [ %#42, %#4 ], [ %#53, %#5 ], [ %#64, %#6 ]
+  %#70 = phi i64 [ %#43, %#4 ], [ %#54, %#5 ], [ %#65, %#6 ]
+  %#71 = icmp samesign ugt i64 %#70, 3
+  br i1 %#71, label %#8, label %#9
+
+#8:
+  %#72 = load i32, ptr %#68, align 8
+  %#73 = zext i32 %#72 to i64
+  %#74 = mul i64 %#73, -7046029288634856825
+  %#75 = xor i64 %#74, %#69
+  %#76 = gep inbounds nuw ptr %#66, 1 x i64 12
+  %#77 = fshl i64 %#75, i64 %#75, i64 23
+  %#78 = mul i64 %#77, -4417276706812531889
+  %#79 = add i64 %#78, 1609587929392839161
+  %#80 = add nsw i64 %#67, -12
+  br label %#9
+
+#9:
+  %#81 = phi i64 [ %#80, %#8 ], [ %#70, %#7 ]
+  %#82 = phi ptr [ %#76, %#8 ], [ %#68, %#7 ]
+  %#83 = phi i64 [ %#79, %#8 ], [ %#69, %#7 ]
+  %#84 = icmp eq i64 %#81, 0
+  br i1 %#84, label %#14, label %#10
+
+#10:
+  %#85 = and i64 %#81, 7
+  %#86 = icmp eq i64 %#85, 0
+  br i1 %#86, label %#12, label %#11
+
+#11:
+  %#87 = phi i64 [ %#97, %#11 ], [ %#83, %#10 ]
+  %#88 = phi ptr [ %#91, %#11 ], [ %#82, %#10 ]
+  %#89 = phi i64 [ %#98, %#11 ], [ %#81, %#10 ]
+  %#90 = phi i64 [ %#99, %#11 ], [ 0, %#10 ]
+  %#91 = gep inbounds nuw ptr %#88, 1 x i64 1
+  %#92 = load i8, ptr %#88, align 1
+  %#93 = zext i8 %#92 to i64
+  %#94 = mul i64 %#93, 2870177450012600261
+  %#95 = xor i64 %#94, %#87
+  %#96 = fshl i64 %#95, i64 %#95, i64 11
+  %#97 = mul i64 %#96, -7046029288634856825
+  %#98 = add nsw i64 %#89, -1
+  %#99 = add i64 %#90, 1
+  %#100 = icmp eq i64 %#99, %#85
+  br i1 %#100, label %#12, label %#11
+
+#12:
+  %#101 = phi i64 [ poison, %#10 ], [ %#97, %#11 ]
+  %#102 = phi i64 [ %#83, %#10 ], [ %#97, %#11 ]
+  %#103 = phi ptr [ %#82, %#10 ], [ %#91, %#11 ]
+  %#104 = phi i64 [ %#81, %#10 ], [ %#98, %#11 ]
+  %#105 = icmp ult i64 %#81, 8
+  br i1 %#105, label %#14, label %#13
+
+#13:
+  %#106 = phi i64 [ %#164, %#13 ], [ %#102, %#12 ]
+  %#107 = phi ptr [ %#158, %#13 ], [ %#103, %#12 ]
+  %#108 = phi i64 [ %#165, %#13 ], [ %#104, %#12 ]
+  %#109 = gep inbounds nuw ptr %#107, 1 x i64 1
+  %#110 = load i8, ptr %#107, align 1
+  %#111 = zext i8 %#110 to i64
+  %#112 = mul i64 %#111, 2870177450012600261
+  %#113 = xor i64 %#112, %#106
+  %#114 = fshl i64 %#113, i64 %#113, i64 11
+  %#115 = mul i64 %#114, -7046029288634856825
+  %#116 = gep inbounds nuw ptr %#107, 1 x i64 2
+  %#117 = load i8, ptr %#109, align 1
+  %#118 = zext i8 %#117 to i64
+  %#119 = mul i64 %#118, 2870177450012600261
+  %#120 = xor i64 %#119, %#115
+  %#121 = fshl i64 %#120, i64 %#120, i64 11
+  %#122 = mul i64 %#121, -7046029288634856825
+  %#123 = gep inbounds nuw ptr %#107, 1 x i64 3
+  %#124 = load i8, ptr %#116, align 1
+  %#125 = zext i8 %#124 to i64
+  %#126 = mul i64 %#125, 2870177450012600261
+  %#127 = xor i64 %#126, %#122
+  %#128 = fshl i64 %#127, i64 %#127, i64 11
+  %#129 = mul i64 %#128, -7046029288634856825
+  %#130 = gep inbounds nuw ptr %#107, 1 x i64 4
+  %#131 = load i8, ptr %#123, align 1
+  %#132 = zext i8 %#131 to i64
+  %#133 = mul i64 %#132, 2870177450012600261
+  %#134 = xor i64 %#133, %#129
+  %#135 = fshl i64 %#134, i64 %#134, i64 11
+  %#136 = mul i64 %#135, -7046029288634856825
+  %#137 = gep inbounds nuw ptr %#107, 1 x i64 5
+  %#138 = load i8, ptr %#130, align 1
+  %#139 = zext i8 %#138 to i64
+  %#140 = mul i64 %#139, 2870177450012600261
+  %#141 = xor i64 %#140, %#136
+  %#142 = fshl i64 %#141, i64 %#141, i64 11
+  %#143 = mul i64 %#142, -7046029288634856825
+  %#144 = gep inbounds nuw ptr %#107, 1 x i64 6
+  %#145 = load i8, ptr %#137, align 1
+  %#146 = zext i8 %#145 to i64
+  %#147 = mul i64 %#146, 2870177450012600261
+  %#148 = xor i64 %#147, %#143
+  %#149 = fshl i64 %#148, i64 %#148, i64 11
+  %#150 = mul i64 %#149, -7046029288634856825
+  %#151 = gep inbounds nuw ptr %#107, 1 x i64 7
+  %#152 = load i8, ptr %#144, align 1
+  %#153 = zext i8 %#152 to i64
+  %#154 = mul i64 %#153, 2870177450012600261
+  %#155 = xor i64 %#154, %#150
+  %#156 = fshl i64 %#155, i64 %#155, i64 11
+  %#157 = mul i64 %#156, -7046029288634856825
+  %#158 = gep inbounds nuw ptr %#107, 1 x i64 8
+  %#159 = load i8, ptr %#151, align 1
+  %#160 = zext i8 %#159 to i64
+  %#161 = mul i64 %#160, 2870177450012600261
+  %#162 = xor i64 %#161, %#157
+  %#163 = fshl i64 %#162, i64 %#162, i64 11
+  %#164 = mul i64 %#163, -7046029288634856825
+  %#165 = add nsw i64 %#108, -8
+  %#166 = icmp eq i64 %#165, 0
+  br i1 %#166, label %#14, label %#13
+
+#14:
+  %#167 = phi i64 [ %#83, %#9 ], [ %#101, %#12 ], [ %#164, %#13 ]
+  %#168 = lshr i64 %#167, 33
+  %#169 = xor i64 %#168, %#167
+  %#170 = mul i64 %#169, -4417276706812531889
+  %#171 = lshr i64 %#170, 29
+  %#172 = xor i64 %#171, %#170
+  %#173 = mul i64 %#172, 1609587929392839161
+  %#174 = lshr i64 %#173, 32
+  %#175 = xor i64 %#174, %#173
+  end_lifetime ptr %#15
+  ret i64 %#175
+}
+ERROR: The target program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i64 @target_s64_10_30(ptr noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#8 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#8
+  memset ptr %#8 align 8, i8 0, i64 40
+  %#9 = icmp eq ptr noundef %#0, null
+  br i1 %#9, label %#6, label %#3
+
+#3:
+  %#10 = add i64 noundef %#1, 7046029288634856825
+  %#11 = add i64 noundef %#1, -4417276706812531889
+  %#12 = add i64 noundef %#1, 6983438078262162902
+  memcpy ptr %#8 align 8, ptr noundef %#0 align 1, i64 10
+  %#13 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i32 10, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  %#15 = gep inbounds nuw ptr %#8, 1 x i64 10
+  memcpy ptr %#15 align 2, ptr %#14 align 1, i64 22
+  %#16 = load i64, ptr %#8, align 8
+  %#17 = mul i64 %#16, -4417276706812531889
+  %#18 = add i64 %#17, %#12
+  %#19 = fshl i64 %#18, i64 %#18, i64 31
+  %#20 = mul i64 %#19, -7046029288634856825
+  %#21 = gep inbounds nuw ptr %#8, 1 x i64 8
+  %#22 = load i64, ptr %#21, align 8
+  %#23 = mul i64 %#22, -4417276706812531889
+  %#24 = add i64 %#23, %#11
+  %#25 = fshl i64 %#24, i64 %#24, i64 31
+  %#26 = mul i64 %#25, -7046029288634856825
+  %#27 = gep inbounds nuw ptr %#8, 1 x i64 16
+  %#28 = load i64, ptr %#27, align 8
+  %#29 = mul i64 %#28, -4417276706812531889
+  %#30 = add i64 %#29, noundef %#1
+  %#31 = fshl i64 %#30, i64 %#30, i64 31
+  %#32 = mul i64 %#31, -7046029288634856825
+  %#33 = gep inbounds nuw ptr %#8, 1 x i64 24
+  %#34 = load i64, ptr %#33, align 8
+  %#35 = mul i64 %#34, -4417276706812531889
+  %#36 = add i64 %#35, %#10
+  %#37 = fshl i64 %#36, i64 %#36, i64 31
+  %#38 = mul i64 %#37, -7046029288634856825
+  %#39 = gep inbounds nuw ptr %#8, 1 x i64 32
+  %#40 = load i32, ptr %#39, align 8
+  %#41 = sub i32 32, %#40
+  %#42 = icmp ult i32 %#41, 30
+  br i1 %#42, label %#4, label %#5
+
+#4:
+  %#43 = zext nneg i32 %#41 to i64
+  %#44 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#43
+  %#45 = gep inbounds nuw ptr %#44, 1 x i64 10
+  %#46 = gep inbounds nuw ptr noundef %#0, 1 x i64 40
+  %#47 = ptrtoint ptr %#46 to i64
+  %#48 = ptrtoint ptr %#45 to i64
+  %#49 = sub i64 %#47, %#48
+  memcpy ptr %#8 align 8, ptr %#45 align 1, i64 %#49
+  br label %#5
+
+#5:
+  %#50 = fshl i64 %#20, i64 %#20, i64 1
+  %#51 = fshl i64 %#26, i64 %#26, i64 7
+  %#52 = add i64 %#51, %#50
+  %#53 = fshl i64 %#32, i64 %#32, i64 12
+  %#54 = add i64 %#52, %#53
+  %#55 = fshl i64 %#38, i64 %#38, i64 18
+  %#56 = add i64 %#54, %#55
+  %#57 = mul i64 %#19, -2381459717836149591
+  %#58 = fshl i64 %#57, i64 %#57, i64 31
+  %#59 = mul i64 %#58, -7046029288634856825
+  %#60 = xor i64 %#56, %#59
+  %#61 = mul i64 %#60, -7046029288634856825
+  %#62 = add i64 %#61, -8796714831421723037
+  %#63 = mul i64 %#25, -2381459717836149591
+  %#64 = fshl i64 %#63, i64 %#63, i64 31
+  %#65 = mul i64 %#64, -7046029288634856825
+  %#66 = xor i64 %#62, %#65
+  %#67 = mul i64 %#66, -7046029288634856825
+  %#68 = add i64 %#67, -8796714831421723037
+  %#69 = mul i64 %#31, -2381459717836149591
+  %#70 = fshl i64 %#69, i64 %#69, i64 31
+  %#71 = mul i64 %#70, -7046029288634856825
+  %#72 = xor i64 %#68, %#71
+  %#73 = mul i64 %#72, -7046029288634856825
+  %#74 = add i64 %#73, -8796714831421723037
+  %#75 = mul i64 %#37, -2381459717836149591
+  %#76 = fshl i64 %#75, i64 %#75, i64 31
+  %#77 = mul i64 %#76, -7046029288634856825
+  %#78 = xor i64 %#74, %#77
+  %#79 = mul i64 %#78, -7046029288634856825
+  %#80 = add i64 %#79, -8796714831421722997
+  %#81 = load i64, ptr %#8, align 8
+  %#82 = mul i64 %#81, -4417276706812531889
+  %#83 = fshl i64 %#82, i64 %#82, i64 31
+  %#84 = mul i64 %#83, -7046029288634856825
+  %#85 = xor i64 %#84, %#80
+  %#86 = fshl i64 %#85, i64 %#85, i64 27
+  %#87 = mul i64 %#86, -7046029288634856825
+  %#88 = add i64 %#87, -8796714831421723037
+  br label %#7
+
+#6:
+  %#89 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  memcpy ptr %#8 align 8, ptr %#89 align 1, i64 30
+  %#90 = add i64 noundef %#1, 2870177450012600291
+  %#91 = load i64, ptr %#8, align 8
+  %#92 = mul i64 %#91, -4417276706812531889
+  %#93 = fshl i64 %#92, i64 %#92, i64 31
+  %#94 = mul i64 %#93, -7046029288634856825
+  %#95 = xor i64 %#94, %#90
+  %#96 = fshl i64 %#95, i64 %#95, i64 27
+  %#97 = mul i64 %#96, -7046029288634856825
+  %#98 = add i64 %#97, -8796714831421723037
+  %#99 = gep inbounds nuw ptr %#8, 1 x i64 8
+  %#100 = load i64, ptr %#99, align 8
+  %#101 = mul i64 %#100, -4417276706812531889
+  %#102 = fshl i64 %#101, i64 %#101, i64 31
+  %#103 = mul i64 %#102, -7046029288634856825
+  %#104 = xor i64 %#103, %#98
+  %#105 = fshl i64 %#104, i64 %#104, i64 27
+  %#106 = mul i64 %#105, -7046029288634856825
+  %#107 = add i64 %#106, -8796714831421723037
+  %#108 = gep inbounds nuw ptr %#8, 1 x i64 16
+  %#109 = load i64, ptr %#108, align 8
+  %#110 = mul i64 %#109, -4417276706812531889
+  %#111 = fshl i64 %#110, i64 %#110, i64 31
+  %#112 = mul i64 %#111, -7046029288634856825
+  %#113 = xor i64 %#112, %#107
+  %#114 = fshl i64 %#113, i64 %#113, i64 27
+  %#115 = mul i64 %#114, -7046029288634856825
+  %#116 = add i64 %#115, -8796714831421723037
+  %#117 = gep inbounds nuw ptr %#8, 1 x i64 24
+  %#118 = load i32, ptr %#117, align 8
+  %#119 = zext i32 %#118 to i64
+  %#120 = mul i64 %#119, -7046029288634856825
+  %#121 = xor i64 %#120, %#116
+  %#122 = fshl i64 %#121, i64 %#121, i64 23
+  %#123 = mul i64 %#122, -4417276706812531889
+  %#124 = add i64 %#123, 1609587929392839161
+  %#125 = gep inbounds nuw ptr %#8, 1 x i64 28
+  %#126 = load i8, ptr %#125, align 4
+  %#127 = zext i8 %#126 to i64
+  %#128 = mul i64 %#127, 2870177450012600261
+  %#129 = xor i64 %#124, %#128
+  %#130 = fshl i64 %#129, i64 %#129, i64 11
+  %#131 = mul i64 %#130, -7046029288634856825
+  %#132 = gep inbounds nuw ptr %#8, 1 x i64 29
+  %#133 = load i8, ptr %#132, align 1
+  %#134 = zext i8 %#133 to i64
+  %#135 = mul i64 %#134, 2870177450012600261
+  %#136 = xor i64 %#131, %#135
+  %#137 = fshl i64 %#136, i64 %#136, i64 11
+  %#138 = mul i64 %#137, -7046029288634856825
+  br label %#7
+
+#7:
+  %#139 = phi i64 [ %#138, %#6 ], [ %#88, %#5 ]
+  %#140 = lshr i64 %#139, 33
+  %#141 = xor i64 %#140, %#139
+  %#142 = mul i64 %#141, -4417276706812531889
+  %#143 = lshr i64 %#142, 29
+  %#144 = xor i64 %#143, %#142
+  %#145 = mul i64 %#144, 1609587929392839161
+  %#146 = lshr i64 %#145, 32
+  %#147 = xor i64 %#146, %#145
+  end_lifetime ptr %#8
+  ret i64 %#147
+}
+=>
+define i64 @target_s64_10_30(ptr noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#17 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#17
+  %#18 = add i64 noundef %#1, 6983438078262162902
+  %#19 = add i64 noundef %#1, -4417276706812531889
+  %#20 = add i64 noundef %#1, 7046029288634856825
+  %#21 = gep inbounds nuw ptr %#17, 1 x i64 8
+  store i64 %#18, ptr %#21, align 8
+  %#22 = gep inbounds nuw ptr %#17, 1 x i64 16
+  store i64 %#19, ptr %#22, align 8
+  %#23 = gep inbounds nuw ptr %#17, 1 x i64 24
+  store i64 noundef %#1, ptr %#23, align 8
+  %#24 = gep inbounds nuw ptr %#17, 1 x i64 32
+  store i64 %#20, ptr %#24, align 8
+  %#25 = gep inbounds nuw ptr %#17, 1 x i64 40
+  memset ptr %#25 align 8, i8 0, i64 40
+  %#26 = icmp eq ptr noundef %#0, null
+  br i1 %#26, label %#6, label %#3
+
+#3:
+  %#27 = gep inbounds nuw ptr %#17, 1 x i64 72
+  memcpy ptr %#25 align 8, ptr noundef %#0 align 1, i64 10
+  store i32 10, ptr %#27, align 8
+  %#28 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  store i64 40, ptr %#17, align 8
+  %#29 = gep inbounds nuw ptr %#17, 1 x i64 72
+  %#30 = gep inbounds nuw ptr %#17, 1 x i64 50
+  memcpy ptr %#30 align 2, ptr %#28 align 1, i64 22
+  %#31 = load i64, ptr %#25, align 8
+  %#32 = mul i64 %#31, -4417276706812531889
+  %#33 = add i64 %#32, %#18
+  %#34 = fshl i64 %#33, i64 %#33, i64 31
+  %#35 = mul i64 %#34, -7046029288634856825
+  store i64 %#35, ptr %#21, align 8
+  %#36 = gep inbounds nuw ptr %#17, 1 x i64 48
+  %#37 = load i64, ptr %#36, align 8
+  %#38 = mul i64 %#37, -4417276706812531889
+  %#39 = add i64 %#38, %#19
+  %#40 = fshl i64 %#39, i64 %#39, i64 31
+  %#41 = mul i64 %#40, -7046029288634856825
+  store i64 %#41, ptr %#22, align 8
+  %#42 = gep inbounds nuw ptr %#17, 1 x i64 56
+  %#43 = load i64, ptr %#42, align 8
+  %#44 = mul i64 %#43, -4417276706812531889
+  %#45 = add i64 %#44, noundef %#1
+  %#46 = fshl i64 %#45, i64 %#45, i64 31
+  %#47 = mul i64 %#46, -7046029288634856825
+  store i64 %#47, ptr %#23, align 8
+  %#48 = gep inbounds nuw ptr %#17, 1 x i64 64
+  %#49 = load i64, ptr %#48, align 8
+  %#50 = mul i64 %#49, -4417276706812531889
+  %#51 = add i64 %#50, %#20
+  %#52 = fshl i64 %#51, i64 %#51, i64 31
+  %#53 = mul i64 %#52, -7046029288634856825
+  store i64 %#53, ptr %#24, align 8
+  %#54 = load i32, ptr %#29, align 8
+  %#55 = sub i32 32, %#54
+  store i32 0, ptr %#29, align 8
+  %#56 = icmp ult i32 %#55, 30
+  br i1 %#56, label %#4, label %#5
+
+#4:
+  %#57 = zext nneg i32 %#55 to i64
+  %#58 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#57
+  %#59 = gep inbounds nuw ptr %#58, 1 x i64 10
+  %#60 = gep inbounds nuw ptr noundef %#0, 1 x i64 40
+  %#61 = ptrtoint ptr %#60 to i64
+  %#62 = ptrtoint ptr %#59 to i64
+  %#63 = sub i64 %#61, %#62
+  memcpy ptr %#25 align 8, ptr %#59 align 1, i64 %#63
+  %#64 = trunc i64 %#63 to i32
+  store i32 %#64, ptr %#29, align 8
+  br label %#5
+
+#5:
+  %#65 = fshl i64 %#35, i64 %#35, i64 1
+  %#66 = fshl i64 %#41, i64 %#41, i64 7
+  %#67 = add i64 %#66, %#65
+  %#68 = fshl i64 %#47, i64 %#47, i64 12
+  %#69 = add i64 %#67, %#68
+  %#70 = fshl i64 %#53, i64 %#53, i64 18
+  %#71 = add i64 %#69, %#70
+  %#72 = mul i64 %#34, -2381459717836149591
+  %#73 = fshl i64 %#72, i64 %#72, i64 31
+  %#74 = mul i64 %#73, -7046029288634856825
+  %#75 = xor i64 %#71, %#74
+  %#76 = mul i64 %#75, -7046029288634856825
+  %#77 = add i64 %#76, -8796714831421723037
+  %#78 = mul i64 %#40, -2381459717836149591
+  %#79 = fshl i64 %#78, i64 %#78, i64 31
+  %#80 = mul i64 %#79, -7046029288634856825
+  %#81 = xor i64 %#77, %#80
+  %#82 = mul i64 %#81, -7046029288634856825
+  %#83 = add i64 %#82, -8796714831421723037
+  %#84 = mul i64 %#46, -2381459717836149591
+  %#85 = fshl i64 %#84, i64 %#84, i64 31
+  %#86 = mul i64 %#85, -7046029288634856825
+  %#87 = xor i64 %#83, %#86
+  %#88 = mul i64 %#87, -7046029288634856825
+  %#89 = add i64 %#88, -8796714831421723037
+  %#90 = mul i64 %#52, -2381459717836149591
+  %#91 = fshl i64 %#90, i64 %#90, i64 31
+  %#92 = mul i64 %#91, -7046029288634856825
+  %#93 = xor i64 %#89, %#92
+  %#94 = mul i64 %#93, -7046029288634856825
+  %#95 = add i64 %#94, -8796714831421723037
+  br label %#7
+
+#6:
+  %#96 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  store i64 30, ptr %#17, align 8
+  %#97 = gep inbounds nuw ptr %#17, 1 x i64 72
+  memcpy ptr %#25 align 8, ptr %#96 align 1, i64 30
+  %#98 = load i32, ptr %#97, align 8
+  %#99 = add i32 %#98, 30
+  store i32 %#99, ptr %#97, align 8
+  %#100 = add i64 noundef %#1, 2870177450012600261
+  br label %#7
+
+#7:
+  %#101 = phi i64 [ 40, %#5 ], [ 30, %#6 ]
+  %#102 = phi i64 [ %#95, %#5 ], [ %#100, %#6 ]
+  %#103 = add i64 %#102, %#101
+  %#104 = and i64 %#101, 30
+  br label %#8
+
+#8:
+  %#105 = phi i64 [ %#116, %#8 ], [ %#103, %#7 ]
+  %#106 = phi ptr [ %#112, %#8 ], [ %#25, %#7 ]
+  %#107 = phi i64 [ %#117, %#8 ], [ %#104, %#7 ]
+  %#108 = load i64, ptr %#106, align 8
+  %#109 = mul i64 %#108, -4417276706812531889
+  %#110 = fshl i64 %#109, i64 %#109, i64 31
+  %#111 = mul i64 %#110, -7046029288634856825
+  %#112 = gep inbounds nuw ptr %#106, 1 x i64 8
+  %#113 = xor i64 %#111, %#105
+  %#114 = fshl i64 %#113, i64 %#113, i64 27
+  %#115 = mul i64 %#114, -7046029288634856825
+  %#116 = add i64 %#115, -8796714831421723037
+  %#117 = add nsw i64 %#107, -8
+  %#118 = icmp ugt i64 %#117, 7
+  br i1 %#118, label %#8, label %#9
+
+#9:
+  %#119 = icmp samesign ugt i64 %#117, 3
+  br i1 %#119, label %#10, label %#11
+
+#10:
+  %#120 = load i32, ptr %#112, align 8
+  %#121 = zext i32 %#120 to i64
+  %#122 = mul i64 %#121, -7046029288634856825
+  %#123 = xor i64 %#122, %#116
+  %#124 = gep inbounds nuw ptr %#106, 1 x i64 12
+  %#125 = fshl i64 %#123, i64 %#123, i64 23
+  %#126 = mul i64 %#125, -4417276706812531889
+  %#127 = add i64 %#126, 1609587929392839161
+  %#128 = add nsw i64 %#107, -12
+  br label %#11
+
+#11:
+  %#129 = phi i64 [ %#128, %#10 ], [ %#117, %#9 ]
+  %#130 = phi ptr [ %#124, %#10 ], [ %#112, %#9 ]
+  %#131 = phi i64 [ %#127, %#10 ], [ %#116, %#9 ]
+  %#132 = icmp eq i64 %#129, 0
+  br i1 %#132, label %#16, label %#12
+
+#12:
+  %#133 = and i64 %#129, 7
+  %#134 = icmp eq i64 %#133, 0
+  br i1 %#134, label %#14, label %#13
+
+#13:
+  %#135 = phi i64 [ %#145, %#13 ], [ %#131, %#12 ]
+  %#136 = phi ptr [ %#139, %#13 ], [ %#130, %#12 ]
+  %#137 = phi i64 [ %#146, %#13 ], [ %#129, %#12 ]
+  %#138 = phi i64 [ %#147, %#13 ], [ 0, %#12 ]
+  %#139 = gep inbounds nuw ptr %#136, 1 x i64 1
+  %#140 = load i8, ptr %#136, align 1
+  %#141 = zext i8 %#140 to i64
+  %#142 = mul i64 %#141, 2870177450012600261
+  %#143 = xor i64 %#142, %#135
+  %#144 = fshl i64 %#143, i64 %#143, i64 11
+  %#145 = mul i64 %#144, -7046029288634856825
+  %#146 = add nsw i64 %#137, -1
+  %#147 = add i64 %#138, 1
+  %#148 = icmp eq i64 %#147, %#133
+  br i1 %#148, label %#14, label %#13
+
+#14:
+  %#149 = phi i64 [ poison, %#12 ], [ %#145, %#13 ]
+  %#150 = phi i64 [ %#131, %#12 ], [ %#145, %#13 ]
+  %#151 = phi ptr [ %#130, %#12 ], [ %#139, %#13 ]
+  %#152 = phi i64 [ %#129, %#12 ], [ %#146, %#13 ]
+  %#153 = icmp ult i64 %#129, 8
+  br i1 %#153, label %#16, label %#15
+
+#15:
+  %#154 = phi i64 [ %#212, %#15 ], [ %#150, %#14 ]
+  %#155 = phi ptr [ %#206, %#15 ], [ %#151, %#14 ]
+  %#156 = phi i64 [ %#213, %#15 ], [ %#152, %#14 ]
+  %#157 = gep inbounds nuw ptr %#155, 1 x i64 1
+  %#158 = load i8, ptr %#155, align 1
+  %#159 = zext i8 %#158 to i64
+  %#160 = mul i64 %#159, 2870177450012600261
+  %#161 = xor i64 %#160, %#154
+  %#162 = fshl i64 %#161, i64 %#161, i64 11
+  %#163 = mul i64 %#162, -7046029288634856825
+  %#164 = gep inbounds nuw ptr %#155, 1 x i64 2
+  %#165 = load i8, ptr %#157, align 1
+  %#166 = zext i8 %#165 to i64
+  %#167 = mul i64 %#166, 2870177450012600261
+  %#168 = xor i64 %#167, %#163
+  %#169 = fshl i64 %#168, i64 %#168, i64 11
+  %#170 = mul i64 %#169, -7046029288634856825
+  %#171 = gep inbounds nuw ptr %#155, 1 x i64 3
+  %#172 = load i8, ptr %#164, align 1
+  %#173 = zext i8 %#172 to i64
+  %#174 = mul i64 %#173, 2870177450012600261
+  %#175 = xor i64 %#174, %#170
+  %#176 = fshl i64 %#175, i64 %#175, i64 11
+  %#177 = mul i64 %#176, -7046029288634856825
+  %#178 = gep inbounds nuw ptr %#155, 1 x i64 4
+  %#179 = load i8, ptr %#171, align 1
+  %#180 = zext i8 %#179 to i64
+  %#181 = mul i64 %#180, 2870177450012600261
+  %#182 = xor i64 %#181, %#177
+  %#183 = fshl i64 %#182, i64 %#182, i64 11
+  %#184 = mul i64 %#183, -7046029288634856825
+  %#185 = gep inbounds nuw ptr %#155, 1 x i64 5
+  %#186 = load i8, ptr %#178, align 1
+  %#187 = zext i8 %#186 to i64
+  %#188 = mul i64 %#187, 2870177450012600261
+  %#189 = xor i64 %#188, %#184
+  %#190 = fshl i64 %#189, i64 %#189, i64 11
+  %#191 = mul i64 %#190, -7046029288634856825
+  %#192 = gep inbounds nuw ptr %#155, 1 x i64 6
+  %#193 = load i8, ptr %#185, align 1
+  %#194 = zext i8 %#193 to i64
+  %#195 = mul i64 %#194, 2870177450012600261
+  %#196 = xor i64 %#195, %#191
+  %#197 = fshl i64 %#196, i64 %#196, i64 11
+  %#198 = mul i64 %#197, -7046029288634856825
+  %#199 = gep inbounds nuw ptr %#155, 1 x i64 7
+  %#200 = load i8, ptr %#192, align 1
+  %#201 = zext i8 %#200 to i64
+  %#202 = mul i64 %#201, 2870177450012600261
+  %#203 = xor i64 %#202, %#198
+  %#204 = fshl i64 %#203, i64 %#203, i64 11
+  %#205 = mul i64 %#204, -7046029288634856825
+  %#206 = gep inbounds nuw ptr %#155, 1 x i64 8
+  %#207 = load i8, ptr %#199, align 1
+  %#208 = zext i8 %#207 to i64
+  %#209 = mul i64 %#208, 2870177450012600261
+  %#210 = xor i64 %#209, %#205
+  %#211 = fshl i64 %#210, i64 %#210, i64 11
+  %#212 = mul i64 %#211, -7046029288634856825
+  %#213 = add nsw i64 %#156, -8
+  %#214 = icmp eq i64 %#213, 0
+  br i1 %#214, label %#16, label %#15
+
+#16:
+  %#215 = phi i64 [ %#131, %#11 ], [ %#149, %#14 ], [ %#212, %#15 ]
+  %#216 = lshr i64 %#215, 33
+  %#217 = xor i64 %#216, %#215
+  %#218 = mul i64 %#217, -4417276706812531889
+  %#219 = lshr i64 %#218, 29
+  %#220 = xor i64 %#219, %#218
+  %#221 = mul i64 %#220, 1609587929392839161
+  %#222 = lshr i64 %#221, 32
+  %#223 = xor i64 %#222, %#221
+  end_lifetime ptr %#17
+  ret i64 %#223
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i64 @target_s64_32_0(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = add i64 noundef %#1, 7046029288634856825
+  %#8 = add i64 noundef %#1, -4417276706812531889
+  %#9 = add i64 noundef %#1, 6983438078262162902
+  %#10 = load i64, ptr nowrite noundef %#0, align 1
+  %#11 = mul i64 %#10, -4417276706812531889
+  %#12 = add i64 %#11, %#9
+  %#13 = fshl i64 %#12, i64 %#12, i64 31
+  %#14 = mul i64 %#13, -7046029288634856825
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#16 = load i64, ptr %#15, align 1
+  %#17 = mul i64 %#16, -4417276706812531889
+  %#18 = add i64 %#17, %#8
+  %#19 = fshl i64 %#18, i64 %#18, i64 31
+  %#20 = mul i64 %#19, -7046029288634856825
+  %#21 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#22 = load i64, ptr %#21, align 1
+  %#23 = mul i64 %#22, -4417276706812531889
+  %#24 = add i64 %#23, noundef %#1
+  %#25 = fshl i64 %#24, i64 %#24, i64 31
+  %#26 = mul i64 %#25, -7046029288634856825
+  %#27 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#28 = load i64, ptr %#27, align 1
+  %#29 = mul i64 %#28, -4417276706812531889
+  %#30 = add i64 %#29, %#7
+  %#31 = fshl i64 %#30, i64 %#30, i64 31
+  %#32 = mul i64 %#31, -7046029288634856825
+  %#33 = fshl i64 %#14, i64 %#14, i64 1
+  %#34 = fshl i64 %#20, i64 %#20, i64 7
+  %#35 = add i64 %#34, %#33
+  %#36 = fshl i64 %#26, i64 %#26, i64 12
+  %#37 = add i64 %#35, %#36
+  %#38 = fshl i64 %#32, i64 %#32, i64 18
+  %#39 = add i64 %#37, %#38
+  %#40 = mul i64 %#13, -2381459717836149591
+  %#41 = fshl i64 %#40, i64 %#40, i64 31
+  %#42 = mul i64 %#41, -7046029288634856825
+  %#43 = xor i64 %#39, %#42
+  %#44 = mul i64 %#43, -7046029288634856825
+  %#45 = add i64 %#44, -8796714831421723037
+  %#46 = mul i64 %#19, -2381459717836149591
+  %#47 = fshl i64 %#46, i64 %#46, i64 31
+  %#48 = mul i64 %#47, -7046029288634856825
+  %#49 = xor i64 %#45, %#48
+  %#50 = mul i64 %#49, -7046029288634856825
+  %#51 = add i64 %#50, -8796714831421723037
+  %#52 = mul i64 %#25, -2381459717836149591
+  %#53 = fshl i64 %#52, i64 %#52, i64 31
+  %#54 = mul i64 %#53, -7046029288634856825
+  %#55 = xor i64 %#51, %#54
+  %#56 = mul i64 %#55, -7046029288634856825
+  %#57 = add i64 %#56, -8796714831421723037
+  %#58 = mul i64 %#31, -2381459717836149591
+  %#59 = fshl i64 %#58, i64 %#58, i64 31
+  %#60 = mul i64 %#59, -7046029288634856825
+  %#61 = xor i64 %#57, %#60
+  %#62 = mul i64 %#61, -7046029288634856825
+  %#63 = add i64 %#62, -8796714831421723037
+  br label %#5
+
+#4:
+  %#64 = add i64 noundef %#1, 2870177450012600261
+  br label %#5
+
+#5:
+  %#65 = phi i64 [ 32, %#3 ], [ 0, %#4 ]
+  %#66 = phi i64 [ %#63, %#3 ], [ %#64, %#4 ]
+  %#67 = add i64 %#66, %#65
+  %#68 = lshr i64 %#67, 33
+  %#69 = xor i64 %#68, %#67
+  %#70 = mul i64 %#69, -4417276706812531889
+  %#71 = lshr i64 %#70, 29
+  %#72 = xor i64 %#71, %#70
+  %#73 = mul i64 %#72, 1609587929392839161
+  %#74 = lshr i64 %#73, 32
+  %#75 = xor i64 %#74, %#73
+  ret i64 %#75
+}
+=>
+define i64 @target_s64_32_0(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = add i64 noundef %#1, 7046029288634856825
+  %#8 = add i64 noundef %#1, -4417276706812531889
+  %#9 = add i64 noundef %#1, 6983438078262162902
+  %#10 = load i64, ptr nowrite noundef %#0, align 1
+  %#11 = mul i64 %#10, -4417276706812531889
+  %#12 = add i64 %#11, %#9
+  %#13 = fshl i64 %#12, i64 %#12, i64 31
+  %#14 = mul i64 %#13, -7046029288634856825
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#16 = load i64, ptr %#15, align 1
+  %#17 = mul i64 %#16, -4417276706812531889
+  %#18 = add i64 %#17, %#8
+  %#19 = fshl i64 %#18, i64 %#18, i64 31
+  %#20 = mul i64 %#19, -7046029288634856825
+  %#21 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#22 = load i64, ptr %#21, align 1
+  %#23 = mul i64 %#22, -4417276706812531889
+  %#24 = add i64 %#23, noundef %#1
+  %#25 = fshl i64 %#24, i64 %#24, i64 31
+  %#26 = mul i64 %#25, -7046029288634856825
+  %#27 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#28 = load i64, ptr %#27, align 1
+  %#29 = mul i64 %#28, -4417276706812531889
+  %#30 = add i64 %#29, %#7
+  %#31 = fshl i64 %#30, i64 %#30, i64 31
+  %#32 = mul i64 %#31, -7046029288634856825
+  %#33 = fshl i64 %#14, i64 %#14, i64 1
+  %#34 = fshl i64 %#20, i64 %#20, i64 7
+  %#35 = add i64 %#34, %#33
+  %#36 = fshl i64 %#26, i64 %#26, i64 12
+  %#37 = add i64 %#35, %#36
+  %#38 = fshl i64 %#32, i64 %#32, i64 18
+  %#39 = add i64 %#37, %#38
+  %#40 = mul i64 %#13, -2381459717836149591
+  %#41 = fshl i64 %#40, i64 %#40, i64 31
+  %#42 = mul i64 %#41, -7046029288634856825
+  %#43 = xor i64 %#39, %#42
+  %#44 = mul i64 %#43, -7046029288634856825
+  %#45 = add i64 %#44, -8796714831421723037
+  %#46 = mul i64 %#19, -2381459717836149591
+  %#47 = fshl i64 %#46, i64 %#46, i64 31
+  %#48 = mul i64 %#47, -7046029288634856825
+  %#49 = xor i64 %#45, %#48
+  %#50 = mul i64 %#49, -7046029288634856825
+  %#51 = add i64 %#50, -8796714831421723037
+  %#52 = mul i64 %#25, -2381459717836149591
+  %#53 = fshl i64 %#52, i64 %#52, i64 31
+  %#54 = mul i64 %#53, -7046029288634856825
+  %#55 = xor i64 %#51, %#54
+  %#56 = mul i64 %#55, -7046029288634856825
+  %#57 = add i64 %#56, -8796714831421723037
+  %#58 = mul i64 %#31, -2381459717836149591
+  %#59 = fshl i64 %#58, i64 %#58, i64 31
+  %#60 = mul i64 %#59, -7046029288634856825
+  %#61 = xor i64 %#57, %#60
+  %#62 = mul i64 %#61, -7046029288634856825
+  %#63 = add i64 %#62, -8796714831421723037
+  br label %#5
+
+#4:
+  %#64 = add i64 noundef %#1, 2870177450012600261
+  br label %#5
+
+#5:
+  %#65 = phi i64 [ 32, %#3 ], [ 0, %#4 ]
+  %#66 = phi i64 [ %#63, %#3 ], [ %#64, %#4 ]
+  %#67 = add i64 %#66, %#65
+  %#68 = lshr i64 %#67, 33
+  %#69 = xor i64 %#68, %#67
+  %#70 = mul i64 %#69, -4417276706812531889
+  %#71 = lshr i64 %#70, 29
+  %#72 = xor i64 %#71, %#70
+  %#73 = mul i64 %#72, 1609587929392839161
+  %#74 = lshr i64 %#73, 32
+  %#75 = xor i64 %#74, %#73
+  ret i64 %#75
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_20_13(ptr noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#8 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#8
+  memset ptr %#8 align 8, i8 0, i64 40
+  %#9 = icmp eq ptr noundef %#0, null
+  br i1 %#9, label %#6, label %#3
+
+#3:
+  %#10 = add i64 noundef %#1, 7046029288634856825
+  %#11 = add i64 noundef %#1, -4417276706812531889
+  %#12 = add i64 noundef %#1, 6983438078262162902
+  memcpy ptr %#8 align 8, ptr noundef %#0 align 1, i64 20
+  %#13 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i32 20, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#15 = gep inbounds nuw ptr %#8, 1 x i64 20
+  memcpy ptr %#15 align 4, ptr %#14 align 1, i64 12
+  %#16 = load i64, ptr %#8, align 8
+  %#17 = mul i64 %#16, -4417276706812531889
+  %#18 = add i64 %#17, %#12
+  %#19 = fshl i64 %#18, i64 %#18, i64 31
+  %#20 = mul i64 %#19, -7046029288634856825
+  %#21 = gep inbounds nuw ptr %#8, 1 x i64 8
+  %#22 = load i64, ptr %#21, align 8
+  %#23 = mul i64 %#22, -4417276706812531889
+  %#24 = add i64 %#23, %#11
+  %#25 = fshl i64 %#24, i64 %#24, i64 31
+  %#26 = mul i64 %#25, -7046029288634856825
+  %#27 = gep inbounds nuw ptr %#8, 1 x i64 16
+  %#28 = load i64, ptr %#27, align 8
+  %#29 = mul i64 %#28, -4417276706812531889
+  %#30 = add i64 %#29, noundef %#1
+  %#31 = fshl i64 %#30, i64 %#30, i64 31
+  %#32 = mul i64 %#31, -7046029288634856825
+  %#33 = gep inbounds nuw ptr %#8, 1 x i64 24
+  %#34 = load i64, ptr %#33, align 8
+  %#35 = mul i64 %#34, -4417276706812531889
+  %#36 = add i64 %#35, %#10
+  %#37 = fshl i64 %#36, i64 %#36, i64 31
+  %#38 = mul i64 %#37, -7046029288634856825
+  %#39 = gep inbounds nuw ptr %#8, 1 x i64 32
+  %#40 = load i32, ptr %#39, align 8
+  %#41 = sub i32 32, %#40
+  %#42 = icmp ult i32 %#41, 13
+  br i1 %#42, label %#4, label %#5
+
+#4:
+  %#43 = zext nneg i32 %#41 to i64
+  %#44 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#43
+  %#45 = gep inbounds nuw ptr %#44, 1 x i64 20
+  %#46 = gep inbounds nuw ptr noundef %#0, 1 x i64 33
+  %#47 = ptrtoint ptr %#46 to i64
+  %#48 = ptrtoint ptr %#45 to i64
+  %#49 = sub i64 %#47, %#48
+  memcpy ptr %#8 align 8, ptr %#45 align 1, i64 %#49
+  br label %#5
+
+#5:
+  %#50 = fshl i64 %#20, i64 %#20, i64 1
+  %#51 = fshl i64 %#26, i64 %#26, i64 7
+  %#52 = add i64 %#51, %#50
+  %#53 = fshl i64 %#32, i64 %#32, i64 12
+  %#54 = add i64 %#52, %#53
+  %#55 = fshl i64 %#38, i64 %#38, i64 18
+  %#56 = add i64 %#54, %#55
+  %#57 = mul i64 %#19, -2381459717836149591
+  %#58 = fshl i64 %#57, i64 %#57, i64 31
+  %#59 = mul i64 %#58, -7046029288634856825
+  %#60 = xor i64 %#56, %#59
+  %#61 = mul i64 %#60, -7046029288634856825
+  %#62 = add i64 %#61, -8796714831421723037
+  %#63 = mul i64 %#25, -2381459717836149591
+  %#64 = fshl i64 %#63, i64 %#63, i64 31
+  %#65 = mul i64 %#64, -7046029288634856825
+  %#66 = xor i64 %#62, %#65
+  %#67 = mul i64 %#66, -7046029288634856825
+  %#68 = add i64 %#67, -8796714831421723037
+  %#69 = mul i64 %#31, -2381459717836149591
+  %#70 = fshl i64 %#69, i64 %#69, i64 31
+  %#71 = mul i64 %#70, -7046029288634856825
+  %#72 = xor i64 %#68, %#71
+  %#73 = mul i64 %#72, -7046029288634856825
+  %#74 = add i64 %#73, -8796714831421723037
+  %#75 = mul i64 %#37, -2381459717836149591
+  %#76 = fshl i64 %#75, i64 %#75, i64 31
+  %#77 = mul i64 %#76, -7046029288634856825
+  %#78 = xor i64 %#74, %#77
+  %#79 = mul i64 %#78, -7046029288634856825
+  %#80 = add i64 %#79, -8796714831421723004
+  %#81 = load i8, ptr %#8, align 8
+  %#82 = zext i8 %#81 to i64
+  %#83 = mul i64 %#82, 2870177450012600261
+  %#84 = xor i64 %#83, %#80
+  %#85 = fshl i64 %#84, i64 %#84, i64 11
+  br label %#7
+
+#6:
+  %#86 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  memcpy ptr %#8 align 8, ptr %#86 align 1, i64 13
+  %#87 = add i64 noundef %#1, 2870177450012600274
+  %#88 = load i64, ptr %#8, align 8
+  %#89 = mul i64 %#88, -4417276706812531889
+  %#90 = fshl i64 %#89, i64 %#89, i64 31
+  %#91 = mul i64 %#90, -7046029288634856825
+  %#92 = xor i64 %#91, %#87
+  %#93 = fshl i64 %#92, i64 %#92, i64 27
+  %#94 = mul i64 %#93, -7046029288634856825
+  %#95 = add i64 %#94, -8796714831421723037
+  %#96 = gep inbounds nuw ptr %#8, 1 x i64 8
+  %#97 = load i32, ptr %#96, align 8
+  %#98 = zext i32 %#97 to i64
+  %#99 = mul i64 %#98, -7046029288634856825
+  %#100 = xor i64 %#99, %#95
+  %#101 = fshl i64 %#100, i64 %#100, i64 23
+  %#102 = mul i64 %#101, -4417276706812531889
+  %#103 = add i64 %#102, 1609587929392839161
+  %#104 = gep inbounds nuw ptr %#8, 1 x i64 12
+  %#105 = load i8, ptr %#104, align 4
+  %#106 = zext i8 %#105 to i64
+  %#107 = mul i64 %#106, 2870177450012600261
+  %#108 = xor i64 %#103, %#107
+  %#109 = fshl i64 %#108, i64 %#108, i64 11
+  br label %#7
+
+#7:
+  %#110 = phi i64 [ %#109, %#6 ], [ %#85, %#5 ]
+  %#111 = mul i64 %#110, -7046029288634856825
+  %#112 = lshr i64 %#111, 33
+  %#113 = xor i64 %#112, %#111
+  %#114 = mul i64 %#113, -4417276706812531889
+  %#115 = lshr i64 %#114, 29
+  %#116 = xor i64 %#115, %#114
+  %#117 = mul i64 %#116, 1609587929392839161
+  %#118 = lshr i64 %#117, 32
+  %#119 = xor i64 %#118, %#117
+  end_lifetime ptr %#8
+  ret i64 %#119
+}
+=>
+define i64 @target_s64_20_13(ptr noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#8 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#8
+  memset ptr %#8 align 8, i8 0, i64 40
+  %#9 = icmp eq ptr noundef %#0, null
+  br i1 %#9, label %#6, label %#3
+
+#3:
+  %#10 = add i64 noundef %#1, 7046029288634856825
+  %#11 = add i64 noundef %#1, -4417276706812531889
+  %#12 = add i64 noundef %#1, 6983438078262162902
+  memcpy ptr %#8 align 8, ptr noundef %#0 align 1, i64 20
+  %#13 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i32 20, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#15 = gep inbounds nuw ptr %#8, 1 x i64 20
+  memcpy ptr %#15 align 4, ptr %#14 align 1, i64 12
+  %#16 = load i64, ptr %#8, align 8
+  %#17 = mul i64 %#16, -4417276706812531889
+  %#18 = add i64 %#17, %#12
+  %#19 = fshl i64 %#18, i64 %#18, i64 31
+  %#20 = mul i64 %#19, -7046029288634856825
+  %#21 = gep inbounds nuw ptr %#8, 1 x i64 8
+  %#22 = load i64, ptr %#21, align 8
+  %#23 = mul i64 %#22, -4417276706812531889
+  %#24 = add i64 %#23, %#11
+  %#25 = fshl i64 %#24, i64 %#24, i64 31
+  %#26 = mul i64 %#25, -7046029288634856825
+  %#27 = gep inbounds nuw ptr %#8, 1 x i64 16
+  %#28 = load i64, ptr %#27, align 8
+  %#29 = mul i64 %#28, -4417276706812531889
+  %#30 = add i64 %#29, noundef %#1
+  %#31 = fshl i64 %#30, i64 %#30, i64 31
+  %#32 = mul i64 %#31, -7046029288634856825
+  %#33 = gep inbounds nuw ptr %#8, 1 x i64 24
+  %#34 = load i64, ptr %#33, align 8
+  %#35 = mul i64 %#34, -4417276706812531889
+  %#36 = add i64 %#35, %#10
+  %#37 = fshl i64 %#36, i64 %#36, i64 31
+  %#38 = mul i64 %#37, -7046029288634856825
+  %#39 = gep inbounds nuw ptr %#8, 1 x i64 32
+  %#40 = load i32, ptr %#39, align 8
+  %#41 = sub i32 32, %#40
+  %#42 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i32 0, ptr %#42, align 8
+  %#43 = icmp ult i32 %#41, 13
+  br i1 %#43, label %#4, label %#5
+
+#4:
+  %#44 = zext nneg i32 %#41 to i64
+  %#45 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#44
+  %#46 = gep inbounds nuw ptr %#45, 1 x i64 20
+  %#47 = gep inbounds nuw ptr noundef %#0, 1 x i64 33
+  %#48 = ptrtoint ptr %#47 to i64
+  %#49 = ptrtoint ptr %#46 to i64
+  %#50 = sub i64 %#48, %#49
+  memcpy ptr %#8 align 8, ptr %#46 align 1, i64 %#50
+  %#51 = trunc i64 %#50 to i32
+  %#52 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i32 %#51, ptr %#52, align 8
+  br label %#5
+
+#5:
+  %#53 = fshl i64 %#20, i64 %#20, i64 1
+  %#54 = fshl i64 %#26, i64 %#26, i64 7
+  %#55 = add i64 %#54, %#53
+  %#56 = fshl i64 %#32, i64 %#32, i64 12
+  %#57 = add i64 %#55, %#56
+  %#58 = fshl i64 %#38, i64 %#38, i64 18
+  %#59 = add i64 %#57, %#58
+  %#60 = mul i64 %#19, -2381459717836149591
+  %#61 = fshl i64 %#60, i64 %#60, i64 31
+  %#62 = mul i64 %#61, -7046029288634856825
+  %#63 = xor i64 %#59, %#62
+  %#64 = mul i64 %#63, -7046029288634856825
+  %#65 = add i64 %#64, -8796714831421723037
+  %#66 = mul i64 %#25, -2381459717836149591
+  %#67 = fshl i64 %#66, i64 %#66, i64 31
+  %#68 = mul i64 %#67, -7046029288634856825
+  %#69 = xor i64 %#65, %#68
+  %#70 = mul i64 %#69, -7046029288634856825
+  %#71 = add i64 %#70, -8796714831421723037
+  %#72 = mul i64 %#31, -2381459717836149591
+  %#73 = fshl i64 %#72, i64 %#72, i64 31
+  %#74 = mul i64 %#73, -7046029288634856825
+  %#75 = xor i64 %#71, %#74
+  %#76 = mul i64 %#75, -7046029288634856825
+  %#77 = add i64 %#76, -8796714831421723037
+  %#78 = mul i64 %#37, -2381459717836149591
+  %#79 = fshl i64 %#78, i64 %#78, i64 31
+  %#80 = mul i64 %#79, -7046029288634856825
+  %#81 = xor i64 %#77, %#80
+  %#82 = mul i64 %#81, -7046029288634856825
+  %#83 = add i64 %#82, -8796714831421723004
+  br label %#7
+
+#6:
+  %#84 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  memcpy ptr %#8 align 8, ptr %#84 align 1, i64 13
+  %#85 = gep inbounds nuw ptr %#8, 1 x i64 32
+  %#86 = load i32, ptr %#85, align 8
+  %#87 = add i32 %#86, 13
+  %#88 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i32 %#87, ptr %#88, align 8
+  %#89 = add i64 noundef %#1, 2870177450012600274
+  %#90 = load i64, ptr %#8, align 8
+  %#91 = mul i64 %#90, -4417276706812531889
+  %#92 = fshl i64 %#91, i64 %#91, i64 31
+  %#93 = mul i64 %#92, -7046029288634856825
+  %#94 = xor i64 %#93, %#89
+  %#95 = fshl i64 %#94, i64 %#94, i64 27
+  %#96 = mul i64 %#95, -7046029288634856825
+  %#97 = add i64 %#96, -8796714831421723037
+  %#98 = gep inbounds nuw ptr %#8, 1 x i64 8
+  %#99 = load i32, ptr %#98, align 8
+  %#100 = zext i32 %#99 to i64
+  %#101 = mul i64 %#100, -7046029288634856825
+  %#102 = xor i64 %#101, %#97
+  %#103 = gep inbounds nuw ptr %#8, 1 x i64 12
+  %#104 = fshl i64 %#102, i64 %#102, i64 23
+  %#105 = mul i64 %#104, -4417276706812531889
+  %#106 = add i64 %#105, 1609587929392839161
+  br label %#7
+
+#7:
+  %#107 = phi i64 [ %#106, %#6 ], [ %#83, %#5 ]
+  %#108 = phi ptr [ %#103, %#6 ], [ %#8, %#5 ]
+  %#109 = load i8, ptr %#108, align 4
+  %#110 = zext i8 %#109 to i64
+  %#111 = mul i64 %#110, 2870177450012600261
+  %#112 = xor i64 %#111, %#107
+  %#113 = fshl i64 %#112, i64 %#112, i64 11
+  %#114 = mul i64 %#113, -7046029288634856825
+  %#115 = lshr i64 %#114, 33
+  %#116 = xor i64 %#115, %#114
+  %#117 = mul i64 %#116, -4417276706812531889
+  %#118 = lshr i64 %#117, 29
+  %#119 = xor i64 %#118, %#117
+  %#120 = mul i64 %#119, 1609587929392839161
+  %#121 = lshr i64 %#120, 32
+  %#122 = xor i64 %#121, %#120
+  end_lifetime ptr %#8
+  ret i64 %#122
+}
+ERROR: SMT Error: smt tactic failed to show goal to be sat/unsat memout
+
+
+----------------------------------------
+define i64 @target_s64_40_23(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#8 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#8
+  %#9 = add i64 noundef %#1, 6983438078262162902
+  %#10 = add i64 noundef %#1, -4417276706812531889
+  %#11 = add i64 noundef %#1, 7046029288634856825
+  %#12 = gep inbounds nuw ptr %#8, 1 x i64 8
+  store i64 %#9, ptr %#12, align 8
+  %#13 = gep inbounds nuw ptr %#8, 1 x i64 16
+  store i64 %#10, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr %#8, 1 x i64 24
+  store i64 noundef %#1, ptr %#14, align 8
+  %#15 = gep inbounds nuw ptr %#8, 1 x i64 32
+  store i64 %#11, ptr %#15, align 8
+  %#16 = gep inbounds nuw ptr %#8, 1 x i64 40
+  memset ptr %#16 align 8, i8 0, i64 40
+  %#17 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#17, label %#5, label %#3
+
+#3:
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 40
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#20 = load i64, ptr %#19, align 1
+  %#21 = mul i64 %#20, -4417276706812531889
+  %#22 = add i64 %#21, %#11
+  %#23 = fshl i64 %#22, i64 %#22, i64 31
+  %#24 = mul i64 %#23, -7046029288634856825
+  %#25 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#26 = load i64, ptr %#25, align 1
+  %#27 = mul i64 %#26, -4417276706812531889
+  %#28 = add i64 %#27, noundef %#1
+  %#29 = fshl i64 %#28, i64 %#28, i64 31
+  %#30 = mul i64 %#29, -7046029288634856825
+  %#31 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#32 = load i64, ptr %#31, align 1
+  %#33 = mul i64 %#32, -4417276706812531889
+  %#34 = add i64 %#33, %#10
+  %#35 = fshl i64 %#34, i64 %#34, i64 31
+  %#36 = mul i64 %#35, -7046029288634856825
+  %#37 = load i64, ptr nowrite noundef %#0, align 1
+  %#38 = mul i64 %#37, -4417276706812531889
+  %#39 = add i64 %#38, %#9
+  %#40 = fshl i64 %#39, i64 %#39, i64 31
+  %#41 = mul i64 %#40, -7046029288634856825
+  %#42 = gep ptr nowrite noundef %#0, 1 x i64 32
+  store i64 %#41, ptr %#12, align 8
+  store i64 %#36, ptr %#13, align 8
+  store i64 %#30, ptr %#14, align 8
+  store i64 %#24, ptr %#15, align 8
+  %#43 = icmp ult ptr %#42, %#18
+  br i1 %#43, label %#4, label %#5
+
+#4:
+  %#44 = gep inbounds nuw ptr %#8, 1 x i64 72
+  %#45 = load i64, ptr %#42, align 1
+  store i64 %#45, ptr %#16, align 8
+  store i32 8, ptr %#44, align 8
+  br label %#5
+
+#5:
+  %#46 = phi i64 [ %#11, %#2 ], [ %#24, %#3 ], [ %#24, %#4 ]
+  %#47 = phi i64 [ noundef %#1, %#2 ], [ %#30, %#3 ], [ %#30, %#4 ]
+  %#48 = phi i64 [ %#10, %#2 ], [ %#36, %#3 ], [ %#36, %#4 ]
+  %#49 = phi i64 [ %#9, %#2 ], [ %#41, %#3 ], [ %#41, %#4 ]
+  %#50 = phi i64 [ 0, %#2 ], [ 0, %#3 ], [ 8, %#4 ]
+  %#51 = phi i64 [ 23, %#2 ], [ 63, %#3 ], [ 63, %#4 ]
+  store i64 %#51, ptr %#8, align 8
+  %#52 = gep inbounds nuw ptr %#8, 1 x i64 72
+  %#53 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 40
+  %#54 = gep inbounds nuw ptr %#16, 1 x i64 %#50
+  memcpy ptr %#54 align 8, ptr %#53 align 1, i64 23
+  %#55 = load i32, ptr %#52, align 8
+  %#56 = add i32 %#55, 23
+  store i32 %#56, ptr %#52, align 8
+  %#57 = fshl i64 %#49, i64 %#49, i64 1
+  %#58 = fshl i64 %#48, i64 %#48, i64 7
+  %#59 = add i64 %#58, %#57
+  %#60 = fshl i64 %#47, i64 %#47, i64 12
+  %#61 = add i64 %#59, %#60
+  %#62 = fshl i64 %#46, i64 %#46, i64 18
+  %#63 = add i64 %#61, %#62
+  %#64 = mul i64 %#49, -4417276706812531889
+  %#65 = fshl i64 %#64, i64 %#64, i64 31
+  %#66 = mul i64 %#65, -7046029288634856825
+  %#67 = xor i64 %#63, %#66
+  %#68 = mul i64 %#67, -7046029288634856825
+  %#69 = add i64 %#68, -8796714831421723037
+  %#70 = mul i64 %#48, -4417276706812531889
+  %#71 = fshl i64 %#70, i64 %#70, i64 31
+  %#72 = mul i64 %#71, -7046029288634856825
+  %#73 = xor i64 %#69, %#72
+  %#74 = mul i64 %#73, -7046029288634856825
+  %#75 = add i64 %#74, -8796714831421723037
+  %#76 = mul i64 %#47, -4417276706812531889
+  %#77 = fshl i64 %#76, i64 %#76, i64 31
+  %#78 = mul i64 %#77, -7046029288634856825
+  %#79 = xor i64 %#75, %#78
+  %#80 = mul i64 %#79, -7046029288634856825
+  %#81 = add i64 %#80, -8796714831421723037
+  %#82 = mul i64 %#46, -4417276706812531889
+  %#83 = fshl i64 %#82, i64 %#82, i64 31
+  %#84 = mul i64 %#83, -7046029288634856825
+  %#85 = xor i64 %#81, %#84
+  %#86 = mul i64 %#85, -7046029288634856825
+  %#87 = add i64 %#86, -8796714831421723037
+  %#88 = add i64 %#87, %#51
+  %#89 = and i64 %#51, 31
+  %#90 = icmp eq i64 %#89, 23
+  br i1 %#90, label %#7, label %#6
+
+#6:
+  %#91 = load i64, ptr %#16, align 8
+  %#92 = mul i64 %#91, -4417276706812531889
+  %#93 = fshl i64 %#92, i64 %#92, i64 31
+  %#94 = mul i64 %#93, -7046029288634856825
+  %#95 = gep inbounds nuw ptr %#8, 1 x i64 48
+  %#96 = xor i64 %#94, %#88
+  %#97 = fshl i64 %#96, i64 %#96, i64 27
+  %#98 = mul i64 %#97, -7046029288634856825
+  %#99 = add i64 %#98, -8796714831421723037
+  br label %#7
+
+#7:
+  %#100 = phi ptr [ %#16, %#5 ], [ %#95, %#6 ]
+  %#101 = phi i64 [ %#88, %#5 ], [ %#99, %#6 ]
+  %#102 = load i64, ptr %#100, align 8
+  %#103 = mul i64 %#102, -4417276706812531889
+  %#104 = fshl i64 %#103, i64 %#103, i64 31
+  %#105 = mul i64 %#104, -7046029288634856825
+  %#106 = gep inbounds nuw ptr %#100, 1 x i64 8
+  %#107 = xor i64 %#105, %#101
+  %#108 = fshl i64 %#107, i64 %#107, i64 27
+  %#109 = mul i64 %#108, -7046029288634856825
+  %#110 = add i64 %#109, -8796714831421723037
+  %#111 = load i64, ptr %#106, align 8
+  %#112 = mul i64 %#111, -4417276706812531889
+  %#113 = fshl i64 %#112, i64 %#112, i64 31
+  %#114 = mul i64 %#113, -7046029288634856825
+  %#115 = gep inbounds nuw ptr %#100, 1 x i64 16
+  %#116 = xor i64 %#114, %#110
+  %#117 = fshl i64 %#116, i64 %#116, i64 27
+  %#118 = mul i64 %#117, -7046029288634856825
+  %#119 = add i64 %#118, -8796714831421723037
+  %#120 = load i32, ptr %#115, align 8
+  %#121 = zext i32 %#120 to i64
+  %#122 = mul i64 %#121, -7046029288634856825
+  %#123 = xor i64 %#122, %#119
+  %#124 = gep inbounds nuw ptr %#100, 1 x i64 20
+  %#125 = fshl i64 %#123, i64 %#123, i64 23
+  %#126 = mul i64 %#125, -4417276706812531889
+  %#127 = add i64 %#126, 1609587929392839161
+  %#128 = gep inbounds nuw ptr %#100, 1 x i64 21
+  %#129 = load i8, ptr %#124, align 4
+  %#130 = zext i8 %#129 to i64
+  %#131 = mul i64 %#130, 2870177450012600261
+  %#132 = xor i64 %#131, %#127
+  %#133 = fshl i64 %#132, i64 %#132, i64 11
+  %#134 = mul i64 %#133, -7046029288634856825
+  %#135 = gep inbounds nuw ptr %#100, 1 x i64 22
+  %#136 = load i8, ptr %#128, align 1
+  %#137 = zext i8 %#136 to i64
+  %#138 = mul i64 %#137, 2870177450012600261
+  %#139 = xor i64 %#138, %#134
+  %#140 = fshl i64 %#139, i64 %#139, i64 11
+  %#141 = mul i64 %#140, -7046029288634856825
+  %#142 = load i8, ptr %#135, align 2
+  %#143 = zext i8 %#142 to i64
+  %#144 = mul i64 %#143, 2870177450012600261
+  %#145 = xor i64 %#144, %#141
+  %#146 = fshl i64 %#145, i64 %#145, i64 11
+  %#147 = mul i64 %#146, -7046029288634856825
+  %#148 = lshr i64 %#147, 33
+  %#149 = xor i64 %#148, %#147
+  %#150 = mul i64 %#149, -4417276706812531889
+  %#151 = lshr i64 %#150, 29
+  %#152 = xor i64 %#151, %#150
+  %#153 = mul i64 %#152, 1609587929392839161
+  %#154 = lshr i64 %#153, 32
+  %#155 = xor i64 %#154, %#153
+  end_lifetime ptr %#8
+  ret i64 %#155
+}
+=>
+define i64 @target_s64_40_23(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#15 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#15
+  %#16 = add i64 noundef %#1, 6983438078262162902
+  %#17 = add i64 noundef %#1, -4417276706812531889
+  %#18 = add i64 noundef %#1, 7046029288634856825
+  %#19 = gep inbounds nuw ptr %#15, 1 x i64 8
+  store i64 %#16, ptr %#19, align 8
+  %#20 = gep inbounds nuw ptr %#15, 1 x i64 16
+  store i64 %#17, ptr %#20, align 8
+  %#21 = gep inbounds nuw ptr %#15, 1 x i64 24
+  store i64 noundef %#1, ptr %#21, align 8
+  %#22 = gep inbounds nuw ptr %#15, 1 x i64 32
+  store i64 %#18, ptr %#22, align 8
+  %#23 = gep inbounds nuw ptr %#15, 1 x i64 40
+  memset ptr %#23 align 8, i8 0, i64 40
+  %#24 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#24, label %#5, label %#3
+
+#3:
+  %#25 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 40
+  %#26 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#27 = load i64, ptr %#26, align 1
+  %#28 = mul i64 %#27, -4417276706812531889
+  %#29 = add i64 %#28, %#18
+  %#30 = fshl i64 %#29, i64 %#29, i64 31
+  %#31 = mul i64 %#30, -7046029288634856825
+  %#32 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#33 = load i64, ptr %#32, align 1
+  %#34 = mul i64 %#33, -4417276706812531889
+  %#35 = add i64 %#34, noundef %#1
+  %#36 = fshl i64 %#35, i64 %#35, i64 31
+  %#37 = mul i64 %#36, -7046029288634856825
+  %#38 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#39 = load i64, ptr %#38, align 1
+  %#40 = mul i64 %#39, -4417276706812531889
+  %#41 = add i64 %#40, %#17
+  %#42 = fshl i64 %#41, i64 %#41, i64 31
+  %#43 = mul i64 %#42, -7046029288634856825
+  %#44 = load i64, ptr nowrite noundef %#0, align 1
+  %#45 = mul i64 %#44, -4417276706812531889
+  %#46 = add i64 %#45, %#16
+  %#47 = fshl i64 %#46, i64 %#46, i64 31
+  %#48 = mul i64 %#47, -7046029288634856825
+  %#49 = gep ptr nowrite noundef %#0, 1 x i64 32
+  store i64 %#48, ptr %#19, align 8
+  store i64 %#43, ptr %#20, align 8
+  store i64 %#37, ptr %#21, align 8
+  store i64 %#31, ptr %#22, align 8
+  %#50 = icmp ult ptr %#49, %#25
+  br i1 %#50, label %#4, label %#5
+
+#4:
+  %#51 = gep inbounds nuw ptr %#15, 1 x i64 72
+  %#52 = load i64, ptr %#49, align 1
+  store i64 %#52, ptr %#23, align 8
+  store i32 8, ptr %#51, align 8
+  br label %#5
+
+#5:
+  %#53 = phi i64 [ %#18, %#2 ], [ %#31, %#3 ], [ %#31, %#4 ]
+  %#54 = phi i64 [ noundef %#1, %#2 ], [ %#37, %#3 ], [ %#37, %#4 ]
+  %#55 = phi i64 [ %#17, %#2 ], [ %#43, %#3 ], [ %#43, %#4 ]
+  %#56 = phi i64 [ %#16, %#2 ], [ %#48, %#3 ], [ %#48, %#4 ]
+  %#57 = phi i64 [ 0, %#2 ], [ 0, %#3 ], [ 8, %#4 ]
+  %#58 = phi i64 [ 23, %#2 ], [ 63, %#3 ], [ 63, %#4 ]
+  store i64 %#58, ptr %#15, align 8
+  %#59 = gep inbounds nuw ptr %#15, 1 x i64 72
+  %#60 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 40
+  %#61 = gep inbounds nuw ptr %#23, 1 x i64 %#57
+  memcpy ptr %#61 align 8, ptr %#60 align 1, i64 23
+  %#62 = load i32, ptr %#59, align 8
+  %#63 = add i32 %#62, 23
+  store i32 %#63, ptr %#59, align 8
+  %#64 = fshl i64 %#56, i64 %#56, i64 1
+  %#65 = fshl i64 %#55, i64 %#55, i64 7
+  %#66 = add i64 %#65, %#64
+  %#67 = fshl i64 %#54, i64 %#54, i64 12
+  %#68 = add i64 %#66, %#67
+  %#69 = fshl i64 %#53, i64 %#53, i64 18
+  %#70 = add i64 %#68, %#69
+  %#71 = mul i64 %#56, -4417276706812531889
+  %#72 = fshl i64 %#71, i64 %#71, i64 31
+  %#73 = mul i64 %#72, -7046029288634856825
+  %#74 = xor i64 %#70, %#73
+  %#75 = mul i64 %#74, -7046029288634856825
+  %#76 = add i64 %#75, -8796714831421723037
+  %#77 = mul i64 %#55, -4417276706812531889
+  %#78 = fshl i64 %#77, i64 %#77, i64 31
+  %#79 = mul i64 %#78, -7046029288634856825
+  %#80 = xor i64 %#76, %#79
+  %#81 = mul i64 %#80, -7046029288634856825
+  %#82 = add i64 %#81, -8796714831421723037
+  %#83 = mul i64 %#54, -4417276706812531889
+  %#84 = fshl i64 %#83, i64 %#83, i64 31
+  %#85 = mul i64 %#84, -7046029288634856825
+  %#86 = xor i64 %#82, %#85
+  %#87 = mul i64 %#86, -7046029288634856825
+  %#88 = add i64 %#87, -8796714831421723037
+  %#89 = mul i64 %#53, -4417276706812531889
+  %#90 = fshl i64 %#89, i64 %#89, i64 31
+  %#91 = mul i64 %#90, -7046029288634856825
+  %#92 = xor i64 %#88, %#91
+  %#93 = mul i64 %#92, -7046029288634856825
+  %#94 = add i64 %#93, -8796714831421723037
+  %#95 = add i64 %#94, %#58
+  %#96 = and i64 %#58, 31
+  br label %#6
+
+#6:
+  %#97 = phi i64 [ %#108, %#6 ], [ %#95, %#5 ]
+  %#98 = phi ptr [ %#104, %#6 ], [ %#23, %#5 ]
+  %#99 = phi i64 [ %#109, %#6 ], [ %#96, %#5 ]
+  %#100 = load i64, ptr %#98, align 8
+  %#101 = mul i64 %#100, -4417276706812531889
+  %#102 = fshl i64 %#101, i64 %#101, i64 31
+  %#103 = mul i64 %#102, -7046029288634856825
+  %#104 = gep inbounds nuw ptr %#98, 1 x i64 8
+  %#105 = xor i64 %#103, %#97
+  %#106 = fshl i64 %#105, i64 %#105, i64 27
+  %#107 = mul i64 %#106, -7046029288634856825
+  %#108 = add i64 %#107, -8796714831421723037
+  %#109 = add nsw i64 %#99, -8
+  %#110 = icmp ugt i64 %#109, 7
+  br i1 %#110, label %#6, label %#7
+
+#7:
+  %#111 = icmp samesign ugt i64 %#109, 3
+  br i1 %#111, label %#8, label %#9
+
+#8:
+  %#112 = load i32, ptr %#104, align 8
+  %#113 = zext i32 %#112 to i64
+  %#114 = mul i64 %#113, -7046029288634856825
+  %#115 = xor i64 %#114, %#108
+  %#116 = gep inbounds nuw ptr %#98, 1 x i64 12
+  %#117 = fshl i64 %#115, i64 %#115, i64 23
+  %#118 = mul i64 %#117, -4417276706812531889
+  %#119 = add i64 %#118, 1609587929392839161
+  %#120 = add nsw i64 %#99, -12
+  br label %#9
+
+#9:
+  %#121 = phi i64 [ %#120, %#8 ], [ %#109, %#7 ]
+  %#122 = phi ptr [ %#116, %#8 ], [ %#104, %#7 ]
+  %#123 = phi i64 [ %#119, %#8 ], [ %#108, %#7 ]
+  %#124 = icmp eq i64 %#121, 0
+  br i1 %#124, label %#14, label %#10
+
+#10:
+  %#125 = and i64 %#121, 7
+  %#126 = icmp eq i64 %#125, 0
+  br i1 %#126, label %#12, label %#11
+
+#11:
+  %#127 = phi i64 [ %#137, %#11 ], [ %#123, %#10 ]
+  %#128 = phi ptr [ %#131, %#11 ], [ %#122, %#10 ]
+  %#129 = phi i64 [ %#138, %#11 ], [ %#121, %#10 ]
+  %#130 = phi i64 [ %#139, %#11 ], [ 0, %#10 ]
+  %#131 = gep inbounds nuw ptr %#128, 1 x i64 1
+  %#132 = load i8, ptr %#128, align 1
+  %#133 = zext i8 %#132 to i64
+  %#134 = mul i64 %#133, 2870177450012600261
+  %#135 = xor i64 %#134, %#127
+  %#136 = fshl i64 %#135, i64 %#135, i64 11
+  %#137 = mul i64 %#136, -7046029288634856825
+  %#138 = add nsw i64 %#129, -1
+  %#139 = add i64 %#130, 1
+  %#140 = icmp eq i64 %#139, %#125
+  br i1 %#140, label %#12, label %#11
+
+#12:
+  %#141 = phi i64 [ poison, %#10 ], [ %#137, %#11 ]
+  %#142 = phi i64 [ %#123, %#10 ], [ %#137, %#11 ]
+  %#143 = phi ptr [ %#122, %#10 ], [ %#131, %#11 ]
+  %#144 = phi i64 [ %#121, %#10 ], [ %#138, %#11 ]
+  %#145 = icmp ult i64 %#121, 8
+  br i1 %#145, label %#14, label %#13
+
+#13:
+  %#146 = phi i64 [ %#204, %#13 ], [ %#142, %#12 ]
+  %#147 = phi ptr [ %#198, %#13 ], [ %#143, %#12 ]
+  %#148 = phi i64 [ %#205, %#13 ], [ %#144, %#12 ]
+  %#149 = gep inbounds nuw ptr %#147, 1 x i64 1
+  %#150 = load i8, ptr %#147, align 1
+  %#151 = zext i8 %#150 to i64
+  %#152 = mul i64 %#151, 2870177450012600261
+  %#153 = xor i64 %#152, %#146
+  %#154 = fshl i64 %#153, i64 %#153, i64 11
+  %#155 = mul i64 %#154, -7046029288634856825
+  %#156 = gep inbounds nuw ptr %#147, 1 x i64 2
+  %#157 = load i8, ptr %#149, align 1
+  %#158 = zext i8 %#157 to i64
+  %#159 = mul i64 %#158, 2870177450012600261
+  %#160 = xor i64 %#159, %#155
+  %#161 = fshl i64 %#160, i64 %#160, i64 11
+  %#162 = mul i64 %#161, -7046029288634856825
+  %#163 = gep inbounds nuw ptr %#147, 1 x i64 3
+  %#164 = load i8, ptr %#156, align 1
+  %#165 = zext i8 %#164 to i64
+  %#166 = mul i64 %#165, 2870177450012600261
+  %#167 = xor i64 %#166, %#162
+  %#168 = fshl i64 %#167, i64 %#167, i64 11
+  %#169 = mul i64 %#168, -7046029288634856825
+  %#170 = gep inbounds nuw ptr %#147, 1 x i64 4
+  %#171 = load i8, ptr %#163, align 1
+  %#172 = zext i8 %#171 to i64
+  %#173 = mul i64 %#172, 2870177450012600261
+  %#174 = xor i64 %#173, %#169
+  %#175 = fshl i64 %#174, i64 %#174, i64 11
+  %#176 = mul i64 %#175, -7046029288634856825
+  %#177 = gep inbounds nuw ptr %#147, 1 x i64 5
+  %#178 = load i8, ptr %#170, align 1
+  %#179 = zext i8 %#178 to i64
+  %#180 = mul i64 %#179, 2870177450012600261
+  %#181 = xor i64 %#180, %#176
+  %#182 = fshl i64 %#181, i64 %#181, i64 11
+  %#183 = mul i64 %#182, -7046029288634856825
+  %#184 = gep inbounds nuw ptr %#147, 1 x i64 6
+  %#185 = load i8, ptr %#177, align 1
+  %#186 = zext i8 %#185 to i64
+  %#187 = mul i64 %#186, 2870177450012600261
+  %#188 = xor i64 %#187, %#183
+  %#189 = fshl i64 %#188, i64 %#188, i64 11
+  %#190 = mul i64 %#189, -7046029288634856825
+  %#191 = gep inbounds nuw ptr %#147, 1 x i64 7
+  %#192 = load i8, ptr %#184, align 1
+  %#193 = zext i8 %#192 to i64
+  %#194 = mul i64 %#193, 2870177450012600261
+  %#195 = xor i64 %#194, %#190
+  %#196 = fshl i64 %#195, i64 %#195, i64 11
+  %#197 = mul i64 %#196, -7046029288634856825
+  %#198 = gep inbounds nuw ptr %#147, 1 x i64 8
+  %#199 = load i8, ptr %#191, align 1
+  %#200 = zext i8 %#199 to i64
+  %#201 = mul i64 %#200, 2870177450012600261
+  %#202 = xor i64 %#201, %#197
+  %#203 = fshl i64 %#202, i64 %#202, i64 11
+  %#204 = mul i64 %#203, -7046029288634856825
+  %#205 = add nsw i64 %#148, -8
+  %#206 = icmp eq i64 %#205, 0
+  br i1 %#206, label %#14, label %#13
+
+#14:
+  %#207 = phi i64 [ %#123, %#9 ], [ %#141, %#12 ], [ %#204, %#13 ]
+  %#208 = lshr i64 %#207, 33
+  %#209 = xor i64 %#208, %#207
+  %#210 = mul i64 %#209, -4417276706812531889
+  %#211 = lshr i64 %#210, 29
+  %#212 = xor i64 %#211, %#210
+  %#213 = mul i64 %#212, 1609587929392839161
+  %#214 = lshr i64 %#213, 32
+  %#215 = xor i64 %#214, %#213
+  end_lifetime ptr %#15
+  ret i64 %#215
+}
+ERROR: The target program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i64 @target_s64_3_60(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#14 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#14
+  %#15 = add i64 noundef %#1, 6983438078262162902
+  %#16 = add i64 noundef %#1, -4417276706812531889
+  %#17 = add i64 noundef %#1, 7046029288634856825
+  memset ptr %#14 align 8, i8 0, i64 40
+  %#18 = icmp eq ptr nowrite noundef %#0, null
+  %#19 = gep inbounds nuw ptr %#14, 1 x i64 32
+  br i1 %#18, label %#4, label %#3
+
+#3:
+  memcpy ptr %#14 align 8, ptr nowrite noundef %#0 align 1, i64 3
+  %#20 = gep inbounds nuw ptr %#14, 1 x i64 32
+  store i32 3, ptr %#20, align 8
+  %#21 = gep inbounds nuw ptr %#14, 1 x i64 32
+  %#22 = gep inbounds nuw ptr %#14, 1 x i64 32
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 3
+  %#24 = gep inbounds nuw ptr %#14, 1 x i64 3
+  memcpy ptr %#24 align 1, ptr %#23 align 1, i64 29
+  %#25 = load i64, ptr %#14, align 8
+  %#26 = mul i64 %#25, -4417276706812531889
+  %#27 = add i64 %#26, %#15
+  %#28 = fshl i64 %#27, i64 %#27, i64 31
+  %#29 = mul i64 %#28, -7046029288634856825
+  %#30 = gep inbounds nuw ptr %#14, 1 x i64 8
+  %#31 = load i64, ptr %#30, align 8
+  %#32 = mul i64 %#31, -4417276706812531889
+  %#33 = add i64 %#32, %#16
+  %#34 = fshl i64 %#33, i64 %#33, i64 31
+  %#35 = mul i64 %#34, -7046029288634856825
+  %#36 = gep inbounds nuw ptr %#14, 1 x i64 16
+  %#37 = load i64, ptr %#36, align 8
+  %#38 = mul i64 %#37, -4417276706812531889
+  %#39 = add i64 %#38, noundef %#1
+  %#40 = fshl i64 %#39, i64 %#39, i64 31
+  %#41 = mul i64 %#40, -7046029288634856825
+  %#42 = gep inbounds nuw ptr %#14, 1 x i64 24
+  %#43 = load i64, ptr %#42, align 8
+  %#44 = mul i64 %#43, -4417276706812531889
+  %#45 = add i64 %#44, %#17
+  %#46 = fshl i64 %#45, i64 %#45, i64 31
+  %#47 = mul i64 %#46, -7046029288634856825
+  %#48 = gep inbounds nuw ptr %#14, 1 x i64 32
+  %#49 = load i32, ptr %#48, align 8
+  %#50 = sub i32 32, %#49
+  %#51 = zext i32 %#50 to i64
+  %#52 = add nsw nuw i64 %#51, 3
+  %#53 = icmp ugt i32 %#50, 28
+  br i1 %#53, label %#5, label %#4
+
+#4:
+  %#54 = phi i64 [ %#52, %#3 ], [ 3, %#2 ]
+  %#55 = phi i64 [ %#29, %#3 ], [ %#15, %#2 ]
+  %#56 = phi i64 [ %#35, %#3 ], [ %#16, %#2 ]
+  %#57 = phi i64 [ %#41, %#3 ], [ noundef %#1, %#2 ]
+  %#58 = phi i64 [ %#47, %#3 ], [ %#17, %#2 ]
+  %#59 = phi i64 [ 63, %#3 ], [ 60, %#2 ]
+  %#60 = phi ptr [ %#22, %#3 ], [ %#19, %#2 ]
+  %#61 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#54
+  %#62 = load i64, ptr %#61, align 1
+  %#63 = mul i64 %#62, -4417276706812531889
+  %#64 = add i64 %#63, %#55
+  %#65 = fshl i64 %#64, i64 %#64, i64 31
+  %#66 = mul i64 %#65, -7046029288634856825
+  %#67 = gep inbounds nuw ptr %#61, 1 x i64 8
+  %#68 = load i64, ptr %#67, align 1
+  %#69 = mul i64 %#68, -4417276706812531889
+  %#70 = add i64 %#69, %#56
+  %#71 = fshl i64 %#70, i64 %#70, i64 31
+  %#72 = mul i64 %#71, -7046029288634856825
+  %#73 = gep inbounds nuw ptr %#61, 1 x i64 16
+  %#74 = load i64, ptr %#73, align 1
+  %#75 = mul i64 %#74, -4417276706812531889
+  %#76 = add i64 %#75, %#57
+  %#77 = fshl i64 %#76, i64 %#76, i64 31
+  %#78 = mul i64 %#77, -7046029288634856825
+  %#79 = gep inbounds nuw ptr %#61, 1 x i64 24
+  %#80 = load i64, ptr %#79, align 1
+  %#81 = mul i64 %#80, -4417276706812531889
+  %#82 = add i64 %#81, %#58
+  %#83 = fshl i64 %#82, i64 %#82, i64 31
+  %#84 = mul i64 %#83, -7046029288634856825
+  %#85 = add nsw nuw i64 %#54, 32
+  br label %#5
+
+#5:
+  %#86 = phi i64 [ %#59, %#4 ], [ 63, %#3 ]
+  %#87 = phi ptr [ %#60, %#4 ], [ %#21, %#3 ]
+  %#88 = phi i64 [ %#84, %#4 ], [ %#47, %#3 ]
+  %#89 = phi i64 [ %#72, %#4 ], [ %#35, %#3 ]
+  %#90 = phi i64 [ %#66, %#4 ], [ %#29, %#3 ]
+  %#91 = phi i64 [ %#78, %#4 ], [ %#41, %#3 ]
+  %#92 = phi i64 [ %#85, %#4 ], [ %#52, %#3 ]
+  %#93 = icmp samesign ult i64 %#92, 63
+  br i1 %#93, label %#6, label %#7
+
+#6:
+  %#94 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#92
+  %#95 = sub nsw nuw i64 63, %#92
+  memcpy ptr %#14 align 8, ptr %#94 align 1, i64 %#95
+  %#96 = trunc nsw nuw i64 %#95 to i32
+  store i32 %#96, ptr %#87, align 8
+  br label %#7
+
+#7:
+  %#97 = fshl i64 %#89, i64 %#89, i64 7
+  %#98 = fshl i64 %#90, i64 %#90, i64 1
+  %#99 = add i64 %#97, %#98
+  %#100 = fshl i64 %#91, i64 %#91, i64 12
+  %#101 = add i64 %#99, %#100
+  %#102 = fshl i64 %#88, i64 %#88, i64 18
+  %#103 = add i64 %#101, %#102
+  %#104 = mul i64 %#90, -4417276706812531889
+  %#105 = fshl i64 %#104, i64 %#104, i64 31
+  %#106 = mul i64 %#105, -7046029288634856825
+  %#107 = xor i64 %#103, %#106
+  %#108 = mul i64 %#107, -7046029288634856825
+  %#109 = add i64 %#108, -8796714831421723037
+  %#110 = mul i64 %#89, -4417276706812531889
+  %#111 = fshl i64 %#110, i64 %#110, i64 31
+  %#112 = mul i64 %#111, -7046029288634856825
+  %#113 = xor i64 %#109, %#112
+  %#114 = mul i64 %#113, -7046029288634856825
+  %#115 = add i64 %#114, -8796714831421723037
+  %#116 = mul i64 %#91, -4417276706812531889
+  %#117 = fshl i64 %#116, i64 %#116, i64 31
+  %#118 = mul i64 %#117, -7046029288634856825
+  %#119 = xor i64 %#115, %#118
+  %#120 = mul i64 %#119, -7046029288634856825
+  %#121 = add i64 %#120, -8796714831421723037
+  %#122 = mul i64 %#88, -4417276706812531889
+  %#123 = fshl i64 %#122, i64 %#122, i64 31
+  %#124 = mul i64 %#123, -7046029288634856825
+  %#125 = xor i64 %#121, %#124
+  %#126 = mul i64 %#125, -7046029288634856825
+  %#127 = add i64 %#126, -8796714831421723037
+  %#128 = add i64 %#127, %#86
+  %#129 = and i64 %#86, 31
+  switch i64 %#129, label %#8 [
+    i64 31, label %#9
+    i64 30, label %#10
+    i64 29, label %#11
+    i64 28, label %#12
+  ]
+
+#8:
+  assume i1 0
+
+#9:
+  %#130 = gep inbounds nuw ptr %#14, 1 x i64 29
+  %#131 = load i8, ptr %#130, align 1
+  %#132 = zext i8 %#131 to i64
+  %#133 = mul i64 %#132, 2870177450012600261
+  %#134 = gep inbounds nuw ptr %#14, 1 x i64 28
+  %#135 = load i8, ptr %#134, align 4
+  %#136 = zext i8 %#135 to i64
+  %#137 = mul i64 %#136, 2870177450012600261
+  %#138 = gep inbounds nuw ptr %#14, 1 x i64 24
+  %#139 = load i32, ptr %#138, align 8
+  %#140 = zext i32 %#139 to i64
+  %#141 = mul i64 %#140, -7046029288634856825
+  %#142 = gep inbounds nuw ptr %#14, 1 x i64 16
+  %#143 = load i64, ptr %#142, align 8
+  %#144 = mul i64 %#143, -4417276706812531889
+  %#145 = fshl i64 %#144, i64 %#144, i64 31
+  %#146 = mul i64 %#145, -7046029288634856825
+  %#147 = gep inbounds nuw ptr %#14, 1 x i64 8
+  %#148 = load i64, ptr %#147, align 8
+  %#149 = mul i64 %#148, -4417276706812531889
+  %#150 = fshl i64 %#149, i64 %#149, i64 31
+  %#151 = mul i64 %#150, -7046029288634856825
+  %#152 = load i64, ptr %#14, align 8
+  %#153 = mul i64 %#152, -4417276706812531889
+  %#154 = fshl i64 %#153, i64 %#153, i64 31
+  %#155 = mul i64 %#154, -7046029288634856825
+  %#156 = xor i64 %#155, %#128
+  %#157 = fshl i64 %#156, i64 %#156, i64 27
+  %#158 = mul i64 %#157, -7046029288634856825
+  %#159 = add i64 %#158, -8796714831421723037
+  %#160 = xor i64 %#151, %#159
+  %#161 = fshl i64 %#160, i64 %#160, i64 27
+  %#162 = mul i64 %#161, -7046029288634856825
+  %#163 = add i64 %#162, -8796714831421723037
+  %#164 = xor i64 %#146, %#163
+  %#165 = fshl i64 %#164, i64 %#164, i64 27
+  %#166 = mul i64 %#165, -7046029288634856825
+  %#167 = add i64 %#166, -8796714831421723037
+  %#168 = xor i64 %#141, %#167
+  %#169 = fshl i64 %#168, i64 %#168, i64 23
+  %#170 = mul i64 %#169, -4417276706812531889
+  %#171 = add i64 %#170, 1609587929392839161
+  %#172 = xor i64 %#137, %#171
+  %#173 = fshl i64 %#172, i64 %#172, i64 11
+  %#174 = mul i64 %#173, -7046029288634856825
+  %#175 = xor i64 %#133, %#174
+  %#176 = fshl i64 %#175, i64 %#175, i64 11
+  %#177 = mul i64 %#176, -7046029288634856825
+  %#178 = gep inbounds nuw ptr %#14, 1 x i64 30
+  %#179 = load i8, ptr %#178, align 2
+  %#180 = zext i8 %#179 to i64
+  %#181 = mul i64 %#180, 2870177450012600261
+  %#182 = xor i64 %#181, %#177
+  %#183 = fshl i64 %#182, i64 %#182, i64 11
+  %#184 = mul i64 %#183, -7046029288634856825
+  br label %#13
+
+#10:
+  %#185 = gep inbounds nuw ptr %#14, 1 x i64 16
+  %#186 = load i64, ptr %#185, align 8
+  %#187 = mul i64 %#186, -4417276706812531889
+  %#188 = fshl i64 %#187, i64 %#187, i64 31
+  %#189 = mul i64 %#188, -7046029288634856825
+  %#190 = gep inbounds nuw ptr %#14, 1 x i64 8
+  %#191 = load i64, ptr %#190, align 8
+  %#192 = mul i64 %#191, -4417276706812531889
+  %#193 = fshl i64 %#192, i64 %#192, i64 31
+  %#194 = mul i64 %#193, -7046029288634856825
+  %#195 = load i64, ptr %#14, align 8
+  %#196 = mul i64 %#195, -4417276706812531889
+  %#197 = fshl i64 %#196, i64 %#196, i64 31
+  %#198 = mul i64 %#197, -7046029288634856825
+  %#199 = xor i64 %#198, %#128
+  %#200 = fshl i64 %#199, i64 %#199, i64 27
+  %#201 = mul i64 %#200, -7046029288634856825
+  %#202 = add i64 %#201, -8796714831421723037
+  %#203 = xor i64 %#194, %#202
+  %#204 = fshl i64 %#203, i64 %#203, i64 27
+  %#205 = mul i64 %#204, -7046029288634856825
+  %#206 = add i64 %#205, -8796714831421723037
+  %#207 = xor i64 %#189, %#206
+  %#208 = fshl i64 %#207, i64 %#207, i64 27
+  %#209 = mul i64 %#208, -7046029288634856825
+  %#210 = add i64 %#209, -8796714831421723037
+  %#211 = gep inbounds nuw ptr %#14, 1 x i64 24
+  %#212 = load i32, ptr %#211, align 8
+  %#213 = zext i32 %#212 to i64
+  %#214 = mul i64 %#213, -7046029288634856825
+  %#215 = xor i64 %#214, %#210
+  %#216 = fshl i64 %#215, i64 %#215, i64 23
+  %#217 = mul i64 %#216, -4417276706812531889
+  %#218 = add i64 %#217, 1609587929392839161
+  %#219 = gep inbounds nuw ptr %#14, 1 x i64 28
+  %#220 = load i8, ptr %#219, align 4
+  %#221 = zext i8 %#220 to i64
+  %#222 = mul i64 %#221, 2870177450012600261
+  %#223 = xor i64 %#218, %#222
+  %#224 = fshl i64 %#223, i64 %#223, i64 11
+  %#225 = mul i64 %#224, -7046029288634856825
+  %#226 = gep inbounds nuw ptr %#14, 1 x i64 29
+  %#227 = load i8, ptr %#226, align 1
+  %#228 = zext i8 %#227 to i64
+  %#229 = mul i64 %#228, 2870177450012600261
+  %#230 = xor i64 %#225, %#229
+  %#231 = fshl i64 %#230, i64 %#230, i64 11
+  %#232 = mul i64 %#231, -7046029288634856825
+  br label %#13
+
+#11:
+  %#233 = gep inbounds nuw ptr %#14, 1 x i64 16
+  %#234 = load i64, ptr %#233, align 8
+  %#235 = mul i64 %#234, -4417276706812531889
+  %#236 = fshl i64 %#235, i64 %#235, i64 31
+  %#237 = mul i64 %#236, -7046029288634856825
+  %#238 = gep inbounds nuw ptr %#14, 1 x i64 8
+  %#239 = load i64, ptr %#238, align 8
+  %#240 = mul i64 %#239, -4417276706812531889
+  %#241 = fshl i64 %#240, i64 %#240, i64 31
+  %#242 = mul i64 %#241, -7046029288634856825
+  %#243 = load i64, ptr %#14, align 8
+  %#244 = mul i64 %#243, -4417276706812531889
+  %#245 = fshl i64 %#244, i64 %#244, i64 31
+  %#246 = mul i64 %#245, -7046029288634856825
+  %#247 = xor i64 %#246, %#128
+  %#248 = fshl i64 %#247, i64 %#247, i64 27
+  %#249 = mul i64 %#248, -7046029288634856825
+  %#250 = add i64 %#249, -8796714831421723037
+  %#251 = xor i64 %#242, %#250
+  %#252 = fshl i64 %#251, i64 %#251, i64 27
+  %#253 = mul i64 %#252, -7046029288634856825
+  %#254 = add i64 %#253, -8796714831421723037
+  %#255 = xor i64 %#237, %#254
+  %#256 = fshl i64 %#255, i64 %#255, i64 27
+  %#257 = mul i64 %#256, -7046029288634856825
+  %#258 = add i64 %#257, -8796714831421723037
+  %#259 = gep inbounds nuw ptr %#14, 1 x i64 24
+  %#260 = load i32, ptr %#259, align 8
+  %#261 = zext i32 %#260 to i64
+  %#262 = mul i64 %#261, -7046029288634856825
+  %#263 = xor i64 %#262, %#258
+  %#264 = fshl i64 %#263, i64 %#263, i64 23
+  %#265 = mul i64 %#264, -4417276706812531889
+  %#266 = add i64 %#265, 1609587929392839161
+  %#267 = gep inbounds nuw ptr %#14, 1 x i64 28
+  %#268 = load i8, ptr %#267, align 4
+  %#269 = zext i8 %#268 to i64
+  %#270 = mul i64 %#269, 2870177450012600261
+  %#271 = xor i64 %#266, %#270
+  %#272 = fshl i64 %#271, i64 %#271, i64 11
+  %#273 = mul i64 %#272, -7046029288634856825
+  br label %#13
+
+#12:
+  %#274 = gep inbounds nuw ptr %#14, 1 x i64 16
+  %#275 = load i64, ptr %#274, align 8
+  %#276 = mul i64 %#275, -4417276706812531889
+  %#277 = fshl i64 %#276, i64 %#276, i64 31
+  %#278 = mul i64 %#277, -7046029288634856825
+  %#279 = gep inbounds nuw ptr %#14, 1 x i64 8
+  %#280 = load i64, ptr %#279, align 8
+  %#281 = mul i64 %#280, -4417276706812531889
+  %#282 = fshl i64 %#281, i64 %#281, i64 31
+  %#283 = mul i64 %#282, -7046029288634856825
+  %#284 = load i64, ptr %#14, align 8
+  %#285 = mul i64 %#284, -4417276706812531889
+  %#286 = fshl i64 %#285, i64 %#285, i64 31
+  %#287 = mul i64 %#286, -7046029288634856825
+  %#288 = xor i64 %#287, %#128
+  %#289 = fshl i64 %#288, i64 %#288, i64 27
+  %#290 = mul i64 %#289, -7046029288634856825
+  %#291 = add i64 %#290, -8796714831421723037
+  %#292 = xor i64 %#283, %#291
+  %#293 = fshl i64 %#292, i64 %#292, i64 27
+  %#294 = mul i64 %#293, -7046029288634856825
+  %#295 = add i64 %#294, -8796714831421723037
+  %#296 = xor i64 %#278, %#295
+  %#297 = fshl i64 %#296, i64 %#296, i64 27
+  %#298 = mul i64 %#297, -7046029288634856825
+  %#299 = add i64 %#298, -8796714831421723037
+  %#300 = gep inbounds nuw ptr %#14, 1 x i64 24
+  %#301 = load i32, ptr %#300, align 8
+  %#302 = zext i32 %#301 to i64
+  %#303 = mul i64 %#302, -7046029288634856825
+  %#304 = xor i64 %#303, %#299
+  %#305 = fshl i64 %#304, i64 %#304, i64 23
+  %#306 = mul i64 %#305, -4417276706812531889
+  %#307 = add i64 %#306, 1609587929392839161
+  br label %#13
+
+#13:
+  %#308 = phi i64 [ %#232, %#10 ], [ %#273, %#11 ], [ %#307, %#12 ], [ %#184, %#9 ]
+  %#309 = lshr i64 %#308, 33
+  %#310 = xor i64 %#309, %#308
+  %#311 = mul i64 %#310, -4417276706812531889
+  %#312 = lshr i64 %#311, 29
+  %#313 = xor i64 %#312, %#311
+  %#314 = mul i64 %#313, 1609587929392839161
+  %#315 = lshr i64 %#314, 32
+  %#316 = xor i64 %#315, %#314
+  end_lifetime ptr %#14
+  ret i64 %#316
+}
+=>
+define i64 @target_s64_3_60(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#19 = alloca i64 88, align 8, dead
+  start_lifetime ptr %#19
+  %#20 = add i64 noundef %#1, 6983438078262162902
+  %#21 = add i64 noundef %#1, -4417276706812531889
+  %#22 = add i64 noundef %#1, 7046029288634856825
+  %#23 = gep inbounds nuw ptr %#19, 1 x i64 8
+  %#24 = gep inbounds nuw ptr %#19, 1 x i64 16
+  %#25 = gep inbounds nuw ptr %#19, 1 x i64 24
+  %#26 = gep inbounds nuw ptr %#19, 1 x i64 32
+  %#27 = gep inbounds nuw ptr %#19, 1 x i64 40
+  memset ptr %#27 align 8, i8 0, i64 40
+  %#28 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#28, label %#4, label %#3
+
+#3:
+  %#29 = gep inbounds nuw ptr %#19, 1 x i64 72
+  memcpy ptr %#27 align 8, ptr nowrite noundef %#0 align 1, i64 3
+  store i32 3, ptr %#29, align 8
+  store i64 63, ptr %#19, align 8
+  %#30 = gep inbounds nuw ptr %#19, 1 x i64 72
+  %#31 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 3
+  %#32 = gep inbounds nuw ptr %#19, 1 x i64 43
+  memcpy ptr %#32 align 1, ptr %#31 align 1, i64 29
+  %#33 = load i64, ptr %#27, align 8
+  %#34 = mul i64 %#33, -4417276706812531889
+  %#35 = add i64 %#34, %#20
+  %#36 = fshl i64 %#35, i64 %#35, i64 31
+  %#37 = mul i64 %#36, -7046029288634856825
+  store i64 %#37, ptr %#23, align 8
+  %#38 = gep inbounds nuw ptr %#19, 1 x i64 48
+  %#39 = load i64, ptr %#38, align 8
+  %#40 = mul i64 %#39, -4417276706812531889
+  %#41 = add i64 %#40, %#21
+  %#42 = fshl i64 %#41, i64 %#41, i64 31
+  %#43 = mul i64 %#42, -7046029288634856825
+  store i64 %#43, ptr %#24, align 8
+  %#44 = gep inbounds nuw ptr %#19, 1 x i64 56
+  %#45 = load i64, ptr %#44, align 8
+  %#46 = mul i64 %#45, -4417276706812531889
+  %#47 = add i64 %#46, noundef %#1
+  %#48 = fshl i64 %#47, i64 %#47, i64 31
+  %#49 = mul i64 %#48, -7046029288634856825
+  store i64 %#49, ptr %#25, align 8
+  %#50 = gep inbounds nuw ptr %#19, 1 x i64 64
+  %#51 = load i64, ptr %#50, align 8
+  %#52 = mul i64 %#51, -4417276706812531889
+  %#53 = add i64 %#52, %#22
+  %#54 = fshl i64 %#53, i64 %#53, i64 31
+  %#55 = mul i64 %#54, -7046029288634856825
+  store i64 %#55, ptr %#26, align 8
+  %#56 = load i32, ptr %#30, align 8
+  %#57 = sub i32 32, %#56
+  %#58 = zext i32 %#57 to i64
+  %#59 = add nsw nuw i64 %#58, 3
+  store i32 0, ptr %#30, align 8
+  %#60 = icmp ugt i32 %#57, 28
+  br i1 %#60, label %#6, label %#5
+
+#4:
+  store i64 60, ptr %#19, align 8
+  %#61 = gep inbounds nuw ptr %#19, 1 x i64 72
+  br label %#5
+
+#5:
+  %#62 = phi i64 [ 3, %#4 ], [ %#59, %#3 ]
+  %#63 = phi i64 [ %#20, %#4 ], [ %#37, %#3 ]
+  %#64 = phi i64 [ %#21, %#4 ], [ %#43, %#3 ]
+  %#65 = phi i64 [ noundef %#1, %#4 ], [ %#49, %#3 ]
+  %#66 = phi i64 [ %#22, %#4 ], [ %#55, %#3 ]
+  %#67 = phi i64 [ 60, %#4 ], [ 63, %#3 ]
+  %#68 = phi ptr [ %#61, %#4 ], [ %#30, %#3 ]
+  %#69 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#62
+  %#70 = load i64, ptr %#69, align 1
+  %#71 = mul i64 %#70, -4417276706812531889
+  %#72 = add i64 %#71, %#63
+  %#73 = fshl i64 %#72, i64 %#72, i64 31
+  %#74 = mul i64 %#73, -7046029288634856825
+  %#75 = gep inbounds nuw ptr %#69, 1 x i64 8
+  %#76 = load i64, ptr %#75, align 1
+  %#77 = mul i64 %#76, -4417276706812531889
+  %#78 = add i64 %#77, %#64
+  %#79 = fshl i64 %#78, i64 %#78, i64 31
+  %#80 = mul i64 %#79, -7046029288634856825
+  %#81 = gep inbounds nuw ptr %#69, 1 x i64 16
+  %#82 = load i64, ptr %#81, align 1
+  %#83 = mul i64 %#82, -4417276706812531889
+  %#84 = add i64 %#83, %#65
+  %#85 = fshl i64 %#84, i64 %#84, i64 31
+  %#86 = mul i64 %#85, -7046029288634856825
+  %#87 = gep inbounds nuw ptr %#69, 1 x i64 24
+  %#88 = load i64, ptr %#87, align 1
+  %#89 = mul i64 %#88, -4417276706812531889
+  %#90 = add i64 %#89, %#66
+  %#91 = fshl i64 %#90, i64 %#90, i64 31
+  %#92 = mul i64 %#91, -7046029288634856825
+  %#93 = add nsw nuw i64 %#62, 32
+  store i64 %#74, ptr %#23, align 8
+  store i64 %#80, ptr %#24, align 8
+  store i64 %#86, ptr %#25, align 8
+  store i64 %#92, ptr %#26, align 8
+  br label %#6
+
+#6:
+  %#94 = phi i64 [ %#67, %#5 ], [ 63, %#3 ]
+  %#95 = phi ptr [ %#68, %#5 ], [ %#30, %#3 ]
+  %#96 = phi i64 [ %#92, %#5 ], [ %#55, %#3 ]
+  %#97 = phi i64 [ %#80, %#5 ], [ %#43, %#3 ]
+  %#98 = phi i64 [ %#74, %#5 ], [ %#37, %#3 ]
+  %#99 = phi i64 [ %#86, %#5 ], [ %#49, %#3 ]
+  %#100 = phi i64 [ %#93, %#5 ], [ %#59, %#3 ]
+  %#101 = icmp samesign ult i64 %#100, 63
+  br i1 %#101, label %#7, label %#8
+
+#7:
+  %#102 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#100
+  %#103 = sub nsw nuw i64 63, %#100
+  memcpy ptr %#27 align 8, ptr %#102 align 1, i64 %#103
+  %#104 = trunc nsw nuw i64 %#103 to i32
+  store i32 %#104, ptr %#95, align 8
+  br label %#8
+
+#8:
+  %#105 = and i64 %#94, 31
+  %#106 = fshl i64 %#97, i64 %#97, i64 7
+  %#107 = fshl i64 %#98, i64 %#98, i64 1
+  %#108 = add i64 %#106, %#107
+  %#109 = fshl i64 %#99, i64 %#99, i64 12
+  %#110 = add i64 %#108, %#109
+  %#111 = fshl i64 %#96, i64 %#96, i64 18
+  %#112 = add i64 %#110, %#111
+  %#113 = mul i64 %#98, -4417276706812531889
+  %#114 = fshl i64 %#113, i64 %#113, i64 31
+  %#115 = mul i64 %#114, -7046029288634856825
+  %#116 = xor i64 %#112, %#115
+  %#117 = mul i64 %#116, -7046029288634856825
+  %#118 = add i64 %#117, -8796714831421723037
+  %#119 = mul i64 %#97, -4417276706812531889
+  %#120 = fshl i64 %#119, i64 %#119, i64 31
+  %#121 = mul i64 %#120, -7046029288634856825
+  %#122 = xor i64 %#118, %#121
+  %#123 = mul i64 %#122, -7046029288634856825
+  %#124 = add i64 %#123, -8796714831421723037
+  %#125 = mul i64 %#99, -4417276706812531889
+  %#126 = fshl i64 %#125, i64 %#125, i64 31
+  %#127 = mul i64 %#126, -7046029288634856825
+  %#128 = xor i64 %#124, %#127
+  %#129 = mul i64 %#128, -7046029288634856825
+  %#130 = add i64 %#129, -8796714831421723037
+  %#131 = mul i64 %#96, -4417276706812531889
+  %#132 = fshl i64 %#131, i64 %#131, i64 31
+  %#133 = mul i64 %#132, -7046029288634856825
+  %#134 = xor i64 %#130, %#133
+  %#135 = mul i64 %#134, -7046029288634856825
+  %#136 = add i64 %#135, -8796714831421723037
+  %#137 = add i64 %#136, %#94
+  %#138 = load i64, ptr %#27, align 8
+  %#139 = mul i64 %#138, -4417276706812531889
+  %#140 = fshl i64 %#139, i64 %#139, i64 31
+  %#141 = mul i64 %#140, -7046029288634856825
+  %#142 = gep inbounds nuw ptr %#19, 1 x i64 48
+  %#143 = xor i64 %#141, %#137
+  %#144 = fshl i64 %#143, i64 %#143, i64 27
+  %#145 = mul i64 %#144, -7046029288634856825
+  %#146 = add i64 %#145, -8796714831421723037
+  %#147 = add nsw i64 %#105, -8
+  %#148 = icmp ugt i64 %#147, 7
+  br i1 %#148, label %#9, label %#11
+
+#9:
+  %#149 = load i64, ptr %#142, align 8
+  %#150 = mul i64 %#149, -4417276706812531889
+  %#151 = fshl i64 %#150, i64 %#150, i64 31
+  %#152 = mul i64 %#151, -7046029288634856825
+  %#153 = gep inbounds nuw ptr %#19, 1 x i64 56
+  %#154 = xor i64 %#152, %#146
+  %#155 = fshl i64 %#154, i64 %#154, i64 27
+  %#156 = mul i64 %#155, -7046029288634856825
+  %#157 = add i64 %#156, -8796714831421723037
+  %#158 = add nsw i64 %#105, -16
+  %#159 = icmp ugt i64 %#158, 7
+  br i1 %#159, label %#10, label %#11
+
+#10:
+  %#160 = load i64, ptr %#153, align 8
+  %#161 = mul i64 %#160, -4417276706812531889
+  %#162 = fshl i64 %#161, i64 %#161, i64 31
+  %#163 = mul i64 %#162, -7046029288634856825
+  %#164 = gep inbounds nuw ptr %#19, 1 x i64 64
+  %#165 = xor i64 %#163, %#157
+  %#166 = fshl i64 %#165, i64 %#165, i64 27
+  %#167 = mul i64 %#166, -7046029288634856825
+  %#168 = add i64 %#167, -8796714831421723037
+  %#169 = add nsw i64 %#105, -24
+  br label %#11
+
+#11:
+  %#170 = phi ptr [ %#27, %#8 ], [ %#142, %#9 ], [ %#153, %#10 ]
+  %#171 = phi i64 [ %#105, %#8 ], [ %#147, %#9 ], [ %#158, %#10 ]
+  %#172 = phi ptr [ %#142, %#8 ], [ %#153, %#9 ], [ %#164, %#10 ]
+  %#173 = phi i64 [ %#146, %#8 ], [ %#157, %#9 ], [ %#168, %#10 ]
+  %#174 = phi i64 [ %#147, %#8 ], [ %#158, %#9 ], [ %#169, %#10 ]
+  %#175 = icmp samesign ugt i64 %#174, 3
+  br i1 %#175, label %#12, label %#13
+
+#12:
+  %#176 = load i32, ptr %#172, align 8
+  %#177 = zext i32 %#176 to i64
+  %#178 = mul i64 %#177, -7046029288634856825
+  %#179 = xor i64 %#178, %#173
+  %#180 = gep inbounds nuw ptr %#170, 1 x i64 12
+  %#181 = fshl i64 %#179, i64 %#179, i64 23
+  %#182 = mul i64 %#181, -4417276706812531889
+  %#183 = add i64 %#182, 1609587929392839161
+  %#184 = add nsw i64 %#171, -12
+  br label %#13
+
+#13:
+  %#185 = phi i64 [ %#184, %#12 ], [ %#174, %#11 ]
+  %#186 = phi ptr [ %#180, %#12 ], [ %#172, %#11 ]
+  %#187 = phi i64 [ %#183, %#12 ], [ %#173, %#11 ]
+  %#188 = icmp eq i64 %#185, 0
+  br i1 %#188, label %#18, label %#14
+
+#14:
+  %#189 = and i64 %#185, 7
+  %#190 = icmp eq i64 %#189, 0
+  br i1 %#190, label %#16, label %#15
+
+#15:
+  %#191 = phi i64 [ %#201, %#15 ], [ %#187, %#14 ]
+  %#192 = phi ptr [ %#195, %#15 ], [ %#186, %#14 ]
+  %#193 = phi i64 [ %#202, %#15 ], [ %#185, %#14 ]
+  %#194 = phi i64 [ %#203, %#15 ], [ 0, %#14 ]
+  %#195 = gep inbounds nuw ptr %#192, 1 x i64 1
+  %#196 = load i8, ptr %#192, align 1
+  %#197 = zext i8 %#196 to i64
+  %#198 = mul i64 %#197, 2870177450012600261
+  %#199 = xor i64 %#198, %#191
+  %#200 = fshl i64 %#199, i64 %#199, i64 11
+  %#201 = mul i64 %#200, -7046029288634856825
+  %#202 = add nsw i64 %#193, -1
+  %#203 = add i64 %#194, 1
+  %#204 = icmp eq i64 %#203, %#189
+  br i1 %#204, label %#16, label %#15
+
+#16:
+  %#205 = phi i64 [ poison, %#14 ], [ %#201, %#15 ]
+  %#206 = phi i64 [ %#187, %#14 ], [ %#201, %#15 ]
+  %#207 = phi ptr [ %#186, %#14 ], [ %#195, %#15 ]
+  %#208 = phi i64 [ %#185, %#14 ], [ %#202, %#15 ]
+  %#209 = icmp ult i64 %#185, 8
+  br i1 %#209, label %#18, label %#17
+
+#17:
+  %#210 = phi i64 [ %#268, %#17 ], [ %#206, %#16 ]
+  %#211 = phi ptr [ %#262, %#17 ], [ %#207, %#16 ]
+  %#212 = phi i64 [ %#269, %#17 ], [ %#208, %#16 ]
+  %#213 = gep inbounds nuw ptr %#211, 1 x i64 1
+  %#214 = load i8, ptr %#211, align 1
+  %#215 = zext i8 %#214 to i64
+  %#216 = mul i64 %#215, 2870177450012600261
+  %#217 = xor i64 %#216, %#210
+  %#218 = fshl i64 %#217, i64 %#217, i64 11
+  %#219 = mul i64 %#218, -7046029288634856825
+  %#220 = gep inbounds nuw ptr %#211, 1 x i64 2
+  %#221 = load i8, ptr %#213, align 1
+  %#222 = zext i8 %#221 to i64
+  %#223 = mul i64 %#222, 2870177450012600261
+  %#224 = xor i64 %#223, %#219
+  %#225 = fshl i64 %#224, i64 %#224, i64 11
+  %#226 = mul i64 %#225, -7046029288634856825
+  %#227 = gep inbounds nuw ptr %#211, 1 x i64 3
+  %#228 = load i8, ptr %#220, align 1
+  %#229 = zext i8 %#228 to i64
+  %#230 = mul i64 %#229, 2870177450012600261
+  %#231 = xor i64 %#230, %#226
+  %#232 = fshl i64 %#231, i64 %#231, i64 11
+  %#233 = mul i64 %#232, -7046029288634856825
+  %#234 = gep inbounds nuw ptr %#211, 1 x i64 4
+  %#235 = load i8, ptr %#227, align 1
+  %#236 = zext i8 %#235 to i64
+  %#237 = mul i64 %#236, 2870177450012600261
+  %#238 = xor i64 %#237, %#233
+  %#239 = fshl i64 %#238, i64 %#238, i64 11
+  %#240 = mul i64 %#239, -7046029288634856825
+  %#241 = gep inbounds nuw ptr %#211, 1 x i64 5
+  %#242 = load i8, ptr %#234, align 1
+  %#243 = zext i8 %#242 to i64
+  %#244 = mul i64 %#243, 2870177450012600261
+  %#245 = xor i64 %#244, %#240
+  %#246 = fshl i64 %#245, i64 %#245, i64 11
+  %#247 = mul i64 %#246, -7046029288634856825
+  %#248 = gep inbounds nuw ptr %#211, 1 x i64 6
+  %#249 = load i8, ptr %#241, align 1
+  %#250 = zext i8 %#249 to i64
+  %#251 = mul i64 %#250, 2870177450012600261
+  %#252 = xor i64 %#251, %#247
+  %#253 = fshl i64 %#252, i64 %#252, i64 11
+  %#254 = mul i64 %#253, -7046029288634856825
+  %#255 = gep inbounds nuw ptr %#211, 1 x i64 7
+  %#256 = load i8, ptr %#248, align 1
+  %#257 = zext i8 %#256 to i64
+  %#258 = mul i64 %#257, 2870177450012600261
+  %#259 = xor i64 %#258, %#254
+  %#260 = fshl i64 %#259, i64 %#259, i64 11
+  %#261 = mul i64 %#260, -7046029288634856825
+  %#262 = gep inbounds nuw ptr %#211, 1 x i64 8
+  %#263 = load i8, ptr %#255, align 1
+  %#264 = zext i8 %#263 to i64
+  %#265 = mul i64 %#264, 2870177450012600261
+  %#266 = xor i64 %#265, %#261
+  %#267 = fshl i64 %#266, i64 %#266, i64 11
+  %#268 = mul i64 %#267, -7046029288634856825
+  %#269 = add nsw i64 %#212, -8
+  %#270 = icmp eq i64 %#269, 0
+  br i1 %#270, label %#18, label %#17
+
+#18:
+  %#271 = phi i64 [ %#187, %#13 ], [ %#205, %#16 ], [ %#268, %#17 ]
+  %#272 = lshr i64 %#271, 33
+  %#273 = xor i64 %#272, %#271
+  %#274 = mul i64 %#273, -4417276706812531889
+  %#275 = lshr i64 %#274, 29
+  %#276 = xor i64 %#275, %#274
+  %#277 = mul i64 %#276, 1609587929392839161
+  %#278 = lshr i64 %#277, 32
+  %#279 = xor i64 %#278, %#277
+  end_lifetime ptr %#19
+  ret i64 %#279
+}
+Transformation seems to be correct!
+
+Summary:
+  6 correct transformations
+  0 incorrect transformations
+  5 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,7 @@
+# `748d4225`: HIP packed-byte subtraction
+
+**Scoped verdict: `EQUIV_PARTIAL`.** The exact historical diff replaces 14 `__vsubss4` calls with `__vsub4`. [`reproduce.py`](reproduce.py) verifies the changed Git blobs, maps every replacement to its input mask and bias, and extracts the unchanged implementations of both helpers from that commit's `vendors/hip.h`. Clang 20 compiles these helper bodies to distinct LLVM IR; Alive2 proves both directions for five byte-bound families: Q4 (0–15 minus 8), Q5 (0–31 minus 16), Q3 (0–7 minus 4), Q3 scale/Q6 (0–63 minus 32), and Q3's separate low/high operands (0–3 minus 0 or 4). These families cover the arithmetic operands at all 14 replacement sites. The [result](result.json) contains all ten successful Alive2 outputs and source/IR hashes.
+
+The two helpers are **not** equal for arbitrary operands. An [Alive2 counterexample](unrestricted-counterexample.log) gives `a=0`, `b=0x80`: the old saturated low byte is 127 and the new wrapping low byte is 128. This control confirms why the source masks matter; it is outside the quantized call-site ranges.
+
+This proves only the packed-byte subtraction values under the source-derived bounds. It does not verify complete HIP kernels, the added AMD scheduling barrier, other changed code, or NVIDIA's separate implementations of these intrinsics. No official historical before/after benchmark score was measured. Reproduce from the project root with `python3 -B history-eq/gpu/llama.cpp/748d4225/reproduce.py`.

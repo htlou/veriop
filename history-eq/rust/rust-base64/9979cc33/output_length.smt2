@@ -1,0 +1,5 @@
+(set-logic QF_LIA)
+(declare-const n Int)
+(assert (or (= n 0) (= n 2) (= n 3) (= n 4) (= n 6) (= n 7) (= n 8)))
+(assert (not (= (ite (= n 0) 0 (ite (= n 2) 8 (ite (= n 3) 16 (ite (= n 4) 24 (ite (= n 6) 32 (ite (= n 7) 40 (ite (= n 8) 48 0))))))) (* (div (* n 6) 8) 8))))
+(check-sat)

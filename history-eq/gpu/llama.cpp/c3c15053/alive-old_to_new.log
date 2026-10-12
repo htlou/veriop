@@ -1,0 +1,303 @@
+
+----------------------------------------
+define i32 @target(i32 noundef %#0, i64 noundef %#1, i64 noundef %#2, i64 noundef %#3) {
+#4:
+  %#11 = alloca i64 4, align 4
+  %#12 = alloca i64 8, align 8
+  %#13 = alloca i64 8, align 8
+  %#14 = alloca i64 8, align 8
+  %#15 = alloca i64 24, align 8
+  %#16 = alloca i64 24, align 8
+  %#17 = alloca i64 16, align 8
+  store i32 noundef %#0, ptr %#11, align 4
+  store i64 noundef %#1, ptr %#12, align 8
+  store i64 noundef %#2, ptr %#13, align 8
+  store i64 noundef %#3, ptr %#14, align 8
+  %#18 = gep inbounds nuw ptr %#15, 24 x i32 0, 1 x i64 0
+  %#19 = load i32, ptr %#11, align 4
+  store i32 %#19, ptr %#18, align 8
+  %#20 = gep inbounds nuw ptr %#15, 24 x i32 0, 1 x i64 8
+  %#21 = load i64, ptr %#12, align 8
+  store i64 %#21, ptr %#20, align 8
+  %#22 = gep inbounds ptr %#20, 8 x i64 1
+  store i64 1, ptr %#22, align 8
+  %#23 = gep inbounds nuw ptr %#16, 24 x i32 0, 1 x i64 0
+  store i32 0, ptr %#23, align 8
+  %#24 = gep inbounds nuw ptr %#16, 24 x i32 0, 1 x i64 8
+  %#25 = load i64, ptr %#13, align 8
+  store i64 %#25, ptr %#24, align 8
+  %#26 = gep inbounds ptr %#24, 8 x i64 1
+  %#27 = load i64, ptr %#14, align 8
+  store i64 %#27, ptr %#26, align 8
+  %#28 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 0
+  store ptr %#15, ptr %#28, align 8
+  %#29 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 8
+  store ptr %#16, ptr %#29, align 8
+  %#30 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 0
+  %#31 = load ptr, ptr %#30, align 8
+  %#32 = gep inbounds nuw ptr %#31, 24 x i32 0, 1 x i64 8
+  %#33 = gep inbounds ptr %#32, 16 x i64 0, 8 x i64 0
+  %#34 = load i64, ptr %#33, align 8
+  %#35 = srem i64 %#34, 4
+  %#36 = icmp eq i64 %#35, 0
+  br i1 %#36, label %#5, label %#10
+
+#5:
+  %#37 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 8
+  %#38 = load ptr, ptr %#37, align 8
+  %#39 = gep inbounds nuw ptr %#38, 24 x i32 0, 1 x i64 8
+  %#40 = gep inbounds ptr %#39, 16 x i64 0, 8 x i64 0
+  %#41 = load i64, ptr %#40, align 8
+  %#42 = srem i64 %#41, 4
+  %#43 = icmp eq i64 %#42, 0
+  br i1 %#43, label %#6, label %#10
+
+#6:
+  %#44 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 8
+  %#45 = load ptr, ptr %#44, align 8
+  %#46 = gep inbounds nuw ptr %#45, 24 x i32 0, 1 x i64 8
+  %#47 = gep inbounds ptr %#46, 16 x i64 0, 8 x i64 1
+  %#48 = load i64, ptr %#47, align 8
+  %#49 = srem i64 %#48, 4
+  %#50 = icmp eq i64 %#49, 0
+  br i1 %#50, label %#7, label %#10
+
+#7:
+  %#51 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 0
+  %#52 = load ptr, ptr %#51, align 8
+  %#53 = gep inbounds nuw ptr %#52, 24 x i32 0, 1 x i64 0
+  %#54 = load i32, ptr %#53, align 8
+  %#55 = icmp eq i32 %#54, 0
+  br i1 %#55, label %#9, label %#8
+
+#8:
+  %#56 = gep inbounds nuw ptr %#17, 16 x i32 0, 1 x i64 0
+  %#57 = load ptr, ptr %#56, align 8
+  %#58 = gep inbounds nuw ptr %#57, 24 x i32 0, 1 x i64 0
+  %#59 = load i32, ptr %#58, align 8
+  %#60 = icmp eq i32 %#59, 1
+  br label %#9
+
+#9:
+  %#61 = phi i1 [ 1, %#7 ], [ %#60, %#8 ]
+  br label %#10
+
+#10:
+  %#62 = phi i1 [ 0, %#6 ], [ 0, %#5 ], [ 0, %#4 ], [ %#61, %#9 ]
+  %#64 = select i1 %#62, i32 1, i32 0
+  ret i32 %#64
+}
+=>
+define i32 @target(i32 noundef %#0, i64 noundef %#1, i64 noundef %#2, i64 noundef %#3) {
+#4:
+  %#10 = alloca i64 4, align 4
+  %#11 = alloca i64 8, align 8
+  %#12 = alloca i64 8, align 8
+  %#13 = alloca i64 8, align 8
+  %#14 = alloca i64 24, align 8
+  %#15 = alloca i64 24, align 8
+  %#16 = alloca i64 16, align 8
+  store i32 noundef %#0, ptr %#10, align 4
+  store i64 noundef %#1, ptr %#11, align 8
+  store i64 noundef %#2, ptr %#12, align 8
+  store i64 noundef %#3, ptr %#13, align 8
+  %#17 = gep inbounds nuw ptr %#14, 24 x i32 0, 1 x i64 0
+  %#18 = load i32, ptr %#10, align 4
+  store i32 %#18, ptr %#17, align 8
+  %#19 = gep inbounds nuw ptr %#14, 24 x i32 0, 1 x i64 8
+  %#20 = load i64, ptr %#11, align 8
+  store i64 %#20, ptr %#19, align 8
+  %#21 = gep inbounds ptr %#19, 8 x i64 1
+  store i64 1, ptr %#21, align 8
+  %#22 = gep inbounds nuw ptr %#15, 24 x i32 0, 1 x i64 0
+  store i32 0, ptr %#22, align 8
+  %#23 = gep inbounds nuw ptr %#15, 24 x i32 0, 1 x i64 8
+  %#24 = load i64, ptr %#12, align 8
+  store i64 %#24, ptr %#23, align 8
+  %#25 = gep inbounds ptr %#23, 8 x i64 1
+  %#26 = load i64, ptr %#13, align 8
+  store i64 %#26, ptr %#25, align 8
+  %#27 = gep inbounds nuw ptr %#16, 16 x i32 0, 1 x i64 0
+  store ptr %#14, ptr %#27, align 8
+  %#28 = gep inbounds nuw ptr %#16, 16 x i32 0, 1 x i64 8
+  store ptr %#15, ptr %#28, align 8
+  %#29 = gep inbounds nuw ptr %#16, 16 x i32 0, 1 x i64 0
+  %#30 = load ptr, ptr %#29, align 8
+  %#31 = gep inbounds nuw ptr %#30, 24 x i32 0, 1 x i64 8
+  %#32 = gep inbounds ptr %#31, 16 x i64 0, 8 x i64 0
+  %#33 = load i64, ptr %#32, align 8
+  %#34 = srem i64 %#33, 4
+  %#35 = icmp eq i64 %#34, 0
+  br i1 %#35, label %#5, label %#9
+
+#5:
+  %#36 = gep inbounds nuw ptr %#16, 16 x i32 0, 1 x i64 8
+  %#37 = load ptr, ptr %#36, align 8
+  %#38 = gep inbounds nuw ptr %#37, 24 x i32 0, 1 x i64 8
+  %#39 = gep inbounds ptr %#38, 16 x i64 0, 8 x i64 0
+  %#40 = load i64, ptr %#39, align 8
+  %#41 = srem i64 %#40, 4
+  %#42 = icmp eq i64 %#41, 0
+  br i1 %#42, label %#6, label %#9
+
+#6:
+  %#43 = gep inbounds nuw ptr %#16, 16 x i32 0, 1 x i64 0
+  %#44 = load ptr, ptr %#43, align 8
+  %#45 = gep inbounds nuw ptr %#44, 24 x i32 0, 1 x i64 0
+  %#46 = load i32, ptr %#45, align 8
+  %#47 = icmp eq i32 %#46, 0
+  br i1 %#47, label %#8, label %#7
+
+#7:
+  %#48 = gep inbounds nuw ptr %#16, 16 x i32 0, 1 x i64 0
+  %#49 = load ptr, ptr %#48, align 8
+  %#50 = gep inbounds nuw ptr %#49, 24 x i32 0, 1 x i64 0
+  %#51 = load i32, ptr %#50, align 8
+  %#52 = icmp eq i32 %#51, 1
+  br label %#8
+
+#8:
+  %#53 = phi i1 [ 1, %#6 ], [ %#52, %#7 ]
+  br label %#9
+
+#9:
+  %#54 = phi i1 [ 0, %#5 ], [ 0, %#4 ], [ %#53, %#8 ]
+  %#56 = select i1 %#54, i32 1, i32 0
+  ret i32 %#56
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i64 noundef %#1 = #x0000000000000000 (0)
+i64 noundef %#2 = #x0000000000000000 (0)
+i64 noundef %#3 = #x0000000000000002 (2)
+
+Source:
+ptr %#11 = pointer(local, block_id=0, offset=0) / Address=#x230
+ptr %#12 = pointer(local, block_id=1, offset=0) / Address=#x210
+ptr %#13 = pointer(local, block_id=2, offset=0) / Address=#x200
+ptr %#14 = pointer(local, block_id=3, offset=0) / Address=#x260
+ptr %#15 = pointer(local, block_id=4, offset=0) / Address=#x270
+ptr %#16 = pointer(local, block_id=5, offset=0) / Address=#x240
+ptr %#17 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#18 = pointer(local, block_id=4, offset=0) / Address=#x270
+i32 %#19 = #x00000000 (0)
+ptr %#20 = pointer(local, block_id=4, offset=8) / Address=#x278
+i64 %#21 = #x0000000000000000 (0)
+ptr %#22 = pointer(local, block_id=4, offset=16) / Address=#x280
+ptr %#23 = pointer(local, block_id=5, offset=0) / Address=#x240
+ptr %#24 = pointer(local, block_id=5, offset=8) / Address=#x248
+i64 %#25 = #x0000000000000000 (0)
+ptr %#26 = pointer(local, block_id=5, offset=16) / Address=#x250
+i64 %#27 = #x0000000000000002 (2)
+ptr %#28 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#29 = pointer(local, block_id=6, offset=8) / Address=#x228
+ptr %#30 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#31 = pointer(local, block_id=4, offset=0) / Address=#x270
+ptr %#32 = pointer(local, block_id=4, offset=8) / Address=#x278
+ptr %#33 = pointer(local, block_id=4, offset=8) / Address=#x278
+i64 %#34 = #x0000000000000000 (0)
+i64 %#35 = #x0000000000000000 (0)
+i1 %#36 = #x1 (1)
+  >> Jump to %#5
+ptr %#37 = pointer(local, block_id=6, offset=8) / Address=#x228
+ptr %#38 = pointer(local, block_id=5, offset=0) / Address=#x240
+ptr %#39 = pointer(local, block_id=5, offset=8) / Address=#x248
+ptr %#40 = pointer(local, block_id=5, offset=8) / Address=#x248
+i64 %#41 = #x0000000000000000 (0)
+i64 %#42 = #x0000000000000000 (0)
+i1 %#43 = #x1 (1)
+  >> Jump to %#6
+ptr %#44 = pointer(local, block_id=6, offset=8) / Address=#x228
+ptr %#45 = pointer(local, block_id=5, offset=0) / Address=#x240
+ptr %#46 = pointer(local, block_id=5, offset=8) / Address=#x248
+ptr %#47 = pointer(local, block_id=5, offset=16) / Address=#x250
+i64 %#48 = #x0000000000000002 (2)
+i64 %#49 = #x0000000000000002 (2)
+i1 %#50 = #x0 (0)
+  >> Jump to %#10
+i1 %#62 = #x0 (0)
+i32 %#64 = #x00000000 (0)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 4	alloc type: 0	alive: false	address: 0
+
+LOCAL BLOCKS:
+Block 8 >	size: 4	align: 4	alloc type: 1	alive: true	address: 560
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 528
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 512
+Block 11 >	size: 8	align: 8	alloc type: 1	alive: true	address: 608
+Block 12 >	size: 24	align: 8	alloc type: 1	alive: true	address: 624
+Block 13 >	size: 24	align: 8	alloc type: 1	alive: true	address: 576
+Block 14 >	size: 16	align: 8	alloc type: 1	alive: true	address: 544
+
+Target:
+ptr %#10 = pointer(local, block_id=0, offset=0) / Address=#x234
+ptr %#11 = pointer(local, block_id=1, offset=0) / Address=#x240
+ptr %#12 = pointer(local, block_id=2, offset=0) / Address=#x270
+ptr %#13 = pointer(local, block_id=3, offset=0) / Address=#x238
+ptr %#14 = pointer(local, block_id=4, offset=0) / Address=#x250
+ptr %#15 = pointer(local, block_id=5, offset=0) / Address=#x200
+ptr %#16 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#17 = pointer(local, block_id=4, offset=0) / Address=#x250
+i32 %#18 = #x00000000 (0)
+ptr %#19 = pointer(local, block_id=4, offset=8) / Address=#x258
+i64 %#20 = #x0000000000000000 (0)
+ptr %#21 = pointer(local, block_id=4, offset=16) / Address=#x260
+ptr %#22 = pointer(local, block_id=5, offset=0) / Address=#x200
+ptr %#23 = pointer(local, block_id=5, offset=8) / Address=#x208
+i64 %#24 = #x0000000000000000 (0)
+ptr %#25 = pointer(local, block_id=5, offset=16) / Address=#x210
+i64 %#26 = #x0000000000000002 (2)
+ptr %#27 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#28 = pointer(local, block_id=6, offset=8) / Address=#x228
+ptr %#29 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#30 = pointer(local, block_id=4, offset=0) / Address=#x250
+ptr %#31 = pointer(local, block_id=4, offset=8) / Address=#x258
+ptr %#32 = pointer(local, block_id=4, offset=8) / Address=#x258
+i64 %#33 = #x0000000000000000 (0)
+i64 %#34 = #x0000000000000000 (0)
+i1 %#35 = #x1 (1)
+  >> Jump to %#5
+ptr %#36 = pointer(local, block_id=6, offset=8) / Address=#x228
+ptr %#37 = pointer(local, block_id=5, offset=0) / Address=#x200
+ptr %#38 = pointer(local, block_id=5, offset=8) / Address=#x208
+ptr %#39 = pointer(local, block_id=5, offset=8) / Address=#x208
+i64 %#40 = #x0000000000000000 (0)
+i64 %#41 = #x0000000000000000 (0)
+i1 %#42 = #x1 (1)
+  >> Jump to %#6
+ptr %#43 = pointer(local, block_id=6, offset=0) / Address=#x220
+ptr %#44 = pointer(local, block_id=4, offset=0) / Address=#x250
+ptr %#45 = pointer(local, block_id=4, offset=0) / Address=#x250
+i32 %#46 = #x00000000 (0)
+i1 %#47 = #x1 (1)
+  >> Jump to %#8
+i1 %#53 = #x1 (1)
+  >> Jump to %#9
+i1 %#54 = #x1 (1)
+i32 %#56 = #x00000001 (1)
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 8 >	size: 4	align: 4	alloc type: 1	alive: true	address: 564
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 576
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 624
+Block 11 >	size: 8	align: 8	alloc type: 1	alive: true	address: 568
+Block 12 >	size: 24	align: 8	alloc type: 1	alive: true	address: 592
+Block 13 >	size: 24	align: 8	alloc type: 1	alive: true	address: 512
+Block 14 >	size: 16	align: 8	alloc type: 1	alive: true	address: 544
+Source value: #x00000000 (0)
+Target value: #x00000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

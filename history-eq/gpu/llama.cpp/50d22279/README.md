@@ -1,0 +1,7 @@
+# `50d22279`: s390x four-lane reduction order
+
+**Scoped verdict: `NOT_EQUIV` for exact FP32 results.** The historical `simd-mappings.h` changes the s390x VXE/VXE2 `GGML_F32x4_REDUCE` macro from `((a+b)+c)+d` to `(a+d)+(b+c)` after the same register-folding loops. [`reproduce.py`](reproduce.py) checks the exact parent/child Git blobs, extracts the complete macro from each, and compiles both with Clang 20 for s390x z15. The compiler's `vec_reve` definition reverses the four float lanes; the portable witness uses that same lane order.
+
+For the eight-register macro input whose first register is `[33554432, -33554432, 1, 1]` and remaining registers are zero, the [complete extracted macro](witness.log) returns **2 before** and **0 after**. The [Alive2 comparison](alive2-tail.log) also finds the changed final four-lane reduction inequivalent (one incorrect transformation, zero inconclusive or tool errors). This is a finite, initialized input, not an undefined-value diagnostic. The changed order can alter rounding even though it sums the same four real numbers.
+
+This checks the reduction macro, not every caller or an entire llama.cpp inference run. The witness executes a portable model of the s390x lane intrinsics on x86; the exact historical macros also compile to [old](old-s390.ll) and [new](new-s390.ll) s390x LLVM IR, but no s390x hardware execution was performed. No official historical benchmark performance delta was measured. Reproduce from the project root with `python3 -B history-eq/gpu/llama.cpp/50d22279/reproduce.py`.

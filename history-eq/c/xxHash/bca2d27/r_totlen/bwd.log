@@ -1,0 +1,204 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/bca2d27/r_totlen/new.ll c/xxHash/bca2d27/r_totlen/old.ll
+
+----------------------------------------
+define i64 @target_s64_total_len(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree memory(argmem: read, inaccessiblemem: write) {
+#3:
+  %#7 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = and i64 noundef %#1, 4294967295
+  br label %#6
+
+#5:
+  %#9 = icmp eq i64 noundef %#1, 0
+  assume i1 %#9
+  br label %#6
+
+#6:
+  %#10 = phi i64 [ 0, %#5 ], [ %#8, %#4 ]
+  %#range_0_%#10 = !range i64 %#10, i64 0, i64 4294967296
+  ret i64 %#range_0_%#10
+}
+=>
+define i64 @target_s64_total_len(ptr nowrite noundef %#0, i64 noundef returned %#1, i64 noundef %#2) nofree noundef memory(argmem: read, inaccessiblemem: write) {
+#3:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#5
+
+#4:
+  %#7 = icmp eq i64 noundef returned %#1, 0
+  assume i1 %#7
+  br label %#5
+
+#5:
+  ret i64 noundef returned %#1
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=0, offset=1, attrs=3) / Address=#x1
+i64 noundef %#1 = #x0000000100000000 (4294967296)
+i64 noundef %#2 = #x0000000000000003 (3)
+
+Source:
+i1 %#7 = #x0 (0)
+  >> Jump to %#4
+i64 %#8 = #x0000000000000000 (0)
+  >> Jump to %#6
+i64 %#10 = #x0000000000000000 (0)
+i64 %#range_0_%#10 = #x0000000000000000 (0)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+i1 %#6 = #x0 (0)
+  >> Jump to %#5
+Source value: #x0000000000000000 (0)
+Target value: #x0000000100000000 (4294967296)
+
+
+----------------------------------------
+define i32 @target_s32_total_len(ptr nowrite noundef %#0, i64 noundef %#1, i32 noundef %#2) noundef memory(argmem: read, inaccessiblemem: write) {
+#3:
+  %#9 = add i32 noundef %#2, 606290984
+  %#10 = add i32 noundef %#2, 2246822519
+  %#11 = add i32 noundef %#2, 1640531535
+  %#12 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#12, label %#7, label %#4
+
+#4:
+  %#13 = trunc i64 noundef %#1 to i32
+  %#14 = icmp ult i64 noundef %#1, 16
+  br i1 %#14, label %#8, label %#5
+
+#5:
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#16 = gep inbounds ptr %#15, 1 x i64 -15
+  br label %#6
+
+#6:
+  %#17 = phi i32 [ %#11, %#5 ], [ %#48, %#6 ]
+  %#18 = phi i32 [ noundef %#2, %#5 ], [ %#41, %#6 ]
+  %#19 = phi i32 [ %#10, %#5 ], [ %#34, %#6 ]
+  %#20 = phi i32 [ %#9, %#5 ], [ %#27, %#6 ]
+  %#21 = phi ptr [ nowrite noundef %#0, %#5 ], [ %#49, %#6 ]
+  %#22 = load i32, ptr %#21, align 1
+  %#23 = mul i32 %#22, 2246822519
+  %#24 = add i32 %#23, %#20
+  %#25 = fshl i32 %#24, i32 %#24, i32 13
+  %#26 = mul i32 %#25, 2654435761
+  %#27 = freeze i32 %#26
+  %#28 = gep inbounds nuw ptr %#21, 1 x i64 4
+  %#29 = load i32, ptr %#28, align 1
+  %#30 = mul i32 %#29, 2246822519
+  %#31 = add i32 %#30, %#19
+  %#32 = fshl i32 %#31, i32 %#31, i32 13
+  %#33 = mul i32 %#32, 2654435761
+  %#34 = freeze i32 %#33
+  %#35 = gep inbounds nuw ptr %#21, 1 x i64 8
+  %#36 = load i32, ptr %#35, align 1
+  %#37 = mul i32 %#36, 2246822519
+  %#38 = add i32 %#37, %#18
+  %#39 = fshl i32 %#38, i32 %#38, i32 13
+  %#40 = mul i32 %#39, 2654435761
+  %#41 = freeze i32 %#40
+  %#42 = gep inbounds nuw ptr %#21, 1 x i64 12
+  %#43 = load i32, ptr %#42, align 1
+  %#44 = mul i32 %#43, 2246822519
+  %#45 = add i32 %#44, %#17
+  %#46 = fshl i32 %#45, i32 %#45, i32 13
+  %#47 = mul i32 %#46, 2654435761
+  %#48 = freeze i32 %#47
+  %#49 = gep inbounds nuw ptr %#21, 1 x i64 16
+  %#50 = icmp ult ptr %#49, %#16, offsetonly
+  br i1 %#50, label %#6, label %#8
+
+#7:
+  %#51 = icmp eq i64 noundef %#1, 0
+  assume i1 %#51
+  br label %#8
+
+#8:
+  %#52 = phi i32 [ 0, %#7 ], [ %#13, %#4 ], [ %#13, %#6 ]
+  ret i32 %#52
+}
+=>
+define i32 @target_s32_total_len(ptr nowrite noundef %#0, i64 noundef %#1, i32 noundef %#2) noundef memory(argmem: read, inaccessiblemem: write) {
+#3:
+  %#9 = add i32 noundef %#2, 606290984
+  %#10 = add i32 noundef %#2, 2246822519
+  %#11 = add i32 noundef %#2, 1640531535
+  %#12 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#12, label %#7, label %#4
+
+#4:
+  %#13 = trunc i64 noundef %#1 to i32
+  %#14 = icmp ult i64 noundef %#1, 16
+  br i1 %#14, label %#8, label %#5
+
+#5:
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#16 = gep inbounds ptr %#15, 1 x i64 -16
+  %#17 = icmp ugt ptr nowrite noundef %#0, %#16
+  br i1 %#17, label %#8, label %#6
+
+#6:
+  %#18 = phi i32 [ %#49, %#6 ], [ %#11, %#5 ]
+  %#19 = phi i32 [ %#42, %#6 ], [ noundef %#2, %#5 ]
+  %#20 = phi i32 [ %#35, %#6 ], [ %#10, %#5 ]
+  %#21 = phi i32 [ %#28, %#6 ], [ %#9, %#5 ]
+  %#22 = phi ptr [ %#50, %#6 ], [ nowrite noundef %#0, %#5 ]
+  %#23 = load i32, ptr %#22, align 1
+  %#24 = mul i32 %#23, 2246822519
+  %#25 = add i32 %#24, %#21
+  %#26 = fshl i32 %#25, i32 %#25, i32 13
+  %#27 = mul i32 %#26, 2654435761
+  %#28 = freeze i32 %#27
+  %#29 = gep inbounds nuw ptr %#22, 1 x i64 4
+  %#30 = load i32, ptr %#29, align 1
+  %#31 = mul i32 %#30, 2246822519
+  %#32 = add i32 %#31, %#20
+  %#33 = fshl i32 %#32, i32 %#32, i32 13
+  %#34 = mul i32 %#33, 2654435761
+  %#35 = freeze i32 %#34
+  %#36 = gep inbounds nuw ptr %#22, 1 x i64 8
+  %#37 = load i32, ptr %#36, align 1
+  %#38 = mul i32 %#37, 2246822519
+  %#39 = add i32 %#38, %#19
+  %#40 = fshl i32 %#39, i32 %#39, i32 13
+  %#41 = mul i32 %#40, 2654435761
+  %#42 = freeze i32 %#41
+  %#43 = gep inbounds nuw ptr %#22, 1 x i64 12
+  %#44 = load i32, ptr %#43, align 1
+  %#45 = mul i32 %#44, 2246822519
+  %#46 = add i32 %#45, %#18
+  %#47 = fshl i32 %#46, i32 %#46, i32 13
+  %#48 = mul i32 %#47, 2654435761
+  %#49 = freeze i32 %#48
+  %#50 = gep inbounds nuw ptr %#22, 1 x i64 16
+  %#51 = icmp ugt ptr %#50, %#16, offsetonly
+  br i1 %#51, label %#8, label %#6
+
+#7:
+  %#52 = icmp eq i64 noundef %#1, 0
+  assume i1 %#52
+  br label %#8
+
+#8:
+  %#53 = phi i32 [ 0, %#7 ], [ %#13, %#4 ], [ %#13, %#5 ], [ %#13, %#6 ]
+  ret i32 %#53
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

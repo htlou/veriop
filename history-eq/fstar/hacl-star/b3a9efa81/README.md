@@ -1,0 +1,7 @@
+# HACL* `b3a9efa8`: HPKE extraction inlining
+
+**Verdict: unverified for the optimization.** The historical parent is `3531390a7bc7a8ebb0a91c339d4776e76fc3cbc3`; the child is `b3a9efa8172956837172f41f8ef070a9601b4f93`. The only changed file is `code/hpke/Hacl.Impl.HPKE.fst`. The exact blobs are `8bc25bd7ef16d971d8d3108703ae185463b140bc` and `8aeea9721926de48ab4bcfe5cd2fe0ecb8f8471e`.
+
+[`check_source.py`](check_source.py) verifies those Git blob IDs and proves mechanically that the ten changed lines only remove `inline_for_extraction` from `noextract` declarations; every other F* source line is byte-identical. This establishes a narrow source-text fact, not the behavior of the generated C. The optimization changes extraction inlining, so generated-C equivalence is the relevant before/after question.
+
+The earlier installed-F* attempts stopped before the target at the historical `FStar.HyperStack` dependency ([old](fstar-old.log), [new](fstar-new.log)). Retrying both exact historical worktrees with installed F* 2026.10.06 and Z3 4.13.3 again stopped before the target, now with a syntax error in unchanged `Vale.Interop.X64.fsti` ([old](fstar-2026-10-06-old.log), [new](fstar-2026-10-06-new.log)). Neither run checked the target module or generated both historical C variants. There is no equivalence verdict or counterexample for the extracted implementation, and no official historical before/after benchmark score.

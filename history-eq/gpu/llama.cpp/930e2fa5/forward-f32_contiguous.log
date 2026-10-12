@@ -1,0 +1,38 @@
+
+----------------------------------------
+define {i64, i64} @compare_f32_contiguous(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn memory(none) {
+#4:
+  %#5 = zext i32 noundef %#0 to i64
+  %#6 = zext i32 noundef %#1 to i64
+  %#7 = shl nuw i64 %#6, 32
+  %#8 = or disjoint i64 %#7, %#5
+  %#9 = zext i32 noundef %#2 to i64
+  %#10 = zext i32 noundef %#3 to i64
+  %#11 = shl nuw i64 %#10, 32
+  %#12 = or disjoint i64 %#11, %#9
+  %#13 = insertvalue {i64, i64} poison, i64 %#8, 0
+  %#14 = insertvalue {i64, i64} %#13, i64 %#12, 1
+  ret {i64, i64} %#14
+}
+=>
+define {i64, i64} @compare_f32_contiguous(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn memory(none) {
+#4:
+  %#5 = zext i32 noundef %#1 to i64
+  %#6 = shl nuw i64 %#5, 32
+  %#7 = zext i32 noundef %#0 to i64
+  %#8 = or disjoint i64 %#6, %#7
+  %#9 = zext i32 noundef %#3 to i64
+  %#10 = shl nuw i64 %#9, 32
+  %#11 = zext i32 noundef %#2 to i64
+  %#12 = or disjoint i64 %#10, %#11
+  %#13 = insertvalue {i64, i64} poison, i64 %#8, 0
+  %#14 = insertvalue {i64, i64} %#13, i64 %#12, 1
+  ret {i64, i64} %#14
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

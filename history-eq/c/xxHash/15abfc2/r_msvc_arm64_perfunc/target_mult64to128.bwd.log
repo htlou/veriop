@@ -1,0 +1,50 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_mult64to128  new.ll old.ll
+
+----------------------------------------
+define void @target_mult64to128(ptr noread noundef initializes((0, 16)) %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = mul i64 noundef %#2, noundef %#1
+  %#5 = zext i64 noundef %#1 to i128
+  %#6 = zext i64 noundef %#2 to i128
+  %#7 = mul nuw i128 %#6, %#5
+  %#8 = lshr i128 %#7, 64
+  %#9 = trunc nuw i128 %#8 to i64
+  store i64 %#4, ptr noread noundef initializes((0, 16)) %#0, align 8
+  %#10 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#0, 1 x i64 8
+  store i64 %#9, ptr %#10, align 8
+  ret void
+}
+=>
+define void @target_mult64to128(ptr noread noundef initializes((0, 16)) %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = and i64 noundef %#2, 4294967295
+  %#6 = mul nuw i64 %#5, %#4
+  %#7 = lshr i64 noundef %#1, 32
+  %#8 = mul nuw i64 %#5, %#7
+  %#9 = lshr i64 noundef %#2, 32
+  %#10 = mul nuw i64 %#9, %#4
+  %#11 = mul nuw i64 %#9, %#7
+  %#12 = lshr i64 %#6, 32
+  %#13 = and i64 %#8, 4294967295
+  %#14 = add nuw i64 %#13, %#10
+  %#15 = add nuw i64 %#14, %#12
+  %#16 = lshr i64 %#8, 32
+  %#17 = lshr i64 %#15, 32
+  %#18 = add nuw i64 %#16, %#11
+  %#19 = add nuw i64 %#18, %#17
+  %#20 = shl i64 %#15, 32
+  %#21 = and i64 %#6, 4294967295
+  %#22 = or disjoint i64 %#20, %#21
+  store i64 %#22, ptr noread noundef initializes((0, 16)) %#0, align 8
+  %#23 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#0, 1 x i64 8
+  store i64 %#19, ptr %#23, align 8
+  ret void
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,29 @@
+{
+ "repo": "llama.cpp",
+ "commit": "3e037f313c2c4cfce897d9be8f43954283a61de1",
+ "checker": "Volta (PTX parse) + per-function PTX identity (nvcc 12.8)",
+ "checker_ran": true,
+ "verdict": "EQUIV_PARTIAL",
+ "scope": "device code of fattn-mma-f16 instances + fattn.cu for sm_80 (22 TUs): 555 kernels PTX-identical, 90 NO_DEVICE_CODE trap stubs differ only in a __LINE__ constant of the vprintf diagnostic; host dispatch in fattn.cu (ggml_cuda_get_best_fattn_kernel, ncols switch) not covered",
+ "build_config": "nvcc 12.8 --ptx -O3 -std=c++17 -arch=compute_80 --extended-lambda -DGGML_BACKEND_BUILD, ggml/src + ggml/include of the respective revision",
+ "units": [
+  {
+   "name": "fattn-mma-f16 / mma.cuh device code",
+   "file": "ggml/src/ggml-cuda/fattn-mma-f16.cuh",
+   "result": "EQUIV",
+   "detail": "NVIDIA sm_80 PTX identical except __LINE__ in trap diagnostics"
+  },
+  {
+   "name": "ggml_cuda_get_best_fattn_kernel / ncols1 switch",
+   "file": "ggml/src/ggml-cuda/fattn.cu",
+   "result": "UNKNOWN",
+   "detail": "host kernel-selection code changed (ncols2_max for DKQ=320, AMD branches); not modelled by PTX checkers"
+  }
+ ],
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "not_equiv_level": null,
+ "counterexample": null,
+ "evidence_dir": "history-eq/gh/work/llama.cpp/3e037f31",
+ "notes": "AMD-targeted change; on the NVIDIA sm_80 build every instantiated kernel is identical up to line numbers embedded in unreachable-config trap messages. Host selection logic changed (also for NVIDIA with DKQ=320) and is not covered, hence EQUIV_PARTIAL. No Volta semantic query was needed because the PTX is identical."
+}

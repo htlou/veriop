@@ -1,0 +1,90 @@
+
+----------------------------------------
+declare void @zstd_old_wildcopy(noundef ptr, noundef ptr, noundef i64)
+
+@__const.zstd_old_probe.src = constant 8 bytes, align 1
+
+define i32 @zstd_old_probe() {
+init:
+  store [8 x i8] { 1, 0, 0, 0, 0, 0, 0, 0 }, ptr @__const.zstd_old_probe.src, align 1
+  br label %#0
+
+#0:
+  %#1 = alloca i64 8, align 1
+  %#2 = alloca i64 8, align 1
+  memcpy ptr %#1 align 1, ptr @__const.zstd_old_probe.src align 1, i64 8
+  memset ptr %#2 align 1, i8 0, i64 8
+  %#3 = gep inbounds ptr %#2, 8 x i64 0, 1 x i64 0
+  %#4 = gep inbounds ptr %#1, 8 x i64 0, 1 x i64 0
+  call void @zstd_old_wildcopy(noundef ptr %#3, noundef ptr %#4, noundef i64 0)
+  %#5 = gep inbounds ptr %#2, 8 x i64 0, 1 x i64 0
+  %#6 = load i8, ptr %#5, align 1
+  %#7 = zext i8 %#6 to i32
+  ret i32 %#7
+}
+=>
+declare void @zstd_new_wildcopy(noundef ptr, noundef ptr, noundef i64)
+
+@__const.zstd_new_probe.src = constant 8 bytes, align 1
+@__const.zstd_old_probe.src = constant 8 bytes, align 1
+
+define i32 @zstd_new_probe() {
+init:
+  store [8 x i8] { 1, 0, 0, 0, 0, 0, 0, 0 }, ptr @__const.zstd_new_probe.src, align 1
+  store [8 x i8] { 1, 0, 0, 0, 0, 0, 0, 0 }, ptr @__const.zstd_old_probe.src, align 1
+  br label %#0
+
+#0:
+  %#1 = alloca i64 8, align 1
+  %#2 = alloca i64 8, align 1
+  memcpy ptr %#1 align 1, ptr @__const.zstd_new_probe.src align 1, i64 8
+  memset ptr %#2 align 1, i8 0, i64 8
+  %#3 = gep inbounds ptr %#2, 8 x i64 0, 1 x i64 0
+  %#4 = gep inbounds ptr %#1, 8 x i64 0, 1 x i64 0
+  call void @zstd_new_wildcopy(noundef ptr %#3, noundef ptr %#4, noundef i64 0)
+  %#5 = gep inbounds ptr %#2, 8 x i64 0, 1 x i64 0
+  %#6 = load i8, ptr %#5, align 1
+  %#7 = zext i8 %#6 to i32
+  ret i32 %#7
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+
+Source:
+  >> Jump to %#0
+ptr %#1 = pointer(local, block_id=0, offset=0) / Address=#x109
+ptr %#2 = pointer(local, block_id=1, offset=0) / Address=#x100
+ptr %#3 = pointer(local, block_id=1, offset=0) / Address=#x100
+ptr %#4 = pointer(local, block_id=0, offset=0) / Address=#x109
+void = function did not return!
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 8	align: 1	alloc type: 0	alive: true	address: 5	const
+Block 2 >	size: 0	align: 2	alloc type: 0	alive: true	address: 4
+Block 3 >	size: 8	align: 1	alloc type: 0	alive: true	address: 13	const
+
+LOCAL BLOCKS:
+Block 4 >	size: 8	align: 1	alloc type: 1	alive: true	address: 265
+Block 5 >	size: 8	align: 1	alloc type: 1	alive: true	address: 256
+
+Target:
+  >> Jump to %#0
+ptr %#1 = pointer(local, block_id=0, offset=0) / Address=#x100
+ptr %#2 = pointer(local, block_id=1, offset=0) / Address=#x109
+ptr %#3 = pointer(local, block_id=1, offset=0) / Address=#x109
+ptr %#4 = pointer(local, block_id=0, offset=0) / Address=#x100
+Function @zstd_new_wildcopy triggered UB
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 4 >	size: 8	align: 1	alloc type: 1	alive: true	address: 256
+Block 5 >	size: 8	align: 1	alloc type: 1	alive: true	address: 265
+
+

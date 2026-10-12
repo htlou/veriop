@@ -1,0 +1,1 @@
+old.ll/new.ll = r_wasm_api/{old,new}.ll after asmfix.py (empty-asm guard on constant-expression operands -> freeze, completing the runner's rewrite) and wasm_model.py (llvm.wasm.shuffle -> shufflevector)

@@ -1,0 +1,40 @@
+{
+  "commit": "b54708f",
+  "date": "2020-02-26",
+  "subject": "xxh128 len[4-8] : minor change",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says the input-word order improves dispersion and may improve the 8-byte case.",
+  "change_summary": "Swaps which 32-bit input segment occupies the high half of the 4..8-byte XXH3 128-bit mixing word.",
+  "units": [
+    {
+      "name": "public XXH3_128bits, withSeed and withSecret, length 4..8",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "4 <= len <= 8; withSecret secret size >= 136",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/b54708f/r_api",
+      "evidence": "All three public API targets have valid-length Alive2 forward value-in-memory counterexamples and fail the reverse check."
+    },
+    {
+      "name": "raw length-8 hash witness",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "len = 8",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/b54708f/r_rawcex",
+      "evidence": "Fixed length 8 gives an independent raw forward counterexample; the fixed length-4 raw wrapper agrees."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "full",
+  "unsupported_reason": null,
+  "not_equiv_kind": "intended-output-change",
+  "notes": "The public API comparison uses symbolic length throughout the only changed class; a particular fixed-length raw subcase can remain equal without restoring class-wide equivalence."
+}

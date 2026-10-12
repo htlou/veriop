@@ -1,0 +1,9 @@
+# `b8dfa44b`: forced-inlining option
+
+The historical commit adds `XXH_NO_INLINE_HINTS`, changing the compiler's inlining attributes for internal xxHash functions. The existing exact-source Clang -O3 x86-64-v3 build contains seven fixed-length public hash-call wrappers. [`revalidate_public.py`](revalidate_public.py) checks the old/new header Git blob IDs and saved LLVM IR hashes, then reruns Alive2 for each wrapper in both directions. [All 14 selected checks](revalidated-public.json) report one correct transformation and no counterexample, timeout, or Alive2 error.
+
+[`audit_defined_outputs.py`](audit_defined_outputs.py) checks the complete historical Git change: the README gains one option description, and the header gains only the option definition and a declaration-macro branch. Removing those additions leaves the parent header **byte-identical**. Both `XXH_FORCE_INLINE` and `XXH_NO_INLINE` still expand to `static` declarations; the difference is only `inline`/`always_inline`/`noinline` hints. Every function body and call site is unchanged. The [audit result](defined-outputs-audit.json) also rechecks ten Alive2 directions on five public calls with `XXH_NO_INLINE_HINTS=1`.
+
+**Verdict: scoped `EQUIV` for functional hash outputs and streaming state on defined C executions.** This combines the complete source audit with the selected Alive2 checks; Alive2 itself has not proved every compiler/configuration pair. It excludes compilation diagnostics, generated machine code, timing, and resource exhaustion. Two no-inline LLVM targets still lack an Alive2 result because the checker cannot discharge them; that does not change the source-level functional relation. No official historical benchmark delta was measured.
+
+Reproduce from the project root with `python3 -B history-eq/c/xxHash/b8dfa44/revalidate_public.py` and `python3 -B history-eq/c/xxHash/b8dfa44/audit_defined_outputs.py`.

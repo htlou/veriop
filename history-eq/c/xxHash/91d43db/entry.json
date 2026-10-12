@@ -1,0 +1,40 @@
+{
+  "commit": "91d43db",
+  "date": "2020-02-27",
+  "subject": "simplified len9to16",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says the new XXH3_128bits 9..16-byte mixing formula uses a reduced multiplication budget.",
+  "change_summary": "Changes the XXH3 128-bit hash formula for inputs of length 9 through 16.",
+  "units": [
+    {
+      "name": "public XXH3_128bits, withSeed and withSecret, length 9..16",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "9 <= len <= 16; withSecret secret size >= 136",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/91d43db/r_api",
+      "evidence": "All three public API targets produce Alive2 forward value-in-memory counterexamples at valid lengths; the reverse checks also refute equivalence."
+    },
+    {
+      "name": "fixed-input raw length-16 witness",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "len = 16",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/xxHash/91d43db/r_rawcex",
+      "evidence": "An independent constant-length raw wrapper also yields a forward counterexample; symbolic raw proof times out."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "full",
+  "unsupported_reason": null,
+  "not_equiv_kind": "intended-output-change",
+  "notes": "The intended hash-output change is checked on the complete changed length class and all three public variants."
+}

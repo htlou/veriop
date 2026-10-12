@@ -1,0 +1,40 @@
+{
+  "commit": "19cd4ff",
+  "date": "2020-02-12",
+  "subject": "xxhash can be inlined even if it was previously included",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit adds a second-include inline-all mode so callers can inline fixed-size hash functions after a prior header include.",
+  "change_summary": "Reworks XXH_INLINE_ALL header reinclusion and symbol names, enabling a build configuration that previously failed.",
+  "units": [
+    {
+      "name": "target double include without XXH_STATIC_LINKING_ONLY",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "interface-or-state-layout-change",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/19cd4ff/r_double_nosl",
+      "evidence": "The old header fails to compile when included normally and then with XXH_INLINE_ALL; no old LLVM program exists for the newly enabled build mode."
+    },
+    {
+      "name": "public fixed-size hash cases in previously supported single/double-include modes",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/19cd4ff/r_single",
+      "evidence": "Six single-include public targets and four double-include static-linking-only public targets pass bidirectional Alive2."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": "interface-or-state-layout-change",
+  "not_equiv_kind": null,
+  "notes": "Existing build configurations have checked fixed-size output behavior; the performance-relevant newly enabled include sequence has no pre-commit counterpart."
+}

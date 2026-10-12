@@ -1,0 +1,113 @@
+
+----------------------------------------
+define i64 @zstd_old_prefix(i32 noundef %#0, i64 noundef %#1, i64 noundef %#2) {
+#3:
+  %#10 = alloca i64 4, align 4
+  %#11 = alloca i64 8, align 8
+  %#12 = alloca i64 8, align 8
+  %#13 = alloca i64 4, align 4
+  %#14 = alloca i64 8, align 8
+  store i32 noundef %#0, ptr %#10, align 4
+  store i64 noundef %#1, ptr %#11, align 8
+  store i64 noundef %#2, ptr %#12, align 8
+  %#15 = load i32, ptr %#10, align 4
+  %#16 = icmp ugt i32 %#15, 26
+  br i1 %#16, label %#9, label %#4
+
+#4:
+  %#17 = load i32, ptr %#10, align 4
+  %#18 = sub i32 %#17, 1
+  store i32 %#18, ptr %#13, align 4
+  %#19 = load i32, ptr %#10, align 4
+  %#20 = icmp eq i32 %#19, 0
+  br i1 %#20, label %#5, label %#6
+
+#5:
+  store i32 0, ptr %#13, align 4
+  br label %#6
+
+#6:
+  %#21 = load i32, ptr %#13, align 4
+  %#22 = zext i32 %#21 to i64
+  %#23 = and i64 %#22, 63
+  %#24 = shl i64 1, %#23
+  %#25 = load i64, ptr %#11, align 8
+  %#26 = add i64 %#24, %#25
+  store i64 %#26, ptr %#14, align 8
+  %#27 = load i32, ptr %#10, align 4
+  %#28 = icmp eq i32 %#27, 0
+  br i1 %#28, label %#7, label %#8
+
+#7:
+  %#29 = load i64, ptr %#12, align 8
+  store i64 %#29, ptr %#14, align 8
+  br label %#8
+
+#8:
+  %#30 = load i64, ptr %#14, align 8
+  ret i64 %#30
+
+#9:
+  assume i1 0
+}
+=>
+@zstd_new_prefix.offsetPrefix = constant 216 bytes, align 16
+
+define i64 @zstd_new_prefix(i32 noundef %#0, i64 noundef %#1, i64 noundef %#2) {
+init:
+  store [27 x i64] { 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432 }, ptr @zstd_new_prefix.offsetPrefix, align 16
+  br label %#3
+
+#3:
+  %#10 = alloca i64 4, align 4
+  %#11 = alloca i64 8, align 8
+  %#12 = alloca i64 8, align 8
+  %#13 = alloca i64 4, align 4
+  %#14 = alloca i64 8, align 8
+  store i32 noundef %#0, ptr %#10, align 4
+  store i64 noundef %#1, ptr %#11, align 8
+  store i64 noundef %#2, ptr %#12, align 8
+  %#15 = load i32, ptr %#10, align 4
+  %#16 = icmp ugt i32 %#15, 26
+  br i1 %#16, label %#9, label %#4
+
+#4:
+  %#17 = load i32, ptr %#10, align 4
+  %#18 = sub i32 %#17, 1
+  store i32 %#18, ptr %#13, align 4
+  %#19 = load i32, ptr %#10, align 4
+  %#20 = icmp eq i32 %#19, 0
+  br i1 %#20, label %#5, label %#6
+
+#5:
+  store i32 0, ptr %#13, align 4
+  br label %#6
+
+#6:
+  %#21 = load i32, ptr %#10, align 4
+  %#22 = zext i32 %#21 to i64
+  %#23 = gep inbounds nuw ptr @zstd_new_prefix.offsetPrefix, 216 x i64 0, 8 x i64 %#22
+  %#24 = load i64, ptr %#23, align 8
+  %#25 = load i64, ptr %#11, align 8
+  %#26 = add i64 %#24, %#25
+  store i64 %#26, ptr %#14, align 8
+  %#27 = load i32, ptr %#10, align 4
+  %#28 = icmp eq i32 %#27, 0
+  br i1 %#28, label %#7, label %#8
+
+#7:
+  %#29 = load i64, ptr %#12, align 8
+  store i64 %#29, ptr %#14, align 8
+  br label %#8
+
+#8:
+  %#30 = load i64, ptr %#14, align 8
+  ret i64 %#30
+
+#9:
+  assume i1 0
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

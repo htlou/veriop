@@ -1,0 +1,40 @@
+{
+  "commit": "665424e",
+  "date": "2021-08-25",
+  "subject": "added variant XXH3_64bits_withSecretandSeed()",
+  "selected_by": "keyword",
+  "perf_evidence": "added variant XXH3_64bits_withSecretandSeed()",
+  "change_summary": "added variant XXH3_64bits_withSecretandSeed()",
+  "units": [
+    {
+      "name": "added variant XXH3_64bits_withSecretandSeed()",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/665424e/r_newapi",
+      "evidence": "The newly introduced withSecretandSeed path at 64 bytes proves bidirectionally against the old withSeed result, with both target bodies fully inlined and different. The 200/256-byte paths still contain residual helper calls and are unproved."
+    },
+    {
+      "name": "generated 192-byte secret bridge for arbitrary seed, scalar x86-64",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "XXH_VECTOR=0; 192 writable output bytes; old initCustomSecret vs new generateSecret_fromSeed",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/665424e/secret-bridge",
+      "evidence": "Bidirectional Alive2 proves all 192 output bytes for arbitrary seed; 24 further bidirectional word checks cover seed zero against the default secret. Common 256-byte long-hash core IR is byte-identical."
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "New API has no same-name old counterpart; the commit-documented old/new call sequence has a proved scalar generated-secret bridge, while complete public long-input calls remain unverified."
+}

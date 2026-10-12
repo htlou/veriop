@@ -1,0 +1,173 @@
+
+----------------------------------------
+define i32 @zstd_old_has_zero(ptr nowrite noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree memory(argmem: read) {
+#3:
+  %#11 = add i8 noundef zeroext %#2, 243
+  %#12 = icmp ult i8 %#11, 244
+  %#13 = add i32 noundef %#1, 4294967040
+  %#14 = icmp ult i32 %#13, 4294967041
+  %#15 = or i1 %#14, %#12
+  br i1 %#15, label %#10, label %#4
+
+#4:
+  %#16 = zext nneg i32 noundef %#1 to i64
+  br label %#5
+
+#5:
+  %#17 = phi i64 [ 0, %#4 ], [ %#21, %#6 ]
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#17
+  %#19 = load i8, ptr %#18, align 1
+  %#20 = icmp ugt i8 %#19, 12
+  br i1 %#20, label %#10, label %#6
+
+#6:
+  %#21 = add nsw nuw i64 %#17, 1
+  %#22 = icmp eq i64 %#21, %#16
+  br i1 %#22, label %#7, label %#5
+
+#7:
+  %#23 = icmp eq i32 noundef %#1, 0
+  br i1 %#23, label %#10, label %#8
+
+#8:
+  %#24 = zext nneg i32 noundef %#1 to i64
+  br label %#9
+
+#9:
+  %#25 = phi i64 [ 0, %#8 ], [ %#32, %#9 ]
+  %#26 = phi i32 [ 0, %#8 ], [ %#31, %#9 ]
+  %#27 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#25
+  %#28 = load i8, ptr %#27, align 1
+  %#29 = icmp eq i8 %#28, 0
+  %#30 = zext i1 %#29 to i32
+  %#31 = or i32 %#26, %#30
+  %#32 = add nsw nuw i64 %#25, 1
+  %#33 = icmp eq i64 %#32, %#24
+  br i1 %#33, label %#10, label %#9
+
+#10:
+  %#34 = phi i32 [ 0, %#3 ], [ 0, %#7 ], [ %#31, %#9 ], [ 0, %#5 ]
+  %#range_0_%#34 = !range i32 %#34, i32 0, i32 2
+  ret i32 %#range_0_%#34
+}
+=>
+define i32 @zstd_new_has_zero(ptr nowrite noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree memory(argmem: read) {
+#3:
+  %#9 = add i8 noundef zeroext %#2, 243
+  %#10 = icmp ult i8 %#9, 244
+  %#11 = add i32 noundef %#1, 4294967040
+  %#12 = icmp ult i32 %#11, 4294967041
+  %#13 = or i1 %#12, %#10
+  br i1 %#13, label %#8, label %#4
+
+#4:
+  %#14 = zext nneg i32 noundef %#1 to i64
+  br label %#5
+
+#5:
+  %#15 = phi i64 [ 0, %#4 ], [ %#23, %#6 ]
+  %#16 = phi i32 [ 0, %#4 ], [ %#22, %#6 ]
+  %#17 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#15
+  %#18 = load i8, ptr %#17, align 1
+  %#19 = icmp ugt i8 %#18, 12
+  br i1 %#19, label %#8, label %#6
+
+#6:
+  %#20 = icmp eq i8 %#18, 0
+  %#21 = zext i1 %#20 to i32
+  %#22 = add i32 %#16, %#21
+  %#23 = add nsw nuw i64 %#15, 1
+  %#24 = icmp eq i64 %#23, %#14
+  br i1 %#24, label %#7, label %#5
+
+#7:
+  %#25 = icmp ugt i32 %#22, 1
+  %#26 = zext i1 %#25 to i32
+  br label %#8
+
+#8:
+  %#27 = phi i32 [ 0, %#3 ], [ %#26, %#7 ], [ 0, %#5 ]
+  %#range_0_%#27 = !range i32 %#27, i32 0, i32 2
+  ret i32 %#range_0_%#27
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i32 noundef %#1 = #x00000001 (1)
+i8 noundef zeroext %#2 = #x0c (12)
+
+Source:
+i8 %#11 = #xff (255, -1)
+i1 %#12 = #x0 (0)
+i32 %#13 = #xffffff01 (4294967041, -255)
+i1 %#14 = #x0 (0)
+i1 %#15 = #x0 (0)
+  >> Jump to %#4
+i64 %#16 = #x0000000000000001 (1)
+  >> Jump to %#5
+i64 %#17 = #x0000000000000000 (0)
+ptr %#18 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i8 %#19 = #x00 (0)
+i1 %#20 = #x0 (0)
+  >> Jump to %#6
+i64 %#21 = #x0000000000000001 (1)
+i1 %#22 = #x1 (1)
+  >> Jump to %#7
+i1 %#23 = #x0 (0)
+  >> Jump to %#8
+i64 %#24 = #x0000000000000001 (1)
+  >> Jump to %#9
+i64 %#25 = #x0000000000000000 (0)
+i32 %#26 = #x00000000 (0)
+ptr %#27 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i8 %#28 = #x00 (0)
+i1 %#29 = #x1 (1)
+i32 %#30 = #x00000001 (1)
+i32 %#31 = #x00000001 (1)
+i64 %#32 = #x0000000000000001 (1)
+i1 %#33 = #x1 (1)
+  >> Jump to %#10
+i32 %#34 = #x00000001 (1)
+i32 %#range_0_%#34 = #x00000001 (1)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 1	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+*: #x00
+
+
+Target:
+i8 %#9 = #xff (255, -1)
+i1 %#10 = #x0 (0)
+i32 %#11 = #xffffff01 (4294967041, -255)
+i1 %#12 = #x0 (0)
+i1 %#13 = #x0 (0)
+  >> Jump to %#4
+i64 %#14 = #x0000000000000001 (1)
+  >> Jump to %#5
+i64 %#15 = #x0000000000000000 (0)
+i32 %#16 = #x00000000 (0)
+ptr %#17 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i8 %#18 = #x00 (0)
+i1 %#19 = #x0 (0)
+  >> Jump to %#6
+i1 %#20 = #x1 (1)
+i32 %#21 = #x00000001 (1)
+i32 %#22 = #x00000001 (1)
+i64 %#23 = #x0000000000000001 (1)
+i1 %#24 = #x1 (1)
+  >> Jump to %#7
+i1 %#25 = #x0 (0)
+i32 %#26 = #x00000000 (0)
+  >> Jump to %#8
+i32 %#27 = #x00000000 (0)
+i32 %#range_0_%#27 = #x00000000 (0)
+Source value: #x00000001 (1)
+Target value: #x00000000 (0)
+

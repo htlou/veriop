@@ -1,0 +1,153 @@
+diff --git a/src/cbor/CBOR.Spec.Raw.Sort.fsti b/src/cbor/CBOR.Spec.Raw.Sort.fsti
+index b25b4650..44228535 100644
+--- a/src/cbor/CBOR.Spec.Raw.Sort.fsti
++++ b/src/cbor/CBOR.Spec.Raw.Sort.fsti
+@@ -69,8 +69,69 @@ let cbor_raw_sort_elem_equiv
+ = raw_equiv_eq x (cbor_raw_sort_elem x);
+   match x with
+   | Map len v ->
+-    list_for_all_intro (list_existsb2 (holds_on_pair2 raw_equiv) (cbor_map_sort_failsafe v)) v (fun _ -> assume False);
+-    list_for_all_intro (list_existsb2 (holds_on_pair2 raw_equiv) v) (cbor_map_sort_failsafe v) (fun _ -> assume False)    
++    list_for_all_intro (list_existsb2 (holds_on_pair2 raw_equiv) (cbor_map_sort_failsafe v)) v (fun x ->
++      raw_equiv_refl (fst x);
++      raw_equiv_refl (snd x);
++      list_existsb_intro (holds_on_pair2 raw_equiv x) (cbor_map_sort_failsafe v) x
++    );
++    list_for_all_intro (list_existsb2 (holds_on_pair2 raw_equiv) v) (cbor_map_sort_failsafe v) (fun x ->
++      raw_equiv_refl (fst x);
++      raw_equiv_refl (snd x);
++      list_existsb_intro (holds_on_pair2 raw_equiv x) v x
++    )
+   | _ -> raw_equiv_refl x
+ 
+ let cbor_raw_sort = raw_data_item_fmap cbor_raw_sort_elem
++
++let rec cbor_raw_sort_ints_optimal
++  (x: raw_data_item)
++: Lemma
++  (requires (raw_data_item_ints_optimal x == true))
++  (ensures (raw_data_item_ints_optimal (cbor_raw_sort x) == true))
++= assert_norm (raw_data_item_ints_optimal == holds_on_raw_data_item raw_data_item_ints_optimal_elem);
++  holds_on_raw_data_item_eq raw_data_item_ints_optimal_elem x;
++  holds_on_raw_data_item_eq raw_data_item_ints_optimal_elem (cbor_raw_sort x);
++  assert_norm (cbor_raw_sort == raw_data_item_fmap cbor_raw_sort_elem);
++  raw_data_item_fmap_eq cbor_raw_sort_elem x;
++  match x with
++  | Tagged tag v ->
++    cbor_raw_sort_ints_optimal v;
++    cbor_raw_sort_elem_ints_optimal (Tagged tag (cbor_raw_sort v))
++  | Array len v ->
++    list_for_all_map cbor_raw_sort v raw_data_item_ints_optimal raw_data_item_ints_optimal (fun x ->
++      cbor_raw_sort_ints_optimal x
++    )
++  | Map len v ->
++    list_for_all_map (apply_on_pair cbor_raw_sort) v (holds_on_pair raw_data_item_ints_optimal) (holds_on_pair raw_data_item_ints_optimal) (fun x ->
++      cbor_raw_sort_ints_optimal (fst x);
++      cbor_raw_sort_ints_optimal (snd x)
++    );
++    let x' = Map len (List.Tot.map (apply_on_pair cbor_raw_sort) v) in
++    holds_on_raw_data_item_eq raw_data_item_ints_optimal_elem x';
++    cbor_raw_sort_elem_ints_optimal x'
++  | _ -> ()
++
++(*
++let rec cbor_raw_sort_equiv
++  (x: raw_data_item)
++: Lemma
++  (ensures (raw_equiv x (cbor_raw_sort x) == true))
++= raw_equiv_eq x (cbor_raw_sort x);
++  assert_norm (cbor_raw_sort == raw_data_item_fmap cbor_raw_sort_elem);
++  raw_data_item_fmap_eq cbor_raw_sort_elem x;
++  match x with
++  | Tagged tag v ->
++    cbor_raw_sort_equiv v
++  | Array len v ->
++    list_for_all2_map cbor_raw_sort v raw_data_item_ints_optimal raw_data_item_ints_optimal (fun x ->
++      cbor_raw_sort_ints_optimal x
++    )
++  | Map len v ->
++    list_for_all_map (apply_on_pair cbor_raw_sort) v (holds_on_pair raw_data_item_ints_optimal) (holds_on_pair raw_data_item_ints_optimal) (fun x ->
++      cbor_raw_sort_ints_optimal (fst x);
++      cbor_raw_sort_ints_optimal (snd x)
++    );
++    let x' = Map len (List.Tot.map (apply_on_pair cbor_raw_sort) v) in
++    holds_on_raw_data_item_eq raw_data_item_ints_optimal_elem x';
++    cbor_raw_sort_elem_ints_optimal x'
++  | _ -> ()
+diff --git a/src/cbor/CBOR.Spec.Raw.Valid.fsti b/src/cbor/CBOR.Spec.Raw.Valid.fsti
+index 0ca4b776..15f705c0 100644
+--- a/src/cbor/CBOR.Spec.Raw.Valid.fsti
++++ b/src/cbor/CBOR.Spec.Raw.Valid.fsti
+@@ -177,6 +177,47 @@ let rec raw_data_item_uint64_optimize_correct (x: raw_data_item) : Lemma
+   | Tagged len v -> raw_data_item_uint64_optimize_correct v
+   | _ -> ()
+ 
++let rec raw_data_item_uint64_optimize_equiv (x: raw_data_item) : Lemma
++  (ensures (raw_equiv x (raw_data_item_uint64_optimize x) == true))
++  (decreases x)
++= raw_data_item_fmap_eq raw_data_item_uint64_optimize_elem x;
++  assert_norm (raw_data_item_uint64_optimize == raw_data_item_fmap raw_data_item_uint64_optimize_elem);
++  let x' = raw_data_item_uint64_optimize x in
++  raw_equiv_eq x x';
++  match x with
++  | Map len v ->
++    list_for_all2_map (apply_on_pair raw_data_item_uint64_optimize) v (holds_on_pair2 raw_equiv) (fun x ->
++      raw_data_item_uint64_optimize_equiv (fst x);
++      raw_data_item_uint64_optimize_equiv (snd x)
++    );
++    let v_ = List.Tot.map (apply_on_pair raw_data_item_uint64_optimize) v in
++    list_for_all2_exists (holds_on_pair2 raw_equiv) v v_;
++    list_for_all2_swap (holds_on_pair2 raw_equiv) v v_;
++    list_for_all2_implies (swap (holds_on_pair2 raw_equiv)) (holds_on_pair2 raw_equiv) v_ v (fun x x_ ->
++      raw_equiv_sym (fst x) (fst x_);
++      raw_equiv_sym (snd x) (snd x_)
++    );
++    list_for_all2_exists (holds_on_pair2 raw_equiv) v_ v;
++    let x_ = Map len v_ in
++    raw_equiv_eq x x_;
++    raw_data_item_uint64_optimize_elem_equiv x_;
++    raw_equiv_trans x x_ x'
++  | Array len v ->
++    list_for_all2_map raw_data_item_uint64_optimize v raw_equiv (fun x ->
++      raw_data_item_uint64_optimize_equiv x
++    );
++    let x_ = Array len (List.Tot.map raw_data_item_uint64_optimize v) in
++    raw_equiv_eq x x_;
++    raw_data_item_uint64_optimize_elem_equiv x_;
++    raw_equiv_trans x x_ x'
++  | Tagged len v ->
++    raw_data_item_uint64_optimize_equiv v;
++    let x_ = Tagged len (raw_data_item_uint64_optimize v) in
++    raw_equiv_eq x x_;
++    raw_data_item_uint64_optimize_elem_equiv x_;
++    raw_equiv_trans x x_ x'
++  | _ -> raw_data_item_uint64_optimize_elem_equiv x
++
+ (* Sorting map keys *)
+ 
+ noextract
+diff --git a/src/cbor/CBOR.Spec.Util.fst b/src/cbor/CBOR.Spec.Util.fst
+index fc6d2583..90198013 100644
+--- a/src/cbor/CBOR.Spec.Util.fst
++++ b/src/cbor/CBOR.Spec.Util.fst
+@@ -768,6 +768,20 @@ let rec list_for_all2_exists
+     list_for_all_exists_append_r_l p q1 [a2] q2
+   | _ -> ()
+ 
++let rec list_for_all2_map
++  (#t1 #t2: Type)
++  (f: t1 -> t2)
++  (l: list t1)
++  (p: t1 -> t2 -> bool)
++  (prf: (x: t1 { List.Tot.memP x l /\ x << l }) -> Lemma
++    (p x (f x) == true)
++  )
++: Lemma
++  (list_for_all2 p l (List.Tot.map f l) == true)
++= match l with
++  | [] -> ()
++  | a :: q -> prf a; list_for_all2_map f q p prf
++
+ let rec list_sum (#t: Type) (f: t -> nat) (l: list t) : Tot nat =
+   match l with
+   | [] -> 0

@@ -1,0 +1,156 @@
+
+----------------------------------------
+declare ptr @BN_new()
+declare i32 @EC_GROUP_get_curve(noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef ptr)
+declare i32 @BN_num_bits(noundef ptr)
+declare void @BN_free(noundef ptr)
+
+define i64 @ec_field_size(ptr noundef %group) {
+entry:
+  %group.addr = alloca i64 8, align 8
+  %p = alloca i64 8, align 8
+  %a = alloca i64 8, align 8
+  %b = alloca i64 8, align 8
+  %field_size = alloca i64 8, align 8
+  store ptr noundef %group, ptr %group.addr, align 8
+  %call = call ptr @BN_new()
+  store ptr %call, ptr %p, align 8
+  %call1 = call ptr @BN_new()
+  store ptr %call1, ptr %a, align 8
+  %call2 = call ptr @BN_new()
+  store ptr %call2, ptr %b, align 8
+  store i64 0, ptr %field_size, align 8
+  %#0 = load ptr, ptr %p, align 8
+  %cmp = icmp eq ptr %#0, null
+  br i1 %cmp, label %if.then, label %lor.lhs.false
+
+lor.lhs.false:
+  %#1 = load ptr, ptr %a, align 8
+  %cmp3 = icmp eq ptr %#1, null
+  br i1 %cmp3, label %if.then, label %lor.lhs.false4
+
+lor.lhs.false4:
+  %#2 = load ptr, ptr %b, align 8
+  %cmp5 = icmp eq ptr %#2, null
+  br i1 %cmp5, label %if.then, label %if.end
+
+if.end:
+  %#3 = load ptr, ptr %group.addr, align 8
+  %#4 = load ptr, ptr %p, align 8
+  %#5 = load ptr, ptr %a, align 8
+  %#6 = load ptr, ptr %b, align 8
+  %call6 = call i32 @EC_GROUP_get_curve(noundef ptr %#3, noundef ptr %#4, noundef ptr %#5, noundef ptr %#6, noundef ptr null)
+  %tobool = icmp ne i32 %call6, 0
+  br i1 %tobool, label %if.end8, label %if.then7
+
+if.end8:
+  %#7 = load ptr, ptr %p, align 8
+  %call9 = call i32 @BN_num_bits(noundef ptr %#7)
+  %add = add nsw i32 %call9, 7
+  %div = sdiv i32 %add, 8
+  %conv = sext i32 %div to i64
+  store i64 %conv, ptr %field_size, align 8
+  br label %done
+
+if.then7:
+  br label %done
+
+if.then:
+  br label %done
+
+done:
+  %#8 = load ptr, ptr %p, align 8
+  call void @BN_free(noundef ptr %#8)
+  %#9 = load ptr, ptr %a, align 8
+  call void @BN_free(noundef ptr %#9)
+  %#10 = load ptr, ptr %b, align 8
+  call void @BN_free(noundef ptr %#10)
+  %#11 = load i64, ptr %field_size, align 8
+  ret i64 %#11
+}
+=>
+declare ptr @EC_GROUP_get0_field(noundef ptr)
+declare i32 @BN_num_bits(noundef ptr)
+
+define i64 @ec_field_size(ptr noundef %group) {
+entry:
+  %retval = alloca i64 8, align 8
+  %group.addr = alloca i64 8, align 8
+  %p = alloca i64 8, align 8
+  store ptr noundef %group, ptr %group.addr, align 8
+  %#0 = load ptr, ptr %group.addr, align 8
+  %call = call ptr @EC_GROUP_get0_field(noundef ptr %#0)
+  store ptr %call, ptr %p, align 8
+  %#1 = load ptr, ptr %p, align 8
+  %cmp = icmp eq ptr %#1, null
+  br i1 %cmp, label %if.then, label %if.end
+
+if.end:
+  %#2 = load ptr, ptr %p, align 8
+  %call1 = call i32 @BN_num_bits(noundef ptr %#2)
+  %add = add nsw i32 %call1, 7
+  %div = sdiv i32 %add, 8
+  %conv = sext i32 %div to i64
+  store i64 %conv, ptr %retval, align 8
+  br label %return
+
+if.then:
+  store i64 0, ptr %retval, align 8
+  br label %return
+
+return:
+  %#3 = load i64, ptr %retval, align 8
+  ret i64 %#3
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noundef %group = null
+
+Source:
+ptr %group.addr = pointer(local, block_id=0, offset=0) / Address=#x108
+ptr %p = pointer(local, block_id=1, offset=0) / Address=#x110
+ptr %a = pointer(local, block_id=2, offset=0) / Address=#x100
+ptr %b = pointer(local, block_id=3, offset=0) / Address=#x140
+ptr %field_size = pointer(local, block_id=4, offset=0) / Address=#x120
+ptr %call = function did not return!
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 8	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 3	align: 4	alloc type: 0	alive: true	address: 4
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 3
+Block 3 >	size: 0	align: 8	alloc type: 0	alive: true	address: 8
+Block 4 >	size: 0	align: 1	alloc type: 0	alive: true	address: 2
+Block 5 >	size: 0	align: 1	alloc type: 0	alive: true	address: 7
+
+LOCAL BLOCKS:
+Block 8 >	size: 8	align: 8	alloc type: 1	alive: true	address: 264
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 272
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 256
+Block 11 >	size: 8	align: 8	alloc type: 1	alive: true	address: 320
+Block 12 >	size: 8	align: 8	alloc type: 1	alive: true	address: 288
+
+Target:
+ptr %retval = null
+ptr %group.addr = pointer(local, block_id=1, offset=0) / Address=#x004
+ptr %p = pointer(local, block_id=2, offset=0) / Address=#x003
+ptr %#0 = null
+Function @EC_GROUP_get0_field triggered UB
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 8 >	size: 0	align: 8	alloc type: 0	alive: false	address: 0
+Block 9 >	size: 3	align: 4	alloc type: 0	alive: false	address: 4
+Block 10 >	size: 0	align: 1	alloc type: 0	alive: false	address: 3
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,40 @@
+{
+  "commit": "090b389",
+  "date": "2020-03-12",
+  "subject": "[NEON] Move veor below if block",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says moving the NEON xor improves instruction interleaving on AArch64.",
+  "change_summary": "Moves the NEON input/secret xor below the accumulator-width branch in XXH3_accumulate_512.",
+  "units": [
+    {
+      "name": "raw XXH3_accumulate_512, 64/128-bit accumulation widths, AArch64",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/090b389/r_acc_a64_id",
+      "evidence": "Both accumulation-width targets with symbolic accumulator, input and secret bytes pass Alive2 in both directions on AArch64."
+    },
+    {
+      "name": "raw XXH3_accumulate_512, 64/128-bit widths, ARMv7 NEON",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "NEON widening multiplies replaced on both sides by equivalent unsigned lane arithmetic",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/090b389/r_acc_v7_id_long",
+      "evidence": "Both ARMv7 targets pass bidirectional Alive2 after a documented symmetric vmull/vmlal semantic model; the initial shorter run timed out."
+    }
+  ],
+  "commit_verdict": "EQUIV",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The changed one-stripe computation is proved on both NEON architectures under the explicit widening-multiply model. No whole-hash public API proof over arbitrary lengths is claimed."
+}

@@ -1,0 +1,63 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/c94e68d/raw_fold64_i386/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/c94e68d/raw_fold64_i386/old.ll
+
+----------------------------------------
+define i64 @target_fold64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = and i64 noundef %#0, 4294967295
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = mul nuw i64 %#4, %#3
+  %#6 = lshr i64 noundef %#0, 32
+  %#7 = mul nuw i64 %#4, %#6
+  %#8 = lshr i64 noundef %#1, 32
+  %#9 = mul nuw i64 %#8, %#3
+  %#10 = mul nuw i64 %#8, %#6
+  %#11 = lshr i64 %#5, 32
+  %#12 = and i64 %#7, 4294967295
+  %#13 = add nuw i64 %#12, %#9
+  %#14 = add nuw i64 %#13, %#11
+  %#15 = lshr i64 %#7, 32
+  %#16 = lshr i64 %#14, 32
+  %#17 = add nuw i64 %#15, %#10
+  %#18 = add nuw i64 %#17, %#16
+  %#19 = shl i64 %#14, 32
+  %#20 = and i64 %#5, 4294967295
+  %#21 = or disjoint i64 %#19, %#20
+  %#22 = xor i64 %#21, %#18
+  ret i64 %#22
+}
+=>
+define i64 @target_fold64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = lshr i64 noundef %#0, 32
+  %#4 = lshr i64 noundef %#1, 32
+  %#5 = mul nuw i64 %#4, %#3
+  %#6 = and i64 noundef %#0, 4294967295
+  %#7 = mul nuw i64 %#4, %#6
+  %#8 = and i64 noundef %#1, 4294967295
+  %#9 = mul nuw i64 %#8, %#3
+  %#10 = mul nuw i64 %#8, %#6
+  %#11 = shl i64 %#7, 32
+  %#12 = add i64 %#11, %#10
+  %#13 = icmp ult i64 %#12, %#10
+  %#14 = zext i1 %#13 to i64
+  %#15 = add i64 %#7, %#9
+  %#16 = shl i64 %#15, 32
+  %#17 = add i64 %#16, %#10
+  %#18 = icmp ult i64 %#17, %#12
+  %#19 = zext i1 %#18 to i64
+  %#20 = lshr i64 %#7, 32
+  %#21 = add nuw i64 %#20, %#5
+  %#22 = lshr i64 %#9, 32
+  %#23 = add nuw i64 %#21, %#22
+  %#24 = add nuw i64 %#23, %#14
+  %#25 = add nuw i64 %#24, %#19
+  %#26 = xor i64 %#25, %#17
+  ret i64 %#26
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

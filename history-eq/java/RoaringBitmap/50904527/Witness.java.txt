@@ -1,0 +1,20 @@
+package org.roaringbitmap.art;
+
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+public final class Witness {
+  public static void main(String[] args) throws Exception {
+    ByteBuffer buffer = ByteBuffer.allocate(8);
+    Arrays.fill(buffer.array(), (byte) 0x55);
+    LeafNode leaf = new LeafNode(0x0102030405060000L, 0L);
+    try {
+      leaf.serialize(buffer);
+      throw new AssertionError("expected BufferOverflowException");
+    } catch (BufferOverflowException expected) {
+      System.out.printf("position=%d bytes=%s exception=%s%n", buffer.position(),
+          Arrays.toString(buffer.array()), expected.getClass().getSimpleName());
+    }
+  }
+}

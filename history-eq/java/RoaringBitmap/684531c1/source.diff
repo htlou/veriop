@@ -1,0 +1,98 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+index 620a2c80..91ca9124 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+@@ -1057,6 +1057,10 @@ public final class ArrayContainer extends Container implements Cloneable {
+ 
+   @Override
+   public int rank(char lowbits) {
++    // rank(Character.MAX_VALUE) is the full cardinality (see Container.rank javadoc).
++    if (lowbits == Character.MAX_VALUE) {
++      return cardinality;
++    }
+     int answer = Util.unsignedBinarySearch(content, 0, cardinality, lowbits);
+     if (answer >= 0) {
+       return answer + 1;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index 90bb111b..cbad4737 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -1155,6 +1155,14 @@ public final class BitmapContainer extends Container implements Cloneable {
+ 
+   @Override
+   public int rank(char lowbits) {
++    // rank(Character.MAX_VALUE) is the full cardinality (see Container.rank javadoc).
++    // Avoid scanning all 1024 words when the cached cardinality is available.
++    if (lowbits == Character.MAX_VALUE) {
++      if (cardinality < 0) {
++        computeCardinality();
++      }
++      return cardinality;
++    }
+     int leftover = (lowbits + 1) & 63;
+     int answer = 0;
+     for (int k = 0; k < (lowbits + 1) >>> 6; ++k) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+index 7535499e..41d00bc4 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+@@ -2009,6 +2009,10 @@ public final class RunContainer extends Container implements Cloneable {
+ 
+   @Override
+   public int rank(char lowbits) {
++    // rank(Character.MAX_VALUE) is the full cardinality (see Container.rank javadoc).
++    if (lowbits == Character.MAX_VALUE) {
++      return getCardinality();
++    }
+     int answer = 0;
+     for (int k = 0; k < this.nbrruns; ++k) {
+       int value = (getValue(k));
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+index d3036351..3fa36245 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+@@ -1335,6 +1335,10 @@ public final class MappeableArrayContainer extends MappeableContainer implements
+ 
+   @Override
+   public int rank(char lowbits) {
++    // rank(Character.MAX_VALUE) is the full cardinality (see MappeableContainer.rank javadoc).
++    if (lowbits == Character.MAX_VALUE) {
++      return cardinality;
++    }
+     int answer = BufferUtil.unsignedBinarySearch(content, 0, cardinality, lowbits);
+     if (answer >= 0) {
+       return answer + 1;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+index 56bb2584..4778f327 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+@@ -1565,6 +1565,14 @@ public final class MappeableBitmapContainer extends MappeableContainer implement
+ 
+   @Override
+   public int rank(char lowbits) {
++    // rank(Character.MAX_VALUE) is the full cardinality (see MappeableContainer.rank javadoc).
++    // Avoid scanning all 1024 words when the cached cardinality is available.
++    if (lowbits == Character.MAX_VALUE) {
++      if (cardinality < 0) {
++        computeCardinality();
++      }
++      return cardinality;
++    }
+     int leftover = (lowbits + 1) & 63;
+     int answer = 0;
+     if (BufferUtil.isBackedBySimpleArray(this.bitmap)) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+index 54ab82d8..8bdb3eb3 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+@@ -1957,6 +1957,10 @@ public final class MappeableRunContainer extends MappeableContainer implements C
+ 
+   @Override
+   public int rank(char lowbits) {
++    // rank(Character.MAX_VALUE) is the full cardinality (see MappeableContainer.rank javadoc).
++    if (lowbits == Character.MAX_VALUE) {
++      return getCardinality();
++    }
+     int answer = 0;
+     for (int k = 0; k < this.nbrruns; ++k) {
+       int value = (getValue(k));

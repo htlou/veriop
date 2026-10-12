@@ -1,0 +1,9 @@
+# RoaringBitmap 73a09574: `andNotCardinality` changes a public result
+
+**Fixed-sample verdict: `NOT_EQUIV` for the public ordinary-bitmap method.** The [historical diff](production.diff) replaces `x1.getCardinality() - andCardinality(x1, x2)` with a specialized traversal. For `x1 = {0x00010001, 0x00020001}` and `x2 = {0x00020001}`, the [same public call](Witness.java) returns `1` in the parent and `2` in the child. These are valid bitmaps and the mathematical difference has cardinality `1`. In the new inner loop, `s1` is read from the old `pos1` before `pos1` increments; the next iteration counts the key-2 container as if it still precedes key 2.
+
+Run `python3 history-eq/java/RoaringBitmap/73a09574/reproduce.py` from the project root. It checks the parent/child Git revisions, materializes all 72 main Java source files plus the exact historical `ArraysShim.java`, compiles each side with Java 21, runs the identical witness, and asserts both outputs. [The manifest](source_manifest.json) records each source blob ID and SHA-256, the production diff hash, and the two observations.
+
+One source blob, `buffer/MappeableContainer.java` (`44bf93b8`), is absent from the local historical object store. Its blob ID is **identical in parent and child**. The script substitutes the same later local copy on both sides and records its SHA-256. This is a mixed-dependency build, not a fully exact historical build. The witness calls the ordinary `RoaringBitmap` path and never constructs a mappeable container. The production change is solely the ordinary public method. The unequal verdict rests on the reproducible public execution and source audit; it is not a whole-class KeY proof.
+
+[KeY 3.0.0 was attempted](key/AndNotBranch.java) on the scalar projection of the decisive loop. Its [log](key/key-scalar.log) reports one open goal, so no KeY proof is claimed. No official before/after performance benchmark was run for this historical pair.

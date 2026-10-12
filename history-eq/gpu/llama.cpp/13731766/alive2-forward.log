@@ -1,0 +1,231 @@
+
+----------------------------------------
+define i1 @gate(i64 noundef %#0, i64 noundef %#1, i1 noundef zeroext %#2, i1 noundef zeroext %#3, i1 noundef zeroext %#4) zeroext {
+#5:
+  %#17 = alloca i64 1, align 1
+  %#18 = alloca i64 8, align 8
+  %#19 = alloca i64 8, align 8
+  %#20 = alloca i64 1, align 1
+  %#21 = alloca i64 1, align 1
+  %#22 = alloca i64 1, align 1
+  store i64 noundef %#0, ptr %#18, align 8
+  store i64 noundef %#1, ptr %#19, align 8
+  %#23 = zext i1 noundef zeroext %#2 to i8
+  store i8 %#23, ptr %#20, align 1
+  %#24 = zext i1 noundef zeroext %#3 to i8
+  store i8 %#24, ptr %#21, align 1
+  %#25 = zext i1 noundef zeroext %#4 to i8
+  store i8 %#25, ptr %#22, align 1
+  %#26 = load i64, ptr %#18, align 8
+  %#27 = icmp slt i64 %#26, 1
+  br i1 %#27, label %#15, label %#6
+
+#6:
+  %#28 = load i64, ptr %#19, align 8
+  %#29 = icmp slt i64 %#28, 8
+  br i1 %#29, label %#15, label %#7
+
+#7:
+  %#30 = load i64, ptr %#18, align 8
+  %#31 = icmp slt i64 %#30, 2
+  br i1 %#31, label %#8, label %#9
+
+#8:
+  store i1 0, ptr %#17, align 1
+  br label %#16
+
+#9:
+  %#32 = load i8, ptr %#22, align 1
+  %#33 = trunc i8 %#32 to i1
+  br i1 %#33, label %#10, label %#14
+
+#10:
+  %#34 = load i8, ptr %#20, align 1
+  %#35 = trunc i8 %#34 to i1
+  br i1 %#35, label %#11, label %#14
+
+#11:
+  %#36 = load i8, ptr %#21, align 1
+  %#37 = trunc i8 %#36 to i1
+  br i1 %#37, label %#12, label %#14
+
+#12:
+  %#38 = load i64, ptr %#19, align 8
+  %#39 = srem i64 %#38, 8
+  %#40 = icmp ne i64 %#39, 0
+  br i1 %#40, label %#14, label %#13
+
+#13:
+  store i1 1, ptr %#17, align 1
+  br label %#16
+
+#14:
+  store i1 0, ptr %#17, align 1
+  br label %#16
+
+#15:
+  store i1 0, ptr %#17, align 1
+  br label %#16
+
+#16:
+  %#41 = load i1, ptr %#17, align 1
+  ret i1 %#41
+}
+=>
+define i1 @gate(i64 noundef %#0, i64 noundef %#1, i1 noundef zeroext %#2, i1 noundef zeroext %#3, i1 noundef zeroext %#4) zeroext {
+#5:
+  %#15 = alloca i64 1, align 1
+  %#16 = alloca i64 8, align 8
+  %#17 = alloca i64 8, align 8
+  %#18 = alloca i64 1, align 1
+  %#19 = alloca i64 1, align 1
+  %#20 = alloca i64 1, align 1
+  store i64 noundef %#0, ptr %#16, align 8
+  store i64 noundef %#1, ptr %#17, align 8
+  %#21 = zext i1 noundef zeroext %#2 to i8
+  store i8 %#21, ptr %#18, align 1
+  %#22 = zext i1 noundef zeroext %#3 to i8
+  store i8 %#22, ptr %#19, align 1
+  %#23 = zext i1 noundef zeroext %#4 to i8
+  store i8 %#23, ptr %#20, align 1
+  %#24 = load i64, ptr %#16, align 8
+  %#25 = icmp slt i64 %#24, 1
+  br i1 %#25, label %#13, label %#6
+
+#6:
+  %#26 = load i64, ptr %#17, align 8
+  %#27 = icmp slt i64 %#26, 8
+  br i1 %#27, label %#13, label %#7
+
+#7:
+  %#28 = load i8, ptr %#20, align 1
+  %#29 = trunc i8 %#28 to i1
+  br i1 %#29, label %#8, label %#12
+
+#8:
+  %#30 = load i8, ptr %#18, align 1
+  %#31 = trunc i8 %#30 to i1
+  br i1 %#31, label %#9, label %#12
+
+#9:
+  %#32 = load i8, ptr %#19, align 1
+  %#33 = trunc i8 %#32 to i1
+  br i1 %#33, label %#10, label %#12
+
+#10:
+  %#34 = load i64, ptr %#17, align 8
+  %#35 = srem i64 %#34, 8
+  %#36 = icmp ne i64 %#35, 0
+  br i1 %#36, label %#12, label %#11
+
+#11:
+  store i1 1, ptr %#15, align 1
+  br label %#14
+
+#12:
+  store i1 0, ptr %#15, align 1
+  br label %#14
+
+#13:
+  store i1 0, ptr %#15, align 1
+  br label %#14
+
+#14:
+  %#37 = load i1, ptr %#15, align 1
+  ret i1 %#37
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 noundef %#0 = #x0000000000000001 (1)
+i64 noundef %#1 = #x0000000000000008 (8)
+i1 noundef zeroext %#2 = #x1 (1)
+i1 noundef zeroext %#3 = #x1 (1)
+i1 noundef zeroext %#4 = #x1 (1)
+
+Source:
+ptr %#17 = pointer(local, block_id=0, offset=0) / Address=#x10f
+ptr %#18 = pointer(local, block_id=1, offset=0) / Address=#x120
+ptr %#19 = pointer(local, block_id=2, offset=0) / Address=#x140
+ptr %#20 = pointer(local, block_id=3, offset=0) / Address=#x102
+ptr %#21 = pointer(local, block_id=4, offset=0) / Address=#x104
+ptr %#22 = pointer(local, block_id=5, offset=0) / Address=#x100
+i8 %#23 = #x01 (1)
+i8 %#24 = #x01 (1)
+i8 %#25 = #x01 (1)
+i64 %#26 = #x0000000000000001 (1)
+i1 %#27 = #x0 (0)
+  >> Jump to %#6
+i64 %#28 = #x0000000000000008 (8)
+i1 %#29 = #x0 (0)
+  >> Jump to %#7
+i64 %#30 = #x0000000000000001 (1)
+i1 %#31 = #x1 (1)
+  >> Jump to %#8
+  >> Jump to %#16
+i1 %#41 = #x0 (0)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	alive: true
+
+LOCAL BLOCKS:
+Block 8 >	size: 1	align: 1	alloc type: 1	alive: true	address: 271
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 288
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 320
+Block 11 >	size: 1	align: 1	alloc type: 1	alive: true	address: 258
+Block 12 >	size: 1	align: 1	alloc type: 1	alive: true	address: 260
+Block 13 >	size: 1	align: 1	alloc type: 1	alive: true	address: 256
+
+Target:
+ptr %#15 = pointer(local, block_id=0, offset=0) / Address=#x100
+ptr %#16 = pointer(local, block_id=1, offset=0) / Address=#x120
+ptr %#17 = pointer(local, block_id=2, offset=0) / Address=#x110
+ptr %#18 = pointer(local, block_id=3, offset=0) / Address=#x108
+ptr %#19 = pointer(local, block_id=4, offset=0) / Address=#x104
+ptr %#20 = pointer(local, block_id=5, offset=0) / Address=#x101
+i8 %#21 = #x01 (1)
+i8 %#22 = #x01 (1)
+i8 %#23 = #x01 (1)
+i64 %#24 = #x0000000000000001 (1)
+i1 %#25 = #x0 (0)
+  >> Jump to %#6
+i64 %#26 = #x0000000000000008 (8)
+i1 %#27 = #x0 (0)
+  >> Jump to %#7
+i8 %#28 = #x01 (1)
+i1 %#29 = #x1 (1)
+  >> Jump to %#8
+i8 %#30 = #x01 (1)
+i1 %#31 = #x1 (1)
+  >> Jump to %#9
+i8 %#32 = #x01 (1)
+i1 %#33 = #x1 (1)
+  >> Jump to %#10
+i64 %#34 = #x0000000000000008 (8)
+i64 %#35 = #x0000000000000000 (0)
+i1 %#36 = #x0 (0)
+  >> Jump to %#11
+  >> Jump to %#14
+i1 %#37 = #x1 (1)
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 8 >	size: 1	align: 1	alloc type: 1	alive: true	address: 256
+Block 9 >	size: 8	align: 8	alloc type: 1	alive: true	address: 288
+Block 10 >	size: 8	align: 8	alloc type: 1	alive: true	address: 272
+Block 11 >	size: 1	align: 1	alloc type: 1	alive: true	address: 264
+Block 12 >	size: 1	align: 1	alloc type: 1	alive: true	address: 260
+Block 13 >	size: 1	align: 1	alloc type: 1	alive: true	address: 257
+Source value: #x0 (0)
+Target value: #x1 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

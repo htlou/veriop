@@ -1,0 +1,9 @@
+# OpenSSL `f99ffceb`: no-RCU hashtable destructor
+
+The selected optimization changes only `crypto/hashtable/hashtable.c`. [`recover.py`](recover.py) reconstructs the missing parent from the available child and verifies both exact Git blob IDs: parent `7b3da99c6d0c5b1831f462a6b7068ea368465e9a`, child `1cce15ed2443c055ff7d6be84f1fc53d982404fa`. The complete difference is confined to `ossl_ht_free`: the old version calls `ossl_ht_flush_internal` even for `no_rcu` tables, while the new version calls `free_oldmd` directly. The unchanged flush helper first calls `OPENSSL_zalloc` and returns early if that allocation fails.
+
+**Verdict: scoped `NOT_EQUIV` for the allocation-callback trace on a valid no-RCU destructor call.** OpenSSL [permits a caller-supplied allocation function](https://docs.openssl.org/3.5/man3/OPENSSL_malloc/) via `CRYPTO_set_mem_functions`, so the number of allocation callbacks is externally observable. [`check_allocator_trace.py`](check_allocator_trace.py) extracts both exact historical destructor bodies. Its context installs a failing `OPENSSL_zalloc` stub, which follows the unchanged helper's source-locked first allocation and failure return. The old destructor invokes that allocation callback once; the new one invokes it zero times. [Alive2](alive2-allocator-trace.log) refutes equality of callback counts, and the [ASan/UBSan witness](native-witness.log) passes.
+
+This is an allocation side-effect difference, not evidence that table values, memory safety, or a successful operation's functional return differs. The historical headers and complete allocator/RCU implementations are not built in this harness; it checks the exact destructor control flow in one valid failing-allocator context. No official historical benchmark score was measured.
+
+Run `sh history-eq/c/openssl/f99ffceb/verify.sh` from the project root to recheck source hashes, the native witness, and Alive2.

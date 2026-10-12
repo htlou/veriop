@@ -1,0 +1,155 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/08aff8b/r_client/new.ll c/xxHash/08aff8b/r_client/old.ll
+
+----------------------------------------
+define i32 @target_client_xxh32_twice(ptr noread nowrite noundef %#0, i64 noundef %#1, i32 noundef %#2) nofree noundef willreturn memory(none) {
+#3:
+  ret i32 0
+}
+=>
+declare i32 @XXH32(noundef ptr, noundef i64, noundef i32)
+
+define i32 @target_client_xxh32_twice(ptr noundef %#0, i64 noundef %#1, i32 noundef %#2) {
+#3:
+  %#4 = tail call i32 @XXH32(noundef ptr noundef %#0, noundef i64 noundef %#1, noundef i32 noundef %#2)
+  %#5 = tail call i32 @XXH32(noundef ptr noundef %#0, noundef i64 noundef %#1, noundef i32 noundef %#2)
+  %#6 = sub i32 %#4, %#5
+  ret i32 %#6
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noread nowrite noundef %#0 = null
+i64 noundef %#1 = #x0000000000000003 (3)
+i32 noundef %#2 = #x00000003 (3)
+
+Source:
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 2
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 3
+
+Target:
+Function @XXH32 triggered UB
+
+
+
+----------------------------------------
+define i64 @target_client_xxh64_twice(ptr noread nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree noundef willreturn memory(none) {
+#3:
+  ret i64 0
+}
+=>
+declare i64 @XXH64(noundef ptr, noundef i64, noundef i64)
+
+define i64 @target_client_xxh64_twice(ptr noundef %#0, i64 noundef %#1, i64 noundef %#2) {
+#3:
+  %#4 = tail call i64 @XXH64(noundef ptr noundef %#0, noundef i64 noundef %#1, noundef i64 noundef %#2)
+  %#5 = tail call i64 @XXH64(noundef ptr noundef %#0, noundef i64 noundef %#1, noundef i64 noundef %#2)
+  %#6 = sub i64 %#4, %#5
+  ret i64 %#6
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noread nowrite noundef %#0 = null
+i64 noundef %#1 = #x0000000000000003 (3)
+i64 noundef %#2 = #x0000000000000003 (3)
+
+Source:
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 1	align: 1	alloc type: 0	alive: true	address: 8
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 8
+
+Target:
+Function @XXH64 triggered UB
+
+
+
+----------------------------------------
+define i64 @target_client_xxh3_twice(ptr noread nowrite noundef %#0, i64 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  ret i64 0
+}
+=>
+declare i64 @XXH3_64bits(noundef ptr, noundef i64)
+
+define i64 @target_client_xxh3_twice(ptr noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = tail call i64 @XXH3_64bits(noundef ptr noundef %#0, noundef i64 noundef %#1)
+  %#4 = tail call i64 @XXH3_64bits(noundef ptr noundef %#0, noundef i64 noundef %#1)
+  %#5 = sub i64 %#3, %#4
+  ret i64 %#5
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noread nowrite noundef %#0 = null
+i64 noundef %#1 = #x0000000000000003 (3)
+
+Source:
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 1	align: 1	alloc type: 0	alive: true	address: 8
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 8
+
+Target:
+Function @XXH3_64bits triggered UB
+
+
+
+----------------------------------------
+define i64 @target_client_digest_twice(ptr noread nowrite noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  ret i64 0
+}
+=>
+declare i64 @XXH64_digest(noundef ptr)
+
+define i64 @target_client_digest_twice(ptr noundef %#0) {
+#1:
+  %#2 = tail call i64 @XXH64_digest(noundef ptr noundef %#0)
+  %#3 = tail call i64 @XXH64_digest(noundef ptr noundef %#0)
+  %#4 = sub i64 %#2, %#3
+  ret i64 %#4
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noread nowrite noundef %#0 = null
+
+Source:
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 2
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 3
+
+Target:
+Function @XXH64_digest triggered UB
+
+
+Summary:
+  0 correct transformations
+  4 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

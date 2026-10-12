@@ -1,0 +1,398 @@
+diff --git a/src/kontrol/cli.py b/src/kontrol/cli.py
+index deaf98f..52ca811 100644
+--- a/src/kontrol/cli.py
++++ b/src/kontrol/cli.py
+@@ -575,7 +575,17 @@ def _create_argument_parser() -> ArgumentParser:
+         help=(
+             'Optimize performance for proof execution. Takes the number of parallel threads to be used.'
+             "Will overwrite other settings of 'assume-defined', 'log-success-rewrites', 'max-frontier-parallel',"
+-            "'maintenance-rate', 'smt-timeout', 'smt-retry-limit', 'max-depth', and 'max-iterations'."
++            "'maintenance-rate', 'smt-timeout', 'smt-retry-limit', 'max-depth', 'max-iterations', and 'no-stack-checks'."
++        ),
++    )
++    prove_args.add_argument(
++        '--no-stack-checks',
++        dest='no_stack_checks',
++        default=None,
++        action='store_true',
++        help=(
++            'Optimize KEVM execution by removing stack overflow/underflow checks.'
++            'Assumes running Solidity-compiled bytecode cannot result in a stack overflow/underflow.'
+         ),
+     )
+ 
+diff --git a/src/kontrol/foundry.py b/src/kontrol/foundry.py
+index 31c549d..caf2beb 100644
+--- a/src/kontrol/foundry.py
++++ b/src/kontrol/foundry.py
+@@ -865,7 +865,12 @@ def foundry_show(
+                 [
+                     KApply(
+                         '<foundry>',
+-                        [KVariable('KEVM_CELL'), KVariable('CHEATCODES_CELL'), KVariable('KEVMTRACING_CELL')],
++                        [
++                            KVariable('KEVM_CELL'),
++                            KVariable('STACKCHECKS_CELL'),
++                            KVariable('CHEATCODES_CELL'),
++                            KVariable('KEVMTRACING_CELL'),
++                        ],
+                     ),
+                     KVariable('GENERATEDCOUNTER_CELL'),
+                 ],
+diff --git a/src/kontrol/kdist/cheatcodes.md b/src/kontrol/kdist/cheatcodes.md
+index 3d50fd9..1b6b9bc 100644
+--- a/src/kontrol/kdist/cheatcodes.md
++++ b/src/kontrol/kdist/cheatcodes.md
+@@ -470,7 +470,7 @@ WThe `#checkRevert` will be used to compare the status code of the execution and
+            <expectedDepth> CD </expectedDepth>
+            ...
+          </expectedRevert>
+-      [priority(38)]
++      [priority(32)]
+ 
+     rule [foundry.set.expectrevert.2]:
+          <k> #next [ _OP:CallSixOp ] ~> (.K => #checkRevert ~> #updateRevertOutput RETSTART RETWIDTH) ~> #execute ... </k>
+@@ -481,7 +481,7 @@ WThe `#checkRevert` will be used to compare the status code of the execution and
+            <expectedDepth> CD </expectedDepth>
+            ...
+          </expectedRevert>
+-      [priority(38)]
++      [priority(32)]
+ 
+     rule [foundry.set.expectrevert.3]:
+          <k> #next [ OP:OpCode ] ~> (.K => #checkRevert) ~> #execute ... </k>
+@@ -492,7 +492,7 @@ WThe `#checkRevert` will be used to compare the status code of the execution and
+            ...
+          </expectedRevert>
+       requires (OP ==K CREATE orBool OP ==K CREATE2)
+-      [priority(38)]
++      [priority(32)]
+ ```
+ 
+ If the `expectRevert()` selector is matched, call the `#setExpectRevert` production to initialize the `<expectedRevert>` subconfiguration.
+@@ -656,7 +656,7 @@ The last point is required in order to prevent overwriting the caller for subcal
+       requires ACCT =/=K NCL
+        andBool ACCTTO =/=K #address(FoundryCheat)
+        andBool (OP ==K CALL orBool OP ==K CALLCODE orBool OP ==K STATICCALL orBool OP ==K CREATE orBool OP ==K CREATE2)
+-      [priority(40)]
++      [priority(34)]
+ ```
+ 
+ #### `startPrank` - Sets `msg.sender` and `tx.origin` for all subsequent calls until `stopPrank` is called.
+diff --git a/src/kontrol/kdist/foundry.md b/src/kontrol/kdist/foundry.md
+index 7b27399..2ac8861 100644
+--- a/src/kontrol/kdist/foundry.md
++++ b/src/kontrol/kdist/foundry.md
+@@ -30,6 +30,7 @@ module FOUNDRY
+     configuration
+       <foundry>
+         <kevm/>
++        <stackChecks> true </stackChecks>
+         <cheatcodes/>
+         <KEVMTracing/>
+       </foundry>
+diff --git a/src/kontrol/kdist/kontrol_lemmas.md b/src/kontrol/kdist/kontrol_lemmas.md
+index f9feb18..8e965c2 100644
+--- a/src/kontrol/kdist/kontrol_lemmas.md
++++ b/src/kontrol/kdist/kontrol_lemmas.md
+@@ -14,18 +14,6 @@ module KONTROL-AUX-LEMMAS
+     imports MAP-SYMBOLIC
+     imports SET-SYMBOLIC
+ 
+-    syntax StepSort ::= Int
+-                      | Bool
+-                      | Bytes
+-                      | Map
+-                      | Set
+- // -------------------------
+-
+-    syntax KItem ::= runLemma ( StepSort )
+-                   | doneLemma( StepSort )
+- // --------------------------------------
+-    rule <k> runLemma(T) => doneLemma(T) ... </k>
+-
+     syntax Int ::= "ethMaxWidth" [macro]
+     syntax Int ::= "ethUpperBound" [macro]
+  // --------------------------------------
+diff --git a/src/kontrol/kdist/no_stack_checks.md b/src/kontrol/kdist/no_stack_checks.md
+new file mode 100644
+index 0000000..0ca3a59
+--- /dev/null
++++ b/src/kontrol/kdist/no_stack_checks.md
+@@ -0,0 +1,145 @@
++Optimized EVM rules
++===================
++
++The provided rules speed up execution by not performing stack overflow/underflow checks
++and rely on the hypothesis that EVM bytecode that comes compiled from Solidity will not
++result in a stack overflow/underflow.
++
++```k
++requires "foundry.md"
++
++module NO-STACK-CHECKS
++    imports EVM
++    imports FOUNDRY
++
++    rule [super.optimized.pushzero]:
++      <k> ( #next[ PUSHZERO ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> WS => 0 : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.push]:
++      <k> ( #next[ PUSH(N) ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <program> PGM </program>
++      <wordStack> WS => #asWord( #range(PGM, PCOUNT +Int 1, N) ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int N +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.dup]:
++      <k> ( #next[ DUP(N) ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> WS => WS [ ( N +Int -1 ) ] : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.swap]:
++      <k> ( #next[ SWAP(N) ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : WS => WS [ ( N +Int -1 ) ] : ( WS [ ( N +Int -1 ) := W0 ] ) </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.add]:
++      <k> ( #next[ ADD ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => chop ( W0 +Int W1 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.sub]:
++      <k> ( #next[ SUB ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => chop ( W0 -Int W1 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.mul]:
++      <k> ( #next[ MUL ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => chop ( W0 *Int W1 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.and]:
++      <k> ( #next[ AND ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => W0 &Int W1 : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.or]:
++      <k> ( #next[ EVMOR ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => W0 |Int W1 : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.xor]:
++      <k> ( #next[ XOR ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => W0 xorInt W1 : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.iszero]:
++      <k> ( #next[ ISZERO ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : WS => bool2Word ( W0 ==Int 0 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.lt]:
++      <k> ( #next[ LT ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => bool2Word ( W0 <Int W1 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.gt]:
++      <k> ( #next[ GT ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => bool2Word ( W1 <Int W0 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.eq]:
++      <k> ( #next[ EQ ] => .K ) ... </k>
++      <useGas> false </useGas>
++      <stackChecks> false </stackChecks>
++      <wordStack> W0 : W1 : WS => bool2Word ( W0 ==Int W1 ) : WS </wordStack>
++      <pc> PCOUNT => PCOUNT +Int 1 </pc>
++      [priority(30)]
++
++    rule [super.optimized.next.succ]:
++      <k> ( #next [ OP:OpCode ] => #addr [ OP ] ~> #exec [ OP ] ~> #pc[ OP ] ) ... </k>
++      <stackChecks> false </stackChecks>
++      <wordStack> WS </wordStack>
++      <static> STATIC:Bool </static>
++      requires notBool ( STATIC andBool #changesState(OP, WS) )
++      [priority(36)]
++
++    rule [super.optimized.next.smv]:
++      <k> ( #next [ OP ] => #end EVMC_STATIC_MODE_VIOLATION ) ... </k>
++      <stackChecks> false </stackChecks>
++      <wordStack> WS </wordStack>
++      <static> STATIC:Bool </static>
++      requires STATIC andBool #changesState(OP, WS)
++      [priority(38)]
++
++endmodule
++```
+\ No newline at end of file
+diff --git a/src/kontrol/kompile.py b/src/kontrol/kompile.py
+index c0a41d0..88a27f2 100644
+--- a/src/kontrol/kompile.py
++++ b/src/kontrol/kompile.py
+@@ -63,6 +63,7 @@ def foundry_kompile(
+         options.requires
+         + ([KSRC_DIR / 'keccak.md'] if options.keccak_lemmas else [])
+         + ([KSRC_DIR / 'kontrol_lemmas.md'] if options.auxiliary_lemmas else [])
++        + ([KSRC_DIR / 'no_stack_checks.md'])
+     )
+     for r in tuple(requires):
+         req = Path(r)
+@@ -227,6 +228,7 @@ def _foundry_to_main_def(
+             [KImport(mname) for mname in (_m.name for _m in modules)]
+             + ([KImport('KECCAK-LEMMAS')] if keccak_lemmas else [])
+             + ([KImport('KONTROL-AUX-LEMMAS')] if auxiliary_lemmas else [])
++            + ([KImport('NO-STACK-CHECKS')])
+         ),
+     )
+ 
+diff --git a/src/kontrol/options.py b/src/kontrol/options.py
+index 3bf0b4d..d030c92 100644
+--- a/src/kontrol/options.py
++++ b/src/kontrol/options.py
+@@ -378,6 +378,7 @@ class ProveOptions(
+     hide_status_bar: bool
+     remove_old_proofs: bool
+     optimize_performance: int | None
++    no_stack_checks: bool
+ 
+     def __init__(self, args: dict[str, Any]) -> None:
+         super().__init__(args)
+@@ -406,6 +407,7 @@ class ProveOptions(
+             'hide_status_bar': False,
+             'remove_old_proofs': False,
+             'optimize_performance': None,
++            'no_stack_checks': False,
+         }
+ 
+     @staticmethod
+@@ -464,11 +466,12 @@ class ProveOptions(
+             self.assume_defined = True
+             self.log_succ_rewrites = False
+             self.max_frontier_parallel = self.optimize_performance
+-            self.maintenance_rate = 2 * self.optimize_performance
++            self.maintenance_rate = 64
+             self.smt_timeout = 120000
+             self.smt_retry_limit = 0
+             self.max_depth = 100000
+             self.max_iterations = 10000
++            self.no_stack_checks = True
+ 
+     def __str__(self) -> str:
+         """
+diff --git a/src/kontrol/prove.py b/src/kontrol/prove.py
+index 84aa15e..beb18a1 100644
+--- a/src/kontrol/prove.py
++++ b/src/kontrol/prove.py
+@@ -425,6 +425,7 @@ def _run_cfg_group(
+                             'usegas': options.usegas,
+                         }
+                     ),
++                    no_stack_checks=options.no_stack_checks,
+                     trace_options=TraceOptions(
+                         {
+                             'active_tracing': options.active_tracing,
+@@ -567,6 +568,7 @@ def method_to_apr_proof(
+     kcfg_explore: KCFGExplore,
+     config_type: ConfigType,
+     evm_chain_options: EVMChainOptions,
++    no_stack_checks: bool,
+     bmc_depth: int | None = None,
+     run_constructor: bool = False,
+     recorded_state_entries: Iterable[StateDiffEntry] | Iterable[StateDumpEntry] | None = None,
+@@ -594,6 +596,7 @@ def method_to_apr_proof(
+         setup_proof=setup_proof,
+         graft_setup_proof=((setup_proof is not None) and not setup_proof_is_constructor),
+         evm_chain_options=evm_chain_options,
++        no_stack_checks=no_stack_checks,
+         recorded_state_entries=recorded_state_entries,
+         active_symbolik=active_symbolik,
+         hevm=hevm,
+@@ -637,6 +640,7 @@ def _method_to_initialized_cfg(
+     kcfg_explore: KCFGExplore,
+     config_type: ConfigType,
+     evm_chain_options: EVMChainOptions,
++    no_stack_checks: bool,
+     *,
+     setup_proof: APRProof | None = None,
+     graft_setup_proof: bool = False,
+@@ -659,6 +663,7 @@ def _method_to_initialized_cfg(
+         recorded_state_entries,
+         active_symbolik,
+         config_type=config_type,
++        no_stack_checks=no_stack_checks,
+         hevm=hevm,
+         trace_options=trace_options,
+     )
+@@ -692,6 +697,7 @@ def _method_to_cfg(
+     recorded_state_entries: Iterable[StateDiffEntry] | Iterable[StateDumpEntry] | None,
+     active_symbolik: bool,
+     config_type: ConfigType,
++    no_stack_checks: bool,
+     hevm: bool = False,
+     trace_options: TraceOptions | None = None,
+ ) -> tuple[KCFG, list[int], int, int, Iterable[int]]:
+@@ -729,6 +735,7 @@ def _method_to_cfg(
+         trace_options=trace_options,
+         config_type=config_type,
+         additional_accounts=external_libs,
++        no_stack_checks=no_stack_checks,
+     )
+     new_node_ids = []
+     bounded_node_ids = []
+@@ -983,6 +990,7 @@ def _init_cterm(
+     active_symbolik: bool,
+     evm_chain_options: EVMChainOptions,
+     additional_accounts: list[KInner],
++    no_stack_checks: bool,
+     *,
+     calldata: KInner | None = None,
+     callvalue: KInner | None = None,
+@@ -999,6 +1007,7 @@ def _init_cterm(
+     init_subst = {
+         'MODE_CELL': KApply(evm_chain_options.mode),
+         'USEGAS_CELL': boolToken(evm_chain_options.usegas),
++        'STACKCHECKS_CELL': boolToken(not no_stack_checks),
+         'SCHEDULE_CELL': schedule,
+         'CHAINID_CELL': intToken(evm_chain_options.chainid),
+         'STATUSCODE_CELL': KVariable('STATUSCODE'),

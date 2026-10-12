@@ -1,0 +1,23 @@
+{
+ "repo": "llama.cpp",
+ "commit": "0a423800ffe4e5da3d83527ef3473da88cd78146",
+ "checker": "Volta (PTX parse) + per-function PTX identity (nvcc 12.8); no semantic query needed",
+ "checker_ran": true,
+ "verdict": "EQUIV",
+ "scope": "the only changed definition (mmq.cuh mul_mat_q launch-bounds guard under GGML_USE_HIPBLAS && __HIP_PLATFORM_AMD__, RDNA1 removed) via 11 translation units (mmq.cu + 10 mmq-instance-*.cu)",
+ "build_config": "nvcc 12.8 --ptx -O3 -std=c++17 -arch=compute_80 --extended-lambda -DGGML_BACKEND_BUILD, ggml/src + ggml/include of the respective revision",
+ "units": [
+  {
+   "name": "mul_mat_q launch bounds",
+   "file": "ggml/src/ggml-cuda/mmq.cuh",
+   "result": "EQUIV",
+   "detail": "old/new PTX byte-identical (after path-string normalisation) for all 11 TUs, 640 kernels; Volta parses both"
+  }
+ ],
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "not_equiv_level": null,
+ "counterexample": null,
+ "evidence_dir": "history-eq/gh/work/llama.cpp/0a423800",
+ "notes": "The edit only removes defined(RDNA1) from an AMD/HIP-only __launch_bounds__ guard, so for the CUDA/NVIDIA configuration the preprocessed code is unchanged and the compiled PTX of every mmq instance is identical. Verdict is for the NVIDIA CUDA build configuration only; the HIP/RDNA1 build was not analysed."
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "base64::encoded_size (private)",
+    "level": "raw",
+    "verdict": "NOT_EQUIV",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": "intended-output-change",
+    "artifact_dir": "rust/rust-base64/lean/Cf977b8e",
+    "evidence": "Proof.lean: encoded_size_not_equiv : Old.encoded_size 0#usize \u2260 New.encoded_size 0#usize (old_zero: Old 0 = ok 4, new_zero: New 0 = ok 0; step*, kernel-checked); extraction tag esz, charon --start-from base64::encoded_size, no cargo args, no external axioms",
+    "hypotheses": [],
+    "notes": "Deliberate change of a capacity hint: old = 4*(len - len%3)/3 + (len%3==0 ? 4 : 0) (over-estimates by 4 when len%3==0, UNDER-estimates by 4 otherwise, e.g. len=1: old 0, new 4); new = (len/3)*4 + (len%3==0 ? 0 : 4) = exact padded length. They differ for every len (old - new = +4 if len%3==0 else -4; only the len=0 counterexample is proved). Overflow domains also differ: old's 4*(len-rem) overflows (panic in Aeneas/debug semantics) for len > usize::MAX/4, new only near usize::MAX.",
+    "primary": false
+  },
+  {
+    "name": "base64::encode_mode (and encode_mode_buf, same pattern)",
+    "level": "api",
+    "verdict": "UNSUPPORTED",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": "missing-std-model",
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/Cf977b8e",
+    "evidence": "Extraction OK (tag emode, --start-from base64::encode_mode; EmodeOld/EmodeNew typecheck), but encode_mode = String::with_capacity(encoded_size(len)) then encode_mode_buf (String::reserve(encoded_size(len)), String::as_mut_vec); these are opaque axioms `alloc.string.String.with_capacity : Usize \u2192 Result String`, `String.reserve : String \u2192 Usize \u2192 Result String`, `String.as_mut_vec`, and they receive different arguments (e.g. len=0: old with_capacity 4, new 0). Equivalence needs 'with_capacity/reserve ignore the capacity argument', which is not derivable and not assumed.",
+    "hypotheses": [],
+    "notes": "In Rust semantics the capacity argument only affects allocation, so the API is expected to be EQUIV except for the overflow-panic domain: old encoded_size panics (debug) for len > usize::MAX/4 where new does not (new would be more defined). Not proved; no Lean proof attempted at api level. Primary verdict (api) = UNSUPPORTED; raw = NOT_EQUIV (intended capacity-hint change).",
+    "primary": true
+  }
+]

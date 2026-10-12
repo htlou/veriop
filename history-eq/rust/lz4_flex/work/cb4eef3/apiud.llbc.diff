@@ -1,0 +1,222 @@
+300,303d299
+< pub unsafe fn core::ptr::const_ptr::{*const T}::read<T>(_1: *const T) -> T
+< = <opaque>
+< 
+< #[track_caller]
+548,549c544,545
+<     let _6: core::ops::range::Range<usize>; // anonymous local
+<     let _7: core::ops::range::Range<usize>; // anonymous local
+---
+>     let dst_ptr_end: *mut u8; // local
+>     let _7: *mut u8; // anonymous local
+551,557c547,553
+<     let iter: core::ops::range::Range<usize>; // local
+<     let _10: core::option::Option<usize>; // anonymous local
+<     let _11: &'3 mut core::ops::range::Range<usize>; // anonymous local
+<     let _12: &'4 mut core::ops::range::Range<usize>; // anonymous local
+<     let curr: u8; // local
+<     let _14: *const u8; // anonymous local
+<     let _15: (); // anonymous local
+---
+>     let _9: bool; // anonymous local
+>     let _10: usize; // anonymous local
+>     let _11: *mut u8; // anonymous local
+>     let _12: usize; // anonymous local
+>     let _13: *mut u8; // anonymous local
+>     let _14: (); // anonymous local
+>     let _15: *const u8; // anonymous local
+559,560c555,556
+<     let _17: u8; // anonymous local
+<     let _18: *mut u8; // anonymous local
+---
+>     let _17: *const u8; // anonymous local
+>     let _18: *const u8; // anonymous local
+562,563c558
+<     let _20: *const u8; // anonymous local
+<     let _21: *const u8; // anonymous local
+---
+>     let _20: *mut u8; // anonymous local
+581c576
+<     storage_live(_6)
+---
+>     storage_live(dst_ptr_end)
+582a578
+>     _7 = copy (*output_ptr)
+584d579
+<     // Note: this looks like a harmless loop but is unrolled/auto-vectorized by the compiler
+586,588c581
+<     _7 = core::ops::range::Range { start: const 0usize, end: move _8 }
+<     storage_dead(_8)
+<     _6 = core::iter::traits::collect::{impl core::iter::traits::collect::IntoIterator<Clause0_Item, I> for I}::into_iter<core::ops::range::Range<usize>, usize>[core::iter::range::{impl core::iter::traits::iterator::Iterator<A> for core::ops::range::Range<A>}<usize>[core::iter::range::{impl core::iter::range::Step for usize}, {built_in impl core::marker::Destruct for usize}]](move _7)
+---
+>     dst_ptr_end = core::ptr::mut_ptr::{*mut T}::add<u8>(move _7, move _8)
+592a586
+>     storage_dead(_8)
+594,595c588
+<     storage_live(iter)
+<     iter = move _6
+---
+>     fake_read(dst_ptr_end)
+596a590
+>         storage_live(_9)
+599,606c593,594
+<         storage_live(_12)
+<         _12 = &mut iter
+<         _11 = &two-phase-mut (*_12)
+<         _10 = core::iter::range::{impl core::iter::traits::iterator::Iterator<A> for core::ops::range::Range<A>}::next<'6, usize>[core::iter::range::{impl core::iter::range::Step for usize}, {built_in impl core::marker::Destruct for usize}](move _11)
+<         ↳⚡ storage_dead(match_length)
+<             storage_dead(start)
+<             storage_dead(output_ptr)
+<             unwind_continue
+---
+>         _11 = copy (*output_ptr)
+>         _10 = cast_expose<*mut u8, usize>(move _11)
+608,613c596,646
+<         match _10 {
+<             core::option::Option::None => {
+<                 break 0
+<             },
+<             core::option::Option::Some => {
+<             },
+---
+>         storage_live(_12)
+>         storage_live(_13)
+>         _13 = copy dst_ptr_end
+>         _12 = cast_expose<*mut u8, usize>(move _13)
+>         storage_dead(_13)
+>         _9 = move _10 < move _12
+>         if move _9 {
+>             storage_dead(_12)
+>             storage_dead(_10)
+>             storage_live(_14)
+>             storage_live(_15)
+>             // Note that we copy 4 bytes, instead of one.
+>             // Without that the compiler will unroll/auto-vectorize the copy with a lot of branches.
+>             // This is not what we want, as large overlapping copies are not that common.
+>             _15 = copy start
+>             storage_live(_16)
+>             _16 = copy (*output_ptr)
+>             _14 = core::ptr::copy<u8>(move _15, move _16, const 4usize)
+>             ↳⚡ storage_dead(match_length)
+>                 storage_dead(start)
+>                 storage_dead(output_ptr)
+>                 unwind_continue
+>             storage_dead(_16)
+>             storage_dead(_15)
+>             storage_dead(_14)
+>             storage_live(_17)
+>             storage_live(_18)
+>             _18 = copy start
+>             _17 = core::ptr::const_ptr::{*const T}::add<u8>(move _18, const 1usize)
+>             ↳⚡ storage_dead(match_length)
+>                 storage_dead(start)
+>                 storage_dead(output_ptr)
+>                 unwind_continue
+>             storage_dead(_18)
+>             start = move _17
+>             storage_dead(_17)
+>             storage_live(_19)
+>             storage_live(_20)
+>             _20 = copy (*output_ptr)
+>             _19 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _20, const 1usize)
+>             ↳⚡ storage_dead(match_length)
+>                 storage_dead(start)
+>                 storage_dead(output_ptr)
+>                 unwind_continue
+>             storage_dead(_20)
+>             (*output_ptr) = move _19
+>             storage_dead(_19)
+>             storage_dead(_9)
+>             continue 0
+>         } else {
+>             break 0
+615,663d647
+<         storage_live(curr)
+<         storage_live(_14)
+<         _14 = copy start
+<         curr = core::ptr::const_ptr::{*const T}::read<u8>(move _14)
+<         ↳⚡ storage_dead(match_length)
+<             storage_dead(start)
+<             storage_dead(output_ptr)
+<             unwind_continue
+<         storage_dead(_14)
+<         fake_read(curr)
+<         storage_live(_15)
+<         storage_live(_16)
+<         _16 = copy (*output_ptr)
+<         storage_live(_17)
+<         _17 = copy curr
+<         _15 = core::ptr::mut_ptr::{*mut T}::write<u8>(move _16, move _17)
+<         ↳⚡ storage_dead(match_length)
+<             storage_dead(start)
+<             storage_dead(output_ptr)
+<             unwind_continue
+<         storage_dead(_17)
+<         storage_dead(_16)
+<         storage_dead(_15)
+<         storage_live(_18)
+<         storage_live(_19)
+<         _19 = copy (*output_ptr)
+<         _18 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _19, const 1usize)
+<         ↳⚡ storage_dead(match_length)
+<             storage_dead(start)
+<             storage_dead(output_ptr)
+<             unwind_continue
+<         storage_dead(_19)
+<         (*output_ptr) = move _18
+<         storage_dead(_18)
+<         storage_live(_20)
+<         storage_live(_21)
+<         _21 = copy start
+<         _20 = core::ptr::const_ptr::{*const T}::add<u8>(move _21, const 1usize)
+<         ↳⚡ storage_dead(match_length)
+<             storage_dead(start)
+<             storage_dead(output_ptr)
+<             unwind_continue
+<         storage_dead(_21)
+<         start = move _20
+<         storage_dead(_20)
+<         storage_dead(curr)
+<         storage_dead(_12)
+<         storage_dead(_10)
+<         continue 0
+665d648
+<     _0 = ()
+668,669c651,653
+<     storage_dead(iter)
+<     storage_dead(_6)
+---
+>     _0 = ()
+>     storage_dead(_9)
+>     storage_dead(dst_ptr_end)
+2255d2238
+<             // match crosses ext_dict and output
+3053a3037
+>                         // match crosses ext_dict and output
+7054c7038
+< Source: 'src/block/decompress.rs', lines 243:67-243:95
+---
+> Source: 'src/block/decompress.rs', lines 245:67-245:95
+7056,7057c7040,7041
+< Definition span: 'src/block/decompress.rs', lines 182:0-433:1
+< Source: 'src/block/decompress.rs', lines 243:67-243:95
+---
+> Definition span: 'src/block/decompress.rs', lines 184:0-435:1
+> Source: 'src/block/decompress.rs', lines 245:67-245:95
+7060c7044
+< Source: 'src/block/decompress.rs', lines 148:12-148:20
+---
+> Source: 'src/block/decompress.rs', lines 150:12-150:20
+7062,7063c7046,7047
+< Definition span: 'src/block/decompress.rs', lines 143:0-155:1
+< Source: 'src/block/decompress.rs', lines 148:12-148:20
+---
+> Definition span: 'src/block/decompress.rs', lines 145:0-157:1
+> Source: 'src/block/decompress.rs', lines 150:12-150:20
+7069a7054,7059
+> Compiler source: interp/Interp.ml, line 617
+> 
+> Source: 'src/block/decompress.rs', lines 61:10-61:32
+> Name pattern: 'lz4_flex::block::decompress::duplicate_overlapping'
+> Definition span: 'src/block/decompress.rs', lines 50:0-69:1
+> Source: 'src/block/decompress.rs', lines 61:10-61:32

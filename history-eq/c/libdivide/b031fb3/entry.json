@@ -1,0 +1,64 @@
+{
+  "commit": "b031fb3",
+  "date": "2016-04-09",
+  "subject": "Save 1 instruction in libdivide_u*_branchfree_do()",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message explicitly targets one fewer instruction in unsigned branchfree division.",
+  "change_summary": "Stores a masked shift in public unsigned branchfree divider structs, then uses it directly in do and reconstructs the marker in recover.",
+  "units": [
+    {
+      "name": "public libdivide_u32_branchfree_gen(d).more field",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": "intended-output-change",
+      "artifact_dir": "c/libdivide/b031fb3/sse2_u4",
+      "evidence": "Alive2 gives a valid divisor d=2: the public generator's more field changes from 64 before to 0 after."
+    },
+    {
+      "name": "public generated unsigned-32/64 branchfree scalar and SSE2 division",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/b031fb3/sse2_u4",
+      "evidence": "All four generated-divider scalar/vector division targets pass both Alive2 directions."
+    },
+    {
+      "name": "public unsigned-32 branchfree generator then recover",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/b031fb3/sse2_u4",
+      "evidence": "The unsigned-32 recovery target passes both directions; unsigned-64 recovery is inconclusive."
+    },
+    {
+      "name": "public unsigned-64 branchfree generator then recover",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/b031fb3/sse2_u4",
+      "evidence": "The unsigned-64 recovery target times out in both directions."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": "intended-output-change",
+  "notes": "The field representation is observable through the public C struct. This does not imply changed quotient results: all checked generated-division paths agree. Raw arbitrary-divider mismatches are consistent with the representation change but are not used as the commit-level witness."
+}

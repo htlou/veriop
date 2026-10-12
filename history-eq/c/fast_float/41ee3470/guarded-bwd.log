@@ -1,0 +1,64 @@
+
+----------------------------------------
+define i64 @target_guarded_value(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#4 = add i64 noundef %#0, 5063812098665367110
+  %#5 = add i64 noundef %#0, -3472328296227680304
+  %#6 = or i64 %#4, %#5
+  %#7 = and i64 %#6, -9187201950435737472
+  %#8 = icmp eq i64 %#7, 0
+  br i1 %#8, label %#2, label %#3
+
+#2:
+  %#9 = mul i64 %#5, 10
+  %#10 = lshr i64 %#5, 8
+  %#11 = add i64 %#9, %#10
+  %#12 = and i64 %#11, 1095216660735
+  %#13 = mul i64 %#12, 4294967296000100
+  %#14 = lshr i64 %#11, 16
+  %#15 = and i64 %#14, 1095216660735
+  %#16 = mul i64 %#15, 42949672960001
+  %#17 = add i64 %#16, %#13
+  %#18 = lshr i64 %#17, 32
+  br label %#3
+
+#3:
+  %#19 = phi i64 [ %#18, %#2 ], [ -1, %#1 ]
+  %#range_0_%#19 = !range i64 %#19, i64 -1, i64 4294967296
+  ret i64 %#range_0_%#19
+}
+=>
+define i64 @target_guarded_value(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#4 = and i64 noundef %#0, -1085102592571150096
+  %#5 = add i64 noundef %#0, 434041037028460038
+  %#6 = lshr i64 %#5, 4
+  %#7 = and i64 %#6, 1085102592571150095
+  %#8 = or disjoint i64 %#7, %#4
+  %#9 = icmp eq i64 %#8, 3689348814741910323
+  br i1 %#9, label %#2, label %#3
+
+#2:
+  %#10 = and i64 noundef %#0, 1085102592571150095
+  %#11 = mul i64 %#10, 2561
+  %#12 = lshr i64 %#11, 8
+  %#13 = and i64 %#12, 71777214294589695
+  %#14 = mul i64 %#13, 6553601
+  %#15 = lshr i64 %#14, 16
+  %#16 = and i64 %#15, 281470681808895
+  %#17 = mul i64 %#16, 42949672960001
+  %#18 = lshr i64 %#17, 32
+  br label %#3
+
+#3:
+  %#19 = phi i64 [ %#18, %#2 ], [ -1, %#1 ]
+  %#range_0_%#19 = !range i64 %#19, i64 -1, i64 4294967296
+  ret i64 %#range_0_%#19
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

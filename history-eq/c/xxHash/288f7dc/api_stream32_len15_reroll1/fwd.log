@@ -1,0 +1,136 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/288f7dc/api_stream32_len15_reroll1/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/288f7dc/api_stream32_len15_reroll1/new.ll
+
+----------------------------------------
+define i32 @target_stream(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#9 = load i32, ptr %#8, align 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#13 = load i24, ptr %#12, align 1
+  %#14 = zext i24 %#13 to i32
+  %#15 = add i32 noundef %#1, 374761408
+  %#16 = mul i32 %#7, 3266489917
+  %#17 = add i32 %#16, %#15
+  %#18 = fshl i32 %#17, i32 %#17, i32 17
+  %#19 = mul i32 %#18, 668265263
+  %#20 = mul i32 %#9, 3266489917
+  %#21 = add i32 %#20, %#19
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  %#24 = mul i32 %#11, 3266489917
+  %#25 = add i32 %#24, %#23
+  %#26 = fshl i32 %#25, i32 %#25, i32 17
+  %#27 = mul i32 %#26, 668265263
+  %#28 = and i24 %#13, 255
+  %#29 = zext nneg i24 %#28 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = add i32 %#30, %#27
+  %#32 = fshl i32 %#31, i32 %#31, i32 11
+  %#33 = mul i32 %#32, 2654435761
+  %#34 = zext i24 %#13 to i32
+  %#35 = lshr i32 %#34, 8
+  %#36 = and i32 %#35, 255
+  %#37 = mul i32 %#36, 374761393
+  %#38 = add i32 %#37, %#33
+  %#39 = fshl i32 %#38, i32 %#38, i32 11
+  %#40 = mul i32 %#39, 2654435761
+  %#41 = lshr i32 %#14, 16
+  %#42 = mul i32 %#41, 374761393
+  %#43 = add i32 %#42, %#40
+  %#44 = fshl i32 %#43, i32 %#43, i32 11
+  %#45 = mul i32 %#44, 2654435761
+  br label %#5
+
+#4:
+  %#46 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#47 = phi i32 [ %#46, %#4 ], [ %#45, %#3 ]
+  %#48 = lshr i32 %#47, 15
+  %#49 = xor i32 %#48, %#47
+  %#50 = mul i32 %#49, 2246822519
+  %#51 = lshr i32 %#50, 13
+  %#52 = xor i32 %#51, %#50
+  %#53 = mul i32 %#52, 3266489917
+  %#54 = lshr i32 %#53, 16
+  %#55 = xor i32 %#54, %#53
+  ret i32 %#55
+}
+=>
+define i32 @target_stream(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#8 = load i24, ptr %#7, align 1
+  %#9 = zext i24 %#8 to i32
+  %#10 = add i32 noundef %#1, 374761408
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#12 = load i32, ptr %#11, align 1
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#14 = load i32, ptr %#13, align 1
+  %#15 = load i32, ptr nowrite noundef %#0, align 1
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = add i32 %#16, %#10
+  %#18 = fshl i32 %#17, i32 %#17, i32 17
+  %#19 = mul i32 %#18, 668265263
+  %#20 = mul i32 %#14, 3266489917
+  %#21 = add i32 %#20, %#19
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  %#24 = mul i32 %#12, 3266489917
+  %#25 = add i32 %#24, %#23
+  %#26 = fshl i32 %#25, i32 %#25, i32 17
+  %#27 = mul i32 %#26, 668265263
+  %#28 = and i24 %#8, 255
+  %#29 = zext nneg i24 %#28 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = add i32 %#30, %#27
+  %#32 = fshl i32 %#31, i32 %#31, i32 11
+  %#33 = mul i32 %#32, 2654435761
+  %#34 = lshr i32 %#9, 8
+  %#35 = and i32 %#34, 255
+  %#36 = mul i32 %#35, 374761393
+  %#37 = add i32 %#36, %#33
+  %#38 = fshl i32 %#37, i32 %#37, i32 11
+  %#39 = mul i32 %#38, 2654435761
+  %#40 = lshr i32 %#9, 16
+  %#41 = mul i32 %#40, 374761393
+  %#42 = add i32 %#41, %#39
+  %#43 = fshl i32 %#42, i32 %#42, i32 11
+  %#44 = mul i32 %#43, 2654435761
+  br label %#5
+
+#4:
+  %#45 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#46 = phi i32 [ %#45, %#4 ], [ %#44, %#3 ]
+  %#47 = lshr i32 %#46, 15
+  %#48 = xor i32 %#47, %#46
+  %#49 = mul i32 %#48, 2246822519
+  %#50 = lshr i32 %#49, 13
+  %#51 = xor i32 %#50, %#49
+  %#52 = mul i32 %#51, 3266489917
+  %#53 = lshr i32 %#52, 16
+  %#54 = xor i32 %#53, %#52
+  ret i32 %#54
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

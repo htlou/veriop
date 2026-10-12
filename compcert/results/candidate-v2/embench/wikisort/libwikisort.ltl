@@ -1,0 +1,3072 @@
+Min() {
+    5:	
+    4:	if (EDI <ls ESI) goto 3 else goto 2
+    3:	goto 1
+    2:	EDI = ESI; 
+    1:	EAX = EDI; return
+}
+
+Max() {
+    5:	
+    4:	if (EDI >ls ESI) goto 3 else goto 2
+    3:	goto 1
+    2:	EDI = ESI; 
+    1:	EAX = EDI; return
+}
+
+TestCompare() {
+    8:	EAX = EDI; 
+    7:	_ = memcpy size 8 align 4 (sp + 0, EAX); 
+    6:	EAX = ESI; _ = memcpy size 8 align 4 (sp + 8, EAX); 
+    5:	ECX = int32[stack(0)]; 
+    4:	EDX = int32[stack(8)]; 
+    3:	EAX = ECX <s EDX; 
+    2:	
+    1:	return
+}
+
+Range_length() {
+    6:	EAX = EDI; 
+    5:	_ = memcpy size 16 align 8 (sp + 0, EAX); 
+    4:	EAX = int64[stack(8)]; 
+    3:	ECX = int64[stack(0)]; 
+    2:	EAX = EAX -l ECX; 
+    1:	return
+}
+
+MakeRange() {
+    5:	
+    4:	int64[stack(0)] = ESI; 
+    3:	int64[stack(8)] = EDX; 
+    2:	EAX = EDI; _ = memcpy size 16 align 8 (EAX, sp + 0); 
+    1:	return
+}
+
+FloorPowerOfTwo() {
+   17:	
+   16:	EAX = EDI; 
+   15:	R9 = EAX; R9 = R9 >>ls 1; 
+   14:	EAX = EAX |l R9; 
+   13:	EDX = EAX; EDX = EDX >>ls 2; 
+   12:	EAX = EAX |l EDX; 
+   11:	EDI = EAX; EDI = EDI >>ls 4; 
+   10:	EAX = EAX |l EDI; 
+    9:	ECX = EAX; ECX = ECX >>ls 8; 
+    8:	EAX = EAX |l ECX; 
+    7:	R8 = EAX; R8 = R8 >>ls 16; 
+    6:	EAX = EAX |l R8; 
+    5:	ECX = EAX; ECX = ECX >>ls 32; 
+    4:	EAX = EAX |l ECX; 
+    3:	ESI = EAX; ESI = ESI >>ls 1; 
+    2:	EAX = EAX -l ESI; 
+    1:	return
+}
+
+BinaryFirst() {
+   29:	R13 = ECX; R12 = ESI; R14 = EDI; 
+   28:	EAX = EDX; _ = memcpy size 16 align 8 (sp + 0, EAX); 
+   27:	EBP = int64[stack(0)]; 
+   26:	EDI = int64[stack(8)]; 
+   25:	EBX = EDI + -1 (long); 
+   24:	if (EBP <ls EBX) goto 23 else goto 13
+   23:	EAX = EBX; EAX = EAX -l EBP; 
+   22:	EAX = EAX >>lx 1; 
+   21:	R15 = EBP + EAX + 0 (long); 
+   20:	EDI = R14 + R15 * 8 + 0 (long); 
+   19:	ESI = R14 + R12 * 8 + 0 (long); 
+   18:	call R13; 
+   17:	R8 = int8unsigned(EAX); 
+   16:	if (R8 !=u 0) goto 15 else goto 14
+   15:	EBP = R15 + 1 (long); goto 24
+   14:	EBX = R15; goto 24
+   13:	ECX = int64[stack(8)]; 
+   12:	R9 = ECX + -1 (long); 
+   11:	if (EBP ==ls R9) goto 10 else goto 5
+   10:	EDI = R14 + EBP * 8 + 0 (long); 
+    9:	ESI = R14 + R12 * 8 + 0 (long); 
+    8:	call R13; 
+    7:	ESI = int8unsigned(EAX); 
+    6:	ECX = ESI !=u 0; goto 4
+    5:	ECX = 0; 
+    4:	EAX = EBP + 1 (long); 
+    3:	EAX = ECX !=u 0 ?long EAX : EBP; 
+    2:	
+    1:	return
+}
+
+BinaryLast() {
+   29:	R13 = ECX; R15 = ESI; R14 = EDI; 
+   28:	EAX = EDX; _ = memcpy size 16 align 8 (sp + 0, EAX); 
+   27:	EBP = int64[stack(0)]; 
+   26:	EAX = int64[stack(8)]; 
+   25:	EBX = EAX + -1 (long); 
+   24:	if (EBP <ls EBX) goto 23 else goto 13
+   23:	EAX = EBX; EAX = EAX -l EBP; 
+   22:	EAX = EAX >>lx 1; 
+   21:	R12 = EBP + EAX + 0 (long); 
+   20:	EDI = R14 + R15 * 8 + 0 (long); 
+   19:	ESI = R14 + R12 * 8 + 0 (long); 
+   18:	call R13; 
+   17:	ESI = int8unsigned(EAX); 
+   16:	if (ESI ==u 0) goto 15 else goto 14
+   15:	EBP = R12 + 1 (long); goto 24
+   14:	EBX = R12; goto 24
+   13:	EDI = int64[stack(8)]; 
+   12:	R9 = EDI + -1 (long); 
+   11:	if (EBP ==ls R9) goto 10 else goto 5
+   10:	EDI = R14 + R15 * 8 + 0 (long); 
+    9:	ESI = R14 + EBP * 8 + 0 (long); 
+    8:	call R13; 
+    7:	EDX = int8unsigned(EAX); 
+    6:	R8 = EDX ==u 0; goto 4
+    5:	R8 = 0; 
+    4:	EAX = EBP + 1 (long); 
+    3:	EAX = R8 !=u 0 ?long EAX : EBP; 
+    2:	
+    1:	return
+}
+
+InsertionSort() {
+   26:	R12 = EDX; EAX = ESI; R13 = EDI; 
+   25:	_ = memcpy size 16 align 8 (sp + 8, EAX); 
+   24:	EDX = int64[stack(8)]; 
+   23:	EBX = EDX + 1 (long); 
+   22:	R8 = int64[stack(16)]; 
+   21:	if (EBX <ls R8) goto 20 else goto 1
+   20:	EAX = R13 + EBX * 8 + 0 (long); 
+   19:	_ = memcpy size 8 align 4 (sp + 0, EAX); 
+   18:	EBP = EBX; 
+   17:	EAX = int64[stack(8)]; 
+   16:	if (EBP >ls EAX) goto 15 else goto 5
+   15:	EDI = stack(0) (long); 
+   14:	ESI = R13 + EBP * 8 + -8 (long); 
+   13:	call R12; 
+   12:	ESI = int8unsigned(EAX); 
+   11:	
+   10:	if (ESI !=u 0) goto 9 else goto 4
+    9:	EAX = R13 + EBP * 8 + 0 (long); 
+    8:	EDX = R13 + EBP * 8 + -8 (long); 
+    7:	_ = memcpy size 8 align 4 (EAX, EDX); 
+    6:	EBP = EBP + -1 (long); goto 17
+    5:	
+    4:	EAX = R13 + EBP * 8 + 0 (long); 
+    3:	_ = memcpy size 8 align 4 (EAX, sp + 0); 
+    2:	EBX = EBX + 1 (long); goto 22
+    1:	return
+}
+
+Reverse() {
+   18:	EAX = ESI; EBX = EDI; 
+   17:	_ = memcpy size 16 align 8 (sp + 8, EAX); 
+   16:	EDI = stack(8) (long); 
+   15:	call "Range_length"; 
+   14:	EAX = EAX >>lx 1; 
+   13:	ESI = EAX + -1 (long); 
+   12:	if (ESI >=ls 0) goto 11 else goto 1
+   11:	EDX = int64[stack(8)]; 
+   10:	EDI = EDX + ESI + 0 (long); 
+    9:	EAX = EBX + EDI * 8 + 0 (long); 
+    8:	ECX = int64[stack(16)]; 
+    7:	ECX = ECX -l ESI; 
+    6:	EDX = EBX + ECX * 8 + -8 (long); 
+    5:	_ = memcpy size 8 align 4 (sp + 0, EAX); 
+    4:	_ = memcpy size 8 align 4 (EAX, EDX); 
+    3:	EAX = EDX; _ = memcpy size 8 align 4 (EAX, sp + 0); 
+    2:	ESI = ESI + -1 (long); goto 12
+    1:	return
+}
+
+BlockSwap() {
+   12:	R8 = ECX; R9 = EDX; 
+   11:	R10 = 0L; 
+   10:	if (R10 <ls R8) goto 9 else goto 1
+    9:	R11 = ESI + R10 + 0 (long); 
+    8:	EAX = EDI + R11 * 8 + 0 (long); 
+    7:	R11 = R9 + R10 + 0 (long); 
+    6:	EDX = EDI + R11 * 8 + 0 (long); 
+    5:	_ = memcpy size 8 align 4 (sp + 0, EAX); 
+    4:	_ = memcpy size 8 align 4 (EAX, EDX); 
+    3:	EAX = EDX; _ = memcpy size 8 align 4 (EAX, sp + 0); 
+    2:	R10 = R10 + 1 (long); goto 10
+    1:	return
+}
+
+Rotate() {
+   82:	R12 = R8; EBX = ECX; EAX = EDX; R13 = ESI; EBP = EDI; 
+   81:	_ = memcpy size 16 align 8 (sp + 16, EAX); 
+   80:	EDI = stack(16) (long); 
+   79:	call "Range_length"; 
+   78:	if (EAX ==ls 0) goto 1 else goto 77
+   77:	if (R13 >=ls 0) goto 74 else goto 76
+   76:	ESI = int64[stack(24)]; 
+   75:	R13 = ESI + R13 + 0 (long); goto 72
+   74:	EDI = int64[stack(16)]; 
+   73:	R13 = EDI + R13 + 0 (long); 
+   72:	EDI = stack(0) (long); 
+   71:	ESI = int64[stack(16)]; 
+   70:	EDX = R13; call "MakeRange"; 
+   69:	_ = memcpy size 16 align 8 (sp + 32, sp + 0); 
+   68:	EDI = stack(64) (long); 
+   67:	EDX = int64[stack(24)]; 
+   66:	ESI = R13; call "MakeRange"; 
+   65:	_ = memcpy size 16 align 8 (sp + 48, sp + 64); 
+   64:	EDI = stack(32) (long); 
+   63:	call "Range_length"; R13 = EAX; 
+   62:	EDI = stack(48) (long); 
+   61:	call "Range_length"; 
+   60:	if (R13 <=ls EAX) goto 33 else goto 59
+   59:	EDI = stack(48) (long); 
+   58:	call "Range_length"; 
+   57:	if (EAX <=ls R12) goto 56 else goto 7
+   56:	EDI = stack(48) (long); 
+   55:	call "Range_length"; 
+   54:	EDI = int64[stack(48)]; 
+   53:	ESI = EBP + EDI * 8 + 0 (long); 
+   52:	EDX = EAX * 8 + 0 (long); 
+   51:	EDI = EBX; call "memcpy"; 
+   50:	EDI = stack(32) (long); 
+   49:	call "Range_length"; R12 = EAX; 
+   48:	EDI = stack(32) (long); 
+   47:	call "Range_length"; 
+   46:	ECX = int64[stack(56)]; 
+   45:	ECX = ECX -l R12; 
+   44:	EDI = EBP + ECX * 8 + 0 (long); 
+   43:	R8 = int64[stack(32)]; 
+   42:	ESI = EBP + R8 * 8 + 0 (long); 
+   41:	EDX = EAX * 8 + 0 (long); 
+   40:	call "memmove"; 
+   39:	EDI = stack(48) (long); 
+   38:	call "Range_length"; 
+   37:	R9 = int64[stack(32)]; 
+   36:	EDI = EBP + R9 * 8 + 0 (long); 
+   35:	EDX = EAX * 8 + 0 (long); 
+   34:	ESI = EBX; call "memcpy"; goto 1
+   33:	EDI = stack(32) (long); 
+   32:	call "Range_length"; 
+   31:	if (EAX <=ls R12) goto 30 else goto 7
+   30:	EDI = stack(32) (long); 
+   29:	call "Range_length"; 
+   28:	R11 = int64[stack(32)]; 
+   27:	ESI = EBP + R11 * 8 + 0 (long); 
+   26:	EDX = EAX * 8 + 0 (long); 
+   25:	EDI = EBX; call "memcpy"; 
+   24:	EDI = stack(48) (long); 
+   23:	call "Range_length"; 
+   22:	R9 = int64[stack(32)]; 
+   21:	EDI = EBP + R9 * 8 + 0 (long); 
+   20:	ECX = int64[stack(48)]; 
+   19:	ESI = EBP + ECX * 8 + 0 (long); 
+   18:	EDX = EAX * 8 + 0 (long); 
+   17:	call "memmove"; 
+   16:	EDI = stack(48) (long); 
+   15:	call "Range_length"; R12 = EAX; 
+   14:	EDI = stack(32) (long); 
+   13:	call "Range_length"; 
+   12:	R10 = int64[stack(32)]; 
+   11:	R11 = R10 + R12 + 0 (long); 
+   10:	EDI = EBP + R11 * 8 + 0 (long); 
+    9:	EDX = EAX * 8 + 0 (long); 
+    8:	ESI = EBX; call "memcpy"; goto 1
+    7:	ESI = stack(32) (long); 
+    6:	EDI = EBP; call "Reverse"; 
+    5:	ESI = stack(48) (long); 
+    4:	EDI = EBP; call "Reverse"; 
+    3:	ESI = stack(16) (long); 
+    2:	EDI = EBP; call "Reverse"; 
+    1:	return
+}
+
+WikiMerge() {
+  101:	R13 = incoming(0,long); EBX = R9; R12 = R8; EBP = EDI; EDI = ECX; 
+  100:	EAX = ESI; _ = memcpy size 16 align 8 (sp + 16, EAX); 
+   99:	EAX = EDX; _ = memcpy size 16 align 8 (sp + 32, EAX); 
+   98:	EAX = EDI; _ = memcpy size 16 align 8 (sp + 48, EAX); 
+   97:	EDI = stack(32) (long); 
+   96:	call "Range_length"; 
+   95:	if (EAX <=ls R13) goto 36 else goto 94
+   94:	R13 = 0L; 
+   93:	EBX = 0L; 
+   92:	R14 = 0L; 
+   91:	EDI = stack(48) (long); 
+   90:	call "Range_length"; 
+   89:	if (EAX >ls 0) goto 88 else goto 45
+   88:	EDI = stack(32) (long); 
+   87:	call "Range_length"; 
+   86:	
+   85:	if (EAX >ls 0) goto 84 else goto 44
+   84:	
+   83:	EDI = int64[stack(48)]; 
+   82:	R10 = EDI + EBX + 0 (long); 
+   81:	EDI = EBP + R10 * 8 + 0 (long); 
+   80:	ECX = int64[stack(16)]; 
+   79:	ECX = ECX + R13 + 0 (long); 
+   78:	ESI = EBP + ECX * 8 + 0 (long); 
+   77:	call R12; 
+   76:	ESI = int8unsigned(EAX); 
+   75:	if (ESI ==u 0) goto 60 else goto 74
+   74:	R8 = int64[stack(32)]; 
+   73:	R11 = R8 + R14 + 0 (long); 
+   72:	EAX = EBP + R11 * 8 + 0 (long); 
+   71:	ECX = int64[stack(48)]; 
+   70:	EDX = ECX + EBX + 0 (long); 
+   69:	EDX = EBP + EDX * 8 + 0 (long); 
+   68:	_ = memcpy size 8 align 4 (sp + 0, EAX); 
+   67:	_ = memcpy size 8 align 4 (EAX, EDX); 
+   66:	EAX = EDX; _ = memcpy size 8 align 4 (EAX, sp + 0); 
+   65:	EBX = EBX + 1 (long); 
+   64:	R14 = R14 + 1 (long); 
+   63:	EDI = stack(48) (long); 
+   62:	call "Range_length"; 
+   61:	if (EBX >=ls EAX) goto 44 else goto 46
+   60:	ESI = int64[stack(32)]; 
+   59:	R11 = ESI + R14 + 0 (long); 
+   58:	EAX = EBP + R11 * 8 + 0 (long); 
+   57:	ECX = int64[stack(16)]; 
+   56:	R10 = ECX + R13 + 0 (long); 
+   55:	EDX = EBP + R10 * 8 + 0 (long); 
+   54:	_ = memcpy size 8 align 4 (sp + 8, EAX); 
+   53:	_ = memcpy size 8 align 4 (EAX, EDX); 
+   52:	EAX = EDX; _ = memcpy size 8 align 4 (EAX, sp + 8); 
+   51:	R13 = R13 + 1 (long); 
+   50:	R14 = R14 + 1 (long); 
+   49:	EDI = stack(32) (long); 
+   48:	call "Range_length"; 
+   47:	if (R13 >=ls EAX) goto 44 else goto 46
+   46:	goto 83
+   45:	
+   44:	EDI = stack(32) (long); 
+   43:	call "Range_length"; 
+   42:	R8 = int64[stack(16)]; 
+   41:	ESI = R8 + R13 + 0 (long); 
+   40:	R9 = int64[stack(32)]; 
+   39:	EDX = R9 + R14 + 0 (long); 
+   38:	ECX = EAX; ECX = ECX -l R13; 
+   37:	EDI = EBP; call "BlockSwap"; goto 1
+   36:	
+   35:	ESI = int64[stack(48)]; 
+   34:	R15 = EBP + ESI * 8 + 0 (long); 
+   33:	R9 = int64[stack(32)]; 
+   32:	R14 = EBP + R9 * 8 + 0 (long); 
+   31:	EDI = stack(32) (long); 
+   30:	call "Range_length"; 
+   29:	R13 = EBX + EAX * 8 + 0 (long); 
+   28:	EDX = int64[stack(56)]; 
+   27:	EBP = EBP + EDX * 8 + 0 (long); 
+   26:	EDI = stack(48) (long); 
+   25:	call "Range_length"; 
+   24:	if (EAX >ls 0) goto 23 else goto 6
+   23:	EDI = stack(32) (long); 
+   22:	call "Range_length"; 
+   21:	
+   20:	if (EAX >ls 0) goto 19 else goto 5
+   19:	
+   18:	ESI = EBX; EDI = R15; call R12; 
+   17:	EDX = int8unsigned(EAX); 
+   16:	if (EDX ==u 0) goto 11 else goto 15
+   15:	EAX = R14; EDX = R15; _ = memcpy size 8 align 4 (EAX, EDX); 
+   14:	R15 = R15 + 8 (long); 
+   13:	R14 = R14 + 8 (long); 
+   12:	if (R15 ==lu EBP) goto 5 else goto 7
+   11:	EAX = R14; EDX = EBX; _ = memcpy size 8 align 4 (EAX, EDX); 
+   10:	EBX = EBX + 8 (long); 
+    9:	R14 = R14 + 8 (long); 
+    8:	if (EBX ==lu R13) goto 5 else goto 7
+    7:	goto 18
+    6:	
+    5:	R13 = R13 -l EBX; 
+    4:	EAX = R13; EAX = EAX >>lx 3; 
+    3:	EDX = EAX * 8 + 0 (long); 
+    2:	ESI = EBX; EDI = R14; call "memcpy"; 
+    1:	return
+}
+
+WikiSort() {
+  906:	EBX = EDX; local(10,long) = ESI; EBP = EDI; 
+  905:	EDX = 512L; local(6,long) = EDX; 
+  904:	ESI = local(10,long); if (ESI <=ls 32) goto 903 else goto 898
+  903:	EDI = stack(40) (long); 
+  902:	ESI = 0L; 
+  901:	EDX = local(10,long); call "MakeRange"; 
+  900:	ESI = stack(40) (long); 
+  899:	EDX = EBX; EDI = EBP; call "InsertionSort"; goto 1
+  898:	EDI = local(10,long); call "FloorPowerOfTwo"; local(18,long) = EAX; 
+  897:	
+  896:	EAX = local(18,long); EAX = EAX >>lx 4; local(12,long) = EAX; 
+  895:	EAX = local(10,long); ECX = local(12,long); EDX = EAX %ls ECX; local(8,long) = EDX; 
+  894:	EAX = local(10,long); ECX = local(12,long); EAX = EAX /ls ECX; R12 = EAX; 
+  893:	R13 = 0L; 
+  892:	R14 = 0L; 
+  891:	R8 = local(10,long); if (R13 <ls R8) goto 890 else goto 878
+  890:	ESI = R13; 
+  889:	R13 = R13 + R12 + 0 (long); 
+  888:	R9 = local(8,long); R14 = R14 + R9 + 0 (long); 
+  887:	EDI = local(12,long); if (R14 >=ls EDI) goto 886 else goto 884
+  886:	R14 = R14 -l EDI; 
+  885:	R13 = ESI + R12 + 1 (long); 
+  884:	EDX = R13; 
+  883:	EDI = stack(24) (long); 
+  882:	call "MakeRange"; 
+  881:	ESI = stack(24) (long); 
+  880:	EDX = EBX; EDI = EBP; call "InsertionSort"; 
+  879:	goto 891
+  878:	EDI = 16L; local(20,long) = EDI; 
+  877:	EDI = local(20,long); EDX = local(18,long); if (EDI <ls EDX) goto 876 else goto 1
+  876:	XMM0 = floatoflong(R12); 
+  875:	call "sqrt"; 
+  874:	R13 = longoffloat(XMM0); 
+  873:	EAX = R12; ECX = R13; EAX = EAX /ls ECX; 
+  872:	R14 = EAX + 1 (long); 
+  871:	EDI = stack(104) (long); 
+  870:	ESI = 0L; 
+  869:	EDX = 0L; 
+  868:	call "MakeRange"; 
+  867:	_ = memcpy size 16 align 8 (sp + 120, sp + 104); 
+  866:	EDI = stack(88) (long); 
+  865:	ESI = 0L; 
+  864:	EDX = 0L; 
+  863:	call "MakeRange"; 
+  862:	_ = memcpy size 16 align 8 (sp + 136, sp + 88); 
+  861:	EDI = stack(72) (long); 
+  860:	ESI = 0L; 
+  859:	EDX = 0L; 
+  858:	call "MakeRange"; 
+  857:	_ = memcpy size 16 align 8 (sp + 152, sp + 72); 
+  856:	EDI = stack(56) (long); 
+  855:	ESI = 0L; 
+  854:	EDX = 0L; 
+  853:	call "MakeRange"; 
+  852:	_ = memcpy size 16 align 8 (sp + 168, sp + 56); 
+  851:	
+  850:	R8 = 0L; local(14,long) = R8; 
+  849:	ECX = 0L; local(16,long) = ECX; 
+  848:	R11 = local(16,long); EAX = local(10,long); if (R11 <ls EAX) goto 847 else goto 76
+  847:	local(0,long) = R11; 
+  846:	EAX = R11 + R12 + 0 (long); 
+  845:	ECX = local(14,long); EDX = local(8,long); R9 = ECX + EDX + 0 (long); 
+  844:	R10 = local(12,long); if (R9 >=ls R10) goto 843 else goto 841
+  843:	R9 = R9 -l R10; 
+  842:	R8 = local(0,long); EAX = R8 + R12 + 1 (long); 
+  841:	R15 = EAX; 
+  840:	R10 = EAX + R12 + 0 (long); local(16,long) = R10; 
+  839:	R10 = local(8,long); R10 = R9 + R10 + 0 (long); local(14,long) = R10; 
+  838:	R8 = local(12,long); if (R10 >=ls R8) goto 837 else goto 835
+  837:	EAX = local(14,long); EAX = EAX -l R8; local(14,long) = EAX; 
+  836:	EDI = R15 + R12 + 1 (long); local(16,long) = EDI; 
+  835:	R11 = local(16,long); local(2,long) = R11; 
+  834:	EDI = EBP + R11 * 8 + -8 (long); 
+  833:	EAX = local(0,long); ESI = EBP + EAX * 8 + 0 (long); 
+  832:	call EBX; 
+  831:	R9 = int8unsigned(EAX); 
+  830:	if (R9 !=u 0) goto 83 else goto 829
+  829:	EDI = EBP + R15 * 8 + 0 (long); 
+  828:	ESI = EBP + R15 * 8 + -8 (long); 
+  827:	call EBX; 
+  826:	R10 = int8unsigned(EAX); 
+  825:	if (R10 !=u 0) goto 824 else goto 77
+  824:	EDI = stack(1048) (long); 
+  823:	EDX = R15; ESI = local(0,long); call "MakeRange"; 
+  822:	_ = memcpy size 16 align 8 (sp + 328, sp + 1048); 
+  821:	EDI = stack(1032) (long); 
+  820:	EDX = local(2,long); ESI = R15; call "MakeRange"; 
+  819:	_ = memcpy size 16 align 8 (sp + 344, sp + 1032); 
+  818:	EDI = stack(328) (long); 
+  817:	call "Range_length"; 
+  816:	if (EAX <=ls 512) goto 815 else goto 799
+  815:	EDI = stack(328) (long); 
+  814:	call "Range_length"; R11 = EAX; 
+  813:	EDI = stack(1080) (long); 
+  812:	R10 = int64[stack(328)]; 
+  811:	ESI = EBP + R10 * 8 + 0 (long); 
+  810:	EDX = R11 * 8 + 0 (long); 
+  809:	call "memcpy"; 
+  808:	EDI = stack(1016) (long); 
+  807:	ESI = 0L; 
+  806:	EDX = 0L; 
+  805:	call "MakeRange"; 
+  804:	ESI = stack(1016) (long); 
+  803:	EDX = stack(328) (long); 
+  802:	ECX = stack(344) (long); 
+  801:	R9 = stack(1080) (long); 
+  800:	R10 = local(6,long); outgoing(0,long) = R10; R8 = EBX; EDI = EBP; call "WikiMerge"; goto 77
+  799:	EDI = stack(120) (long); 
+  798:	call "Range_length"; 
+  797:	if (EAX >ls 0) goto 333 else goto 796
+  796:	R15 = 1L; 
+  795:	EAX = int64[stack(328)]; 
+  794:	R9 = EAX + 1 (long); 
+  793:	int64[stack(216)] = R9; 
+  792:	
+  791:	ECX = int64[stack(216)]; 
+  790:	EAX = int64[stack(336)]; 
+  789:	if (ECX <ls EAX) goto 788 else goto 765
+  788:	
+  787:	EDI = EBP + ECX * 8 + -8 (long); 
+  786:	
+  785:	ESI = EBP + ECX * 8 + 0 (long); 
+  784:	call EBX; 
+  783:	R11 = int8unsigned(EAX); 
+  782:	if (R11 !=u 0) goto 773 else goto 781
+  781:	ECX = int64[stack(216)]; 
+  780:	EDI = EBP + ECX * 8 + 0 (long); 
+  779:	
+  778:	ESI = EBP + ECX * 8 + -8 (long); 
+  777:	call EBX; 
+  776:	R11 = int8unsigned(EAX); 
+  775:	
+  774:	if (R11 !=u 0) goto 772 else goto 769
+  773:	
+  772:	R15 = R15 + 1 (long); 
+  771:	
+  770:	if (R15 ==ls R14) goto 765 else goto 769
+  769:	ECX = int64[stack(216)]; 
+  768:	R11 = ECX + 1 (long); 
+  767:	int64[stack(216)] = R11; 
+  766:	goto 791
+  765:	R10 = int64[stack(216)]; 
+  764:	R8 = R10 + R15 + 0 (long); 
+  763:	int64[stack(224)] = R8; 
+  762:	if (R14 <=ls 512) goto 538 else goto 761
+  761:	R15 = 0L; 
+  760:	
+  759:	EDI = R10 + 1 (long); 
+  758:	int64[stack(232)] = EDI; 
+  757:	
+  756:	R8 = int64[stack(232)]; 
+  755:	ESI = int64[stack(336)]; 
+  754:	if (R8 <ls ESI) goto 753 else goto 730
+  753:	
+  752:	EDI = EBP + R8 * 8 + -8 (long); 
+  751:	
+  750:	ESI = EBP + R8 * 8 + 0 (long); 
+  749:	call EBX; 
+  748:	EDX = int8unsigned(EAX); 
+  747:	if (EDX !=u 0) goto 738 else goto 746
+  746:	ECX = int64[stack(232)]; 
+  745:	EDI = EBP + ECX * 8 + 0 (long); 
+  744:	
+  743:	ESI = EBP + ECX * 8 + -8 (long); 
+  742:	call EBX; 
+  741:	EAX = int8unsigned(EAX); 
+  740:	
+  739:	if (EAX !=u 0) goto 737 else goto 734
+  738:	
+  737:	R15 = R15 + 1 (long); 
+  736:	
+  735:	if (R15 ==ls R14) goto 730 else goto 734
+  734:	R9 = int64[stack(232)]; 
+  733:	R11 = R9 + 1 (long); 
+  732:	int64[stack(232)] = R11; 
+  731:	goto 756
+  730:	EAX = int64[stack(232)]; 
+  729:	R10 = EAX + R15 + 0 (long); 
+  728:	int64[stack(240)] = R10; 
+  727:	EDI = stack(232) (long); 
+  726:	call "Range_length"; 
+  725:	if (EAX ==ls R14) goto 562 else goto 724
+  724:	EDI = stack(216) (long); 
+  723:	call "Range_length"; 
+  722:	if (EAX ==ls R14) goto 625 else goto 721
+  721:	R15 = 1L; 
+  720:	ESI = int64[stack(352)]; 
+  719:	ESI = ESI + -2 (long); 
+  718:	int64[stack(216)] = ESI; 
+  717:	
+  716:	R8 = int64[stack(216)]; 
+  715:	EDX = int64[stack(344)]; 
+  714:	if (R8 >=ls EDX) goto 713 else goto 690
+  713:	
+  712:	EDI = EBP + R8 * 8 + 0 (long); 
+  711:	
+  710:	ESI = EBP + R8 * 8 + 8 (long); 
+  709:	call EBX; 
+  708:	R10 = int8unsigned(EAX); 
+  707:	if (R10 !=u 0) goto 698 else goto 706
+  706:	R8 = int64[stack(216)]; 
+  705:	EDI = EBP + R8 * 8 + 8 (long); 
+  704:	
+  703:	ESI = EBP + R8 * 8 + 0 (long); 
+  702:	call EBX; 
+  701:	R10 = int8unsigned(EAX); 
+  700:	
+  699:	if (R10 !=u 0) goto 697 else goto 694
+  698:	
+  697:	R15 = R15 + 1 (long); 
+  696:	
+  695:	if (R15 ==ls R14) goto 690 else goto 694
+  694:	EDI = int64[stack(216)]; 
+  693:	ECX = EDI + -1 (long); 
+  692:	int64[stack(216)] = ECX; 
+  691:	goto 716
+  690:	EDX = int64[stack(216)]; 
+  689:	R11 = EDX + R15 + 0 (long); 
+  688:	int64[stack(224)] = R11; 
+  687:	R15 = 0L; 
+  686:	
+  685:	R9 = EDX + -1 (long); 
+  684:	int64[stack(232)] = R9; 
+  683:	
+  682:	EDX = int64[stack(232)]; 
+  681:	EDI = int64[stack(344)]; 
+  680:	if (EDX >=ls EDI) goto 679 else goto 656
+  679:	
+  678:	EDI = EBP + EDX * 8 + 0 (long); 
+  677:	
+  676:	ESI = EBP + EDX * 8 + 8 (long); 
+  675:	call EBX; 
+  674:	EDI = int8unsigned(EAX); 
+  673:	if (EDI !=u 0) goto 664 else goto 672
+  672:	R8 = int64[stack(232)]; 
+  671:	EDI = EBP + R8 * 8 + 8 (long); 
+  670:	
+  669:	ESI = EBP + R8 * 8 + 0 (long); 
+  668:	call EBX; 
+  667:	ESI = int8unsigned(EAX); 
+  666:	
+  665:	if (ESI !=u 0) goto 663 else goto 660
+  664:	
+  663:	R15 = R15 + 1 (long); 
+  662:	
+  661:	if (R15 ==ls R14) goto 656 else goto 660
+  660:	EDI = int64[stack(232)]; 
+  659:	EDI = EDI + -1 (long); 
+  658:	int64[stack(232)] = EDI; 
+  657:	goto 682
+  656:	R8 = int64[stack(232)]; 
+  655:	ESI = R8 + R15 + 0 (long); 
+  654:	int64[stack(240)] = ESI; 
+  653:	EDI = stack(232) (long); 
+  652:	call "Range_length"; 
+  651:	if (EAX ==ls R14) goto 650 else goto 627
+  650:	EDI = stack(712) (long); 
+  649:	EDX = int64[stack(328)]; 
+  648:	
+  647:	ESI = EDX; call "MakeRange"; 
+  646:	_ = memcpy size 16 align 8 (sp + 184, sp + 712); 
+  645:	EDI = stack(696) (long); 
+  644:	ESI = int64[stack(232)]; 
+  643:	
+  642:	EDX = ESI + R14 * 2 + 0 (long); 
+  641:	call "MakeRange"; 
+  640:	_ = memcpy size 16 align 8 (sp + 200, sp + 696); 
+  639:	EDI = stack(680) (long); 
+  638:	EDX = int64[stack(352)]; 
+  637:	ESI = EDX; ESI = ESI -l R14; 
+  636:	
+  635:	call "MakeRange"; 
+  634:	_ = memcpy size 16 align 8 (sp + 216, sp + 680); 
+  633:	EDI = stack(664) (long); 
+  632:	EDX = int64[stack(216)]; 
+  631:	ESI = EDX; ESI = ESI -l R14; 
+  630:	
+  629:	call "MakeRange"; 
+  628:	_ = memcpy size 16 align 8 (sp + 232, sp + 664); goto 454
+  627:	R10 = int64[stack(216)]; 
+  626:	int64[stack(224)] = R10; goto 454
+  625:	EDI = stack(776) (long); 
+  624:	ESI = int64[stack(216)]; 
+  623:	
+  622:	EDX = ESI + R14 + 0 (long); 
+  621:	call "MakeRange"; 
+  620:	_ = memcpy size 16 align 8 (sp + 184, sp + 776); 
+  619:	EDI = stack(760) (long); 
+  618:	ESI = int64[stack(328)]; 
+  617:	
+  616:	EDX = ESI + R14 + 0 (long); 
+  615:	call "MakeRange"; 
+  614:	_ = memcpy size 16 align 8 (sp + 216, sp + 760); 
+  613:	R15 = 1L; 
+  612:	R10 = int64[stack(352)]; 
+  611:	R8 = R10 + -2 (long); 
+  610:	int64[stack(232)] = R8; 
+  609:	
+  608:	EAX = int64[stack(232)]; 
+  607:	R10 = int64[stack(344)]; 
+  606:	if (EAX >=ls R10) goto 605 else goto 582
+  605:	
+  604:	EDI = EBP + EAX * 8 + 0 (long); 
+  603:	
+  602:	ESI = EBP + EAX * 8 + 8 (long); 
+  601:	call EBX; 
+  600:	ESI = int8unsigned(EAX); 
+  599:	if (ESI !=u 0) goto 590 else goto 598
+  598:	R11 = int64[stack(232)]; 
+  597:	EDI = EBP + R11 * 8 + 8 (long); 
+  596:	
+  595:	ESI = EBP + R11 * 8 + 0 (long); 
+  594:	call EBX; 
+  593:	EAX = int8unsigned(EAX); 
+  592:	
+  591:	if (EAX !=u 0) goto 589 else goto 586
+  590:	
+  589:	R15 = R15 + 1 (long); 
+  588:	
+  587:	if (R15 ==ls R14) goto 582 else goto 586
+  586:	EDI = int64[stack(232)]; 
+  585:	EAX = EDI + -1 (long); 
+  584:	int64[stack(232)] = EAX; 
+  583:	goto 608
+  582:	R9 = int64[stack(232)]; 
+  581:	R11 = R9 + R15 + 0 (long); 
+  580:	int64[stack(240)] = R11; 
+  579:	EDI = stack(232) (long); 
+  578:	call "Range_length"; 
+  577:	if (EAX ==ls R14) goto 576 else goto 564
+  576:	EDI = stack(744) (long); 
+  575:	ESI = int64[stack(232)]; 
+  574:	
+  573:	EDX = ESI + R14 + 0 (long); 
+  572:	call "MakeRange"; 
+  571:	_ = memcpy size 16 align 8 (sp + 200, sp + 744); 
+  570:	EDI = stack(728) (long); 
+  569:	EDX = int64[stack(352)]; 
+  568:	ESI = EDX; ESI = ESI -l R14; 
+  567:	
+  566:	call "MakeRange"; 
+  565:	_ = memcpy size 16 align 8 (sp + 232, sp + 728); goto 454
+  564:	R9 = int64[stack(216)]; 
+  563:	int64[stack(224)] = R9; goto 454
+  562:	EDI = stack(840) (long); 
+  561:	ESI = int64[stack(232)]; 
+  560:	
+  559:	EDX = ESI + R14 * 2 + 0 (long); 
+  558:	call "MakeRange"; 
+  557:	_ = memcpy size 16 align 8 (sp + 184, sp + 840); 
+  556:	EDI = stack(824) (long); 
+  555:	ESI = int64[stack(352)]; 
+  554:	
+  553:	EDX = ESI; call "MakeRange"; 
+  552:	_ = memcpy size 16 align 8 (sp + 200, sp + 824); 
+  551:	EDI = stack(808) (long); 
+  550:	ESI = int64[stack(328)]; 
+  549:	
+  548:	EDX = ESI + R14 + 0 (long); 
+  547:	call "MakeRange"; 
+  546:	_ = memcpy size 16 align 8 (sp + 216, sp + 808); 
+  545:	EDI = stack(792) (long); 
+  544:	R8 = int64[stack(328)]; 
+  543:	ESI = R8 + R14 + 0 (long); 
+  542:	
+  541:	EDX = R8 + R14 * 2 + 0 (long); 
+  540:	call "MakeRange"; 
+  539:	_ = memcpy size 16 align 8 (sp + 232, sp + 792); goto 454
+  538:	EDI = stack(968) (long); 
+  537:	EDX = int64[stack(328)]; 
+  536:	
+  535:	ESI = EDX; call "MakeRange"; 
+  534:	_ = memcpy size 16 align 8 (sp + 232, sp + 968); 
+  533:	EDI = stack(216) (long); 
+  532:	call "Range_length"; 
+  531:	if (EAX ==ls R14) goto 471 else goto 530
+  530:	EDI = stack(904) (long); 
+  529:	EDX = int64[stack(216)]; 
+  528:	
+  527:	ESI = EDX; call "MakeRange"; 
+  526:	_ = memcpy size 16 align 8 (sp + 184, sp + 904); 
+  525:	EDI = stack(888) (long); 
+  524:	EDX = int64[stack(328)]; 
+  523:	
+  522:	ESI = EDX; call "MakeRange"; 
+  521:	_ = memcpy size 16 align 8 (sp + 216, sp + 888); 
+  520:	R15 = 1L; 
+  519:	EDX = int64[stack(352)]; 
+  518:	R10 = EDX + -2 (long); 
+  517:	int64[stack(216)] = R10; 
+  516:	
+  515:	R9 = int64[stack(216)]; 
+  514:	R8 = int64[stack(344)]; 
+  513:	if (R9 >=ls R8) goto 512 else goto 489
+  512:	
+  511:	EDI = EBP + R9 * 8 + 0 (long); 
+  510:	
+  509:	ESI = EBP + R9 * 8 + 8 (long); 
+  508:	call EBX; 
+  507:	EDX = int8unsigned(EAX); 
+  506:	if (EDX !=u 0) goto 497 else goto 505
+  505:	ESI = int64[stack(216)]; 
+  504:	EDI = EBP + ESI * 8 + 8 (long); 
+  503:	
+  502:	ESI = EBP + ESI * 8 + 0 (long); 
+  501:	call EBX; 
+  500:	EDI = int8unsigned(EAX); 
+  499:	
+  498:	if (EDI !=u 0) goto 496 else goto 493
+  497:	
+  496:	R15 = R15 + 1 (long); 
+  495:	
+  494:	if (R15 ==ls R14) goto 489 else goto 493
+  493:	ECX = int64[stack(216)]; 
+  492:	ECX = ECX + -1 (long); 
+  491:	int64[stack(216)] = ECX; 
+  490:	goto 515
+  489:	R11 = int64[stack(216)]; 
+  488:	EAX = R11 + R15 + 0 (long); 
+  487:	int64[stack(224)] = EAX; 
+  486:	EDI = stack(216) (long); 
+  485:	call "Range_length"; 
+  484:	if (EAX ==ls R14) goto 483 else goto 454
+  483:	EDI = stack(872) (long); 
+  482:	ESI = int64[stack(216)]; 
+  481:	
+  480:	EDX = ESI + R14 + 0 (long); 
+  479:	call "MakeRange"; 
+  478:	_ = memcpy size 16 align 8 (sp + 200, sp + 872); 
+  477:	EDI = stack(856) (long); 
+  476:	EDX = int64[stack(352)]; 
+  475:	ESI = EDX; ESI = ESI -l R14; 
+  474:	
+  473:	call "MakeRange"; 
+  472:	_ = memcpy size 16 align 8 (sp + 216, sp + 856); goto 454
+  471:	EDI = stack(952) (long); 
+  470:	ESI = int64[stack(216)]; 
+  469:	
+  468:	EDX = ESI + R14 + 0 (long); 
+  467:	call "MakeRange"; 
+  466:	_ = memcpy size 16 align 8 (sp + 184, sp + 952); 
+  465:	EDI = stack(936) (long); 
+  464:	EDX = int64[stack(352)]; 
+  463:	
+  462:	ESI = EDX; call "MakeRange"; 
+  461:	_ = memcpy size 16 align 8 (sp + 200, sp + 936); 
+  460:	EDI = stack(920) (long); 
+  459:	ESI = int64[stack(328)]; 
+  458:	
+  457:	EDX = ESI + R14 + 0 (long); 
+  456:	call "MakeRange"; 
+  455:	_ = memcpy size 16 align 8 (sp + 216, sp + 920); 
+  454:	EDI = stack(216) (long); 
+  453:	call "Range_length"; 
+  452:	if (EAX <ls R14) goto 451 else goto 419
+  451:	
+  450:	EDI = stack(328) (long); 
+  449:	call "Range_length"; 
+  448:	if (EAX >ls 0) goto 447 else goto 420
+  447:	EDI = stack(344) (long); 
+  446:	call "Range_length"; 
+  445:	
+  444:	if (EAX >ls 0) goto 443 else goto 77
+  443:	ESI = int64[stack(328)]; 
+  442:	EDX = stack(344) (long); 
+  441:	ECX = EBX; EDI = EBP; call "BinaryFirst"; 
+  440:	local(0,long) = EAX; 
+  439:	ECX = int64[stack(336)]; 
+  438:	R15 = local(0,long); R15 = R15 -l ECX; 
+  437:	EDI = stack(648) (long); 
+  436:	ESI = int64[stack(328)]; 
+  435:	EDX = local(0,long); call "MakeRange"; 
+  434:	ESI = R15; ESI = (-l ESI); 
+  433:	EDX = stack(648) (long); 
+  432:	ECX = stack(1080) (long); 
+  431:	R8 = local(6,long); EDI = EBP; call "Rotate"; 
+  430:	EAX = local(0,long); int64[stack(344)] = EAX; 
+  429:	R10 = int64[stack(328)]; 
+  428:	ESI = R10 + R15 + 0 (long); 
+  427:	EDX = stack(328) (long); 
+  426:	ECX = EBX; EDI = EBP; call "BinaryLast"; ESI = EAX; 
+  425:	EDI = stack(632) (long); 
+  424:	EDX = int64[stack(344)]; 
+  423:	call "MakeRange"; 
+  422:	_ = memcpy size 16 align 8 (sp + 328, sp + 632); 
+  421:	goto 450
+  420:	goto 848
+  419:	EDI = stack(184) (long); 
+  418:	call "Range_length"; local(0,long) = EAX; 
+  417:	
+  416:	ESI = 0L; local(2,long) = ESI; 
+  415:	R15 = int64[stack(184)]; 
+  414:	
+  413:	R11 = local(2,long); R10 = local(0,long); if (R11 <ls R10) goto 412 else goto 383
+  412:	ESI = int64[stack(328)]; 
+  411:	if (R15 ==ls ESI) goto 398 else goto 410
+  410:	EDI = EBP + R15 * 8 + -8 (long); 
+  409:	ESI = EBP + R15 * 8 + 0 (long); 
+  408:	call EBX; 
+  407:	EDI = int8unsigned(EAX); 
+  406:	
+  405:	if (EDI !=u 0) goto 397 else goto 404
+  404:	EDI = EBP + R15 * 8 + 0 (long); 
+  403:	ESI = EBP + R15 * 8 + -8 (long); 
+  402:	call EBX; 
+  401:	EDX = int8unsigned(EAX); 
+  400:	
+  399:	if (EDX !=u 0) goto 396 else goto 384
+  398:	
+  397:	
+  396:	EDI = stack(616) (long); 
+  395:	ESI = R15 + 1 (long); 
+  394:	EDX = int64[stack(184)]; 
+  393:	EDX = EDX + 1 (long); 
+  392:	call "MakeRange"; 
+  391:	ESI = local(2,long); ESI = (-l ESI); 
+  390:	EDX = stack(616) (long); 
+  389:	ECX = stack(1080) (long); 
+  388:	R8 = local(6,long); EDI = EBP; call "Rotate"; 
+  387:	EAX = local(2,long); R10 = R15 + EAX + 0 (long); 
+  386:	int64[stack(184)] = R10; 
+  385:	ECX = EAX + 1 (long); local(2,long) = ECX; 
+  384:	R15 = R15 + -1 (long); goto 413
+  383:	EDI = stack(600) (long); 
+  382:	ESI = int64[stack(328)]; 
+  381:	
+  380:	R10 = local(0,long); R9 = ESI + R10 + 0 (long); 
+  379:	EDX = R9; call "MakeRange"; 
+  378:	_ = memcpy size 16 align 8 (sp + 184, sp + 600); 
+  377:	EDI = stack(200) (long); 
+  376:	call "Range_length"; local(0,long) = EAX; 
+  375:	
+  374:	R10 = 0L; local(2,long) = R10; 
+  373:	R15 = int64[stack(200)]; 
+  372:	
+  371:	EDX = local(2,long); ECX = local(0,long); if (EDX <ls ECX) goto 370 else goto 343
+  370:	EDI = int64[stack(352)]; 
+  369:	ESI = EDI + -1 (long); 
+  368:	if (R15 ==ls ESI) goto 355 else goto 367
+  367:	EDI = EBP + R15 * 8 + 0 (long); 
+  366:	ESI = EBP + R15 * 8 + 8 (long); 
+  365:	call EBX; 
+  364:	EDX = int8unsigned(EAX); 
+  363:	
+  362:	if (EDX !=u 0) goto 354 else goto 361
+  361:	EDI = EBP + R15 * 8 + 8 (long); 
+  360:	ESI = EBP + R15 * 8 + 0 (long); 
+  359:	call EBX; 
+  358:	R11 = int8unsigned(EAX); 
+  357:	
+  356:	if (R11 !=u 0) goto 353 else goto 344
+  355:	
+  354:	
+  353:	EDI = stack(584) (long); 
+  352:	ESI = int64[stack(200)]; 
+  351:	EDX = R15; call "MakeRange"; 
+  350:	EDX = stack(584) (long); 
+  349:	ECX = stack(1080) (long); 
+  348:	R8 = local(6,long); ESI = local(2,long); EDI = EBP; call "Rotate"; 
+  347:	ESI = local(2,long); ECX = R15; ECX = ECX -l ESI; 
+  346:	int64[stack(200)] = ECX; 
+  345:	R11 = ESI + 1 (long); local(2,long) = R11; 
+  344:	R15 = R15 + 1 (long); goto 371
+  343:	EDI = stack(568) (long); 
+  342:	EDX = int64[stack(352)]; 
+  341:	R10 = local(0,long); R9 = EDX; R9 = R9 -l R10; 
+  340:	
+  339:	ESI = R9; call "MakeRange"; 
+  338:	_ = memcpy size 16 align 8 (sp + 200, sp + 568); 
+  337:	_ = memcpy size 16 align 8 (sp + 120, sp + 216); 
+  336:	_ = memcpy size 16 align 8 (sp + 136, sp + 232); 
+  335:	_ = memcpy size 16 align 8 (sp + 152, sp + 184); 
+  334:	_ = memcpy size 16 align 8 (sp + 168, sp + 200); goto 321
+  333:	EDI = stack(1000) (long); 
+  332:	EDX = int64[stack(328)]; 
+  331:	
+  330:	ESI = EDX; call "MakeRange"; 
+  329:	_ = memcpy size 16 align 8 (sp + 184, sp + 1000); 
+  328:	EDI = stack(984) (long); 
+  327:	ESI = int64[stack(352)]; 
+  326:	
+  325:	EDX = ESI; call "MakeRange"; 
+  324:	_ = memcpy size 16 align 8 (sp + 200, sp + 984); 
+  323:	_ = memcpy size 16 align 8 (sp + 216, sp + 120); 
+  322:	_ = memcpy size 16 align 8 (sp + 232, sp + 136); 
+  321:	EDI = stack(552) (long); 
+  320:	ESI = int64[stack(192)]; 
+  319:	EDX = int64[stack(336)]; 
+  318:	call "MakeRange"; 
+  317:	_ = memcpy size 16 align 8 (sp + 248, sp + 552); 
+  316:	EDI = stack(248) (long); 
+  315:	call "Range_length"; 
+  314:	EDI = stack(536) (long); 
+  313:	ESI = int64[stack(192)]; 
+  312:	
+  311:	ECX = R13; EDX = EAX %ls ECX; 
+  310:	EDX = ESI + EDX + 0 (long); 
+  309:	call "MakeRange"; 
+  308:	_ = memcpy size 16 align 8 (sp + 280, sp + 536); 
+  307:	ESI = 0L; 
+  306:	EDX = int64[stack(288)]; 
+  305:	R9 = EDX + 1 (long); 
+  304:	EDI = int64[stack(256)]; 
+  303:	if (R9 <ls EDI) goto 302 else goto 293
+  302:	R10 = int64[stack(216)]; 
+  301:	EAX = R10 + ESI + 0 (long); 
+  300:	EAX = EBP + EAX * 8 + 0 (long); 
+  299:	EDX = EBP + R9 * 8 + 0 (long); 
+  298:	_ = memcpy size 8 align 4 (sp + 8, EAX); 
+  297:	_ = memcpy size 8 align 4 (EAX, EDX); 
+  296:	EAX = EDX; _ = memcpy size 8 align 4 (EAX, sp + 8); 
+  295:	ESI = ESI + 1 (long); 
+  294:	R9 = R9 + R13 + 0 (long); goto 304
+  293:	_ = memcpy size 16 align 8 (sp + 296, sp + 280); 
+  292:	EDI = stack(520) (long); 
+  291:	ESI = 0L; 
+  290:	EDX = 0L; 
+  289:	call "MakeRange"; 
+  288:	_ = memcpy size 16 align 8 (sp + 312, sp + 520); 
+  287:	EDI = stack(344) (long); 
+  286:	call "Range_length"; R15 = EAX; 
+  285:	EDI = stack(200) (long); 
+  284:	call "Range_length"; 
+  283:	ESI = R15; ESI = ESI -l EAX; 
+  282:	EDI = R13; call "Min"; R9 = EAX; 
+  281:	EDI = stack(504) (long); 
+  280:	ESI = int64[stack(344)]; 
+  279:	
+  278:	EDX = ESI + R9 + 0 (long); 
+  277:	call "MakeRange"; 
+  276:	_ = memcpy size 16 align 8 (sp + 264, sp + 504); 
+  275:	EDI = stack(280) (long); 
+  274:	call "Range_length"; 
+  273:	EDX = int64[stack(248)]; 
+  272:	R15 = EDX + EAX + 0 (long); 
+  271:	int64[stack(248)] = R15; 
+  270:	
+  269:	EAX = EBP + R15 * 8 + 0 (long); 
+  268:	_ = memcpy size 8 align 4 (sp + 0, EAX); 
+  267:	R11 = 0L; local(4,long) = R11; 
+  266:	EDI = stack(296) (long); 
+  265:	call "Range_length"; 
+  264:	if (EAX <=ls 512) goto 263 else goto 256
+  263:	EDI = stack(296) (long); 
+  262:	call "Range_length"; R11 = EAX; 
+  261:	EDI = stack(1080) (long); 
+  260:	EAX = int64[stack(296)]; 
+  259:	ESI = EBP + EAX * 8 + 0 (long); 
+  258:	EDX = R11 * 8 + 0 (long); 
+  257:	call "memcpy"; goto 251
+  256:	EDI = stack(296) (long); 
+  255:	call "Range_length"; ECX = EAX; 
+  254:	ESI = int64[stack(296)]; 
+  253:	EDX = int64[stack(232)]; 
+  252:	EDI = EBP; call "BlockSwap"; 
+  251:	
+  250:	EDI = stack(312) (long); 
+  249:	call "Range_length"; 
+  248:	if (EAX >ls 0) goto 247 else goto 239
+  247:	EAX = int64[stack(320)]; 
+  246:	EDI = EBP + EAX * 8 + -8 (long); 
+  245:	ESI = stack(0) (long); 
+  244:	call EBX; 
+  243:	EDI = int8unsigned(EAX); 
+  242:	
+  241:	if (EDI ==u 0) goto 240 else goto 238
+  240:	goto 234
+  239:	
+  238:	EDI = stack(264) (long); 
+  237:	call "Range_length"; 
+  236:	
+  235:	if (EAX ==ls 0) goto 234 else goto 150
+  234:	EDX = stack(312) (long); 
+  233:	ECX = EBX; ESI = R15; EDI = EBP; call "BinaryFirst"; 
+  232:	local(2,long) = EAX; 
+  231:	R10 = int64[stack(320)]; 
+  230:	R11 = local(2,long); R10 = R10 -l R11; local(0,long) = R10; 
+  229:	ESI = int64[stack(248)]; 
+  228:	ECX = R13; EDX = R15; EDI = EBP; call "BlockSwap"; 
+  227:	R11 = int64[stack(248)]; 
+  226:	EAX = EBP + R11 * 8 + 8 (long); 
+  225:	ECX = local(4,long); 
+  224:	R10 = ECX + 1 (long); local(4,long) = R10; 
+  223:	R9 = int64[stack(216)]; 
+  222:	R8 = R9 + ECX + 0 (long); 
+  221:	EDX = EBP + R8 * 8 + 0 (long); 
+  220:	_ = memcpy size 8 align 4 (sp + 16, EAX); 
+  219:	_ = memcpy size 8 align 4 (EAX, EDX); 
+  218:	EAX = EDX; _ = memcpy size 8 align 4 (EAX, sp + 16); 
+  217:	EDI = stack(488) (long); 
+  216:	ESI = int64[stack(304)]; 
+  215:	EDX = local(2,long); call "MakeRange"; 
+  214:	ESI = stack(232) (long); 
+  213:	EDX = stack(296) (long); 
+  212:	ECX = stack(488) (long); 
+  211:	R9 = stack(1080) (long); 
+  210:	EAX = local(6,long); outgoing(0,long) = EAX; R8 = EBX; EDI = EBP; call "WikiMerge"; 
+  209:	if (R13 <=ls 512) goto 208 else goto 203
+  208:	EDI = stack(1080) (long); 
+  207:	ECX = int64[stack(248)]; 
+  206:	ESI = EBP + ECX * 8 + 0 (long); 
+  205:	EDX = R13 * 8 + 0 (long); 
+  204:	call "memcpy"; goto 200
+  203:	ESI = int64[stack(248)]; 
+  202:	EDX = int64[stack(232)]; 
+  201:	ECX = R13; EDI = EBP; call "BlockSwap"; 
+  200:	EAX = int64[stack(248)]; 
+  199:	EDX = EAX + R13 + 0 (long); 
+  198:	R9 = local(0,long); EDX = EDX -l R9; 
+  197:	ECX = local(0,long); ESI = local(2,long); EDI = EBP; call "BlockSwap"; 
+  196:	EDI = stack(472) (long); 
+  195:	ESI = int64[stack(248)]; 
+  194:	R8 = local(0,long); ESI = ESI -l R8; 
+  193:	
+  192:	
+  191:	EDX = ESI + R13 + 0 (long); 
+  190:	call "MakeRange"; 
+  189:	_ = memcpy size 16 align 8 (sp + 296, sp + 472); 
+  188:	EDI = stack(456) (long); 
+  187:	ESI = int64[stack(304)]; 
+  186:	
+  185:	R8 = local(0,long); R9 = ESI + R8 + 0 (long); 
+  184:	EDX = R9; call "MakeRange"; 
+  183:	_ = memcpy size 16 align 8 (sp + 312, sp + 456); 
+  182:	R10 = int64[stack(248)]; 
+  181:	EDX = R10 + R13 + 0 (long); 
+  180:	int64[stack(248)] = EDX; 
+  179:	EDI = stack(248) (long); 
+  178:	call "Range_length"; 
+  177:	if (EAX ==ls 0) goto 162 else goto 176
+  176:	R9 = int64[stack(248)]; 
+  175:	R15 = R9 + 1 (long); 
+  174:	EDX = R15 + R13 + 0 (long); local(0,long) = EDX; 
+  173:	ECX = int64[stack(256)]; 
+  172:	EDX = local(0,long); if (EDX <ls ECX) goto 171 else goto 165
+  171:	EDI = EBP + EDX * 8 + 0 (long); 
+  170:	ESI = EBP + R15 * 8 + 0 (long); 
+  169:	call EBX; 
+  168:	EAX = int8unsigned(EAX); 
+  167:	EDX = local(0,long); EDX = EAX !=u 0 ?long EDX : R15; R15 = EDX; 
+  166:	ESI = local(0,long); EDI = ESI + R13 + 0 (long); local(0,long) = EDI; goto 173
+  165:	R15 = R15 + -1 (long); 
+  164:	EAX = EBP + R15 * 8 + 0 (long); 
+  163:	_ = memcpy size 8 align 4 (sp + 0, EAX); goto 84
+  162:	EDI = stack(200) (long); 
+  161:	call "Range_length"; R8 = EAX; 
+  160:	EDI = stack(392) (long); 
+  159:	ESI = int64[stack(304)]; 
+  158:	EDX = int64[stack(352)]; 
+  157:	EDX = EDX -l R8; 
+  156:	call "MakeRange"; 
+  155:	ESI = stack(232) (long); 
+  154:	EDX = stack(296) (long); 
+  153:	ECX = stack(392) (long); 
+  152:	R9 = stack(1080) (long); 
+  151:	R10 = local(6,long); outgoing(0,long) = R10; R8 = EBX; EDI = EBP; call "WikiMerge"; goto 77
+  150:	EDI = stack(264) (long); 
+  149:	call "Range_length"; 
+  148:	if (EAX <ls R13) goto 147 else goto 113
+  147:	EDI = stack(264) (long); 
+  146:	call "Range_length"; local(0,long) = EAX; 
+  145:	EDI = stack(440) (long); 
+  144:	ESI = int64[stack(248)]; 
+  143:	EDX = int64[stack(272)]; 
+  142:	call "MakeRange"; 
+  141:	ESI = local(0,long); ESI = (-l ESI); 
+  140:	EDX = stack(440) (long); 
+  139:	ECX = stack(1080) (long); 
+  138:	R8 = 0L; 
+  137:	EDI = EBP; call "Rotate"; 
+  136:	EDI = stack(264) (long); 
+  135:	call "Range_length"; R8 = EAX; 
+  134:	EDI = stack(424) (long); 
+  133:	ESI = int64[stack(248)]; 
+  132:	
+  131:	EDX = ESI + R8 + 0 (long); 
+  130:	call "MakeRange"; 
+  129:	_ = memcpy size 16 align 8 (sp + 312, sp + 424); 
+  128:	EDI = stack(264) (long); 
+  127:	call "Range_length"; 
+  126:	ECX = int64[stack(248)]; 
+  125:	R11 = ECX + EAX + 0 (long); 
+  124:	int64[stack(248)] = R11; 
+  123:	EDI = stack(264) (long); 
+  122:	call "Range_length"; 
+  121:	R8 = int64[stack(256)]; 
+  120:	ECX = R8 + EAX + 0 (long); 
+  119:	int64[stack(256)] = ECX; 
+  118:	EDI = stack(264) (long); 
+  117:	call "Range_length"; 
+  116:	R15 = R15 + EAX + 0 (long); 
+  115:	R8 = int64[stack(264)]; 
+  114:	int64[stack(272)] = R8; goto 84
+  113:	ESI = int64[stack(248)]; 
+  112:	EDX = int64[stack(264)]; 
+  111:	ECX = R13; EDI = EBP; call "BlockSwap"; 
+  110:	EDI = stack(408) (long); 
+  109:	ESI = int64[stack(248)]; 
+  108:	
+  107:	EDX = ESI + R13 + 0 (long); 
+  106:	call "MakeRange"; 
+  105:	_ = memcpy size 16 align 8 (sp + 312, sp + 408); 
+  104:	EDX = int64[stack(248)]; 
+  103:	if (R15 ==ls EDX) goto 102 else goto 101
+  102:	R15 = int64[stack(256)]; 
+  101:	EDX = int64[stack(248)]; 
+  100:	EAX = EDX + R13 + 0 (long); 
+   99:	int64[stack(248)] = EAX; 
+   98:	ESI = int64[stack(256)]; 
+   97:	R8 = ESI + R13 + 0 (long); 
+   96:	int64[stack(256)] = R8; 
+   95:	R11 = int64[stack(264)]; 
+   94:	R9 = R11 + R13 + 0 (long); 
+   93:	int64[stack(264)] = R9; 
+   92:	R9 = int64[stack(272)]; 
+   91:	EAX = R9 + R13 + 0 (long); 
+   90:	int64[stack(272)] = EAX; 
+   89:	
+   88:	ECX = int64[stack(200)]; 
+   87:	if (EAX >ls ECX) goto 86 else goto 84
+   86:	
+   85:	int64[stack(272)] = ECX; 
+   84:	goto 250
+   83:	EDI = stack(1064) (long); 
+   82:	EDX = local(2,long); ESI = local(0,long); call "MakeRange"; 
+   81:	EAX = local(0,long); ESI = R15; ESI = ESI -l EAX; 
+   80:	EDX = stack(1064) (long); 
+   79:	ECX = stack(1080) (long); 
+   78:	R8 = local(6,long); EDI = EBP; call "Rotate"; 
+   77:	goto 848
+   76:	EDI = stack(120) (long); 
+   75:	call "Range_length"; 
+   74:	if (EAX >ls 0) goto 73 else goto 7
+   73:	ESI = stack(136) (long); 
+   72:	EDX = EBX; EDI = EBP; call "InsertionSort"; 
+   71:	R14 = int64[stack(152)]; 
+   70:	R15 = int64[stack(160)]; 
+   69:	
+   68:	EDI = stack(152) (long); 
+   67:	call "Range_length"; 
+   66:	if (EAX >ls 0) goto 65 else goto 38
+   65:	ECX = int64[stack(168)]; 
+   64:	if (R15 ==ls ECX) goto 56 else goto 63
+   63:	EDI = EBP + R15 * 8 + 0 (long); 
+   62:	ESI = int64[stack(152)]; 
+   61:	ESI = EBP + ESI * 8 + 0 (long); 
+   60:	call EBX; 
+   59:	R8 = int8unsigned(EAX); 
+   58:	
+   57:	if (R8 ==u 0) goto 55 else goto 39
+   56:	
+   55:	R9 = int64[stack(160)]; 
+   54:	R13 = R15; R13 = R13 -l R9; 
+   53:	EDI = stack(376) (long); 
+   52:	ESI = int64[stack(152)]; 
+   51:	EDX = R15; call "MakeRange"; 
+   50:	ESI = R13; ESI = (-l ESI); 
+   49:	EDX = stack(376) (long); 
+   48:	ECX = stack(1080) (long); 
+   47:	R8 = local(6,long); EDI = EBP; call "Rotate"; 
+   46:	R8 = int64[stack(152)]; 
+   45:	EDX = R8 + R13 + 1 (long); 
+   44:	int64[stack(152)] = EDX; 
+   43:	R9 = int64[stack(160)]; 
+   42:	EAX = R9 + R13 + 0 (long); 
+   41:	int64[stack(160)] = EAX; 
+   40:	R15 = R15 + -1 (long); 
+   39:	R15 = R15 + 1 (long); goto 68
+   38:	R15 = int64[stack(168)]; 
+   37:	
+   36:	EDI = stack(168) (long); 
+   35:	call "Range_length"; 
+   34:	if (EAX >ls 0) goto 33 else goto 7
+   33:	if (R15 ==ls R14) goto 25 else goto 32
+   32:	EDI = int64[stack(176)]; 
+   31:	EDI = EBP + EDI * 8 + -8 (long); 
+   30:	ESI = EBP + R15 * 8 + -8 (long); 
+   29:	call EBX; 
+   28:	R8 = int8unsigned(EAX); 
+   27:	
+   26:	if (R8 ==u 0) goto 24 else goto 8
+   25:	
+   24:	R13 = int64[stack(168)]; 
+   23:	R13 = R13 -l R15; 
+   22:	EDI = stack(360) (long); 
+   21:	EDX = int64[stack(176)]; 
+   20:	ESI = R15; call "MakeRange"; 
+   19:	EDX = stack(360) (long); 
+   18:	ECX = stack(1080) (long); 
+   17:	R8 = local(6,long); ESI = R13; EDI = EBP; call "Rotate"; 
+   16:	ECX = int64[stack(168)]; 
+   15:	ECX = ECX -l R13; 
+   14:	int64[stack(168)] = ECX; 
+   13:	EDI = int64[stack(176)]; 
+   12:	EDI = EDI -l R13; 
+   11:	ECX = EDI + -1 (long); 
+   10:	int64[stack(176)] = ECX; 
+    9:	R15 = R15 + 1 (long); 
+    8:	R15 = R15 + -1 (long); goto 36
+    7:	R12 = R12 + R12 + 0 (long); 
+    6:	R9 = local(8,long); R11 = R9 + R9 + 0 (long); local(8,long) = R11; 
+    5:	EDX = local(12,long); if (R11 >=ls EDX) goto 4 else goto 2
+    4:	ECX = local(8,long); ECX = ECX -l EDX; local(8,long) = ECX; 
+    3:	R12 = R12 + 1 (long); 
+    2:	R10 = local(20,long); ECX = R10 + R10 + 0 (long); local(20,long) = ECX; goto 877
+    1:	return
+}
+
+TestingPathological() {
+   11:	
+   10:	if (EDI ==ls 0) goto 2 else goto 9
+    9:	EAX = ESI; EAX = EAX >>lx 1; 
+    8:	if (EDI <ls EAX) goto 3 else goto 7
+    7:	ECX = ESI + -1 (long); 
+    6:	if (EDI ==ls ECX) goto 5 else goto 4
+    5:	EAX = 10L; goto 1
+    4:	EAX = 9L; goto 1
+    3:	EAX = 11L; goto 1
+    2:	EAX = 10L; 
+    1:	return
+}
+
+TestingRandom() {
+    4:	
+    3:	call "rand_beebs"; 
+    2:	EAX = long32signed(EAX); 
+    1:	return
+}
+
+TestingMostlyDescending() {
+   16:	EBX = ESI; EBP = EDI; 
+   15:	call "rand_beebs"; 
+   14:	EBX = EBX -l EBP; 
+   13:	XMM1 = floatoflong(EBX); 
+   12:	XMM0 = floatofint(EAX); 
+   11:	XMM3 = 1.; 
+   10:	XMM0 = XMM0 *f XMM3; 
+    9:	XMM2 = 2147483647.; 
+    8:	XMM0 = XMM0 /f XMM2; 
+    7:	XMM6 = 5.; 
+    6:	XMM0 = XMM0 *f XMM6; 
+    5:	XMM1 = XMM1 +f XMM0; 
+    4:	XMM5 = 2.5; 
+    3:	XMM1 = XMM1 -f XMM5; 
+    2:	EAX = longoffloat(XMM1); 
+    1:	return
+}
+
+TestingMostlyAscending() {
+   15:	EBX = EDI; 
+   14:	call "rand_beebs"; 
+   13:	XMM1 = floatoflong(EBX); 
+   12:	XMM0 = floatofint(EAX); 
+   11:	XMM5 = 1.; 
+   10:	XMM0 = XMM0 *f XMM5; 
+    9:	XMM4 = 2147483647.; 
+    8:	XMM0 = XMM0 /f XMM4; 
+    7:	XMM2 = 5.; 
+    6:	XMM0 = XMM0 *f XMM2; 
+    5:	XMM1 = XMM1 +f XMM0; 
+    4:	XMM3 = 2.5; 
+    3:	XMM1 = XMM1 -f XMM3; 
+    2:	EAX = longoffloat(XMM1); 
+    1:	return
+}
+
+TestingAscending() {
+    3:	
+    2:	EAX = EDI; 
+    1:	return
+}
+
+TestingDescending() {
+    3:	
+    2:	EAX = ESI; EAX = EAX -l EDI; 
+    1:	return
+}
+
+TestingEqual() {
+    3:	
+    2:	EAX = 1000L; 
+    1:	return
+}
+
+TestingJittered() {
+   12:	EBX = EDI; 
+   11:	call "rand_beebs"; 
+   10:	ECX = EBX + -2 (long); 
+    9:	XMM0 = floatofint(EAX); 
+    8:	XMM2 = 1.; 
+    7:	XMM0 = XMM0 *f XMM2; 
+    6:	XMM1 = 2147483647.; 
+    5:	XMM0 = XMM0 /f XMM1; 
+    4:	XMM3 = 0.9; 
+    3:	EBX = XMM0 <=f XMM3 ?long EBX : ECX; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+TestingMostlyEqual() {
+    9:	
+    8:	call "rand_beebs"; EDX = EAX; 
+    7:	
+    6:	EAX = EDX; EAX = EAX >>x 2; 
+    5:	ECX = EAX * 4 + 0 (int); 
+    4:	EDX = EDX - ECX; 
+    3:	EAX = long32signed(EDX); 
+    2:	EAX = EAX + 1000 (long); 
+    1:	return
+}
+
+verify_benchmark() {
+ 1608:	
+ 1607:	EAX = 1000; 
+ 1606:	int32[stack(0)] = EAX; 
+ 1605:	EAX = 1; 
+ 1604:	int32[stack(4)] = EAX; 
+ 1603:	EAX = 1000; 
+ 1602:	int32[stack(8)] = EAX; 
+ 1601:	EAX = 2; 
+ 1600:	int32[stack(12)] = EAX; 
+ 1599:	EAX = 1000; 
+ 1598:	int32[stack(16)] = EAX; 
+ 1597:	EAX = 13; 
+ 1596:	int32[stack(20)] = EAX; 
+ 1595:	EAX = 1000; 
+ 1594:	int32[stack(24)] = EAX; 
+ 1593:	EAX = 18; 
+ 1592:	int32[stack(28)] = EAX; 
+ 1591:	EAX = 1000; 
+ 1590:	int32[stack(32)] = EAX; 
+ 1589:	EAX = 19; 
+ 1588:	int32[stack(36)] = EAX; 
+ 1587:	EAX = 1000; 
+ 1586:	int32[stack(40)] = EAX; 
+ 1585:	EAX = 26; 
+ 1584:	int32[stack(44)] = EAX; 
+ 1583:	EAX = 1000; 
+ 1582:	int32[stack(48)] = EAX; 
+ 1581:	EAX = 31; 
+ 1580:	int32[stack(52)] = EAX; 
+ 1579:	EAX = 1000; 
+ 1578:	int32[stack(56)] = EAX; 
+ 1577:	EAX = 32; 
+ 1576:	int32[stack(60)] = EAX; 
+ 1575:	EAX = 1000; 
+ 1574:	int32[stack(64)] = EAX; 
+ 1573:	EAX = 35; 
+ 1572:	int32[stack(68)] = EAX; 
+ 1571:	EAX = 1000; 
+ 1570:	int32[stack(72)] = EAX; 
+ 1569:	EAX = 36; 
+ 1568:	int32[stack(76)] = EAX; 
+ 1567:	EAX = 1000; 
+ 1566:	int32[stack(80)] = EAX; 
+ 1565:	EAX = 37; 
+ 1564:	int32[stack(84)] = EAX; 
+ 1563:	EAX = 1000; 
+ 1562:	int32[stack(88)] = EAX; 
+ 1561:	EAX = 46; 
+ 1560:	int32[stack(92)] = EAX; 
+ 1559:	EAX = 1000; 
+ 1558:	int32[stack(96)] = EAX; 
+ 1557:	EAX = 49; 
+ 1556:	int32[stack(100)] = EAX; 
+ 1555:	EAX = 1000; 
+ 1554:	int32[stack(104)] = EAX; 
+ 1553:	EAX = 55; 
+ 1552:	int32[stack(108)] = EAX; 
+ 1551:	EAX = 1000; 
+ 1550:	int32[stack(112)] = EAX; 
+ 1549:	EAX = 61; 
+ 1548:	int32[stack(116)] = EAX; 
+ 1547:	EAX = 1000; 
+ 1546:	int32[stack(120)] = EAX; 
+ 1545:	EAX = 62; 
+ 1544:	int32[stack(124)] = EAX; 
+ 1543:	EAX = 1000; 
+ 1542:	int32[stack(128)] = EAX; 
+ 1541:	EAX = 66; 
+ 1540:	int32[stack(132)] = EAX; 
+ 1539:	EAX = 1000; 
+ 1538:	int32[stack(136)] = EAX; 
+ 1537:	EAX = 72; 
+ 1536:	int32[stack(140)] = EAX; 
+ 1535:	EAX = 1000; 
+ 1534:	int32[stack(144)] = EAX; 
+ 1533:	EAX = 73; 
+ 1532:	int32[stack(148)] = EAX; 
+ 1531:	EAX = 1000; 
+ 1530:	int32[stack(152)] = EAX; 
+ 1529:	EAX = 74; 
+ 1528:	int32[stack(156)] = EAX; 
+ 1527:	EAX = 1000; 
+ 1526:	int32[stack(160)] = EAX; 
+ 1525:	EAX = 75; 
+ 1524:	int32[stack(164)] = EAX; 
+ 1523:	EAX = 1000; 
+ 1522:	int32[stack(168)] = EAX; 
+ 1521:	EAX = 76; 
+ 1520:	int32[stack(172)] = EAX; 
+ 1519:	EAX = 1000; 
+ 1518:	int32[stack(176)] = EAX; 
+ 1517:	EAX = 77; 
+ 1516:	int32[stack(180)] = EAX; 
+ 1515:	EAX = 1000; 
+ 1514:	int32[stack(184)] = EAX; 
+ 1513:	EAX = 81; 
+ 1512:	int32[stack(188)] = EAX; 
+ 1511:	EAX = 1000; 
+ 1510:	int32[stack(192)] = EAX; 
+ 1509:	EAX = 82; 
+ 1508:	int32[stack(196)] = EAX; 
+ 1507:	EAX = 1000; 
+ 1506:	int32[stack(200)] = EAX; 
+ 1505:	EAX = 83; 
+ 1504:	int32[stack(204)] = EAX; 
+ 1503:	EAX = 1000; 
+ 1502:	int32[stack(208)] = EAX; 
+ 1501:	EAX = 87; 
+ 1500:	int32[stack(212)] = EAX; 
+ 1499:	EAX = 1000; 
+ 1498:	int32[stack(216)] = EAX; 
+ 1497:	EAX = 89; 
+ 1496:	int32[stack(220)] = EAX; 
+ 1495:	EAX = 1000; 
+ 1494:	int32[stack(224)] = EAX; 
+ 1493:	EAX = 91; 
+ 1492:	int32[stack(228)] = EAX; 
+ 1491:	EAX = 1000; 
+ 1490:	int32[stack(232)] = EAX; 
+ 1489:	EAX = 92; 
+ 1488:	int32[stack(236)] = EAX; 
+ 1487:	EAX = 1000; 
+ 1486:	int32[stack(240)] = EAX; 
+ 1485:	EAX = 95; 
+ 1484:	int32[stack(244)] = EAX; 
+ 1483:	EAX = 1000; 
+ 1482:	int32[stack(248)] = EAX; 
+ 1481:	EAX = 99; 
+ 1480:	int32[stack(252)] = EAX; 
+ 1479:	EAX = 1000; 
+ 1478:	int32[stack(256)] = EAX; 
+ 1477:	EAX = 101; 
+ 1476:	int32[stack(260)] = EAX; 
+ 1475:	EAX = 1000; 
+ 1474:	int32[stack(264)] = EAX; 
+ 1473:	EAX = 105; 
+ 1472:	int32[stack(268)] = EAX; 
+ 1471:	EAX = 1000; 
+ 1470:	int32[stack(272)] = EAX; 
+ 1469:	EAX = 108; 
+ 1468:	int32[stack(276)] = EAX; 
+ 1467:	EAX = 1000; 
+ 1466:	int32[stack(280)] = EAX; 
+ 1465:	EAX = 109; 
+ 1464:	int32[stack(284)] = EAX; 
+ 1463:	EAX = 1000; 
+ 1462:	int32[stack(288)] = EAX; 
+ 1461:	EAX = 114; 
+ 1460:	int32[stack(292)] = EAX; 
+ 1459:	EAX = 1000; 
+ 1458:	int32[stack(296)] = EAX; 
+ 1457:	EAX = 119; 
+ 1456:	int32[stack(300)] = EAX; 
+ 1455:	EAX = 1000; 
+ 1454:	int32[stack(304)] = EAX; 
+ 1453:	EAX = 120; 
+ 1452:	int32[stack(308)] = EAX; 
+ 1451:	EAX = 1000; 
+ 1450:	int32[stack(312)] = EAX; 
+ 1449:	EAX = 128; 
+ 1448:	int32[stack(316)] = EAX; 
+ 1447:	EAX = 1000; 
+ 1446:	int32[stack(320)] = EAX; 
+ 1445:	EAX = 137; 
+ 1444:	int32[stack(324)] = EAX; 
+ 1443:	EAX = 1000; 
+ 1442:	int32[stack(328)] = EAX; 
+ 1441:	EAX = 143; 
+ 1440:	int32[stack(332)] = EAX; 
+ 1439:	EAX = 1000; 
+ 1438:	int32[stack(336)] = EAX; 
+ 1437:	EAX = 144; 
+ 1436:	int32[stack(340)] = EAX; 
+ 1435:	EAX = 1000; 
+ 1434:	int32[stack(344)] = EAX; 
+ 1433:	EAX = 151; 
+ 1432:	int32[stack(348)] = EAX; 
+ 1431:	EAX = 1000; 
+ 1430:	int32[stack(352)] = EAX; 
+ 1429:	EAX = 158; 
+ 1428:	int32[stack(356)] = EAX; 
+ 1427:	EAX = 1000; 
+ 1426:	int32[stack(360)] = EAX; 
+ 1425:	EAX = 161; 
+ 1424:	int32[stack(364)] = EAX; 
+ 1423:	EAX = 1000; 
+ 1422:	int32[stack(368)] = EAX; 
+ 1421:	EAX = 162; 
+ 1420:	int32[stack(372)] = EAX; 
+ 1419:	EAX = 1000; 
+ 1418:	int32[stack(376)] = EAX; 
+ 1417:	EAX = 165; 
+ 1416:	int32[stack(380)] = EAX; 
+ 1415:	EAX = 1000; 
+ 1414:	int32[stack(384)] = EAX; 
+ 1413:	EAX = 169; 
+ 1412:	int32[stack(388)] = EAX; 
+ 1411:	EAX = 1000; 
+ 1410:	int32[stack(392)] = EAX; 
+ 1409:	EAX = 181; 
+ 1408:	int32[stack(396)] = EAX; 
+ 1407:	EAX = 1000; 
+ 1406:	int32[stack(400)] = EAX; 
+ 1405:	EAX = 182; 
+ 1404:	int32[stack(404)] = EAX; 
+ 1403:	EAX = 1000; 
+ 1402:	int32[stack(408)] = EAX; 
+ 1401:	EAX = 187; 
+ 1400:	int32[stack(412)] = EAX; 
+ 1399:	EAX = 1000; 
+ 1398:	int32[stack(416)] = EAX; 
+ 1397:	EAX = 188; 
+ 1396:	int32[stack(420)] = EAX; 
+ 1395:	EAX = 1000; 
+ 1394:	int32[stack(424)] = EAX; 
+ 1393:	EAX = 190; 
+ 1392:	int32[stack(428)] = EAX; 
+ 1391:	EAX = 1000; 
+ 1390:	int32[stack(432)] = EAX; 
+ 1389:	EAX = 195; 
+ 1388:	int32[stack(436)] = EAX; 
+ 1387:	EAX = 1000; 
+ 1386:	int32[stack(440)] = EAX; 
+ 1385:	EAX = 196; 
+ 1384:	int32[stack(444)] = EAX; 
+ 1383:	EAX = 1000; 
+ 1382:	int32[stack(448)] = EAX; 
+ 1381:	EAX = 198; 
+ 1380:	int32[stack(452)] = EAX; 
+ 1379:	EAX = 1000; 
+ 1378:	int32[stack(456)] = EAX; 
+ 1377:	EAX = 200; 
+ 1376:	int32[stack(460)] = EAX; 
+ 1375:	EAX = 1000; 
+ 1374:	int32[stack(464)] = EAX; 
+ 1373:	EAX = 201; 
+ 1372:	int32[stack(468)] = EAX; 
+ 1371:	EAX = 1000; 
+ 1370:	int32[stack(472)] = EAX; 
+ 1369:	EAX = 205; 
+ 1368:	int32[stack(476)] = EAX; 
+ 1367:	EAX = 1000; 
+ 1366:	int32[stack(480)] = EAX; 
+ 1365:	EAX = 206; 
+ 1364:	int32[stack(484)] = EAX; 
+ 1363:	EAX = 1000; 
+ 1362:	int32[stack(488)] = EAX; 
+ 1361:	EAX = 211; 
+ 1360:	int32[stack(492)] = EAX; 
+ 1359:	EAX = 1000; 
+ 1358:	int32[stack(496)] = EAX; 
+ 1357:	EAX = 212; 
+ 1356:	int32[stack(500)] = EAX; 
+ 1355:	EAX = 1000; 
+ 1354:	int32[stack(504)] = EAX; 
+ 1353:	EAX = 213; 
+ 1352:	int32[stack(508)] = EAX; 
+ 1351:	EAX = 1000; 
+ 1350:	int32[stack(512)] = EAX; 
+ 1349:	EAX = 214; 
+ 1348:	int32[stack(516)] = EAX; 
+ 1347:	EAX = 1000; 
+ 1346:	int32[stack(520)] = EAX; 
+ 1345:	EAX = 215; 
+ 1344:	int32[stack(524)] = EAX; 
+ 1343:	EAX = 1000; 
+ 1342:	int32[stack(528)] = EAX; 
+ 1341:	EAX = 217; 
+ 1340:	int32[stack(532)] = EAX; 
+ 1339:	EAX = 1000; 
+ 1338:	int32[stack(536)] = EAX; 
+ 1337:	EAX = 221; 
+ 1336:	int32[stack(540)] = EAX; 
+ 1335:	EAX = 1000; 
+ 1334:	int32[stack(544)] = EAX; 
+ 1333:	EAX = 223; 
+ 1332:	int32[stack(548)] = EAX; 
+ 1331:	EAX = 1000; 
+ 1330:	int32[stack(552)] = EAX; 
+ 1329:	EAX = 225; 
+ 1328:	int32[stack(556)] = EAX; 
+ 1327:	EAX = 1000; 
+ 1326:	int32[stack(560)] = EAX; 
+ 1325:	EAX = 226; 
+ 1324:	int32[stack(564)] = EAX; 
+ 1323:	EAX = 1000; 
+ 1322:	int32[stack(568)] = EAX; 
+ 1321:	EAX = 227; 
+ 1320:	int32[stack(572)] = EAX; 
+ 1319:	EAX = 1000; 
+ 1318:	int32[stack(576)] = EAX; 
+ 1317:	EAX = 233; 
+ 1316:	int32[stack(580)] = EAX; 
+ 1315:	EAX = 1000; 
+ 1314:	int32[stack(584)] = EAX; 
+ 1313:	EAX = 242; 
+ 1312:	int32[stack(588)] = EAX; 
+ 1311:	EAX = 1000; 
+ 1310:	int32[stack(592)] = EAX; 
+ 1309:	EAX = 245; 
+ 1308:	int32[stack(596)] = EAX; 
+ 1307:	EAX = 1000; 
+ 1306:	int32[stack(600)] = EAX; 
+ 1305:	EAX = 249; 
+ 1304:	int32[stack(604)] = EAX; 
+ 1303:	EAX = 1000; 
+ 1302:	int32[stack(608)] = EAX; 
+ 1301:	EAX = 250; 
+ 1300:	int32[stack(612)] = EAX; 
+ 1299:	EAX = 1000; 
+ 1298:	int32[stack(616)] = EAX; 
+ 1297:	EAX = 266; 
+ 1296:	int32[stack(620)] = EAX; 
+ 1295:	EAX = 1000; 
+ 1294:	int32[stack(624)] = EAX; 
+ 1293:	EAX = 270; 
+ 1292:	int32[stack(628)] = EAX; 
+ 1291:	EAX = 1000; 
+ 1290:	int32[stack(632)] = EAX; 
+ 1289:	EAX = 271; 
+ 1288:	int32[stack(636)] = EAX; 
+ 1287:	EAX = 1000; 
+ 1286:	int32[stack(640)] = EAX; 
+ 1285:	EAX = 273; 
+ 1284:	int32[stack(644)] = EAX; 
+ 1283:	EAX = 1000; 
+ 1282:	int32[stack(648)] = EAX; 
+ 1281:	EAX = 274; 
+ 1280:	int32[stack(652)] = EAX; 
+ 1279:	EAX = 1000; 
+ 1278:	int32[stack(656)] = EAX; 
+ 1277:	EAX = 280; 
+ 1276:	int32[stack(660)] = EAX; 
+ 1275:	EAX = 1000; 
+ 1274:	int32[stack(664)] = EAX; 
+ 1273:	EAX = 287; 
+ 1272:	int32[stack(668)] = EAX; 
+ 1271:	EAX = 1000; 
+ 1270:	int32[stack(672)] = EAX; 
+ 1269:	EAX = 291; 
+ 1268:	int32[stack(676)] = EAX; 
+ 1267:	EAX = 1000; 
+ 1266:	int32[stack(680)] = EAX; 
+ 1265:	EAX = 295; 
+ 1264:	int32[stack(684)] = EAX; 
+ 1263:	EAX = 1000; 
+ 1262:	int32[stack(688)] = EAX; 
+ 1261:	EAX = 299; 
+ 1260:	int32[stack(692)] = EAX; 
+ 1259:	EAX = 1000; 
+ 1258:	int32[stack(696)] = EAX; 
+ 1257:	EAX = 303; 
+ 1256:	int32[stack(700)] = EAX; 
+ 1255:	EAX = 1000; 
+ 1254:	int32[stack(704)] = EAX; 
+ 1253:	EAX = 304; 
+ 1252:	int32[stack(708)] = EAX; 
+ 1251:	EAX = 1000; 
+ 1250:	int32[stack(712)] = EAX; 
+ 1249:	EAX = 312; 
+ 1248:	int32[stack(716)] = EAX; 
+ 1247:	EAX = 1000; 
+ 1246:	int32[stack(720)] = EAX; 
+ 1245:	EAX = 328; 
+ 1244:	int32[stack(724)] = EAX; 
+ 1243:	EAX = 1000; 
+ 1242:	int32[stack(728)] = EAX; 
+ 1241:	EAX = 330; 
+ 1240:	int32[stack(732)] = EAX; 
+ 1239:	EAX = 1000; 
+ 1238:	int32[stack(736)] = EAX; 
+ 1237:	EAX = 333; 
+ 1236:	int32[stack(740)] = EAX; 
+ 1235:	EAX = 1000; 
+ 1234:	int32[stack(744)] = EAX; 
+ 1233:	EAX = 339; 
+ 1232:	int32[stack(748)] = EAX; 
+ 1231:	EAX = 1000; 
+ 1230:	int32[stack(752)] = EAX; 
+ 1229:	EAX = 342; 
+ 1228:	int32[stack(756)] = EAX; 
+ 1227:	EAX = 1000; 
+ 1226:	int32[stack(760)] = EAX; 
+ 1225:	EAX = 346; 
+ 1224:	int32[stack(764)] = EAX; 
+ 1223:	EAX = 1000; 
+ 1222:	int32[stack(768)] = EAX; 
+ 1221:	EAX = 350; 
+ 1220:	int32[stack(772)] = EAX; 
+ 1219:	EAX = 1000; 
+ 1218:	int32[stack(776)] = EAX; 
+ 1217:	EAX = 361; 
+ 1216:	int32[stack(780)] = EAX; 
+ 1215:	EAX = 1000; 
+ 1214:	int32[stack(784)] = EAX; 
+ 1213:	EAX = 371; 
+ 1212:	int32[stack(788)] = EAX; 
+ 1211:	EAX = 1000; 
+ 1210:	int32[stack(792)] = EAX; 
+ 1209:	EAX = 376; 
+ 1208:	int32[stack(796)] = EAX; 
+ 1207:	EAX = 1000; 
+ 1206:	int32[stack(800)] = EAX; 
+ 1205:	EAX = 378; 
+ 1204:	int32[stack(804)] = EAX; 
+ 1203:	EAX = 1000; 
+ 1202:	int32[stack(808)] = EAX; 
+ 1201:	EAX = 382; 
+ 1200:	int32[stack(812)] = EAX; 
+ 1199:	EAX = 1000; 
+ 1198:	int32[stack(816)] = EAX; 
+ 1197:	EAX = 384; 
+ 1196:	int32[stack(820)] = EAX; 
+ 1195:	EAX = 1000; 
+ 1194:	int32[stack(824)] = EAX; 
+ 1193:	EAX = 385; 
+ 1192:	int32[stack(828)] = EAX; 
+ 1191:	EAX = 1000; 
+ 1190:	int32[stack(832)] = EAX; 
+ 1189:	EAX = 390; 
+ 1188:	int32[stack(836)] = EAX; 
+ 1187:	EAX = 1000; 
+ 1186:	int32[stack(840)] = EAX; 
+ 1185:	EAX = 396; 
+ 1184:	int32[stack(844)] = EAX; 
+ 1183:	EAX = 1001; 
+ 1182:	int32[stack(848)] = EAX; 
+ 1181:	EAX = 5; 
+ 1180:	int32[stack(852)] = EAX; 
+ 1179:	EAX = 1001; 
+ 1178:	int32[stack(856)] = EAX; 
+ 1177:	EAX = 7; 
+ 1176:	int32[stack(860)] = EAX; 
+ 1175:	EAX = 1001; 
+ 1174:	int32[stack(864)] = EAX; 
+ 1173:	EAX = 8; 
+ 1172:	int32[stack(868)] = EAX; 
+ 1171:	EAX = 1001; 
+ 1170:	int32[stack(872)] = EAX; 
+ 1169:	EAX = 11; 
+ 1168:	int32[stack(876)] = EAX; 
+ 1167:	EAX = 1001; 
+ 1166:	int32[stack(880)] = EAX; 
+ 1165:	EAX = 16; 
+ 1164:	int32[stack(884)] = EAX; 
+ 1163:	EAX = 1001; 
+ 1162:	int32[stack(888)] = EAX; 
+ 1161:	EAX = 20; 
+ 1160:	int32[stack(892)] = EAX; 
+ 1159:	EAX = 1001; 
+ 1158:	int32[stack(896)] = EAX; 
+ 1157:	EAX = 21; 
+ 1156:	int32[stack(900)] = EAX; 
+ 1155:	EAX = 1001; 
+ 1154:	int32[stack(904)] = EAX; 
+ 1153:	EAX = 22; 
+ 1152:	int32[stack(908)] = EAX; 
+ 1151:	EAX = 1001; 
+ 1150:	int32[stack(912)] = EAX; 
+ 1149:	EAX = 29; 
+ 1148:	int32[stack(916)] = EAX; 
+ 1147:	EAX = 1001; 
+ 1146:	int32[stack(920)] = EAX; 
+ 1145:	EAX = 34; 
+ 1144:	int32[stack(924)] = EAX; 
+ 1143:	EAX = 1001; 
+ 1142:	int32[stack(928)] = EAX; 
+ 1141:	EAX = 39; 
+ 1140:	int32[stack(932)] = EAX; 
+ 1139:	EAX = 1001; 
+ 1138:	int32[stack(936)] = EAX; 
+ 1137:	EAX = 40; 
+ 1136:	int32[stack(940)] = EAX; 
+ 1135:	EAX = 1001; 
+ 1134:	int32[stack(944)] = EAX; 
+ 1133:	EAX = 41; 
+ 1132:	int32[stack(948)] = EAX; 
+ 1131:	EAX = 1001; 
+ 1130:	int32[stack(952)] = EAX; 
+ 1129:	EAX = 42; 
+ 1128:	int32[stack(956)] = EAX; 
+ 1127:	EAX = 1001; 
+ 1126:	int32[stack(960)] = EAX; 
+ 1125:	EAX = 47; 
+ 1124:	int32[stack(964)] = EAX; 
+ 1123:	EAX = 1001; 
+ 1122:	int32[stack(968)] = EAX; 
+ 1121:	EAX = 54; 
+ 1120:	int32[stack(972)] = EAX; 
+ 1119:	EAX = 1001; 
+ 1118:	int32[stack(976)] = EAX; 
+ 1117:	EAX = 63; 
+ 1116:	int32[stack(980)] = EAX; 
+ 1115:	EAX = 1001; 
+ 1114:	int32[stack(984)] = EAX; 
+ 1113:	EAX = 68; 
+ 1112:	int32[stack(988)] = EAX; 
+ 1111:	EAX = 1001; 
+ 1110:	int32[stack(992)] = EAX; 
+ 1109:	EAX = 71; 
+ 1108:	int32[stack(996)] = EAX; 
+ 1107:	EAX = 1001; 
+ 1106:	int32[stack(1000)] = EAX; 
+ 1105:	EAX = 78; 
+ 1104:	int32[stack(1004)] = EAX; 
+ 1103:	EAX = 1001; 
+ 1102:	int32[stack(1008)] = EAX; 
+ 1101:	EAX = 84; 
+ 1100:	int32[stack(1012)] = EAX; 
+ 1099:	EAX = 1001; 
+ 1098:	int32[stack(1016)] = EAX; 
+ 1097:	EAX = 85; 
+ 1096:	int32[stack(1020)] = EAX; 
+ 1095:	EAX = 1001; 
+ 1094:	int32[stack(1024)] = EAX; 
+ 1093:	EAX = 93; 
+ 1092:	int32[stack(1028)] = EAX; 
+ 1091:	EAX = 1001; 
+ 1090:	int32[stack(1032)] = EAX; 
+ 1089:	EAX = 96; 
+ 1088:	int32[stack(1036)] = EAX; 
+ 1087:	EAX = 1001; 
+ 1086:	int32[stack(1040)] = EAX; 
+ 1085:	EAX = 97; 
+ 1084:	int32[stack(1044)] = EAX; 
+ 1083:	EAX = 1001; 
+ 1082:	int32[stack(1048)] = EAX; 
+ 1081:	EAX = 103; 
+ 1080:	int32[stack(1052)] = EAX; 
+ 1079:	EAX = 1001; 
+ 1078:	int32[stack(1056)] = EAX; 
+ 1077:	EAX = 104; 
+ 1076:	int32[stack(1060)] = EAX; 
+ 1075:	EAX = 1001; 
+ 1074:	int32[stack(1064)] = EAX; 
+ 1073:	EAX = 107; 
+ 1072:	int32[stack(1068)] = EAX; 
+ 1071:	EAX = 1001; 
+ 1070:	int32[stack(1072)] = EAX; 
+ 1069:	EAX = 117; 
+ 1068:	int32[stack(1076)] = EAX; 
+ 1067:	EAX = 1001; 
+ 1066:	int32[stack(1080)] = EAX; 
+ 1065:	EAX = 129; 
+ 1064:	int32[stack(1084)] = EAX; 
+ 1063:	EAX = 1001; 
+ 1062:	int32[stack(1088)] = EAX; 
+ 1061:	EAX = 139; 
+ 1060:	int32[stack(1092)] = EAX; 
+ 1059:	EAX = 1001; 
+ 1058:	int32[stack(1096)] = EAX; 
+ 1057:	EAX = 140; 
+ 1056:	int32[stack(1100)] = EAX; 
+ 1055:	EAX = 1001; 
+ 1054:	int32[stack(1104)] = EAX; 
+ 1053:	EAX = 148; 
+ 1052:	int32[stack(1108)] = EAX; 
+ 1051:	EAX = 1001; 
+ 1050:	int32[stack(1112)] = EAX; 
+ 1049:	EAX = 156; 
+ 1048:	int32[stack(1116)] = EAX; 
+ 1047:	EAX = 1001; 
+ 1046:	int32[stack(1120)] = EAX; 
+ 1045:	EAX = 160; 
+ 1044:	int32[stack(1124)] = EAX; 
+ 1043:	EAX = 1001; 
+ 1042:	int32[stack(1128)] = EAX; 
+ 1041:	EAX = 167; 
+ 1040:	int32[stack(1132)] = EAX; 
+ 1039:	EAX = 1001; 
+ 1038:	int32[stack(1136)] = EAX; 
+ 1037:	EAX = 172; 
+ 1036:	int32[stack(1140)] = EAX; 
+ 1035:	EAX = 1001; 
+ 1034:	int32[stack(1144)] = EAX; 
+ 1033:	EAX = 174; 
+ 1032:	int32[stack(1148)] = EAX; 
+ 1031:	EAX = 1001; 
+ 1030:	int32[stack(1152)] = EAX; 
+ 1029:	EAX = 175; 
+ 1028:	int32[stack(1156)] = EAX; 
+ 1027:	EAX = 1001; 
+ 1026:	int32[stack(1160)] = EAX; 
+ 1025:	EAX = 179; 
+ 1024:	int32[stack(1164)] = EAX; 
+ 1023:	EAX = 1001; 
+ 1022:	int32[stack(1168)] = EAX; 
+ 1021:	EAX = 185; 
+ 1020:	int32[stack(1172)] = EAX; 
+ 1019:	EAX = 1001; 
+ 1018:	int32[stack(1176)] = EAX; 
+ 1017:	EAX = 186; 
+ 1016:	int32[stack(1180)] = EAX; 
+ 1015:	EAX = 1001; 
+ 1014:	int32[stack(1184)] = EAX; 
+ 1013:	EAX = 193; 
+ 1012:	int32[stack(1188)] = EAX; 
+ 1011:	EAX = 1001; 
+ 1010:	int32[stack(1192)] = EAX; 
+ 1009:	EAX = 194; 
+ 1008:	int32[stack(1196)] = EAX; 
+ 1007:	EAX = 1001; 
+ 1006:	int32[stack(1200)] = EAX; 
+ 1005:	EAX = 207; 
+ 1004:	int32[stack(1204)] = EAX; 
+ 1003:	EAX = 1001; 
+ 1002:	int32[stack(1208)] = EAX; 
+ 1001:	EAX = 208; 
+ 1000:	int32[stack(1212)] = EAX; 
+  999:	EAX = 1001; 
+  998:	int32[stack(1216)] = EAX; 
+  997:	EAX = 216; 
+  996:	int32[stack(1220)] = EAX; 
+  995:	EAX = 1001; 
+  994:	int32[stack(1224)] = EAX; 
+  993:	EAX = 219; 
+  992:	int32[stack(1228)] = EAX; 
+  991:	EAX = 1001; 
+  990:	int32[stack(1232)] = EAX; 
+  989:	EAX = 224; 
+  988:	int32[stack(1236)] = EAX; 
+  987:	EAX = 1001; 
+  986:	int32[stack(1240)] = EAX; 
+  985:	EAX = 228; 
+  984:	int32[stack(1244)] = EAX; 
+  983:	EAX = 1001; 
+  982:	int32[stack(1248)] = EAX; 
+  981:	EAX = 229; 
+  980:	int32[stack(1252)] = EAX; 
+  979:	EAX = 1001; 
+  978:	int32[stack(1256)] = EAX; 
+  977:	EAX = 235; 
+  976:	int32[stack(1260)] = EAX; 
+  975:	EAX = 1001; 
+  974:	int32[stack(1264)] = EAX; 
+  973:	EAX = 237; 
+  972:	int32[stack(1268)] = EAX; 
+  971:	EAX = 1001; 
+  970:	int32[stack(1272)] = EAX; 
+  969:	EAX = 240; 
+  968:	int32[stack(1276)] = EAX; 
+  967:	EAX = 1001; 
+  966:	int32[stack(1280)] = EAX; 
+  965:	EAX = 246; 
+  964:	int32[stack(1284)] = EAX; 
+  963:	EAX = 1001; 
+  962:	int32[stack(1288)] = EAX; 
+  961:	EAX = 252; 
+  960:	int32[stack(1292)] = EAX; 
+  959:	EAX = 1001; 
+  958:	int32[stack(1296)] = EAX; 
+  957:	EAX = 255; 
+  956:	int32[stack(1300)] = EAX; 
+  955:	EAX = 1001; 
+  954:	int32[stack(1304)] = EAX; 
+  953:	EAX = 256; 
+  952:	int32[stack(1308)] = EAX; 
+  951:	EAX = 1001; 
+  950:	int32[stack(1312)] = EAX; 
+  949:	EAX = 257; 
+  948:	int32[stack(1316)] = EAX; 
+  947:	EAX = 1001; 
+  946:	int32[stack(1320)] = EAX; 
+  945:	EAX = 259; 
+  944:	int32[stack(1324)] = EAX; 
+  943:	EAX = 1001; 
+  942:	int32[stack(1328)] = EAX; 
+  941:	EAX = 260; 
+  940:	int32[stack(1332)] = EAX; 
+  939:	EAX = 1001; 
+  938:	int32[stack(1336)] = EAX; 
+  937:	EAX = 261; 
+  936:	int32[stack(1340)] = EAX; 
+  935:	EAX = 1001; 
+  934:	int32[stack(1344)] = EAX; 
+  933:	EAX = 265; 
+  932:	int32[stack(1348)] = EAX; 
+  931:	EAX = 1001; 
+  930:	int32[stack(1352)] = EAX; 
+  929:	EAX = 267; 
+  928:	int32[stack(1356)] = EAX; 
+  927:	EAX = 1001; 
+  926:	int32[stack(1360)] = EAX; 
+  925:	EAX = 269; 
+  924:	int32[stack(1364)] = EAX; 
+  923:	EAX = 1001; 
+  922:	int32[stack(1368)] = EAX; 
+  921:	EAX = 275; 
+  920:	int32[stack(1372)] = EAX; 
+  919:	EAX = 1001; 
+  918:	int32[stack(1376)] = EAX; 
+  917:	EAX = 286; 
+  916:	int32[stack(1380)] = EAX; 
+  915:	EAX = 1001; 
+  914:	int32[stack(1384)] = EAX; 
+  913:	EAX = 288; 
+  912:	int32[stack(1388)] = EAX; 
+  911:	EAX = 1001; 
+  910:	int32[stack(1392)] = EAX; 
+  909:	EAX = 289; 
+  908:	int32[stack(1396)] = EAX; 
+  907:	EAX = 1001; 
+  906:	int32[stack(1400)] = EAX; 
+  905:	EAX = 294; 
+  904:	int32[stack(1404)] = EAX; 
+  903:	EAX = 1001; 
+  902:	int32[stack(1408)] = EAX; 
+  901:	EAX = 301; 
+  900:	int32[stack(1412)] = EAX; 
+  899:	EAX = 1001; 
+  898:	int32[stack(1416)] = EAX; 
+  897:	EAX = 302; 
+  896:	int32[stack(1420)] = EAX; 
+  895:	EAX = 1001; 
+  894:	int32[stack(1424)] = EAX; 
+  893:	EAX = 308; 
+  892:	int32[stack(1428)] = EAX; 
+  891:	EAX = 1001; 
+  890:	int32[stack(1432)] = EAX; 
+  889:	EAX = 309; 
+  888:	int32[stack(1436)] = EAX; 
+  887:	EAX = 1001; 
+  886:	int32[stack(1440)] = EAX; 
+  885:	EAX = 314; 
+  884:	int32[stack(1444)] = EAX; 
+  883:	EAX = 1001; 
+  882:	int32[stack(1448)] = EAX; 
+  881:	EAX = 322; 
+  880:	int32[stack(1452)] = EAX; 
+  879:	EAX = 1001; 
+  878:	int32[stack(1456)] = EAX; 
+  877:	EAX = 323; 
+  876:	int32[stack(1460)] = EAX; 
+  875:	EAX = 1001; 
+  874:	int32[stack(1464)] = EAX; 
+  873:	EAX = 325; 
+  872:	int32[stack(1468)] = EAX; 
+  871:	EAX = 1001; 
+  870:	int32[stack(1472)] = EAX; 
+  869:	EAX = 326; 
+  868:	int32[stack(1476)] = EAX; 
+  867:	EAX = 1001; 
+  866:	int32[stack(1480)] = EAX; 
+  865:	EAX = 327; 
+  864:	int32[stack(1484)] = EAX; 
+  863:	EAX = 1001; 
+  862:	int32[stack(1488)] = EAX; 
+  861:	EAX = 334; 
+  860:	int32[stack(1492)] = EAX; 
+  859:	EAX = 1001; 
+  858:	int32[stack(1496)] = EAX; 
+  857:	EAX = 337; 
+  856:	int32[stack(1500)] = EAX; 
+  855:	EAX = 1001; 
+  854:	int32[stack(1504)] = EAX; 
+  853:	EAX = 341; 
+  852:	int32[stack(1508)] = EAX; 
+  851:	EAX = 1001; 
+  850:	int32[stack(1512)] = EAX; 
+  849:	EAX = 347; 
+  848:	int32[stack(1516)] = EAX; 
+  847:	EAX = 1001; 
+  846:	int32[stack(1520)] = EAX; 
+  845:	EAX = 352; 
+  844:	int32[stack(1524)] = EAX; 
+  843:	EAX = 1001; 
+  842:	int32[stack(1528)] = EAX; 
+  841:	EAX = 357; 
+  840:	int32[stack(1532)] = EAX; 
+  839:	EAX = 1001; 
+  838:	int32[stack(1536)] = EAX; 
+  837:	EAX = 360; 
+  836:	int32[stack(1540)] = EAX; 
+  835:	EAX = 1001; 
+  834:	int32[stack(1544)] = EAX; 
+  833:	EAX = 363; 
+  832:	int32[stack(1548)] = EAX; 
+  831:	EAX = 1001; 
+  830:	int32[stack(1552)] = EAX; 
+  829:	EAX = 365; 
+  828:	int32[stack(1556)] = EAX; 
+  827:	EAX = 1001; 
+  826:	int32[stack(1560)] = EAX; 
+  825:	EAX = 366; 
+  824:	int32[stack(1564)] = EAX; 
+  823:	EAX = 1001; 
+  822:	int32[stack(1568)] = EAX; 
+  821:	EAX = 369; 
+  820:	int32[stack(1572)] = EAX; 
+  819:	EAX = 1001; 
+  818:	int32[stack(1576)] = EAX; 
+  817:	EAX = 375; 
+  816:	int32[stack(1580)] = EAX; 
+  815:	EAX = 1001; 
+  814:	int32[stack(1584)] = EAX; 
+  813:	EAX = 379; 
+  812:	int32[stack(1588)] = EAX; 
+  811:	EAX = 1001; 
+  810:	int32[stack(1592)] = EAX; 
+  809:	EAX = 381; 
+  808:	int32[stack(1596)] = EAX; 
+  807:	EAX = 1001; 
+  806:	int32[stack(1600)] = EAX; 
+  805:	EAX = 393; 
+  804:	int32[stack(1604)] = EAX; 
+  803:	EAX = 1001; 
+  802:	int32[stack(1608)] = EAX; 
+  801:	EAX = 394; 
+  800:	int32[stack(1612)] = EAX; 
+  799:	EAX = 1001; 
+  798:	int32[stack(1616)] = EAX; 
+  797:	EAX = 398; 
+  796:	int32[stack(1620)] = EAX; 
+  795:	EAX = 1002; 
+  794:	int32[stack(1624)] = EAX; 
+  793:	EAX = 9; 
+  792:	int32[stack(1628)] = EAX; 
+  791:	EAX = 1002; 
+  790:	int32[stack(1632)] = EAX; 
+  789:	EAX = 17; 
+  788:	int32[stack(1636)] = EAX; 
+  787:	EAX = 1002; 
+  786:	int32[stack(1640)] = EAX; 
+  785:	EAX = 23; 
+  784:	int32[stack(1644)] = EAX; 
+  783:	EAX = 1002; 
+  782:	int32[stack(1648)] = EAX; 
+  781:	EAX = 24; 
+  780:	int32[stack(1652)] = EAX; 
+  779:	EAX = 1002; 
+  778:	int32[stack(1656)] = EAX; 
+  777:	EAX = 30; 
+  776:	int32[stack(1660)] = EAX; 
+  775:	EAX = 1002; 
+  774:	int32[stack(1664)] = EAX; 
+  773:	EAX = 33; 
+  772:	int32[stack(1668)] = EAX; 
+  771:	EAX = 1002; 
+  770:	int32[stack(1672)] = EAX; 
+  769:	EAX = 38; 
+  768:	int32[stack(1676)] = EAX; 
+  767:	EAX = 1002; 
+  766:	int32[stack(1680)] = EAX; 
+  765:	EAX = 43; 
+  764:	int32[stack(1684)] = EAX; 
+  763:	EAX = 1002; 
+  762:	int32[stack(1688)] = EAX; 
+  761:	EAX = 45; 
+  760:	int32[stack(1692)] = EAX; 
+  759:	EAX = 1002; 
+  758:	int32[stack(1696)] = EAX; 
+  757:	EAX = 53; 
+  756:	int32[stack(1700)] = EAX; 
+  755:	EAX = 1002; 
+  754:	int32[stack(1704)] = EAX; 
+  753:	EAX = 57; 
+  752:	int32[stack(1708)] = EAX; 
+  751:	EAX = 1002; 
+  750:	int32[stack(1712)] = EAX; 
+  749:	EAX = 59; 
+  748:	int32[stack(1716)] = EAX; 
+  747:	EAX = 1002; 
+  746:	int32[stack(1720)] = EAX; 
+  745:	EAX = 60; 
+  744:	int32[stack(1724)] = EAX; 
+  743:	EAX = 1002; 
+  742:	int32[stack(1728)] = EAX; 
+  741:	EAX = 64; 
+  740:	int32[stack(1732)] = EAX; 
+  739:	EAX = 1002; 
+  738:	int32[stack(1736)] = EAX; 
+  737:	EAX = 69; 
+  736:	int32[stack(1740)] = EAX; 
+  735:	EAX = 1002; 
+  734:	int32[stack(1744)] = EAX; 
+  733:	EAX = 70; 
+  732:	int32[stack(1748)] = EAX; 
+  731:	EAX = 1002; 
+  730:	int32[stack(1752)] = EAX; 
+  729:	EAX = 79; 
+  728:	int32[stack(1756)] = EAX; 
+  727:	EAX = 1002; 
+  726:	int32[stack(1760)] = EAX; 
+  725:	EAX = 88; 
+  724:	int32[stack(1764)] = EAX; 
+  723:	EAX = 1002; 
+  722:	int32[stack(1768)] = EAX; 
+  721:	EAX = 94; 
+  720:	int32[stack(1772)] = EAX; 
+  719:	EAX = 1002; 
+  718:	int32[stack(1776)] = EAX; 
+  717:	EAX = 98; 
+  716:	int32[stack(1780)] = EAX; 
+  715:	EAX = 1002; 
+  714:	int32[stack(1784)] = EAX; 
+  713:	EAX = 100; 
+  712:	int32[stack(1788)] = EAX; 
+  711:	EAX = 1002; 
+  710:	int32[stack(1792)] = EAX; 
+  709:	EAX = 110; 
+  708:	int32[stack(1796)] = EAX; 
+  707:	EAX = 1002; 
+  706:	int32[stack(1800)] = EAX; 
+  705:	EAX = 111; 
+  704:	int32[stack(1804)] = EAX; 
+  703:	EAX = 1002; 
+  702:	int32[stack(1808)] = EAX; 
+  701:	EAX = 115; 
+  700:	int32[stack(1812)] = EAX; 
+  699:	EAX = 1002; 
+  698:	int32[stack(1816)] = EAX; 
+  697:	EAX = 118; 
+  696:	int32[stack(1820)] = EAX; 
+  695:	EAX = 1002; 
+  694:	int32[stack(1824)] = EAX; 
+  693:	EAX = 123; 
+  692:	int32[stack(1828)] = EAX; 
+  691:	EAX = 1002; 
+  690:	int32[stack(1832)] = EAX; 
+  689:	EAX = 125; 
+  688:	int32[stack(1836)] = EAX; 
+  687:	EAX = 1002; 
+  686:	int32[stack(1840)] = EAX; 
+  685:	EAX = 127; 
+  684:	int32[stack(1844)] = EAX; 
+  683:	EAX = 1002; 
+  682:	int32[stack(1848)] = EAX; 
+  681:	EAX = 130; 
+  680:	int32[stack(1852)] = EAX; 
+  679:	EAX = 1002; 
+  678:	int32[stack(1856)] = EAX; 
+  677:	EAX = 131; 
+  676:	int32[stack(1860)] = EAX; 
+  675:	EAX = 1002; 
+  674:	int32[stack(1864)] = EAX; 
+  673:	EAX = 134; 
+  672:	int32[stack(1868)] = EAX; 
+  671:	EAX = 1002; 
+  670:	int32[stack(1872)] = EAX; 
+  669:	EAX = 136; 
+  668:	int32[stack(1876)] = EAX; 
+  667:	EAX = 1002; 
+  666:	int32[stack(1880)] = EAX; 
+  665:	EAX = 138; 
+  664:	int32[stack(1884)] = EAX; 
+  663:	EAX = 1002; 
+  662:	int32[stack(1888)] = EAX; 
+  661:	EAX = 142; 
+  660:	int32[stack(1892)] = EAX; 
+  659:	EAX = 1002; 
+  658:	int32[stack(1896)] = EAX; 
+  657:	EAX = 146; 
+  656:	int32[stack(1900)] = EAX; 
+  655:	EAX = 1002; 
+  654:	int32[stack(1904)] = EAX; 
+  653:	EAX = 149; 
+  652:	int32[stack(1908)] = EAX; 
+  651:	EAX = 1002; 
+  650:	int32[stack(1912)] = EAX; 
+  649:	EAX = 150; 
+  648:	int32[stack(1916)] = EAX; 
+  647:	EAX = 1002; 
+  646:	int32[stack(1920)] = EAX; 
+  645:	EAX = 152; 
+  644:	int32[stack(1924)] = EAX; 
+  643:	EAX = 1002; 
+  642:	int32[stack(1928)] = EAX; 
+  641:	EAX = 153; 
+  640:	int32[stack(1932)] = EAX; 
+  639:	EAX = 1002; 
+  638:	int32[stack(1936)] = EAX; 
+  637:	EAX = 157; 
+  636:	int32[stack(1940)] = EAX; 
+  635:	EAX = 1002; 
+  634:	int32[stack(1944)] = EAX; 
+  633:	EAX = 163; 
+  632:	int32[stack(1948)] = EAX; 
+  631:	EAX = 1002; 
+  630:	int32[stack(1952)] = EAX; 
+  629:	EAX = 166; 
+  628:	int32[stack(1956)] = EAX; 
+  627:	EAX = 1002; 
+  626:	int32[stack(1960)] = EAX; 
+  625:	EAX = 168; 
+  624:	int32[stack(1964)] = EAX; 
+  623:	EAX = 1002; 
+  622:	int32[stack(1968)] = EAX; 
+  621:	EAX = 170; 
+  620:	int32[stack(1972)] = EAX; 
+  619:	EAX = 1002; 
+  618:	int32[stack(1976)] = EAX; 
+  617:	EAX = 171; 
+  616:	int32[stack(1980)] = EAX; 
+  615:	EAX = 1002; 
+  614:	int32[stack(1984)] = EAX; 
+  613:	EAX = 173; 
+  612:	int32[stack(1988)] = EAX; 
+  611:	EAX = 1002; 
+  610:	int32[stack(1992)] = EAX; 
+  609:	EAX = 176; 
+  608:	int32[stack(1996)] = EAX; 
+  607:	EAX = 1002; 
+  606:	int32[stack(2000)] = EAX; 
+  605:	EAX = 177; 
+  604:	int32[stack(2004)] = EAX; 
+  603:	EAX = 1002; 
+  602:	int32[stack(2008)] = EAX; 
+  601:	EAX = 180; 
+  600:	int32[stack(2012)] = EAX; 
+  599:	EAX = 1002; 
+  598:	int32[stack(2016)] = EAX; 
+  597:	EAX = 183; 
+  596:	int32[stack(2020)] = EAX; 
+  595:	EAX = 1002; 
+  594:	int32[stack(2024)] = EAX; 
+  593:	EAX = 184; 
+  592:	int32[stack(2028)] = EAX; 
+  591:	EAX = 1002; 
+  590:	int32[stack(2032)] = EAX; 
+  589:	EAX = 189; 
+  588:	int32[stack(2036)] = EAX; 
+  587:	EAX = 1002; 
+  586:	int32[stack(2040)] = EAX; 
+  585:	EAX = 191; 
+  584:	int32[stack(2044)] = EAX; 
+  583:	EAX = 1002; 
+  582:	int32[stack(2048)] = EAX; 
+  581:	EAX = 197; 
+  580:	int32[stack(2052)] = EAX; 
+  579:	EAX = 1002; 
+  578:	int32[stack(2056)] = EAX; 
+  577:	EAX = 202; 
+  576:	int32[stack(2060)] = EAX; 
+  575:	EAX = 1002; 
+  574:	int32[stack(2064)] = EAX; 
+  573:	EAX = 203; 
+  572:	int32[stack(2068)] = EAX; 
+  571:	EAX = 1002; 
+  570:	int32[stack(2072)] = EAX; 
+  569:	EAX = 204; 
+  568:	int32[stack(2076)] = EAX; 
+  567:	EAX = 1002; 
+  566:	int32[stack(2080)] = EAX; 
+  565:	EAX = 210; 
+  564:	int32[stack(2084)] = EAX; 
+  563:	EAX = 1002; 
+  562:	int32[stack(2088)] = EAX; 
+  561:	EAX = 218; 
+  560:	int32[stack(2092)] = EAX; 
+  559:	EAX = 1002; 
+  558:	int32[stack(2096)] = EAX; 
+  557:	EAX = 220; 
+  556:	int32[stack(2100)] = EAX; 
+  555:	EAX = 1002; 
+  554:	int32[stack(2104)] = EAX; 
+  553:	EAX = 232; 
+  552:	int32[stack(2108)] = EAX; 
+  551:	EAX = 1002; 
+  550:	int32[stack(2112)] = EAX; 
+  549:	EAX = 236; 
+  548:	int32[stack(2116)] = EAX; 
+  547:	EAX = 1002; 
+  546:	int32[stack(2120)] = EAX; 
+  545:	EAX = 238; 
+  544:	int32[stack(2124)] = EAX; 
+  543:	EAX = 1002; 
+  542:	int32[stack(2128)] = EAX; 
+  541:	EAX = 241; 
+  540:	int32[stack(2132)] = EAX; 
+  539:	EAX = 1002; 
+  538:	int32[stack(2136)] = EAX; 
+  537:	EAX = 243; 
+  536:	int32[stack(2140)] = EAX; 
+  535:	EAX = 1002; 
+  534:	int32[stack(2144)] = EAX; 
+  533:	EAX = 244; 
+  532:	int32[stack(2148)] = EAX; 
+  531:	EAX = 1002; 
+  530:	int32[stack(2152)] = EAX; 
+  529:	EAX = 251; 
+  528:	int32[stack(2156)] = EAX; 
+  527:	EAX = 1002; 
+  526:	int32[stack(2160)] = EAX; 
+  525:	EAX = 253; 
+  524:	int32[stack(2164)] = EAX; 
+  523:	EAX = 1002; 
+  522:	int32[stack(2168)] = EAX; 
+  521:	EAX = 254; 
+  520:	int32[stack(2172)] = EAX; 
+  519:	EAX = 1002; 
+  518:	int32[stack(2176)] = EAX; 
+  517:	EAX = 258; 
+  516:	int32[stack(2180)] = EAX; 
+  515:	EAX = 1002; 
+  514:	int32[stack(2184)] = EAX; 
+  513:	EAX = 264; 
+  512:	int32[stack(2188)] = EAX; 
+  511:	EAX = 1002; 
+  510:	int32[stack(2192)] = EAX; 
+  509:	EAX = 272; 
+  508:	int32[stack(2196)] = EAX; 
+  507:	EAX = 1002; 
+  506:	int32[stack(2200)] = EAX; 
+  505:	EAX = 277; 
+  504:	int32[stack(2204)] = EAX; 
+  503:	EAX = 1002; 
+  502:	int32[stack(2208)] = EAX; 
+  501:	EAX = 279; 
+  500:	int32[stack(2212)] = EAX; 
+  499:	EAX = 1002; 
+  498:	int32[stack(2216)] = EAX; 
+  497:	EAX = 282; 
+  496:	int32[stack(2220)] = EAX; 
+  495:	EAX = 1002; 
+  494:	int32[stack(2224)] = EAX; 
+  493:	EAX = 283; 
+  492:	int32[stack(2228)] = EAX; 
+  491:	EAX = 1002; 
+  490:	int32[stack(2232)] = EAX; 
+  489:	EAX = 284; 
+  488:	int32[stack(2236)] = EAX; 
+  487:	EAX = 1002; 
+  486:	int32[stack(2240)] = EAX; 
+  485:	EAX = 290; 
+  484:	int32[stack(2244)] = EAX; 
+  483:	EAX = 1002; 
+  482:	int32[stack(2248)] = EAX; 
+  481:	EAX = 292; 
+  480:	int32[stack(2252)] = EAX; 
+  479:	EAX = 1002; 
+  478:	int32[stack(2256)] = EAX; 
+  477:	EAX = 296; 
+  476:	int32[stack(2260)] = EAX; 
+  475:	EAX = 1002; 
+  474:	int32[stack(2264)] = EAX; 
+  473:	EAX = 297; 
+  472:	int32[stack(2268)] = EAX; 
+  471:	EAX = 1002; 
+  470:	int32[stack(2272)] = EAX; 
+  469:	EAX = 298; 
+  468:	int32[stack(2276)] = EAX; 
+  467:	EAX = 1002; 
+  466:	int32[stack(2280)] = EAX; 
+  465:	EAX = 300; 
+  464:	int32[stack(2284)] = EAX; 
+  463:	EAX = 1002; 
+  462:	int32[stack(2288)] = EAX; 
+  461:	EAX = 306; 
+  460:	int32[stack(2292)] = EAX; 
+  459:	EAX = 1002; 
+  458:	int32[stack(2296)] = EAX; 
+  457:	EAX = 307; 
+  456:	int32[stack(2300)] = EAX; 
+  455:	EAX = 1002; 
+  454:	int32[stack(2304)] = EAX; 
+  453:	EAX = 310; 
+  452:	int32[stack(2308)] = EAX; 
+  451:	EAX = 1002; 
+  450:	int32[stack(2312)] = EAX; 
+  449:	EAX = 311; 
+  448:	int32[stack(2316)] = EAX; 
+  447:	EAX = 1002; 
+  446:	int32[stack(2320)] = EAX; 
+  445:	EAX = 315; 
+  444:	int32[stack(2324)] = EAX; 
+  443:	EAX = 1002; 
+  442:	int32[stack(2328)] = EAX; 
+  441:	EAX = 316; 
+  440:	int32[stack(2332)] = EAX; 
+  439:	EAX = 1002; 
+  438:	int32[stack(2336)] = EAX; 
+  437:	EAX = 319; 
+  436:	int32[stack(2340)] = EAX; 
+  435:	EAX = 1002; 
+  434:	int32[stack(2344)] = EAX; 
+  433:	EAX = 321; 
+  432:	int32[stack(2348)] = EAX; 
+  431:	EAX = 1002; 
+  430:	int32[stack(2352)] = EAX; 
+  429:	EAX = 324; 
+  428:	int32[stack(2356)] = EAX; 
+  427:	EAX = 1002; 
+  426:	int32[stack(2360)] = EAX; 
+  425:	EAX = 331; 
+  424:	int32[stack(2364)] = EAX; 
+  423:	EAX = 1002; 
+  422:	int32[stack(2368)] = EAX; 
+  421:	EAX = 335; 
+  420:	int32[stack(2372)] = EAX; 
+  419:	EAX = 1002; 
+  418:	int32[stack(2376)] = EAX; 
+  417:	EAX = 340; 
+  416:	int32[stack(2380)] = EAX; 
+  415:	EAX = 1002; 
+  414:	int32[stack(2384)] = EAX; 
+  413:	EAX = 344; 
+  412:	int32[stack(2388)] = EAX; 
+  411:	EAX = 1002; 
+  410:	int32[stack(2392)] = EAX; 
+  409:	EAX = 349; 
+  408:	int32[stack(2396)] = EAX; 
+  407:	EAX = 1002; 
+  406:	int32[stack(2400)] = EAX; 
+  405:	EAX = 353; 
+  404:	int32[stack(2404)] = EAX; 
+  403:	EAX = 1002; 
+  402:	int32[stack(2408)] = EAX; 
+  401:	EAX = 354; 
+  400:	int32[stack(2412)] = EAX; 
+  399:	EAX = 1002; 
+  398:	int32[stack(2416)] = EAX; 
+  397:	EAX = 358; 
+  396:	int32[stack(2420)] = EAX; 
+  395:	EAX = 1002; 
+  394:	int32[stack(2424)] = EAX; 
+  393:	EAX = 362; 
+  392:	int32[stack(2428)] = EAX; 
+  391:	EAX = 1002; 
+  390:	int32[stack(2432)] = EAX; 
+  389:	EAX = 364; 
+  388:	int32[stack(2436)] = EAX; 
+  387:	EAX = 1002; 
+  386:	int32[stack(2440)] = EAX; 
+  385:	EAX = 370; 
+  384:	int32[stack(2444)] = EAX; 
+  383:	EAX = 1002; 
+  382:	int32[stack(2448)] = EAX; 
+  381:	EAX = 374; 
+  380:	int32[stack(2452)] = EAX; 
+  379:	EAX = 1002; 
+  378:	int32[stack(2456)] = EAX; 
+  377:	EAX = 380; 
+  376:	int32[stack(2460)] = EAX; 
+  375:	EAX = 1002; 
+  374:	int32[stack(2464)] = EAX; 
+  373:	EAX = 383; 
+  372:	int32[stack(2468)] = EAX; 
+  371:	EAX = 1002; 
+  370:	int32[stack(2472)] = EAX; 
+  369:	EAX = 386; 
+  368:	int32[stack(2476)] = EAX; 
+  367:	EAX = 1002; 
+  366:	int32[stack(2480)] = EAX; 
+  365:	EAX = 389; 
+  364:	int32[stack(2484)] = EAX; 
+  363:	EAX = 1002; 
+  362:	int32[stack(2488)] = EAX; 
+  361:	EAX = 391; 
+  360:	int32[stack(2492)] = EAX; 
+  359:	EAX = 1002; 
+  358:	int32[stack(2496)] = EAX; 
+  357:	EAX = 392; 
+  356:	int32[stack(2500)] = EAX; 
+  355:	EAX = 1002; 
+  354:	int32[stack(2504)] = EAX; 
+  353:	EAX = 397; 
+  352:	int32[stack(2508)] = EAX; 
+  351:	EAX = 1003; 
+  350:	int32[stack(2512)] = EAX; 
+  349:	EAX = 0; 
+  348:	int32[stack(2516)] = EAX; 
+  347:	EAX = 1003; 
+  346:	int32[stack(2520)] = EAX; 
+  345:	EAX = 3; 
+  344:	int32[stack(2524)] = EAX; 
+  343:	EAX = 1003; 
+  342:	int32[stack(2528)] = EAX; 
+  341:	EAX = 4; 
+  340:	int32[stack(2532)] = EAX; 
+  339:	EAX = 1003; 
+  338:	int32[stack(2536)] = EAX; 
+  337:	EAX = 6; 
+  336:	int32[stack(2540)] = EAX; 
+  335:	EAX = 1003; 
+  334:	int32[stack(2544)] = EAX; 
+  333:	EAX = 10; 
+  332:	int32[stack(2548)] = EAX; 
+  331:	EAX = 1003; 
+  330:	int32[stack(2552)] = EAX; 
+  329:	EAX = 12; 
+  328:	int32[stack(2556)] = EAX; 
+  327:	EAX = 1003; 
+  326:	int32[stack(2560)] = EAX; 
+  325:	EAX = 14; 
+  324:	int32[stack(2564)] = EAX; 
+  323:	EAX = 1003; 
+  322:	int32[stack(2568)] = EAX; 
+  321:	EAX = 15; 
+  320:	int32[stack(2572)] = EAX; 
+  319:	EAX = 1003; 
+  318:	int32[stack(2576)] = EAX; 
+  317:	EAX = 25; 
+  316:	int32[stack(2580)] = EAX; 
+  315:	EAX = 1003; 
+  314:	int32[stack(2584)] = EAX; 
+  313:	EAX = 27; 
+  312:	int32[stack(2588)] = EAX; 
+  311:	EAX = 1003; 
+  310:	int32[stack(2592)] = EAX; 
+  309:	EAX = 28; 
+  308:	int32[stack(2596)] = EAX; 
+  307:	EAX = 1003; 
+  306:	int32[stack(2600)] = EAX; 
+  305:	EAX = 44; 
+  304:	int32[stack(2604)] = EAX; 
+  303:	EAX = 1003; 
+  302:	int32[stack(2608)] = EAX; 
+  301:	EAX = 48; 
+  300:	int32[stack(2612)] = EAX; 
+  299:	EAX = 1003; 
+  298:	int32[stack(2616)] = EAX; 
+  297:	EAX = 50; 
+  296:	int32[stack(2620)] = EAX; 
+  295:	EAX = 1003; 
+  294:	int32[stack(2624)] = EAX; 
+  293:	EAX = 51; 
+  292:	int32[stack(2628)] = EAX; 
+  291:	EAX = 1003; 
+  290:	int32[stack(2632)] = EAX; 
+  289:	EAX = 52; 
+  288:	int32[stack(2636)] = EAX; 
+  287:	EAX = 1003; 
+  286:	int32[stack(2640)] = EAX; 
+  285:	EAX = 56; 
+  284:	int32[stack(2644)] = EAX; 
+  283:	EAX = 1003; 
+  282:	int32[stack(2648)] = EAX; 
+  281:	EAX = 58; 
+  280:	int32[stack(2652)] = EAX; 
+  279:	EAX = 1003; 
+  278:	int32[stack(2656)] = EAX; 
+  277:	EAX = 65; 
+  276:	int32[stack(2660)] = EAX; 
+  275:	EAX = 1003; 
+  274:	int32[stack(2664)] = EAX; 
+  273:	EAX = 67; 
+  272:	int32[stack(2668)] = EAX; 
+  271:	EAX = 1003; 
+  270:	int32[stack(2672)] = EAX; 
+  269:	EAX = 80; 
+  268:	int32[stack(2676)] = EAX; 
+  267:	EAX = 1003; 
+  266:	int32[stack(2680)] = EAX; 
+  265:	EAX = 86; 
+  264:	int32[stack(2684)] = EAX; 
+  263:	EAX = 1003; 
+  262:	int32[stack(2688)] = EAX; 
+  261:	EAX = 90; 
+  260:	int32[stack(2692)] = EAX; 
+  259:	EAX = 1003; 
+  258:	int32[stack(2696)] = EAX; 
+  257:	EAX = 102; 
+  256:	int32[stack(2700)] = EAX; 
+  255:	EAX = 1003; 
+  254:	int32[stack(2704)] = EAX; 
+  253:	EAX = 106; 
+  252:	int32[stack(2708)] = EAX; 
+  251:	EAX = 1003; 
+  250:	int32[stack(2712)] = EAX; 
+  249:	EAX = 112; 
+  248:	int32[stack(2716)] = EAX; 
+  247:	EAX = 1003; 
+  246:	int32[stack(2720)] = EAX; 
+  245:	EAX = 113; 
+  244:	int32[stack(2724)] = EAX; 
+  243:	EAX = 1003; 
+  242:	int32[stack(2728)] = EAX; 
+  241:	EAX = 116; 
+  240:	int32[stack(2732)] = EAX; 
+  239:	EAX = 1003; 
+  238:	int32[stack(2736)] = EAX; 
+  237:	EAX = 121; 
+  236:	int32[stack(2740)] = EAX; 
+  235:	EAX = 1003; 
+  234:	int32[stack(2744)] = EAX; 
+  233:	EAX = 122; 
+  232:	int32[stack(2748)] = EAX; 
+  231:	EAX = 1003; 
+  230:	int32[stack(2752)] = EAX; 
+  229:	EAX = 124; 
+  228:	int32[stack(2756)] = EAX; 
+  227:	EAX = 1003; 
+  226:	int32[stack(2760)] = EAX; 
+  225:	EAX = 126; 
+  224:	int32[stack(2764)] = EAX; 
+  223:	EAX = 1003; 
+  222:	int32[stack(2768)] = EAX; 
+  221:	EAX = 132; 
+  220:	int32[stack(2772)] = EAX; 
+  219:	EAX = 1003; 
+  218:	int32[stack(2776)] = EAX; 
+  217:	EAX = 133; 
+  216:	int32[stack(2780)] = EAX; 
+  215:	EAX = 1003; 
+  214:	int32[stack(2784)] = EAX; 
+  213:	EAX = 135; 
+  212:	int32[stack(2788)] = EAX; 
+  211:	EAX = 1003; 
+  210:	int32[stack(2792)] = EAX; 
+  209:	EAX = 141; 
+  208:	int32[stack(2796)] = EAX; 
+  207:	EAX = 1003; 
+  206:	int32[stack(2800)] = EAX; 
+  205:	EAX = 145; 
+  204:	int32[stack(2804)] = EAX; 
+  203:	EAX = 1003; 
+  202:	int32[stack(2808)] = EAX; 
+  201:	EAX = 147; 
+  200:	int32[stack(2812)] = EAX; 
+  199:	EAX = 1003; 
+  198:	int32[stack(2816)] = EAX; 
+  197:	EAX = 154; 
+  196:	int32[stack(2820)] = EAX; 
+  195:	EAX = 1003; 
+  194:	int32[stack(2824)] = EAX; 
+  193:	EAX = 155; 
+  192:	int32[stack(2828)] = EAX; 
+  191:	EAX = 1003; 
+  190:	int32[stack(2832)] = EAX; 
+  189:	EAX = 159; 
+  188:	int32[stack(2836)] = EAX; 
+  187:	EAX = 1003; 
+  186:	int32[stack(2840)] = EAX; 
+  185:	EAX = 164; 
+  184:	int32[stack(2844)] = EAX; 
+  183:	EAX = 1003; 
+  182:	int32[stack(2848)] = EAX; 
+  181:	EAX = 178; 
+  180:	int32[stack(2852)] = EAX; 
+  179:	EAX = 1003; 
+  178:	int32[stack(2856)] = EAX; 
+  177:	EAX = 192; 
+  176:	int32[stack(2860)] = EAX; 
+  175:	EAX = 1003; 
+  174:	int32[stack(2864)] = EAX; 
+  173:	EAX = 199; 
+  172:	int32[stack(2868)] = EAX; 
+  171:	EAX = 1003; 
+  170:	int32[stack(2872)] = EAX; 
+  169:	EAX = 209; 
+  168:	int32[stack(2876)] = EAX; 
+  167:	EAX = 1003; 
+  166:	int32[stack(2880)] = EAX; 
+  165:	EAX = 222; 
+  164:	int32[stack(2884)] = EAX; 
+  163:	EAX = 1003; 
+  162:	int32[stack(2888)] = EAX; 
+  161:	EAX = 230; 
+  160:	int32[stack(2892)] = EAX; 
+  159:	EAX = 1003; 
+  158:	int32[stack(2896)] = EAX; 
+  157:	EAX = 231; 
+  156:	int32[stack(2900)] = EAX; 
+  155:	EAX = 1003; 
+  154:	int32[stack(2904)] = EAX; 
+  153:	EAX = 234; 
+  152:	int32[stack(2908)] = EAX; 
+  151:	EAX = 1003; 
+  150:	int32[stack(2912)] = EAX; 
+  149:	EAX = 239; 
+  148:	int32[stack(2916)] = EAX; 
+  147:	EAX = 1003; 
+  146:	int32[stack(2920)] = EAX; 
+  145:	EAX = 247; 
+  144:	int32[stack(2924)] = EAX; 
+  143:	EAX = 1003; 
+  142:	int32[stack(2928)] = EAX; 
+  141:	EAX = 248; 
+  140:	int32[stack(2932)] = EAX; 
+  139:	EAX = 1003; 
+  138:	int32[stack(2936)] = EAX; 
+  137:	EAX = 262; 
+  136:	int32[stack(2940)] = EAX; 
+  135:	EAX = 1003; 
+  134:	int32[stack(2944)] = EAX; 
+  133:	EAX = 263; 
+  132:	int32[stack(2948)] = EAX; 
+  131:	EAX = 1003; 
+  130:	int32[stack(2952)] = EAX; 
+  129:	EAX = 268; 
+  128:	int32[stack(2956)] = EAX; 
+  127:	EAX = 1003; 
+  126:	int32[stack(2960)] = EAX; 
+  125:	EAX = 276; 
+  124:	int32[stack(2964)] = EAX; 
+  123:	EAX = 1003; 
+  122:	int32[stack(2968)] = EAX; 
+  121:	EAX = 278; 
+  120:	int32[stack(2972)] = EAX; 
+  119:	EAX = 1003; 
+  118:	int32[stack(2976)] = EAX; 
+  117:	EAX = 281; 
+  116:	int32[stack(2980)] = EAX; 
+  115:	EAX = 1003; 
+  114:	int32[stack(2984)] = EAX; 
+  113:	EAX = 285; 
+  112:	int32[stack(2988)] = EAX; 
+  111:	EAX = 1003; 
+  110:	int32[stack(2992)] = EAX; 
+  109:	EAX = 293; 
+  108:	int32[stack(2996)] = EAX; 
+  107:	EAX = 1003; 
+  106:	int32[stack(3000)] = EAX; 
+  105:	EAX = 305; 
+  104:	int32[stack(3004)] = EAX; 
+  103:	EAX = 1003; 
+  102:	int32[stack(3008)] = EAX; 
+  101:	EAX = 313; 
+  100:	int32[stack(3012)] = EAX; 
+   99:	EAX = 1003; 
+   98:	int32[stack(3016)] = EAX; 
+   97:	EAX = 317; 
+   96:	int32[stack(3020)] = EAX; 
+   95:	EAX = 1003; 
+   94:	int32[stack(3024)] = EAX; 
+   93:	EAX = 318; 
+   92:	int32[stack(3028)] = EAX; 
+   91:	EAX = 1003; 
+   90:	int32[stack(3032)] = EAX; 
+   89:	EAX = 320; 
+   88:	int32[stack(3036)] = EAX; 
+   87:	EAX = 1003; 
+   86:	int32[stack(3040)] = EAX; 
+   85:	EAX = 329; 
+   84:	int32[stack(3044)] = EAX; 
+   83:	EAX = 1003; 
+   82:	int32[stack(3048)] = EAX; 
+   81:	EAX = 332; 
+   80:	int32[stack(3052)] = EAX; 
+   79:	EAX = 1003; 
+   78:	int32[stack(3056)] = EAX; 
+   77:	EAX = 336; 
+   76:	int32[stack(3060)] = EAX; 
+   75:	EAX = 1003; 
+   74:	int32[stack(3064)] = EAX; 
+   73:	EAX = 338; 
+   72:	int32[stack(3068)] = EAX; 
+   71:	EAX = 1003; 
+   70:	int32[stack(3072)] = EAX; 
+   69:	EAX = 343; 
+   68:	int32[stack(3076)] = EAX; 
+   67:	EAX = 1003; 
+   66:	int32[stack(3080)] = EAX; 
+   65:	EAX = 345; 
+   64:	int32[stack(3084)] = EAX; 
+   63:	EAX = 1003; 
+   62:	int32[stack(3088)] = EAX; 
+   61:	EAX = 348; 
+   60:	int32[stack(3092)] = EAX; 
+   59:	EAX = 1003; 
+   58:	int32[stack(3096)] = EAX; 
+   57:	EAX = 351; 
+   56:	int32[stack(3100)] = EAX; 
+   55:	EAX = 1003; 
+   54:	int32[stack(3104)] = EAX; 
+   53:	EAX = 355; 
+   52:	int32[stack(3108)] = EAX; 
+   51:	EAX = 1003; 
+   50:	int32[stack(3112)] = EAX; 
+   49:	EAX = 356; 
+   48:	int32[stack(3116)] = EAX; 
+   47:	EAX = 1003; 
+   46:	int32[stack(3120)] = EAX; 
+   45:	EAX = 359; 
+   44:	int32[stack(3124)] = EAX; 
+   43:	EAX = 1003; 
+   42:	int32[stack(3128)] = EAX; 
+   41:	EAX = 367; 
+   40:	int32[stack(3132)] = EAX; 
+   39:	EAX = 1003; 
+   38:	int32[stack(3136)] = EAX; 
+   37:	EAX = 368; 
+   36:	int32[stack(3140)] = EAX; 
+   35:	EAX = 1003; 
+   34:	int32[stack(3144)] = EAX; 
+   33:	EAX = 372; 
+   32:	int32[stack(3148)] = EAX; 
+   31:	EAX = 1003; 
+   30:	int32[stack(3152)] = EAX; 
+   29:	EAX = 373; 
+   28:	int32[stack(3156)] = EAX; 
+   27:	EAX = 1003; 
+   26:	int32[stack(3160)] = EAX; 
+   25:	EAX = 377; 
+   24:	int32[stack(3164)] = EAX; 
+   23:	EAX = 1003; 
+   22:	int32[stack(3168)] = EAX; 
+   21:	EAX = 387; 
+   20:	int32[stack(3172)] = EAX; 
+   19:	EAX = 1003; 
+   18:	int32[stack(3176)] = EAX; 
+   17:	EAX = 388; 
+   16:	int32[stack(3180)] = EAX; 
+   15:	EAX = 1003; 
+   14:	int32[stack(3184)] = EAX; 
+   13:	EAX = 395; 
+   12:	int32[stack(3188)] = EAX; 
+   11:	EAX = 1003; 
+   10:	int32[stack(3192)] = EAX; 
+    9:	EAX = 399; 
+    8:	int32[stack(3196)] = EAX; 
+    7:	EDI = &array1; 
+    6:	ESI = stack(0) (long); 
+    5:	
+    4:	EDX = 3200L; 
+    3:	call "memcmp"; 
+    2:	EAX = EAX ==s 0; 
+    1:	return
+}
+
+initialise_benchmark() {
+    2:	
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 1; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   46:	EBP = EDI; 
+   45:	EBX = TestCompare + 0 (long); 
+   44:	ESI = TestingPathological + 0 (long); 
+   43:	int64[stack(8)] = ESI; 
+   42:	ECX = TestingRandom + 0 (long); 
+   41:	int64[stack(16)] = ECX; 
+   40:	R9 = TestingMostlyDescending + 0 (long); 
+   39:	int64[stack(24)] = R9; 
+   38:	R8 = TestingMostlyAscending + 0 (long); 
+   37:	int64[stack(32)] = R8; 
+   36:	R11 = TestingAscending + 0 (long); 
+   35:	int64[stack(40)] = R11; 
+   34:	ESI = TestingDescending + 0 (long); 
+   33:	int64[stack(48)] = ESI; 
+   32:	EDX = TestingEqual + 0 (long); 
+   31:	int64[stack(56)] = EDX; 
+   30:	ECX = TestingJittered + 0 (long); 
+   29:	int64[stack(64)] = ECX; 
+   28:	EDI = TestingMostlyEqual + 0 (long); 
+   27:	int64[stack(72)] = EDI; 
+   26:	R13 = 0; 
+   25:	if (R13 <s EBP) goto 24 else goto 2
+   24:	EDI = 0; 
+   23:	call "srand_beebs"; 
+   22:	R15 = 400L; 
+   21:	R12 = 0L; 
+   20:	R14 = 0L; 
+   19:	EDI = stack(8) (long); 
+   18:	EDX = int64[EDI + R12 * 8 + 0]; 
+   17:	ESI = R15; EDI = R14; call EDX; 
+   16:	EAX = lowlong(EAX); 
+   15:	int32[stack(0)] = EAX; 
+   14:	EAX = R14; EAX = lowlong(EAX); 
+   13:	int32[stack(4)] = EAX; 
+   12:	EDI = &array1; 
+   11:	EAX = EDI + R14 * 8 + 0 (long); 
+   10:	_ = memcpy size 8 align 4 (EAX, sp + 0); 
+    9:	R14 = R14 + 1 (long); 
+    8:	if (R14 <ls 400) goto 19 else goto 7
+    7:	
+    6:	EDX = EBX; ESI = R15; call "WikiSort"; 
+    5:	R12 = R12 + 1 (long); 
+    4:	if (R12 <ls 9) goto 20 else goto 3
+    3:	R13 = R13 + 1 (int); goto 25
+    2:	EAX = 0; 
+    1:	return
+}
+

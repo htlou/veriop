@@ -1,0 +1,18 @@
+(set-logic QF_LIA)
+(declare-const length Int)
+(declare-const capacity Int)
+(declare-const index Int)
+(assert (and (<= 0 length) (<= length capacity)))
+; A simple slice b[i:] is valid iff 0 <= i <= len(b), because its omitted high is len(b).
+(define-fun old-slice-valid () Bool (and (<= 0 index) (<= index length)))
+; The full slice b[:len(b):len(b)] is always valid for a valid slice header.
+(define-fun new-slice-valid () Bool (and (<= 0 length) (<= length capacity)
+                                         (<= 0 index) (<= index length)))
+(define-fun old-32-normal () Bool (and old-slice-valid (<= 4 (- length index))))
+(define-fun new-32-normal () Bool (and new-slice-valid (<= 4 (- length index))))
+(define-fun old-64-normal () Bool (and old-slice-valid (<= 8 (- length index))))
+(define-fun new-64-normal () Bool (and new-slice-valid (<= 8 (- length index))))
+(assert (or (xor old-slice-valid new-slice-valid)
+            (xor old-32-normal new-32-normal)
+            (xor old-64-normal new-64-normal)))
+(check-sat)

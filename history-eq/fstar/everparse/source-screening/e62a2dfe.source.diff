@@ -1,0 +1,64 @@
+diff --git a/src/cbor/CBOR.Spec.Raw.Valid.fsti b/src/cbor/CBOR.Spec.Raw.Valid.fsti
+index 3c04a4bb..b6d92242 100644
+--- a/src/cbor/CBOR.Spec.Raw.Valid.fsti
++++ b/src/cbor/CBOR.Spec.Raw.Valid.fsti
+@@ -137,6 +137,28 @@ let rec raw_data_item_uint64_optimize_size (x: raw_data_item) : Lemma
+     raw_data_item_uint64_optimize_elem_size (Tagged len (raw_data_item_uint64_optimize v))
+   | _ -> raw_data_item_uint64_optimize_elem_size x
+ 
++let rec raw_data_item_uint64_optimize_correct (x: raw_data_item) : Lemma
++  (ensures (raw_data_item_ints_optimal (raw_data_item_uint64_optimize x) == true))
++  (decreases x)
++= holds_on_raw_data_item_eq raw_data_item_ints_optimal_elem x;
++  raw_data_item_fmap_eq raw_data_item_uint64_optimize_elem x;
++  assert_norm (raw_data_item_ints_optimal == holds_on_raw_data_item raw_data_item_ints_optimal_elem);
++  assert_norm (raw_data_item_uint64_optimize == raw_data_item_fmap raw_data_item_uint64_optimize_elem);
++  match x with
++  | Map len v ->
++    list_for_all_truep v;
++    list_for_all_map (apply_on_pair raw_data_item_uint64_optimize) v truep (holds_on_pair raw_data_item_ints_optimal) (fun x ->
++      raw_data_item_uint64_optimize_correct (fst x);
++      raw_data_item_uint64_optimize_correct (snd x)
++    )
++  | Array len v ->
++    list_for_all_truep v;
++    list_for_all_map (raw_data_item_uint64_optimize) v truep raw_data_item_ints_optimal (fun x ->
++      raw_data_item_uint64_optimize_correct x
++    )
++  | Tagged len v -> raw_data_item_uint64_optimize_correct v
++  | _ -> ()
++
+ (* Sorting map keys *)
+ 
+ noextract
+diff --git a/src/cbor/CBOR.Spec.Util.fst b/src/cbor/CBOR.Spec.Util.fst
+index 70506366..d6b85c9e 100644
+--- a/src/cbor/CBOR.Spec.Util.fst
++++ b/src/cbor/CBOR.Spec.Util.fst
+@@ -512,6 +512,26 @@ let list_for_all_exists_trans
+     list_existsb_intro (p x1) l3 x3
+   )
+ 
++let rec list_for_all_map
++  (#t1 #t2: Type) (f: t1 -> t2) (l: list t1) (p1: t1 -> bool) (p2: t2 -> bool) (prf: (x: t1 { List.Tot.memP x l /\ x << l }) -> Lemma
++    (requires (p1 x == true))
++    (ensures (p2 (f x) == true))
++  ) : Lemma
++  (requires (List.Tot.for_all p1 l == true))
++  (ensures (List.Tot.for_all p2 (List.Tot.map f l) == true))
++= match l with
++  | [] -> ()
++  | a :: q -> prf a; list_for_all_map f q p1 p2 prf
++
++let truep (#t: Type) (x: t) : Tot bool = true
++
++let list_for_all_truep
++  (#t: Type)
++  (l: list t)
++: Lemma
++  (List.Tot.for_all truep l)
++= list_for_all_intro truep l (fun _ -> ())
++
+ let rec list_no_setoid_repeats
+   (#t: Type)
+   (equiv: t -> t -> bool)

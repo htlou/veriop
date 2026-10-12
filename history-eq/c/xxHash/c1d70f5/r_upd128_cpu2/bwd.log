@@ -1,0 +1,1289 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/c1d70f5/r_upd128_cpu2/new.ll c/xxHash/c1d70f5/r_upd128_cpu2/old.ll
+
+----------------------------------------
+declare i64 @XXHL64_default_scalar(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_scalar(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_secret_scalar(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i32 @XXH3_64bits_update_scalar(noundef ptr, noundef ptr, noundef i64) nofree memory(read)
+declare i64 @XXHL64_default_sse2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_sse2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare i64 @XXHL64_secret_sse2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i32 @XXH3_64bits_update_sse2(noundef ptr, noundef ptr, noundef i64) nofree memory(read)
+declare i64 @XXHL64_default_avx2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_avx2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare i64 @XXHL64_secret_avx2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i32 @XXH3_64bits_update_avx2(noundef ptr, noundef ptr, noundef i64) nofree memory(read)
+declare i64 @XXHL64_default_avx512(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_avx512(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_secret_avx512(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i32 @XXH3_64bits_update_avx512(noundef ptr, noundef ptr, noundef i64) nofree memory(read)
+declare {i64, i64} @XXHL128_default_scalar(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_scalar(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_secret_scalar(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_sse2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_sse2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare {i64, i64} @XXHL128_secret_sse2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_avx2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_avx2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare {i64, i64} @XXHL128_secret_avx2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_avx512(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_avx512(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_secret_avx512(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare void @XXH3_accumulate_512_scalar(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_scalar(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_accumulate_512_sse2(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_sse2(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_accumulate_512_avx2(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_avx2(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_accumulate_512_avx512(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_avx512(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+
+@g_dispatch = global 32 bytes, align 8
+@k_dispatch = constant 128 bytes, align 16
+@g_dispatch128 = global 24 bytes, align 8
+@k_dispatch128 = constant 96 bytes, align 16
+@g_coreFunc = global 16 bytes, align 8
+@k_coreFunc = constant 64 bytes, align 16
+@XXH3_kSecret = constant 192 bytes, align 64
+@XXHL64_default_scalar = constant ? bytes, exec, align 8
+@XXHL64_seed_scalar = constant ? bytes, exec, align 8
+@XXHL64_secret_scalar = constant ? bytes, exec, align 8
+@XXH3_64bits_update_scalar = constant ? bytes, exec, align 8
+@XXHL64_default_sse2 = constant ? bytes, exec, align 8
+@XXHL64_seed_sse2 = constant ? bytes, exec, align 8
+@XXHL64_secret_sse2 = constant ? bytes, exec, align 8
+@XXH3_64bits_update_sse2 = constant ? bytes, exec, align 8
+@XXHL64_default_avx2 = constant ? bytes, exec, align 8
+@XXHL64_seed_avx2 = constant ? bytes, exec, align 8
+@XXHL64_secret_avx2 = constant ? bytes, exec, align 8
+@XXH3_64bits_update_avx2 = constant ? bytes, exec, align 8
+@XXHL64_default_avx512 = constant ? bytes, exec, align 8
+@XXHL64_seed_avx512 = constant ? bytes, exec, align 8
+@XXHL64_secret_avx512 = constant ? bytes, exec, align 8
+@XXH3_64bits_update_avx512 = constant ? bytes, exec, align 8
+@XXHL128_default_scalar = constant ? bytes, exec, align 8
+@XXHL128_seed_scalar = constant ? bytes, exec, align 8
+@XXHL128_secret_scalar = constant ? bytes, exec, align 8
+@XXHL128_default_sse2 = constant ? bytes, exec, align 8
+@XXHL128_seed_sse2 = constant ? bytes, exec, align 8
+@XXHL128_secret_sse2 = constant ? bytes, exec, align 8
+@XXHL128_default_avx2 = constant ? bytes, exec, align 8
+@XXHL128_seed_avx2 = constant ? bytes, exec, align 8
+@XXHL128_secret_avx2 = constant ? bytes, exec, align 8
+@XXHL128_default_avx512 = constant ? bytes, exec, align 8
+@XXHL128_seed_avx512 = constant ? bytes, exec, align 8
+@XXHL128_secret_avx512 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_scalar = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_scalar = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_sse2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_sse2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx512 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx512 = constant ? bytes, exec, align 8
+
+define void @target_upd128_disp(ptr nowrite noundef %#0, ptr noread noundef %#1) nofree willreturn {
+init:
+  %__copy_0 = {ptr, ptr, ptr, ptr} { @XXHL64_default_scalar, @XXHL64_seed_scalar, @XXHL64_secret_scalar, @XXH3_64bits_update_scalar }
+  %__copy_1 = {ptr, ptr, ptr, ptr} { @XXHL64_default_sse2, @XXHL64_seed_sse2, @XXHL64_secret_sse2, @XXH3_64bits_update_sse2 }
+  %__copy_2 = {ptr, ptr, ptr, ptr} { @XXHL64_default_avx2, @XXHL64_seed_avx2, @XXHL64_secret_avx2, @XXH3_64bits_update_avx2 }
+  %__copy_3 = {ptr, ptr, ptr, ptr} { @XXHL64_default_avx512, @XXHL64_seed_avx512, @XXHL64_secret_avx512, @XXH3_64bits_update_avx512 }
+  %__copy_4 = [4 x {ptr, ptr, ptr, ptr}] { %__copy_0, %__copy_1, %__copy_2, %__copy_3 }
+  %__copy_5 = {ptr, ptr, ptr} { @XXHL128_default_scalar, @XXHL128_seed_scalar, @XXHL128_secret_scalar }
+  %__copy_6 = {ptr, ptr, ptr} { @XXHL128_default_sse2, @XXHL128_seed_sse2, @XXHL128_secret_sse2 }
+  %__copy_7 = {ptr, ptr, ptr} { @XXHL128_default_avx2, @XXHL128_seed_avx2, @XXHL128_secret_avx2 }
+  %__copy_8 = {ptr, ptr, ptr} { @XXHL128_default_avx512, @XXHL128_seed_avx512, @XXHL128_secret_avx512 }
+  %__copy_9 = [4 x {ptr, ptr, ptr}] { %__copy_5, %__copy_6, %__copy_7, %__copy_8 }
+  %__copy_10 = {ptr, ptr} { @XXH3_accumulate_512_scalar, @XXH3_scrambleAcc_scalar }
+  %__copy_11 = {ptr, ptr} { @XXH3_accumulate_512_sse2, @XXH3_scrambleAcc_sse2 }
+  %__copy_12 = {ptr, ptr} { @XXH3_accumulate_512_avx2, @XXH3_scrambleAcc_avx2 }
+  %__copy_13 = {ptr, ptr} { @XXH3_accumulate_512_avx512, @XXH3_scrambleAcc_avx512 }
+  %__copy_14 = [4 x {ptr, ptr}] { %__copy_10, %__copy_11, %__copy_12, %__copy_13 }
+  store [192 x i8] { 184, 254, 108, 57, 35, 164, 75, 190, 124, 1, 129, 44, 247, 33, 173, 28, 222, 212, 109, 233, 131, 144, 151, 219, 114, 64, 164, 164, 183, 179, 103, 31, 203, 121, 230, 78, 204, 192, 229, 120, 130, 90, 208, 125, 204, 255, 114, 33, 184, 8, 70, 116, 247, 67, 36, 142, 224, 53, 144, 230, 129, 58, 38, 76, 60, 40, 82, 187, 145, 195, 0, 203, 136, 208, 101, 139, 27, 83, 46, 163, 113, 100, 72, 151, 162, 13, 249, 78, 56, 25, 239, 70, 169, 222, 172, 216, 168, 250, 118, 63, 227, 156, 52, 63, 249, 220, 187, 199, 199, 11, 79, 29, 138, 81, 224, 75, 205, 180, 89, 49, 200, 159, 126, 201, 217, 120, 115, 100, 234, 197, 172, 131, 52, 211, 235, 195, 197, 129, 160, 255, 250, 19, 99, 235, 23, 13, 221, 81, 183, 240, 218, 73, 211, 22, 85, 38, 41, 212, 104, 158, 43, 22, 190, 88, 125, 71, 161, 252, 143, 248, 184, 209, 122, 208, 49, 206, 69, 203, 58, 143, 149, 22, 4, 40, 175, 215, 251, 202, 187, 75, 64, 126 }, ptr @XXH3_kSecret, align 64
+  store [4 x {ptr, ptr}] %__copy_14, ptr @k_coreFunc, align 16
+  store [4 x {ptr, ptr, ptr, ptr}] %__copy_4, ptr @k_dispatch, align 16
+  store [4 x {ptr, ptr, ptr}] %__copy_9, ptr @k_dispatch128, align 16
+  br label %#2
+
+#2:
+  %#6 = alloca i64 32, align 32, dead
+  %#7 = alloca i64 576, align 64, dead
+  start_lifetime ptr %#7
+  %__constexpr_0 = gep inbounds nuw ptr @k_dispatch, 1 x i64 64
+  tail memcpy ptr @g_dispatch align 8, ptr %__constexpr_0 align 16, i64 32
+  %__constexpr_1 = gep inbounds nuw ptr @k_dispatch128, 1 x i64 48
+  tail memcpy ptr @g_dispatch128 align 8, ptr %__constexpr_1 align 16, i64 24
+  %__constexpr_2 = gep inbounds nuw ptr @k_coreFunc, 1 x i64 32
+  tail memcpy ptr @g_coreFunc align 8, ptr %__constexpr_2 align 16, i64 16
+  %#8 = gep inbounds nuw ptr %#7, 1 x i64 64
+  memset ptr %#8 align 64, i8 0, i64 512
+  store i64 3266489917, ptr %#7, align 64
+  %#9 = gep inbounds nuw ptr %#7, 1 x i64 8
+  store i64 -7046029288634856825, ptr %#9, align 8
+  %#10 = gep inbounds nuw ptr %#7, 1 x i64 16
+  store i64 -4417276706812531889, ptr %#10, align 16
+  %#11 = gep inbounds nuw ptr %#7, 1 x i64 24
+  store i64 1609587929392839161, ptr %#11, align 8
+  %#12 = gep inbounds nuw ptr %#7, 1 x i64 32
+  store i64 -8796714831421723037, ptr %#12, align 32
+  %#13 = gep inbounds nuw ptr %#7, 1 x i64 40
+  store i64 2246822519, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr %#7, 1 x i64 48
+  store i64 2870177450012600261, ptr %#14, align 16
+  %#15 = gep inbounds nuw ptr %#7, 1 x i64 56
+  store i64 2654435761, ptr %#15, align 8
+  %#16 = gep inbounds nuw ptr %#7, 1 x i64 568
+  store ptr @XXH3_kSecret, ptr %#16, align 8
+  %#17 = gep inbounds nuw ptr %#7, 1 x i64 536
+  store i64 128, ptr %#17, align 8
+  %#18 = gep inbounds nuw ptr %#7, 1 x i64 520
+  store i64 16, ptr %#18, align 8
+  %#19 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#19, label %#4, label %#3
+
+#3:
+  %#20 = gep inbounds nuw ptr %#7, 1 x i64 512
+  %#21 = gep inbounds nuw ptr %#7, 1 x i64 256
+  memcpy ptr %#21 align 64, ptr nowrite noundef %#0 align 1, i64 100
+  store i32 100, ptr %#20, align 64
+  %#22 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 100
+  %#23 = gep inbounds nuw ptr %#7, 1 x i64 544
+  store i64 300, ptr %#23, align 32
+  %#24 = gep inbounds nuw ptr %#7, 1 x i64 356
+  memcpy ptr %#24 align 4, ptr %#22 align 1, i64 156
+  %#25 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 256
+  assume_welldefined i1 0
+  %#27 = load <4 x i64>, ptr %#21, align 64
+  %#28 = xor <4 x i64> %#27, { -4734510112055689544, 2066345149520216444, -2623469361688619810, 2262974939099578482 }
+  %#29 = bitcast <4 x i64> %#28 to <8 x i32>
+  %#30 = shufflevector <8 x i32> %#29, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#31 = bitcast <8 x i32> %#30 to <4 x i64>
+  %#32 = and <4 x i64> %#28, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#33 = and <4 x i64> %#31, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#34 = mul nuw <4 x i64> %#33, %#32
+  %#35 = shufflevector <4 x i64> %#27, <4 x i64> poison, 1, 0, 3, 2
+  %#36 = load <4 x i64>, ptr %#7, align 64
+  %#37 = add <4 x i64> %#36, %#35
+  %#38 = add <4 x i64> %#37, %#34
+  store <4 x i64> %#38, ptr %#7, align 64
+  %#39 = gep inbounds nuw ptr %#7, 1 x i64 288
+  %#40 = load <4 x i64>, ptr %#39, align 32
+  %#41 = xor <4 x i64> %#40, { 8711581037947681227, 2410270004345854594, -8204357891075471176, 5487137525590930912 }
+  %#42 = bitcast <4 x i64> %#41 to <8 x i32>
+  %#43 = shufflevector <8 x i32> %#42, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#44 = bitcast <8 x i32> %#43 to <4 x i64>
+  %#45 = and <4 x i64> %#41, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#46 = and <4 x i64> %#44, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#47 = mul nuw <4 x i64> %#46, %#45
+  %#48 = shufflevector <4 x i64> %#40, <4 x i64> poison, 1, 0, 3, 2
+  %#49 = load <4 x i64>, ptr %#12, align 32
+  %#50 = add <4 x i64> %#49, %#48
+  %#51 = add <4 x i64> %#50, %#47
+  store <4 x i64> %#51, ptr %#12, align 32
+  %#52 = gep inbounds nuw ptr %#7, 1 x i64 320
+  assume_welldefined i1 0
+  %#54 = load <4 x i64>, ptr %#52, align 64
+  %#55 = xor <4 x i64> %#54, { 2066345149520216444, -2623469361688619810, 2262974939099578482, 8711581037947681227 }
+  %#56 = bitcast <4 x i64> %#55 to <8 x i32>
+  %#57 = shufflevector <8 x i32> %#56, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#58 = bitcast <8 x i32> %#57 to <4 x i64>
+  %#59 = and <4 x i64> %#55, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#60 = and <4 x i64> %#58, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#61 = mul nuw <4 x i64> %#60, %#59
+  %#62 = shufflevector <4 x i64> %#54, <4 x i64> poison, 1, 0, 3, 2
+  %#63 = add <4 x i64> %#38, %#62
+  %#64 = add <4 x i64> %#63, %#61
+  store <4 x i64> %#64, ptr %#7, align 64
+  %#65 = gep inbounds nuw ptr %#7, 1 x i64 352
+  %#66 = load <4 x i64>, ptr %#65, align 32
+  %#67 = xor <4 x i64> %#66, { 2410270004345854594, -8204357891075471176, 5487137525590930912, -3818837453329782724 }
+  %#68 = bitcast <4 x i64> %#67 to <8 x i32>
+  %#69 = shufflevector <8 x i32> %#68, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#70 = bitcast <8 x i32> %#69 to <4 x i64>
+  %#71 = and <4 x i64> %#67, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#72 = and <4 x i64> %#70, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#73 = mul nuw <4 x i64> %#72, %#71
+  %#74 = shufflevector <4 x i64> %#66, <4 x i64> poison, 1, 0, 3, 2
+  %#75 = add <4 x i64> %#51, %#74
+  %#76 = add <4 x i64> %#75, %#73
+  store <4 x i64> %#76, ptr %#12, align 32
+  %#77 = gep inbounds nuw ptr %#7, 1 x i64 384
+  assume_welldefined i1 0
+  %#79 = load <4 x i64>, ptr %#77, align 64
+  %#80 = xor <4 x i64> %#79, { -2623469361688619810, 2262974939099578482, 8711581037947681227, 2410270004345854594 }
+  %#81 = bitcast <4 x i64> %#80 to <8 x i32>
+  %#82 = shufflevector <8 x i32> %#81, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#83 = bitcast <8 x i32> %#82 to <4 x i64>
+  %#84 = and <4 x i64> %#80, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#85 = and <4 x i64> %#83, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#86 = mul nuw <4 x i64> %#85, %#84
+  %#87 = shufflevector <4 x i64> %#79, <4 x i64> poison, 1, 0, 3, 2
+  %#88 = add <4 x i64> %#64, %#87
+  %#89 = add <4 x i64> %#88, %#86
+  store <4 x i64> %#89, ptr %#7, align 64
+  %#90 = gep inbounds nuw ptr %#7, 1 x i64 416
+  %#91 = load <4 x i64>, ptr %#90, align 32
+  %#92 = xor <4 x i64> %#91, { -8204357891075471176, 5487137525590930912, -3818837453329782724, -6688317018830679928 }
+  %#93 = bitcast <4 x i64> %#92 to <8 x i32>
+  %#94 = shufflevector <8 x i32> %#93, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#95 = bitcast <8 x i32> %#94 to <4 x i64>
+  %#96 = and <4 x i64> %#92, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#97 = and <4 x i64> %#95, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#98 = mul nuw <4 x i64> %#97, %#96
+  %#99 = shufflevector <4 x i64> %#91, <4 x i64> poison, 1, 0, 3, 2
+  %#100 = add <4 x i64> %#76, %#99
+  %#101 = add <4 x i64> %#100, %#98
+  store <4 x i64> %#101, ptr %#12, align 32
+  %#102 = gep inbounds nuw ptr %#7, 1 x i64 448
+  assume_welldefined i1 0
+  %#104 = load <4 x i64>, ptr %#102, align 64
+  %#105 = xor <4 x i64> %#104, { 2262974939099578482, 8711581037947681227, 2410270004345854594, -8204357891075471176 }
+  %#106 = bitcast <4 x i64> %#105 to <8 x i32>
+  %#107 = shufflevector <8 x i32> %#106, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#108 = bitcast <8 x i32> %#107 to <4 x i64>
+  %#109 = and <4 x i64> %#105, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#110 = and <4 x i64> %#108, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#111 = mul nuw <4 x i64> %#110, %#109
+  %#112 = shufflevector <4 x i64> %#104, <4 x i64> poison, 1, 0, 3, 2
+  %#113 = add <4 x i64> %#89, %#112
+  %#114 = add <4 x i64> %#113, %#111
+  %#115 = gep inbounds nuw ptr %#7, 1 x i64 480
+  %#116 = load <4 x i64>, ptr %#115, align 32
+  %#117 = xor <4 x i64> %#116, { 5487137525590930912, -3818837453329782724, -6688317018830679928, 5690594596133299313 }
+  %#118 = bitcast <4 x i64> %#117 to <8 x i32>
+  %#119 = shufflevector <8 x i32> %#118, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#120 = bitcast <8 x i32> %#119 to <4 x i64>
+  %#121 = and <4 x i64> %#117, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#122 = and <4 x i64> %#120, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#123 = mul nuw <4 x i64> %#122, %#121
+  %#124 = shufflevector <4 x i64> %#116, <4 x i64> poison, 1, 0, 3, 2
+  %#125 = add <4 x i64> %#101, %#124
+  %#126 = add <4 x i64> %#125, %#123
+  memcpy ptr %#21 align 64, ptr %#25 align 1, i64 44
+  start_lifetime ptr %#6
+  %#127 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 236
+  memcpy ptr %#6 align 32, ptr %#127 align 1, i64 20
+  %#128 = gep inbounds nuw ptr %#6, 1 x i64 20
+  memcpy ptr %#128 align 4, ptr %#25 align 1, i64 12
+  %#129 = gep inbounds nuw ptr %#7, 1 x i64 268
+  %#130 = load <4 x i64>, ptr %#129, align 4
+  %#131 = load <4 x i64>, ptr %#6, align 32
+  %#132 = xor <4 x i64> %#131, { -1556992608276218209, -4196251135427498811, 1723580219865931905, -3221803331004277491 }
+  %#133 = bitcast <4 x i64> %#132 to <8 x i32>
+  %#134 = shufflevector <8 x i32> %#133, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#135 = bitcast <8 x i32> %#134 to <4 x i64>
+  %#136 = and <4 x i64> %#132, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#137 = and <4 x i64> %#135, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#138 = mul nuw <4 x i64> %#137, %#136
+  %#139 = shufflevector <4 x i64> %#131, <4 x i64> poison, 1, 0, 3, 2
+  %#140 = add <4 x i64> %#114, %#139
+  %#141 = add <4 x i64> %#140, %#138
+  %#142 = xor <4 x i64> %#130, { 3143064850383918358, -8071399103737053674, 5030012605302946040, -5825401622958753077 }
+  %#143 = bitcast <4 x i64> %#142 to <8 x i32>
+  %#144 = shufflevector <8 x i32> %#143, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#145 = bitcast <8 x i32> %#144 to <4 x i64>
+  %#146 = and <4 x i64> %#142, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#147 = and <4 x i64> %#145, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#148 = mul nuw <4 x i64> %#147, %#146
+  %#149 = shufflevector <4 x i64> %#130, <4 x i64> poison, 1, 0, 3, 2
+  %#150 = add <4 x i64> %#126, %#149
+  %#151 = add <4 x i64> %#150, %#148
+  end_lifetime ptr %#6
+  %#152 = extractelement <4 x i64> %#141, i64 0
+  %#153 = extractelement <4 x i64> %#141, i64 1
+  %#154 = xor i64 %#152, 7914194659941938988
+  %#155 = xor i64 %#153, -6611157965513653271
+  %#156 = zext i64 %#154 to i128
+  %#157 = zext i64 %#155 to i128
+  %#158 = mul nuw i128 %#157, %#156
+  %#159 = lshr i128 %#158, 64
+  %#160 = xor i128 %#159, %#158
+  %#161 = trunc i128 %#160 to i64
+  %#162 = extractelement <4 x i64> %#141, i64 2
+  %#163 = extractelement <4 x i64> %#141, i64 3
+  %#164 = xor i64 %#162, -1839215637059881052
+  %#165 = xor i64 %#163, -3433288310154277810
+  %#166 = zext i64 %#164 to i128
+  %#167 = zext i64 %#165 to i128
+  %#168 = mul nuw i128 %#167, %#166
+  %#169 = lshr i128 %#168, 64
+  %#170 = xor i128 %#169, %#168
+  %#171 = trunc i128 %#170 to i64
+  %#172 = extractelement <4 x i64> %#151, i64 0
+  %#173 = extractelement <4 x i64> %#151, i64 1
+  %#174 = xor i64 %#172, 5046485836271438973
+  %#175 = xor i64 %#173, -8055285457383852172
+  %#176 = zext i64 %#174 to i128
+  %#177 = zext i64 %#175 to i128
+  %#178 = mul nuw i128 %#177, %#176
+  %#179 = lshr i128 %#178, 64
+  %#180 = xor i128 %#179, %#178
+  %#181 = trunc i128 %#180 to i64
+  %#182 = extractelement <4 x i64> %#151, i64 2
+  %#183 = extractelement <4 x i64> %#151, i64 3
+  %#184 = xor i64 %#182, 5920048007935066598
+  %#185 = xor i64 %#183, 7336514198459093435
+  %#186 = zext i64 %#184 to i128
+  %#187 = zext i64 %#185 to i128
+  %#188 = mul nuw i128 %#187, %#186
+  %#189 = lshr i128 %#188, 64
+  %#190 = xor i128 %#189, %#188
+  %#191 = trunc i128 %#190 to i64
+  %#192 = add i64 %#181, 7566781886141388340
+  %#193 = add i64 %#192, %#191
+  %#194 = add i64 %#193, %#161
+  %#195 = add i64 %#194, %#171
+  %#196 = lshr i64 %#195, 37
+  %#197 = xor i64 %#196, %#195
+  %#198 = mul i64 %#197, 1609587791953885689
+  %#199 = lshr i64 %#198, 32
+  %#200 = xor i64 %#199, %#198
+  %#201 = xor i64 %#152, -2753530472436770380
+  %#202 = xor i64 %#153, 3784058077962335096
+  %#203 = zext i64 %#201 to i128
+  %#204 = zext i64 %#202 to i128
+  %#205 = mul nuw i128 %#204, %#203
+  %#206 = lshr i128 %#205, 64
+  %#207 = xor i128 %#206, %#205
+  %#208 = trunc i128 %#207 to i64
+  %#209 = xor i64 %#162, -360392965937173549
+  %#210 = xor i64 %#163, -5237161843349560557
+  %#211 = zext i64 %#209 to i128
+  %#212 = zext i64 %#210 to i128
+  %#213 = mul nuw i128 %#212, %#211
+  %#214 = lshr i128 %#213, 64
+  %#215 = xor i128 %#214, %#213
+  %#216 = trunc i128 %#215 to i64
+  %#217 = xor i64 %#172, 2965150961192524528
+  %#218 = xor i64 %#173, 9032178055121889492
+  %#219 = zext i64 %#217 to i128
+  %#220 = zext i64 %#218 to i128
+  %#221 = mul nuw i128 %#220, %#219
+  %#222 = lshr i128 %#221, 64
+  %#223 = xor i128 %#222, %#221
+  %#224 = trunc i128 %#223 to i64
+  %#225 = xor i64 %#182, 8850058120466833735
+  %#226 = xor i64 %#183, -7669846995664752176
+  %#227 = zext i64 %#225 to i128
+  %#228 = zext i64 %#226 to i128
+  %#229 = mul nuw i128 %#228, %#227
+  %#230 = lshr i128 %#229, 64
+  %#231 = xor i128 %#230, %#229
+  %#232 = trunc i128 %#231 to i64
+  %#233 = add i64 %#224, -2982561263328149653
+  %#234 = add i64 %#233, %#232
+  %#235 = add i64 %#234, %#208
+  %#236 = add i64 %#235, %#216
+  %#237 = lshr i64 %#236, 37
+  %#238 = xor i64 %#237, %#236
+  %#239 = mul i64 %#238, 1609587791953885689
+  %#240 = lshr i64 %#239, 32
+  %#241 = xor i64 %#240, %#239
+  br label %#5
+
+#4:
+  %#242 = gep inbounds nuw ptr %#7, 1 x i64 544
+  store i64 200, ptr %#242, align 32
+  %#243 = gep inbounds nuw ptr %#7, 1 x i64 256
+  %__constexpr_3 = int2ptr i64 100 to ptr
+  memcpy ptr %#243 align 64, ptr %__constexpr_3 align 4, i64 200
+  %#244 = gep inbounds nuw ptr %#7, 1 x i64 272
+  %#245 = load i64, ptr %#243, align 64
+  %#246 = gep inbounds nuw ptr %#7, 1 x i64 264
+  %#247 = load i64, ptr %#246, align 8
+  %#248 = load i64, ptr %#244, align 16
+  %#249 = gep inbounds nuw ptr %#7, 1 x i64 280
+  %#250 = load i64, ptr %#249, align 8
+  %#251 = xor i64 %#245, -4734510112055689544
+  %#252 = xor i64 %#247, 2066345149520216444
+  %#253 = zext i64 %#251 to i128
+  %#254 = zext i64 %#252 to i128
+  %#255 = mul nuw i128 %#254, %#253
+  %#256 = lshr i128 %#255, 64
+  %#257 = xor i128 %#256, %#255
+  %#258 = trunc i128 %#257 to i64
+  %#259 = add i64 %#258, -7253308125045442184
+  %#260 = add i64 %#250, %#248
+  %#261 = xor i64 %#259, %#260
+  %#262 = xor i64 %#248, -2623469361688619810
+  %#263 = xor i64 %#250, 2262974939099578482
+  %#264 = zext i64 %#262 to i128
+  %#265 = zext i64 %#263 to i128
+  %#266 = mul nuw i128 %#265, %#264
+  %#267 = lshr i128 %#266, 64
+  %#268 = xor i128 %#267, %#266
+  %#269 = trunc i128 %#268 to i64
+  %#270 = add i64 %#247, %#245
+  %#271 = xor i64 %#270, %#269
+  %#272 = gep inbounds nuw ptr %#7, 1 x i64 288
+  %#273 = gep inbounds nuw ptr %#7, 1 x i64 304
+  %#274 = load i64, ptr %#272, align 32
+  %#275 = gep inbounds nuw ptr %#7, 1 x i64 296
+  %#276 = load i64, ptr %#275, align 8
+  %#277 = load i64, ptr %#273, align 16
+  %#278 = gep inbounds nuw ptr %#7, 1 x i64 312
+  %#279 = load i64, ptr %#278, align 8
+  %#280 = xor i64 %#274, 8711581037947681227
+  %#281 = xor i64 %#276, 2410270004345854594
+  %#282 = zext i64 %#280 to i128
+  %#283 = zext i64 %#281 to i128
+  %#284 = mul nuw i128 %#283, %#282
+  %#285 = lshr i128 %#284, 64
+  %#286 = xor i128 %#285, %#284
+  %#287 = trunc i128 %#286 to i64
+  %#288 = add i64 %#261, %#287
+  %#289 = add i64 %#279, %#277
+  %#290 = xor i64 %#288, %#289
+  %#291 = xor i64 %#277, -8204357891075471176
+  %#292 = xor i64 %#279, 5487137525590930912
+  %#293 = zext i64 %#291 to i128
+  %#294 = zext i64 %#292 to i128
+  %#295 = mul nuw i128 %#294, %#293
+  %#296 = lshr i128 %#295, 64
+  %#297 = xor i128 %#296, %#295
+  %#298 = trunc i128 %#297 to i64
+  %#299 = add i64 %#271, %#298
+  %#300 = add i64 %#276, %#274
+  %#301 = xor i64 %#299, %#300
+  %#302 = gep inbounds nuw ptr %#7, 1 x i64 320
+  %#303 = gep inbounds nuw ptr %#7, 1 x i64 336
+  %#304 = load i64, ptr %#302, align 64
+  %#305 = gep inbounds nuw ptr %#7, 1 x i64 328
+  %#306 = load i64, ptr %#305, align 8
+  %#307 = load i64, ptr %#303, align 16
+  %#308 = gep inbounds nuw ptr %#7, 1 x i64 344
+  %#309 = load i64, ptr %#308, align 8
+  %#310 = xor i64 %#304, -3818837453329782724
+  %#311 = xor i64 %#306, -6688317018830679928
+  %#312 = zext i64 %#310 to i128
+  %#313 = zext i64 %#311 to i128
+  %#314 = mul nuw i128 %#313, %#312
+  %#315 = lshr i128 %#314, 64
+  %#316 = xor i128 %#315, %#314
+  %#317 = trunc i128 %#316 to i64
+  %#318 = add i64 %#290, %#317
+  %#319 = add i64 %#309, %#307
+  %#320 = xor i64 %#318, %#319
+  %#321 = xor i64 %#307, 5690594596133299313
+  %#322 = xor i64 %#309, -2833645246901970632
+  %#323 = zext i64 %#321 to i128
+  %#324 = zext i64 %#322 to i128
+  %#325 = mul nuw i128 %#324, %#323
+  %#326 = lshr i128 %#325, 64
+  %#327 = xor i128 %#326, %#325
+  %#328 = trunc i128 %#327 to i64
+  %#329 = add i64 %#301, %#328
+  %#330 = add i64 %#306, %#304
+  %#331 = xor i64 %#329, %#330
+  %#332 = gep inbounds nuw ptr %#7, 1 x i64 352
+  %#333 = gep inbounds nuw ptr %#7, 1 x i64 368
+  %#334 = load i64, ptr %#332, align 32
+  %#335 = gep inbounds nuw ptr %#7, 1 x i64 360
+  %#336 = load i64, ptr %#335, align 8
+  %#337 = load i64, ptr %#333, align 16
+  %#338 = gep inbounds nuw ptr %#7, 1 x i64 376
+  %#339 = load i64, ptr %#338, align 8
+  %#340 = xor i64 %#334, 4554437623014685352
+  %#341 = xor i64 %#336, 2111919702937427193
+  %#342 = zext i64 %#340 to i128
+  %#343 = zext i64 %#341 to i128
+  %#344 = mul nuw i128 %#343, %#342
+  %#345 = lshr i128 %#344, 64
+  %#346 = xor i128 %#345, %#344
+  %#347 = trunc i128 %#346 to i64
+  %#348 = add i64 %#320, %#347
+  %#349 = add i64 %#339, %#337
+  %#350 = xor i64 %#348, %#349
+  %#351 = xor i64 %#337, 3556072174620004746
+  %#352 = xor i64 %#339, 7238261902898274248
+  %#353 = zext i64 %#351 to i128
+  %#354 = zext i64 %#352 to i128
+  %#355 = mul nuw i128 %#354, %#353
+  %#356 = lshr i128 %#355, 64
+  %#357 = xor i128 %#356, %#355
+  %#358 = trunc i128 %#357 to i64
+  %#359 = add i64 %#331, %#358
+  %#360 = add i64 %#336, %#334
+  %#361 = xor i64 %#359, %#360
+  %#362 = lshr i64 %#350, 37
+  %#363 = xor i64 %#362, %#350
+  %#364 = mul i64 %#363, 1609587791953885689
+  %#365 = lshr i64 %#364, 32
+  %#366 = xor i64 %#365, %#364
+  %#367 = lshr i64 %#361, 37
+  %#368 = xor i64 %#367, %#361
+  %#369 = mul i64 %#368, 1609587791953885689
+  %#370 = lshr i64 %#369, 32
+  %#371 = xor i64 %#370, %#369
+  %#372 = gep inbounds nuw ptr %#7, 1 x i64 384
+  %#373 = gep inbounds nuw ptr %#7, 1 x i64 400
+  %#374 = load i64, ptr %#372, align 64
+  %#375 = gep inbounds nuw ptr %#7, 1 x i64 392
+  %#376 = load i64, ptr %#375, align 8
+  %#377 = load i64, ptr %#373, align 16
+  %#378 = gep inbounds nuw ptr %#7, 1 x i64 408
+  %#379 = load i64, ptr %#378, align 8
+  %#380 = xor i64 %#374, -9150895811085458631
+  %#381 = xor i64 %#376, 7914194659941938988
+  %#382 = zext i64 %#380 to i128
+  %#383 = zext i64 %#381 to i128
+  %#384 = mul nuw i128 %#383, %#382
+  %#385 = lshr i128 %#384, 64
+  %#386 = xor i128 %#385, %#384
+  %#387 = trunc i128 %#386 to i64
+  %#388 = add i64 %#366, %#387
+  %#389 = add i64 %#379, %#377
+  %#390 = xor i64 %#388, %#389
+  %#391 = xor i64 %#377, -6611157965513653271
+  %#392 = xor i64 %#379, -1839215637059881052
+  %#393 = zext i64 %#391 to i128
+  %#394 = zext i64 %#392 to i128
+  %#395 = mul nuw i128 %#394, %#393
+  %#396 = lshr i128 %#395, 64
+  %#397 = xor i128 %#396, %#395
+  %#398 = trunc i128 %#397 to i64
+  %#399 = add i64 %#371, %#398
+  %#400 = add i64 %#376, %#374
+  %#401 = xor i64 %#399, %#400
+  %#402 = gep inbounds nuw ptr %#7, 1 x i64 416
+  %#403 = gep inbounds nuw ptr %#7, 1 x i64 432
+  %#404 = load i64, ptr %#402, align 32
+  %#405 = gep inbounds nuw ptr %#7, 1 x i64 424
+  %#406 = load i64, ptr %#405, align 8
+  %#407 = load i64, ptr %#403, align 16
+  %#408 = gep inbounds nuw ptr %#7, 1 x i64 440
+  %#409 = load i64, ptr %#408, align 8
+  %#410 = xor i64 %#404, -3433288310154277810
+  %#411 = xor i64 %#406, 5046485836271438973
+  %#412 = zext i64 %#410 to i128
+  %#413 = zext i64 %#411 to i128
+  %#414 = mul nuw i128 %#413, %#412
+  %#415 = lshr i128 %#414, 64
+  %#416 = xor i128 %#415, %#414
+  %#417 = trunc i128 %#416 to i64
+  %#418 = add i64 %#390, %#417
+  %#419 = add i64 %#409, %#407
+  %#420 = xor i64 %#418, %#419
+  %#421 = xor i64 %#407, -8055285457383852172
+  %#422 = xor i64 %#409, 5920048007935066598
+  %#423 = zext i64 %#421 to i128
+  %#424 = zext i64 %#422 to i128
+  %#425 = mul nuw i128 %#424, %#423
+  %#426 = lshr i128 %#425, 64
+  %#427 = xor i128 %#426, %#425
+  %#428 = trunc i128 %#427 to i64
+  %#429 = add i64 %#401, %#428
+  %#430 = add i64 %#406, %#404
+  %#431 = xor i64 %#429, %#430
+  %#432 = gep inbounds nuw ptr %#7, 1 x i64 448
+  %#433 = load i64, ptr %#432, align 64
+  %#434 = xor i64 %#409, 5695865814404364607
+  %#435 = xor i64 %#433, 6464017090953185821
+  %#436 = zext i64 %#434 to i128
+  %#437 = zext i64 %#435 to i128
+  %#438 = mul nuw i128 %#437, %#436
+  %#439 = lshr i128 %#438, 64
+  %#440 = xor i128 %#439, %#438
+  %#441 = trunc i128 %#440 to i64
+  %#442 = add i64 %#420, %#441
+  %#443 = add i64 %#407, %#406
+  %#444 = xor i64 %#442, %#443
+  %#445 = xor i64 %#406, 8320639771003045937
+  %#446 = xor i64 %#407, -1453760514566526364
+  %#447 = zext i64 %#445 to i128
+  %#448 = zext i64 %#446 to i128
+  %#449 = mul nuw i128 %#448, %#447
+  %#450 = lshr i128 %#449, 64
+  %#451 = xor i128 %#450, %#449
+  %#452 = trunc i128 %#451 to i64
+  %#453 = add i64 %#431, %#452
+  %#454 = add i64 %#433, %#409
+  %#455 = xor i64 %#453, %#454
+  %#456 = add i64 %#455, %#444
+  %#457 = mul i64 %#444, -7046029288634856825
+  %#458 = mul i64 %#455, -8796714831421723037
+  %#459 = add i64 %#457, 1988374175552099768
+  %#460 = add i64 %#459, %#458
+  %#461 = lshr i64 %#456, 37
+  %#462 = xor i64 %#461, %#456
+  %#463 = mul i64 %#462, 1609587791953885689
+  %#464 = lshr i64 %#463, 32
+  %#465 = xor i64 %#464, %#463
+  %#466 = lshr i64 %#460, 37
+  %#467 = xor i64 %#466, %#460
+  %#468 = mul i64 %#467, 1609587791953885689
+  %#469 = lshr i64 %#468, 32
+  %#470 = xor i64 %#469, %#468
+  %#471 = sub i64 0, %#470
+  br label %#5
+
+#5:
+  %#472 = phi i64 [ %#200, %#3 ], [ %#465, %#4 ]
+  %#473 = phi i64 [ %#241, %#3 ], [ %#471, %#4 ]
+  store i64 %#472, ptr noread noundef %#1, align 8
+  %#474 = gep inbounds nuw ptr noread noundef %#1, 1 x i64 8
+  store i64 %#473, ptr %#474, align 8
+  end_lifetime ptr %#7
+  ret void
+}
+=>
+declare i64 @XXHL64_default_scalar(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_scalar(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_secret_scalar(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_default_sse2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_sse2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare i64 @XXHL64_secret_sse2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_default_avx2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_avx2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare i64 @XXHL64_secret_avx2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_default_avx512(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_seed_avx512(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare i64 @XXHL64_secret_avx512(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_scalar(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_scalar(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_secret_scalar(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_sse2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_sse2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare {i64, i64} @XXHL128_secret_sse2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_avx2(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_avx2(nowrite noundef ptr, noundef i64, noundef i64) memory(write)
+declare {i64, i64} @XXHL128_secret_avx2(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_default_avx512(nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_seed_avx512(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare {i64, i64} @XXHL128_secret_avx512(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+declare void @XXH3_accumulate_512_scalar(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_scalar(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_accumulate_512_sse2(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_sse2(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_accumulate_512_avx2(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_avx2(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_accumulate_512_avx512(noundef ptr, nowrite noundef ptr, nowrite noundef ptr, noundef i32) nofree willreturn memory(argmem: readwrite)
+declare void @XXH3_scrambleAcc_avx512(noundef ptr, nowrite noundef ptr) nofree willreturn memory(argmem: readwrite)
+
+@g_dispatch = global 24 bytes, align 8
+@k_dispatch = constant 96 bytes, align 16
+@g_dispatch128 = global 24 bytes, align 8
+@k_dispatch128 = constant 96 bytes, align 16
+@g_coreFunc = global 16 bytes, align 8
+@k_coreFunc = constant 64 bytes, align 16
+@XXH3_kSecret = constant 192 bytes, align 64
+@XXHL64_default_scalar = constant ? bytes, exec, align 8
+@XXHL64_seed_scalar = constant ? bytes, exec, align 8
+@XXHL64_secret_scalar = constant ? bytes, exec, align 8
+@XXH3_64bits_update_scalar = constant ? bytes, exec, align 8
+@XXHL64_default_sse2 = constant ? bytes, exec, align 8
+@XXHL64_seed_sse2 = constant ? bytes, exec, align 8
+@XXHL64_secret_sse2 = constant ? bytes, exec, align 8
+@XXH3_64bits_update_sse2 = constant ? bytes, exec, align 8
+@XXHL64_default_avx2 = constant ? bytes, exec, align 8
+@XXHL64_seed_avx2 = constant ? bytes, exec, align 8
+@XXHL64_secret_avx2 = constant ? bytes, exec, align 8
+@XXH3_64bits_update_avx2 = constant ? bytes, exec, align 8
+@XXHL64_default_avx512 = constant ? bytes, exec, align 8
+@XXHL64_seed_avx512 = constant ? bytes, exec, align 8
+@XXHL64_secret_avx512 = constant ? bytes, exec, align 8
+@XXH3_64bits_update_avx512 = constant ? bytes, exec, align 8
+@XXHL128_default_scalar = constant ? bytes, exec, align 8
+@XXHL128_seed_scalar = constant ? bytes, exec, align 8
+@XXHL128_secret_scalar = constant ? bytes, exec, align 8
+@XXHL128_default_sse2 = constant ? bytes, exec, align 8
+@XXHL128_seed_sse2 = constant ? bytes, exec, align 8
+@XXHL128_secret_sse2 = constant ? bytes, exec, align 8
+@XXHL128_default_avx2 = constant ? bytes, exec, align 8
+@XXHL128_seed_avx2 = constant ? bytes, exec, align 8
+@XXHL128_secret_avx2 = constant ? bytes, exec, align 8
+@XXHL128_default_avx512 = constant ? bytes, exec, align 8
+@XXHL128_seed_avx512 = constant ? bytes, exec, align 8
+@XXHL128_secret_avx512 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_scalar = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_scalar = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_sse2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_sse2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx512 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx512 = constant ? bytes, exec, align 8
+@XXHL64_default_scalar = constant ? bytes, exec, align 8
+@XXHL64_seed_scalar = constant ? bytes, exec, align 8
+@XXHL64_secret_scalar = constant ? bytes, exec, align 8
+@XXHL64_default_sse2 = constant ? bytes, exec, align 8
+@XXHL64_seed_sse2 = constant ? bytes, exec, align 8
+@XXHL64_secret_sse2 = constant ? bytes, exec, align 8
+@XXHL64_default_avx2 = constant ? bytes, exec, align 8
+@XXHL64_seed_avx2 = constant ? bytes, exec, align 8
+@XXHL64_secret_avx2 = constant ? bytes, exec, align 8
+@XXHL64_default_avx512 = constant ? bytes, exec, align 8
+@XXHL64_seed_avx512 = constant ? bytes, exec, align 8
+@XXHL64_secret_avx512 = constant ? bytes, exec, align 8
+@XXHL128_default_scalar = constant ? bytes, exec, align 8
+@XXHL128_seed_scalar = constant ? bytes, exec, align 8
+@XXHL128_secret_scalar = constant ? bytes, exec, align 8
+@XXHL128_default_sse2 = constant ? bytes, exec, align 8
+@XXHL128_seed_sse2 = constant ? bytes, exec, align 8
+@XXHL128_secret_sse2 = constant ? bytes, exec, align 8
+@XXHL128_default_avx2 = constant ? bytes, exec, align 8
+@XXHL128_seed_avx2 = constant ? bytes, exec, align 8
+@XXHL128_secret_avx2 = constant ? bytes, exec, align 8
+@XXHL128_default_avx512 = constant ? bytes, exec, align 8
+@XXHL128_seed_avx512 = constant ? bytes, exec, align 8
+@XXHL128_secret_avx512 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_scalar = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_scalar = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_sse2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_sse2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx2 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx2 = constant ? bytes, exec, align 8
+@XXH3_accumulate_512_avx512 = constant ? bytes, exec, align 8
+@XXH3_scrambleAcc_avx512 = constant ? bytes, exec, align 8
+
+define void @target_upd128_disp(ptr nowrite noundef %#0, ptr noread noundef %#1) nofree willreturn {
+init:
+  %__copy_0 = {ptr, ptr, ptr} { @XXHL64_default_scalar, @XXHL64_seed_scalar, @XXHL64_secret_scalar }
+  %__copy_1 = {ptr, ptr, ptr} { @XXHL64_default_sse2, @XXHL64_seed_sse2, @XXHL64_secret_sse2 }
+  %__copy_2 = {ptr, ptr, ptr} { @XXHL64_default_avx2, @XXHL64_seed_avx2, @XXHL64_secret_avx2 }
+  %__copy_3 = {ptr, ptr, ptr} { @XXHL64_default_avx512, @XXHL64_seed_avx512, @XXHL64_secret_avx512 }
+  %__copy_4 = [4 x {ptr, ptr, ptr}] { %__copy_0, %__copy_1, %__copy_2, %__copy_3 }
+  %__copy_5 = {ptr, ptr, ptr} { @XXHL128_default_scalar, @XXHL128_seed_scalar, @XXHL128_secret_scalar }
+  %__copy_6 = {ptr, ptr, ptr} { @XXHL128_default_sse2, @XXHL128_seed_sse2, @XXHL128_secret_sse2 }
+  %__copy_7 = {ptr, ptr, ptr} { @XXHL128_default_avx2, @XXHL128_seed_avx2, @XXHL128_secret_avx2 }
+  %__copy_8 = {ptr, ptr, ptr} { @XXHL128_default_avx512, @XXHL128_seed_avx512, @XXHL128_secret_avx512 }
+  %__copy_9 = [4 x {ptr, ptr, ptr}] { %__copy_5, %__copy_6, %__copy_7, %__copy_8 }
+  %__copy_10 = {ptr, ptr} { @XXH3_accumulate_512_scalar, @XXH3_scrambleAcc_scalar }
+  %__copy_11 = {ptr, ptr} { @XXH3_accumulate_512_sse2, @XXH3_scrambleAcc_sse2 }
+  %__copy_12 = {ptr, ptr} { @XXH3_accumulate_512_avx2, @XXH3_scrambleAcc_avx2 }
+  %__copy_13 = {ptr, ptr} { @XXH3_accumulate_512_avx512, @XXH3_scrambleAcc_avx512 }
+  %__copy_14 = [4 x {ptr, ptr}] { %__copy_10, %__copy_11, %__copy_12, %__copy_13 }
+  store [192 x i8] { 184, 254, 108, 57, 35, 164, 75, 190, 124, 1, 129, 44, 247, 33, 173, 28, 222, 212, 109, 233, 131, 144, 151, 219, 114, 64, 164, 164, 183, 179, 103, 31, 203, 121, 230, 78, 204, 192, 229, 120, 130, 90, 208, 125, 204, 255, 114, 33, 184, 8, 70, 116, 247, 67, 36, 142, 224, 53, 144, 230, 129, 58, 38, 76, 60, 40, 82, 187, 145, 195, 0, 203, 136, 208, 101, 139, 27, 83, 46, 163, 113, 100, 72, 151, 162, 13, 249, 78, 56, 25, 239, 70, 169, 222, 172, 216, 168, 250, 118, 63, 227, 156, 52, 63, 249, 220, 187, 199, 199, 11, 79, 29, 138, 81, 224, 75, 205, 180, 89, 49, 200, 159, 126, 201, 217, 120, 115, 100, 234, 197, 172, 131, 52, 211, 235, 195, 197, 129, 160, 255, 250, 19, 99, 235, 23, 13, 221, 81, 183, 240, 218, 73, 211, 22, 85, 38, 41, 212, 104, 158, 43, 22, 190, 88, 125, 71, 161, 252, 143, 248, 184, 209, 122, 208, 49, 206, 69, 203, 58, 143, 149, 22, 4, 40, 175, 215, 251, 202, 187, 75, 64, 126 }, ptr @XXH3_kSecret, align 64
+  store [4 x {ptr, ptr}] %__copy_14, ptr @k_coreFunc, align 16
+  store [4 x {ptr, ptr, ptr}] %__copy_4, ptr @k_dispatch, align 16
+  store [4 x {ptr, ptr, ptr}] %__copy_9, ptr @k_dispatch128, align 16
+  br label %#2
+
+#2:
+  %#6 = alloca i64 32, align 32, dead
+  %#7 = alloca i64 576, align 64, dead
+  start_lifetime ptr %#7
+  %__constexpr_0 = gep inbounds nuw ptr @k_dispatch, 1 x i64 48
+  tail memcpy ptr @g_dispatch align 8, ptr %__constexpr_0 align 16, i64 24
+  %__constexpr_1 = gep inbounds nuw ptr @k_dispatch128, 1 x i64 48
+  tail memcpy ptr @g_dispatch128 align 8, ptr %__constexpr_1 align 16, i64 24
+  %__constexpr_2 = gep inbounds nuw ptr @k_coreFunc, 1 x i64 32
+  tail memcpy ptr @g_coreFunc align 8, ptr %__constexpr_2 align 16, i64 16
+  %#8 = gep inbounds nuw ptr %#7, 1 x i64 64
+  memset ptr %#8 align 64, i8 0, i64 512
+  store i64 3266489917, ptr %#7, align 64
+  %#9 = gep inbounds nuw ptr %#7, 1 x i64 8
+  store i64 -7046029288634856825, ptr %#9, align 8
+  %#10 = gep inbounds nuw ptr %#7, 1 x i64 16
+  store i64 -4417276706812531889, ptr %#10, align 16
+  %#11 = gep inbounds nuw ptr %#7, 1 x i64 24
+  store i64 1609587929392839161, ptr %#11, align 8
+  %#12 = gep inbounds nuw ptr %#7, 1 x i64 32
+  store i64 -8796714831421723037, ptr %#12, align 32
+  %#13 = gep inbounds nuw ptr %#7, 1 x i64 40
+  store i64 2246822519, ptr %#13, align 8
+  %#14 = gep inbounds nuw ptr %#7, 1 x i64 48
+  store i64 2870177450012600261, ptr %#14, align 16
+  %#15 = gep inbounds nuw ptr %#7, 1 x i64 56
+  store i64 2654435761, ptr %#15, align 8
+  %#16 = gep inbounds nuw ptr %#7, 1 x i64 568
+  store ptr @XXH3_kSecret, ptr %#16, align 8
+  %#17 = gep inbounds nuw ptr %#7, 1 x i64 536
+  store i64 128, ptr %#17, align 8
+  %#18 = gep inbounds nuw ptr %#7, 1 x i64 520
+  store i64 16, ptr %#18, align 8
+  %#19 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#19, label %#4, label %#3
+
+#3:
+  %#20 = gep inbounds nuw ptr %#7, 1 x i64 512
+  %#21 = gep inbounds nuw ptr %#7, 1 x i64 256
+  memcpy ptr %#21 align 64, ptr nowrite noundef %#0 align 1, i64 100
+  store i32 100, ptr %#20, align 64
+  %#22 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 100
+  %#23 = gep inbounds nuw ptr %#7, 1 x i64 544
+  store i64 300, ptr %#23, align 32
+  %#24 = gep inbounds nuw ptr %#7, 1 x i64 356
+  memcpy ptr %#24 align 4, ptr %#22 align 1, i64 156
+  %#25 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 256
+  assume_welldefined i1 0
+  %#27 = load <4 x i64>, ptr %#21, align 64
+  %#28 = xor <4 x i64> %#27, { -4734510112055689544, 2066345149520216444, -2623469361688619810, 2262974939099578482 }
+  %#29 = bitcast <4 x i64> %#28 to <8 x i32>
+  %#30 = shufflevector <8 x i32> %#29, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#31 = bitcast <8 x i32> %#30 to <4 x i64>
+  %#32 = and <4 x i64> %#28, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#33 = and <4 x i64> %#31, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#34 = mul nuw <4 x i64> %#33, %#32
+  %#35 = shufflevector <4 x i64> %#27, <4 x i64> poison, 1, 0, 3, 2
+  %#36 = load <4 x i64>, ptr %#7, align 64
+  %#37 = add <4 x i64> %#36, %#35
+  %#38 = add <4 x i64> %#37, %#34
+  store <4 x i64> %#38, ptr %#7, align 64
+  %#39 = gep inbounds nuw ptr %#7, 1 x i64 288
+  %#40 = load <4 x i64>, ptr %#39, align 32
+  %#41 = xor <4 x i64> %#40, { 8711581037947681227, 2410270004345854594, -8204357891075471176, 5487137525590930912 }
+  %#42 = bitcast <4 x i64> %#41 to <8 x i32>
+  %#43 = shufflevector <8 x i32> %#42, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#44 = bitcast <8 x i32> %#43 to <4 x i64>
+  %#45 = and <4 x i64> %#41, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#46 = and <4 x i64> %#44, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#47 = mul nuw <4 x i64> %#46, %#45
+  %#48 = shufflevector <4 x i64> %#40, <4 x i64> poison, 1, 0, 3, 2
+  %#49 = load <4 x i64>, ptr %#12, align 32
+  %#50 = add <4 x i64> %#49, %#48
+  %#51 = add <4 x i64> %#50, %#47
+  store <4 x i64> %#51, ptr %#12, align 32
+  %#52 = gep inbounds nuw ptr %#7, 1 x i64 320
+  assume_welldefined i1 0
+  %#54 = load <4 x i64>, ptr %#52, align 64
+  %#55 = xor <4 x i64> %#54, { 2066345149520216444, -2623469361688619810, 2262974939099578482, 8711581037947681227 }
+  %#56 = bitcast <4 x i64> %#55 to <8 x i32>
+  %#57 = shufflevector <8 x i32> %#56, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#58 = bitcast <8 x i32> %#57 to <4 x i64>
+  %#59 = and <4 x i64> %#55, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#60 = and <4 x i64> %#58, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#61 = mul nuw <4 x i64> %#60, %#59
+  %#62 = shufflevector <4 x i64> %#54, <4 x i64> poison, 1, 0, 3, 2
+  %#63 = add <4 x i64> %#38, %#62
+  %#64 = add <4 x i64> %#63, %#61
+  store <4 x i64> %#64, ptr %#7, align 64
+  %#65 = gep inbounds nuw ptr %#7, 1 x i64 352
+  %#66 = load <4 x i64>, ptr %#65, align 32
+  %#67 = xor <4 x i64> %#66, { 2410270004345854594, -8204357891075471176, 5487137525590930912, -3818837453329782724 }
+  %#68 = bitcast <4 x i64> %#67 to <8 x i32>
+  %#69 = shufflevector <8 x i32> %#68, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#70 = bitcast <8 x i32> %#69 to <4 x i64>
+  %#71 = and <4 x i64> %#67, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#72 = and <4 x i64> %#70, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#73 = mul nuw <4 x i64> %#72, %#71
+  %#74 = shufflevector <4 x i64> %#66, <4 x i64> poison, 1, 0, 3, 2
+  %#75 = add <4 x i64> %#51, %#74
+  %#76 = add <4 x i64> %#75, %#73
+  store <4 x i64> %#76, ptr %#12, align 32
+  %#77 = gep inbounds nuw ptr %#7, 1 x i64 384
+  assume_welldefined i1 0
+  %#79 = load <4 x i64>, ptr %#77, align 64
+  %#80 = xor <4 x i64> %#79, { -2623469361688619810, 2262974939099578482, 8711581037947681227, 2410270004345854594 }
+  %#81 = bitcast <4 x i64> %#80 to <8 x i32>
+  %#82 = shufflevector <8 x i32> %#81, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#83 = bitcast <8 x i32> %#82 to <4 x i64>
+  %#84 = and <4 x i64> %#80, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#85 = and <4 x i64> %#83, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#86 = mul nuw <4 x i64> %#85, %#84
+  %#87 = shufflevector <4 x i64> %#79, <4 x i64> poison, 1, 0, 3, 2
+  %#88 = add <4 x i64> %#64, %#87
+  %#89 = add <4 x i64> %#88, %#86
+  store <4 x i64> %#89, ptr %#7, align 64
+  %#90 = gep inbounds nuw ptr %#7, 1 x i64 416
+  %#91 = load <4 x i64>, ptr %#90, align 32
+  %#92 = xor <4 x i64> %#91, { -8204357891075471176, 5487137525590930912, -3818837453329782724, -6688317018830679928 }
+  %#93 = bitcast <4 x i64> %#92 to <8 x i32>
+  %#94 = shufflevector <8 x i32> %#93, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#95 = bitcast <8 x i32> %#94 to <4 x i64>
+  %#96 = and <4 x i64> %#92, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#97 = and <4 x i64> %#95, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#98 = mul nuw <4 x i64> %#97, %#96
+  %#99 = shufflevector <4 x i64> %#91, <4 x i64> poison, 1, 0, 3, 2
+  %#100 = add <4 x i64> %#76, %#99
+  %#101 = add <4 x i64> %#100, %#98
+  store <4 x i64> %#101, ptr %#12, align 32
+  %#102 = gep inbounds nuw ptr %#7, 1 x i64 448
+  assume_welldefined i1 0
+  %#104 = load <4 x i64>, ptr %#102, align 64
+  %#105 = xor <4 x i64> %#104, { 2262974939099578482, 8711581037947681227, 2410270004345854594, -8204357891075471176 }
+  %#106 = bitcast <4 x i64> %#105 to <8 x i32>
+  %#107 = shufflevector <8 x i32> %#106, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#108 = bitcast <8 x i32> %#107 to <4 x i64>
+  %#109 = and <4 x i64> %#105, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#110 = and <4 x i64> %#108, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#111 = mul nuw <4 x i64> %#110, %#109
+  %#112 = shufflevector <4 x i64> %#104, <4 x i64> poison, 1, 0, 3, 2
+  %#113 = add <4 x i64> %#89, %#112
+  %#114 = add <4 x i64> %#113, %#111
+  %#115 = gep inbounds nuw ptr %#7, 1 x i64 480
+  %#116 = load <4 x i64>, ptr %#115, align 32
+  %#117 = xor <4 x i64> %#116, { 5487137525590930912, -3818837453329782724, -6688317018830679928, 5690594596133299313 }
+  %#118 = bitcast <4 x i64> %#117 to <8 x i32>
+  %#119 = shufflevector <8 x i32> %#118, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#120 = bitcast <8 x i32> %#119 to <4 x i64>
+  %#121 = and <4 x i64> %#117, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#122 = and <4 x i64> %#120, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#123 = mul nuw <4 x i64> %#122, %#121
+  %#124 = shufflevector <4 x i64> %#116, <4 x i64> poison, 1, 0, 3, 2
+  %#125 = add <4 x i64> %#101, %#124
+  %#126 = add <4 x i64> %#125, %#123
+  memcpy ptr %#21 align 64, ptr %#25 align 1, i64 44
+  start_lifetime ptr %#6
+  %#127 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 236
+  memcpy ptr %#6 align 32, ptr %#127 align 1, i64 20
+  %#128 = gep inbounds nuw ptr %#6, 1 x i64 20
+  memcpy ptr %#128 align 4, ptr %#25 align 1, i64 12
+  %#129 = gep inbounds nuw ptr %#7, 1 x i64 268
+  %#130 = load <4 x i64>, ptr %#129, align 4
+  %#131 = load <4 x i64>, ptr %#6, align 32
+  %#132 = xor <4 x i64> %#131, { -1556992608276218209, -4196251135427498811, 1723580219865931905, -3221803331004277491 }
+  %#133 = bitcast <4 x i64> %#132 to <8 x i32>
+  %#134 = shufflevector <8 x i32> %#133, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#135 = bitcast <8 x i32> %#134 to <4 x i64>
+  %#136 = and <4 x i64> %#132, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#137 = and <4 x i64> %#135, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#138 = mul nuw <4 x i64> %#137, %#136
+  %#139 = shufflevector <4 x i64> %#131, <4 x i64> poison, 1, 0, 3, 2
+  %#140 = add <4 x i64> %#114, %#139
+  %#141 = add <4 x i64> %#140, %#138
+  %#142 = xor <4 x i64> %#130, { 3143064850383918358, -8071399103737053674, 5030012605302946040, -5825401622958753077 }
+  %#143 = bitcast <4 x i64> %#142 to <8 x i32>
+  %#144 = shufflevector <8 x i32> %#143, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#145 = bitcast <8 x i32> %#144 to <4 x i64>
+  %#146 = and <4 x i64> %#142, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#147 = and <4 x i64> %#145, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#148 = mul nuw <4 x i64> %#147, %#146
+  %#149 = shufflevector <4 x i64> %#130, <4 x i64> poison, 1, 0, 3, 2
+  %#150 = add <4 x i64> %#126, %#149
+  %#151 = add <4 x i64> %#150, %#148
+  end_lifetime ptr %#6
+  %#152 = extractelement <4 x i64> %#141, i64 0
+  %#153 = extractelement <4 x i64> %#141, i64 1
+  %#154 = xor i64 %#152, 7914194659941938988
+  %#155 = xor i64 %#153, -6611157965513653271
+  %#156 = zext i64 %#154 to i128
+  %#157 = zext i64 %#155 to i128
+  %#158 = mul nuw i128 %#157, %#156
+  %#159 = lshr i128 %#158, 64
+  %#160 = xor i128 %#159, %#158
+  %#161 = trunc i128 %#160 to i64
+  %#162 = extractelement <4 x i64> %#141, i64 2
+  %#163 = extractelement <4 x i64> %#141, i64 3
+  %#164 = xor i64 %#162, -1839215637059881052
+  %#165 = xor i64 %#163, -3433288310154277810
+  %#166 = zext i64 %#164 to i128
+  %#167 = zext i64 %#165 to i128
+  %#168 = mul nuw i128 %#167, %#166
+  %#169 = lshr i128 %#168, 64
+  %#170 = xor i128 %#169, %#168
+  %#171 = trunc i128 %#170 to i64
+  %#172 = extractelement <4 x i64> %#151, i64 0
+  %#173 = extractelement <4 x i64> %#151, i64 1
+  %#174 = xor i64 %#172, 5046485836271438973
+  %#175 = xor i64 %#173, -8055285457383852172
+  %#176 = zext i64 %#174 to i128
+  %#177 = zext i64 %#175 to i128
+  %#178 = mul nuw i128 %#177, %#176
+  %#179 = lshr i128 %#178, 64
+  %#180 = xor i128 %#179, %#178
+  %#181 = trunc i128 %#180 to i64
+  %#182 = extractelement <4 x i64> %#151, i64 2
+  %#183 = extractelement <4 x i64> %#151, i64 3
+  %#184 = xor i64 %#182, 5920048007935066598
+  %#185 = xor i64 %#183, 7336514198459093435
+  %#186 = zext i64 %#184 to i128
+  %#187 = zext i64 %#185 to i128
+  %#188 = mul nuw i128 %#187, %#186
+  %#189 = lshr i128 %#188, 64
+  %#190 = xor i128 %#189, %#188
+  %#191 = trunc i128 %#190 to i64
+  %#192 = add i64 %#181, 7566781886141388340
+  %#193 = add i64 %#192, %#191
+  %#194 = add i64 %#193, %#161
+  %#195 = add i64 %#194, %#171
+  %#196 = lshr i64 %#195, 37
+  %#197 = xor i64 %#196, %#195
+  %#198 = mul i64 %#197, 1609587791953885689
+  %#199 = lshr i64 %#198, 32
+  %#200 = xor i64 %#199, %#198
+  %#201 = xor i64 %#152, -2753530472436770380
+  %#202 = xor i64 %#153, 3784058077962335096
+  %#203 = zext i64 %#201 to i128
+  %#204 = zext i64 %#202 to i128
+  %#205 = mul nuw i128 %#204, %#203
+  %#206 = lshr i128 %#205, 64
+  %#207 = xor i128 %#206, %#205
+  %#208 = trunc i128 %#207 to i64
+  %#209 = xor i64 %#162, -360392965937173549
+  %#210 = xor i64 %#163, -5237161843349560557
+  %#211 = zext i64 %#209 to i128
+  %#212 = zext i64 %#210 to i128
+  %#213 = mul nuw i128 %#212, %#211
+  %#214 = lshr i128 %#213, 64
+  %#215 = xor i128 %#214, %#213
+  %#216 = trunc i128 %#215 to i64
+  %#217 = xor i64 %#172, 2965150961192524528
+  %#218 = xor i64 %#173, 9032178055121889492
+  %#219 = zext i64 %#217 to i128
+  %#220 = zext i64 %#218 to i128
+  %#221 = mul nuw i128 %#220, %#219
+  %#222 = lshr i128 %#221, 64
+  %#223 = xor i128 %#222, %#221
+  %#224 = trunc i128 %#223 to i64
+  %#225 = xor i64 %#182, 8850058120466833735
+  %#226 = xor i64 %#183, -7669846995664752176
+  %#227 = zext i64 %#225 to i128
+  %#228 = zext i64 %#226 to i128
+  %#229 = mul nuw i128 %#228, %#227
+  %#230 = lshr i128 %#229, 64
+  %#231 = xor i128 %#230, %#229
+  %#232 = trunc i128 %#231 to i64
+  %#233 = add i64 %#224, -2982561263328149653
+  %#234 = add i64 %#233, %#232
+  %#235 = add i64 %#234, %#208
+  %#236 = add i64 %#235, %#216
+  %#237 = lshr i64 %#236, 37
+  %#238 = xor i64 %#237, %#236
+  %#239 = mul i64 %#238, 1609587791953885689
+  %#240 = lshr i64 %#239, 32
+  %#241 = xor i64 %#240, %#239
+  br label %#5
+
+#4:
+  %#242 = gep inbounds nuw ptr %#7, 1 x i64 544
+  store i64 200, ptr %#242, align 32
+  %#243 = gep inbounds nuw ptr %#7, 1 x i64 256
+  %__constexpr_3 = int2ptr i64 100 to ptr
+  memcpy ptr %#243 align 64, ptr %__constexpr_3 align 4, i64 200
+  %#244 = gep inbounds nuw ptr %#7, 1 x i64 272
+  %#245 = load i64, ptr %#243, align 64
+  %#246 = gep inbounds nuw ptr %#7, 1 x i64 264
+  %#247 = load i64, ptr %#246, align 8
+  %#248 = load i64, ptr %#244, align 16
+  %#249 = gep inbounds nuw ptr %#7, 1 x i64 280
+  %#250 = load i64, ptr %#249, align 8
+  %#251 = xor i64 %#245, -4734510112055689544
+  %#252 = xor i64 %#247, 2066345149520216444
+  %#253 = zext i64 %#251 to i128
+  %#254 = zext i64 %#252 to i128
+  %#255 = mul nuw i128 %#254, %#253
+  %#256 = lshr i128 %#255, 64
+  %#257 = xor i128 %#256, %#255
+  %#258 = trunc i128 %#257 to i64
+  %#259 = add i64 %#258, -7253308125045442184
+  %#260 = add i64 %#250, %#248
+  %#261 = xor i64 %#259, %#260
+  %#262 = xor i64 %#248, -2623469361688619810
+  %#263 = xor i64 %#250, 2262974939099578482
+  %#264 = zext i64 %#262 to i128
+  %#265 = zext i64 %#263 to i128
+  %#266 = mul nuw i128 %#265, %#264
+  %#267 = lshr i128 %#266, 64
+  %#268 = xor i128 %#267, %#266
+  %#269 = trunc i128 %#268 to i64
+  %#270 = add i64 %#247, %#245
+  %#271 = xor i64 %#270, %#269
+  %#272 = gep inbounds nuw ptr %#7, 1 x i64 288
+  %#273 = gep inbounds nuw ptr %#7, 1 x i64 304
+  %#274 = load i64, ptr %#272, align 32
+  %#275 = gep inbounds nuw ptr %#7, 1 x i64 296
+  %#276 = load i64, ptr %#275, align 8
+  %#277 = load i64, ptr %#273, align 16
+  %#278 = gep inbounds nuw ptr %#7, 1 x i64 312
+  %#279 = load i64, ptr %#278, align 8
+  %#280 = xor i64 %#274, 8711581037947681227
+  %#281 = xor i64 %#276, 2410270004345854594
+  %#282 = zext i64 %#280 to i128
+  %#283 = zext i64 %#281 to i128
+  %#284 = mul nuw i128 %#283, %#282
+  %#285 = lshr i128 %#284, 64
+  %#286 = xor i128 %#285, %#284
+  %#287 = trunc i128 %#286 to i64
+  %#288 = add i64 %#261, %#287
+  %#289 = add i64 %#279, %#277
+  %#290 = xor i64 %#288, %#289
+  %#291 = xor i64 %#277, -8204357891075471176
+  %#292 = xor i64 %#279, 5487137525590930912
+  %#293 = zext i64 %#291 to i128
+  %#294 = zext i64 %#292 to i128
+  %#295 = mul nuw i128 %#294, %#293
+  %#296 = lshr i128 %#295, 64
+  %#297 = xor i128 %#296, %#295
+  %#298 = trunc i128 %#297 to i64
+  %#299 = add i64 %#271, %#298
+  %#300 = add i64 %#276, %#274
+  %#301 = xor i64 %#299, %#300
+  %#302 = gep inbounds nuw ptr %#7, 1 x i64 320
+  %#303 = gep inbounds nuw ptr %#7, 1 x i64 336
+  %#304 = load i64, ptr %#302, align 64
+  %#305 = gep inbounds nuw ptr %#7, 1 x i64 328
+  %#306 = load i64, ptr %#305, align 8
+  %#307 = load i64, ptr %#303, align 16
+  %#308 = gep inbounds nuw ptr %#7, 1 x i64 344
+  %#309 = load i64, ptr %#308, align 8
+  %#310 = xor i64 %#304, -3818837453329782724
+  %#311 = xor i64 %#306, -6688317018830679928
+  %#312 = zext i64 %#310 to i128
+  %#313 = zext i64 %#311 to i128
+  %#314 = mul nuw i128 %#313, %#312
+  %#315 = lshr i128 %#314, 64
+  %#316 = xor i128 %#315, %#314
+  %#317 = trunc i128 %#316 to i64
+  %#318 = add i64 %#290, %#317
+  %#319 = add i64 %#309, %#307
+  %#320 = xor i64 %#318, %#319
+  %#321 = xor i64 %#307, 5690594596133299313
+  %#322 = xor i64 %#309, -2833645246901970632
+  %#323 = zext i64 %#321 to i128
+  %#324 = zext i64 %#322 to i128
+  %#325 = mul nuw i128 %#324, %#323
+  %#326 = lshr i128 %#325, 64
+  %#327 = xor i128 %#326, %#325
+  %#328 = trunc i128 %#327 to i64
+  %#329 = add i64 %#301, %#328
+  %#330 = add i64 %#306, %#304
+  %#331 = xor i64 %#329, %#330
+  %#332 = gep inbounds nuw ptr %#7, 1 x i64 352
+  %#333 = gep inbounds nuw ptr %#7, 1 x i64 368
+  %#334 = load i64, ptr %#332, align 32
+  %#335 = gep inbounds nuw ptr %#7, 1 x i64 360
+  %#336 = load i64, ptr %#335, align 8
+  %#337 = load i64, ptr %#333, align 16
+  %#338 = gep inbounds nuw ptr %#7, 1 x i64 376
+  %#339 = load i64, ptr %#338, align 8
+  %#340 = xor i64 %#334, 4554437623014685352
+  %#341 = xor i64 %#336, 2111919702937427193
+  %#342 = zext i64 %#340 to i128
+  %#343 = zext i64 %#341 to i128
+  %#344 = mul nuw i128 %#343, %#342
+  %#345 = lshr i128 %#344, 64
+  %#346 = xor i128 %#345, %#344
+  %#347 = trunc i128 %#346 to i64
+  %#348 = add i64 %#320, %#347
+  %#349 = add i64 %#339, %#337
+  %#350 = xor i64 %#348, %#349
+  %#351 = xor i64 %#337, 3556072174620004746
+  %#352 = xor i64 %#339, 7238261902898274248
+  %#353 = zext i64 %#351 to i128
+  %#354 = zext i64 %#352 to i128
+  %#355 = mul nuw i128 %#354, %#353
+  %#356 = lshr i128 %#355, 64
+  %#357 = xor i128 %#356, %#355
+  %#358 = trunc i128 %#357 to i64
+  %#359 = add i64 %#331, %#358
+  %#360 = add i64 %#336, %#334
+  %#361 = xor i64 %#359, %#360
+  %#362 = lshr i64 %#350, 37
+  %#363 = xor i64 %#362, %#350
+  %#364 = mul i64 %#363, 1609587791953885689
+  %#365 = lshr i64 %#364, 32
+  %#366 = xor i64 %#365, %#364
+  %#367 = lshr i64 %#361, 37
+  %#368 = xor i64 %#367, %#361
+  %#369 = mul i64 %#368, 1609587791953885689
+  %#370 = lshr i64 %#369, 32
+  %#371 = xor i64 %#370, %#369
+  %#372 = gep inbounds nuw ptr %#7, 1 x i64 384
+  %#373 = gep inbounds nuw ptr %#7, 1 x i64 400
+  %#374 = load i64, ptr %#372, align 64
+  %#375 = gep inbounds nuw ptr %#7, 1 x i64 392
+  %#376 = load i64, ptr %#375, align 8
+  %#377 = load i64, ptr %#373, align 16
+  %#378 = gep inbounds nuw ptr %#7, 1 x i64 408
+  %#379 = load i64, ptr %#378, align 8
+  %#380 = xor i64 %#374, -9150895811085458631
+  %#381 = xor i64 %#376, 7914194659941938988
+  %#382 = zext i64 %#380 to i128
+  %#383 = zext i64 %#381 to i128
+  %#384 = mul nuw i128 %#383, %#382
+  %#385 = lshr i128 %#384, 64
+  %#386 = xor i128 %#385, %#384
+  %#387 = trunc i128 %#386 to i64
+  %#388 = add i64 %#366, %#387
+  %#389 = add i64 %#379, %#377
+  %#390 = xor i64 %#388, %#389
+  %#391 = xor i64 %#377, -6611157965513653271
+  %#392 = xor i64 %#379, -1839215637059881052
+  %#393 = zext i64 %#391 to i128
+  %#394 = zext i64 %#392 to i128
+  %#395 = mul nuw i128 %#394, %#393
+  %#396 = lshr i128 %#395, 64
+  %#397 = xor i128 %#396, %#395
+  %#398 = trunc i128 %#397 to i64
+  %#399 = add i64 %#371, %#398
+  %#400 = add i64 %#376, %#374
+  %#401 = xor i64 %#399, %#400
+  %#402 = gep inbounds nuw ptr %#7, 1 x i64 416
+  %#403 = gep inbounds nuw ptr %#7, 1 x i64 432
+  %#404 = load i64, ptr %#402, align 32
+  %#405 = gep inbounds nuw ptr %#7, 1 x i64 424
+  %#406 = load i64, ptr %#405, align 8
+  %#407 = load i64, ptr %#403, align 16
+  %#408 = gep inbounds nuw ptr %#7, 1 x i64 440
+  %#409 = load i64, ptr %#408, align 8
+  %#410 = xor i64 %#404, -3433288310154277810
+  %#411 = xor i64 %#406, 5046485836271438973
+  %#412 = zext i64 %#410 to i128
+  %#413 = zext i64 %#411 to i128
+  %#414 = mul nuw i128 %#413, %#412
+  %#415 = lshr i128 %#414, 64
+  %#416 = xor i128 %#415, %#414
+  %#417 = trunc i128 %#416 to i64
+  %#418 = add i64 %#390, %#417
+  %#419 = add i64 %#409, %#407
+  %#420 = xor i64 %#418, %#419
+  %#421 = xor i64 %#407, -8055285457383852172
+  %#422 = xor i64 %#409, 5920048007935066598
+  %#423 = zext i64 %#421 to i128
+  %#424 = zext i64 %#422 to i128
+  %#425 = mul nuw i128 %#424, %#423
+  %#426 = lshr i128 %#425, 64
+  %#427 = xor i128 %#426, %#425
+  %#428 = trunc i128 %#427 to i64
+  %#429 = add i64 %#401, %#428
+  %#430 = add i64 %#406, %#404
+  %#431 = xor i64 %#429, %#430
+  %#432 = gep inbounds nuw ptr %#7, 1 x i64 448
+  %#433 = load i64, ptr %#432, align 64
+  %#434 = xor i64 %#409, 5695865814404364607
+  %#435 = xor i64 %#433, 6464017090953185821
+  %#436 = zext i64 %#434 to i128
+  %#437 = zext i64 %#435 to i128
+  %#438 = mul nuw i128 %#437, %#436
+  %#439 = lshr i128 %#438, 64
+  %#440 = xor i128 %#439, %#438
+  %#441 = trunc i128 %#440 to i64
+  %#442 = add i64 %#420, %#441
+  %#443 = add i64 %#407, %#406
+  %#444 = xor i64 %#442, %#443
+  %#445 = xor i64 %#406, 8320639771003045937
+  %#446 = xor i64 %#407, -1453760514566526364
+  %#447 = zext i64 %#445 to i128
+  %#448 = zext i64 %#446 to i128
+  %#449 = mul nuw i128 %#448, %#447
+  %#450 = lshr i128 %#449, 64
+  %#451 = xor i128 %#450, %#449
+  %#452 = trunc i128 %#451 to i64
+  %#453 = add i64 %#431, %#452
+  %#454 = add i64 %#433, %#409
+  %#455 = xor i64 %#453, %#454
+  %#456 = add i64 %#455, %#444
+  %#457 = mul i64 %#444, -7046029288634856825
+  %#458 = mul i64 %#455, -8796714831421723037
+  %#459 = add i64 %#457, 1988374175552099768
+  %#460 = add i64 %#459, %#458
+  %#461 = lshr i64 %#456, 37
+  %#462 = xor i64 %#461, %#456
+  %#463 = mul i64 %#462, 1609587791953885689
+  %#464 = lshr i64 %#463, 32
+  %#465 = xor i64 %#464, %#463
+  %#466 = lshr i64 %#460, 37
+  %#467 = xor i64 %#466, %#460
+  %#468 = mul i64 %#467, 1609587791953885689
+  %#469 = lshr i64 %#468, 32
+  %#470 = xor i64 %#469, %#468
+  %#471 = sub i64 0, %#470
+  br label %#5
+
+#5:
+  %#472 = phi i64 [ %#200, %#3 ], [ %#465, %#4 ]
+  %#473 = phi i64 [ %#241, %#3 ], [ %#471, %#4 ]
+  store i64 %#472, ptr noread noundef %#1, align 8
+  %#474 = gep inbounds nuw ptr noread noundef %#1, 1 x i64 8
+  store i64 %#473, ptr %#474, align 8
+  end_lifetime ptr %#7
+  ret void
+}
+ERROR: Unsupported interprocedural transformation: global variable @g_dispatch has different size in source and target (32 vs 24 bytes)
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

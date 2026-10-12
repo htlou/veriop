@@ -1,0 +1,52 @@
+{
+  "commit": "dc1932b",
+  "date": "2016-03-29",
+  "subject": "Enable int128_t path in libdivide_128_div_128_to_64",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit enables the native 128-bit arithmetic path for 128-by-128 narrowing division.",
+  "change_summary": "Switches the 128-by-128 helper to native int128 arithmetic when available.",
+  "units": [
+    {
+      "name": "raw 128-by-128 quotient and remainder",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "other",
+      "artifact_dir": "c/libdivide/dc1932b/u4",
+      "evidence": "Alive2 gives raw quotient/high-remainder counterexamples in both directions."
+    },
+    {
+      "name": "128-by-128 helper with nonzero divisor and 64-bit quotient fit",
+      "level": "precond",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "(vh != 0) || (vl != 0 && uh < vl)",
+      "unsupported_reason": null,
+      "not_equiv_kind": "other",
+      "artifact_dir": "c/libdivide/dc1932b/u4",
+      "evidence": "For uh=1, ul=0, vh=13, vl=0, the old helper returns quotient 0x13b13b13b13b13b1 and new returns 0; the latter is the mathematical quotient. High remainder also differs."
+    },
+    {
+      "name": "public signed/unsigned 64-bit generator then recover",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/dc1932b/u4",
+      "evidence": "Signed-64 recovery passes both directions; unsigned-64 recovery times out in both directions. No public-API mismatch is established."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The helper-level difference occurs even under the stated quotient-fit precondition, but the public recovery caller remains inconclusive. The old helper appears wrong on this direct input; that does not show a reachable public API regression or refinement."
+}

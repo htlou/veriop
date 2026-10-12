@@ -1,0 +1,58 @@
+
+----------------------------------------
+define void @target(ptr noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  %#3 = ptrtoint ptr noundef %#0 to i64
+  %#4 = and i64 %#3, 3
+  %#5 = icmp eq i64 %#4, 0
+  assume i1 %#5
+  tail memcpy ptr noread noundef %#1 align 1, ptr noundef %#0 align 4, i64 16
+  %#6 = gep inbounds ptr noundef %#0, 1 x i64 24
+  %#7 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#7 align 1, ptr %#6 align 4, i64 16
+  %#8 = gep inbounds ptr noundef %#0, 1 x i64 48
+  %#9 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#9 align 1, ptr %#8 align 4, i64 16
+  %#10 = gep inbounds ptr noundef %#0, 1 x i64 80
+  %#11 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#11 align 1, ptr %#10 align 4, i64 16
+  %#12 = gep inbounds ptr noundef %#0, 1 x i64 104
+  %#13 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#13 align 1, ptr %#12 align 4, i64 16
+  %#14 = gep inbounds ptr noundef %#0, 1 x i64 128
+  %#15 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#15 align 1, ptr %#14 align 4, i64 16
+  ret void
+}
+=>
+define void @target(ptr noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  %#3 = ptrtoint ptr noundef %#0 to i64
+  %#4 = and i64 %#3, 3
+  %#5 = icmp eq i64 %#4, 0
+  assume i1 %#5
+  tail memcpy ptr noread noundef %#1 align 1, ptr noundef %#0 align 4, i64 16
+  %#6 = gep inbounds ptr noundef %#0, 1 x i64 24
+  %#7 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#7 align 1, ptr %#6 align 4, i64 16
+  %#8 = gep inbounds ptr noundef %#0, 1 x i64 48
+  %#9 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#9 align 1, ptr %#8 align 4, i64 16
+  %#10 = gep inbounds ptr noundef %#0, 1 x i64 80
+  %#11 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#11 align 1, ptr %#10 align 4, i64 16
+  %#12 = gep inbounds ptr noundef %#0, 1 x i64 104
+  %#13 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#13 align 1, ptr %#12 align 4, i64 16
+  %#14 = gep inbounds ptr noundef %#0, 1 x i64 128
+  %#15 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#15 align 1, ptr %#14 align 4, i64 16
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

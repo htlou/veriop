@@ -1,0 +1,29 @@
+{
+ "repo": "llama.cpp",
+ "commit": "b62b3509813dd3169663885975c2306e96df2242",
+ "checker": "Volta (PTX parse) + per-function PTX identity (nvcc 12.8)",
+ "checker_ran": true,
+ "verdict": "UNSUPPORTED",
+ "scope": "ssm-scan.cu sm_80 PTX: 12 pre-existing kernels identical; 4 new kernels (ssm_ssd_init_state/pre_matmul/prepare_dt/...) plus new host dispatch for Mamba-2 prefill",
+ "build_config": "nvcc 12.8 --ptx -O3 -std=c++17 -arch=compute_80 --extended-lambda -DGGML_BACKEND_BUILD, ggml/src + ggml/include of the respective revision",
+ "units": [
+  {
+   "name": "pre-existing ssm_scan kernels",
+   "file": "ggml/src/ggml-cuda/ssm-scan.cu",
+   "result": "EQUIV",
+   "detail": "12 kernels PTX-identical"
+  },
+  {
+   "name": "chunked SSD prefill pipeline",
+   "file": "ggml/src/ggml-cuda/ssm-scan.cu",
+   "result": "UNSUPPORTED",
+   "detail": "new multi-kernel pipeline (red.global.add.f32 accumulation, ex2.approx, host-side dispatch and cuBLAS-style staging) replaces the single-kernel prefill path; no old kernel to pair it with and floating-point summation order differs"
+  }
+ ],
+ "unsupported_reason": "interface-or-state-layout-change",
+ "not_equiv_kind": null,
+ "not_equiv_level": null,
+ "counterexample": null,
+ "evidence_dir": "history-eq/gh/work/llama.cpp/b62b3509",
+ "notes": "The optimization is a new algorithm (chunked SSD matmul) selected by host code for large prefill; old and new paths are different multi-kernel computations, so no common harness/interface exists. Volta parses the new PTX; no semantic query was formed."
+}

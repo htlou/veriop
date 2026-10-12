@@ -1,0 +1,847 @@
+; ModuleID = '/srv/home/hantaolou/code/veriop/history-eq/c/xxHash/e876423/wrap_o64.c'
+source_filename = "/srv/home/hantaolou/code/veriop/history-eq/c/xxHash/e876423/wrap_o64.c"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+%struct.XXH_NAMESPACEXXH64_state_s = type { i64, [4 x i64], [4 x i64], i32, i32, i64 }
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none) uwtable
+define dso_local i64 @target_xxh64_len0(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #0 {
+  %3 = add i64 %1, 2870177450012600261
+  %4 = lshr i64 %3, 33
+  %5 = xor i64 %4, %3
+  %6 = mul i64 %5, -4417276706812531889
+  %7 = lshr i64 %6, 29
+  %8 = xor i64 %7, %6
+  %9 = mul i64 %8, 1609587929392839161
+  %10 = lshr i64 %9, 32
+  %11 = xor i64 %10, %9
+  ret i64 %11
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_xxh64_len7(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #1 {
+  %3 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %3)
+  %4 = add i64 %1, 2870177450012600268
+  %5 = load i32, ptr %0, align 1
+  %6 = zext i32 %5 to i64
+  %7 = mul i64 %6, -7046029288634856825
+  %8 = xor i64 %7, %4
+  %9 = getelementptr inbounds nuw i8, ptr %0, i64 4
+  %10 = tail call i64 @llvm.fshl.i64(i64 %8, i64 %8, i64 23)
+  %11 = mul i64 %10, -4417276706812531889
+  %12 = add i64 %11, 1609587929392839161
+  %13 = getelementptr inbounds nuw i8, ptr %0, i64 5
+  %14 = load i8, ptr %9, align 1
+  %15 = zext i8 %14 to i64
+  %16 = mul i64 %15, 2870177450012600261
+  %17 = xor i64 %16, %12
+  %18 = tail call i64 @llvm.fshl.i64(i64 %17, i64 %17, i64 11)
+  %19 = mul i64 %18, -7046029288634856825
+  %20 = getelementptr inbounds nuw i8, ptr %0, i64 6
+  %21 = load i8, ptr %13, align 1
+  %22 = zext i8 %21 to i64
+  %23 = mul i64 %22, 2870177450012600261
+  %24 = xor i64 %23, %19
+  %25 = tail call i64 @llvm.fshl.i64(i64 %24, i64 %24, i64 11)
+  %26 = mul i64 %25, -7046029288634856825
+  %27 = load i8, ptr %20, align 1
+  %28 = zext i8 %27 to i64
+  %29 = mul i64 %28, 2870177450012600261
+  %30 = xor i64 %29, %26
+  %31 = tail call i64 @llvm.fshl.i64(i64 %30, i64 %30, i64 11)
+  %32 = mul i64 %31, -7046029288634856825
+  %33 = lshr i64 %32, 33
+  %34 = xor i64 %33, %32
+  %35 = mul i64 %34, -4417276706812531889
+  %36 = lshr i64 %35, 29
+  %37 = xor i64 %36, %35
+  %38 = mul i64 %37, 1609587929392839161
+  %39 = lshr i64 %38, 32
+  %40 = xor i64 %39, %38
+  ret i64 %40
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_xxh64_len31(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #1 {
+  %3 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %3)
+  %4 = getelementptr i8, ptr %0, i64 24
+  %5 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %6 = load i64, ptr %5, align 1
+  %7 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %8 = load i64, ptr %7, align 1
+  %9 = load i64, ptr %0, align 1
+  %10 = load i32, ptr %4, align 1
+  %11 = getelementptr i8, ptr %0, i64 30
+  %12 = load i8, ptr %11, align 1
+  %13 = zext i8 %12 to i64
+  %14 = mul i64 %13, 2870177450012600261
+  %15 = getelementptr i8, ptr %0, i64 29
+  %16 = load i8, ptr %15, align 1
+  %17 = zext i8 %16 to i64
+  %18 = mul i64 %17, 2870177450012600261
+  %19 = getelementptr i8, ptr %0, i64 28
+  %20 = load i8, ptr %19, align 1
+  %21 = zext i8 %20 to i64
+  %22 = mul i64 %21, 2870177450012600261
+  %23 = zext i32 %10 to i64
+  %24 = mul i64 %23, -7046029288634856825
+  %25 = mul i64 %6, -4417276706812531889
+  %26 = tail call i64 @llvm.fshl.i64(i64 %25, i64 %25, i64 31)
+  %27 = mul i64 %26, -7046029288634856825
+  %28 = mul i64 %8, -4417276706812531889
+  %29 = tail call i64 @llvm.fshl.i64(i64 %28, i64 %28, i64 31)
+  %30 = mul i64 %29, -7046029288634856825
+  %31 = mul i64 %9, -4417276706812531889
+  %32 = tail call i64 @llvm.fshl.i64(i64 %31, i64 %31, i64 31)
+  %33 = mul i64 %32, -7046029288634856825
+  %34 = add i64 %1, 2870177450012600292
+  %35 = xor i64 %33, %34
+  %36 = tail call i64 @llvm.fshl.i64(i64 %35, i64 %35, i64 27)
+  %37 = mul i64 %36, -7046029288634856825
+  %38 = add i64 %37, -8796714831421723037
+  %39 = xor i64 %30, %38
+  %40 = tail call i64 @llvm.fshl.i64(i64 %39, i64 %39, i64 27)
+  %41 = mul i64 %40, -7046029288634856825
+  %42 = add i64 %41, -8796714831421723037
+  %43 = xor i64 %27, %42
+  %44 = tail call i64 @llvm.fshl.i64(i64 %43, i64 %43, i64 27)
+  %45 = mul i64 %44, -7046029288634856825
+  %46 = add i64 %45, -8796714831421723037
+  %47 = xor i64 %24, %46
+  %48 = tail call i64 @llvm.fshl.i64(i64 %47, i64 %47, i64 23)
+  %49 = mul i64 %48, -4417276706812531889
+  %50 = add i64 %49, 1609587929392839161
+  %51 = xor i64 %22, %50
+  %52 = tail call i64 @llvm.fshl.i64(i64 %51, i64 %51, i64 11)
+  %53 = mul i64 %52, -7046029288634856825
+  %54 = xor i64 %18, %53
+  %55 = tail call i64 @llvm.fshl.i64(i64 %54, i64 %54, i64 11)
+  %56 = mul i64 %55, -7046029288634856825
+  %57 = xor i64 %14, %56
+  %58 = tail call i64 @llvm.fshl.i64(i64 %57, i64 %57, i64 11)
+  %59 = mul i64 %58, -7046029288634856825
+  %60 = lshr i64 %59, 33
+  %61 = xor i64 %60, %59
+  %62 = mul i64 %61, -4417276706812531889
+  %63 = lshr i64 %62, 29
+  %64 = xor i64 %63, %62
+  %65 = mul i64 %64, 1609587929392839161
+  %66 = lshr i64 %65, 32
+  %67 = xor i64 %66, %65
+  ret i64 %67
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_xxh64_len32(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #1 {
+  %3 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %3)
+  %4 = add i64 %1, 6983438078262162902
+  %5 = add i64 %1, -4417276706812531889
+  %6 = add i64 %1, 7046029288634856825
+  %7 = getelementptr inbounds nuw i8, ptr %0, i64 24
+  %8 = load i64, ptr %7, align 1
+  %9 = mul i64 %8, -4417276706812531889
+  %10 = add i64 %6, %9
+  %11 = tail call i64 @llvm.fshl.i64(i64 %10, i64 %10, i64 31)
+  %12 = mul i64 %11, -7046029288634856825
+  %13 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %14 = load i64, ptr %13, align 1
+  %15 = mul i64 %14, -4417276706812531889
+  %16 = add i64 %15, %1
+  %17 = tail call i64 @llvm.fshl.i64(i64 %16, i64 %16, i64 31)
+  %18 = mul i64 %17, -7046029288634856825
+  %19 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %20 = load i64, ptr %19, align 1
+  %21 = mul i64 %20, -4417276706812531889
+  %22 = add i64 %5, %21
+  %23 = tail call i64 @llvm.fshl.i64(i64 %22, i64 %22, i64 31)
+  %24 = mul i64 %23, -7046029288634856825
+  %25 = load i64, ptr %0, align 1
+  %26 = mul i64 %25, -4417276706812531889
+  %27 = add i64 %4, %26
+  %28 = tail call i64 @llvm.fshl.i64(i64 %27, i64 %27, i64 31)
+  %29 = mul i64 %28, -7046029288634856825
+  %30 = tail call i64 @llvm.fshl.i64(i64 %29, i64 %29, i64 1)
+  %31 = tail call i64 @llvm.fshl.i64(i64 %24, i64 %24, i64 7)
+  %32 = tail call i64 @llvm.fshl.i64(i64 %18, i64 %18, i64 12)
+  %33 = tail call i64 @llvm.fshl.i64(i64 %12, i64 %12, i64 18)
+  %34 = add i64 %32, %33
+  %35 = add i64 %34, %31
+  %36 = add i64 %35, %30
+  %37 = mul i64 %28, -2381459717836149591
+  %38 = tail call i64 @llvm.fshl.i64(i64 %37, i64 %37, i64 31)
+  %39 = mul i64 %38, -7046029288634856825
+  %40 = xor i64 %36, %39
+  %41 = mul i64 %40, -7046029288634856825
+  %42 = add i64 %41, -8796714831421723037
+  %43 = mul i64 %23, -2381459717836149591
+  %44 = tail call i64 @llvm.fshl.i64(i64 %43, i64 %43, i64 31)
+  %45 = mul i64 %44, -7046029288634856825
+  %46 = xor i64 %42, %45
+  %47 = mul i64 %46, -7046029288634856825
+  %48 = add i64 %47, -8796714831421723037
+  %49 = mul i64 %17, -2381459717836149591
+  %50 = tail call i64 @llvm.fshl.i64(i64 %49, i64 %49, i64 31)
+  %51 = mul i64 %50, -7046029288634856825
+  %52 = xor i64 %48, %51
+  %53 = mul i64 %52, -7046029288634856825
+  %54 = add i64 %53, -8796714831421723037
+  %55 = mul i64 %11, -2381459717836149591
+  %56 = tail call i64 @llvm.fshl.i64(i64 %55, i64 %55, i64 31)
+  %57 = mul i64 %56, -7046029288634856825
+  %58 = xor i64 %54, %57
+  %59 = mul i64 %58, -7046029288634856825
+  %60 = add i64 %59, -8796714831421723005
+  %61 = lshr i64 %60, 33
+  %62 = xor i64 %61, %60
+  %63 = mul i64 %62, -4417276706812531889
+  %64 = lshr i64 %63, 29
+  %65 = xor i64 %64, %63
+  %66 = mul i64 %65, 1609587929392839161
+  %67 = lshr i64 %66, 32
+  %68 = xor i64 %67, %66
+  ret i64 %68
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_xxh64_len63(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #1 {
+  %3 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %3)
+  %4 = getelementptr i8, ptr %0, i64 56
+  %5 = getelementptr i8, ptr %0, i64 48
+  %6 = load i64, ptr %5, align 1
+  %7 = getelementptr i8, ptr %0, i64 40
+  %8 = load i64, ptr %7, align 1
+  %9 = getelementptr i8, ptr %0, i64 32
+  %10 = load i64, ptr %9, align 1
+  %11 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %12 = load i64, ptr %11, align 1
+  %13 = load i64, ptr %0, align 1
+  %14 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %15 = load i64, ptr %14, align 1
+  %16 = getelementptr inbounds nuw i8, ptr %0, i64 24
+  %17 = load i64, ptr %16, align 1
+  %18 = load i32, ptr %4, align 1
+  %19 = getelementptr i8, ptr %0, i64 62
+  %20 = load i8, ptr %19, align 1
+  %21 = zext i8 %20 to i64
+  %22 = mul i64 %21, 2870177450012600261
+  %23 = getelementptr i8, ptr %0, i64 61
+  %24 = load i8, ptr %23, align 1
+  %25 = zext i8 %24 to i64
+  %26 = mul i64 %25, 2870177450012600261
+  %27 = getelementptr i8, ptr %0, i64 60
+  %28 = load i8, ptr %27, align 1
+  %29 = zext i8 %28 to i64
+  %30 = mul i64 %29, 2870177450012600261
+  %31 = zext i32 %18 to i64
+  %32 = mul i64 %31, -7046029288634856825
+  %33 = mul i64 %6, -4417276706812531889
+  %34 = tail call i64 @llvm.fshl.i64(i64 %33, i64 %33, i64 31)
+  %35 = mul i64 %34, -7046029288634856825
+  %36 = mul i64 %8, -4417276706812531889
+  %37 = tail call i64 @llvm.fshl.i64(i64 %36, i64 %36, i64 31)
+  %38 = mul i64 %37, -7046029288634856825
+  %39 = mul i64 %10, -4417276706812531889
+  %40 = tail call i64 @llvm.fshl.i64(i64 %39, i64 %39, i64 31)
+  %41 = mul i64 %40, -7046029288634856825
+  %42 = mul i64 %12, -4417276706812531889
+  %43 = add i64 %1, -4417276706812531889
+  %44 = add i64 %42, %43
+  %45 = tail call i64 @llvm.fshl.i64(i64 %44, i64 %44, i64 31)
+  %46 = mul i64 %45, -7046029288634856825
+  %47 = tail call i64 @llvm.fshl.i64(i64 %46, i64 %46, i64 7)
+  %48 = mul i64 %13, -4417276706812531889
+  %49 = add i64 %1, 6983438078262162902
+  %50 = add i64 %48, %49
+  %51 = tail call i64 @llvm.fshl.i64(i64 %50, i64 %50, i64 31)
+  %52 = mul i64 %51, -7046029288634856825
+  %53 = tail call i64 @llvm.fshl.i64(i64 %52, i64 %52, i64 1)
+  %54 = add i64 %47, %53
+  %55 = mul i64 %15, -4417276706812531889
+  %56 = add i64 %55, %1
+  %57 = tail call i64 @llvm.fshl.i64(i64 %56, i64 %56, i64 31)
+  %58 = mul i64 %57, -7046029288634856825
+  %59 = tail call i64 @llvm.fshl.i64(i64 %58, i64 %58, i64 12)
+  %60 = add i64 %54, %59
+  %61 = mul i64 %17, -4417276706812531889
+  %62 = add i64 %1, 7046029288634856825
+  %63 = add i64 %61, %62
+  %64 = tail call i64 @llvm.fshl.i64(i64 %63, i64 %63, i64 31)
+  %65 = mul i64 %64, -7046029288634856825
+  %66 = tail call i64 @llvm.fshl.i64(i64 %65, i64 %65, i64 18)
+  %67 = add i64 %60, %66
+  %68 = mul i64 %51, -2381459717836149591
+  %69 = tail call i64 @llvm.fshl.i64(i64 %68, i64 %68, i64 31)
+  %70 = mul i64 %69, -7046029288634856825
+  %71 = xor i64 %67, %70
+  %72 = mul i64 %71, -7046029288634856825
+  %73 = add i64 %72, -8796714831421723037
+  %74 = mul i64 %45, -2381459717836149591
+  %75 = tail call i64 @llvm.fshl.i64(i64 %74, i64 %74, i64 31)
+  %76 = mul i64 %75, -7046029288634856825
+  %77 = xor i64 %73, %76
+  %78 = mul i64 %77, -7046029288634856825
+  %79 = add i64 %78, -8796714831421723037
+  %80 = mul i64 %57, -2381459717836149591
+  %81 = tail call i64 @llvm.fshl.i64(i64 %80, i64 %80, i64 31)
+  %82 = mul i64 %81, -7046029288634856825
+  %83 = xor i64 %79, %82
+  %84 = mul i64 %83, -7046029288634856825
+  %85 = add i64 %84, -8796714831421723037
+  %86 = mul i64 %64, -2381459717836149591
+  %87 = tail call i64 @llvm.fshl.i64(i64 %86, i64 %86, i64 31)
+  %88 = mul i64 %87, -7046029288634856825
+  %89 = xor i64 %85, %88
+  %90 = mul i64 %89, -7046029288634856825
+  %91 = add i64 %90, -8796714831421722974
+  %92 = xor i64 %41, %91
+  %93 = tail call i64 @llvm.fshl.i64(i64 %92, i64 %92, i64 27)
+  %94 = mul i64 %93, -7046029288634856825
+  %95 = add i64 %94, -8796714831421723037
+  %96 = xor i64 %38, %95
+  %97 = tail call i64 @llvm.fshl.i64(i64 %96, i64 %96, i64 27)
+  %98 = mul i64 %97, -7046029288634856825
+  %99 = add i64 %98, -8796714831421723037
+  %100 = xor i64 %35, %99
+  %101 = tail call i64 @llvm.fshl.i64(i64 %100, i64 %100, i64 27)
+  %102 = mul i64 %101, -7046029288634856825
+  %103 = add i64 %102, -8796714831421723037
+  %104 = xor i64 %32, %103
+  %105 = tail call i64 @llvm.fshl.i64(i64 %104, i64 %104, i64 23)
+  %106 = mul i64 %105, -4417276706812531889
+  %107 = add i64 %106, 1609587929392839161
+  %108 = xor i64 %30, %107
+  %109 = tail call i64 @llvm.fshl.i64(i64 %108, i64 %108, i64 11)
+  %110 = mul i64 %109, -7046029288634856825
+  %111 = xor i64 %26, %110
+  %112 = tail call i64 @llvm.fshl.i64(i64 %111, i64 %111, i64 11)
+  %113 = mul i64 %112, -7046029288634856825
+  %114 = xor i64 %22, %113
+  %115 = tail call i64 @llvm.fshl.i64(i64 %114, i64 %114, i64 11)
+  %116 = mul i64 %115, -7046029288634856825
+  %117 = lshr i64 %116, 33
+  %118 = xor i64 %117, %116
+  %119 = mul i64 %118, -4417276706812531889
+  %120 = lshr i64 %119, 29
+  %121 = xor i64 %120, %119
+  %122 = mul i64 %121, 1609587929392839161
+  %123 = lshr i64 %122, 32
+  %124 = xor i64 %123, %122
+  ret i64 %124
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_xxh64_len64(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #1 {
+  %3 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %3)
+  %4 = add i64 %1, 6983438078262162902
+  %5 = add i64 %1, -4417276706812531889
+  %6 = add i64 %1, 7046029288634856825
+  %7 = load i64, ptr %0, align 1
+  %8 = mul i64 %7, -4417276706812531889
+  %9 = add i64 %8, %4
+  %10 = tail call i64 @llvm.fshl.i64(i64 %9, i64 %9, i64 31)
+  %11 = mul i64 %10, -7046029288634856825
+  %12 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %13 = load i64, ptr %12, align 1
+  %14 = mul i64 %13, -4417276706812531889
+  %15 = add i64 %14, %5
+  %16 = tail call i64 @llvm.fshl.i64(i64 %15, i64 %15, i64 31)
+  %17 = mul i64 %16, -7046029288634856825
+  %18 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %19 = load i64, ptr %18, align 1
+  %20 = mul i64 %19, -4417276706812531889
+  %21 = add i64 %20, %1
+  %22 = tail call i64 @llvm.fshl.i64(i64 %21, i64 %21, i64 31)
+  %23 = mul i64 %22, -7046029288634856825
+  %24 = getelementptr inbounds nuw i8, ptr %0, i64 24
+  %25 = load i64, ptr %24, align 1
+  %26 = mul i64 %25, -4417276706812531889
+  %27 = add i64 %26, %6
+  %28 = tail call i64 @llvm.fshl.i64(i64 %27, i64 %27, i64 31)
+  %29 = mul i64 %28, -7046029288634856825
+  %30 = getelementptr inbounds nuw i8, ptr %0, i64 32
+  %31 = load i64, ptr %30, align 1
+  %32 = mul i64 %31, -4417276706812531889
+  %33 = add i64 %32, %11
+  %34 = tail call i64 @llvm.fshl.i64(i64 %33, i64 %33, i64 31)
+  %35 = mul i64 %34, -7046029288634856825
+  %36 = getelementptr inbounds nuw i8, ptr %0, i64 40
+  %37 = load i64, ptr %36, align 1
+  %38 = mul i64 %37, -4417276706812531889
+  %39 = add i64 %38, %17
+  %40 = tail call i64 @llvm.fshl.i64(i64 %39, i64 %39, i64 31)
+  %41 = mul i64 %40, -7046029288634856825
+  %42 = getelementptr inbounds nuw i8, ptr %0, i64 48
+  %43 = load i64, ptr %42, align 1
+  %44 = mul i64 %43, -4417276706812531889
+  %45 = add i64 %44, %23
+  %46 = tail call i64 @llvm.fshl.i64(i64 %45, i64 %45, i64 31)
+  %47 = mul i64 %46, -7046029288634856825
+  %48 = getelementptr inbounds nuw i8, ptr %0, i64 56
+  %49 = load i64, ptr %48, align 1
+  %50 = mul i64 %49, -4417276706812531889
+  %51 = add i64 %50, %29
+  %52 = tail call i64 @llvm.fshl.i64(i64 %51, i64 %51, i64 31)
+  %53 = mul i64 %52, -7046029288634856825
+  %54 = tail call i64 @llvm.fshl.i64(i64 %35, i64 %35, i64 1)
+  %55 = tail call i64 @llvm.fshl.i64(i64 %41, i64 %41, i64 7)
+  %56 = add i64 %55, %54
+  %57 = tail call i64 @llvm.fshl.i64(i64 %47, i64 %47, i64 12)
+  %58 = add i64 %56, %57
+  %59 = tail call i64 @llvm.fshl.i64(i64 %53, i64 %53, i64 18)
+  %60 = add i64 %58, %59
+  %61 = mul i64 %34, -2381459717836149591
+  %62 = tail call i64 @llvm.fshl.i64(i64 %61, i64 %61, i64 31)
+  %63 = mul i64 %62, -7046029288634856825
+  %64 = xor i64 %60, %63
+  %65 = mul i64 %64, -7046029288634856825
+  %66 = add i64 %65, -8796714831421723037
+  %67 = mul i64 %40, -2381459717836149591
+  %68 = tail call i64 @llvm.fshl.i64(i64 %67, i64 %67, i64 31)
+  %69 = mul i64 %68, -7046029288634856825
+  %70 = xor i64 %66, %69
+  %71 = mul i64 %70, -7046029288634856825
+  %72 = add i64 %71, -8796714831421723037
+  %73 = mul i64 %46, -2381459717836149591
+  %74 = tail call i64 @llvm.fshl.i64(i64 %73, i64 %73, i64 31)
+  %75 = mul i64 %74, -7046029288634856825
+  %76 = xor i64 %72, %75
+  %77 = mul i64 %76, -7046029288634856825
+  %78 = add i64 %77, -8796714831421723037
+  %79 = mul i64 %52, -2381459717836149591
+  %80 = tail call i64 @llvm.fshl.i64(i64 %79, i64 %79, i64 31)
+  %81 = mul i64 %80, -7046029288634856825
+  %82 = xor i64 %78, %81
+  %83 = mul i64 %82, -7046029288634856825
+  %84 = add i64 %83, -8796714831421722973
+  %85 = lshr i64 %84, 33
+  %86 = xor i64 %85, %84
+  %87 = mul i64 %86, -4417276706812531889
+  %88 = lshr i64 %87, 29
+  %89 = xor i64 %88, %87
+  %90 = mul i64 %89, 1609587929392839161
+  %91 = lshr i64 %90, 32
+  %92 = xor i64 %91, %90
+  ret i64 %92
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable
+define dso_local i64 @target_xxh64_len100(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #1 {
+  %3 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %3)
+  %4 = add i64 %1, 6983438078262162902
+  %5 = add i64 %1, -4417276706812531889
+  %6 = add i64 %1, 7046029288634856825
+  %7 = load i64, ptr %0, align 1
+  %8 = mul i64 %7, -4417276706812531889
+  %9 = add i64 %8, %4
+  %10 = tail call i64 @llvm.fshl.i64(i64 %9, i64 %9, i64 31)
+  %11 = mul i64 %10, -7046029288634856825
+  %12 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %13 = load i64, ptr %12, align 1
+  %14 = mul i64 %13, -4417276706812531889
+  %15 = add i64 %14, %5
+  %16 = tail call i64 @llvm.fshl.i64(i64 %15, i64 %15, i64 31)
+  %17 = mul i64 %16, -7046029288634856825
+  %18 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %19 = load i64, ptr %18, align 1
+  %20 = mul i64 %19, -4417276706812531889
+  %21 = add i64 %20, %1
+  %22 = tail call i64 @llvm.fshl.i64(i64 %21, i64 %21, i64 31)
+  %23 = mul i64 %22, -7046029288634856825
+  %24 = getelementptr inbounds nuw i8, ptr %0, i64 24
+  %25 = load i64, ptr %24, align 1
+  %26 = mul i64 %25, -4417276706812531889
+  %27 = add i64 %26, %6
+  %28 = tail call i64 @llvm.fshl.i64(i64 %27, i64 %27, i64 31)
+  %29 = mul i64 %28, -7046029288634856825
+  %30 = getelementptr inbounds nuw i8, ptr %0, i64 32
+  %31 = load i64, ptr %30, align 1
+  %32 = mul i64 %31, -4417276706812531889
+  %33 = add i64 %32, %11
+  %34 = tail call i64 @llvm.fshl.i64(i64 %33, i64 %33, i64 31)
+  %35 = mul i64 %34, -7046029288634856825
+  %36 = getelementptr inbounds nuw i8, ptr %0, i64 40
+  %37 = load i64, ptr %36, align 1
+  %38 = mul i64 %37, -4417276706812531889
+  %39 = add i64 %38, %17
+  %40 = tail call i64 @llvm.fshl.i64(i64 %39, i64 %39, i64 31)
+  %41 = mul i64 %40, -7046029288634856825
+  %42 = getelementptr inbounds nuw i8, ptr %0, i64 48
+  %43 = load i64, ptr %42, align 1
+  %44 = mul i64 %43, -4417276706812531889
+  %45 = add i64 %44, %23
+  %46 = tail call i64 @llvm.fshl.i64(i64 %45, i64 %45, i64 31)
+  %47 = mul i64 %46, -7046029288634856825
+  %48 = getelementptr inbounds nuw i8, ptr %0, i64 56
+  %49 = load i64, ptr %48, align 1
+  %50 = mul i64 %49, -4417276706812531889
+  %51 = add i64 %50, %29
+  %52 = tail call i64 @llvm.fshl.i64(i64 %51, i64 %51, i64 31)
+  %53 = mul i64 %52, -7046029288634856825
+  %54 = getelementptr inbounds nuw i8, ptr %0, i64 64
+  %55 = load i64, ptr %54, align 1
+  %56 = mul i64 %55, -4417276706812531889
+  %57 = add i64 %56, %35
+  %58 = tail call i64 @llvm.fshl.i64(i64 %57, i64 %57, i64 31)
+  %59 = mul i64 %58, -7046029288634856825
+  %60 = getelementptr inbounds nuw i8, ptr %0, i64 72
+  %61 = load i64, ptr %60, align 1
+  %62 = mul i64 %61, -4417276706812531889
+  %63 = add i64 %62, %41
+  %64 = tail call i64 @llvm.fshl.i64(i64 %63, i64 %63, i64 31)
+  %65 = mul i64 %64, -7046029288634856825
+  %66 = getelementptr inbounds nuw i8, ptr %0, i64 80
+  %67 = load i64, ptr %66, align 1
+  %68 = mul i64 %67, -4417276706812531889
+  %69 = add i64 %68, %47
+  %70 = tail call i64 @llvm.fshl.i64(i64 %69, i64 %69, i64 31)
+  %71 = mul i64 %70, -7046029288634856825
+  %72 = getelementptr inbounds nuw i8, ptr %0, i64 88
+  %73 = load i64, ptr %72, align 1
+  %74 = mul i64 %73, -4417276706812531889
+  %75 = add i64 %74, %53
+  %76 = tail call i64 @llvm.fshl.i64(i64 %75, i64 %75, i64 31)
+  %77 = mul i64 %76, -7046029288634856825
+  %78 = getelementptr inbounds nuw i8, ptr %0, i64 96
+  %79 = tail call i64 @llvm.fshl.i64(i64 %59, i64 %59, i64 1)
+  %80 = tail call i64 @llvm.fshl.i64(i64 %65, i64 %65, i64 7)
+  %81 = add i64 %80, %79
+  %82 = tail call i64 @llvm.fshl.i64(i64 %71, i64 %71, i64 12)
+  %83 = add i64 %81, %82
+  %84 = tail call i64 @llvm.fshl.i64(i64 %77, i64 %77, i64 18)
+  %85 = add i64 %83, %84
+  %86 = mul i64 %58, -2381459717836149591
+  %87 = tail call i64 @llvm.fshl.i64(i64 %86, i64 %86, i64 31)
+  %88 = mul i64 %87, -7046029288634856825
+  %89 = xor i64 %85, %88
+  %90 = mul i64 %89, -7046029288634856825
+  %91 = add i64 %90, -8796714831421723037
+  %92 = mul i64 %64, -2381459717836149591
+  %93 = tail call i64 @llvm.fshl.i64(i64 %92, i64 %92, i64 31)
+  %94 = mul i64 %93, -7046029288634856825
+  %95 = xor i64 %91, %94
+  %96 = mul i64 %95, -7046029288634856825
+  %97 = add i64 %96, -8796714831421723037
+  %98 = mul i64 %70, -2381459717836149591
+  %99 = tail call i64 @llvm.fshl.i64(i64 %98, i64 %98, i64 31)
+  %100 = mul i64 %99, -7046029288634856825
+  %101 = xor i64 %97, %100
+  %102 = mul i64 %101, -7046029288634856825
+  %103 = add i64 %102, -8796714831421723037
+  %104 = mul i64 %76, -2381459717836149591
+  %105 = tail call i64 @llvm.fshl.i64(i64 %104, i64 %104, i64 31)
+  %106 = mul i64 %105, -7046029288634856825
+  %107 = xor i64 %103, %106
+  %108 = mul i64 %107, -7046029288634856825
+  %109 = add i64 %108, -8796714831421722937
+  %110 = load i32, ptr %78, align 1
+  %111 = zext i32 %110 to i64
+  %112 = mul i64 %111, -7046029288634856825
+  %113 = xor i64 %112, %109
+  %114 = tail call i64 @llvm.fshl.i64(i64 %113, i64 %113, i64 23)
+  %115 = mul i64 %114, -4417276706812531889
+  %116 = add i64 %115, 1609587929392839161
+  %117 = lshr i64 %116, 33
+  %118 = xor i64 %117, %116
+  %119 = mul i64 %118, -4417276706812531889
+  %120 = lshr i64 %119, 29
+  %121 = xor i64 %120, %119
+  %122 = mul i64 %121, 1609587929392839161
+  %123 = lshr i64 %122, 32
+  %124 = xor i64 %123, %122
+  ret i64 %124
+}
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: readwrite, inaccessiblemem: write) uwtable
+define dso_local i64 @target_s64_10_30(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #2 {
+  %3 = add i64 %1, 6983438078262162902
+  %4 = add i64 %1, -4417276706812531889
+  %5 = add i64 %1, 7046029288634856825
+  %6 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %6)
+  %7 = getelementptr inbounds nuw i8, ptr %0, i64 10
+  %8 = load i64, ptr %0, align 1
+  %9 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %10 = load i16, ptr %9, align 1
+  %11 = zext i16 %10 to i64
+  %12 = load i48, ptr %7, align 1
+  %13 = zext i48 %12 to i64
+  %14 = shl nuw i64 %13, 16
+  %15 = or disjoint i64 %14, %11
+  %16 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %17 = load i64, ptr %16, align 1
+  %18 = getelementptr inbounds nuw i8, ptr %0, i64 24
+  %19 = load i64, ptr %18, align 1
+  %20 = mul i64 %8, -4417276706812531889
+  %21 = add i64 %20, %3
+  %22 = tail call i64 @llvm.fshl.i64(i64 %21, i64 %21, i64 31)
+  %23 = mul i64 %22, -7046029288634856825
+  %24 = mul i64 %15, -4417276706812531889
+  %25 = add i64 %24, %4
+  %26 = tail call i64 @llvm.fshl.i64(i64 %25, i64 %25, i64 31)
+  %27 = mul i64 %26, -7046029288634856825
+  %28 = mul i64 %17, -4417276706812531889
+  %29 = add i64 %28, %1
+  %30 = tail call i64 @llvm.fshl.i64(i64 %29, i64 %29, i64 31)
+  %31 = mul i64 %30, -7046029288634856825
+  %32 = mul i64 %19, -4417276706812531889
+  %33 = add i64 %32, %5
+  %34 = tail call i64 @llvm.fshl.i64(i64 %33, i64 %33, i64 31)
+  %35 = mul i64 %34, -7046029288634856825
+  %36 = getelementptr inbounds nuw i8, ptr %0, i64 32
+  %37 = load i64, ptr %36, align 1
+  %38 = mul i64 %37, -4417276706812531889
+  %39 = tail call i64 @llvm.fshl.i64(i64 %38, i64 %38, i64 31)
+  %40 = mul i64 %39, -7046029288634856825
+  %41 = tail call i64 @llvm.fshl.i64(i64 %27, i64 %27, i64 7)
+  %42 = tail call i64 @llvm.fshl.i64(i64 %23, i64 %23, i64 1)
+  %43 = add i64 %41, %42
+  %44 = tail call i64 @llvm.fshl.i64(i64 %31, i64 %31, i64 12)
+  %45 = add i64 %43, %44
+  %46 = tail call i64 @llvm.fshl.i64(i64 %35, i64 %35, i64 18)
+  %47 = add i64 %45, %46
+  %48 = mul i64 %22, -2381459717836149591
+  %49 = tail call i64 @llvm.fshl.i64(i64 %48, i64 %48, i64 31)
+  %50 = mul i64 %49, -7046029288634856825
+  %51 = xor i64 %47, %50
+  %52 = mul i64 %51, -7046029288634856825
+  %53 = add i64 %52, -8796714831421723037
+  %54 = mul i64 %26, -2381459717836149591
+  %55 = tail call i64 @llvm.fshl.i64(i64 %54, i64 %54, i64 31)
+  %56 = mul i64 %55, -7046029288634856825
+  %57 = xor i64 %53, %56
+  %58 = mul i64 %57, -7046029288634856825
+  %59 = add i64 %58, -8796714831421723037
+  %60 = mul i64 %30, -2381459717836149591
+  %61 = tail call i64 @llvm.fshl.i64(i64 %60, i64 %60, i64 31)
+  %62 = mul i64 %61, -7046029288634856825
+  %63 = xor i64 %59, %62
+  %64 = mul i64 %63, -7046029288634856825
+  %65 = add i64 %64, -8796714831421723037
+  %66 = mul i64 %34, -2381459717836149591
+  %67 = tail call i64 @llvm.fshl.i64(i64 %66, i64 %66, i64 31)
+  %68 = mul i64 %67, -7046029288634856825
+  %69 = xor i64 %65, %68
+  %70 = mul i64 %69, -7046029288634856825
+  %71 = add i64 %70, -8796714831421722997
+  %72 = xor i64 %40, %71
+  %73 = tail call i64 @llvm.fshl.i64(i64 %72, i64 %72, i64 27)
+  %74 = mul i64 %73, -7046029288634856825
+  %75 = add i64 %74, -8796714831421723037
+  %76 = lshr i64 %75, 33
+  %77 = xor i64 %76, %75
+  %78 = mul i64 %77, -4417276706812531889
+  %79 = lshr i64 %78, 29
+  %80 = xor i64 %79, %78
+  %81 = mul i64 %80, 1609587929392839161
+  %82 = lshr i64 %81, 32
+  %83 = xor i64 %82, %81
+  ret i64 %83
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.lifetime.start.p0(i64 immarg, ptr) #3
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.lifetime.end.p0(i64 immarg, ptr) #3
+
+; Function Attrs: nofree norecurse nosync nounwind memory(argmem: readwrite, inaccessiblemem: write) uwtable
+define dso_local i64 @target_s64_40_23(ptr noundef readonly %0, i64 noundef %1) local_unnamed_addr #4 {
+  %3 = alloca %struct.XXH_NAMESPACEXXH64_state_s, align 8
+  call void @llvm.lifetime.start.p0(i64 88, ptr nonnull %3) #9
+  %4 = getelementptr inbounds nuw i8, ptr %3, i64 40
+  call void @llvm.memset.p0.i64(ptr noundef nonnull align 8 dereferenceable(88) %4, i8 0, i64 48, i1 false)
+  %5 = add i64 %1, 6983438078262162902
+  %6 = getelementptr inbounds nuw i8, ptr %3, i64 8
+  %7 = add i64 %1, -4417276706812531889
+  %8 = getelementptr inbounds nuw i8, ptr %3, i64 16
+  %9 = getelementptr inbounds nuw i8, ptr %3, i64 24
+  %10 = add i64 %1, 7046029288634856825
+  %11 = getelementptr inbounds nuw i8, ptr %3, i64 32
+  %12 = icmp ne ptr %0, null
+  tail call void @llvm.assume(i1 %12)
+  %13 = getelementptr inbounds nuw i8, ptr %0, i64 40
+  %14 = getelementptr inbounds nuw i8, ptr %3, i64 72
+  %15 = load i64, ptr %0, align 1
+  %16 = mul i64 %15, -4417276706812531889
+  %17 = add i64 %16, %5
+  %18 = tail call i64 @llvm.fshl.i64(i64 %17, i64 %17, i64 31)
+  %19 = mul i64 %18, -7046029288634856825
+  store i64 %19, ptr %6, align 8
+  %20 = getelementptr inbounds nuw i8, ptr %0, i64 8
+  %21 = load i64, ptr %20, align 1
+  %22 = mul i64 %21, -4417276706812531889
+  %23 = add i64 %22, %7
+  %24 = tail call i64 @llvm.fshl.i64(i64 %23, i64 %23, i64 31)
+  %25 = mul i64 %24, -7046029288634856825
+  store i64 %25, ptr %8, align 8
+  %26 = getelementptr inbounds nuw i8, ptr %0, i64 16
+  %27 = load i64, ptr %26, align 1
+  %28 = mul i64 %27, -4417276706812531889
+  %29 = add i64 %28, %1
+  %30 = tail call i64 @llvm.fshl.i64(i64 %29, i64 %29, i64 31)
+  %31 = mul i64 %30, -7046029288634856825
+  store i64 %31, ptr %9, align 8
+  %32 = getelementptr inbounds nuw i8, ptr %0, i64 24
+  %33 = load i64, ptr %32, align 1
+  %34 = mul i64 %33, -4417276706812531889
+  %35 = add i64 %34, %10
+  %36 = tail call i64 @llvm.fshl.i64(i64 %35, i64 %35, i64 31)
+  %37 = mul i64 %36, -7046029288634856825
+  store i64 %37, ptr %11, align 8
+  %38 = getelementptr i8, ptr %0, i64 32
+  %39 = icmp ult ptr %38, %13
+  br i1 %39, label %40, label %43
+
+40:                                               ; preds = %2
+  %41 = getelementptr inbounds nuw i8, ptr %3, i64 40
+  %42 = load i64, ptr %38, align 1
+  store i64 %42, ptr %41, align 8
+  store i32 8, ptr %14, align 8
+  br label %43
+
+43:                                               ; preds = %2, %40
+  %44 = phi i64 [ 8, %40 ], [ 0, %2 ]
+  store i64 63, ptr %3, align 8
+  %45 = getelementptr inbounds nuw i8, ptr %3, i64 40
+  %46 = getelementptr inbounds nuw i8, ptr %45, i64 %44
+  call void @llvm.memcpy.p0.p0.i64(ptr noundef nonnull align 8 dereferenceable(23) %46, ptr noundef nonnull readonly align 1 dereferenceable(23) %13, i64 23, i1 false)
+  %47 = load i32, ptr %14, align 8
+  %48 = add i32 %47, 23
+  store i32 %48, ptr %14, align 8
+  %49 = getelementptr inbounds nuw i8, ptr %3, i64 56
+  %50 = load i64, ptr %49, align 8
+  %51 = mul i64 %50, -4417276706812531889
+  %52 = tail call i64 @llvm.fshl.i64(i64 %51, i64 %51, i64 31)
+  %53 = mul i64 %52, -7046029288634856825
+  %54 = getelementptr inbounds nuw i8, ptr %3, i64 48
+  %55 = load i64, ptr %54, align 8
+  %56 = mul i64 %55, -4417276706812531889
+  %57 = tail call i64 @llvm.fshl.i64(i64 %56, i64 %56, i64 31)
+  %58 = mul i64 %57, -7046029288634856825
+  %59 = getelementptr inbounds nuw i8, ptr %3, i64 40
+  %60 = load i64, ptr %59, align 8
+  %61 = mul i64 %60, -4417276706812531889
+  %62 = tail call i64 @llvm.fshl.i64(i64 %61, i64 %61, i64 31)
+  %63 = mul i64 %62, -7046029288634856825
+  %64 = tail call i64 @llvm.fshl.i64(i64 %25, i64 %25, i64 7)
+  %65 = tail call i64 @llvm.fshl.i64(i64 %19, i64 %19, i64 1)
+  %66 = add i64 %64, %65
+  %67 = tail call i64 @llvm.fshl.i64(i64 %31, i64 %31, i64 12)
+  %68 = add i64 %66, %67
+  %69 = tail call i64 @llvm.fshl.i64(i64 %37, i64 %37, i64 18)
+  %70 = add i64 %68, %69
+  %71 = mul i64 %18, -2381459717836149591
+  %72 = tail call i64 @llvm.fshl.i64(i64 %71, i64 %71, i64 31)
+  %73 = mul i64 %72, -7046029288634856825
+  %74 = xor i64 %70, %73
+  %75 = mul i64 %74, -7046029288634856825
+  %76 = add i64 %75, -8796714831421723037
+  %77 = mul i64 %24, -2381459717836149591
+  %78 = tail call i64 @llvm.fshl.i64(i64 %77, i64 %77, i64 31)
+  %79 = mul i64 %78, -7046029288634856825
+  %80 = xor i64 %76, %79
+  %81 = mul i64 %80, -7046029288634856825
+  %82 = add i64 %81, -8796714831421723037
+  %83 = mul i64 %30, -2381459717836149591
+  %84 = tail call i64 @llvm.fshl.i64(i64 %83, i64 %83, i64 31)
+  %85 = mul i64 %84, -7046029288634856825
+  %86 = xor i64 %82, %85
+  %87 = mul i64 %86, -7046029288634856825
+  %88 = add i64 %87, -8796714831421723037
+  %89 = mul i64 %36, -2381459717836149591
+  %90 = tail call i64 @llvm.fshl.i64(i64 %89, i64 %89, i64 31)
+  %91 = mul i64 %90, -7046029288634856825
+  %92 = xor i64 %88, %91
+  %93 = mul i64 %92, -7046029288634856825
+  %94 = add i64 %93, -8796714831421722974
+  %95 = xor i64 %63, %94
+  %96 = tail call i64 @llvm.fshl.i64(i64 %95, i64 %95, i64 27)
+  %97 = mul i64 %96, -7046029288634856825
+  %98 = add i64 %97, -8796714831421723037
+  %99 = xor i64 %58, %98
+  %100 = tail call i64 @llvm.fshl.i64(i64 %99, i64 %99, i64 27)
+  %101 = mul i64 %100, -7046029288634856825
+  %102 = add i64 %101, -8796714831421723037
+  %103 = xor i64 %53, %102
+  %104 = tail call i64 @llvm.fshl.i64(i64 %103, i64 %103, i64 27)
+  %105 = mul i64 %104, -7046029288634856825
+  %106 = add i64 %105, -8796714831421723037
+  %107 = getelementptr inbounds nuw i8, ptr %3, i64 64
+  %108 = load i32, ptr %107, align 8
+  %109 = zext i32 %108 to i64
+  %110 = mul i64 %109, -7046029288634856825
+  %111 = xor i64 %110, %106
+  %112 = getelementptr inbounds nuw i8, ptr %3, i64 68
+  %113 = tail call i64 @llvm.fshl.i64(i64 %111, i64 %111, i64 23)
+  %114 = mul i64 %113, -4417276706812531889
+  %115 = add i64 %114, 1609587929392839161
+  %116 = getelementptr inbounds nuw i8, ptr %112, i64 1
+  %117 = load i8, ptr %112, align 1
+  %118 = zext i8 %117 to i64
+  %119 = mul i64 %118, 2870177450012600261
+  %120 = xor i64 %119, %115
+  %121 = tail call i64 @llvm.fshl.i64(i64 %120, i64 %120, i64 11)
+  %122 = mul i64 %121, -7046029288634856825
+  %123 = getelementptr inbounds nuw i8, ptr %112, i64 2
+  %124 = load i8, ptr %116, align 1
+  %125 = zext i8 %124 to i64
+  %126 = mul i64 %125, 2870177450012600261
+  %127 = xor i64 %126, %122
+  %128 = tail call i64 @llvm.fshl.i64(i64 %127, i64 %127, i64 11)
+  %129 = mul i64 %128, -7046029288634856825
+  %130 = load i8, ptr %123, align 1
+  %131 = zext i8 %130 to i64
+  %132 = mul i64 %131, 2870177450012600261
+  %133 = xor i64 %132, %129
+  %134 = tail call i64 @llvm.fshl.i64(i64 %133, i64 %133, i64 11)
+  %135 = mul i64 %134, -7046029288634856825
+  %136 = lshr i64 %135, 33
+  %137 = xor i64 %136, %135
+  %138 = mul i64 %137, -4417276706812531889
+  %139 = lshr i64 %138, 29
+  %140 = xor i64 %139, %138
+  %141 = mul i64 %140, 1609587929392839161
+  %142 = lshr i64 %141, 32
+  %143 = xor i64 %142, %141
+  call void @llvm.lifetime.end.p0(i64 88, ptr nonnull %3) #9
+  ret i64 %143
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: write)
+declare void @llvm.assume(i1 noundef) #5
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.fshl.i64(i64, i64, i64) #6
+
+; Function Attrs: mustprogress nocallback nofree nounwind willreturn memory(argmem: write)
+declare void @llvm.memset.p0.i64(ptr writeonly, i8, i64, i1 immarg) #7
+
+; Function Attrs: mustprogress nocallback nofree nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias writeonly, ptr noalias readonly, i64, i1 immarg) #8
+
+attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(none) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64-v3" "target-features"="+avx,+avx2,+bmi,+bmi2,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fxsr,+lzcnt,+mmx,+movbe,+popcnt,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" }
+attributes #1 = { mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read, inaccessiblemem: write) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64-v3" "target-features"="+avx,+avx2,+bmi,+bmi2,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fxsr,+lzcnt,+mmx,+movbe,+popcnt,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" }
+attributes #2 = { mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: readwrite, inaccessiblemem: write) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64-v3" "target-features"="+avx,+avx2,+bmi,+bmi2,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fxsr,+lzcnt,+mmx,+movbe,+popcnt,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" }
+attributes #3 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
+attributes #4 = { nofree norecurse nosync nounwind memory(argmem: readwrite, inaccessiblemem: write) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64-v3" "target-features"="+avx,+avx2,+bmi,+bmi2,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fxsr,+lzcnt,+mmx,+movbe,+popcnt,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" }
+attributes #5 = { mustprogress nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: write) }
+attributes #6 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #7 = { mustprogress nocallback nofree nounwind willreturn memory(argmem: write) }
+attributes #8 = { mustprogress nocallback nofree nounwind willreturn memory(argmem: readwrite) }
+attributes #9 = { nounwind }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"PIE Level", i32 2}
+!3 = !{i32 7, !"uwtable", i32 2}
+!4 = !{!"Ubuntu clang version 20.1.8 (++20250708082409+6fb913d3e2ec-1~exp1~20250708202428.132)"}

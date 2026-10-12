@@ -1,0 +1,64 @@
+{
+ "commit": "0d7465e",
+ "date": "2025-06-13",
+ "subject": "Add XXH3_initCustomSecret_rvv func",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Adds an RVV-vectorized XXH3_initCustomSecret (previously scalar on RVV) and moves accumulate/scramble from LMUL=1 to LMUL=2 vectors (vuint64m2_t, vsetvl_e64m2) to process more lanes per instruction; bench Makefile updated. SIMD speed-up intent.",
+ "change_summary": "accumulate_512_rvv and scrambleAcc_rvv switched from m1 to m2 register groups (swap/prime arrays widened to 16); new XXH3_initCustomSecret_rvv (strip-mined vadd of kSecret with {seed,-seed,...}); XXH_SEC_ALIGN=64 for RVV.",
+ "units": [
+  {
+   "name": "XXH3_accumulate_512_rvv (m1 -> m2)",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/0d7465e/r_rvv",
+   "evidence": "Alive2: 'ERROR: Unsupported type: <vscale x 1 x i64>' / 'Unsupported instruction: tail call <vscale x 1 x i64> @llvm.riscv.vle.nxv1i64.i64(...)' -> 'Could not translate' (old) / <vscale x 2 x i64> (new)"
+  },
+  {
+   "name": "XXH3_scrambleAcc_rvv (m1 -> m2)",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/0d7465e/r_rvv",
+   "evidence": "Alive2: 'ERROR: Unsupported type: <vscale x 1 x i64>' / 'Unsupported instruction: tail call <vscale x 1 x i64> @llvm.riscv.vle.nxv1i64.i64(...)' -> 'Could not translate' (old) / <vscale x 2 x i64> (new)"
+  },
+  {
+   "name": "XXH3_initCustomSecret (scalar -> rvv)",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/0d7465e/r_rvv",
+   "evidence": "Alive2: 'ERROR: Unsupported type: <vscale x 2 x i64>' / 'Unsupported instruction: call <vscale x 2 x i64> @llvm.riscv.vle.nxv2i64.i64(...)' -> 'Could not translate' in target_initsecret (new side)"
+  },
+  {
+   "name": "XXH3_64bits_withSeed(p,1024,seed) on riscv64 rv64gcv",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/0d7465e/r_rvv",
+   "evidence": "Alive2 cannot translate scalable-vector RVV intrinsics on either side (target_api_len1024)"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "non-x86-target-intrinsics",
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged: wrapper with all one-shot APIs (XXH32/XXH64/XXH3_64 seed+secret/XXH3_128, symbolic len) compiled with -march=x86-64-v3 and with default SSE2 gives identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/); riscv64 -march=rv64gc (no V) also identical target IR (ident_rv64gc_novector/). RVV intrinsics compile to scalable-vector LLVM types (<vscale x N x i64>) and llvm.riscv.* calls, which Alive2 cannot translate at all; even with -march=rv64gcv_zvl512b -mrvv-vector-bits=zvl the IR keeps scalable types (vscale_range(8,8)), see 2973489/compile_rvv_zvl512/. Inputs are value args (U8ARGS) copied into local arrays; XXH3_accumulate_512/XXH3_scrambleAcc/XXH3_initCustomSecret are the library's own dispatch macros. Flags: --target riscv64-linux-gnu, cflags '-O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -nostdlibinc -isystem _work2020/cross_sysinc -march=rv64gcv' + '-DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000' (no -ffreestanding so memcpy stays a builtin). No part of the changed code could be checked."
+}

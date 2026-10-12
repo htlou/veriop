@@ -1,0 +1,32 @@
+package scion
+
+type MetaHdr struct {
+	CurrINF uint8
+	CurrHF  uint8
+	SegLen  [3]uint8
+}
+
+type Base struct {
+	PathMeta MetaHdr
+	NumINF int
+	NumHops int
+}
+
+requires acc(s)
+ensures acc(s)
+ensures res <= 2
+ensures hf < s.PathMeta.SegLen[0] ==> res == 0
+ensures hf >= s.PathMeta.SegLen[0] &&
+    hf < s.PathMeta.SegLen[0]+s.PathMeta.SegLen[1] ==> res == 1
+ensures hf >= s.PathMeta.SegLen[0] &&
+    hf >= s.PathMeta.SegLen[0]+s.PathMeta.SegLen[1] ==> res == 2
+func (s *Base) infIndexForHF(hf uint8) (res uint8) {
+	switch {
+	case hf < s.PathMeta.SegLen[0]:
+		return 0
+	case hf < s.PathMeta.SegLen[0]+s.PathMeta.SegLen[1]:
+		return 1
+	default:
+		return 2
+	}
+}

@@ -1,0 +1,27 @@
+diff --git a/backend/Inliningaux.ml b/backend/Inliningaux.ml
+index 2e83eb0..7512e53 100644
+--- a/backend/Inliningaux.ml
++++ b/backend/Inliningaux.ml
+@@ -85,11 +85,21 @@ let static_called_once id io =
+ 
+ (* To be considered: heuristics based on size of function? *)
+ 
++(* Bounded extra opportunity under the existing verified inliner. *)
++let tiny_leaf io id f =
++  let calls = call_count id io in
++  if calls < 1 || calls > 4 || address_taken id io ||
++     not (Camlcoq.Z.eq f.fn_stacksize Camlcoq.Z.zero) then false else
++  let size, leaf = PTree.fold (fun _ instr (n, leaf) ->
++    (n + 1, leaf && (match instr with Icall _ | Itailcall _ -> false | _ -> true)))
++    f.fn_code (0, true) in
++  leaf && size <= 12
++
+ let should_inline (io: inlining_info) (id: ident) (f: coq_function) =
+   if !Clflags.option_finline then begin
+     match C2C.atom_inline id with
+     | C2C.Inline -> true
+     | C2C.Noinline -> false
+-    | C2C.No_specifier -> static_called_once id io
++    | C2C.No_specifier -> static_called_once id io || tiny_leaf io id f
+   end else
+     false

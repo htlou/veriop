@@ -1,0 +1,38 @@
+
+----------------------------------------
+define i32 @old_bit_reduced(i16 noundef signext %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp sgt i16 noundef signext %#0, 63871
+  assume i1 %#2
+  %#3 = icmp slt i16 noundef signext %#0, 1665
+  assume i1 %#3
+  %#4 = icmp slt i16 noundef signext %#0, 0
+  %#5 = select i1 %#4, i16 3329, i16 0
+  %#6 = add nsw i16 %#5, noundef signext %#0
+  %#7 = shl nsw nuw i16 %#6, 1
+  %#8 = add nsw nuw i16 %#7, 1664
+  %#9 = udiv i16 %#8, 3329
+  %#10 = and i16 %#9, 1
+  %#11 = zext nneg i16 %#10 to i32
+  %#range_0_%#11 = !range i32 %#11, i32 0, i32 2
+  ret i32 %#range_0_%#11
+}
+=>
+define i32 @new_bit_reduced(i16 noundef signext %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp sgt i16 noundef signext %#0, 63871
+  assume i1 %#2
+  %#3 = icmp slt i16 noundef signext %#0, 1665
+  assume i1 %#3
+  %#4 = sext i16 noundef signext %#0 to i32
+  %#5 = mul nsw i32 %#4, 161270
+  %#6 = add nsw i32 %#5, 134257275
+  %#7 = lshr i32 %#6, 28
+  %#8 = and i32 %#7, 1
+  %#range_0_%#8 = !range i32 %#8, i32 0, i32 2
+  ret i32 %#range_0_%#8
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

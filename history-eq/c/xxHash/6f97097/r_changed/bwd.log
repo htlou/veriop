@@ -1,0 +1,690 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=10000 --always-verify c/xxHash/6f97097/r_changed/new.ll c/xxHash/6f97097/r_changed/old.ll
+
+----------------------------------------
+define i32 @target_xxh32_len0(ptr noread nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i32 noundef %#1, 374761393
+  %#4 = lshr i32 %#3, 15
+  %#5 = xor i32 %#4, %#3
+  %#6 = mul i32 %#5, 2246822519
+  %#7 = lshr i32 %#6, 13
+  %#8 = xor i32 %#7, %#6
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = lshr i32 %#9, 16
+  %#11 = xor i32 %#10, %#9
+  ret i32 %#11
+}
+=>
+define i32 @target_xxh32_len0(ptr noread nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i32 noundef %#1, 374761393
+  %#4 = lshr i32 %#3, 15
+  %#5 = xor i32 %#4, %#3
+  %#6 = mul i32 %#5, 2246822519
+  %#7 = lshr i32 %#6, 13
+  %#8 = xor i32 %#7, %#6
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = lshr i32 %#9, 16
+  %#11 = xor i32 %#10, %#9
+  ret i32 %#11
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_xxh32_len3(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#5 = add i32 noundef %#1, 374761396
+  br label %#3
+
+#3:
+  %#6 = phi i32 [ %#15, %#3 ], [ %#5, %#2 ]
+  %#7 = phi i64 [ %#16, %#3 ], [ 3, %#2 ]
+  %#8 = phi ptr [ %#9, %#3 ], [ nowrite noundef %#0, %#2 ]
+  %#9 = gep inbounds nuw ptr %#8, 1 x i64 1
+  %#10 = load i8, ptr %#8, align 1
+  %#11 = zext i8 %#10 to i32
+  %#12 = mul i32 %#11, 374761393
+  %#13 = add i32 %#12, %#6
+  %#14 = fshl i32 %#13, i32 %#13, i32 11
+  %#15 = mul i32 %#14, 2654435761
+  %#16 = add nsw i64 %#7, -1
+  %#17 = icmp eq i64 %#16, 0
+  br i1 %#17, label %#4, label %#3
+
+#4:
+  %#18 = lshr i32 %#15, 15
+  %#19 = xor i32 %#18, %#15
+  %#20 = mul i32 %#19, 2246822519
+  %#21 = lshr i32 %#20, 13
+  %#22 = xor i32 %#21, %#20
+  %#23 = mul i32 %#22, 3266489917
+  %#24 = lshr i32 %#23, 16
+  %#25 = xor i32 %#24, %#23
+  ret i32 %#25
+}
+=>
+define i32 @target_xxh32_len3(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#5 = add i32 noundef %#1, 374761396
+  br label %#3
+
+#3:
+  %#6 = phi i32 [ %#15, %#3 ], [ %#5, %#2 ]
+  %#7 = phi i64 [ %#16, %#3 ], [ 3, %#2 ]
+  %#8 = phi ptr [ %#9, %#3 ], [ nowrite noundef %#0, %#2 ]
+  %#9 = gep inbounds nuw ptr %#8, 1 x i64 1
+  %#10 = load i8, ptr %#8, align 1
+  %#11 = zext i8 %#10 to i32
+  %#12 = mul i32 %#11, 374761393
+  %#13 = add i32 %#12, %#6
+  %#14 = fshl i32 %#13, i32 %#13, i32 11
+  %#15 = mul i32 %#14, 2654435761
+  %#16 = add nsw i64 %#7, -1
+  %#17 = icmp eq i64 %#16, 0
+  br i1 %#17, label %#4, label %#3
+
+#4:
+  %#18 = lshr i32 %#15, 15
+  %#19 = xor i32 %#18, %#15
+  %#20 = mul i32 %#19, 2246822519
+  %#21 = lshr i32 %#20, 13
+  %#22 = xor i32 %#21, %#20
+  %#23 = mul i32 %#22, 3266489917
+  %#24 = lshr i32 %#23, 16
+  %#25 = xor i32 %#24, %#23
+  ret i32 %#25
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i32 @target_xxh32_len15(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#7 = add i32 noundef %#1, 374761408
+  br label %#3
+
+#3:
+  %#8 = phi i32 [ %#16, %#3 ], [ %#7, %#2 ]
+  %#9 = phi i64 [ %#17, %#3 ], [ 15, %#2 ]
+  %#10 = phi ptr [ %#14, %#3 ], [ nowrite noundef %#0, %#2 ]
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = mul i32 %#11, 3266489917
+  %#13 = add i32 %#12, %#8
+  %#14 = gep inbounds nuw ptr %#10, 1 x i64 4
+  %#15 = fshl i32 %#13, i32 %#13, i32 17
+  %#16 = mul i32 %#15, 668265263
+  %#17 = add nsw i64 %#9, -4
+  %#18 = icmp ugt i64 %#17, 3
+  br i1 %#18, label %#3, label %#4
+
+#4:
+  %#19 = gep ptr nowrite noundef %#0, 1 x i64 12
+  br label %#5
+
+#5:
+  %#20 = phi i32 [ %#29, %#5 ], [ %#16, %#4 ]
+  %#21 = phi i64 [ %#30, %#5 ], [ 3, %#4 ]
+  %#22 = phi ptr [ %#23, %#5 ], [ %#19, %#4 ]
+  %#23 = gep inbounds nuw ptr %#22, 1 x i64 1
+  %#24 = load i8, ptr %#22, align 1
+  %#25 = zext i8 %#24 to i32
+  %#26 = mul i32 %#25, 374761393
+  %#27 = add i32 %#26, %#20
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = add nsw i64 %#21, -1
+  %#31 = icmp eq i64 %#30, 0
+  br i1 %#31, label %#6, label %#5
+
+#6:
+  %#32 = lshr i32 %#29, 15
+  %#33 = xor i32 %#32, %#29
+  %#34 = mul i32 %#33, 2246822519
+  %#35 = lshr i32 %#34, 13
+  %#36 = xor i32 %#35, %#34
+  %#37 = mul i32 %#36, 3266489917
+  %#38 = lshr i32 %#37, 16
+  %#39 = xor i32 %#38, %#37
+  ret i32 %#39
+}
+=>
+define i32 @target_xxh32_len15(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#7 = add i32 noundef %#1, 374761408
+  br label %#3
+
+#3:
+  %#8 = phi i32 [ %#16, %#3 ], [ %#7, %#2 ]
+  %#9 = phi i64 [ %#17, %#3 ], [ 15, %#2 ]
+  %#10 = phi ptr [ %#14, %#3 ], [ nowrite noundef %#0, %#2 ]
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = mul i32 %#11, 3266489917
+  %#13 = add i32 %#12, %#8
+  %#14 = gep inbounds nuw ptr %#10, 1 x i64 4
+  %#15 = fshl i32 %#13, i32 %#13, i32 17
+  %#16 = mul i32 %#15, 668265263
+  %#17 = add nsw i64 %#9, -4
+  %#18 = icmp ugt i64 %#17, 3
+  br i1 %#18, label %#3, label %#4
+
+#4:
+  %#19 = gep ptr nowrite noundef %#0, 1 x i64 12
+  br label %#5
+
+#5:
+  %#20 = phi i32 [ %#29, %#5 ], [ %#16, %#4 ]
+  %#21 = phi i64 [ %#30, %#5 ], [ 3, %#4 ]
+  %#22 = phi ptr [ %#23, %#5 ], [ %#19, %#4 ]
+  %#23 = gep inbounds nuw ptr %#22, 1 x i64 1
+  %#24 = load i8, ptr %#22, align 1
+  %#25 = zext i8 %#24 to i32
+  %#26 = mul i32 %#25, 374761393
+  %#27 = add i32 %#26, %#20
+  %#28 = fshl i32 %#27, i32 %#27, i32 11
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = add nsw i64 %#21, -1
+  %#31 = icmp eq i64 %#30, 0
+  br i1 %#31, label %#6, label %#5
+
+#6:
+  %#32 = lshr i32 %#29, 15
+  %#33 = xor i32 %#32, %#29
+  %#34 = mul i32 %#33, 2246822519
+  %#35 = lshr i32 %#34, 13
+  %#36 = xor i32 %#35, %#34
+  %#37 = mul i32 %#36, 3266489917
+  %#38 = lshr i32 %#37, 16
+  %#39 = xor i32 %#38, %#37
+  ret i32 %#39
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i32 @target_xxh32_len16(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#3 = add i32 noundef %#1, 606290984
+  %#4 = add i32 noundef %#1, 2246822519
+  %#5 = add i32 noundef %#1, 1640531535
+  %#6 = load i32, ptr nowrite noundef %#0, align 1
+  %#7 = mul i32 %#6, 2246822519
+  %#8 = add i32 %#3, %#7
+  %#9 = fshl i32 %#8, i32 %#8, i32 13
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = freeze i32 %#10
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#13 = load i32, ptr %#12, align 1
+  %#14 = mul i32 %#13, 2246822519
+  %#15 = add i32 %#4, %#14
+  %#16 = fshl i32 %#15, i32 %#15, i32 13
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = freeze i32 %#17
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#20 = load i32, ptr %#19, align 1
+  %#21 = mul i32 %#20, 2246822519
+  %#22 = add i32 %#21, noundef %#1
+  %#23 = fshl i32 %#22, i32 %#22, i32 13
+  %#24 = mul i32 %#23, 2654435761
+  %#25 = freeze i32 %#24
+  %#26 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#27 = load i32, ptr %#26, align 1
+  %#28 = mul i32 %#27, 2246822519
+  %#29 = add i32 %#5, %#28
+  %#30 = fshl i32 %#29, i32 %#29, i32 13
+  %#31 = mul i32 %#30, 2654435761
+  %#32 = freeze i32 %#31
+  %#33 = fshl i32 %#11, i32 %#11, i32 1
+  %#34 = fshl i32 %#18, i32 %#18, i32 7
+  %#35 = fshl i32 %#25, i32 %#25, i32 12
+  %#36 = fshl i32 %#32, i32 %#32, i32 18
+  %#37 = add i32 %#33, 16
+  %#38 = add i32 %#37, %#34
+  %#39 = add i32 %#38, %#35
+  %#40 = add i32 %#39, %#36
+  %#41 = lshr i32 %#40, 15
+  %#42 = xor i32 %#41, %#40
+  %#43 = mul i32 %#42, 2246822519
+  %#44 = lshr i32 %#43, 13
+  %#45 = xor i32 %#44, %#43
+  %#46 = mul i32 %#45, 3266489917
+  %#47 = lshr i32 %#46, 16
+  %#48 = xor i32 %#47, %#46
+  ret i32 %#48
+}
+=>
+define i32 @target_xxh32_len16(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#3 = add i32 noundef %#1, 606290984
+  %#4 = add i32 noundef %#1, 2246822519
+  %#5 = add i32 noundef %#1, 1640531535
+  %#6 = load i32, ptr nowrite noundef %#0, align 1
+  %#7 = mul i32 %#6, 2246822519
+  %#8 = add i32 %#3, %#7
+  %#9 = fshl i32 %#8, i32 %#8, i32 13
+  %#10 = mul i32 %#9, 2654435761
+  %#11 = freeze i32 %#10
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#13 = load i32, ptr %#12, align 1
+  %#14 = mul i32 %#13, 2246822519
+  %#15 = add i32 %#4, %#14
+  %#16 = fshl i32 %#15, i32 %#15, i32 13
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = freeze i32 %#17
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#20 = load i32, ptr %#19, align 1
+  %#21 = mul i32 %#20, 2246822519
+  %#22 = add i32 %#21, noundef %#1
+  %#23 = fshl i32 %#22, i32 %#22, i32 13
+  %#24 = mul i32 %#23, 2654435761
+  %#25 = freeze i32 %#24
+  %#26 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#27 = load i32, ptr %#26, align 1
+  %#28 = mul i32 %#27, 2246822519
+  %#29 = add i32 %#5, %#28
+  %#30 = fshl i32 %#29, i32 %#29, i32 13
+  %#31 = mul i32 %#30, 2654435761
+  %#32 = freeze i32 %#31
+  %#33 = fshl i32 %#11, i32 %#11, i32 1
+  %#34 = fshl i32 %#18, i32 %#18, i32 7
+  %#35 = fshl i32 %#25, i32 %#25, i32 12
+  %#36 = fshl i32 %#32, i32 %#32, i32 18
+  %#37 = add i32 %#33, 16
+  %#38 = add i32 %#37, %#34
+  %#39 = add i32 %#38, %#35
+  %#40 = add i32 %#39, %#36
+  %#41 = lshr i32 %#40, 15
+  %#42 = xor i32 %#41, %#40
+  %#43 = mul i32 %#42, 2246822519
+  %#44 = lshr i32 %#43, 13
+  %#45 = xor i32 %#44, %#43
+  %#46 = mul i32 %#45, 3266489917
+  %#47 = lshr i32 %#46, 16
+  %#48 = xor i32 %#47, %#46
+  ret i32 %#48
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i32 @target_xxh32_len31(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#7 = add i32 noundef %#1, 606290984
+  %#8 = add i32 noundef %#1, 2246822519
+  %#9 = add i32 noundef %#1, 1640531535
+  %#10 = load i32, ptr nowrite noundef %#0, align 1
+  %#11 = mul i32 %#10, 2246822519
+  %#12 = add i32 %#11, %#7
+  %#13 = fshl i32 %#12, i32 %#12, i32 13
+  %#14 = mul i32 %#13, 2654435761
+  %#15 = freeze i32 %#14
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = add i32 %#18, %#8
+  %#20 = fshl i32 %#19, i32 %#19, i32 13
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = freeze i32 %#21
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#24 = load i32, ptr %#23, align 1
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = add i32 %#25, noundef %#1
+  %#27 = fshl i32 %#26, i32 %#26, i32 13
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = freeze i32 %#28
+  %#30 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#31 = load i32, ptr %#30, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#9
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#38 = fshl i32 %#15, i32 %#15, i32 1
+  %#39 = fshl i32 %#22, i32 %#22, i32 7
+  %#40 = fshl i32 %#29, i32 %#29, i32 12
+  %#41 = fshl i32 %#36, i32 %#36, i32 18
+  %#42 = add i32 %#38, 31
+  %#43 = add i32 %#42, %#39
+  %#44 = add i32 %#43, %#40
+  %#45 = add i32 %#44, %#41
+  br label %#3
+
+#3:
+  %#46 = phi i32 [ %#54, %#3 ], [ %#45, %#2 ]
+  %#47 = phi i64 [ %#55, %#3 ], [ 15, %#2 ]
+  %#48 = phi ptr [ %#52, %#3 ], [ %#37, %#2 ]
+  %#49 = load i32, ptr %#48, align 1
+  %#50 = mul i32 %#49, 3266489917
+  %#51 = add i32 %#50, %#46
+  %#52 = gep inbounds nuw ptr %#48, 1 x i64 4
+  %#53 = fshl i32 %#51, i32 %#51, i32 17
+  %#54 = mul i32 %#53, 668265263
+  %#55 = add nsw i64 %#47, -4
+  %#56 = icmp ugt i64 %#55, 3
+  br i1 %#56, label %#3, label %#4
+
+#4:
+  %#57 = gep ptr nowrite noundef %#0, 1 x i64 28
+  br label %#5
+
+#5:
+  %#58 = phi i32 [ %#67, %#5 ], [ %#54, %#4 ]
+  %#59 = phi i64 [ %#68, %#5 ], [ 3, %#4 ]
+  %#60 = phi ptr [ %#61, %#5 ], [ %#57, %#4 ]
+  %#61 = gep inbounds nuw ptr %#60, 1 x i64 1
+  %#62 = load i8, ptr %#60, align 1
+  %#63 = zext i8 %#62 to i32
+  %#64 = mul i32 %#63, 374761393
+  %#65 = add i32 %#64, %#58
+  %#66 = fshl i32 %#65, i32 %#65, i32 11
+  %#67 = mul i32 %#66, 2654435761
+  %#68 = add nsw i64 %#59, -1
+  %#69 = icmp eq i64 %#68, 0
+  br i1 %#69, label %#6, label %#5
+
+#6:
+  %#70 = lshr i32 %#67, 15
+  %#71 = xor i32 %#70, %#67
+  %#72 = mul i32 %#71, 2246822519
+  %#73 = lshr i32 %#72, 13
+  %#74 = xor i32 %#73, %#72
+  %#75 = mul i32 %#74, 3266489917
+  %#76 = lshr i32 %#75, 16
+  %#77 = xor i32 %#76, %#75
+  ret i32 %#77
+}
+=>
+define i32 @target_xxh32_len31(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#7 = add i32 noundef %#1, 606290984
+  %#8 = add i32 noundef %#1, 2246822519
+  %#9 = add i32 noundef %#1, 1640531535
+  %#10 = load i32, ptr nowrite noundef %#0, align 1
+  %#11 = mul i32 %#10, 2246822519
+  %#12 = add i32 %#11, %#7
+  %#13 = fshl i32 %#12, i32 %#12, i32 13
+  %#14 = mul i32 %#13, 2654435761
+  %#15 = freeze i32 %#14
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = add i32 %#18, %#8
+  %#20 = fshl i32 %#19, i32 %#19, i32 13
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = freeze i32 %#21
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#24 = load i32, ptr %#23, align 1
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = add i32 %#25, noundef %#1
+  %#27 = fshl i32 %#26, i32 %#26, i32 13
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = freeze i32 %#28
+  %#30 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#31 = load i32, ptr %#30, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#9
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#38 = fshl i32 %#15, i32 %#15, i32 1
+  %#39 = fshl i32 %#22, i32 %#22, i32 7
+  %#40 = fshl i32 %#29, i32 %#29, i32 12
+  %#41 = fshl i32 %#36, i32 %#36, i32 18
+  %#42 = add i32 %#38, 31
+  %#43 = add i32 %#42, %#39
+  %#44 = add i32 %#43, %#40
+  %#45 = add i32 %#44, %#41
+  br label %#3
+
+#3:
+  %#46 = phi i32 [ %#54, %#3 ], [ %#45, %#2 ]
+  %#47 = phi i64 [ %#55, %#3 ], [ 15, %#2 ]
+  %#48 = phi ptr [ %#52, %#3 ], [ %#37, %#2 ]
+  %#49 = load i32, ptr %#48, align 1
+  %#50 = mul i32 %#49, 3266489917
+  %#51 = add i32 %#50, %#46
+  %#52 = gep inbounds nuw ptr %#48, 1 x i64 4
+  %#53 = fshl i32 %#51, i32 %#51, i32 17
+  %#54 = mul i32 %#53, 668265263
+  %#55 = add nsw i64 %#47, -4
+  %#56 = icmp ugt i64 %#55, 3
+  br i1 %#56, label %#3, label %#4
+
+#4:
+  %#57 = gep ptr nowrite noundef %#0, 1 x i64 28
+  br label %#5
+
+#5:
+  %#58 = phi i32 [ %#67, %#5 ], [ %#54, %#4 ]
+  %#59 = phi i64 [ %#68, %#5 ], [ 3, %#4 ]
+  %#60 = phi ptr [ %#61, %#5 ], [ %#57, %#4 ]
+  %#61 = gep inbounds nuw ptr %#60, 1 x i64 1
+  %#62 = load i8, ptr %#60, align 1
+  %#63 = zext i8 %#62 to i32
+  %#64 = mul i32 %#63, 374761393
+  %#65 = add i32 %#64, %#58
+  %#66 = fshl i32 %#65, i32 %#65, i32 11
+  %#67 = mul i32 %#66, 2654435761
+  %#68 = add nsw i64 %#59, -1
+  %#69 = icmp eq i64 %#68, 0
+  br i1 %#69, label %#6, label %#5
+
+#6:
+  %#70 = lshr i32 %#67, 15
+  %#71 = xor i32 %#70, %#67
+  %#72 = mul i32 %#71, 2246822519
+  %#73 = lshr i32 %#72, 13
+  %#74 = xor i32 %#73, %#72
+  %#75 = mul i32 %#74, 3266489917
+  %#76 = lshr i32 %#75, 16
+  %#77 = xor i32 %#76, %#75
+  ret i32 %#77
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i32 @target_xxh32_len40(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#7 = add i32 noundef %#1, 606290984
+  %#8 = add i32 noundef %#1, 2246822519
+  %#9 = add i32 noundef %#1, 1640531535
+  br label %#3
+
+#3:
+  %#10 = phi i1 [ 1, %#2 ], [ 0, %#3 ]
+  %#11 = phi i64 [ 0, %#2 ], [ 16, %#3 ]
+  %#12 = phi i32 [ %#7, %#2 ], [ %#22, %#3 ]
+  %#13 = phi i32 [ %#8, %#2 ], [ %#29, %#3 ]
+  %#14 = phi i32 [ noundef %#1, %#2 ], [ %#36, %#3 ]
+  %#15 = phi i32 [ %#9, %#2 ], [ %#43, %#3 ]
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#11
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = add i32 %#18, %#12
+  %#20 = fshl i32 %#19, i32 %#19, i32 13
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = freeze i32 %#21
+  %#23 = gep inbounds nuw ptr %#16, 1 x i64 4
+  %#24 = load i32, ptr %#23, align 1
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = add i32 %#25, %#13
+  %#27 = fshl i32 %#26, i32 %#26, i32 13
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = freeze i32 %#28
+  %#30 = gep inbounds nuw ptr %#16, 1 x i64 8
+  %#31 = load i32, ptr %#30, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#14
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = gep inbounds nuw ptr %#16, 1 x i64 12
+  %#38 = load i32, ptr %#37, align 1
+  %#39 = mul i32 %#38, 2246822519
+  %#40 = add i32 %#39, %#15
+  %#41 = fshl i32 %#40, i32 %#40, i32 13
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = freeze i32 %#42
+  br i1 %#10, label %#3, label %#4
+
+#4:
+  %#44 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 32
+  %#45 = fshl i32 %#22, i32 %#22, i32 1
+  %#46 = fshl i32 %#29, i32 %#29, i32 7
+  %#47 = fshl i32 %#36, i32 %#36, i32 12
+  %#48 = fshl i32 %#43, i32 %#43, i32 18
+  %#49 = add i32 %#45, 40
+  %#50 = add i32 %#49, %#46
+  %#51 = add i32 %#50, %#47
+  %#52 = add i32 %#51, %#48
+  br label %#5
+
+#5:
+  %#53 = phi i32 [ %#61, %#5 ], [ %#52, %#4 ]
+  %#54 = phi i64 [ %#62, %#5 ], [ 8, %#4 ]
+  %#55 = phi ptr [ %#59, %#5 ], [ %#44, %#4 ]
+  %#56 = load i32, ptr %#55, align 1
+  %#57 = mul i32 %#56, 3266489917
+  %#58 = add i32 %#57, %#53
+  %#59 = gep inbounds nuw ptr %#55, 1 x i64 4
+  %#60 = fshl i32 %#58, i32 %#58, i32 17
+  %#61 = mul i32 %#60, 668265263
+  %#62 = add nsw i64 %#54, -4
+  %#63 = icmp eq i64 %#62, 0
+  br i1 %#63, label %#6, label %#5
+
+#6:
+  %#64 = lshr i32 %#61, 15
+  %#65 = xor i32 %#64, %#61
+  %#66 = mul i32 %#65, 2246822519
+  %#67 = lshr i32 %#66, 13
+  %#68 = xor i32 %#67, %#66
+  %#69 = mul i32 %#68, 3266489917
+  %#70 = lshr i32 %#69, 16
+  %#71 = xor i32 %#70, %#69
+  ret i32 %#71
+}
+=>
+define i32 @target_xxh32_len40(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#7 = add i32 noundef %#1, 606290984
+  %#8 = add i32 noundef %#1, 2246822519
+  %#9 = add i32 noundef %#1, 1640531535
+  br label %#3
+
+#3:
+  %#10 = phi i1 [ 1, %#2 ], [ 0, %#3 ]
+  %#11 = phi i64 [ 0, %#2 ], [ 16, %#3 ]
+  %#12 = phi i32 [ %#7, %#2 ], [ %#22, %#3 ]
+  %#13 = phi i32 [ %#8, %#2 ], [ %#29, %#3 ]
+  %#14 = phi i32 [ noundef %#1, %#2 ], [ %#36, %#3 ]
+  %#15 = phi i32 [ %#9, %#2 ], [ %#43, %#3 ]
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#11
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = add i32 %#18, %#12
+  %#20 = fshl i32 %#19, i32 %#19, i32 13
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = freeze i32 %#21
+  %#23 = gep inbounds nuw ptr %#16, 1 x i64 4
+  %#24 = load i32, ptr %#23, align 1
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = add i32 %#25, %#13
+  %#27 = fshl i32 %#26, i32 %#26, i32 13
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = freeze i32 %#28
+  %#30 = gep inbounds nuw ptr %#16, 1 x i64 8
+  %#31 = load i32, ptr %#30, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#14
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = gep inbounds nuw ptr %#16, 1 x i64 12
+  %#38 = load i32, ptr %#37, align 1
+  %#39 = mul i32 %#38, 2246822519
+  %#40 = add i32 %#39, %#15
+  %#41 = fshl i32 %#40, i32 %#40, i32 13
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = freeze i32 %#42
+  br i1 %#10, label %#3, label %#4
+
+#4:
+  %#44 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 32
+  %#45 = fshl i32 %#22, i32 %#22, i32 1
+  %#46 = fshl i32 %#29, i32 %#29, i32 7
+  %#47 = fshl i32 %#36, i32 %#36, i32 12
+  %#48 = fshl i32 %#43, i32 %#43, i32 18
+  %#49 = add i32 %#45, 40
+  %#50 = add i32 %#49, %#46
+  %#51 = add i32 %#50, %#47
+  %#52 = add i32 %#51, %#48
+  br label %#5
+
+#5:
+  %#53 = phi i32 [ %#61, %#5 ], [ %#52, %#4 ]
+  %#54 = phi i64 [ %#62, %#5 ], [ 8, %#4 ]
+  %#55 = phi ptr [ %#59, %#5 ], [ %#44, %#4 ]
+  %#56 = load i32, ptr %#55, align 1
+  %#57 = mul i32 %#56, 3266489917
+  %#58 = add i32 %#57, %#53
+  %#59 = gep inbounds nuw ptr %#55, 1 x i64 4
+  %#60 = fshl i32 %#58, i32 %#58, i32 17
+  %#61 = mul i32 %#60, 668265263
+  %#62 = add nsw i64 %#54, -4
+  %#63 = icmp eq i64 %#62, 0
+  br i1 %#63, label %#6, label %#5
+
+#6:
+  %#64 = lshr i32 %#61, 15
+  %#65 = xor i32 %#64, %#61
+  %#66 = mul i32 %#65, 2246822519
+  %#67 = lshr i32 %#66, 13
+  %#68 = xor i32 %#67, %#66
+  %#69 = mul i32 %#68, 3266489917
+  %#70 = lshr i32 %#69, 16
+  %#71 = xor i32 %#70, %#69
+  ret i32 %#71
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  5 failed-to-prove transformations
+  0 Alive2 errors

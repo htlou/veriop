@@ -1,0 +1,1997 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/1978f27/api256/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/1978f27/api256/old.ll
+
+----------------------------------------
+define <4 x i64> @target_u16_api_vec256(<4 x i64> noundef %#0, i16 noundef zeroext %#1) nofree willreturn memory(none) {
+#2:
+  %#12 = icmp eq i16 noundef zeroext %#1, 0
+  br i1 %#12, label %#11, label %#3
+
+#3:
+  %#13 = zext i16 noundef zeroext %#1 to i32
+  %#14 = ctlz i16 noundef zeroext %#1, 1
+  %#range_0_%#14 = !range i16 %#14, i16 0, i16 16
+  %#15 = trunc nsw nuw i16 %#range_0_%#14 to i8
+  %#16 = xor i8 %#15, 15
+  %#17 = add nsw nuw i32 %#13, 65535
+  %#18 = and i32 %#17, %#13
+  %#19 = icmp eq i32 %#18, 0
+  br i1 %#19, label %#7, label %#4
+
+#4:
+  %#20 = zext nneg i8 %#16 to i32
+  %#21 = shl nuw i32 65536, %#20
+  %#22 = udiv i32 %#21, %#13
+  %#23 = trunc i32 %#22 to i16
+  %#24 = mul i16 noundef zeroext %#1, %#23
+  %#25 = add i16 %#24, noundef zeroext %#1
+  %#26 = zext i16 %#25 to i32
+  %#27 = lshr i32 %#26, %#20
+  %#28 = icmp eq i32 %#27, 0
+  br i1 %#28, label %#6, label %#5
+
+#5:
+  %#29 = sub i16 0, %#24
+  %#30 = shl i16 %#23, 1
+  %#31 = shl i16 %#29, 1
+  %#32 = icmp uge i16 %#31, noundef zeroext %#1
+  %#33 = icmp slt i16 %#29, 0
+  %#34 = or i1 %#33, %#32
+  %#35 = zext i1 %#34 to i16
+  %#36 = or disjoint i16 %#30, %#35
+  %#37 = or disjoint i8 %#16, 64
+  br label %#6
+
+#6:
+  %#38 = phi i16 [ %#36, %#5 ], [ %#23, %#4 ]
+  %#39 = phi i8 [ %#37, %#5 ], [ %#16, %#4 ]
+  %#40 = add i16 %#38, 1
+  %#41 = icmp eq i16 %#40, 0
+  br i1 %#41, label %#7, label %#8
+
+#7:
+  %#42 = phi i8 [ %#39, %#6 ], [ %#16, %#3 ]
+  %#43 = zext nneg i8 %#42 to i32
+  %#44 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#45 = x86_avx2_psrli_w <16 x i16> %#44, i32 %#43
+  %#46 = bitcast <16 x i16> %#45 to <4 x i64>
+  br label %#11
+
+#8:
+  %#47 = insertelement <16 x i16> poison, i16 %#40, i64 0
+  %#48 = shufflevector <16 x i16> %#47, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#49 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#50 = x86_avx2_pmulhu_w <16 x i16> %#49, <16 x i16> %#48
+  %#51 = zext nneg i8 %#39 to i32
+  %#52 = icmp samesign ult i8 %#39, 64
+  br i1 %#52, label %#9, label %#10
+
+#9:
+  %#53 = x86_avx2_psrli_w <16 x i16> %#50, i32 %#51
+  %#54 = bitcast <16 x i16> %#53 to <4 x i64>
+  br label %#11
+
+#10:
+  %#55 = usub_sat <16 x i16> %#49, %#50
+  %#56 = lshr <16 x i16> %#55, { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+  %#57 = uadd_sat <16 x i16> %#56, %#50
+  %#58 = and i32 %#51, 31
+  %#59 = x86_avx2_psrli_w <16 x i16> %#57, i32 %#58
+  %#60 = bitcast <16 x i16> %#59 to <4 x i64>
+  br label %#11
+
+#11:
+  %#61 = phi <4 x i64> [ noundef %#0, %#2 ], [ %#46, %#7 ], [ %#60, %#10 ], [ %#54, %#9 ]
+  ret <4 x i64> %#61
+}
+=>
+define <4 x i64> @target_u16_api_vec256(<4 x i64> noundef %#0, i16 noundef zeroext %#1) nofree willreturn memory(none) {
+#2:
+  %#14 = icmp eq i16 noundef zeroext %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = zext i16 noundef zeroext %#1 to i32
+  %#16 = ctlz i16 noundef zeroext %#1, 1
+  %#range_0_%#16 = !range i16 %#16, i16 0, i16 16
+  %#17 = trunc nsw nuw i16 %#range_0_%#16 to i8
+  %#18 = xor i8 %#17, 15
+  %#19 = add nsw nuw i32 %#15, 65535
+  %#20 = and i32 %#19, %#15
+  %#21 = icmp eq i32 %#20, 0
+  br i1 %#21, label %#4, label %#5
+
+#4:
+  %#22 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#23 = zext nneg i8 %#18 to i32
+  br label %#8
+
+#5:
+  %#24 = zext nneg i8 %#18 to i32
+  %#25 = shl nuw i32 65536, %#24
+  %#26 = udiv i32 %#25, %#15
+  %#27 = trunc i32 %#26 to i16
+  %#28 = mul i16 noundef zeroext %#1, %#27
+  %#29 = add i16 %#28, noundef zeroext %#1
+  %#30 = zext i16 %#29 to i32
+  %#31 = lshr i32 %#30, %#24
+  %#32 = icmp eq i32 %#31, 0
+  br i1 %#32, label %#7, label %#6
+
+#6:
+  %#33 = sub i16 0, %#28
+  %#34 = shl i16 %#27, 1
+  %#35 = shl i16 %#33, 1
+  %#36 = icmp uge i16 %#35, noundef zeroext %#1
+  %#37 = icmp slt i16 %#33, 0
+  %#38 = or i1 %#37, %#36
+  %#39 = zext i1 %#38 to i16
+  %#40 = or disjoint i16 %#34, %#39
+  %#41 = or disjoint i8 %#18, 64
+  br label %#7
+
+#7:
+  %#42 = phi i16 [ %#40, %#6 ], [ %#27, %#5 ]
+  %#43 = phi i8 [ %#41, %#6 ], [ %#18, %#5 ]
+  %#44 = add i16 %#42, 1
+  %#45 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#46 = icmp eq i16 %#44, 0
+  %#47 = zext i16 %#44 to i32
+  %#48 = zext nneg i8 %#43 to i32
+  %#49 = and i32 %#48, 31
+  br i1 %#46, label %#8, label %#9
+
+#8:
+  %#50 = phi i32 [ %#23, %#4 ], [ %#48, %#7 ]
+  %#51 = phi <16 x i16> [ %#22, %#4 ], [ %#45, %#7 ]
+  %#52 = extractelement <16 x i16> %#51, i64 0
+  %#53 = zext i16 %#52 to i32
+  %#54 = lshr i32 %#53, %#50
+  %#55 = trunc nuw i32 %#54 to i16
+  %#56 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#55, i64 0
+  %#57 = extractelement <16 x i16> %#51, i64 1
+  %#58 = zext i16 %#57 to i32
+  %#59 = lshr i32 %#58, %#50
+  %#60 = trunc nuw i32 %#59 to i16
+  %#61 = insertelement <16 x i16> %#56, i16 %#60, i64 1
+  %#62 = extractelement <16 x i16> %#51, i64 2
+  %#63 = zext i16 %#62 to i32
+  %#64 = lshr i32 %#63, %#50
+  %#65 = trunc nuw i32 %#64 to i16
+  %#66 = insertelement <16 x i16> %#61, i16 %#65, i64 2
+  %#67 = extractelement <16 x i16> %#51, i64 3
+  %#68 = zext i16 %#67 to i32
+  %#69 = lshr i32 %#68, %#50
+  %#70 = trunc nuw i32 %#69 to i16
+  %#71 = insertelement <16 x i16> %#66, i16 %#70, i64 3
+  %#72 = extractelement <16 x i16> %#51, i64 4
+  %#73 = zext i16 %#72 to i32
+  %#74 = lshr i32 %#73, %#50
+  %#75 = trunc nuw i32 %#74 to i16
+  %#76 = insertelement <16 x i16> %#71, i16 %#75, i64 4
+  %#77 = extractelement <16 x i16> %#51, i64 5
+  %#78 = zext i16 %#77 to i32
+  %#79 = lshr i32 %#78, %#50
+  %#80 = trunc nuw i32 %#79 to i16
+  %#81 = insertelement <16 x i16> %#76, i16 %#80, i64 5
+  %#82 = extractelement <16 x i16> %#51, i64 6
+  %#83 = zext i16 %#82 to i32
+  %#84 = lshr i32 %#83, %#50
+  %#85 = trunc nuw i32 %#84 to i16
+  %#86 = insertelement <16 x i16> %#81, i16 %#85, i64 6
+  %#87 = extractelement <16 x i16> %#51, i64 7
+  %#88 = zext i16 %#87 to i32
+  %#89 = lshr i32 %#88, %#50
+  %#90 = trunc nuw i32 %#89 to i16
+  %#91 = insertelement <16 x i16> %#86, i16 %#90, i64 7
+  %#92 = extractelement <16 x i16> %#51, i64 8
+  %#93 = zext i16 %#92 to i32
+  %#94 = lshr i32 %#93, %#50
+  %#95 = trunc nuw i32 %#94 to i16
+  %#96 = insertelement <16 x i16> %#91, i16 %#95, i64 8
+  %#97 = extractelement <16 x i16> %#51, i64 9
+  %#98 = zext i16 %#97 to i32
+  %#99 = lshr i32 %#98, %#50
+  %#100 = trunc nuw i32 %#99 to i16
+  %#101 = insertelement <16 x i16> %#96, i16 %#100, i64 9
+  %#102 = extractelement <16 x i16> %#51, i64 10
+  %#103 = zext i16 %#102 to i32
+  %#104 = lshr i32 %#103, %#50
+  %#105 = trunc nuw i32 %#104 to i16
+  %#106 = insertelement <16 x i16> %#101, i16 %#105, i64 10
+  %#107 = extractelement <16 x i16> %#51, i64 11
+  %#108 = zext i16 %#107 to i32
+  %#109 = lshr i32 %#108, %#50
+  %#110 = trunc nuw i32 %#109 to i16
+  %#111 = insertelement <16 x i16> %#106, i16 %#110, i64 11
+  %#112 = extractelement <16 x i16> %#51, i64 12
+  %#113 = zext i16 %#112 to i32
+  %#114 = lshr i32 %#113, %#50
+  %#115 = trunc nuw i32 %#114 to i16
+  %#116 = insertelement <16 x i16> %#111, i16 %#115, i64 12
+  %#117 = extractelement <16 x i16> %#51, i64 13
+  %#118 = zext i16 %#117 to i32
+  %#119 = lshr i32 %#118, %#50
+  %#120 = trunc nuw i32 %#119 to i16
+  %#121 = insertelement <16 x i16> %#116, i16 %#120, i64 13
+  %#122 = extractelement <16 x i16> %#51, i64 14
+  %#123 = zext i16 %#122 to i32
+  %#124 = lshr i32 %#123, %#50
+  %#125 = trunc nuw i32 %#124 to i16
+  %#126 = insertelement <16 x i16> %#121, i16 %#125, i64 14
+  %#127 = extractelement <16 x i16> %#51, i64 15
+  %#128 = zext i16 %#127 to i32
+  %#129 = lshr i32 %#128, %#50
+  br label %#12
+
+#9:
+  %#130 = icmp samesign ult i8 %#43, 64
+  %#131 = extractelement <16 x i16> %#45, i64 0
+  %#132 = zext i16 %#131 to i32
+  %#133 = mul nuw i32 %#132, %#47
+  %#134 = lshr i32 %#133, 16
+  br i1 %#130, label %#10, label %#11
+
+#10:
+  %#135 = lshr i32 %#134, %#48
+  %#136 = trunc nuw i32 %#135 to i16
+  %#137 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#136, i64 0
+  %#138 = extractelement <16 x i16> %#45, i64 1
+  %#139 = zext i16 %#138 to i32
+  %#140 = mul nuw i32 %#139, %#47
+  %#141 = lshr i32 %#140, 16
+  %#142 = lshr i32 %#141, %#48
+  %#143 = trunc nuw i32 %#142 to i16
+  %#144 = insertelement <16 x i16> %#137, i16 %#143, i64 1
+  %#145 = extractelement <16 x i16> %#45, i64 2
+  %#146 = zext i16 %#145 to i32
+  %#147 = mul nuw i32 %#146, %#47
+  %#148 = lshr i32 %#147, 16
+  %#149 = lshr i32 %#148, %#48
+  %#150 = trunc nuw i32 %#149 to i16
+  %#151 = insertelement <16 x i16> %#144, i16 %#150, i64 2
+  %#152 = extractelement <16 x i16> %#45, i64 3
+  %#153 = zext i16 %#152 to i32
+  %#154 = mul nuw i32 %#153, %#47
+  %#155 = lshr i32 %#154, 16
+  %#156 = lshr i32 %#155, %#48
+  %#157 = trunc nuw i32 %#156 to i16
+  %#158 = insertelement <16 x i16> %#151, i16 %#157, i64 3
+  %#159 = extractelement <16 x i16> %#45, i64 4
+  %#160 = zext i16 %#159 to i32
+  %#161 = mul nuw i32 %#160, %#47
+  %#162 = lshr i32 %#161, 16
+  %#163 = lshr i32 %#162, %#48
+  %#164 = trunc nuw i32 %#163 to i16
+  %#165 = insertelement <16 x i16> %#158, i16 %#164, i64 4
+  %#166 = extractelement <16 x i16> %#45, i64 5
+  %#167 = zext i16 %#166 to i32
+  %#168 = mul nuw i32 %#167, %#47
+  %#169 = lshr i32 %#168, 16
+  %#170 = lshr i32 %#169, %#48
+  %#171 = trunc nuw i32 %#170 to i16
+  %#172 = insertelement <16 x i16> %#165, i16 %#171, i64 5
+  %#173 = extractelement <16 x i16> %#45, i64 6
+  %#174 = zext i16 %#173 to i32
+  %#175 = mul nuw i32 %#174, %#47
+  %#176 = lshr i32 %#175, 16
+  %#177 = lshr i32 %#176, %#48
+  %#178 = trunc nuw i32 %#177 to i16
+  %#179 = insertelement <16 x i16> %#172, i16 %#178, i64 6
+  %#180 = extractelement <16 x i16> %#45, i64 7
+  %#181 = zext i16 %#180 to i32
+  %#182 = mul nuw i32 %#181, %#47
+  %#183 = lshr i32 %#182, 16
+  %#184 = lshr i32 %#183, %#48
+  %#185 = trunc nuw i32 %#184 to i16
+  %#186 = insertelement <16 x i16> %#179, i16 %#185, i64 7
+  %#187 = extractelement <16 x i16> %#45, i64 8
+  %#188 = zext i16 %#187 to i32
+  %#189 = mul nuw i32 %#188, %#47
+  %#190 = lshr i32 %#189, 16
+  %#191 = lshr i32 %#190, %#48
+  %#192 = trunc nuw i32 %#191 to i16
+  %#193 = insertelement <16 x i16> %#186, i16 %#192, i64 8
+  %#194 = extractelement <16 x i16> %#45, i64 9
+  %#195 = zext i16 %#194 to i32
+  %#196 = mul nuw i32 %#195, %#47
+  %#197 = lshr i32 %#196, 16
+  %#198 = lshr i32 %#197, %#48
+  %#199 = trunc nuw i32 %#198 to i16
+  %#200 = insertelement <16 x i16> %#193, i16 %#199, i64 9
+  %#201 = extractelement <16 x i16> %#45, i64 10
+  %#202 = zext i16 %#201 to i32
+  %#203 = mul nuw i32 %#202, %#47
+  %#204 = lshr i32 %#203, 16
+  %#205 = lshr i32 %#204, %#48
+  %#206 = trunc nuw i32 %#205 to i16
+  %#207 = insertelement <16 x i16> %#200, i16 %#206, i64 10
+  %#208 = extractelement <16 x i16> %#45, i64 11
+  %#209 = zext i16 %#208 to i32
+  %#210 = mul nuw i32 %#209, %#47
+  %#211 = lshr i32 %#210, 16
+  %#212 = lshr i32 %#211, %#48
+  %#213 = trunc nuw i32 %#212 to i16
+  %#214 = insertelement <16 x i16> %#207, i16 %#213, i64 11
+  %#215 = extractelement <16 x i16> %#45, i64 12
+  %#216 = zext i16 %#215 to i32
+  %#217 = mul nuw i32 %#216, %#47
+  %#218 = lshr i32 %#217, 16
+  %#219 = lshr i32 %#218, %#48
+  %#220 = trunc nuw i32 %#219 to i16
+  %#221 = insertelement <16 x i16> %#214, i16 %#220, i64 12
+  %#222 = extractelement <16 x i16> %#45, i64 13
+  %#223 = zext i16 %#222 to i32
+  %#224 = mul nuw i32 %#223, %#47
+  %#225 = lshr i32 %#224, 16
+  %#226 = lshr i32 %#225, %#48
+  %#227 = trunc nuw i32 %#226 to i16
+  %#228 = insertelement <16 x i16> %#221, i16 %#227, i64 13
+  %#229 = extractelement <16 x i16> %#45, i64 14
+  %#230 = zext i16 %#229 to i32
+  %#231 = mul nuw i32 %#230, %#47
+  %#232 = lshr i32 %#231, 16
+  %#233 = lshr i32 %#232, %#48
+  %#234 = trunc nuw i32 %#233 to i16
+  %#235 = insertelement <16 x i16> %#228, i16 %#234, i64 14
+  %#236 = extractelement <16 x i16> %#45, i64 15
+  %#237 = zext i16 %#236 to i32
+  %#238 = mul nuw i32 %#237, %#47
+  %#239 = lshr i32 %#238, 16
+  %#240 = lshr i32 %#239, %#48
+  br label %#12
+
+#11:
+  %#241 = sub nsw i32 %#132, %#134
+  %#242 = lshr i32 %#241, 1
+  %#243 = add nuw i32 %#242, %#134
+  %#244 = and i32 %#243, 65535
+  %#245 = lshr i32 %#244, %#49
+  %#246 = trunc nuw i32 %#245 to i16
+  %#247 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#246, i64 0
+  %#248 = extractelement <16 x i16> %#45, i64 1
+  %#249 = zext i16 %#248 to i32
+  %#250 = mul nuw i32 %#249, %#47
+  %#251 = lshr i32 %#250, 16
+  %#252 = sub nsw i32 %#249, %#251
+  %#253 = lshr i32 %#252, 1
+  %#254 = add nuw i32 %#253, %#251
+  %#255 = and i32 %#254, 65535
+  %#256 = lshr i32 %#255, %#49
+  %#257 = trunc nuw i32 %#256 to i16
+  %#258 = insertelement <16 x i16> %#247, i16 %#257, i64 1
+  %#259 = extractelement <16 x i16> %#45, i64 2
+  %#260 = zext i16 %#259 to i32
+  %#261 = mul nuw i32 %#260, %#47
+  %#262 = lshr i32 %#261, 16
+  %#263 = sub nsw i32 %#260, %#262
+  %#264 = lshr i32 %#263, 1
+  %#265 = add nuw i32 %#264, %#262
+  %#266 = and i32 %#265, 65535
+  %#267 = lshr i32 %#266, %#49
+  %#268 = trunc nuw i32 %#267 to i16
+  %#269 = insertelement <16 x i16> %#258, i16 %#268, i64 2
+  %#270 = extractelement <16 x i16> %#45, i64 3
+  %#271 = zext i16 %#270 to i32
+  %#272 = mul nuw i32 %#271, %#47
+  %#273 = lshr i32 %#272, 16
+  %#274 = sub nsw i32 %#271, %#273
+  %#275 = lshr i32 %#274, 1
+  %#276 = add nuw i32 %#275, %#273
+  %#277 = and i32 %#276, 65535
+  %#278 = lshr i32 %#277, %#49
+  %#279 = trunc nuw i32 %#278 to i16
+  %#280 = insertelement <16 x i16> %#269, i16 %#279, i64 3
+  %#281 = extractelement <16 x i16> %#45, i64 4
+  %#282 = zext i16 %#281 to i32
+  %#283 = mul nuw i32 %#282, %#47
+  %#284 = lshr i32 %#283, 16
+  %#285 = sub nsw i32 %#282, %#284
+  %#286 = lshr i32 %#285, 1
+  %#287 = add nuw i32 %#286, %#284
+  %#288 = and i32 %#287, 65535
+  %#289 = lshr i32 %#288, %#49
+  %#290 = trunc nuw i32 %#289 to i16
+  %#291 = insertelement <16 x i16> %#280, i16 %#290, i64 4
+  %#292 = extractelement <16 x i16> %#45, i64 5
+  %#293 = zext i16 %#292 to i32
+  %#294 = mul nuw i32 %#293, %#47
+  %#295 = lshr i32 %#294, 16
+  %#296 = sub nsw i32 %#293, %#295
+  %#297 = lshr i32 %#296, 1
+  %#298 = add nuw i32 %#297, %#295
+  %#299 = and i32 %#298, 65535
+  %#300 = lshr i32 %#299, %#49
+  %#301 = trunc nuw i32 %#300 to i16
+  %#302 = insertelement <16 x i16> %#291, i16 %#301, i64 5
+  %#303 = extractelement <16 x i16> %#45, i64 6
+  %#304 = zext i16 %#303 to i32
+  %#305 = mul nuw i32 %#304, %#47
+  %#306 = lshr i32 %#305, 16
+  %#307 = sub nsw i32 %#304, %#306
+  %#308 = lshr i32 %#307, 1
+  %#309 = add nuw i32 %#308, %#306
+  %#310 = and i32 %#309, 65535
+  %#311 = lshr i32 %#310, %#49
+  %#312 = trunc nuw i32 %#311 to i16
+  %#313 = insertelement <16 x i16> %#302, i16 %#312, i64 6
+  %#314 = extractelement <16 x i16> %#45, i64 7
+  %#315 = zext i16 %#314 to i32
+  %#316 = mul nuw i32 %#315, %#47
+  %#317 = lshr i32 %#316, 16
+  %#318 = sub nsw i32 %#315, %#317
+  %#319 = lshr i32 %#318, 1
+  %#320 = add nuw i32 %#319, %#317
+  %#321 = and i32 %#320, 65535
+  %#322 = lshr i32 %#321, %#49
+  %#323 = trunc nuw i32 %#322 to i16
+  %#324 = insertelement <16 x i16> %#313, i16 %#323, i64 7
+  %#325 = extractelement <16 x i16> %#45, i64 8
+  %#326 = zext i16 %#325 to i32
+  %#327 = mul nuw i32 %#326, %#47
+  %#328 = lshr i32 %#327, 16
+  %#329 = sub nsw i32 %#326, %#328
+  %#330 = lshr i32 %#329, 1
+  %#331 = add nuw i32 %#330, %#328
+  %#332 = and i32 %#331, 65535
+  %#333 = lshr i32 %#332, %#49
+  %#334 = trunc nuw i32 %#333 to i16
+  %#335 = insertelement <16 x i16> %#324, i16 %#334, i64 8
+  %#336 = extractelement <16 x i16> %#45, i64 9
+  %#337 = zext i16 %#336 to i32
+  %#338 = mul nuw i32 %#337, %#47
+  %#339 = lshr i32 %#338, 16
+  %#340 = sub nsw i32 %#337, %#339
+  %#341 = lshr i32 %#340, 1
+  %#342 = add nuw i32 %#341, %#339
+  %#343 = and i32 %#342, 65535
+  %#344 = lshr i32 %#343, %#49
+  %#345 = trunc nuw i32 %#344 to i16
+  %#346 = insertelement <16 x i16> %#335, i16 %#345, i64 9
+  %#347 = extractelement <16 x i16> %#45, i64 10
+  %#348 = zext i16 %#347 to i32
+  %#349 = mul nuw i32 %#348, %#47
+  %#350 = lshr i32 %#349, 16
+  %#351 = sub nsw i32 %#348, %#350
+  %#352 = lshr i32 %#351, 1
+  %#353 = add nuw i32 %#352, %#350
+  %#354 = and i32 %#353, 65535
+  %#355 = lshr i32 %#354, %#49
+  %#356 = trunc nuw i32 %#355 to i16
+  %#357 = insertelement <16 x i16> %#346, i16 %#356, i64 10
+  %#358 = extractelement <16 x i16> %#45, i64 11
+  %#359 = zext i16 %#358 to i32
+  %#360 = mul nuw i32 %#359, %#47
+  %#361 = lshr i32 %#360, 16
+  %#362 = sub nsw i32 %#359, %#361
+  %#363 = lshr i32 %#362, 1
+  %#364 = add nuw i32 %#363, %#361
+  %#365 = and i32 %#364, 65535
+  %#366 = lshr i32 %#365, %#49
+  %#367 = trunc nuw i32 %#366 to i16
+  %#368 = insertelement <16 x i16> %#357, i16 %#367, i64 11
+  %#369 = extractelement <16 x i16> %#45, i64 12
+  %#370 = zext i16 %#369 to i32
+  %#371 = mul nuw i32 %#370, %#47
+  %#372 = lshr i32 %#371, 16
+  %#373 = sub nsw i32 %#370, %#372
+  %#374 = lshr i32 %#373, 1
+  %#375 = add nuw i32 %#374, %#372
+  %#376 = and i32 %#375, 65535
+  %#377 = lshr i32 %#376, %#49
+  %#378 = trunc nuw i32 %#377 to i16
+  %#379 = insertelement <16 x i16> %#368, i16 %#378, i64 12
+  %#380 = extractelement <16 x i16> %#45, i64 13
+  %#381 = zext i16 %#380 to i32
+  %#382 = mul nuw i32 %#381, %#47
+  %#383 = lshr i32 %#382, 16
+  %#384 = sub nsw i32 %#381, %#383
+  %#385 = lshr i32 %#384, 1
+  %#386 = add nuw i32 %#385, %#383
+  %#387 = and i32 %#386, 65535
+  %#388 = lshr i32 %#387, %#49
+  %#389 = trunc nuw i32 %#388 to i16
+  %#390 = insertelement <16 x i16> %#379, i16 %#389, i64 13
+  %#391 = extractelement <16 x i16> %#45, i64 14
+  %#392 = zext i16 %#391 to i32
+  %#393 = mul nuw i32 %#392, %#47
+  %#394 = lshr i32 %#393, 16
+  %#395 = sub nsw i32 %#392, %#394
+  %#396 = lshr i32 %#395, 1
+  %#397 = add nuw i32 %#396, %#394
+  %#398 = and i32 %#397, 65535
+  %#399 = lshr i32 %#398, %#49
+  %#400 = trunc nuw i32 %#399 to i16
+  %#401 = insertelement <16 x i16> %#390, i16 %#400, i64 14
+  %#402 = extractelement <16 x i16> %#45, i64 15
+  %#403 = zext i16 %#402 to i32
+  %#404 = mul nuw i32 %#403, %#47
+  %#405 = lshr i32 %#404, 16
+  %#406 = sub nsw i32 %#403, %#405
+  %#407 = lshr i32 %#406, 1
+  %#408 = add nuw i32 %#407, %#405
+  %#409 = and i32 %#408, 65535
+  %#410 = lshr i32 %#409, %#49
+  br label %#12
+
+#12:
+  %#411 = phi i32 [ %#410, %#11 ], [ %#240, %#10 ], [ %#129, %#8 ]
+  %#412 = phi <16 x i16> [ %#401, %#11 ], [ %#235, %#10 ], [ %#126, %#8 ]
+  %#413 = trunc nuw i32 %#411 to i16
+  %#414 = insertelement <16 x i16> %#412, i16 %#413, i64 15
+  %#415 = bitcast <16 x i16> %#414 to <4 x i64>
+  br label %#13
+
+#13:
+  %#416 = phi <4 x i64> [ %#415, %#12 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#416
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <4 x i64> @target_u16bf_api_vec256(<4 x i64> noundef %#0, i16 noundef zeroext %#1) nofree willreturn memory(none) {
+#2:
+  %#8 = icmp ult i16 noundef zeroext %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = zext i16 noundef zeroext %#1 to i32
+  %#10 = ctlz i16 noundef zeroext %#1, 1
+  %#range_0_%#10 = !range i16 %#10, i16 0, i16 16
+  %#11 = trunc nsw nuw i16 %#range_0_%#10 to i8
+  %#12 = add nsw nuw i32 %#9, 65535
+  %#13 = and i32 %#12, %#9
+  %#14 = icmp eq i32 %#13, 0
+  br i1 %#14, label %#4, label %#5
+
+#4:
+  %#15 = sub nsw nuw i8 14, %#11
+  br label %#6
+
+#5:
+  %#16 = xor i8 %#11, 15
+  %#17 = zext nneg i8 %#16 to i16
+  %#18 = shl nuw i16 1, %#17
+  %#19 = zext i16 %#18 to i32
+  %#20 = shl nuw i32 %#19, 16
+  %#21 = udiv i32 %#20, %#9
+  %#22 = trunc i32 %#21 to i16
+  %#23 = mul i16 noundef zeroext %#1, %#22
+  %#24 = sub i16 0, %#23
+  %#25 = shl i16 %#22, 1
+  %#26 = shl i16 %#24, 1
+  %#27 = icmp uge i16 %#26, noundef zeroext %#1
+  %#28 = icmp slt i16 %#24, 0
+  %#29 = or i1 %#28, %#27
+  %#30 = zext i1 %#29 to i16
+  %#31 = or disjoint i16 %#25, 1
+  %#32 = add i16 %#31, %#30
+  br label %#6
+
+#6:
+  %#33 = phi i16 [ 0, %#4 ], [ %#32, %#5 ]
+  %#34 = phi i8 [ %#15, %#4 ], [ %#16, %#5 ]
+  %#35 = insertelement <16 x i16> poison, i16 %#33, i64 0
+  %#36 = shufflevector <16 x i16> %#35, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#37 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#38 = x86_avx2_pmulhu_w <16 x i16> %#37, <16 x i16> %#36
+  %#39 = usub_sat <16 x i16> %#37, %#38
+  %#40 = lshr <16 x i16> %#39, { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+  %#41 = uadd_sat <16 x i16> %#40, %#38
+  %#42 = zext nneg i8 %#34 to i32
+  %#43 = x86_avx2_psrli_w <16 x i16> %#41, i32 %#42
+  %#44 = bitcast <16 x i16> %#43 to <4 x i64>
+  br label %#7
+
+#7:
+  %#45 = phi <4 x i64> [ %#44, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#45
+}
+=>
+define <4 x i64> @target_u16bf_api_vec256(<4 x i64> noundef %#0, i16 noundef zeroext %#1) nofree willreturn memory(none) {
+#2:
+  %#8 = icmp ult i16 noundef zeroext %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = zext i16 noundef zeroext %#1 to i32
+  %#10 = ctlz i16 noundef zeroext %#1, 1
+  %#range_0_%#10 = !range i16 %#10, i16 0, i16 16
+  %#11 = trunc nsw nuw i16 %#range_0_%#10 to i8
+  %#12 = add nsw nuw i32 %#9, 65535
+  %#13 = and i32 %#12, %#9
+  %#14 = icmp eq i32 %#13, 0
+  br i1 %#14, label %#4, label %#5
+
+#4:
+  %#15 = sub nsw nuw i8 14, %#11
+  br label %#6
+
+#5:
+  %#16 = xor i8 %#11, 15
+  %#17 = zext nneg i8 %#16 to i16
+  %#18 = shl nuw i16 1, %#17
+  %#19 = zext i16 %#18 to i32
+  %#20 = shl nuw i32 %#19, 16
+  %#21 = udiv i32 %#20, %#9
+  %#22 = trunc i32 %#21 to i16
+  %#23 = mul i16 noundef zeroext %#1, %#22
+  %#24 = sub i16 0, %#23
+  %#25 = shl nuw i32 %#21, 1
+  %#26 = shl i16 %#24, 1
+  %#27 = icmp uge i16 %#26, noundef zeroext %#1
+  %#28 = icmp slt i16 %#24, 0
+  %#29 = or i1 %#28, %#27
+  %#30 = zext i1 %#29 to i32
+  %#31 = or disjoint i32 %#25, 1
+  %#32 = add nuw i32 %#31, %#30
+  %#33 = and i32 %#32, 65535
+  br label %#6
+
+#6:
+  %#34 = phi i32 [ 0, %#4 ], [ %#33, %#5 ]
+  %#35 = phi i8 [ %#15, %#4 ], [ %#16, %#5 ]
+  %#36 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#37 = zext nneg i8 %#35 to i32
+  %#38 = extractelement <16 x i16> %#36, i64 0
+  %#39 = zext i16 %#38 to i32
+  %#40 = mul nuw i32 %#34, %#39
+  %#41 = lshr i32 %#40, 16
+  %#42 = sub nsw i32 %#39, %#41
+  %#43 = lshr i32 %#42, 1
+  %#44 = add nuw i32 %#43, %#41
+  %#45 = and i32 %#44, 65535
+  %#46 = lshr i32 %#45, %#37
+  %#47 = trunc nuw i32 %#46 to i16
+  %#48 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#47, i64 0
+  %#49 = extractelement <16 x i16> %#36, i64 1
+  %#50 = zext i16 %#49 to i32
+  %#51 = mul nuw i32 %#34, %#50
+  %#52 = lshr i32 %#51, 16
+  %#53 = sub nsw i32 %#50, %#52
+  %#54 = lshr i32 %#53, 1
+  %#55 = add nuw i32 %#54, %#52
+  %#56 = and i32 %#55, 65535
+  %#57 = lshr i32 %#56, %#37
+  %#58 = trunc nuw i32 %#57 to i16
+  %#59 = insertelement <16 x i16> %#48, i16 %#58, i64 1
+  %#60 = extractelement <16 x i16> %#36, i64 2
+  %#61 = zext i16 %#60 to i32
+  %#62 = mul nuw i32 %#34, %#61
+  %#63 = lshr i32 %#62, 16
+  %#64 = sub nsw i32 %#61, %#63
+  %#65 = lshr i32 %#64, 1
+  %#66 = add nuw i32 %#65, %#63
+  %#67 = and i32 %#66, 65535
+  %#68 = lshr i32 %#67, %#37
+  %#69 = trunc nuw i32 %#68 to i16
+  %#70 = insertelement <16 x i16> %#59, i16 %#69, i64 2
+  %#71 = extractelement <16 x i16> %#36, i64 3
+  %#72 = zext i16 %#71 to i32
+  %#73 = mul nuw i32 %#34, %#72
+  %#74 = lshr i32 %#73, 16
+  %#75 = sub nsw i32 %#72, %#74
+  %#76 = lshr i32 %#75, 1
+  %#77 = add nuw i32 %#76, %#74
+  %#78 = and i32 %#77, 65535
+  %#79 = lshr i32 %#78, %#37
+  %#80 = trunc nuw i32 %#79 to i16
+  %#81 = insertelement <16 x i16> %#70, i16 %#80, i64 3
+  %#82 = extractelement <16 x i16> %#36, i64 4
+  %#83 = zext i16 %#82 to i32
+  %#84 = mul nuw i32 %#34, %#83
+  %#85 = lshr i32 %#84, 16
+  %#86 = sub nsw i32 %#83, %#85
+  %#87 = lshr i32 %#86, 1
+  %#88 = add nuw i32 %#87, %#85
+  %#89 = and i32 %#88, 65535
+  %#90 = lshr i32 %#89, %#37
+  %#91 = trunc nuw i32 %#90 to i16
+  %#92 = insertelement <16 x i16> %#81, i16 %#91, i64 4
+  %#93 = extractelement <16 x i16> %#36, i64 5
+  %#94 = zext i16 %#93 to i32
+  %#95 = mul nuw i32 %#34, %#94
+  %#96 = lshr i32 %#95, 16
+  %#97 = sub nsw i32 %#94, %#96
+  %#98 = lshr i32 %#97, 1
+  %#99 = add nuw i32 %#98, %#96
+  %#100 = and i32 %#99, 65535
+  %#101 = lshr i32 %#100, %#37
+  %#102 = trunc nuw i32 %#101 to i16
+  %#103 = insertelement <16 x i16> %#92, i16 %#102, i64 5
+  %#104 = extractelement <16 x i16> %#36, i64 6
+  %#105 = zext i16 %#104 to i32
+  %#106 = mul nuw i32 %#34, %#105
+  %#107 = lshr i32 %#106, 16
+  %#108 = sub nsw i32 %#105, %#107
+  %#109 = lshr i32 %#108, 1
+  %#110 = add nuw i32 %#109, %#107
+  %#111 = and i32 %#110, 65535
+  %#112 = lshr i32 %#111, %#37
+  %#113 = trunc nuw i32 %#112 to i16
+  %#114 = insertelement <16 x i16> %#103, i16 %#113, i64 6
+  %#115 = extractelement <16 x i16> %#36, i64 7
+  %#116 = zext i16 %#115 to i32
+  %#117 = mul nuw i32 %#34, %#116
+  %#118 = lshr i32 %#117, 16
+  %#119 = sub nsw i32 %#116, %#118
+  %#120 = lshr i32 %#119, 1
+  %#121 = add nuw i32 %#120, %#118
+  %#122 = and i32 %#121, 65535
+  %#123 = lshr i32 %#122, %#37
+  %#124 = trunc nuw i32 %#123 to i16
+  %#125 = insertelement <16 x i16> %#114, i16 %#124, i64 7
+  %#126 = extractelement <16 x i16> %#36, i64 8
+  %#127 = zext i16 %#126 to i32
+  %#128 = mul nuw i32 %#34, %#127
+  %#129 = lshr i32 %#128, 16
+  %#130 = sub nsw i32 %#127, %#129
+  %#131 = lshr i32 %#130, 1
+  %#132 = add nuw i32 %#131, %#129
+  %#133 = and i32 %#132, 65535
+  %#134 = lshr i32 %#133, %#37
+  %#135 = trunc nuw i32 %#134 to i16
+  %#136 = insertelement <16 x i16> %#125, i16 %#135, i64 8
+  %#137 = extractelement <16 x i16> %#36, i64 9
+  %#138 = zext i16 %#137 to i32
+  %#139 = mul nuw i32 %#34, %#138
+  %#140 = lshr i32 %#139, 16
+  %#141 = sub nsw i32 %#138, %#140
+  %#142 = lshr i32 %#141, 1
+  %#143 = add nuw i32 %#142, %#140
+  %#144 = and i32 %#143, 65535
+  %#145 = lshr i32 %#144, %#37
+  %#146 = trunc nuw i32 %#145 to i16
+  %#147 = insertelement <16 x i16> %#136, i16 %#146, i64 9
+  %#148 = extractelement <16 x i16> %#36, i64 10
+  %#149 = zext i16 %#148 to i32
+  %#150 = mul nuw i32 %#34, %#149
+  %#151 = lshr i32 %#150, 16
+  %#152 = sub nsw i32 %#149, %#151
+  %#153 = lshr i32 %#152, 1
+  %#154 = add nuw i32 %#153, %#151
+  %#155 = and i32 %#154, 65535
+  %#156 = lshr i32 %#155, %#37
+  %#157 = trunc nuw i32 %#156 to i16
+  %#158 = insertelement <16 x i16> %#147, i16 %#157, i64 10
+  %#159 = extractelement <16 x i16> %#36, i64 11
+  %#160 = zext i16 %#159 to i32
+  %#161 = mul nuw i32 %#34, %#160
+  %#162 = lshr i32 %#161, 16
+  %#163 = sub nsw i32 %#160, %#162
+  %#164 = lshr i32 %#163, 1
+  %#165 = add nuw i32 %#164, %#162
+  %#166 = and i32 %#165, 65535
+  %#167 = lshr i32 %#166, %#37
+  %#168 = trunc nuw i32 %#167 to i16
+  %#169 = insertelement <16 x i16> %#158, i16 %#168, i64 11
+  %#170 = extractelement <16 x i16> %#36, i64 12
+  %#171 = zext i16 %#170 to i32
+  %#172 = mul nuw i32 %#34, %#171
+  %#173 = lshr i32 %#172, 16
+  %#174 = sub nsw i32 %#171, %#173
+  %#175 = lshr i32 %#174, 1
+  %#176 = add nuw i32 %#175, %#173
+  %#177 = and i32 %#176, 65535
+  %#178 = lshr i32 %#177, %#37
+  %#179 = trunc nuw i32 %#178 to i16
+  %#180 = insertelement <16 x i16> %#169, i16 %#179, i64 12
+  %#181 = extractelement <16 x i16> %#36, i64 13
+  %#182 = zext i16 %#181 to i32
+  %#183 = mul nuw i32 %#34, %#182
+  %#184 = lshr i32 %#183, 16
+  %#185 = sub nsw i32 %#182, %#184
+  %#186 = lshr i32 %#185, 1
+  %#187 = add nuw i32 %#186, %#184
+  %#188 = and i32 %#187, 65535
+  %#189 = lshr i32 %#188, %#37
+  %#190 = trunc nuw i32 %#189 to i16
+  %#191 = insertelement <16 x i16> %#180, i16 %#190, i64 13
+  %#192 = extractelement <16 x i16> %#36, i64 14
+  %#193 = zext i16 %#192 to i32
+  %#194 = mul nuw i32 %#34, %#193
+  %#195 = lshr i32 %#194, 16
+  %#196 = sub nsw i32 %#193, %#195
+  %#197 = lshr i32 %#196, 1
+  %#198 = add nuw i32 %#197, %#195
+  %#199 = and i32 %#198, 65535
+  %#200 = lshr i32 %#199, %#37
+  %#201 = trunc nuw i32 %#200 to i16
+  %#202 = insertelement <16 x i16> %#191, i16 %#201, i64 14
+  %#203 = extractelement <16 x i16> %#36, i64 15
+  %#204 = zext i16 %#203 to i32
+  %#205 = mul nuw i32 %#34, %#204
+  %#206 = lshr i32 %#205, 16
+  %#207 = sub nsw i32 %#204, %#206
+  %#208 = lshr i32 %#207, 1
+  %#209 = add nuw i32 %#208, %#206
+  %#210 = and i32 %#209, 65535
+  %#211 = lshr i32 %#210, %#37
+  %#212 = trunc nuw i32 %#211 to i16
+  %#213 = insertelement <16 x i16> %#202, i16 %#212, i64 15
+  %#214 = bitcast <16 x i16> %#213 to <4 x i64>
+  br label %#7
+
+#7:
+  %#215 = phi <4 x i64> [ %#214, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#215
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define <4 x i64> @target_s16_api_vec256(<4 x i64> noundef %#0, i16 noundef signext %#1) nofree willreturn memory(none) {
+#2:
+  %#14 = icmp eq i16 noundef signext %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i16 noundef signext %#1, 0
+  %#16 = abs i16 noundef signext %#1, 0
+  %#17 = ctlz i16 %#16, 1
+  %#range_0_%#17 = !range i16 %#17, i16 0, i16 16
+  %#18 = xor i16 %#range_0_%#17, 15
+  %#19 = zext i16 %#16 to i32
+  %#20 = add nsw nuw i32 %#19, 65535
+  %#21 = and i32 %#20, %#19
+  %#22 = icmp eq i32 %#21, 0
+  br i1 %#22, label %#4, label %#5
+
+#4:
+  %#23 = lshr i16 noundef signext %#1, 8
+  %#24 = and i16 %#23, 128
+  %#25 = or disjoint i16 %#18, %#24
+  %#26 = trunc nuw i16 %#25 to i8
+  br label %#9
+
+#5:
+  %#27 = zext nneg i16 %#18 to i32
+  %#28 = shl nsw nuw i32 32768, %#27
+  %#29 = udiv i32 %#28, %#19
+  %#30 = trunc i32 %#29 to i16
+  %#31 = mul i16 %#16, %#30
+  %#32 = add i16 %#31, %#16
+  %#33 = zext i16 %#32 to i32
+  %#34 = lshr i32 %#33, %#27
+  %#35 = icmp eq i32 %#34, 0
+  br i1 %#35, label %#6, label %#7
+
+#6:
+  %#36 = trunc nsw nuw i16 %#range_0_%#17 to i8
+  %#37 = sub nsw i8 14, %#36
+  br label %#8
+
+#7:
+  %#38 = sub i16 0, %#31
+  %#39 = shl i16 %#30, 1
+  %#40 = shl i16 %#38, 1
+  %#41 = icmp uge i16 %#40, %#16
+  %#42 = icmp slt i16 %#38, 0
+  %#43 = or i1 %#42, %#41
+  %#44 = zext i1 %#43 to i16
+  %#45 = or disjoint i16 %#39, %#44
+  %#46 = trunc nsw nuw i16 %#18 to i8
+  %#47 = or disjoint i8 %#46, 64
+  br label %#8
+
+#8:
+  %#48 = phi i16 [ %#45, %#7 ], [ %#30, %#6 ]
+  %#49 = phi i8 [ %#47, %#7 ], [ %#37, %#6 ]
+  %#50 = add i16 %#48, 1
+  %#51 = or i8 %#49, 128
+  %#52 = xor i16 %#48, 65535
+  %#53 = select i1 %#15, i8 %#51, i8 %#49
+  %#54 = select i1 %#15, i16 %#52, i16 %#50
+  %#55 = icmp eq i16 %#54, 0
+  br i1 %#55, label %#9, label %#10
+
+#9:
+  %#56 = phi i8 [ %#26, %#4 ], [ %#53, %#8 ]
+  %#57 = and i8 %#56, 31
+  %#58 = zext nneg i8 %#57 to i32
+  %#59 = shl nsw i32 4294967295, %#58
+  %#60 = trunc i32 %#59 to i16
+  %#61 = xor i16 %#60, 65535
+  %#62 = insertelement <16 x i16> poison, i16 %#61, i64 0
+  %#63 = shufflevector <16 x i16> %#62, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#64 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#65 = icmp slt <16 x i16> %#64, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#66 = select <16 x i1> %#65, <16 x i16> %#63, <16 x i16> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#67 = add <16 x i16> %#66, %#64
+  %#68 = x86_avx2_psrai_w <16 x i16> %#67, i32 %#58
+  %#69 = ashr i8 %#56, 7
+  %#70 = sext i8 %#69 to i16
+  %#71 = insertelement <16 x i16> poison, i16 %#70, i64 0
+  %#72 = shufflevector <16 x i16> %#71, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#73 = xor <16 x i16> %#68, %#72
+  %#74 = sub <16 x i16> %#73, %#72
+  %#75 = bitcast <16 x i16> %#74 to <4 x i64>
+  br label %#13
+
+#10:
+  %#76 = insertelement <16 x i16> poison, i16 %#54, i64 0
+  %#77 = shufflevector <16 x i16> %#76, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#78 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#79 = x86_avx2_pmulh_w <16 x i16> %#78, <16 x i16> %#77
+  %#80 = zext i8 %#53 to i32
+  %#81 = and i32 %#80, 64
+  %#82 = icmp eq i32 %#81, 0
+  br i1 %#82, label %#12, label %#11
+
+#11:
+  %#83 = ashr i8 %#53, 7
+  %#84 = sext i8 %#83 to i16
+  %#85 = insertelement <16 x i16> poison, i16 %#84, i64 0
+  %#86 = shufflevector <16 x i16> %#85, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#87 = xor <16 x i16> %#86, %#78
+  %#88 = sub <16 x i16> %#87, %#86
+  %#89 = add <16 x i16> %#88, %#79
+  br label %#12
+
+#12:
+  %#90 = phi <16 x i16> [ %#89, %#11 ], [ %#79, %#10 ]
+  %#91 = and i32 %#80, 31
+  %#92 = x86_avx2_psrai_w <16 x i16> %#90, i32 %#91
+  %#93 = lshr <16 x i16> %#92, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#94 = add <16 x i16> %#93, %#92
+  %#95 = bitcast <16 x i16> %#94 to <4 x i64>
+  br label %#13
+
+#13:
+  %#96 = phi <4 x i64> [ noundef %#0, %#2 ], [ %#95, %#12 ], [ %#75, %#9 ]
+  ret <4 x i64> %#96
+}
+=>
+define <4 x i64> @target_s16_api_vec256(<4 x i64> noundef %#0, i16 noundef signext %#1) nofree willreturn memory(none) {
+#2:
+  %#15 = icmp eq i16 noundef signext %#1, 0
+  br i1 %#15, label %#14, label %#3
+
+#3:
+  %#16 = icmp slt i16 noundef signext %#1, 0
+  %#17 = abs i16 noundef signext %#1, 0
+  %#18 = ctlz i16 %#17, 1
+  %#range_0_%#18 = !range i16 %#18, i16 0, i16 16
+  %#19 = xor i16 %#range_0_%#18, 15
+  %#20 = zext i16 %#17 to i32
+  %#21 = add nsw nuw i32 %#20, 65535
+  %#22 = and i32 %#21, %#20
+  %#23 = icmp eq i32 %#22, 0
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  %#24 = lshr i16 noundef signext %#1, 8
+  %#25 = and i16 %#24, 128
+  %#26 = or disjoint i16 %#19, %#25
+  %#27 = trunc nuw i16 %#26 to i8
+  %#28 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#29 = and i8 %#27, 15
+  %#30 = zext nneg i8 %#29 to i32
+  br label %#9
+
+#5:
+  %#31 = zext nneg i16 %#19 to i32
+  %#32 = shl nsw nuw i32 32768, %#31
+  %#33 = udiv i32 %#32, %#20
+  %#34 = trunc i32 %#33 to i16
+  %#35 = mul i16 %#17, %#34
+  %#36 = add i16 %#35, %#17
+  %#37 = zext i16 %#36 to i32
+  %#38 = lshr i32 %#37, %#31
+  %#39 = icmp eq i32 %#38, 0
+  br i1 %#39, label %#6, label %#7
+
+#6:
+  %#40 = trunc nsw nuw i16 %#range_0_%#18 to i8
+  %#41 = sub nsw i8 14, %#40
+  br label %#8
+
+#7:
+  %#42 = sub i16 0, %#35
+  %#43 = shl i16 %#34, 1
+  %#44 = shl i16 %#42, 1
+  %#45 = icmp uge i16 %#44, %#17
+  %#46 = icmp slt i16 %#42, 0
+  %#47 = or i1 %#46, %#45
+  %#48 = zext i1 %#47 to i16
+  %#49 = or disjoint i16 %#43, %#48
+  %#50 = trunc nsw nuw i16 %#19 to i8
+  %#51 = or disjoint i8 %#50, 64
+  br label %#8
+
+#8:
+  %#52 = phi i16 [ %#49, %#7 ], [ %#34, %#6 ]
+  %#53 = phi i8 [ %#51, %#7 ], [ %#41, %#6 ]
+  %#54 = add i16 %#52, 1
+  %#55 = or i8 %#53, 128
+  %#56 = xor i16 %#52, 65535
+  %#57 = select i1 %#16, i8 %#55, i8 %#53
+  %#58 = select i1 %#16, i16 %#56, i16 %#54
+  %#59 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#60 = and i8 %#57, 31
+  %#61 = icmp eq i16 %#58, 0
+  %#62 = sext i16 %#58 to i32
+  %#63 = ashr i8 %#57, 7
+  %#64 = sext i8 %#63 to i32
+  %#65 = zext nneg i8 %#60 to i32
+  br i1 %#61, label %#9, label %#10
+
+#9:
+  %#66 = phi i32 [ %#30, %#4 ], [ %#65, %#8 ]
+  %#67 = phi <16 x i16> [ %#28, %#4 ], [ %#59, %#8 ]
+  %#68 = phi i8 [ %#27, %#4 ], [ %#57, %#8 ]
+  %#69 = icmp slt i8 %#68, 0
+  %#70 = select i1 %#69, i32 65535, i32 0
+  %#71 = shl nsw i32 4294967295, %#66
+  %#72 = xor i32 %#71, 4294967295
+  %#73 = extractelement <16 x i16> %#67, i64 0
+  %#74 = sext i16 %#73 to i32
+  %#75 = lshr i32 %#74, 15
+  %#76 = and i32 %#75, %#72
+  %#77 = trunc i32 %#76 to i16
+  %#78 = add i16 %#73, %#77
+  %#79 = sext i16 %#78 to i32
+  %#80 = ashr i32 %#79, %#66
+  %#81 = xor i32 %#80, %#70
+  %#82 = sub nsw i32 %#81, %#70
+  %#83 = trunc i32 %#82 to i16
+  %#84 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#83, i64 0
+  %#85 = extractelement <16 x i16> %#67, i64 1
+  %#86 = sext i16 %#85 to i32
+  %#87 = lshr i32 %#86, 15
+  %#88 = and i32 %#87, %#72
+  %#89 = trunc i32 %#88 to i16
+  %#90 = add i16 %#85, %#89
+  %#91 = sext i16 %#90 to i32
+  %#92 = ashr i32 %#91, %#66
+  %#93 = xor i32 %#92, %#70
+  %#94 = sub nsw i32 %#93, %#70
+  %#95 = trunc i32 %#94 to i16
+  %#96 = insertelement <16 x i16> %#84, i16 %#95, i64 1
+  %#97 = extractelement <16 x i16> %#67, i64 2
+  %#98 = sext i16 %#97 to i32
+  %#99 = lshr i32 %#98, 15
+  %#100 = and i32 %#99, %#72
+  %#101 = trunc i32 %#100 to i16
+  %#102 = add i16 %#97, %#101
+  %#103 = sext i16 %#102 to i32
+  %#104 = ashr i32 %#103, %#66
+  %#105 = xor i32 %#104, %#70
+  %#106 = sub nsw i32 %#105, %#70
+  %#107 = trunc i32 %#106 to i16
+  %#108 = insertelement <16 x i16> %#96, i16 %#107, i64 2
+  %#109 = extractelement <16 x i16> %#67, i64 3
+  %#110 = sext i16 %#109 to i32
+  %#111 = lshr i32 %#110, 15
+  %#112 = and i32 %#111, %#72
+  %#113 = trunc i32 %#112 to i16
+  %#114 = add i16 %#109, %#113
+  %#115 = sext i16 %#114 to i32
+  %#116 = ashr i32 %#115, %#66
+  %#117 = xor i32 %#116, %#70
+  %#118 = sub nsw i32 %#117, %#70
+  %#119 = trunc i32 %#118 to i16
+  %#120 = insertelement <16 x i16> %#108, i16 %#119, i64 3
+  %#121 = extractelement <16 x i16> %#67, i64 4
+  %#122 = sext i16 %#121 to i32
+  %#123 = lshr i32 %#122, 15
+  %#124 = and i32 %#123, %#72
+  %#125 = trunc i32 %#124 to i16
+  %#126 = add i16 %#121, %#125
+  %#127 = sext i16 %#126 to i32
+  %#128 = ashr i32 %#127, %#66
+  %#129 = xor i32 %#128, %#70
+  %#130 = sub nsw i32 %#129, %#70
+  %#131 = trunc i32 %#130 to i16
+  %#132 = insertelement <16 x i16> %#120, i16 %#131, i64 4
+  %#133 = extractelement <16 x i16> %#67, i64 5
+  %#134 = sext i16 %#133 to i32
+  %#135 = lshr i32 %#134, 15
+  %#136 = and i32 %#135, %#72
+  %#137 = trunc i32 %#136 to i16
+  %#138 = add i16 %#133, %#137
+  %#139 = sext i16 %#138 to i32
+  %#140 = ashr i32 %#139, %#66
+  %#141 = xor i32 %#140, %#70
+  %#142 = sub nsw i32 %#141, %#70
+  %#143 = trunc i32 %#142 to i16
+  %#144 = insertelement <16 x i16> %#132, i16 %#143, i64 5
+  %#145 = extractelement <16 x i16> %#67, i64 6
+  %#146 = sext i16 %#145 to i32
+  %#147 = lshr i32 %#146, 15
+  %#148 = and i32 %#147, %#72
+  %#149 = trunc i32 %#148 to i16
+  %#150 = add i16 %#145, %#149
+  %#151 = sext i16 %#150 to i32
+  %#152 = ashr i32 %#151, %#66
+  %#153 = xor i32 %#152, %#70
+  %#154 = sub nsw i32 %#153, %#70
+  %#155 = trunc i32 %#154 to i16
+  %#156 = insertelement <16 x i16> %#144, i16 %#155, i64 6
+  %#157 = extractelement <16 x i16> %#67, i64 7
+  %#158 = sext i16 %#157 to i32
+  %#159 = lshr i32 %#158, 15
+  %#160 = and i32 %#159, %#72
+  %#161 = trunc i32 %#160 to i16
+  %#162 = add i16 %#157, %#161
+  %#163 = sext i16 %#162 to i32
+  %#164 = ashr i32 %#163, %#66
+  %#165 = xor i32 %#164, %#70
+  %#166 = sub nsw i32 %#165, %#70
+  %#167 = trunc i32 %#166 to i16
+  %#168 = insertelement <16 x i16> %#156, i16 %#167, i64 7
+  %#169 = extractelement <16 x i16> %#67, i64 8
+  %#170 = sext i16 %#169 to i32
+  %#171 = lshr i32 %#170, 15
+  %#172 = and i32 %#171, %#72
+  %#173 = trunc i32 %#172 to i16
+  %#174 = add i16 %#169, %#173
+  %#175 = sext i16 %#174 to i32
+  %#176 = ashr i32 %#175, %#66
+  %#177 = xor i32 %#176, %#70
+  %#178 = sub nsw i32 %#177, %#70
+  %#179 = trunc i32 %#178 to i16
+  %#180 = insertelement <16 x i16> %#168, i16 %#179, i64 8
+  %#181 = extractelement <16 x i16> %#67, i64 9
+  %#182 = sext i16 %#181 to i32
+  %#183 = lshr i32 %#182, 15
+  %#184 = and i32 %#183, %#72
+  %#185 = trunc i32 %#184 to i16
+  %#186 = add i16 %#181, %#185
+  %#187 = sext i16 %#186 to i32
+  %#188 = ashr i32 %#187, %#66
+  %#189 = xor i32 %#188, %#70
+  %#190 = sub nsw i32 %#189, %#70
+  %#191 = trunc i32 %#190 to i16
+  %#192 = insertelement <16 x i16> %#180, i16 %#191, i64 9
+  %#193 = extractelement <16 x i16> %#67, i64 10
+  %#194 = sext i16 %#193 to i32
+  %#195 = lshr i32 %#194, 15
+  %#196 = and i32 %#195, %#72
+  %#197 = trunc i32 %#196 to i16
+  %#198 = add i16 %#193, %#197
+  %#199 = sext i16 %#198 to i32
+  %#200 = ashr i32 %#199, %#66
+  %#201 = xor i32 %#200, %#70
+  %#202 = sub nsw i32 %#201, %#70
+  %#203 = trunc i32 %#202 to i16
+  %#204 = insertelement <16 x i16> %#192, i16 %#203, i64 10
+  %#205 = extractelement <16 x i16> %#67, i64 11
+  %#206 = sext i16 %#205 to i32
+  %#207 = lshr i32 %#206, 15
+  %#208 = and i32 %#207, %#72
+  %#209 = trunc i32 %#208 to i16
+  %#210 = add i16 %#205, %#209
+  %#211 = sext i16 %#210 to i32
+  %#212 = ashr i32 %#211, %#66
+  %#213 = xor i32 %#212, %#70
+  %#214 = sub nsw i32 %#213, %#70
+  %#215 = trunc i32 %#214 to i16
+  %#216 = insertelement <16 x i16> %#204, i16 %#215, i64 11
+  %#217 = extractelement <16 x i16> %#67, i64 12
+  %#218 = sext i16 %#217 to i32
+  %#219 = lshr i32 %#218, 15
+  %#220 = and i32 %#219, %#72
+  %#221 = trunc i32 %#220 to i16
+  %#222 = add i16 %#217, %#221
+  %#223 = sext i16 %#222 to i32
+  %#224 = ashr i32 %#223, %#66
+  %#225 = xor i32 %#224, %#70
+  %#226 = sub nsw i32 %#225, %#70
+  %#227 = trunc i32 %#226 to i16
+  %#228 = insertelement <16 x i16> %#216, i16 %#227, i64 12
+  %#229 = extractelement <16 x i16> %#67, i64 13
+  %#230 = sext i16 %#229 to i32
+  %#231 = lshr i32 %#230, 15
+  %#232 = and i32 %#231, %#72
+  %#233 = trunc i32 %#232 to i16
+  %#234 = add i16 %#229, %#233
+  %#235 = sext i16 %#234 to i32
+  %#236 = ashr i32 %#235, %#66
+  %#237 = xor i32 %#236, %#70
+  %#238 = sub nsw i32 %#237, %#70
+  %#239 = trunc i32 %#238 to i16
+  %#240 = insertelement <16 x i16> %#228, i16 %#239, i64 13
+  %#241 = extractelement <16 x i16> %#67, i64 14
+  %#242 = sext i16 %#241 to i32
+  %#243 = lshr i32 %#242, 15
+  %#244 = and i32 %#243, %#72
+  %#245 = trunc i32 %#244 to i16
+  %#246 = add i16 %#241, %#245
+  %#247 = sext i16 %#246 to i32
+  %#248 = ashr i32 %#247, %#66
+  %#249 = xor i32 %#248, %#70
+  %#250 = sub nsw i32 %#249, %#70
+  %#251 = trunc i32 %#250 to i16
+  %#252 = insertelement <16 x i16> %#240, i16 %#251, i64 14
+  %#253 = extractelement <16 x i16> %#67, i64 15
+  %#254 = sext i16 %#253 to i32
+  %#255 = lshr i32 %#254, 15
+  %#256 = and i32 %#255, %#72
+  %#257 = trunc i32 %#256 to i16
+  %#258 = add i16 %#253, %#257
+  %#259 = sext i16 %#258 to i32
+  %#260 = ashr i32 %#259, %#66
+  %#261 = xor i32 %#260, %#70
+  %#262 = sub nsw i32 %#261, %#70
+  br label %#13
+
+#10:
+  %#263 = and i8 %#57, 64
+  %#264 = icmp eq i8 %#263, 0
+  %#265 = extractelement <16 x i16> %#59, i64 0
+  %#266 = sext i16 %#265 to i32
+  %#267 = mul nsw i32 %#266, %#62
+  br i1 %#264, label %#11, label %#12
+
+#11:
+  %#268 = ashr i32 %#267, 16
+  %#269 = ashr i32 %#268, %#65
+  %#270 = lshr i32 %#269, 31
+  %#271 = add nsw i32 %#270, %#269
+  %#272 = trunc nsw i32 %#271 to i16
+  %#273 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#272, i64 0
+  %#274 = extractelement <16 x i16> %#59, i64 1
+  %#275 = sext i16 %#274 to i32
+  %#276 = mul nsw i32 %#275, %#62
+  %#277 = ashr i32 %#276, 16
+  %#278 = ashr i32 %#277, %#65
+  %#279 = lshr i32 %#278, 31
+  %#280 = add nsw i32 %#279, %#278
+  %#281 = trunc nsw i32 %#280 to i16
+  %#282 = insertelement <16 x i16> %#273, i16 %#281, i64 1
+  %#283 = extractelement <16 x i16> %#59, i64 2
+  %#284 = sext i16 %#283 to i32
+  %#285 = mul nsw i32 %#284, %#62
+  %#286 = ashr i32 %#285, 16
+  %#287 = ashr i32 %#286, %#65
+  %#288 = lshr i32 %#287, 31
+  %#289 = add nsw i32 %#288, %#287
+  %#290 = trunc nsw i32 %#289 to i16
+  %#291 = insertelement <16 x i16> %#282, i16 %#290, i64 2
+  %#292 = extractelement <16 x i16> %#59, i64 3
+  %#293 = sext i16 %#292 to i32
+  %#294 = mul nsw i32 %#293, %#62
+  %#295 = ashr i32 %#294, 16
+  %#296 = ashr i32 %#295, %#65
+  %#297 = lshr i32 %#296, 31
+  %#298 = add nsw i32 %#297, %#296
+  %#299 = trunc nsw i32 %#298 to i16
+  %#300 = insertelement <16 x i16> %#291, i16 %#299, i64 3
+  %#301 = extractelement <16 x i16> %#59, i64 4
+  %#302 = sext i16 %#301 to i32
+  %#303 = mul nsw i32 %#302, %#62
+  %#304 = ashr i32 %#303, 16
+  %#305 = ashr i32 %#304, %#65
+  %#306 = lshr i32 %#305, 31
+  %#307 = add nsw i32 %#306, %#305
+  %#308 = trunc nsw i32 %#307 to i16
+  %#309 = insertelement <16 x i16> %#300, i16 %#308, i64 4
+  %#310 = extractelement <16 x i16> %#59, i64 5
+  %#311 = sext i16 %#310 to i32
+  %#312 = mul nsw i32 %#311, %#62
+  %#313 = ashr i32 %#312, 16
+  %#314 = ashr i32 %#313, %#65
+  %#315 = lshr i32 %#314, 31
+  %#316 = add nsw i32 %#315, %#314
+  %#317 = trunc nsw i32 %#316 to i16
+  %#318 = insertelement <16 x i16> %#309, i16 %#317, i64 5
+  %#319 = extractelement <16 x i16> %#59, i64 6
+  %#320 = sext i16 %#319 to i32
+  %#321 = mul nsw i32 %#320, %#62
+  %#322 = ashr i32 %#321, 16
+  %#323 = ashr i32 %#322, %#65
+  %#324 = lshr i32 %#323, 31
+  %#325 = add nsw i32 %#324, %#323
+  %#326 = trunc nsw i32 %#325 to i16
+  %#327 = insertelement <16 x i16> %#318, i16 %#326, i64 6
+  %#328 = extractelement <16 x i16> %#59, i64 7
+  %#329 = sext i16 %#328 to i32
+  %#330 = mul nsw i32 %#329, %#62
+  %#331 = ashr i32 %#330, 16
+  %#332 = ashr i32 %#331, %#65
+  %#333 = lshr i32 %#332, 31
+  %#334 = add nsw i32 %#333, %#332
+  %#335 = trunc nsw i32 %#334 to i16
+  %#336 = insertelement <16 x i16> %#327, i16 %#335, i64 7
+  %#337 = extractelement <16 x i16> %#59, i64 8
+  %#338 = sext i16 %#337 to i32
+  %#339 = mul nsw i32 %#338, %#62
+  %#340 = ashr i32 %#339, 16
+  %#341 = ashr i32 %#340, %#65
+  %#342 = lshr i32 %#341, 31
+  %#343 = add nsw i32 %#342, %#341
+  %#344 = trunc nsw i32 %#343 to i16
+  %#345 = insertelement <16 x i16> %#336, i16 %#344, i64 8
+  %#346 = extractelement <16 x i16> %#59, i64 9
+  %#347 = sext i16 %#346 to i32
+  %#348 = mul nsw i32 %#347, %#62
+  %#349 = ashr i32 %#348, 16
+  %#350 = ashr i32 %#349, %#65
+  %#351 = lshr i32 %#350, 31
+  %#352 = add nsw i32 %#351, %#350
+  %#353 = trunc nsw i32 %#352 to i16
+  %#354 = insertelement <16 x i16> %#345, i16 %#353, i64 9
+  %#355 = extractelement <16 x i16> %#59, i64 10
+  %#356 = sext i16 %#355 to i32
+  %#357 = mul nsw i32 %#356, %#62
+  %#358 = ashr i32 %#357, 16
+  %#359 = ashr i32 %#358, %#65
+  %#360 = lshr i32 %#359, 31
+  %#361 = add nsw i32 %#360, %#359
+  %#362 = trunc nsw i32 %#361 to i16
+  %#363 = insertelement <16 x i16> %#354, i16 %#362, i64 10
+  %#364 = extractelement <16 x i16> %#59, i64 11
+  %#365 = sext i16 %#364 to i32
+  %#366 = mul nsw i32 %#365, %#62
+  %#367 = ashr i32 %#366, 16
+  %#368 = ashr i32 %#367, %#65
+  %#369 = lshr i32 %#368, 31
+  %#370 = add nsw i32 %#369, %#368
+  %#371 = trunc nsw i32 %#370 to i16
+  %#372 = insertelement <16 x i16> %#363, i16 %#371, i64 11
+  %#373 = extractelement <16 x i16> %#59, i64 12
+  %#374 = sext i16 %#373 to i32
+  %#375 = mul nsw i32 %#374, %#62
+  %#376 = ashr i32 %#375, 16
+  %#377 = ashr i32 %#376, %#65
+  %#378 = lshr i32 %#377, 31
+  %#379 = add nsw i32 %#378, %#377
+  %#380 = trunc nsw i32 %#379 to i16
+  %#381 = insertelement <16 x i16> %#372, i16 %#380, i64 12
+  %#382 = extractelement <16 x i16> %#59, i64 13
+  %#383 = sext i16 %#382 to i32
+  %#384 = mul nsw i32 %#383, %#62
+  %#385 = ashr i32 %#384, 16
+  %#386 = ashr i32 %#385, %#65
+  %#387 = lshr i32 %#386, 31
+  %#388 = add nsw i32 %#387, %#386
+  %#389 = trunc nsw i32 %#388 to i16
+  %#390 = insertelement <16 x i16> %#381, i16 %#389, i64 13
+  %#391 = extractelement <16 x i16> %#59, i64 14
+  %#392 = sext i16 %#391 to i32
+  %#393 = mul nsw i32 %#392, %#62
+  %#394 = ashr i32 %#393, 16
+  %#395 = ashr i32 %#394, %#65
+  %#396 = lshr i32 %#395, 31
+  %#397 = add nsw i32 %#396, %#395
+  %#398 = trunc nsw i32 %#397 to i16
+  %#399 = insertelement <16 x i16> %#390, i16 %#398, i64 14
+  %#400 = extractelement <16 x i16> %#59, i64 15
+  %#401 = sext i16 %#400 to i32
+  %#402 = mul nsw i32 %#401, %#62
+  %#403 = ashr i32 %#402, 16
+  %#404 = ashr i32 %#403, %#65
+  %#405 = lshr i32 %#404, 31
+  %#406 = add nsw i32 %#405, %#404
+  br label %#13
+
+#12:
+  %#407 = zext i16 %#265 to i32
+  %#408 = xor i32 %#407, %#64
+  %#409 = sub nsw i32 %#408, %#64
+  %#410 = shl i32 %#409, 16
+  %#411 = add i32 %#267, %#410
+  %#412 = ashr i32 %#411, 16
+  %#413 = ashr i32 %#412, %#65
+  %#414 = lshr i32 %#413, 31
+  %#415 = add nsw i32 %#414, %#413
+  %#416 = trunc i32 %#415 to i16
+  %#417 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#416, i64 0
+  %#418 = extractelement <16 x i16> %#59, i64 1
+  %#419 = sext i16 %#418 to i32
+  %#420 = mul nsw i32 %#419, %#62
+  %#421 = zext i16 %#418 to i32
+  %#422 = xor i32 %#421, %#64
+  %#423 = sub nsw i32 %#422, %#64
+  %#424 = shl i32 %#423, 16
+  %#425 = add i32 %#420, %#424
+  %#426 = ashr i32 %#425, 16
+  %#427 = ashr i32 %#426, %#65
+  %#428 = lshr i32 %#427, 31
+  %#429 = add nsw i32 %#428, %#427
+  %#430 = trunc i32 %#429 to i16
+  %#431 = insertelement <16 x i16> %#417, i16 %#430, i64 1
+  %#432 = extractelement <16 x i16> %#59, i64 2
+  %#433 = sext i16 %#432 to i32
+  %#434 = mul nsw i32 %#433, %#62
+  %#435 = zext i16 %#432 to i32
+  %#436 = xor i32 %#435, %#64
+  %#437 = sub nsw i32 %#436, %#64
+  %#438 = shl i32 %#437, 16
+  %#439 = add i32 %#434, %#438
+  %#440 = ashr i32 %#439, 16
+  %#441 = ashr i32 %#440, %#65
+  %#442 = lshr i32 %#441, 31
+  %#443 = add nsw i32 %#442, %#441
+  %#444 = trunc i32 %#443 to i16
+  %#445 = insertelement <16 x i16> %#431, i16 %#444, i64 2
+  %#446 = extractelement <16 x i16> %#59, i64 3
+  %#447 = sext i16 %#446 to i32
+  %#448 = mul nsw i32 %#447, %#62
+  %#449 = zext i16 %#446 to i32
+  %#450 = xor i32 %#449, %#64
+  %#451 = sub nsw i32 %#450, %#64
+  %#452 = shl i32 %#451, 16
+  %#453 = add i32 %#448, %#452
+  %#454 = ashr i32 %#453, 16
+  %#455 = ashr i32 %#454, %#65
+  %#456 = lshr i32 %#455, 31
+  %#457 = add nsw i32 %#456, %#455
+  %#458 = trunc i32 %#457 to i16
+  %#459 = insertelement <16 x i16> %#445, i16 %#458, i64 3
+  %#460 = extractelement <16 x i16> %#59, i64 4
+  %#461 = sext i16 %#460 to i32
+  %#462 = mul nsw i32 %#461, %#62
+  %#463 = zext i16 %#460 to i32
+  %#464 = xor i32 %#463, %#64
+  %#465 = sub nsw i32 %#464, %#64
+  %#466 = shl i32 %#465, 16
+  %#467 = add i32 %#462, %#466
+  %#468 = ashr i32 %#467, 16
+  %#469 = ashr i32 %#468, %#65
+  %#470 = lshr i32 %#469, 31
+  %#471 = add nsw i32 %#470, %#469
+  %#472 = trunc i32 %#471 to i16
+  %#473 = insertelement <16 x i16> %#459, i16 %#472, i64 4
+  %#474 = extractelement <16 x i16> %#59, i64 5
+  %#475 = sext i16 %#474 to i32
+  %#476 = mul nsw i32 %#475, %#62
+  %#477 = zext i16 %#474 to i32
+  %#478 = xor i32 %#477, %#64
+  %#479 = sub nsw i32 %#478, %#64
+  %#480 = shl i32 %#479, 16
+  %#481 = add i32 %#476, %#480
+  %#482 = ashr i32 %#481, 16
+  %#483 = ashr i32 %#482, %#65
+  %#484 = lshr i32 %#483, 31
+  %#485 = add nsw i32 %#484, %#483
+  %#486 = trunc i32 %#485 to i16
+  %#487 = insertelement <16 x i16> %#473, i16 %#486, i64 5
+  %#488 = extractelement <16 x i16> %#59, i64 6
+  %#489 = sext i16 %#488 to i32
+  %#490 = mul nsw i32 %#489, %#62
+  %#491 = zext i16 %#488 to i32
+  %#492 = xor i32 %#491, %#64
+  %#493 = sub nsw i32 %#492, %#64
+  %#494 = shl i32 %#493, 16
+  %#495 = add i32 %#490, %#494
+  %#496 = ashr i32 %#495, 16
+  %#497 = ashr i32 %#496, %#65
+  %#498 = lshr i32 %#497, 31
+  %#499 = add nsw i32 %#498, %#497
+  %#500 = trunc i32 %#499 to i16
+  %#501 = insertelement <16 x i16> %#487, i16 %#500, i64 6
+  %#502 = extractelement <16 x i16> %#59, i64 7
+  %#503 = sext i16 %#502 to i32
+  %#504 = mul nsw i32 %#503, %#62
+  %#505 = zext i16 %#502 to i32
+  %#506 = xor i32 %#505, %#64
+  %#507 = sub nsw i32 %#506, %#64
+  %#508 = shl i32 %#507, 16
+  %#509 = add i32 %#504, %#508
+  %#510 = ashr i32 %#509, 16
+  %#511 = ashr i32 %#510, %#65
+  %#512 = lshr i32 %#511, 31
+  %#513 = add nsw i32 %#512, %#511
+  %#514 = trunc i32 %#513 to i16
+  %#515 = insertelement <16 x i16> %#501, i16 %#514, i64 7
+  %#516 = extractelement <16 x i16> %#59, i64 8
+  %#517 = sext i16 %#516 to i32
+  %#518 = mul nsw i32 %#517, %#62
+  %#519 = zext i16 %#516 to i32
+  %#520 = xor i32 %#519, %#64
+  %#521 = sub nsw i32 %#520, %#64
+  %#522 = shl i32 %#521, 16
+  %#523 = add i32 %#518, %#522
+  %#524 = ashr i32 %#523, 16
+  %#525 = ashr i32 %#524, %#65
+  %#526 = lshr i32 %#525, 31
+  %#527 = add nsw i32 %#526, %#525
+  %#528 = trunc i32 %#527 to i16
+  %#529 = insertelement <16 x i16> %#515, i16 %#528, i64 8
+  %#530 = extractelement <16 x i16> %#59, i64 9
+  %#531 = sext i16 %#530 to i32
+  %#532 = mul nsw i32 %#531, %#62
+  %#533 = zext i16 %#530 to i32
+  %#534 = xor i32 %#533, %#64
+  %#535 = sub nsw i32 %#534, %#64
+  %#536 = shl i32 %#535, 16
+  %#537 = add i32 %#532, %#536
+  %#538 = ashr i32 %#537, 16
+  %#539 = ashr i32 %#538, %#65
+  %#540 = lshr i32 %#539, 31
+  %#541 = add nsw i32 %#540, %#539
+  %#542 = trunc i32 %#541 to i16
+  %#543 = insertelement <16 x i16> %#529, i16 %#542, i64 9
+  %#544 = extractelement <16 x i16> %#59, i64 10
+  %#545 = sext i16 %#544 to i32
+  %#546 = mul nsw i32 %#545, %#62
+  %#547 = zext i16 %#544 to i32
+  %#548 = xor i32 %#547, %#64
+  %#549 = sub nsw i32 %#548, %#64
+  %#550 = shl i32 %#549, 16
+  %#551 = add i32 %#546, %#550
+  %#552 = ashr i32 %#551, 16
+  %#553 = ashr i32 %#552, %#65
+  %#554 = lshr i32 %#553, 31
+  %#555 = add nsw i32 %#554, %#553
+  %#556 = trunc i32 %#555 to i16
+  %#557 = insertelement <16 x i16> %#543, i16 %#556, i64 10
+  %#558 = extractelement <16 x i16> %#59, i64 11
+  %#559 = sext i16 %#558 to i32
+  %#560 = mul nsw i32 %#559, %#62
+  %#561 = zext i16 %#558 to i32
+  %#562 = xor i32 %#561, %#64
+  %#563 = sub nsw i32 %#562, %#64
+  %#564 = shl i32 %#563, 16
+  %#565 = add i32 %#560, %#564
+  %#566 = ashr i32 %#565, 16
+  %#567 = ashr i32 %#566, %#65
+  %#568 = lshr i32 %#567, 31
+  %#569 = add nsw i32 %#568, %#567
+  %#570 = trunc i32 %#569 to i16
+  %#571 = insertelement <16 x i16> %#557, i16 %#570, i64 11
+  %#572 = extractelement <16 x i16> %#59, i64 12
+  %#573 = sext i16 %#572 to i32
+  %#574 = mul nsw i32 %#573, %#62
+  %#575 = zext i16 %#572 to i32
+  %#576 = xor i32 %#575, %#64
+  %#577 = sub nsw i32 %#576, %#64
+  %#578 = shl i32 %#577, 16
+  %#579 = add i32 %#574, %#578
+  %#580 = ashr i32 %#579, 16
+  %#581 = ashr i32 %#580, %#65
+  %#582 = lshr i32 %#581, 31
+  %#583 = add nsw i32 %#582, %#581
+  %#584 = trunc i32 %#583 to i16
+  %#585 = insertelement <16 x i16> %#571, i16 %#584, i64 12
+  %#586 = extractelement <16 x i16> %#59, i64 13
+  %#587 = sext i16 %#586 to i32
+  %#588 = mul nsw i32 %#587, %#62
+  %#589 = zext i16 %#586 to i32
+  %#590 = xor i32 %#589, %#64
+  %#591 = sub nsw i32 %#590, %#64
+  %#592 = shl i32 %#591, 16
+  %#593 = add i32 %#588, %#592
+  %#594 = ashr i32 %#593, 16
+  %#595 = ashr i32 %#594, %#65
+  %#596 = lshr i32 %#595, 31
+  %#597 = add nsw i32 %#596, %#595
+  %#598 = trunc i32 %#597 to i16
+  %#599 = insertelement <16 x i16> %#585, i16 %#598, i64 13
+  %#600 = extractelement <16 x i16> %#59, i64 14
+  %#601 = sext i16 %#600 to i32
+  %#602 = mul nsw i32 %#601, %#62
+  %#603 = zext i16 %#600 to i32
+  %#604 = xor i32 %#603, %#64
+  %#605 = sub nsw i32 %#604, %#64
+  %#606 = shl i32 %#605, 16
+  %#607 = add i32 %#602, %#606
+  %#608 = ashr i32 %#607, 16
+  %#609 = ashr i32 %#608, %#65
+  %#610 = lshr i32 %#609, 31
+  %#611 = add nsw i32 %#610, %#609
+  %#612 = trunc i32 %#611 to i16
+  %#613 = insertelement <16 x i16> %#599, i16 %#612, i64 14
+  %#614 = extractelement <16 x i16> %#59, i64 15
+  %#615 = sext i16 %#614 to i32
+  %#616 = mul nsw i32 %#615, %#62
+  %#617 = zext i16 %#614 to i32
+  %#618 = xor i32 %#617, %#64
+  %#619 = sub nsw i32 %#618, %#64
+  %#620 = shl i32 %#619, 16
+  %#621 = add i32 %#616, %#620
+  %#622 = ashr i32 %#621, 16
+  %#623 = ashr i32 %#622, %#65
+  %#624 = lshr i32 %#623, 31
+  %#625 = add nsw i32 %#624, %#623
+  br label %#13
+
+#13:
+  %#626 = phi i32 [ %#625, %#12 ], [ %#406, %#11 ], [ %#262, %#9 ]
+  %#627 = phi <16 x i16> [ %#613, %#12 ], [ %#399, %#11 ], [ %#252, %#9 ]
+  %#628 = trunc i32 %#626 to i16
+  %#629 = insertelement <16 x i16> %#627, i16 %#628, i64 15
+  %#630 = bitcast <16 x i16> %#629 to <4 x i64>
+  br label %#14
+
+#14:
+  %#631 = phi <4 x i64> [ %#630, %#13 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#631
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define <4 x i64> @target_s16bf_api_vec256(<4 x i64> noundef %#0, i16 noundef signext %#1) nofree willreturn memory(none) {
+#2:
+  %#8 = icmp eq i16 noundef signext %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i16 noundef signext %#1, 0
+  %#10 = ctlz i16 %#9, 1
+  %#range_0_%#10 = !range i16 %#10, i16 0, i16 16
+  %#11 = xor i16 %#range_0_%#10, 15
+  %#12 = zext i16 %#9 to i32
+  %#13 = add nsw nuw i32 %#12, 65535
+  %#14 = and i32 %#13, %#12
+  %#15 = icmp eq i32 %#14, 0
+  br i1 %#15, label %#4, label %#5
+
+#4:
+  %#16 = lshr i16 noundef signext %#1, 8
+  %#17 = and i16 %#16, 128
+  %#18 = or disjoint i16 %#11, %#17
+  %#19 = trunc nuw i16 %#18 to i8
+  br label %#6
+
+#5:
+  %#20 = icmp slt i16 noundef signext %#1, 0
+  %#21 = zext nneg i16 %#11 to i32
+  %#22 = shl nsw nuw i32 32768, %#21
+  %#23 = udiv i32 %#22, %#12
+  %#24 = trunc i32 %#23 to i16
+  %#25 = mul i16 %#9, %#24
+  %#26 = sub i16 0, %#25
+  %#27 = shl i16 %#24, 1
+  %#28 = shl i16 %#26, 1
+  %#29 = icmp uge i16 %#28, %#9
+  %#30 = icmp slt i16 %#26, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i16
+  %#33 = trunc nsw nuw i16 %#11 to i8
+  %#34 = or disjoint i16 %#27, 1
+  %#35 = add i16 %#34, %#32
+  %#36 = select i1 %#20, i8 192, i8 64
+  %#37 = or disjoint i8 %#36, %#33
+  br label %#6
+
+#6:
+  %#38 = phi i16 [ 0, %#4 ], [ %#35, %#5 ]
+  %#39 = phi i8 [ %#19, %#4 ], [ %#37, %#5 ]
+  %#40 = and i8 %#39, 31
+  %#41 = ashr i8 %#39, 7
+  %#42 = sext i8 %#41 to i16
+  %#43 = insertelement <16 x i16> poison, i16 %#42, i64 0
+  %#44 = shufflevector <16 x i16> %#43, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#45 = insertelement <16 x i16> poison, i16 %#38, i64 0
+  %#46 = shufflevector <16 x i16> %#45, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#47 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#48 = x86_avx2_pmulh_w <16 x i16> %#47, <16 x i16> %#46
+  %#49 = add <16 x i16> %#48, %#47
+  %#50 = icmp eq i16 %#38, 0
+  %#51 = zext nneg i8 %#40 to i32
+  %#52 = shl nuw i32 1, %#51
+  %#53 = sext i1 %#50 to i32
+  %#54 = add i32 %#52, %#53
+  %#55 = trunc i32 %#54 to i16
+  %#56 = insertelement <16 x i16> poison, i16 %#55, i64 0
+  %#57 = shufflevector <16 x i16> %#56, <16 x i16> poison, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  %#58 = icmp slt <16 x i16> %#49, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#59 = select <16 x i1> %#58, <16 x i16> %#57, <16 x i16> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  %#60 = add <16 x i16> %#59, %#49
+  %#61 = x86_avx2_psrai_w <16 x i16> %#60, i32 %#51
+  %#62 = xor <16 x i16> %#44, %#61
+  %#63 = sub <16 x i16> %#62, %#44
+  %#64 = bitcast <16 x i16> %#63 to <4 x i64>
+  br label %#7
+
+#7:
+  %#65 = phi <4 x i64> [ %#64, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#65
+}
+=>
+define <4 x i64> @target_s16bf_api_vec256(<4 x i64> noundef %#0, i16 noundef signext %#1) nofree willreturn memory(none) {
+#2:
+  %#8 = icmp eq i16 noundef signext %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i16 noundef signext %#1, 0
+  %#10 = ctlz i16 %#9, 1
+  %#range_0_%#10 = !range i16 %#10, i16 0, i16 16
+  %#11 = xor i16 %#range_0_%#10, 15
+  %#12 = zext i16 %#9 to i32
+  %#13 = add nsw nuw i32 %#12, 65535
+  %#14 = and i32 %#13, %#12
+  %#15 = icmp eq i32 %#14, 0
+  br i1 %#15, label %#4, label %#5
+
+#4:
+  %#16 = lshr i16 noundef signext %#1, 8
+  %#17 = and i16 %#16, 128
+  %#18 = or disjoint i16 %#11, %#17
+  %#19 = trunc nuw i16 %#18 to i8
+  br label %#6
+
+#5:
+  %#20 = icmp slt i16 noundef signext %#1, 0
+  %#21 = zext nneg i16 %#11 to i32
+  %#22 = shl nsw nuw i32 32768, %#21
+  %#23 = udiv i32 %#22, %#12
+  %#24 = trunc i32 %#23 to i16
+  %#25 = mul i16 %#9, %#24
+  %#26 = sub i16 0, %#25
+  %#27 = shl i16 %#24, 1
+  %#28 = shl i16 %#26, 1
+  %#29 = icmp uge i16 %#28, %#9
+  %#30 = icmp slt i16 %#26, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i16
+  %#33 = trunc nsw nuw i16 %#11 to i8
+  %#34 = or disjoint i16 %#27, 1
+  %#35 = add i16 %#34, %#32
+  %#36 = select i1 %#20, i8 192, i8 64
+  %#37 = or disjoint i8 %#36, %#33
+  br label %#6
+
+#6:
+  %#38 = phi i16 [ 0, %#4 ], [ %#35, %#5 ]
+  %#39 = phi i8 [ %#19, %#4 ], [ %#37, %#5 ]
+  %#40 = bitcast <4 x i64> noundef %#0 to <16 x i16>
+  %#41 = and i8 %#39, 31
+  %#42 = ashr i8 %#39, 7
+  %#43 = sext i16 %#38 to i32
+  %#44 = icmp eq i16 %#38, 0
+  %#45 = zext nneg i8 %#41 to i32
+  %#46 = shl nuw i32 1, %#45
+  %#47 = sext i1 %#44 to i32
+  %#48 = add i32 %#46, %#47
+  %#49 = trunc i32 %#48 to i16
+  %#50 = sext i8 %#42 to i32
+  %#51 = extractelement <16 x i16> %#40, i64 0
+  %#52 = sext i16 %#51 to i32
+  %#53 = mul nsw i32 %#52, %#43
+  %#54 = lshr i32 %#53, 16
+  %#55 = trunc nuw i32 %#54 to i16
+  %#56 = add i16 %#51, %#55
+  %#57 = icmp slt i16 %#56, 0
+  %#58 = select i1 %#57, i16 %#49, i16 0
+  %#59 = add i16 %#58, %#56
+  %#60 = sext i16 %#59 to i32
+  %#61 = ashr i32 %#60, %#45
+  %#62 = xor i32 %#61, %#50
+  %#63 = sub nsw i32 %#62, %#50
+  %#64 = trunc i32 %#63 to i16
+  %#65 = insertelement <16 x i16> { poison, poison, poison, poison, poison, poison, poison, poison, poison, poison, undef, undef, undef, undef, undef, undef }, i16 %#64, i64 0
+  %#66 = extractelement <16 x i16> %#40, i64 1
+  %#67 = sext i16 %#66 to i32
+  %#68 = mul nsw i32 %#67, %#43
+  %#69 = lshr i32 %#68, 16
+  %#70 = trunc nuw i32 %#69 to i16
+  %#71 = add i16 %#66, %#70
+  %#72 = icmp slt i16 %#71, 0
+  %#73 = select i1 %#72, i16 %#49, i16 0
+  %#74 = add i16 %#73, %#71
+  %#75 = sext i16 %#74 to i32
+  %#76 = ashr i32 %#75, %#45
+  %#77 = xor i32 %#76, %#50
+  %#78 = sub nsw i32 %#77, %#50
+  %#79 = trunc i32 %#78 to i16
+  %#80 = insertelement <16 x i16> %#65, i16 %#79, i64 1
+  %#81 = extractelement <16 x i16> %#40, i64 2
+  %#82 = sext i16 %#81 to i32
+  %#83 = mul nsw i32 %#82, %#43
+  %#84 = lshr i32 %#83, 16
+  %#85 = trunc nuw i32 %#84 to i16
+  %#86 = add i16 %#81, %#85
+  %#87 = icmp slt i16 %#86, 0
+  %#88 = select i1 %#87, i16 %#49, i16 0
+  %#89 = add i16 %#88, %#86
+  %#90 = sext i16 %#89 to i32
+  %#91 = ashr i32 %#90, %#45
+  %#92 = xor i32 %#91, %#50
+  %#93 = sub nsw i32 %#92, %#50
+  %#94 = trunc i32 %#93 to i16
+  %#95 = insertelement <16 x i16> %#80, i16 %#94, i64 2
+  %#96 = extractelement <16 x i16> %#40, i64 3
+  %#97 = sext i16 %#96 to i32
+  %#98 = mul nsw i32 %#97, %#43
+  %#99 = lshr i32 %#98, 16
+  %#100 = trunc nuw i32 %#99 to i16
+  %#101 = add i16 %#96, %#100
+  %#102 = icmp slt i16 %#101, 0
+  %#103 = select i1 %#102, i16 %#49, i16 0
+  %#104 = add i16 %#103, %#101
+  %#105 = sext i16 %#104 to i32
+  %#106 = ashr i32 %#105, %#45
+  %#107 = xor i32 %#106, %#50
+  %#108 = sub nsw i32 %#107, %#50
+  %#109 = trunc i32 %#108 to i16
+  %#110 = insertelement <16 x i16> %#95, i16 %#109, i64 3
+  %#111 = extractelement <16 x i16> %#40, i64 4
+  %#112 = sext i16 %#111 to i32
+  %#113 = mul nsw i32 %#112, %#43
+  %#114 = lshr i32 %#113, 16
+  %#115 = trunc nuw i32 %#114 to i16
+  %#116 = add i16 %#111, %#115
+  %#117 = icmp slt i16 %#116, 0
+  %#118 = select i1 %#117, i16 %#49, i16 0
+  %#119 = add i16 %#118, %#116
+  %#120 = sext i16 %#119 to i32
+  %#121 = ashr i32 %#120, %#45
+  %#122 = xor i32 %#121, %#50
+  %#123 = sub nsw i32 %#122, %#50
+  %#124 = trunc i32 %#123 to i16
+  %#125 = insertelement <16 x i16> %#110, i16 %#124, i64 4
+  %#126 = extractelement <16 x i16> %#40, i64 5
+  %#127 = sext i16 %#126 to i32
+  %#128 = mul nsw i32 %#127, %#43
+  %#129 = lshr i32 %#128, 16
+  %#130 = trunc nuw i32 %#129 to i16
+  %#131 = add i16 %#126, %#130
+  %#132 = icmp slt i16 %#131, 0
+  %#133 = select i1 %#132, i16 %#49, i16 0
+  %#134 = add i16 %#133, %#131
+  %#135 = sext i16 %#134 to i32
+  %#136 = ashr i32 %#135, %#45
+  %#137 = xor i32 %#136, %#50
+  %#138 = sub nsw i32 %#137, %#50
+  %#139 = trunc i32 %#138 to i16
+  %#140 = insertelement <16 x i16> %#125, i16 %#139, i64 5
+  %#141 = extractelement <16 x i16> %#40, i64 6
+  %#142 = sext i16 %#141 to i32
+  %#143 = mul nsw i32 %#142, %#43
+  %#144 = lshr i32 %#143, 16
+  %#145 = trunc nuw i32 %#144 to i16
+  %#146 = add i16 %#141, %#145
+  %#147 = icmp slt i16 %#146, 0
+  %#148 = select i1 %#147, i16 %#49, i16 0
+  %#149 = add i16 %#148, %#146
+  %#150 = sext i16 %#149 to i32
+  %#151 = ashr i32 %#150, %#45
+  %#152 = xor i32 %#151, %#50
+  %#153 = sub nsw i32 %#152, %#50
+  %#154 = trunc i32 %#153 to i16
+  %#155 = insertelement <16 x i16> %#140, i16 %#154, i64 6
+  %#156 = extractelement <16 x i16> %#40, i64 7
+  %#157 = sext i16 %#156 to i32
+  %#158 = mul nsw i32 %#157, %#43
+  %#159 = lshr i32 %#158, 16
+  %#160 = trunc nuw i32 %#159 to i16
+  %#161 = add i16 %#156, %#160
+  %#162 = icmp slt i16 %#161, 0
+  %#163 = select i1 %#162, i16 %#49, i16 0
+  %#164 = add i16 %#163, %#161
+  %#165 = sext i16 %#164 to i32
+  %#166 = ashr i32 %#165, %#45
+  %#167 = xor i32 %#166, %#50
+  %#168 = sub nsw i32 %#167, %#50
+  %#169 = trunc i32 %#168 to i16
+  %#170 = insertelement <16 x i16> %#155, i16 %#169, i64 7
+  %#171 = extractelement <16 x i16> %#40, i64 8
+  %#172 = sext i16 %#171 to i32
+  %#173 = mul nsw i32 %#172, %#43
+  %#174 = lshr i32 %#173, 16
+  %#175 = trunc nuw i32 %#174 to i16
+  %#176 = add i16 %#171, %#175
+  %#177 = icmp slt i16 %#176, 0
+  %#178 = select i1 %#177, i16 %#49, i16 0
+  %#179 = add i16 %#178, %#176
+  %#180 = sext i16 %#179 to i32
+  %#181 = ashr i32 %#180, %#45
+  %#182 = xor i32 %#181, %#50
+  %#183 = sub nsw i32 %#182, %#50
+  %#184 = trunc i32 %#183 to i16
+  %#185 = insertelement <16 x i16> %#170, i16 %#184, i64 8
+  %#186 = extractelement <16 x i16> %#40, i64 9
+  %#187 = sext i16 %#186 to i32
+  %#188 = mul nsw i32 %#187, %#43
+  %#189 = lshr i32 %#188, 16
+  %#190 = trunc nuw i32 %#189 to i16
+  %#191 = add i16 %#186, %#190
+  %#192 = icmp slt i16 %#191, 0
+  %#193 = select i1 %#192, i16 %#49, i16 0
+  %#194 = add i16 %#193, %#191
+  %#195 = sext i16 %#194 to i32
+  %#196 = ashr i32 %#195, %#45
+  %#197 = xor i32 %#196, %#50
+  %#198 = sub nsw i32 %#197, %#50
+  %#199 = trunc i32 %#198 to i16
+  %#200 = insertelement <16 x i16> %#185, i16 %#199, i64 9
+  %#201 = extractelement <16 x i16> %#40, i64 10
+  %#202 = sext i16 %#201 to i32
+  %#203 = mul nsw i32 %#202, %#43
+  %#204 = lshr i32 %#203, 16
+  %#205 = trunc nuw i32 %#204 to i16
+  %#206 = add i16 %#201, %#205
+  %#207 = icmp slt i16 %#206, 0
+  %#208 = select i1 %#207, i16 %#49, i16 0
+  %#209 = add i16 %#208, %#206
+  %#210 = sext i16 %#209 to i32
+  %#211 = ashr i32 %#210, %#45
+  %#212 = xor i32 %#211, %#50
+  %#213 = sub nsw i32 %#212, %#50
+  %#214 = trunc i32 %#213 to i16
+  %#215 = insertelement <16 x i16> %#200, i16 %#214, i64 10
+  %#216 = extractelement <16 x i16> %#40, i64 11
+  %#217 = sext i16 %#216 to i32
+  %#218 = mul nsw i32 %#217, %#43
+  %#219 = lshr i32 %#218, 16
+  %#220 = trunc nuw i32 %#219 to i16
+  %#221 = add i16 %#216, %#220
+  %#222 = icmp slt i16 %#221, 0
+  %#223 = select i1 %#222, i16 %#49, i16 0
+  %#224 = add i16 %#223, %#221
+  %#225 = sext i16 %#224 to i32
+  %#226 = ashr i32 %#225, %#45
+  %#227 = xor i32 %#226, %#50
+  %#228 = sub nsw i32 %#227, %#50
+  %#229 = trunc i32 %#228 to i16
+  %#230 = insertelement <16 x i16> %#215, i16 %#229, i64 11
+  %#231 = extractelement <16 x i16> %#40, i64 12
+  %#232 = sext i16 %#231 to i32
+  %#233 = mul nsw i32 %#232, %#43
+  %#234 = lshr i32 %#233, 16
+  %#235 = trunc nuw i32 %#234 to i16
+  %#236 = add i16 %#231, %#235
+  %#237 = icmp slt i16 %#236, 0
+  %#238 = select i1 %#237, i16 %#49, i16 0
+  %#239 = add i16 %#238, %#236
+  %#240 = sext i16 %#239 to i32
+  %#241 = ashr i32 %#240, %#45
+  %#242 = xor i32 %#241, %#50
+  %#243 = sub nsw i32 %#242, %#50
+  %#244 = trunc i32 %#243 to i16
+  %#245 = insertelement <16 x i16> %#230, i16 %#244, i64 12
+  %#246 = extractelement <16 x i16> %#40, i64 13
+  %#247 = sext i16 %#246 to i32
+  %#248 = mul nsw i32 %#247, %#43
+  %#249 = lshr i32 %#248, 16
+  %#250 = trunc nuw i32 %#249 to i16
+  %#251 = add i16 %#246, %#250
+  %#252 = icmp slt i16 %#251, 0
+  %#253 = select i1 %#252, i16 %#49, i16 0
+  %#254 = add i16 %#253, %#251
+  %#255 = sext i16 %#254 to i32
+  %#256 = ashr i32 %#255, %#45
+  %#257 = xor i32 %#256, %#50
+  %#258 = sub nsw i32 %#257, %#50
+  %#259 = trunc i32 %#258 to i16
+  %#260 = insertelement <16 x i16> %#245, i16 %#259, i64 13
+  %#261 = extractelement <16 x i16> %#40, i64 14
+  %#262 = sext i16 %#261 to i32
+  %#263 = mul nsw i32 %#262, %#43
+  %#264 = lshr i32 %#263, 16
+  %#265 = trunc nuw i32 %#264 to i16
+  %#266 = add i16 %#261, %#265
+  %#267 = icmp slt i16 %#266, 0
+  %#268 = select i1 %#267, i16 %#49, i16 0
+  %#269 = add i16 %#268, %#266
+  %#270 = sext i16 %#269 to i32
+  %#271 = ashr i32 %#270, %#45
+  %#272 = xor i32 %#271, %#50
+  %#273 = sub nsw i32 %#272, %#50
+  %#274 = trunc i32 %#273 to i16
+  %#275 = insertelement <16 x i16> %#260, i16 %#274, i64 14
+  %#276 = extractelement <16 x i16> %#40, i64 15
+  %#277 = sext i16 %#276 to i32
+  %#278 = mul nsw i32 %#277, %#43
+  %#279 = lshr i32 %#278, 16
+  %#280 = trunc nuw i32 %#279 to i16
+  %#281 = add i16 %#276, %#280
+  %#282 = icmp slt i16 %#281, 0
+  %#283 = select i1 %#282, i16 %#49, i16 0
+  %#284 = add i16 %#283, %#281
+  %#285 = sext i16 %#284 to i32
+  %#286 = ashr i32 %#285, %#45
+  %#287 = xor i32 %#286, %#50
+  %#288 = sub nsw i32 %#287, %#50
+  %#289 = trunc i32 %#288 to i16
+  %#290 = insertelement <16 x i16> %#275, i16 %#289, i64 15
+  %#291 = bitcast <16 x i16> %#290 to <4 x i64>
+  br label %#7
+
+#7:
+  %#292 = phi <4 x i64> [ %#291, %#6 ], [ noundef %#0, %#2 ]
+  ret <4 x i64> %#292
+}
+Transformation seems to be correct!
+
+Summary:
+  2 correct transformations
+  0 incorrect transformations
+  2 failed-to-prove transformations
+  0 Alive2 errors

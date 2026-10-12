@@ -1,0 +1,7 @@
+(set-logic QF_BV)
+(declare-fun value () (_ BitVec 64))
+(declare-fun containerMask () (_ BitVec 64))
+(declare-fun mask () (_ BitVec 64))
+(assert (not (= (bvand (bvand (bvnot value) (bvnot containerMask)) mask)
+                (bvand (bvnot (bvor value containerMask)) mask))))
+(check-sat)

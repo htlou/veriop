@@ -1,0 +1,82 @@
+diff --git a/ggml/src/ggml-alloc.c b/ggml/src/ggml-alloc.c
+index 41419b617..7f414b231 100644
+--- a/ggml/src/ggml-alloc.c
++++ b/ggml/src/ggml-alloc.c
+@@ -17,11 +17,6 @@
+ //#define AT_PRINTF(...) GGML_LOG_DEBUG(__VA_ARGS__)
+ #define AT_PRINTF(...)
+ 
+-
+-static bool ggml_is_view(const struct ggml_tensor * t) {
+-    return t->view_src != NULL;
+-}
+-
+ // ops that return true for this function must not use restrict pointers for their backend implementations
+ bool ggml_op_can_inplace(enum ggml_op op) {
+     switch (op) {
+@@ -627,7 +622,7 @@ static void ggml_gallocr_allocate_node(ggml_gallocr_t galloc, struct ggml_tensor
+     GGML_ASSERT(buffer_id >= 0);
+     struct hash_node * hn = ggml_gallocr_hash_get(galloc, node);
+ 
+-    if (!ggml_gallocr_is_allocated(galloc, node) && !ggml_is_view(node)) {
++    if (!ggml_gallocr_is_allocated(galloc, node) && !ggml_impl_is_view(node)) {
+         hn->allocated = true;
+         assert(hn->addr.offset == 0);
+ 
+@@ -658,7 +653,7 @@ static void ggml_gallocr_allocate_node(ggml_gallocr_t galloc, struct ggml_tensor
+ 
+                 struct hash_node * p_hn = ggml_gallocr_hash_get(galloc, parent);
+                 if (p_hn->n_children == 1 && p_hn->n_views == 0) {
+-                    if (ggml_is_view(parent)) {
++                    if (ggml_impl_is_view(parent)) {
+                         struct ggml_tensor * view_src = parent->view_src;
+                         struct hash_node * view_src_hn = ggml_gallocr_hash_get(galloc, view_src);
+                         if (view_src_hn->n_views == 1 && view_src_hn->n_children == 0 && view_src->data == parent->data) {
+@@ -739,7 +734,7 @@ static void ggml_gallocr_alloc_graph_impl(ggml_gallocr_t galloc, struct ggml_cgr
+         // GGML_OP_NONE does not appear normally in the graph nodes, but is used by ggml-backend to add dependencies to
+         // control when some tensors are allocated and freed. in this case, the dependencies are in `src`, but the node
+         // itself is never used and should not be considered a dependency
+-        if (ggml_is_view(node) && node->op != GGML_OP_NONE) {
++        if (ggml_impl_is_view(node) && node->op != GGML_OP_NONE) {
+             struct ggml_tensor * view_src = node->view_src;
+             ggml_gallocr_hash_get(galloc, view_src)->n_views += 1;
+         }
+@@ -806,7 +801,7 @@ static void ggml_gallocr_alloc_graph_impl(ggml_gallocr_t galloc, struct ggml_cgr
+                 parent->name, p_hn->n_children, p_hn->n_views, p_hn->allocated);
+ 
+             if (p_hn->n_children == 0 && p_hn->n_views == 0) {
+-                if (ggml_is_view(parent)) {
++                if (ggml_impl_is_view(parent)) {
+                     struct ggml_tensor * view_src = parent->view_src;
+                     struct hash_node * view_src_hn = ggml_gallocr_hash_get(galloc, view_src);
+                     view_src_hn->n_views -= 1;
+diff --git a/ggml/src/ggml-impl.h b/ggml/src/ggml-impl.h
+index baadfe9a7..e3714b38a 100644
+--- a/ggml/src/ggml-impl.h
++++ b/ggml/src/ggml-impl.h
+@@ -98,6 +98,10 @@ static bool ggml_op_is_empty(enum ggml_op op) {
+     }
+ }
+ 
++static inline bool ggml_impl_is_view(const struct ggml_tensor * t) {
++    return t->view_src != NULL;
++}
++
+ static inline float ggml_compute_softplus_f32(float input) {
+     return (input > 20.0f) ? input : logf(1 + expf(input));
+ }
+diff --git a/ggml/src/ggml.c b/ggml/src/ggml.c
+index e2a6ff67b..ed819eaa4 100644
+--- a/ggml/src/ggml.c
++++ b/ggml/src/ggml.c
+@@ -1496,6 +1496,10 @@ bool ggml_are_same_stride(const struct ggml_tensor * t0, const struct ggml_tenso
+         (t0->nb[3] == t1->nb[3]);
+ }
+ 
++bool ggml_is_view(const struct ggml_tensor * t) {
++    return ggml_impl_is_view(t);
++}
++
+ // check if t1 can be represented as a repetition of t0
+ bool ggml_can_repeat(const struct ggml_tensor * t0, const struct ggml_tensor * t1) {
+     static_assert(GGML_MAX_DIMS == 4, "GGML_MAX_DIMS is not 4 - update this function");

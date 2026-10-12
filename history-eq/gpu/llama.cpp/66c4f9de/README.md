@@ -1,0 +1,5 @@
+# llama.cpp `66c4f9de`: q4 MMQ vector loads
+
+**Verdict: `EQUIV_PARTIAL`.** The historical edit replaces the scalar filling of eight `u[]` integers in each of the q4_0 and q4_1 MMQ dot-product paths with two 8- or 16-byte copies and interleaving. [The reproducible check](reproduce.py) extracts both exact changed source fragments and the unchanged historical copy helper and constants, then compiles both variants with Clang 20. [Alive2 proves both directions](bytes8/alive-old_to_new.log) for the four output halves at the 8-byte setting; the [reverse](bytes8/alive-new_to_old.log) and both [16-byte](bytes16/alive-old_to_new.log) [directions](bytes16/alive-new_to_old.log) also pass with zero errors. The eight input words are arbitrary initialized integers.
+
+[The result record](result.json) contains the historical Git blob IDs, source-diff hash, generated model hashes, and check counts. This is equality of the eight loaded integer values under aligned, nonaliasing source and destination arrays. It does not prove CUDA/HIP shared-memory execution, the complete MMQ kernel or output tensor, or a performance gain on an official benchmark.

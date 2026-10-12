@@ -1,0 +1,1255 @@
+; ModuleID = '/srv/home/hantaolou/code/veriop/history-eq/c/xxHash/d83cce5/wrap_long.c'
+source_filename = "/srv/home/hantaolou/code/veriop/history-eq/c/xxHash/d83cce5/wrap_long.c"
+target datalayout = "e-m:x-p:32:32-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32-a:0:32-S32"
+target triple = "i686-pc-windows-msvc19.33.0"
+
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(inaccessiblemem: readwrite)
+define dso_local i64 @target_xxh3_len256(i64 noundef %0, i64 noundef %1, i64 noundef %2, i64 noundef %3, i64 noundef %4, i64 noundef %5, i64 noundef %6, i64 noundef %7, i64 noundef %8, i64 noundef %9, i64 noundef %10, i64 noundef %11, i64 noundef %12, i64 noundef %13, i64 noundef %14, i64 noundef %15, i64 noundef %16, i64 noundef %17, i64 noundef %18, i64 noundef %19, i64 noundef %20, i64 noundef %21, i64 noundef %22, i64 noundef %23, i64 noundef %24, i64 noundef %25, i64 noundef %26, i64 noundef %27, i64 noundef %28, i64 noundef %29, i64 noundef %30, i64 noundef %31) local_unnamed_addr #0 {
+  %33 = alloca [256 x i8], align 1
+  call void @llvm.lifetime.start.p0(i64 256, ptr nonnull %33) #5
+  store i64 %0, ptr %33, align 1
+  %34 = getelementptr inbounds nuw i8, ptr %33, i32 8
+  store i64 %1, ptr %34, align 1
+  %35 = getelementptr inbounds nuw i8, ptr %33, i32 16
+  store i64 %2, ptr %35, align 1
+  %36 = getelementptr inbounds nuw i8, ptr %33, i32 24
+  store i64 %3, ptr %36, align 1
+  %37 = getelementptr inbounds nuw i8, ptr %33, i32 32
+  store i64 %4, ptr %37, align 1
+  %38 = getelementptr inbounds nuw i8, ptr %33, i32 40
+  store i64 %5, ptr %38, align 1
+  %39 = getelementptr inbounds nuw i8, ptr %33, i32 48
+  store i64 %6, ptr %39, align 1
+  %40 = getelementptr inbounds nuw i8, ptr %33, i32 56
+  store i64 %7, ptr %40, align 1
+  %41 = getelementptr inbounds nuw i8, ptr %33, i32 64
+  store i64 %8, ptr %41, align 1
+  %42 = getelementptr inbounds nuw i8, ptr %33, i32 72
+  store i64 %9, ptr %42, align 1
+  %43 = getelementptr inbounds nuw i8, ptr %33, i32 80
+  store i64 %10, ptr %43, align 1
+  %44 = getelementptr inbounds nuw i8, ptr %33, i32 88
+  store i64 %11, ptr %44, align 1
+  %45 = getelementptr inbounds nuw i8, ptr %33, i32 96
+  store i64 %12, ptr %45, align 1
+  %46 = getelementptr inbounds nuw i8, ptr %33, i32 104
+  store i64 %13, ptr %46, align 1
+  %47 = getelementptr inbounds nuw i8, ptr %33, i32 112
+  store i64 %14, ptr %47, align 1
+  %48 = getelementptr inbounds nuw i8, ptr %33, i32 120
+  store i64 %15, ptr %48, align 1
+  %49 = getelementptr inbounds nuw i8, ptr %33, i32 128
+  store i64 %16, ptr %49, align 1
+  %50 = getelementptr inbounds nuw i8, ptr %33, i32 136
+  store i64 %17, ptr %50, align 1
+  %51 = getelementptr inbounds nuw i8, ptr %33, i32 144
+  store i64 %18, ptr %51, align 1
+  %52 = getelementptr inbounds nuw i8, ptr %33, i32 152
+  store i64 %19, ptr %52, align 1
+  %53 = getelementptr inbounds nuw i8, ptr %33, i32 160
+  store i64 %20, ptr %53, align 1
+  %54 = getelementptr inbounds nuw i8, ptr %33, i32 168
+  store i64 %21, ptr %54, align 1
+  %55 = getelementptr inbounds nuw i8, ptr %33, i32 176
+  store i64 %22, ptr %55, align 1
+  %56 = getelementptr inbounds nuw i8, ptr %33, i32 184
+  store i64 %23, ptr %56, align 1
+  %57 = getelementptr inbounds nuw i8, ptr %33, i32 192
+  store i64 %24, ptr %57, align 1
+  %58 = getelementptr inbounds nuw i8, ptr %33, i32 200
+  store i64 %25, ptr %58, align 1
+  %59 = getelementptr inbounds nuw i8, ptr %33, i32 208
+  store i64 %26, ptr %59, align 1
+  %60 = getelementptr inbounds nuw i8, ptr %33, i32 216
+  store i64 %27, ptr %60, align 1
+  %61 = getelementptr inbounds nuw i8, ptr %33, i32 224
+  store i64 %28, ptr %61, align 1
+  %62 = getelementptr inbounds nuw i8, ptr %33, i32 232
+  store i64 %29, ptr %62, align 1
+  %63 = getelementptr inbounds nuw i8, ptr %33, i32 240
+  store i64 %30, ptr %63, align 1
+  %64 = getelementptr inbounds nuw i8, ptr %33, i32 248
+  store i64 %31, ptr %64, align 1
+  %65 = getelementptr inbounds nuw i8, ptr %33, i32 320
+  call void @llvm.prefetch.p0(ptr nonnull readonly %65, i32 0, i32 3, i32 1)
+  %66 = load <2 x i64>, ptr %33, align 1
+  %67 = xor <2 x i64> %66, <i64 -4734510112055689544, i64 2066345149520216444>
+  %68 = bitcast <2 x i64> %67 to <4 x i32>
+  %69 = shufflevector <4 x i32> %68, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %70 = bitcast <4 x i32> %69 to <2 x i64>
+  %71 = and <2 x i64> %67, splat (i64 4294967295)
+  %72 = and <2 x i64> %70, splat (i64 4294967295)
+  %73 = mul nuw <2 x i64> %72, %71
+  %74 = add <2 x i64> %66, <i64 -7046029288634856825, i64 3266489917>
+  %75 = shufflevector <2 x i64> %74, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %76 = add <2 x i64> %75, %73
+  %77 = load <2 x i64>, ptr %35, align 1
+  %78 = xor <2 x i64> %77, <i64 -2623469361688619810, i64 2262974939099578482>
+  %79 = bitcast <2 x i64> %78 to <4 x i32>
+  %80 = shufflevector <4 x i32> %79, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %81 = bitcast <4 x i32> %80 to <2 x i64>
+  %82 = and <2 x i64> %78, splat (i64 4294967295)
+  %83 = and <2 x i64> %81, splat (i64 4294967295)
+  %84 = mul nuw <2 x i64> %83, %82
+  %85 = add <2 x i64> %77, <i64 1609587929392839161, i64 -4417276706812531889>
+  %86 = shufflevector <2 x i64> %85, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %87 = add <2 x i64> %86, %84
+  %88 = load <2 x i64>, ptr %37, align 1
+  %89 = xor <2 x i64> %88, <i64 8711581037947681227, i64 2410270004345854594>
+  %90 = bitcast <2 x i64> %89 to <4 x i32>
+  %91 = shufflevector <4 x i32> %90, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %92 = bitcast <4 x i32> %91 to <2 x i64>
+  %93 = and <2 x i64> %89, splat (i64 4294967295)
+  %94 = and <2 x i64> %92, splat (i64 4294967295)
+  %95 = mul nuw <2 x i64> %94, %93
+  %96 = add <2 x i64> %88, <i64 2246822519, i64 -8796714831421723037>
+  %97 = shufflevector <2 x i64> %96, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %98 = add <2 x i64> %97, %95
+  %99 = load <2 x i64>, ptr %39, align 1
+  %100 = xor <2 x i64> %99, <i64 -8204357891075471176, i64 5487137525590930912>
+  %101 = bitcast <2 x i64> %100 to <4 x i32>
+  %102 = shufflevector <4 x i32> %101, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %103 = bitcast <4 x i32> %102 to <2 x i64>
+  %104 = and <2 x i64> %100, splat (i64 4294967295)
+  %105 = and <2 x i64> %103, splat (i64 4294967295)
+  %106 = mul nuw <2 x i64> %105, %104
+  %107 = add <2 x i64> %99, <i64 2654435761, i64 2870177450012600261>
+  %108 = shufflevector <2 x i64> %107, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %109 = add <2 x i64> %108, %106
+  %110 = getelementptr inbounds nuw i8, ptr %33, i32 384
+  call void @llvm.prefetch.p0(ptr nonnull readonly %110, i32 0, i32 3, i32 1)
+  %111 = load <2 x i64>, ptr %41, align 1
+  %112 = xor <2 x i64> %111, <i64 2066345149520216444, i64 -2623469361688619810>
+  %113 = bitcast <2 x i64> %112 to <4 x i32>
+  %114 = shufflevector <4 x i32> %113, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %115 = bitcast <4 x i32> %114 to <2 x i64>
+  %116 = and <2 x i64> %112, splat (i64 4294967295)
+  %117 = and <2 x i64> %115, splat (i64 4294967295)
+  %118 = mul nuw <2 x i64> %117, %116
+  %119 = shufflevector <2 x i64> %111, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %120 = add <2 x i64> %76, %119
+  %121 = add <2 x i64> %120, %118
+  %122 = load <2 x i64>, ptr %43, align 1
+  %123 = xor <2 x i64> %122, <i64 2262974939099578482, i64 8711581037947681227>
+  %124 = bitcast <2 x i64> %123 to <4 x i32>
+  %125 = shufflevector <4 x i32> %124, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %126 = bitcast <4 x i32> %125 to <2 x i64>
+  %127 = and <2 x i64> %123, splat (i64 4294967295)
+  %128 = and <2 x i64> %126, splat (i64 4294967295)
+  %129 = mul nuw <2 x i64> %128, %127
+  %130 = shufflevector <2 x i64> %122, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %131 = add <2 x i64> %87, %130
+  %132 = add <2 x i64> %131, %129
+  %133 = load <2 x i64>, ptr %45, align 1
+  %134 = xor <2 x i64> %133, <i64 2410270004345854594, i64 -8204357891075471176>
+  %135 = bitcast <2 x i64> %134 to <4 x i32>
+  %136 = shufflevector <4 x i32> %135, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %137 = bitcast <4 x i32> %136 to <2 x i64>
+  %138 = and <2 x i64> %134, splat (i64 4294967295)
+  %139 = and <2 x i64> %137, splat (i64 4294967295)
+  %140 = mul nuw <2 x i64> %139, %138
+  %141 = shufflevector <2 x i64> %133, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %142 = add <2 x i64> %98, %141
+  %143 = add <2 x i64> %142, %140
+  %144 = load <2 x i64>, ptr %47, align 1
+  %145 = xor <2 x i64> %144, <i64 5487137525590930912, i64 -3818837453329782724>
+  %146 = bitcast <2 x i64> %145 to <4 x i32>
+  %147 = shufflevector <4 x i32> %146, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %148 = bitcast <4 x i32> %147 to <2 x i64>
+  %149 = and <2 x i64> %145, splat (i64 4294967295)
+  %150 = and <2 x i64> %148, splat (i64 4294967295)
+  %151 = mul nuw <2 x i64> %150, %149
+  %152 = shufflevector <2 x i64> %144, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %153 = add <2 x i64> %109, %152
+  %154 = add <2 x i64> %153, %151
+  %155 = getelementptr inbounds nuw i8, ptr %33, i32 448
+  call void @llvm.prefetch.p0(ptr nonnull readonly %155, i32 0, i32 3, i32 1)
+  %156 = load <2 x i64>, ptr %49, align 1
+  %157 = xor <2 x i64> %156, <i64 -2623469361688619810, i64 2262974939099578482>
+  %158 = bitcast <2 x i64> %157 to <4 x i32>
+  %159 = shufflevector <4 x i32> %158, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %160 = bitcast <4 x i32> %159 to <2 x i64>
+  %161 = and <2 x i64> %157, splat (i64 4294967295)
+  %162 = and <2 x i64> %160, splat (i64 4294967295)
+  %163 = mul nuw <2 x i64> %162, %161
+  %164 = shufflevector <2 x i64> %156, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %165 = add <2 x i64> %121, %164
+  %166 = add <2 x i64> %165, %163
+  %167 = load <2 x i64>, ptr %51, align 1
+  %168 = xor <2 x i64> %167, <i64 8711581037947681227, i64 2410270004345854594>
+  %169 = bitcast <2 x i64> %168 to <4 x i32>
+  %170 = shufflevector <4 x i32> %169, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %171 = bitcast <4 x i32> %170 to <2 x i64>
+  %172 = and <2 x i64> %168, splat (i64 4294967295)
+  %173 = and <2 x i64> %171, splat (i64 4294967295)
+  %174 = mul nuw <2 x i64> %173, %172
+  %175 = shufflevector <2 x i64> %167, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %176 = add <2 x i64> %132, %175
+  %177 = add <2 x i64> %176, %174
+  %178 = load <2 x i64>, ptr %53, align 1
+  %179 = xor <2 x i64> %178, <i64 -8204357891075471176, i64 5487137525590930912>
+  %180 = bitcast <2 x i64> %179 to <4 x i32>
+  %181 = shufflevector <4 x i32> %180, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %182 = bitcast <4 x i32> %181 to <2 x i64>
+  %183 = and <2 x i64> %179, splat (i64 4294967295)
+  %184 = and <2 x i64> %182, splat (i64 4294967295)
+  %185 = mul nuw <2 x i64> %184, %183
+  %186 = shufflevector <2 x i64> %178, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %187 = add <2 x i64> %143, %186
+  %188 = add <2 x i64> %187, %185
+  %189 = load <2 x i64>, ptr %55, align 1
+  %190 = xor <2 x i64> %189, <i64 -3818837453329782724, i64 -6688317018830679928>
+  %191 = bitcast <2 x i64> %190 to <4 x i32>
+  %192 = shufflevector <4 x i32> %191, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %193 = bitcast <4 x i32> %192 to <2 x i64>
+  %194 = and <2 x i64> %190, splat (i64 4294967295)
+  %195 = and <2 x i64> %193, splat (i64 4294967295)
+  %196 = mul nuw <2 x i64> %195, %194
+  %197 = shufflevector <2 x i64> %189, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %198 = add <2 x i64> %154, %197
+  %199 = add <2 x i64> %198, %196
+  %200 = load <2 x i64>, ptr %57, align 1
+  %201 = xor <2 x i64> %200, <i64 -1556992608276218209, i64 -4196251135427498811>
+  %202 = bitcast <2 x i64> %201 to <4 x i32>
+  %203 = shufflevector <4 x i32> %202, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %204 = bitcast <4 x i32> %203 to <2 x i64>
+  %205 = and <2 x i64> %201, splat (i64 4294967295)
+  %206 = and <2 x i64> %204, splat (i64 4294967295)
+  %207 = mul nuw <2 x i64> %206, %205
+  %208 = shufflevector <2 x i64> %200, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %209 = add <2 x i64> %166, %208
+  %210 = add <2 x i64> %209, %207
+  %211 = load <2 x i64>, ptr %59, align 1
+  %212 = xor <2 x i64> %211, <i64 1723580219865931905, i64 -3221803331004277491>
+  %213 = bitcast <2 x i64> %212 to <4 x i32>
+  %214 = shufflevector <4 x i32> %213, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %215 = bitcast <4 x i32> %214 to <2 x i64>
+  %216 = and <2 x i64> %212, splat (i64 4294967295)
+  %217 = and <2 x i64> %215, splat (i64 4294967295)
+  %218 = mul nuw <2 x i64> %217, %216
+  %219 = shufflevector <2 x i64> %211, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %220 = add <2 x i64> %177, %219
+  %221 = add <2 x i64> %220, %218
+  %222 = load <2 x i64>, ptr %61, align 1
+  %223 = xor <2 x i64> %222, <i64 3143064850383918358, i64 -8071399103737053674>
+  %224 = bitcast <2 x i64> %223 to <4 x i32>
+  %225 = shufflevector <4 x i32> %224, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %226 = bitcast <4 x i32> %225 to <2 x i64>
+  %227 = and <2 x i64> %223, splat (i64 4294967295)
+  %228 = and <2 x i64> %226, splat (i64 4294967295)
+  %229 = mul nuw <2 x i64> %228, %227
+  %230 = shufflevector <2 x i64> %222, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %231 = add <2 x i64> %188, %230
+  %232 = add <2 x i64> %231, %229
+  %233 = load <2 x i64>, ptr %63, align 1
+  %234 = xor <2 x i64> %233, <i64 5030012605302946040, i64 -5825401622958753077>
+  %235 = bitcast <2 x i64> %234 to <4 x i32>
+  %236 = shufflevector <4 x i32> %235, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %237 = bitcast <4 x i32> %236 to <2 x i64>
+  %238 = and <2 x i64> %234, splat (i64 4294967295)
+  %239 = and <2 x i64> %237, splat (i64 4294967295)
+  %240 = mul nuw <2 x i64> %239, %238
+  %241 = shufflevector <2 x i64> %233, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %242 = add <2 x i64> %199, %241
+  %243 = add <2 x i64> %242, %240
+  %244 = extractelement <2 x i64> %210, i64 0
+  %245 = extractelement <2 x i64> %210, i64 1
+  %246 = xor i64 %245, -6611157965513653271
+  %247 = xor i64 %244, 7914194659941938988
+  %248 = and i64 %247, 4294967295
+  %249 = and i64 %246, 4294967295
+  %250 = mul nuw i64 %249, %248
+  %251 = lshr i64 %247, 32
+  %252 = mul nuw i64 %249, %251
+  %253 = lshr i64 %246, 32
+  %254 = mul nuw i64 %253, %248
+  %255 = mul nuw i64 %253, %251
+  %256 = lshr i64 %250, 32
+  %257 = and i64 %252, 4294967295
+  %258 = add nuw i64 %257, %254
+  %259 = add nuw i64 %258, %256
+  %260 = lshr i64 %252, 32
+  %261 = lshr i64 %259, 32
+  %262 = add nuw i64 %260, %255
+  %263 = add nuw i64 %262, %261
+  %264 = shl i64 %259, 32
+  %265 = and i64 %250, 4294967295
+  %266 = or disjoint i64 %264, %265
+  %267 = xor i64 %266, %263
+  %268 = add i64 %267, 3997421333012711168
+  %269 = extractelement <2 x i64> %221, i64 0
+  %270 = extractelement <2 x i64> %221, i64 1
+  %271 = xor i64 %270, -3433288310154277810
+  %272 = xor i64 %269, -1839215637059881052
+  %273 = and i64 %272, 4294967295
+  %274 = and i64 %271, 4294967295
+  %275 = mul nuw i64 %274, %273
+  %276 = lshr i64 %272, 32
+  %277 = mul nuw i64 %274, %276
+  %278 = lshr i64 %271, 32
+  %279 = mul nuw i64 %278, %273
+  %280 = mul nuw i64 %278, %276
+  %281 = lshr i64 %275, 32
+  %282 = and i64 %277, 4294967295
+  %283 = add nuw i64 %282, %279
+  %284 = add nuw i64 %283, %281
+  %285 = lshr i64 %277, 32
+  %286 = lshr i64 %284, 32
+  %287 = add nuw i64 %285, %280
+  %288 = add nuw i64 %287, %286
+  %289 = shl i64 %284, 32
+  %290 = and i64 %275, 4294967295
+  %291 = or disjoint i64 %289, %290
+  %292 = xor i64 %291, %288
+  %293 = add i64 %268, %292
+  %294 = extractelement <2 x i64> %232, i64 0
+  %295 = extractelement <2 x i64> %232, i64 1
+  %296 = xor i64 %295, -8055285457383852172
+  %297 = xor i64 %294, 5046485836271438973
+  %298 = and i64 %297, 4294967295
+  %299 = and i64 %296, 4294967295
+  %300 = mul nuw i64 %299, %298
+  %301 = lshr i64 %297, 32
+  %302 = mul nuw i64 %299, %301
+  %303 = lshr i64 %296, 32
+  %304 = mul nuw i64 %303, %298
+  %305 = mul nuw i64 %303, %301
+  %306 = lshr i64 %300, 32
+  %307 = and i64 %302, 4294967295
+  %308 = add nuw i64 %307, %304
+  %309 = add nuw i64 %308, %306
+  %310 = lshr i64 %302, 32
+  %311 = lshr i64 %309, 32
+  %312 = add nuw i64 %310, %305
+  %313 = add nuw i64 %312, %311
+  %314 = shl i64 %309, 32
+  %315 = and i64 %300, 4294967295
+  %316 = or disjoint i64 %314, %315
+  %317 = xor i64 %316, %313
+  %318 = add i64 %293, %317
+  %319 = extractelement <2 x i64> %243, i64 0
+  %320 = extractelement <2 x i64> %243, i64 1
+  %321 = xor i64 %320, 7336514198459093435
+  %322 = xor i64 %319, 5920048007935066598
+  %323 = and i64 %322, 4294967295
+  %324 = and i64 %321, 4294967295
+  %325 = mul nuw i64 %324, %323
+  %326 = lshr i64 %322, 32
+  %327 = mul nuw i64 %324, %326
+  %328 = lshr i64 %321, 32
+  %329 = mul nuw i64 %328, %323
+  %330 = mul nuw i64 %328, %326
+  %331 = lshr i64 %325, 32
+  %332 = and i64 %327, 4294967295
+  %333 = add nuw i64 %332, %329
+  %334 = add nuw i64 %333, %331
+  %335 = lshr i64 %327, 32
+  %336 = lshr i64 %334, 32
+  %337 = add nuw i64 %335, %330
+  %338 = add nuw i64 %337, %336
+  %339 = shl i64 %334, 32
+  %340 = and i64 %325, 4294967295
+  %341 = or disjoint i64 %339, %340
+  %342 = xor i64 %341, %338
+  %343 = add i64 %318, %342
+  %344 = lshr i64 %343, 37
+  %345 = xor i64 %344, %343
+  %346 = mul i64 %345, 1609587791953885689
+  %347 = lshr i64 %346, 32
+  %348 = xor i64 %347, %346
+  call void @llvm.lifetime.end.p0(i64 256, ptr nonnull %33) #5
+  ret i64 %348
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.lifetime.start.p0(i64 immarg, ptr) #1
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.lifetime.end.p0(i64 immarg, ptr) #1
+
+; Function Attrs: nounwind memory(write, inaccessiblemem: readwrite)
+define dso_local i64 @target_xxh3_seed_len256(i64 noundef %0, i64 noundef %1, i64 noundef %2, i64 noundef %3, i64 noundef %4, i64 noundef %5, i64 noundef %6, i64 noundef %7, i64 noundef %8, i64 noundef %9, i64 noundef %10, i64 noundef %11, i64 noundef %12, i64 noundef %13, i64 noundef %14, i64 noundef %15, i64 noundef %16, i64 noundef %17, i64 noundef %18, i64 noundef %19, i64 noundef %20, i64 noundef %21, i64 noundef %22, i64 noundef %23, i64 noundef %24, i64 noundef %25, i64 noundef %26, i64 noundef %27, i64 noundef %28, i64 noundef %29, i64 noundef %30, i64 noundef %31, i64 noundef %32) local_unnamed_addr #2 {
+  %34 = alloca [192 x i8], align 16
+  %35 = alloca [256 x i8], align 1
+  call void @llvm.lifetime.start.p0(i64 256, ptr nonnull %35) #5
+  store i64 %0, ptr %35, align 1
+  %36 = getelementptr inbounds nuw i8, ptr %35, i32 8
+  store i64 %1, ptr %36, align 1
+  %37 = getelementptr inbounds nuw i8, ptr %35, i32 16
+  store i64 %2, ptr %37, align 1
+  %38 = getelementptr inbounds nuw i8, ptr %35, i32 24
+  store i64 %3, ptr %38, align 1
+  %39 = getelementptr inbounds nuw i8, ptr %35, i32 32
+  store i64 %4, ptr %39, align 1
+  %40 = getelementptr inbounds nuw i8, ptr %35, i32 40
+  store i64 %5, ptr %40, align 1
+  %41 = getelementptr inbounds nuw i8, ptr %35, i32 48
+  store i64 %6, ptr %41, align 1
+  %42 = getelementptr inbounds nuw i8, ptr %35, i32 56
+  store i64 %7, ptr %42, align 1
+  %43 = getelementptr inbounds nuw i8, ptr %35, i32 64
+  store i64 %8, ptr %43, align 1
+  %44 = getelementptr inbounds nuw i8, ptr %35, i32 72
+  store i64 %9, ptr %44, align 1
+  %45 = getelementptr inbounds nuw i8, ptr %35, i32 80
+  store i64 %10, ptr %45, align 1
+  %46 = getelementptr inbounds nuw i8, ptr %35, i32 88
+  store i64 %11, ptr %46, align 1
+  %47 = getelementptr inbounds nuw i8, ptr %35, i32 96
+  store i64 %12, ptr %47, align 1
+  %48 = getelementptr inbounds nuw i8, ptr %35, i32 104
+  store i64 %13, ptr %48, align 1
+  %49 = getelementptr inbounds nuw i8, ptr %35, i32 112
+  store i64 %14, ptr %49, align 1
+  %50 = getelementptr inbounds nuw i8, ptr %35, i32 120
+  store i64 %15, ptr %50, align 1
+  %51 = getelementptr inbounds nuw i8, ptr %35, i32 128
+  store i64 %16, ptr %51, align 1
+  %52 = getelementptr inbounds nuw i8, ptr %35, i32 136
+  store i64 %17, ptr %52, align 1
+  %53 = getelementptr inbounds nuw i8, ptr %35, i32 144
+  store i64 %18, ptr %53, align 1
+  %54 = getelementptr inbounds nuw i8, ptr %35, i32 152
+  store i64 %19, ptr %54, align 1
+  %55 = getelementptr inbounds nuw i8, ptr %35, i32 160
+  store i64 %20, ptr %55, align 1
+  %56 = getelementptr inbounds nuw i8, ptr %35, i32 168
+  store i64 %21, ptr %56, align 1
+  %57 = getelementptr inbounds nuw i8, ptr %35, i32 176
+  store i64 %22, ptr %57, align 1
+  %58 = getelementptr inbounds nuw i8, ptr %35, i32 184
+  store i64 %23, ptr %58, align 1
+  %59 = getelementptr inbounds nuw i8, ptr %35, i32 192
+  store i64 %24, ptr %59, align 1
+  %60 = getelementptr inbounds nuw i8, ptr %35, i32 200
+  store i64 %25, ptr %60, align 1
+  %61 = getelementptr inbounds nuw i8, ptr %35, i32 208
+  store i64 %26, ptr %61, align 1
+  %62 = getelementptr inbounds nuw i8, ptr %35, i32 216
+  store i64 %27, ptr %62, align 1
+  %63 = getelementptr inbounds nuw i8, ptr %35, i32 224
+  store i64 %28, ptr %63, align 1
+  %64 = getelementptr inbounds nuw i8, ptr %35, i32 232
+  store i64 %29, ptr %64, align 1
+  %65 = getelementptr inbounds nuw i8, ptr %35, i32 240
+  store i64 %30, ptr %65, align 1
+  %66 = getelementptr inbounds nuw i8, ptr %35, i32 248
+  store i64 %31, ptr %66, align 1
+  %67 = icmp eq i64 %32, 0
+  br i1 %67, label %68, label %353
+
+68:                                               ; preds = %33
+  %69 = getelementptr inbounds nuw i8, ptr %35, i32 320
+  call void @llvm.prefetch.p0(ptr nonnull readonly %69, i32 0, i32 3, i32 1)
+  %70 = load <2 x i64>, ptr %35, align 1
+  %71 = xor <2 x i64> %70, <i64 -4734510112055689544, i64 2066345149520216444>
+  %72 = bitcast <2 x i64> %71 to <4 x i32>
+  %73 = shufflevector <4 x i32> %72, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %74 = bitcast <4 x i32> %73 to <2 x i64>
+  %75 = and <2 x i64> %71, splat (i64 4294967295)
+  %76 = and <2 x i64> %74, splat (i64 4294967295)
+  %77 = mul nuw <2 x i64> %76, %75
+  %78 = add <2 x i64> %70, <i64 -7046029288634856825, i64 3266489917>
+  %79 = shufflevector <2 x i64> %78, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %80 = add <2 x i64> %79, %77
+  %81 = load <2 x i64>, ptr %37, align 1
+  %82 = xor <2 x i64> %81, <i64 -2623469361688619810, i64 2262974939099578482>
+  %83 = bitcast <2 x i64> %82 to <4 x i32>
+  %84 = shufflevector <4 x i32> %83, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %85 = bitcast <4 x i32> %84 to <2 x i64>
+  %86 = and <2 x i64> %82, splat (i64 4294967295)
+  %87 = and <2 x i64> %85, splat (i64 4294967295)
+  %88 = mul nuw <2 x i64> %87, %86
+  %89 = add <2 x i64> %81, <i64 1609587929392839161, i64 -4417276706812531889>
+  %90 = shufflevector <2 x i64> %89, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %91 = add <2 x i64> %90, %88
+  %92 = load <2 x i64>, ptr %39, align 1
+  %93 = xor <2 x i64> %92, <i64 8711581037947681227, i64 2410270004345854594>
+  %94 = bitcast <2 x i64> %93 to <4 x i32>
+  %95 = shufflevector <4 x i32> %94, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %96 = bitcast <4 x i32> %95 to <2 x i64>
+  %97 = and <2 x i64> %93, splat (i64 4294967295)
+  %98 = and <2 x i64> %96, splat (i64 4294967295)
+  %99 = mul nuw <2 x i64> %98, %97
+  %100 = add <2 x i64> %92, <i64 2246822519, i64 -8796714831421723037>
+  %101 = shufflevector <2 x i64> %100, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %102 = add <2 x i64> %101, %99
+  %103 = load <2 x i64>, ptr %41, align 1
+  %104 = xor <2 x i64> %103, <i64 -8204357891075471176, i64 5487137525590930912>
+  %105 = bitcast <2 x i64> %104 to <4 x i32>
+  %106 = shufflevector <4 x i32> %105, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %107 = bitcast <4 x i32> %106 to <2 x i64>
+  %108 = and <2 x i64> %104, splat (i64 4294967295)
+  %109 = and <2 x i64> %107, splat (i64 4294967295)
+  %110 = mul nuw <2 x i64> %109, %108
+  %111 = add <2 x i64> %103, <i64 2654435761, i64 2870177450012600261>
+  %112 = shufflevector <2 x i64> %111, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %113 = add <2 x i64> %112, %110
+  %114 = getelementptr inbounds nuw i8, ptr %35, i32 384
+  call void @llvm.prefetch.p0(ptr nonnull readonly %114, i32 0, i32 3, i32 1)
+  %115 = load <2 x i64>, ptr %43, align 1
+  %116 = xor <2 x i64> %115, <i64 2066345149520216444, i64 -2623469361688619810>
+  %117 = bitcast <2 x i64> %116 to <4 x i32>
+  %118 = shufflevector <4 x i32> %117, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %119 = bitcast <4 x i32> %118 to <2 x i64>
+  %120 = and <2 x i64> %116, splat (i64 4294967295)
+  %121 = and <2 x i64> %119, splat (i64 4294967295)
+  %122 = mul nuw <2 x i64> %121, %120
+  %123 = shufflevector <2 x i64> %115, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %124 = add <2 x i64> %80, %123
+  %125 = add <2 x i64> %124, %122
+  %126 = load <2 x i64>, ptr %45, align 1
+  %127 = xor <2 x i64> %126, <i64 2262974939099578482, i64 8711581037947681227>
+  %128 = bitcast <2 x i64> %127 to <4 x i32>
+  %129 = shufflevector <4 x i32> %128, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %130 = bitcast <4 x i32> %129 to <2 x i64>
+  %131 = and <2 x i64> %127, splat (i64 4294967295)
+  %132 = and <2 x i64> %130, splat (i64 4294967295)
+  %133 = mul nuw <2 x i64> %132, %131
+  %134 = shufflevector <2 x i64> %126, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %135 = add <2 x i64> %91, %134
+  %136 = add <2 x i64> %135, %133
+  %137 = load <2 x i64>, ptr %47, align 1
+  %138 = xor <2 x i64> %137, <i64 2410270004345854594, i64 -8204357891075471176>
+  %139 = bitcast <2 x i64> %138 to <4 x i32>
+  %140 = shufflevector <4 x i32> %139, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %141 = bitcast <4 x i32> %140 to <2 x i64>
+  %142 = and <2 x i64> %138, splat (i64 4294967295)
+  %143 = and <2 x i64> %141, splat (i64 4294967295)
+  %144 = mul nuw <2 x i64> %143, %142
+  %145 = shufflevector <2 x i64> %137, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %146 = add <2 x i64> %102, %145
+  %147 = add <2 x i64> %146, %144
+  %148 = load <2 x i64>, ptr %49, align 1
+  %149 = xor <2 x i64> %148, <i64 5487137525590930912, i64 -3818837453329782724>
+  %150 = bitcast <2 x i64> %149 to <4 x i32>
+  %151 = shufflevector <4 x i32> %150, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %152 = bitcast <4 x i32> %151 to <2 x i64>
+  %153 = and <2 x i64> %149, splat (i64 4294967295)
+  %154 = and <2 x i64> %152, splat (i64 4294967295)
+  %155 = mul nuw <2 x i64> %154, %153
+  %156 = shufflevector <2 x i64> %148, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %157 = add <2 x i64> %113, %156
+  %158 = add <2 x i64> %157, %155
+  %159 = getelementptr inbounds nuw i8, ptr %35, i32 448
+  call void @llvm.prefetch.p0(ptr nonnull readonly %159, i32 0, i32 3, i32 1)
+  %160 = load <2 x i64>, ptr %51, align 1
+  %161 = xor <2 x i64> %160, <i64 -2623469361688619810, i64 2262974939099578482>
+  %162 = bitcast <2 x i64> %161 to <4 x i32>
+  %163 = shufflevector <4 x i32> %162, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %164 = bitcast <4 x i32> %163 to <2 x i64>
+  %165 = and <2 x i64> %161, splat (i64 4294967295)
+  %166 = and <2 x i64> %164, splat (i64 4294967295)
+  %167 = mul nuw <2 x i64> %166, %165
+  %168 = shufflevector <2 x i64> %160, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %169 = add <2 x i64> %125, %168
+  %170 = add <2 x i64> %169, %167
+  %171 = load <2 x i64>, ptr %53, align 1
+  %172 = xor <2 x i64> %171, <i64 8711581037947681227, i64 2410270004345854594>
+  %173 = bitcast <2 x i64> %172 to <4 x i32>
+  %174 = shufflevector <4 x i32> %173, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %175 = bitcast <4 x i32> %174 to <2 x i64>
+  %176 = and <2 x i64> %172, splat (i64 4294967295)
+  %177 = and <2 x i64> %175, splat (i64 4294967295)
+  %178 = mul nuw <2 x i64> %177, %176
+  %179 = shufflevector <2 x i64> %171, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %180 = add <2 x i64> %136, %179
+  %181 = add <2 x i64> %180, %178
+  %182 = load <2 x i64>, ptr %55, align 1
+  %183 = xor <2 x i64> %182, <i64 -8204357891075471176, i64 5487137525590930912>
+  %184 = bitcast <2 x i64> %183 to <4 x i32>
+  %185 = shufflevector <4 x i32> %184, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %186 = bitcast <4 x i32> %185 to <2 x i64>
+  %187 = and <2 x i64> %183, splat (i64 4294967295)
+  %188 = and <2 x i64> %186, splat (i64 4294967295)
+  %189 = mul nuw <2 x i64> %188, %187
+  %190 = shufflevector <2 x i64> %182, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %191 = add <2 x i64> %147, %190
+  %192 = add <2 x i64> %191, %189
+  %193 = load <2 x i64>, ptr %57, align 1
+  %194 = xor <2 x i64> %193, <i64 -3818837453329782724, i64 -6688317018830679928>
+  %195 = bitcast <2 x i64> %194 to <4 x i32>
+  %196 = shufflevector <4 x i32> %195, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %197 = bitcast <4 x i32> %196 to <2 x i64>
+  %198 = and <2 x i64> %194, splat (i64 4294967295)
+  %199 = and <2 x i64> %197, splat (i64 4294967295)
+  %200 = mul nuw <2 x i64> %199, %198
+  %201 = shufflevector <2 x i64> %193, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %202 = add <2 x i64> %158, %201
+  %203 = add <2 x i64> %202, %200
+  %204 = load <2 x i64>, ptr %59, align 1
+  %205 = xor <2 x i64> %204, <i64 -1556992608276218209, i64 -4196251135427498811>
+  %206 = bitcast <2 x i64> %205 to <4 x i32>
+  %207 = shufflevector <4 x i32> %206, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %208 = bitcast <4 x i32> %207 to <2 x i64>
+  %209 = and <2 x i64> %205, splat (i64 4294967295)
+  %210 = and <2 x i64> %208, splat (i64 4294967295)
+  %211 = mul nuw <2 x i64> %210, %209
+  %212 = shufflevector <2 x i64> %204, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %213 = add <2 x i64> %170, %212
+  %214 = add <2 x i64> %213, %211
+  %215 = load <2 x i64>, ptr %61, align 1
+  %216 = xor <2 x i64> %215, <i64 1723580219865931905, i64 -3221803331004277491>
+  %217 = bitcast <2 x i64> %216 to <4 x i32>
+  %218 = shufflevector <4 x i32> %217, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %219 = bitcast <4 x i32> %218 to <2 x i64>
+  %220 = and <2 x i64> %216, splat (i64 4294967295)
+  %221 = and <2 x i64> %219, splat (i64 4294967295)
+  %222 = mul nuw <2 x i64> %221, %220
+  %223 = shufflevector <2 x i64> %215, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %224 = add <2 x i64> %181, %223
+  %225 = add <2 x i64> %224, %222
+  %226 = load <2 x i64>, ptr %63, align 1
+  %227 = xor <2 x i64> %226, <i64 3143064850383918358, i64 -8071399103737053674>
+  %228 = bitcast <2 x i64> %227 to <4 x i32>
+  %229 = shufflevector <4 x i32> %228, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %230 = bitcast <4 x i32> %229 to <2 x i64>
+  %231 = and <2 x i64> %227, splat (i64 4294967295)
+  %232 = and <2 x i64> %230, splat (i64 4294967295)
+  %233 = mul nuw <2 x i64> %232, %231
+  %234 = shufflevector <2 x i64> %226, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %235 = add <2 x i64> %192, %234
+  %236 = add <2 x i64> %235, %233
+  %237 = load <2 x i64>, ptr %65, align 1
+  %238 = xor <2 x i64> %237, <i64 5030012605302946040, i64 -5825401622958753077>
+  %239 = bitcast <2 x i64> %238 to <4 x i32>
+  %240 = shufflevector <4 x i32> %239, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %241 = bitcast <4 x i32> %240 to <2 x i64>
+  %242 = and <2 x i64> %238, splat (i64 4294967295)
+  %243 = and <2 x i64> %241, splat (i64 4294967295)
+  %244 = mul nuw <2 x i64> %243, %242
+  %245 = shufflevector <2 x i64> %237, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %246 = add <2 x i64> %203, %245
+  %247 = add <2 x i64> %246, %244
+  %248 = extractelement <2 x i64> %214, i64 0
+  %249 = extractelement <2 x i64> %214, i64 1
+  %250 = xor i64 %249, -6611157965513653271
+  %251 = xor i64 %248, 7914194659941938988
+  %252 = and i64 %251, 4294967295
+  %253 = and i64 %250, 4294967295
+  %254 = mul nuw i64 %253, %252
+  %255 = lshr i64 %251, 32
+  %256 = mul nuw i64 %253, %255
+  %257 = lshr i64 %250, 32
+  %258 = mul nuw i64 %257, %252
+  %259 = mul nuw i64 %257, %255
+  %260 = lshr i64 %254, 32
+  %261 = and i64 %256, 4294967295
+  %262 = add nuw i64 %261, %258
+  %263 = add nuw i64 %262, %260
+  %264 = lshr i64 %256, 32
+  %265 = lshr i64 %263, 32
+  %266 = add nuw i64 %264, %259
+  %267 = add nuw i64 %266, %265
+  %268 = shl i64 %263, 32
+  %269 = and i64 %254, 4294967295
+  %270 = or disjoint i64 %268, %269
+  %271 = xor i64 %270, %267
+  %272 = add i64 %271, 3997421333012711168
+  %273 = extractelement <2 x i64> %225, i64 0
+  %274 = extractelement <2 x i64> %225, i64 1
+  %275 = xor i64 %274, -3433288310154277810
+  %276 = xor i64 %273, -1839215637059881052
+  %277 = and i64 %276, 4294967295
+  %278 = and i64 %275, 4294967295
+  %279 = mul nuw i64 %278, %277
+  %280 = lshr i64 %276, 32
+  %281 = mul nuw i64 %278, %280
+  %282 = lshr i64 %275, 32
+  %283 = mul nuw i64 %282, %277
+  %284 = mul nuw i64 %282, %280
+  %285 = lshr i64 %279, 32
+  %286 = and i64 %281, 4294967295
+  %287 = add nuw i64 %286, %283
+  %288 = add nuw i64 %287, %285
+  %289 = lshr i64 %281, 32
+  %290 = lshr i64 %288, 32
+  %291 = add nuw i64 %289, %284
+  %292 = add nuw i64 %291, %290
+  %293 = shl i64 %288, 32
+  %294 = and i64 %279, 4294967295
+  %295 = or disjoint i64 %293, %294
+  %296 = xor i64 %295, %292
+  %297 = add i64 %272, %296
+  %298 = extractelement <2 x i64> %236, i64 0
+  %299 = extractelement <2 x i64> %236, i64 1
+  %300 = xor i64 %299, -8055285457383852172
+  %301 = xor i64 %298, 5046485836271438973
+  %302 = and i64 %301, 4294967295
+  %303 = and i64 %300, 4294967295
+  %304 = mul nuw i64 %303, %302
+  %305 = lshr i64 %301, 32
+  %306 = mul nuw i64 %303, %305
+  %307 = lshr i64 %300, 32
+  %308 = mul nuw i64 %307, %302
+  %309 = mul nuw i64 %307, %305
+  %310 = lshr i64 %304, 32
+  %311 = and i64 %306, 4294967295
+  %312 = add nuw i64 %311, %308
+  %313 = add nuw i64 %312, %310
+  %314 = lshr i64 %306, 32
+  %315 = lshr i64 %313, 32
+  %316 = add nuw i64 %314, %309
+  %317 = add nuw i64 %316, %315
+  %318 = shl i64 %313, 32
+  %319 = and i64 %304, 4294967295
+  %320 = or disjoint i64 %318, %319
+  %321 = xor i64 %320, %317
+  %322 = add i64 %297, %321
+  %323 = extractelement <2 x i64> %247, i64 0
+  %324 = extractelement <2 x i64> %247, i64 1
+  %325 = xor i64 %324, 7336514198459093435
+  %326 = xor i64 %323, 5920048007935066598
+  %327 = and i64 %326, 4294967295
+  %328 = and i64 %325, 4294967295
+  %329 = mul nuw i64 %328, %327
+  %330 = lshr i64 %326, 32
+  %331 = mul nuw i64 %328, %330
+  %332 = lshr i64 %325, 32
+  %333 = mul nuw i64 %332, %327
+  %334 = mul nuw i64 %332, %330
+  %335 = lshr i64 %329, 32
+  %336 = and i64 %331, 4294967295
+  %337 = add nuw i64 %336, %333
+  %338 = add nuw i64 %337, %335
+  %339 = lshr i64 %331, 32
+  %340 = lshr i64 %338, 32
+  %341 = add nuw i64 %339, %334
+  %342 = add nuw i64 %341, %340
+  %343 = shl i64 %338, 32
+  %344 = and i64 %329, 4294967295
+  %345 = or disjoint i64 %343, %344
+  %346 = xor i64 %345, %342
+  %347 = add i64 %322, %346
+  %348 = lshr i64 %347, 37
+  %349 = xor i64 %348, %347
+  %350 = mul i64 %349, 1609587791953885689
+  %351 = lshr i64 %350, 32
+  %352 = xor i64 %351, %350
+  br label %706
+
+353:                                              ; preds = %33
+  call void @llvm.lifetime.start.p0(i64 192, ptr nonnull %34) #5
+  %354 = sub nsw i64 0, %32
+  %355 = insertelement <2 x i64> poison, i64 %32, i64 0
+  %356 = insertelement <2 x i64> %355, i64 %354, i64 1
+  %357 = freeze ptr %34
+  %358 = add <2 x i64> %356, <i64 -4734510112055689544, i64 2066345149520216444>
+  store <2 x i64> %358, ptr %357, align 16
+  %359 = add <2 x i64> %356, <i64 -2623469361688619810, i64 2262974939099578482>
+  %360 = getelementptr inbounds nuw i8, ptr %357, i32 16
+  store <2 x i64> %359, ptr %360, align 16
+  %361 = add <2 x i64> %356, <i64 8711581037947681227, i64 2410270004345854594>
+  %362 = getelementptr inbounds nuw i8, ptr %357, i32 32
+  store <2 x i64> %361, ptr %362, align 16
+  %363 = add <2 x i64> %356, <i64 -8204357891075471176, i64 5487137525590930912>
+  %364 = getelementptr inbounds nuw i8, ptr %357, i32 48
+  store <2 x i64> %363, ptr %364, align 16
+  %365 = add <2 x i64> %356, <i64 -3818837453329782724, i64 -6688317018830679928>
+  %366 = getelementptr inbounds nuw i8, ptr %357, i32 64
+  store <2 x i64> %365, ptr %366, align 16
+  %367 = add <2 x i64> %356, <i64 5690594596133299313, i64 -2833645246901970632>
+  %368 = getelementptr inbounds nuw i8, ptr %357, i32 80
+  store <2 x i64> %367, ptr %368, align 16
+  %369 = add <2 x i64> %356, <i64 4554437623014685352, i64 2111919702937427193>
+  %370 = getelementptr inbounds nuw i8, ptr %357, i32 96
+  store <2 x i64> %369, ptr %370, align 16
+  %371 = add <2 x i64> %356, <i64 3556072174620004746, i64 7238261902898274248>
+  %372 = getelementptr inbounds nuw i8, ptr %357, i32 112
+  store <2 x i64> %371, ptr %372, align 16
+  %373 = add <2 x i64> %356, <i64 -4329134394285701654, i64 -1485321483350670907>
+  %374 = getelementptr inbounds nuw i8, ptr %357, i32 128
+  store <2 x i64> %373, ptr %374, align 16
+  %375 = add <2 x i64> %356, <i64 5321830579834785047, i64 -7032137544937171245>
+  %376 = getelementptr inbounds nuw i8, ptr %357, i32 144
+  store <2 x i64> %375, ptr %376, align 16
+  %377 = add <2 x i64> %356, <i64 -242834301215959509, i64 -3588858202114426737>
+  %378 = getelementptr inbounds nuw i8, ptr %357, i32 160
+  store <2 x i64> %377, ptr %378, align 16
+  %379 = add <2 x i64> %356, <i64 2883454493032893253, i64 9097354517224871855>
+  %380 = getelementptr inbounds nuw i8, ptr %357, i32 176
+  store <2 x i64> %379, ptr %380, align 16
+  %381 = getelementptr inbounds nuw i8, ptr %35, i32 320
+  call void @llvm.prefetch.p0(ptr nonnull readonly %381, i32 0, i32 3, i32 1)
+  %382 = load <2 x i64>, ptr %35, align 1
+  %383 = load <2 x i64>, ptr %34, align 16
+  %384 = xor <2 x i64> %383, %382
+  %385 = bitcast <2 x i64> %384 to <4 x i32>
+  %386 = shufflevector <4 x i32> %385, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %387 = bitcast <4 x i32> %386 to <2 x i64>
+  %388 = and <2 x i64> %384, splat (i64 4294967295)
+  %389 = and <2 x i64> %387, splat (i64 4294967295)
+  %390 = mul nuw <2 x i64> %389, %388
+  %391 = add <2 x i64> %382, <i64 -7046029288634856825, i64 3266489917>
+  %392 = shufflevector <2 x i64> %391, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %393 = add <2 x i64> %392, %390
+  %394 = load <2 x i64>, ptr %37, align 1
+  %395 = getelementptr inbounds nuw i8, ptr %34, i32 16
+  %396 = load <2 x i64>, ptr %395, align 16
+  %397 = xor <2 x i64> %396, %394
+  %398 = bitcast <2 x i64> %397 to <4 x i32>
+  %399 = shufflevector <4 x i32> %398, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %400 = bitcast <4 x i32> %399 to <2 x i64>
+  %401 = and <2 x i64> %397, splat (i64 4294967295)
+  %402 = and <2 x i64> %400, splat (i64 4294967295)
+  %403 = mul nuw <2 x i64> %402, %401
+  %404 = add <2 x i64> %394, <i64 1609587929392839161, i64 -4417276706812531889>
+  %405 = shufflevector <2 x i64> %404, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %406 = add <2 x i64> %405, %403
+  %407 = load <2 x i64>, ptr %39, align 1
+  %408 = getelementptr inbounds nuw i8, ptr %34, i32 32
+  %409 = load <2 x i64>, ptr %408, align 16
+  %410 = xor <2 x i64> %409, %407
+  %411 = bitcast <2 x i64> %410 to <4 x i32>
+  %412 = shufflevector <4 x i32> %411, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %413 = bitcast <4 x i32> %412 to <2 x i64>
+  %414 = and <2 x i64> %410, splat (i64 4294967295)
+  %415 = and <2 x i64> %413, splat (i64 4294967295)
+  %416 = mul nuw <2 x i64> %415, %414
+  %417 = add <2 x i64> %407, <i64 2246822519, i64 -8796714831421723037>
+  %418 = shufflevector <2 x i64> %417, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %419 = add <2 x i64> %418, %416
+  %420 = load <2 x i64>, ptr %41, align 1
+  %421 = getelementptr inbounds nuw i8, ptr %34, i32 48
+  %422 = load <2 x i64>, ptr %421, align 16
+  %423 = xor <2 x i64> %422, %420
+  %424 = bitcast <2 x i64> %423 to <4 x i32>
+  %425 = shufflevector <4 x i32> %424, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %426 = bitcast <4 x i32> %425 to <2 x i64>
+  %427 = and <2 x i64> %423, splat (i64 4294967295)
+  %428 = and <2 x i64> %426, splat (i64 4294967295)
+  %429 = mul nuw <2 x i64> %428, %427
+  %430 = add <2 x i64> %420, <i64 2654435761, i64 2870177450012600261>
+  %431 = shufflevector <2 x i64> %430, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %432 = add <2 x i64> %431, %429
+  %433 = getelementptr inbounds nuw i8, ptr %35, i32 384
+  call void @llvm.prefetch.p0(ptr nonnull readonly %433, i32 0, i32 3, i32 1)
+  %434 = getelementptr inbounds nuw i8, ptr %34, i32 8
+  %435 = load <2 x i64>, ptr %43, align 1
+  %436 = load <2 x i64>, ptr %434, align 8
+  %437 = xor <2 x i64> %436, %435
+  %438 = bitcast <2 x i64> %437 to <4 x i32>
+  %439 = shufflevector <4 x i32> %438, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %440 = bitcast <4 x i32> %439 to <2 x i64>
+  %441 = and <2 x i64> %437, splat (i64 4294967295)
+  %442 = and <2 x i64> %440, splat (i64 4294967295)
+  %443 = mul nuw <2 x i64> %442, %441
+  %444 = shufflevector <2 x i64> %435, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %445 = add <2 x i64> %393, %444
+  %446 = add <2 x i64> %445, %443
+  %447 = load <2 x i64>, ptr %45, align 1
+  %448 = getelementptr inbounds nuw i8, ptr %34, i32 24
+  %449 = load <2 x i64>, ptr %448, align 8
+  %450 = xor <2 x i64> %449, %447
+  %451 = bitcast <2 x i64> %450 to <4 x i32>
+  %452 = shufflevector <4 x i32> %451, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %453 = bitcast <4 x i32> %452 to <2 x i64>
+  %454 = and <2 x i64> %450, splat (i64 4294967295)
+  %455 = and <2 x i64> %453, splat (i64 4294967295)
+  %456 = mul nuw <2 x i64> %455, %454
+  %457 = shufflevector <2 x i64> %447, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %458 = add <2 x i64> %406, %457
+  %459 = add <2 x i64> %458, %456
+  %460 = load <2 x i64>, ptr %47, align 1
+  %461 = getelementptr inbounds nuw i8, ptr %34, i32 40
+  %462 = load <2 x i64>, ptr %461, align 8
+  %463 = xor <2 x i64> %462, %460
+  %464 = bitcast <2 x i64> %463 to <4 x i32>
+  %465 = shufflevector <4 x i32> %464, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %466 = bitcast <4 x i32> %465 to <2 x i64>
+  %467 = and <2 x i64> %463, splat (i64 4294967295)
+  %468 = and <2 x i64> %466, splat (i64 4294967295)
+  %469 = mul nuw <2 x i64> %468, %467
+  %470 = shufflevector <2 x i64> %460, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %471 = add <2 x i64> %419, %470
+  %472 = add <2 x i64> %471, %469
+  %473 = load <2 x i64>, ptr %49, align 1
+  %474 = getelementptr inbounds nuw i8, ptr %34, i32 56
+  %475 = load <2 x i64>, ptr %474, align 8
+  %476 = xor <2 x i64> %475, %473
+  %477 = bitcast <2 x i64> %476 to <4 x i32>
+  %478 = shufflevector <4 x i32> %477, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %479 = bitcast <4 x i32> %478 to <2 x i64>
+  %480 = and <2 x i64> %476, splat (i64 4294967295)
+  %481 = and <2 x i64> %479, splat (i64 4294967295)
+  %482 = mul nuw <2 x i64> %481, %480
+  %483 = shufflevector <2 x i64> %473, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %484 = add <2 x i64> %432, %483
+  %485 = add <2 x i64> %484, %482
+  %486 = getelementptr inbounds nuw i8, ptr %35, i32 448
+  call void @llvm.prefetch.p0(ptr nonnull readonly %486, i32 0, i32 3, i32 1)
+  %487 = load <2 x i64>, ptr %51, align 1
+  %488 = xor <2 x i64> %487, %396
+  %489 = bitcast <2 x i64> %488 to <4 x i32>
+  %490 = shufflevector <4 x i32> %489, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %491 = bitcast <4 x i32> %490 to <2 x i64>
+  %492 = and <2 x i64> %488, splat (i64 4294967295)
+  %493 = and <2 x i64> %491, splat (i64 4294967295)
+  %494 = mul nuw <2 x i64> %493, %492
+  %495 = shufflevector <2 x i64> %487, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %496 = add <2 x i64> %446, %495
+  %497 = add <2 x i64> %496, %494
+  %498 = load <2 x i64>, ptr %53, align 1
+  %499 = xor <2 x i64> %498, %409
+  %500 = bitcast <2 x i64> %499 to <4 x i32>
+  %501 = shufflevector <4 x i32> %500, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %502 = bitcast <4 x i32> %501 to <2 x i64>
+  %503 = and <2 x i64> %499, splat (i64 4294967295)
+  %504 = and <2 x i64> %502, splat (i64 4294967295)
+  %505 = mul nuw <2 x i64> %504, %503
+  %506 = shufflevector <2 x i64> %498, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %507 = add <2 x i64> %459, %506
+  %508 = add <2 x i64> %507, %505
+  %509 = load <2 x i64>, ptr %55, align 1
+  %510 = xor <2 x i64> %509, %422
+  %511 = bitcast <2 x i64> %510 to <4 x i32>
+  %512 = shufflevector <4 x i32> %511, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %513 = bitcast <4 x i32> %512 to <2 x i64>
+  %514 = and <2 x i64> %510, splat (i64 4294967295)
+  %515 = and <2 x i64> %513, splat (i64 4294967295)
+  %516 = mul nuw <2 x i64> %515, %514
+  %517 = shufflevector <2 x i64> %509, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %518 = add <2 x i64> %472, %517
+  %519 = add <2 x i64> %518, %516
+  %520 = load <2 x i64>, ptr %57, align 1
+  %521 = getelementptr inbounds nuw i8, ptr %34, i32 64
+  %522 = load <2 x i64>, ptr %521, align 16
+  %523 = xor <2 x i64> %522, %520
+  %524 = bitcast <2 x i64> %523 to <4 x i32>
+  %525 = shufflevector <4 x i32> %524, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %526 = bitcast <4 x i32> %525 to <2 x i64>
+  %527 = and <2 x i64> %523, splat (i64 4294967295)
+  %528 = and <2 x i64> %526, splat (i64 4294967295)
+  %529 = mul nuw <2 x i64> %528, %527
+  %530 = shufflevector <2 x i64> %520, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %531 = add <2 x i64> %485, %530
+  %532 = add <2 x i64> %531, %529
+  %533 = getelementptr inbounds nuw i8, ptr %34, i32 121
+  %534 = load <2 x i64>, ptr %59, align 1
+  %535 = load <2 x i64>, ptr %533, align 1
+  %536 = xor <2 x i64> %535, %534
+  %537 = bitcast <2 x i64> %536 to <4 x i32>
+  %538 = shufflevector <4 x i32> %537, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %539 = bitcast <4 x i32> %538 to <2 x i64>
+  %540 = and <2 x i64> %536, splat (i64 4294967295)
+  %541 = and <2 x i64> %539, splat (i64 4294967295)
+  %542 = mul nuw <2 x i64> %541, %540
+  %543 = shufflevector <2 x i64> %534, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %544 = add <2 x i64> %497, %543
+  %545 = add <2 x i64> %544, %542
+  %546 = load <2 x i64>, ptr %61, align 1
+  %547 = getelementptr inbounds nuw i8, ptr %34, i32 137
+  %548 = load <2 x i64>, ptr %547, align 1
+  %549 = xor <2 x i64> %548, %546
+  %550 = bitcast <2 x i64> %549 to <4 x i32>
+  %551 = shufflevector <4 x i32> %550, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %552 = bitcast <4 x i32> %551 to <2 x i64>
+  %553 = and <2 x i64> %549, splat (i64 4294967295)
+  %554 = and <2 x i64> %552, splat (i64 4294967295)
+  %555 = mul nuw <2 x i64> %554, %553
+  %556 = shufflevector <2 x i64> %546, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %557 = add <2 x i64> %508, %556
+  %558 = add <2 x i64> %557, %555
+  %559 = load <2 x i64>, ptr %63, align 1
+  %560 = getelementptr inbounds nuw i8, ptr %34, i32 153
+  %561 = load <2 x i64>, ptr %560, align 1
+  %562 = xor <2 x i64> %561, %559
+  %563 = bitcast <2 x i64> %562 to <4 x i32>
+  %564 = shufflevector <4 x i32> %563, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %565 = bitcast <4 x i32> %564 to <2 x i64>
+  %566 = and <2 x i64> %562, splat (i64 4294967295)
+  %567 = and <2 x i64> %565, splat (i64 4294967295)
+  %568 = mul nuw <2 x i64> %567, %566
+  %569 = shufflevector <2 x i64> %559, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %570 = add <2 x i64> %519, %569
+  %571 = add <2 x i64> %570, %568
+  %572 = load <2 x i64>, ptr %65, align 1
+  %573 = getelementptr inbounds nuw i8, ptr %34, i32 169
+  %574 = load <2 x i64>, ptr %573, align 1
+  %575 = xor <2 x i64> %574, %572
+  %576 = bitcast <2 x i64> %575 to <4 x i32>
+  %577 = shufflevector <4 x i32> %576, <4 x i32> poison, <4 x i32> <i32 1, i32 0, i32 3, i32 0>
+  %578 = bitcast <4 x i32> %577 to <2 x i64>
+  %579 = and <2 x i64> %575, splat (i64 4294967295)
+  %580 = and <2 x i64> %578, splat (i64 4294967295)
+  %581 = mul nuw <2 x i64> %580, %579
+  %582 = shufflevector <2 x i64> %572, <2 x i64> poison, <2 x i32> <i32 1, i32 0>
+  %583 = add <2 x i64> %532, %582
+  %584 = add <2 x i64> %583, %581
+  %585 = getelementptr inbounds nuw i8, ptr %34, i32 11
+  %586 = extractelement <2 x i64> %545, i64 0
+  %587 = extractelement <2 x i64> %545, i64 1
+  %588 = load i64, ptr %585, align 1
+  %589 = getelementptr inbounds nuw i8, ptr %34, i32 19
+  %590 = load i64, ptr %589, align 1
+  %591 = xor i64 %590, %587
+  %592 = xor i64 %586, %588
+  %593 = and i64 %592, 4294967295
+  %594 = and i64 %591, 4294967295
+  %595 = mul nuw i64 %594, %593
+  %596 = lshr i64 %592, 32
+  %597 = mul nuw i64 %594, %596
+  %598 = lshr i64 %591, 32
+  %599 = mul nuw i64 %598, %593
+  %600 = mul nuw i64 %598, %596
+  %601 = lshr i64 %595, 32
+  %602 = and i64 %597, 4294967295
+  %603 = add nuw i64 %602, %599
+  %604 = add nuw i64 %603, %601
+  %605 = lshr i64 %597, 32
+  %606 = lshr i64 %604, 32
+  %607 = add nuw i64 %605, %600
+  %608 = add nuw i64 %607, %606
+  %609 = shl i64 %604, 32
+  %610 = and i64 %595, 4294967295
+  %611 = or disjoint i64 %609, %610
+  %612 = xor i64 %611, %608
+  %613 = add i64 %612, 3997421333012711168
+  %614 = getelementptr inbounds nuw i8, ptr %34, i32 27
+  %615 = extractelement <2 x i64> %558, i64 0
+  %616 = extractelement <2 x i64> %558, i64 1
+  %617 = load i64, ptr %614, align 1
+  %618 = getelementptr inbounds nuw i8, ptr %34, i32 35
+  %619 = load i64, ptr %618, align 1
+  %620 = xor i64 %619, %616
+  %621 = xor i64 %615, %617
+  %622 = and i64 %621, 4294967295
+  %623 = and i64 %620, 4294967295
+  %624 = mul nuw i64 %623, %622
+  %625 = lshr i64 %621, 32
+  %626 = mul nuw i64 %623, %625
+  %627 = lshr i64 %620, 32
+  %628 = mul nuw i64 %627, %622
+  %629 = mul nuw i64 %627, %625
+  %630 = lshr i64 %624, 32
+  %631 = and i64 %626, 4294967295
+  %632 = add nuw i64 %631, %628
+  %633 = add nuw i64 %632, %630
+  %634 = lshr i64 %626, 32
+  %635 = lshr i64 %633, 32
+  %636 = add nuw i64 %634, %629
+  %637 = add nuw i64 %636, %635
+  %638 = shl i64 %633, 32
+  %639 = and i64 %624, 4294967295
+  %640 = or disjoint i64 %638, %639
+  %641 = xor i64 %640, %637
+  %642 = add i64 %613, %641
+  %643 = getelementptr inbounds nuw i8, ptr %34, i32 43
+  %644 = extractelement <2 x i64> %571, i64 0
+  %645 = extractelement <2 x i64> %571, i64 1
+  %646 = load i64, ptr %643, align 1
+  %647 = getelementptr inbounds nuw i8, ptr %34, i32 51
+  %648 = load i64, ptr %647, align 1
+  %649 = xor i64 %648, %645
+  %650 = xor i64 %644, %646
+  %651 = and i64 %650, 4294967295
+  %652 = and i64 %649, 4294967295
+  %653 = mul nuw i64 %652, %651
+  %654 = lshr i64 %650, 32
+  %655 = mul nuw i64 %652, %654
+  %656 = lshr i64 %649, 32
+  %657 = mul nuw i64 %656, %651
+  %658 = mul nuw i64 %656, %654
+  %659 = lshr i64 %653, 32
+  %660 = and i64 %655, 4294967295
+  %661 = add nuw i64 %660, %657
+  %662 = add nuw i64 %661, %659
+  %663 = lshr i64 %655, 32
+  %664 = lshr i64 %662, 32
+  %665 = add nuw i64 %663, %658
+  %666 = add nuw i64 %665, %664
+  %667 = shl i64 %662, 32
+  %668 = and i64 %653, 4294967295
+  %669 = or disjoint i64 %667, %668
+  %670 = xor i64 %669, %666
+  %671 = add i64 %642, %670
+  %672 = getelementptr inbounds nuw i8, ptr %34, i32 59
+  %673 = extractelement <2 x i64> %584, i64 0
+  %674 = extractelement <2 x i64> %584, i64 1
+  %675 = load i64, ptr %672, align 1
+  %676 = getelementptr inbounds nuw i8, ptr %34, i32 67
+  %677 = load i64, ptr %676, align 1
+  %678 = xor i64 %677, %674
+  %679 = xor i64 %673, %675
+  %680 = and i64 %679, 4294967295
+  %681 = and i64 %678, 4294967295
+  %682 = mul nuw i64 %681, %680
+  %683 = lshr i64 %679, 32
+  %684 = mul nuw i64 %681, %683
+  %685 = lshr i64 %678, 32
+  %686 = mul nuw i64 %685, %680
+  %687 = mul nuw i64 %685, %683
+  %688 = lshr i64 %682, 32
+  %689 = and i64 %684, 4294967295
+  %690 = add nuw i64 %689, %686
+  %691 = add nuw i64 %690, %688
+  %692 = lshr i64 %684, 32
+  %693 = lshr i64 %691, 32
+  %694 = add nuw i64 %692, %687
+  %695 = add nuw i64 %694, %693
+  %696 = shl i64 %691, 32
+  %697 = and i64 %682, 4294967295
+  %698 = or disjoint i64 %696, %697
+  %699 = xor i64 %698, %695
+  %700 = add i64 %671, %699
+  %701 = lshr i64 %700, 37
+  %702 = xor i64 %701, %700
+  %703 = mul i64 %702, 1609587791953885689
+  %704 = lshr i64 %703, 32
+  %705 = xor i64 %704, %703
+  call void @llvm.lifetime.end.p0(i64 192, ptr nonnull %34) #5
+  br label %706
+
+706:                                              ; preds = %68, %353
+  %707 = phi i64 [ %352, %68 ], [ %705, %353 ]
+  call void @llvm.lifetime.end.p0(i64 256, ptr nonnull %35) #5
+  ret i64 %707
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite, inaccessiblemem: readwrite)
+declare void @llvm.prefetch.p0(ptr readonly, i32 immarg, i32 immarg, i32 immarg) #3
+
+; Function Attrs: nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: readwrite)
+declare void @llvm.experimental.noalias.scope.decl(metadata) #4
+
+attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(inaccessiblemem: readwrite) "min-legal-vector-width"="128" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="i686" "target-features"="+cmov,+cx8,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
+attributes #2 = { nounwind memory(write, inaccessiblemem: readwrite) "min-legal-vector-width"="128" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="i686" "target-features"="+cmov,+cx8,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #3 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite, inaccessiblemem: readwrite) }
+attributes #4 = { nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: readwrite) }
+attributes #5 = { nounwind }
+attributes #6 = { nounwind memory(none) }
+
+!llvm.module.flags = !{!0, !1, !2}
+!llvm.ident = !{!3}
+
+!0 = !{i32 1, !"NumRegisterParameters", i32 0}
+!1 = !{i32 1, !"wchar_size", i32 2}
+!2 = !{i32 1, !"MaxTLSAlign", i32 65536}
+!3 = !{!"Ubuntu clang version 20.1.8 (++20250708082409+6fb913d3e2ec-1~exp1~20250708202428.132)"}
+!4 = !{!5, !7, !8, !10, !11}
+!5 = distinct !{!5, !6, !"XXH3_accumulate: argument 0"}
+!6 = distinct !{!6, !"XXH3_accumulate"}
+!7 = distinct !{!7, !6, !"XXH3_accumulate: argument 2"}
+!8 = distinct !{!8, !9, !"XXH3_hashLong_internal_loop: argument 0"}
+!9 = distinct !{!9, !"XXH3_hashLong_internal_loop"}
+!10 = distinct !{!10, !9, !"XXH3_hashLong_internal_loop: argument 2"}
+!11 = distinct !{!11, !12, !"XXH3_hashLong_64b_internal: argument 1"}
+!12 = distinct !{!12, !"XXH3_hashLong_64b_internal"}
+!13 = !{!14, !16, !17, !18, !19}
+!14 = distinct !{!14, !15, !"XXH3_accumulate_512_sse2: argument 1"}
+!15 = distinct !{!15, !"XXH3_accumulate_512_sse2"}
+!16 = distinct !{!16, !6, !"XXH3_accumulate: argument 1"}
+!17 = distinct !{!17, !9, !"XXH3_hashLong_internal_loop: argument 1"}
+!18 = distinct !{!18, !12, !"XXH3_hashLong_64b_internal: argument 0"}
+!19 = distinct !{!19, !20, !"XXH3_hashLong_64b_default: argument 0"}
+!20 = distinct !{!20, !"XXH3_hashLong_64b_default"}
+!21 = !{!22, !23, !5, !7, !8, !10, !11}
+!22 = distinct !{!22, !15, !"XXH3_accumulate_512_sse2: argument 0"}
+!23 = distinct !{!23, !15, !"XXH3_accumulate_512_sse2: argument 2"}
+!24 = !{!25, !16, !17, !18, !19}
+!25 = distinct !{!25, !15, !"XXH3_accumulate_512_sse2: argument 1:It1"}
+!26 = !{!22, !27, !5, !7, !8, !10, !11}
+!27 = distinct !{!27, !15, !"XXH3_accumulate_512_sse2: argument 2:It1"}
+!28 = !{!29, !16, !17, !18, !19}
+!29 = distinct !{!29, !15, !"XXH3_accumulate_512_sse2: argument 1:It2"}
+!30 = !{!22, !31, !5, !7, !8, !10, !11}
+!31 = distinct !{!31, !15, !"XXH3_accumulate_512_sse2: argument 2:It2"}
+!32 = !{!33, !17, !18, !19}
+!33 = distinct !{!33, !34, !"XXH3_accumulate_512_sse2: argument 1"}
+!34 = distinct !{!34, !"XXH3_accumulate_512_sse2"}
+!35 = !{!36, !37, !8, !10, !11}
+!36 = distinct !{!36, !34, !"XXH3_accumulate_512_sse2: argument 0"}
+!37 = distinct !{!37, !34, !"XXH3_accumulate_512_sse2: argument 2"}
+!38 = !{!39, !41, !42, !44, !45}
+!39 = distinct !{!39, !40, !"XXH3_accumulate: argument 0"}
+!40 = distinct !{!40, !"XXH3_accumulate"}
+!41 = distinct !{!41, !40, !"XXH3_accumulate: argument 2"}
+!42 = distinct !{!42, !43, !"XXH3_hashLong_internal_loop: argument 0"}
+!43 = distinct !{!43, !"XXH3_hashLong_internal_loop"}
+!44 = distinct !{!44, !43, !"XXH3_hashLong_internal_loop: argument 2"}
+!45 = distinct !{!45, !46, !"XXH3_hashLong_64b_internal: argument 1"}
+!46 = distinct !{!46, !"XXH3_hashLong_64b_internal"}
+!47 = !{!48, !50, !51, !52}
+!48 = distinct !{!48, !49, !"XXH3_accumulate_512_sse2: argument 1"}
+!49 = distinct !{!49, !"XXH3_accumulate_512_sse2"}
+!50 = distinct !{!50, !40, !"XXH3_accumulate: argument 1"}
+!51 = distinct !{!51, !43, !"XXH3_hashLong_internal_loop: argument 1"}
+!52 = distinct !{!52, !46, !"XXH3_hashLong_64b_internal: argument 0"}
+!53 = !{!54, !55, !39, !41, !42, !44, !45}
+!54 = distinct !{!54, !49, !"XXH3_accumulate_512_sse2: argument 0"}
+!55 = distinct !{!55, !49, !"XXH3_accumulate_512_sse2: argument 2"}
+!56 = !{!57, !50, !51, !52}
+!57 = distinct !{!57, !49, !"XXH3_accumulate_512_sse2: argument 1:It1"}
+!58 = !{!54, !59, !39, !41, !42, !44, !45}
+!59 = distinct !{!59, !49, !"XXH3_accumulate_512_sse2: argument 2:It1"}
+!60 = !{!61, !50, !51, !52}
+!61 = distinct !{!61, !49, !"XXH3_accumulate_512_sse2: argument 1:It2"}
+!62 = !{!54, !63, !39, !41, !42, !44, !45}
+!63 = distinct !{!63, !49, !"XXH3_accumulate_512_sse2: argument 2:It2"}
+!64 = !{!65, !51, !52}
+!65 = distinct !{!65, !66, !"XXH3_accumulate_512_sse2: argument 1"}
+!66 = distinct !{!66, !"XXH3_accumulate_512_sse2"}
+!67 = !{!68, !69, !42, !44, !45}
+!68 = distinct !{!68, !66, !"XXH3_accumulate_512_sse2: argument 0"}
+!69 = distinct !{!69, !66, !"XXH3_accumulate_512_sse2: argument 2"}
+!70 = !{i64 195982}
+!71 = !{!72}
+!72 = distinct !{!72, !73, !"XXH3_hashLong_64b_internal: argument 0"}
+!73 = distinct !{!73, !"XXH3_hashLong_64b_internal"}
+!74 = !{!75}
+!75 = distinct !{!75, !73, !"XXH3_hashLong_64b_internal: argument 1"}
+!76 = !{!77}
+!77 = distinct !{!77, !78, !"XXH3_hashLong_internal_loop: argument 1"}
+!78 = distinct !{!78, !"XXH3_hashLong_internal_loop"}
+!79 = !{!80}
+!80 = distinct !{!80, !78, !"XXH3_hashLong_internal_loop: argument 2"}
+!81 = !{!82}
+!82 = distinct !{!82, !83, !"XXH3_accumulate: argument 1"}
+!83 = distinct !{!83, !"XXH3_accumulate"}
+!84 = !{!85}
+!85 = distinct !{!85, !83, !"XXH3_accumulate: argument 2"}
+!86 = !{!87, !85, !88, !80, !75}
+!87 = distinct !{!87, !83, !"XXH3_accumulate: argument 0"}
+!88 = distinct !{!88, !78, !"XXH3_hashLong_internal_loop: argument 0"}
+!89 = !{!90}
+!90 = distinct !{!90, !91, !"XXH3_accumulate_512_sse2: argument 1"}
+!91 = distinct !{!91, !"XXH3_accumulate_512_sse2"}
+!92 = !{!93}
+!93 = distinct !{!93, !91, !"XXH3_accumulate_512_sse2: argument 2"}
+!94 = !{!90, !82, !77, !72}
+!95 = !{!96, !93, !87, !85, !88, !80, !75}
+!96 = distinct !{!96, !91, !"XXH3_accumulate_512_sse2: argument 0"}
+!97 = !{!93, !85, !80, !75}
+!98 = !{!96, !90, !87, !82, !88, !77, !72}
+!99 = !{!100}
+!100 = distinct !{!100, !91, !"XXH3_accumulate_512_sse2: argument 1:It1"}
+!101 = !{!102}
+!102 = distinct !{!102, !91, !"XXH3_accumulate_512_sse2: argument 2:It1"}
+!103 = !{!100, !82, !77, !72}
+!104 = !{!96, !102, !87, !85, !88, !80, !75}
+!105 = !{!102, !85, !80, !75}
+!106 = !{!96, !100, !87, !82, !88, !77, !72}
+!107 = !{!108}
+!108 = distinct !{!108, !91, !"XXH3_accumulate_512_sse2: argument 1:It2"}
+!109 = !{!110}
+!110 = distinct !{!110, !91, !"XXH3_accumulate_512_sse2: argument 2:It2"}
+!111 = !{!108, !82, !77, !72}
+!112 = !{!96, !110, !87, !85, !88, !80, !75}
+!113 = !{!110, !85, !80, !75}
+!114 = !{!96, !108, !87, !82, !88, !77, !72}
+!115 = !{!116}
+!116 = distinct !{!116, !117, !"XXH3_accumulate_512_sse2: argument 1"}
+!117 = distinct !{!117, !"XXH3_accumulate_512_sse2"}
+!118 = !{!119}
+!119 = distinct !{!119, !117, !"XXH3_accumulate_512_sse2: argument 2"}
+!120 = !{!116, !77, !72}
+!121 = !{!122, !119, !88, !80, !75}
+!122 = distinct !{!122, !117, !"XXH3_accumulate_512_sse2: argument 0"}
+!123 = !{!119, !80, !75}
+!124 = !{!122, !116, !88, !77, !72}
+!125 = !{!126, !75}
+!126 = distinct !{!126, !127, !"XXH3_mergeAccs: argument 1"}
+!127 = distinct !{!127, !"XXH3_mergeAccs"}
+!128 = !{!129, !72}
+!129 = distinct !{!129, !127, !"XXH3_mergeAccs: argument 0"}

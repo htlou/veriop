@@ -1,0 +1,79 @@
+
+----------------------------------------
+define void @target(ptr nowrite noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  tail memcpy ptr noread noundef %#1 align 1, ptr nowrite noundef %#0 align 1, i64 16
+  %#3 = gep inbounds ptr nowrite noundef %#0, 1 x i64 24
+  %#4 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#4 align 1, ptr %#3 align 1, i64 16
+  %#5 = gep inbounds ptr nowrite noundef %#0, 1 x i64 48
+  %#6 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#6 align 1, ptr %#5 align 1, i64 16
+  %#7 = gep inbounds ptr nowrite noundef %#0, 1 x i64 80
+  %#8 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#8 align 1, ptr %#7 align 1, i64 16
+  %#9 = gep inbounds ptr nowrite noundef %#0, 1 x i64 104
+  %#10 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#10 align 1, ptr %#9 align 1, i64 16
+  %#11 = gep inbounds ptr nowrite noundef %#0, 1 x i64 128
+  %#12 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#12 align 1, ptr %#11 align 1, i64 16
+  ret void
+}
+=>
+define void @target(ptr nowrite noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  tail memcpy ptr noread noundef %#1 align 1, ptr nowrite noundef %#0 align 4, i64 16
+  %#3 = gep inbounds ptr nowrite noundef %#0, 1 x i64 24
+  %#4 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#4 align 1, ptr %#3 align 4, i64 16
+  %#5 = gep inbounds ptr nowrite noundef %#0, 1 x i64 48
+  %#6 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#6 align 1, ptr %#5 align 4, i64 16
+  %#7 = gep inbounds ptr nowrite noundef %#0, 1 x i64 80
+  %#8 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#8 align 1, ptr %#7 align 4, i64 16
+  %#9 = gep inbounds ptr nowrite noundef %#0, 1 x i64 104
+  %#10 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#10 align 1, ptr %#9 align 4, i64 16
+  %#11 = gep inbounds ptr nowrite noundef %#0, 1 x i64 128
+  %#12 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#12 align 1, ptr %#11 align 4, i64 16
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=90, attrs=2) / Address=#x05b
+ptr noread noundef %#1 = pointer(non-local, block_id=1, offset=1, attrs=1) / Address=#x002
+
+Source:
+ptr %#3 = pointer(non-local, block_id=1, offset=114, attrs=2) / Address=#x073
+ptr %#4 = pointer(non-local, block_id=1, offset=17, attrs=1) / Address=#x012
+ptr %#5 = pointer(non-local, block_id=1, offset=138, attrs=2) / Address=#x08b
+ptr %#6 = pointer(non-local, block_id=1, offset=33, attrs=1) / Address=#x022
+ptr %#7 = pointer(non-local, block_id=1, offset=170, attrs=2) / Address=#x0ab
+ptr %#8 = pointer(non-local, block_id=1, offset=49, attrs=1) / Address=#x032
+ptr %#9 = pointer(non-local, block_id=1, offset=194, attrs=2) / Address=#x0c3
+ptr %#10 = pointer(non-local, block_id=1, offset=65, attrs=1) / Address=#x042
+ptr %#11 = pointer(non-local, block_id=1, offset=218, attrs=2) / Address=#x0db
+ptr %#12 = pointer(non-local, block_id=1, offset=81, attrs=1) / Address=#x052
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 234	align: 1	alloc type: 0	alive: true	address: 1
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+void = UB triggered!
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

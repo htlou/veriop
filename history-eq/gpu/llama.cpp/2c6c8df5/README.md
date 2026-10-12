@@ -1,0 +1,9 @@
+# llama.cpp `2c6c8df5`: Vulkan IQ2_XXS FP16-to-FP32 rewrite
+
+**Verdict: `UNKNOWN` for the historical Vulkan kernel.** The exact old and new `dequantFuncIQ2_XXS` bodies are saved as [`old.glsl`](old.glsl) and [`new.glsl`](new.glsl) by [`reproduce.py`](reproduce.py). The changed expression computes `dscale` and the intermediate result in FP16 before, but in FP32 with a final FP16 conversion after.
+
+A source-valid diagnostic input uses `idx = 0`, `qs[0] = 2`, packed sign/scale word `0x10000000`, and `bl.block.d` with FP16 bits `0x2001`. The historical lookup table has `iq2xxs_grid_const[2].x = 0x08081919`, so the selected grid value is 25 and the sign is positive. The [GLSL packing extension](https://docs.vulkan.org/glslext/latest/glslext/ext/GL_EXT_shader_explicit_arithmetic_types.html) specifies the low-to-high component order used for `pack32` and `unpack8`. Under **strict IEEE round-to-nearest, ties-to-even after each source arithmetic operator**, [`proof.smt2`](proof.smt2) gives old FP16 output `0x2cb2` and new FP16 output `0x2cb1`. Z3 proves both fixed outputs and their difference in [`proof.log`](proof.log).
+
+This is a difference in that explicit arithmetic model, not a verified output difference of the compiled shader. The [Vulkan SPIR-V environment specification](https://docs.vulkan.org/spec/latest/appendices/spirvenv.html) permits floating-point rearrangement when `NoContraction` is absent; this historical source does not request it. No historical SPIR-V build or Vulkan execution was available to determine the emitted operations and device result. The other changed IQ2/IQ3 callbacks and whole commit are also unproved. Z3 was called directly, not through Kuiper; no official before/after benchmark score was measured.
+
+Run `python3 -B history-eq/gpu/llama.cpp/2c6c8df5/reproduce.py` from the project root.

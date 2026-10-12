@@ -1,0 +1,44 @@
+
+----------------------------------------
+define i64 @target(i32 noundef %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp ult i32 noundef %#0, 3072
+  assume i1 %#2
+  %#3 = zext nneg i32 noundef %#0 to i64
+  %#4 = and i64 %#3, 1023
+  %#5 = shl nsw nuw i64 %#3, 1
+  %#6 = and i64 %#5, 6144
+  %#7 = or disjoint i64 %#4, %#6
+  %#8 = shl nsw nuw i64 %#3, 32
+  %#9 = or disjoint i64 %#7, %#8
+  %#range_0_%#9 = !range i64 %#9, i64 0, i64 13189844574208
+  ret i64 %#range_0_%#9
+}
+=>
+define i64 @target(i32 noundef %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp ult i32 noundef %#0, 3072
+  assume i1 %#2
+  %#3 = and i32 noundef %#0, 4092
+  %#4 = lshr i32 noundef %#0, 10
+  %#5 = zext nneg i32 %#4 to i64
+  %#6 = shl nsw nuw i64 %#5, 10
+  %#7 = zext nneg i32 %#3 to i64
+  %#8 = sub nsw i64 %#7, %#6
+  %#9 = shl nsw nuw i64 %#5, 11
+  %#10 = add nsw i64 %#8, %#9
+  %#11 = and i32 noundef %#0, 3
+  %#12 = zext nneg i32 %#11 to i64
+  %#13 = or disjoint i64 %#7, %#12
+  %#14 = shl nsw nuw i64 %#13, 32
+  %#15 = or i64 %#10, %#14
+  %#16 = or disjoint i64 %#15, %#12
+  ret i64 %#16
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

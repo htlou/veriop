@@ -1,0 +1,32 @@
+
+----------------------------------------
+define i32 @target_state(i1 noundef zeroext %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  %#3 = select i1 noundef zeroext %#0, i32 noundef %#1, i32 0
+  ret i32 %#3
+}
+=>
+define i32 @target_state(i1 noundef zeroext %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  ret i32 0
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i1 noundef zeroext %#0 = #x1 (1)
+i32 noundef %#1 = #x00000001 (1)
+
+Source:
+i32 %#3 = #x00000001 (1)
+
+Target:
+Source value: #x00000001 (1)
+Target value: #x00000000 (0)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

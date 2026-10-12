@@ -1,0 +1,52 @@
+{
+  "commit": "f534e5b",
+  "date": "2022-07-19",
+  "subject": "Use `vpsrlq` instead of `vpshufd` in avx2/avx512 accumulate.",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit replaces a shuffle with a logical shift to relieve a measured SIMD port bottleneck.",
+  "change_summary": "Rewrites AVX2/AVX512 XXH3 accumulate and scramble lane extraction with 64-bit logical shifts.",
+  "units": [
+    {
+      "name": "raw AVX2 and AVX512 one-stripe accumulate and scramble",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/f534e5b/r_avx2",
+      "evidence": "Both changed raw functions pass bidirectional Alive2 for AVX2; the corresponding AVX512 functions also pass in r_avx512."
+    },
+    {
+      "name": "public XXH3 64/128-bit fixed 256/320-byte AVX2 and AVX512 cases",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": "withSecret secret size 136 or 192",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/f534e5b/r_api_avx2",
+      "evidence": "Five public cases pass both Alive2 directions under AVX2, and the same five pass under AVX512 in r_api_avx512."
+    },
+    {
+      "name": "public XXH3_64bits, 1088 bytes, path including accumulator scramble",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 17,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/f534e5b/r_api_big_avx512",
+      "evidence": "AVX2 times out at 1088 bytes; AVX512 SMT runs out of memory. Both are inconclusive, not unsupported instruction semantics."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "Raw-step equivalence supports the change but is not promoted to an unchecked full-loop API proof. The old r_api_big_avx512 result.json calls solver memout UNSUPPORTED; METHOD.md and the corrected runner classify it UNKNOWN."
+}

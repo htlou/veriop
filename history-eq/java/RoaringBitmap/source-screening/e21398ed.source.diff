@@ -1,0 +1,1251 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/AppendableStorage.java b/roaringbitmap/src/main/java/org/roaringbitmap/AppendableStorage.java
+new file mode 100644
+index 00000000..9fd08f7c
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/AppendableStorage.java
+@@ -0,0 +1,17 @@
++package org.roaringbitmap;
++
++/**
++ * Key-value storage of 16 bit containers
++ * @param <T> the type of stored container
++ */
++public interface AppendableStorage<T> {
++
++  /**
++   * Appends the key and container to the storage, throws if the key is less
++   * than the current mark.
++   * @param key the key to append
++   * @param container the data to append
++   */
++  void append(short key, T container);
++
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapDataProvider.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapDataProvider.java
+index 5e331c23..2d757c3a 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapDataProvider.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapDataProvider.java
+@@ -14,17 +14,24 @@ public interface BitmapDataProvider extends ImmutableBitmapDataProvider {
+    *
+    * @param x integer value
+    */
+-  public void add(int x);
++  void add(int x);
++
++  /**
++   * Add a range of values to the bitmap
++   * @param min the inclusive minimum value
++   * @param sup the exclusive maximum value
++   */
++  void add(long min, long sup);
+ 
+   /**
+    * If present remove the specified integers (effectively, sets its bit value to false)
+    *
+    * @param x integer value representing the index in a bitmap
+    */
+-  public void remove(int x);
++  void remove(int x);
+ 
+   /**
+    * Recover allocated but unused memory.
+    */
+-  public void trim();
++  void trim();
+ }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ConstantMemoryContainerAppender.java b/roaringbitmap/src/main/java/org/roaringbitmap/ConstantMemoryContainerAppender.java
+new file mode 100644
+index 00000000..3d6f83d6
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ConstantMemoryContainerAppender.java
+@@ -0,0 +1,143 @@
++package org.roaringbitmap;
++
++import java.util.Arrays;
++import java.util.function.Supplier;
++
++import static org.roaringbitmap.Util.*;
++
++
++/**
++ * This class can be used to write quickly values to a bitmap.
++ * The values are expected to be (increasing) sorted order.
++ * Values are first written to a temporary internal buffer, but
++ * the underlying bitmap can forcefully synchronize by calling "flush"
++ * (although calling flush to often would defeat the performance
++ * purpose of this class).
++ * The main use case for an ConstantMemoryContainerAppender is to get bitmaps quickly.
++ * You should benchmark your particular use case to see if it helps.
++ *
++ * <pre>
++ * {@code
++ *
++ *       //...
++ *
++ *
++ *       RoaringBitmapWriter<RoaringBitmap> writer =
++ *            RoaringBitmapWriter.writer().constantMemory().get();
++ *       for (int i :....) {
++ *         writer.add(i);
++ *       }
++ *       writer.flush(); // important
++ * }
++ * </pre>
++ */
++public class ConstantMemoryContainerAppender<T extends BitmapDataProvider
++        & AppendableStorage<Container>> implements RoaringBitmapWriter<T> {
++
++  private boolean doPartialSort;
++  private static final int WORD_COUNT = 1 << 10;
++  private final long[] bitmap;
++  private final Supplier<T> newUnderlying;
++  private T underlying;
++  private boolean dirty = false;
++  private int currentKey;
++
++  /**
++   * Initialize an ConstantMemoryContainerAppender with a receiving bitmap
++   *
++   * @param doPartialSort indicates whether to sort the upper 16 bits of input data in addMany
++   * @param newUnderlying supplier of bitmaps where the data gets written
++   */
++  ConstantMemoryContainerAppender(boolean doPartialSort, Supplier<T> newUnderlying) {
++    this.newUnderlying = newUnderlying;
++    this.underlying = newUnderlying.get();
++    this.doPartialSort = doPartialSort;
++    this.bitmap = new long[WORD_COUNT];
++  }
++
++  /**
++   * Grab a reference to the underlying bitmap
++   *
++   * @return the underlying bitmap
++   */
++  @Override
++  public T getUnderlying() {
++    return underlying;
++  }
++
++  /**
++   * Adds the value to the underlying bitmap. The data might
++   * be added to a temporary buffer. You should call "flush"
++   * when you are done.
++   *
++   * @param value the value to add.
++   */
++  @Override
++  public void add(int value) {
++    int key = toIntUnsigned(highbits(value));
++    if (key != currentKey) {
++      if (key < currentKey) {
++        underlying.add(value);
++        return;
++      } else {
++        appendToUnderlying();
++        currentKey = key;
++      }
++    }
++    int low = toIntUnsigned(lowbits(value));
++    bitmap[(low >>> 6)] |= (1L << low);
++    dirty = true;
++  }
++
++  @Override
++  public void addMany(int... values) {
++    if (doPartialSort) {
++      partialRadixSort(values);
++    }
++    for (int value : values) {
++      add(value);
++    }
++  }
++
++  @Override
++  public void add(long min, long max) {
++    appendToUnderlying();
++    underlying.add(min, max);
++    int mark = (int)((max >>> 16) + 1);
++    if (currentKey < mark) {
++      currentKey = mark;
++    }
++  }
++
++  /**
++   * Ensures that any buffered additions are flushed to the underlying bitmap.
++   */
++  @Override
++  public void flush() {
++    currentKey += appendToUnderlying();
++  }
++
++  @Override
++  public void reset() {
++    currentKey = 0;
++    underlying = newUnderlying.get();
++    dirty = false;
++  }
++
++  private Container chooseBestContainer() {
++    Container container = new BitmapContainer(bitmap, -1)
++            .repairAfterLazy().runOptimize();
++    return container instanceof BitmapContainer ? container.clone() : container;
++  }
++
++  private int appendToUnderlying() {
++    if (dirty) {
++      assert currentKey <= 0xFFFF;
++      underlying.append((short) currentKey, chooseBestContainer());
++      Arrays.fill(bitmap, 0L);
++      dirty = false;
++      return 1;
++    }
++    return 0;
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+index 8970b9df..61d8b549 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+@@ -15,7 +15,8 @@ import org.roaringbitmap.buffer.MappeableContainer;
+ /**
+  * Base container class.
+  */
+-public abstract class Container implements Iterable<Short>, Cloneable, Externalizable {
++public abstract class Container implements Iterable<Short>, Cloneable, Externalizable,
++        WordStorage<Container> {
+ 
+   /**
+    * Create a container initialized with a range of consecutive values
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ContainerAppender.java b/roaringbitmap/src/main/java/org/roaringbitmap/ContainerAppender.java
+new file mode 100644
+index 00000000..05f32d83
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ContainerAppender.java
+@@ -0,0 +1,131 @@
++package org.roaringbitmap;
++
++
++import java.util.function.Supplier;
++
++import static org.roaringbitmap.Util.*;
++
++/**
++ * This class can be used to write quickly values to a bitmap.
++ * The values are expected to be (increasing) sorted order.
++ * Values are first written to a temporary internal buffer, but
++ * the underlying bitmap can forcefully synchronize by calling "flush"
++ * (although calling flush to often would defeat the performance
++ * purpose of this class).
++ * The main use case for an ContainerAppender is to get bitmaps quickly.
++ * You should benchmark your particular use case to see if it helps.
++ *
++ * <pre>
++ * {@code
++ *
++ *     //...
++ *
++ *     RoaringBitmapWriter<RoaringBitmap> writer =
++ *        RoaringBitmapWriter.writer().get();
++ *     for (int i :....) {
++ *       writer.add(i);
++ *     }
++ *     writer.flush(); // important
++ * }
++ * </pre>
++ */
++public class ContainerAppender<C extends WordStorage<C>,
++        T extends BitmapDataProvider & AppendableStorage<C>>
++        implements RoaringBitmapWriter<T> {
++
++
++  private final boolean doPartialSort;
++  private final Supplier<C> newContainer;
++  private final Supplier<T> newUnderlying;
++  private C container;
++  private T underlying;
++  private int currentKey;
++
++  /**
++   * Initialize an ContainerAppender with a receiving bitmap
++   *
++   */
++  ContainerAppender(boolean doPartialSort, Supplier<T> newUnderlying, Supplier<C> newContainer) {
++    this.doPartialSort = doPartialSort;
++    this.newUnderlying = newUnderlying;
++    this.underlying = newUnderlying.get();
++    this.newContainer = newContainer;
++    this.container = newContainer.get();
++  }
++
++  /**
++   * Grab a reference to the underlying bitmap
++   *
++   * @return the underlying bitmap
++   */
++  public T getUnderlying() {
++    return underlying;
++  }
++
++  /**
++   * Adds the value to the underlying bitmap. The data might
++   * be added to a temporary buffer. You should call "flush"
++   * when you are done.
++   *
++   * @param value the value to add.
++   */
++  @Override
++  public void add(int value) {
++    int key = toIntUnsigned(highbits(value));
++    if (key != currentKey) {
++      if (key < currentKey) {
++        underlying.add(value);
++        return;
++      } else {
++        appendToUnderlying();
++        currentKey = key;
++      }
++    }
++    container = container.add(lowbits(value));
++  }
++
++  @Override
++  public void add(long min, long max) {
++    appendToUnderlying();
++    underlying.add(min, max);
++    int mark = (int)((max >>> 16) + 1);
++    if (currentKey < mark) {
++      currentKey = mark;
++    }
++  }
++
++  @Override
++  public void addMany(int... values) {
++    if (doPartialSort) {
++      partialRadixSort(values);
++    }
++    for (int i : values) {
++      add(i);
++    }
++  }
++
++  /**
++   * Ensures that any buffered additions are flushed to the underlying bitmap.
++   */
++  @Override
++  public void flush() {
++    currentKey += appendToUnderlying();
++  }
++
++  @Override
++  public void reset() {
++    currentKey = 0;
++    container = newContainer.get();
++    underlying = newUnderlying.get();
++  }
++
++  private int appendToUnderlying() {
++    if (!container.isEmpty()) {
++      assert currentKey <= 0xFFFF;
++      underlying.append((short)currentKey, container.runOptimize());
++      container = newContainer.get();
++      return 1;
++    }
++    return 0;
++  }
++}
+\ No newline at end of file
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/DenseOrderedWriter.java b/roaringbitmap/src/main/java/org/roaringbitmap/DenseOrderedWriter.java
+deleted file mode 100644
+index ddbd726b..00000000
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/DenseOrderedWriter.java
++++ /dev/null
+@@ -1,119 +0,0 @@
+-package org.roaringbitmap;
+-
+-import java.util.Arrays;
+-
+-
+-/**
+- * This class can be used to write quickly values to a bitmap.
+- * The values are expected to be (increasing) sorted order.
+- * Values are first written to a temporary internal buffer, but
+- * the underlying bitmap can forcefully synchronize by calling "flush"
+- * (although calling flush to often would defeat the performance
+- * purpose of this class).
+- * The main use case for an DenseOrderedWriter is to create bitmaps quickly.
+- * You should benchmark your particular use case to see if it helps.
+- *
+- * <pre>
+- * {@code
+- *
+- *       //...
+- *
+- *       RoaringBitmap r = new RoaringBitmap();
+- *       DenseOrderedWriter ow = new DenseOrderedWriter(r);
+- *       for (int i :....) {
+- *         ow.add(i);
+- *       }
+- *       ow.flush(); // important
+- * }
+- * </pre>
+- */
+-public class DenseOrderedWriter implements OrderedWriter {
+-
+-  private static final int WORD_COUNT = 1 << 10;
+-  private final long[] bitmap;
+-  private final RoaringBitmap underlying;
+-  private boolean dirty = false;
+-  private short currentKey;
+-
+-  /**
+-   * Initialize an DenseOrderedWriter with a receiving bitmap
+-   *
+-   * @param underlying bitmap where the data gets written
+-   */
+-  public DenseOrderedWriter(RoaringBitmap underlying) {
+-    this.underlying = underlying;
+-    this.bitmap = new long[WORD_COUNT];
+-  }
+-
+-  /**
+-   * Initialize an DenseOrderedWriter and construct a new RoaringBitmap
+-   */
+-  public DenseOrderedWriter() {
+-    this(new RoaringBitmap());
+-  }
+-
+-  /**
+-   * Grab a reference to the underlying bitmap
+-   *
+-   * @return the underlying bitmap
+-   */
+-  public RoaringBitmap getUnderlying() {
+-    return underlying;
+-  }
+-
+-  /**
+-   * Adds the value to the underlying bitmap. The data might
+-   * be added to a temporary buffer. You should call "flush"
+-   * when you are done.
+-   *
+-   * @param value the value to add.
+-   */
+-  @Override
+-  public void add(int value) {
+-    short key = Util.highbits(value);
+-    short low = Util.lowbits(value);
+-    if (key != currentKey) {
+-      if (Util.compareUnsigned(key, currentKey) < 0) {
+-        underlying.add(value);
+-        return;
+-      } else {
+-        flush();
+-      }
+-    }
+-    int ulow = low & 0xFFFF;
+-    bitmap[(ulow >>> 6)] |= (1L << ulow);
+-    currentKey = key;
+-    dirty = true;
+-  }
+-
+-
+-  /**
+-   * Ensures that any buffered additions are flushed to the underlying bitmap.
+-   */
+-  @Override
+-  public void flush() {
+-    if (dirty) {
+-      RoaringArray highLowContainer = underlying.highLowContainer;
+-      // we check that it's safe to append since RoaringArray.append does no validation
+-      if (highLowContainer.size > 0) {
+-        short key = highLowContainer.getKeyAtIndex(highLowContainer.size - 1);
+-        if (Util.compareUnsigned(currentKey, key) <= 0) {
+-          throw new IllegalStateException("Cannot write " + currentKey + " after " + key);
+-        }
+-      }
+-      highLowContainer.append(currentKey, chooseBestContainer());
+-      clearBitmap();
+-      dirty = false;
+-      ++currentKey;
+-    }
+-  }
+-
+-  private Container chooseBestContainer() {
+-    Container container = new BitmapContainer(bitmap, -1).repairAfterLazy().runOptimize();
+-    return container instanceof BitmapContainer ? container.clone() : container;
+-  }
+-
+-  private void clearBitmap() {
+-    Arrays.fill(bitmap, 0L);
+-  }
+-}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java
+index 2aac8974..4ac0a3e6 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java
+@@ -25,6 +25,14 @@ public class FastRankRoaringBitmap extends RoaringBitmap {
+   private boolean cumulatedCardinalitiesCacheIsValid = false;
+   private int[] highToCumulatedCardinality = null;
+ 
++  public FastRankRoaringBitmap() {
++    super();
++  }
++
++  public FastRankRoaringBitmap(RoaringArray array) {
++    super(array);
++  }
++
+   private void resetCache() {
+     // Reset the cache on any write operation
+     if (highToCumulatedCardinality != null && highToCumulatedCardinality.length >= 1) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java b/roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java
+deleted file mode 100644
+index 482839ed..00000000
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java
++++ /dev/null
+@@ -1,21 +0,0 @@
+-package org.roaringbitmap;
+-
+-public interface OrderedWriter {
+-
+-  /**
+-   * Gets the bitmap being written to.
+-   * @return the bitmpa
+-   */
+-  RoaringBitmap getUnderlying();
+-
+-  /**
+-   * buffers a value to be added to the bitmap.
+-   * @param value the value
+-   */
+-  void add(int value);
+-
+-  /**
+-   * Flushes all pending changes to the bitmap.
+-   */
+-  void flush();
+-}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java
+index 034462b7..4dcda665 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java
+@@ -10,13 +10,14 @@ import java.util.Arrays;
+ import java.util.NoSuchElementException;
+ 
+ import static org.roaringbitmap.Util.compareUnsigned;
++import static org.roaringbitmap.Util.toIntUnsigned;
+ 
+ 
+ /**
+  * Specialized array to store the containers used by a RoaringBitmap. This is not meant to be used
+  * by end users.
+  */
+-public final class RoaringArray implements Cloneable, Externalizable {
++public final class RoaringArray implements Cloneable, Externalizable, AppendableStorage<Container> {
+   protected static final short SERIAL_COOKIE_NO_RUNCONTAINER = 12346;
+   protected static final short SERIAL_COOKIE = 12347;
+   protected static final int NO_OFFSET_THRESHOLD = 4;
+@@ -35,7 +36,11 @@ public final class RoaringArray implements Cloneable, Externalizable {
+   int size = 0;
+ 
+   protected RoaringArray() {
+-    this(new short[INITIAL_CAPACITY], new Container[INITIAL_CAPACITY], 0);
++    this(INITIAL_CAPACITY);
++  }
++
++  RoaringArray(int initialCapacity) {
++    this(new short[initialCapacity], new Container[initialCapacity], 0);
+   }
+ 
+ 
+@@ -100,12 +105,16 @@ public final class RoaringArray implements Cloneable, Externalizable {
+     return upper;
+   }
+ 
+-  protected void append(short key, Container value) {
+-    assert !value.isEmpty();
++  @Override
++  public void append(short key, Container value) {
++    if (size > 0 && compareUnsigned(key, keys[size - 1]) < 0) {
++      throw new IllegalArgumentException("append only: "
++              + toIntUnsigned(key) + " < " + toIntUnsigned(keys[size - 1]));
++    }
+     extendArray(1);
+-    this.keys[this.size] = key;
+-    this.values[this.size] = value;
+-    this.size++;
++    keys[size] = key;
++    values[size] = value;
++    size++;
+   }
+ 
+   void append(RoaringArray roaringArray) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+index 310b42a2..9102c2bb 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+@@ -18,7 +18,7 @@ import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
+ import org.roaringbitmap.buffer.MappeableContainerPointer;
+ import org.roaringbitmap.buffer.MutableRoaringBitmap;
+ 
+-import static org.roaringbitmap.Util.partialRadixSort;
++import static org.roaringbitmap.RoaringBitmapWriter.writer;
+ 
+ 
+ /**
+@@ -53,7 +53,7 @@ import static org.roaringbitmap.Util.partialRadixSort;
+ 
+ 
+ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>, Externalizable,
+-    ImmutableBitmapDataProvider, BitmapDataProvider {
++    ImmutableBitmapDataProvider, BitmapDataProvider, AppendableStorage<Container> {
+ 
+   private final class RoaringIntIterator implements PeekableIntIterator {
+     private int hs = 0;
+@@ -533,14 +533,11 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
+    * @return a new bitmap
+    */
+   public static RoaringBitmap bitmapOfUnordered(final int... data) {
+-    partialRadixSort(data);
+-    RoaringBitmap bitmap = new RoaringBitmap();
+-    OrderedWriter writer = new DenseOrderedWriter(bitmap);
+-    for (int i : data) {
+-      writer.add(i);
+-    }
++    RoaringBitmapWriter<RoaringBitmap> writer = writer().constantMemory()
++            .doPartialRadixSort().get();
++    writer.addMany(data);
+     writer.flush();
+-    return bitmap;
++    return writer.getUnderlying();
+   }
+ 
+   /**
+@@ -2548,6 +2545,10 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
+     return array;
+   }
+ 
++  @Override
++  public void append(short key, Container container) {
++    highLowContainer.append(key, container);
++  }
+ 
+   /**
+    *
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java
+new file mode 100644
+index 00000000..5fac3e79
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java
+@@ -0,0 +1,290 @@
++package org.roaringbitmap;
++
++import org.roaringbitmap.buffer.*;
++
++import java.util.function.Supplier;
++
++public interface RoaringBitmapWriter<T extends BitmapDataProvider> extends Supplier<T> {
++
++  static Wizard<Container, RoaringBitmap> writer() {
++    return new RoaringBitmapWizard();
++  }
++
++  static Wizard<MappeableContainer, MutableRoaringBitmap> bufferWriter() {
++    return new BufferWizard();
++  }
++
++  abstract class Wizard<C extends WordStorage<C>,
++          T extends BitmapDataProvider & AppendableStorage<C>>
++          implements Supplier<RoaringBitmapWriter<T>> {
++
++    protected int initialCapacity = RoaringArray.INITIAL_CAPACITY;
++    protected boolean constantMemory;
++    protected boolean partiallySortValues = false;
++    protected Supplier<C> containerSupplier;
++    protected int expectedContainerSize = 16;
++
++    Wizard() {
++      containerSupplier = arraySupplier();
++    }
++
++    /**
++     * Choose this option if it is known that most containers will be sparse.
++     * @return this
++     */
++    public Wizard<C, T> optimiseForArrays() {
++      containerSupplier = arraySupplier();
++      return this;
++    }
++
++    /**
++     * Choose this option if the bitmap is expected to be RLE compressible.
++     * Will buffer additions into a RunContainer.
++     * @return this
++     */
++    public Wizard<C, T> optimiseForRuns() {
++      containerSupplier = runSupplier();
++      return this;
++    }
++
++    /**
++     * Choose this option if the bitmap is expected to be mostly dense but unlikely to be RLE
++     * compressible
++     * @return this
++     */
++    public Wizard<C, T> optimiseForBitmaps() {
++      containerSupplier = bitmapSupplier();
++      return this;
++    }
++
++    /**
++     *
++     * @param count how many values are expected to fall within any 65536 bit range.
++     * @return this
++     */
++    public Wizard<C, T> expectedValuesPerContainer(int count) {
++      sanityCheck(count);
++      this.expectedContainerSize = count;
++      if (count < ArrayContainer.DEFAULT_MAX_SIZE) {
++        return optimiseForArrays();
++      } else if (count < 1 << 14) {
++        return optimiseForBitmaps();
++      } else {
++        return optimiseForRuns();
++      }
++    }
++
++    public Wizard<Container, FastRankRoaringBitmap> fastRank() {
++      throw new IllegalStateException("Fast rank not yet implemented for byte buffers");
++    }
++
++    /**
++     * All writes are buffered into the same buffer of 8kB, before converting to
++     * the best container representation and appending to the bitmap.
++     * This option overrides any optimiseForArrays, optimiseForRuns and optimiseForBitmaps settings.
++     * @return this
++     */
++    public Wizard<C, T> constantMemory() {
++      constantMemory = true;
++      return this;
++    }
++
++    /**
++     * Influence default container choice by how dense the bitmap is expected to be.
++     * @param density value in [0.0, 1.0], density of the bitmap
++     * @return this
++     */
++    public Wizard<C, T> expectedDensity(double density) {
++      return expectedValuesPerContainer((int) (0xFFFF * density));
++    }
++
++    /**
++     * Guesses the number of prefices required based on an estimate of the range the bitmap
++     * will contain, assumes that all prefices in the range will be required. This is a good
++     * heuristic for a contiguous bitmap, and, for instance, a very bad heuristic for a bitmap
++     * with just two values far apart.
++     * @param min the inclusive min value
++     * @param max the exclusive max value
++     * @return this
++     */
++    public Wizard<C, T> expectedRange(long min, long max) {
++      return initialCapacity((int) ((max - min) >>> 16) + 1);
++    }
++
++    /**
++     * Takes control of the size of the prefix array, in case it can be precalculated
++     * or estimated. This can potentially save many array allocations during building
++     * the bitmap.
++     * @param count an estimate of the number of prefix keys required.
++     * @return this
++     */
++    public Wizard<C, T> initialCapacity(int count) {
++      sanityCheck(count);
++      initialCapacity = count;
++      return this;
++    }
++
++    /**
++     * Will partially sort values, which can allocate O(n) temporary
++     * memory but can significantly speed up adding unsorted values
++     * to a bitmap.
++     * @return this
++     */
++    public Wizard<C, T> doPartialRadixSort() {
++      partiallySortValues = true;
++      return this;
++    }
++
++    protected abstract Supplier<C> arraySupplier();
++
++    protected abstract Supplier<C> bitmapSupplier();
++
++    protected abstract Supplier<C> runSupplier();
++
++    protected abstract T createUnderlying(int initialCapacity);
++
++    /**
++     * Builds a bitmap writer based on the supplied options.
++     * A call to this method is repeatable, and will not fail because the wizard
++     * should already be in a valid state.
++     * @return a new RoaringBitmapWriter
++     */
++    @Override
++    public RoaringBitmapWriter<T> get() {
++      return new ContainerAppender<>(
++              partiallySortValues, () -> createUnderlying(initialCapacity), containerSupplier);
++    }
++
++    private static void sanityCheck(int count) {
++      if (count >= 0xFFFF) {
++        throw new IllegalArgumentException(count + " > 65536");
++      }
++      if (count < 0) {
++        throw new IllegalArgumentException(count + " < 0");
++      }
++    }
++  }
++
++  class BufferWizard extends Wizard<MappeableContainer, MutableRoaringBitmap> {
++
++    @Override
++    protected Supplier<MappeableContainer> arraySupplier() {
++      return () -> new MappeableArrayContainer(expectedContainerSize);
++    }
++
++    @Override
++    protected Supplier<MappeableContainer> bitmapSupplier() {
++      return MappeableBitmapContainer::new;
++    }
++
++    @Override
++    protected Supplier<MappeableContainer> runSupplier() {
++      return MappeableRunContainer::new;
++    }
++
++    @Override
++    protected MutableRoaringBitmap createUnderlying(int initialCapacity) {
++      return new MutableRoaringBitmap(new MutableRoaringArray(initialCapacity));
++    }
++  }
++
++  abstract class RoaringWizard<T extends RoaringBitmap> extends Wizard<Container, T> {
++
++    @Override
++    protected Supplier<Container> arraySupplier() {
++      return () -> new ArrayContainer(expectedContainerSize);
++    }
++
++    @Override
++    protected Supplier<Container> bitmapSupplier() {
++      return BitmapContainer::new;
++    }
++
++    @Override
++    protected Supplier<Container> runSupplier() {
++      return RunContainer::new;
++    }
++
++    @Override
++    public Wizard<Container, FastRankRoaringBitmap> fastRank() {
++      return new FastRankRoaringBitmapWizard(this);
++    }
++
++    @Override
++    public RoaringBitmapWriter<T> get() {
++      if (constantMemory) {
++        return new ConstantMemoryContainerAppender<>(
++                partiallySortValues, () -> createUnderlying(initialCapacity));
++      }
++      return super.get();
++    }
++  }
++
++  class FastRankRoaringBitmapWizard extends RoaringWizard<FastRankRoaringBitmap> {
++
++    FastRankRoaringBitmapWizard(Wizard<Container, ? extends RoaringBitmap> wizard) {
++      this.constantMemory = wizard.constantMemory;
++      this.initialCapacity = wizard.initialCapacity;
++      this.containerSupplier = wizard.containerSupplier;
++      this.partiallySortValues = wizard.partiallySortValues;
++    }
++
++    @Override
++    protected FastRankRoaringBitmap createUnderlying(int initialCapacity) {
++      return new FastRankRoaringBitmap(new RoaringArray(initialCapacity));
++    }
++  }
++
++  class RoaringBitmapWizard extends RoaringWizard<RoaringBitmap> {
++
++    @Override
++    protected RoaringBitmap createUnderlying(int initialCapacity) {
++      return new RoaringBitmap(new RoaringArray(initialCapacity));
++    }
++  }
++
++  /**
++   * Gets the bitmap being written to.
++   * @return the bitmap
++   */
++  T getUnderlying();
++
++  /**
++   * buffers a value to be added to the bitmap.
++   * @param value the value
++   */
++  void add(int value);
++
++  /**
++   * Add a range to the bitmap
++   * @param min the inclusive min value
++   * @param max the exclusive max value
++   */
++  void add(long min, long max);
++
++  /**
++   * Adds many values to the bitmap.
++   * @param values the values to add
++   *
++   */
++  void addMany(int... values);
++
++  /**
++   * Flushes all pending changes to the bitmap.
++   */
++  void flush();
++
++  /**
++   * flushes any pending changes to the bitmap and returns the bitmap
++   * @return the underlying bitmap
++   */
++  default T get() {
++    flush();
++    return getUnderlying();
++  }
++
++  /**
++   * Resets the writer so it can be reused, must release the reference to the underlying bitmap
++   */
++  void reset();
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/SparseOrderedWriter.java b/roaringbitmap/src/main/java/org/roaringbitmap/SparseOrderedWriter.java
+deleted file mode 100644
+index ed0cb902..00000000
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/SparseOrderedWriter.java
++++ /dev/null
+@@ -1,104 +0,0 @@
+-package org.roaringbitmap;
+-
+-
+-/**
+- * This class can be used to write quickly values to a bitmap.
+- * The values are expected to be (increasing) sorted order.
+- * Values are first written to a temporary internal buffer, but
+- * the underlying bitmap can forcefully synchronize by calling "flush"
+- * (although calling flush to often would defeat the performance
+- * purpose of this class).
+- * The main use case for an SparseOrderedWriter is to create bitmaps quickly.
+- * You should benchmark your particular use case to see if it helps.
+- *
+- * <pre>
+- * {@code
+- *
+- *     //...
+- *
+- *     RoaringBitmap r = new RoaringBitmap();
+- *     SparseOrderedWriter ow = new SparseOrderedWriter(r);
+- *     for (int i :....) {
+- *     ow.add(i);
+- *     }
+- *     ow.flush(); // important
+- * }
+- * </pre>
+- */
+-public class SparseOrderedWriter implements OrderedWriter {
+-
+-
+-  private final RoaringBitmap underlying;
+-  private Container container;
+-  private short currentKey;
+-
+-  /**
+-   * Initialize an SparseOrderedWriter with a receiving bitmap
+-   *
+-   * @param underlying bitmap where the data gets written
+-   */
+-  public SparseOrderedWriter(RoaringBitmap underlying) {
+-    this.underlying = underlying;
+-    this.container = new ArrayContainer();
+-  }
+-
+-
+-  /**
+-   * Initialize an SparseOrderedWriter and construct a new RoaringBitmap
+-   */
+-  public SparseOrderedWriter() {
+-    this(new RoaringBitmap());
+-  }
+-
+-  /**
+-   * Grab a reference to the underlying bitmap
+-   *
+-   * @return the underlying bitmap
+-   */
+-  public RoaringBitmap getUnderlying() {
+-    return underlying;
+-  }
+-
+-  /**
+-   * Adds the value to the underlying bitmap. The data might
+-   * be added to a temporary buffer. You should call "flush"
+-   * when you are done.
+-   *
+-   * @param value the value to add.
+-   */
+-  @Override
+-  public void add(int value) {
+-    short key = Util.highbits(value);
+-    short low = Util.lowbits(value);
+-    if (key != currentKey) {
+-      if (Util.compareUnsigned(key, currentKey) < 0) {
+-        underlying.add(value);
+-        return;
+-      } else {
+-        flush();
+-      }
+-    }
+-    currentKey = key;
+-    container = container.add(low);
+-  }
+-
+-  /**
+-   * Ensures that any buffered additions are flushed to the underlying bitmap.
+-   */
+-  @Override
+-  public void flush() {
+-    if (!container.isEmpty()) {
+-      RoaringArray highLowContainer = underlying.highLowContainer;
+-      // we check that it's safe to append since RoaringArray.append does no validation
+-      if (highLowContainer.size > 0) {
+-        short key = highLowContainer.getKeyAtIndex(highLowContainer.size - 1);
+-        if (Util.compareUnsigned(currentKey, key) <= 0) {
+-          throw new IllegalStateException("Cannot write " + currentKey + " after " + key);
+-        }
+-      }
+-      highLowContainer.append(currentKey, container.runOptimize());
+-      ++currentKey;
+-      container = new ArrayContainer();
+-    }
+-  }
+-}
+\ No newline at end of file
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/WordStorage.java b/roaringbitmap/src/main/java/org/roaringbitmap/WordStorage.java
+new file mode 100644
+index 00000000..24969360
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/WordStorage.java
+@@ -0,0 +1,11 @@
++package org.roaringbitmap;
++
++public interface WordStorage<T> {
++
++  T add(short value);
++
++  boolean isEmpty();
++
++  T runOptimize();
++
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
+index e05ccba5..2779ec2c 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
+@@ -15,7 +15,8 @@ import java.util.NoSuchElementException;
+  * Base container class. This class is similar to org.roaringbitmap.Container but meant to be used
+  * with memory mapping.
+  */
+-public abstract class MappeableContainer implements Iterable<Short>, Cloneable, Externalizable {
++public abstract class MappeableContainer implements Iterable<Short>, Cloneable, Externalizable,
++        WordStorage<MappeableContainer> {
+   /**
+    * Create a container initialized with a range of consecutive values
+    * 
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
+index f28c6faf..b28c94a2 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java
+@@ -11,9 +11,13 @@ import java.nio.ShortBuffer;
+ import java.util.Arrays;
+ import java.util.NoSuchElementException;
+ 
++import org.roaringbitmap.AppendableStorage;
+ import org.roaringbitmap.InvalidRoaringFormat;
+ import org.roaringbitmap.Util;
+ 
++import static org.roaringbitmap.buffer.BufferUtil.compareUnsigned;
++import static org.roaringbitmap.buffer.BufferUtil.toIntUnsigned;
++
+ 
+ /**
+  * Specialized array to store the containers used by a RoaringBitmap. This class is similar to
+@@ -22,7 +26,8 @@ import org.roaringbitmap.Util;
+  *
+  * Objects of this class reside in RAM.
+  */
+-public final class MutableRoaringArray implements Cloneable, Externalizable, PointableRoaringArray {
++public final class MutableRoaringArray implements Cloneable, Externalizable, PointableRoaringArray,
++        AppendableStorage<MappeableContainer> {
+ 
+   protected static final int INITIAL_CAPACITY = 4;
+ 
+@@ -32,8 +37,6 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+   protected static final int NO_OFFSET_THRESHOLD = 4;
+ 
+   private static final long serialVersionUID = 5L; // TODO: OFK was 4L, not sure
+-  protected boolean mayHaveRunContainers = false; // does not necessarily have them, after
+-                                                  // optimization
+ 
+ 
+   short[] keys = null;
+@@ -42,7 +45,11 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+   int size = 0;
+ 
+   protected MutableRoaringArray() {
+-    this(new short[INITIAL_CAPACITY], new MappeableContainer[INITIAL_CAPACITY], 0);
++    this(INITIAL_CAPACITY);
++  }
++
++  public MutableRoaringArray(int initialCapacity) {
++    this(new short[initialCapacity], new MappeableContainer[initialCapacity], 0);
+   }
+ 
+   MutableRoaringArray(short[] keys, MappeableContainer[] values, int size) {
+@@ -57,7 +64,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+     int lower = pos + 1;
+ 
+     // special handling for a possibly common sequential case
+-    if (lower >= size || BufferUtil.toIntUnsigned(keys[lower]) >= BufferUtil.toIntUnsigned(x)) {
++    if (lower >= size || toIntUnsigned(keys[lower]) >= toIntUnsigned(x)) {
+       return lower;
+     }
+ 
+@@ -65,7 +72,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+     // bootstrap an upper limit
+ 
+     while (lower + spansize < size
+-        && BufferUtil.toIntUnsigned(keys[lower + spansize]) < BufferUtil.toIntUnsigned(x)) {
++        && toIntUnsigned(keys[lower + spansize]) < toIntUnsigned(x)) {
+       spansize *= 2; // hoping for compiler will reduce to shift
+     }
+     int upper = (lower + spansize < size) ? lower + spansize : size - 1;
+@@ -76,7 +83,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+       return upper;
+     }
+ 
+-    if (BufferUtil.toIntUnsigned(keys[upper]) < BufferUtil.toIntUnsigned(x)) {// means array has no
++    if (toIntUnsigned(keys[upper]) < toIntUnsigned(x)) {// means array has no
+                                                                               // item key >= x
+       return size;
+     }
+@@ -90,7 +97,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+       int mid = (lower + upper) / 2;
+       if (keys[mid] == x) {
+         return mid;
+-      } else if (BufferUtil.toIntUnsigned(keys[mid]) < BufferUtil.toIntUnsigned(x)) {
++      } else if (toIntUnsigned(keys[mid]) < toIntUnsigned(x)) {
+         lower = mid;
+       } else {
+         upper = mid;
+@@ -99,8 +106,12 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+     return upper;
+   }
+ 
+-  protected void append(short key, MappeableContainer value) {
+-    assert !value.isEmpty();
++  @Override
++  public void append(short key, MappeableContainer value) {
++    if (size > 0 && compareUnsigned(key, keys[size - 1]) < 0) {
++      throw new IllegalArgumentException("append only: " + toIntUnsigned(key)
++              + " < " + toIntUnsigned(keys[size - 1]));
++    }
+     extendArray(1);
+     this.keys[this.size] = key;
+     this.values[this.size] = value;
+@@ -109,7 +120,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+ 
+   void append(MutableRoaringArray appendage) {
+     assert size == 0 || appendage.size == 0
+-            || BufferUtil.compareUnsigned(keys[size - 1], appendage.keys[0]) < 0;
++            || compareUnsigned(keys[size - 1], appendage.keys[0]) < 0;
+     if (appendage.size != 0 && size != 0) {
+       keys = Arrays.copyOf(keys, size + appendage.size);
+       values = Arrays.copyOf(values, size + appendage.size);
+@@ -153,10 +164,10 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+    * @param stoppingKey any equal or larger key in other array will terminate copying
+    */
+   protected void appendCopiesUntil(PointableRoaringArray highLowContainer, short stoppingKey) {
+-    final int stopKey = BufferUtil.toIntUnsigned(stoppingKey);
++    final int stopKey = toIntUnsigned(stoppingKey);
+     MappeableContainerPointer cp = highLowContainer.getContainerPointer();
+     while (cp.hasContainer()) {
+-      if (BufferUtil.toIntUnsigned(cp.key()) >= stopKey) {
++      if (toIntUnsigned(cp.key()) >= stopKey) {
+         break;
+       }
+       extendArray(1);
+@@ -298,7 +309,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+         val = new MappeableBitmapContainer(bitmapArray, cardinalities[k]);
+       } else if (bitmapOfRunContainers != null
+           && ((bitmapOfRunContainers[k / 8] & (1 << (k % 8))) != 0)) {
+-        int nbrruns = BufferUtil.toIntUnsigned(Short.reverseBytes(in.readShort()));
++        int nbrruns = toIntUnsigned(Short.reverseBytes(in.readShort()));
+         final ShortBuffer shortArray = ShortBuffer.allocate(2 * nbrruns);
+         for (int l = 0; l < shortArray.limit(); ++l) {
+           shortArray.put(l, Short.reverseBytes(in.readShort()));
+@@ -385,7 +396,7 @@ public final class MutableRoaringArray implements Cloneable, Externalizable, Poi
+       @Override
+       public int compareTo(MappeableContainerPointer o) {
+         if (key() != o.key()) {
+-          return BufferUtil.toIntUnsigned(key()) - BufferUtil.toIntUnsigned(o.key());
++          return toIntUnsigned(key()) - toIntUnsigned(o.key());
+         }
+         return o.getCardinality() - this.getCardinality();
+       }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
+index 40865dff..f6cd7dbc 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java
+@@ -4,12 +4,7 @@
+ 
+ package org.roaringbitmap.buffer;
+ 
+-import org.roaringbitmap.BitmapDataProvider;
+-import org.roaringbitmap.ContainerPointer;
+-import org.roaringbitmap.RoaringBitmap;
+-import org.roaringbitmap.ShortIterator;
+-import org.roaringbitmap.InvalidRoaringFormat;
+-import org.roaringbitmap.Util;
++import org.roaringbitmap.*;
+ 
+ import java.io.*;
+ import java.util.Iterator;
+@@ -65,7 +60,8 @@ import java.util.Iterator;
+  * @see org.roaringbitmap.RoaringBitmap
+  */
+ public class MutableRoaringBitmap extends ImmutableRoaringBitmap
+-    implements Cloneable, Serializable, Iterable<Integer>, Externalizable, BitmapDataProvider {
++    implements Cloneable, Serializable, Iterable<Integer>, Externalizable,
++        BitmapDataProvider, AppendableStorage<MappeableContainer> {
+   private static final long serialVersionUID = 4L; // 3L; bumped by ofk for runcontainers
+ 
+   /**
+@@ -1569,4 +1565,9 @@ public class MutableRoaringBitmap extends ImmutableRoaringBitmap
+   public static long maximumSerializedSize(int cardinality, int universe_size) {
+     return RoaringBitmap.maximumSerializedSize(cardinality, universe_size);
+   }
++
++  @Override
++  public void append(short key, MappeableContainer container) {
++    ((MutableRoaringArray) highLowContainer).append(key, container);
++  }
+ }

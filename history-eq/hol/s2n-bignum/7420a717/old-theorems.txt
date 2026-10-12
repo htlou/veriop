@@ -1,0 +1,43 @@
+  |- forall z x y a b pc.
+         nonoverlapping (word pc,344) (z,8 * 8) /\
+         (y = z \/ nonoverlapping (y,8 * 4) (z,8 * 8)) /\
+         nonoverlapping (x,8 * 4) (z,8 * 8)
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_4_8_mc /\
+                  read RIP s = word (pc + 2) /\
+                  C_ARGUMENTS [z; x; y] s /\
+                  bignum_from_memory (x,4) s = a /\
+                  bignum_from_memory (y,4) s = b)
+             (\s.
+                  read RIP s = word (pc + 341) /\
+                  bignum_from_memory (z,8) s = a * b)
+             (MAYCHANGE [RIP; RAX; RBP; RBX; RCX; RDX; R8; R9; R10; R11] ,,
+              MAYCHANGE [memory :> bytes (z,8 * 8)] ,,
+              MAYCHANGE SOME_FLAGS)
+
+  |- forall z x y a b pc stackpointer returnaddress.
+         nonoverlapping (word_sub stackpointer (word 16),24) (z,8 * 8) /\
+         ALL (nonoverlapping (word_sub stackpointer (word 16),16))
+         [word pc,344; x,8 * 4; y,8 * 4] /\
+         nonoverlapping (word pc,344) (z,8 * 8) /\
+         (y = z \/ nonoverlapping (y,8 * 4) (z,8 * 8)) /\
+         nonoverlapping (x,8 * 4) (z,8 * 8)
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_4_8_mc /\
+                  read RIP s = word pc /\
+                  read RSP s = stackpointer /\
+                  read (memory :> bytes64 stackpointer) s = returnaddress /\
+                  C_ARGUMENTS [z; x; y] s /\
+                  bignum_from_memory (x,4) s = a /\
+                  bignum_from_memory (y,4) s = b)
+             (\s.
+                  read RIP s = returnaddress /\
+                  read RSP s = word_add stackpointer (word 8) /\
+                  bignum_from_memory (z,8) s = a * b)
+             (MAYCHANGE [RIP; RSP; RAX; RCX; RDX; R8; R9; R10; R11] ,,
+              MAYCHANGE
+              [memory :> bytes (z,8 * 8);
+               memory :> bytes (word_sub stackpointer (word 16),16)] ,,
+              MAYCHANGE SOME_FLAGS)

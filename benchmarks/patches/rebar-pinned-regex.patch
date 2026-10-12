@@ -1,0 +1,75 @@
+diff --git a/engines/rust/regex/Cargo.lock b/engines/rust/regex/Cargo.lock
+index c4b9ed9..f796f22 100644
+--- a/engines/rust/regex/Cargo.lock
++++ b/engines/rust/regex/Cargo.lock
+@@ -95,7 +95,7 @@ checksum = "113b30b4cd05f7c06868fdb2854f66a7b9fece9a48425351cd532e810d74024f"
+ 
+ [[package]]
+ name = "main"
+-version = "1.12.4"
++version = "1.13.1"
+ dependencies = [
+  "anyhow",
+  "bstr",
+@@ -137,9 +137,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "regex"
+-version = "1.12.4"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "f1292b7759ae1cb9ec195452d1390a074f0cd8541ab7a5a8c31cd6db45d4a6ba"
++version = "1.13.1"
+ dependencies = [
+  "aho-corasick",
+  "memchr",
+@@ -149,9 +147,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "regex-automata"
+-version = "0.4.14"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "6e1dd4122fc1595e8162618945476892eefca7b88c52820e74af6262213cae8f"
++version = "0.4.18"
+ dependencies = [
+  "aho-corasick",
+  "log",
+@@ -162,8 +158,6 @@ dependencies = [
+ [[package]]
+ name = "regex-syntax"
+ version = "0.8.11"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
+ 
+ [[package]]
+ name = "regexredux"
+diff --git a/engines/rust/regex/Cargo.toml b/engines/rust/regex/Cargo.toml
+index 588db41..7613579 100644
+--- a/engines/rust/regex/Cargo.toml
++++ b/engines/rust/regex/Cargo.toml
+@@ -1,6 +1,6 @@
+ [package]
+ name = "main"
+-version = "1.12.4"
++version = "1.13.1"
+ edition = "2021"
+ 
+ [[bin]]
+@@ -27,11 +27,16 @@ lexopt = "0.3.0"
+ # parsing the Cargo.lock file would be inappropriate as that doesn't mean the
+ # engine is available to run. Otherwise, it would be fine to just rely on
+ # 'Cargo.lock' for version pinning and we could drop the '=' constraint here.
+-regex = { version = "=1.12.4", features = ["logging", "perf-dfa-full"] }
++regex = { version = "=1.13.1", features = ["logging", "perf-dfa-full"] }
+ # So... we don't actually use the regex crate directly. We use the 'meta'
+ # regex API from regex-automata. See the README for justification. When
+ # bumping the regex crate version, this should be bumped if needed as well.
+-regex-automata = "=0.4.14"
++regex-automata = "=0.4.18"
++
++[patch.crates-io]
++regex = { path = "../../../../../repos/regex" }
++regex-automata = { path = "../../../../../repos/regex/regex-automata" }
++regex-syntax = { path = "../../../../../repos/regex/regex-syntax" }
+ 
+ [dependencies.klv]
+ path = "../../../shared/klv"

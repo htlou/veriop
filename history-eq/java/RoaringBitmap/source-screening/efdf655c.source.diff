@@ -1,0 +1,445 @@
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java
+index 8b9a62c7..60e528a2 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java
+@@ -1,6 +1,7 @@
+ package org.roaringbitmap.art;
+ 
+ import org.roaringbitmap.art.Art.Toolkit;
++import org.roaringbitmap.longlong.LongUtils;
+ 
+ /**
+  * visit the art tree's space through a stack which records the deep first visiting paths.
+@@ -25,6 +26,14 @@ public abstract class AbstractShuttle implements Shuttle {
+     visitToLeaf(art.getRoot());
+   }
+ 
++  @Override
++  public void initShuttleFrom(long key) {
++    hasRun = false; // reset just in case
++    depth = -1;
++    byte[] high = LongUtils.highPart(key);
++    visitToLeafFrom(high, 0, art.getRoot());
++  }
++
+   @Override
+   public boolean moveToNextLeaf() {
+     if (!hasRun) {
+@@ -148,8 +157,54 @@ public abstract class AbstractShuttle implements Shuttle {
+     visitToLeaf(child);
+   }
+ 
++  private void visitToLeafFrom(byte[] high, int keyDepth, Node node) {
++    if (node == null) {
++      return;
++    }
++    if (node == art.getRoot()) {
++      NodeEntry nodeEntry = new NodeEntry();
++      nodeEntry.node = node;
++      this.depth = 0;
++      stack[depth] = nodeEntry;
++    }
++    if (node.nodeType == NodeType.LEAF_NODE) {
++      //leaf node's corresponding NodeEntry will not have the position member set.
++      if (depth - 1 >= 0) {
++        findNextSiblingKeyOfLeafNode();
++      }
++      return;
++    }
++    if (depth == MAX_DEPTH) {
++      return;
++    }
++    if (node.prefixLength > 0) {
++      int commonLength = Art.commonPrefixLength(
++              high,
++              depth,
++              high.length,
++              node.prefix,
++              0,
++              node.prefixLength);
++      assert(commonLength == node.prefixLength);
++      //common prefix is the same ,then increase the depth
++      keyDepth += node.prefixLength;
++    }
++    //find next min child
++    int pos = fromNodePosition(high[keyDepth], node);
++    stack[depth].position = pos;
++    stack[depth].visited = true;
++    Node child = node.getChild(pos);
++    NodeEntry childNodeEntry = new NodeEntry();
++    childNodeEntry.node = child;
++    this.depth++;
++    stack[depth] = childNodeEntry;
++    visitToLeafFrom(high, keyDepth + 1, child);
++  }
++
+   protected abstract int boundaryNodePosition(Node node);
+ 
++  protected abstract int fromNodePosition(byte key, Node node);
++
+   private void findNextSiblingKeyOfLeafNode() {
+     Node parentNode = stack[depth - 1].node;
+     int nextSiblingPos = visitedNodeNextPosition(parentNode, stack[depth - 1].position);
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Art.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Art.java
+index e6934d35..336a509f 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Art.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Art.java
+@@ -259,7 +259,7 @@ public class Art {
+   }
+ 
+   //find common prefix length
+-  private static int commonPrefixLength(byte[] key1, int aFromIndex, int aToIndex,
++  static int commonPrefixLength(byte[] key1, int aFromIndex, int aToIndex,
+       byte[] key2, int bFromIndex, int bToIndex) {
+     int aLength = aToIndex - aFromIndex;
+     int bLength = bToIndex - bFromIndex;
+@@ -300,6 +300,10 @@ public class Art {
+     return new LeafNodeIterator(this, reverse, containers);
+   }
+ 
++  public LeafNodeIterator leafNodeIteratorFrom(long bound, boolean reverse, Containers containers) {
++    return new LeafNodeIterator(this, reverse, containers, bound);
++  }
++
+   private void serialize(Node node, DataOutput dataOutput) throws IOException {
+     if (node.nodeType != NodeType.LEAF_NODE) {
+       //serialize the internal node itself first
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java
+index 85b8a6eb..40411ce4 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java
+@@ -18,4 +18,14 @@ public class BackwardShuttle extends AbstractShuttle {
+   protected int boundaryNodePosition(Node node) {
+     return node.getMaxPos();
+   }
++
++  @Override
++  protected int fromNodePosition(byte key, Node node) {
++    int pos = node.getChildPos(key);
++    if (pos == Node.ILLEGAL_IDX) {
++      return node.getNextSmallerPos(pos);
++    } else {
++      return pos;
++    }
++  }
+ }
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java
+index 25ff79f0..617807c8 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java
+@@ -18,4 +18,14 @@ public class ForwardShuttle extends AbstractShuttle {
+   protected int boundaryNodePosition(Node node) {
+     return node.getMinPos();
+   }
++
++  @Override
++  protected int fromNodePosition(byte key, Node node) {
++    int pos = node.getChildPos(key);
++    if (pos == Node.ILLEGAL_IDX) {
++      return node.getNextLargerPos(pos);
++    } else {
++      return pos;
++    }
++  }
+ }
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/LeafNodeIterator.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/LeafNodeIterator.java
+index 33dcdd8a..07e5dad0 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/LeafNodeIterator.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/LeafNodeIterator.java
+@@ -1,12 +1,14 @@
+ package org.roaringbitmap.art;
+ 
+ import java.util.Iterator;
++import java.util.NoSuchElementException;
+ 
+ public class LeafNodeIterator implements Iterator<LeafNode> {
+ 
+   private Shuttle shuttle;
++  private boolean hasCurrent;
+   private LeafNode current;
+-  private boolean consumedCurrent;
++  private boolean calledHasNext;
+   private boolean isEmpty;
+ 
+   /**
+@@ -35,28 +37,65 @@ public class LeafNodeIterator implements Iterator<LeafNode> {
+       shuttle = new BackwardShuttle(art, containers);
+     }
+     shuttle.initShuttle();
+-    consumedCurrent = true;
++    calledHasNext = false;
+   }
+ 
+-  @Override
+-  public boolean hasNext() {
++  /**
++   * constructor
++   * @param art the ART
++   * @param reverse false: ascending order,true: the descending order
++   * @param containers the containers
++   * @param from starting upper/lower bound
++   */
++  public LeafNodeIterator(Art art, boolean reverse, Containers containers, long from) {
++    isEmpty = art.isEmpty();
+     if (isEmpty) {
+-      return false;
++      return;
+     }
+-    if (!consumedCurrent) {
+-      return false;
++    if (!reverse) {
++      shuttle = new ForwardShuttle(art, containers);
++    } else {
++      shuttle = new BackwardShuttle(art, containers);
+     }
++    shuttle.initShuttleFrom(from);
++    calledHasNext = false;
++  }
++
++
++  private boolean advance() {
+     boolean hasLeafNode = shuttle.moveToNextLeaf();
+     if (hasLeafNode) {
++      hasCurrent = true;
+       current = shuttle.getCurrentLeafNode();
+-      consumedCurrent = false;
++    } else {
++      hasCurrent = false;
++      current = null;
+     }
+     return hasLeafNode;
+   }
+ 
++  @Override
++  public boolean hasNext() {
++    if (isEmpty) {
++      return false;
++    }
++    if (!calledHasNext) {
++      calledHasNext = true;
++      return advance();
++    } else {
++      return hasCurrent;
++    }
++  }
++
+   @Override
+   public LeafNode next() {
+-    consumedCurrent = true;
++    if (!calledHasNext) {
++      hasNext();
++    }
++    if (!hasCurrent) {
++      throw new NoSuchElementException();
++    }
++    calledHasNext = false;
+     return current;
+   }
+ 
+@@ -64,4 +103,31 @@ public class LeafNodeIterator implements Iterator<LeafNode> {
+   public void remove() {
+     shuttle.remove();
+   }
++
++  /**
++   * Move this iterator to the leaf that contains `boundval`.
++   *
++   * If no leaf contains `boundval`, then move to the next largest (on forward iterators
++   * or next smallest (on backwards iterators).
++   */
++  public void seek(long boundval) {
++    shuttle.initShuttleFrom(boundval);
++    calledHasNext = false;
++  }
++
++  /**
++   * Return the next leaf without advancing the iterator.
++   *
++   * @return the next leaf
++   */
++  public LeafNode peekNext() {
++    if (!calledHasNext) {
++      hasNext();
++    }
++    if (!hasCurrent) {
++      throw new NoSuchElementException();
++    }
++    // don't set calledHasNext, so that multiple invocations don't advance
++    return current;
++  }
+ }
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Shuttle.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Shuttle.java
+index c06c86ba..0a535e40 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Shuttle.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Shuttle.java
+@@ -7,6 +7,14 @@ public interface Shuttle {
+    */
+   public void initShuttle();
+ 
++  /**
++   * Call this instead of initShuttle, if the iterator should start from a bound
++   * (upper/lower depending on direction)
++   *
++   * @param key the upper/lower bound to start from
++   */
++  public void initShuttleFrom(long key);
++
+   /**
+    *
+    * @return true: has a LeafNode ,false: has no LeafNode
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java
+index f95162c7..24076db5 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java
+@@ -90,6 +90,10 @@ public class HighLowContainer {
+     return art.leafNodeIterator(reverse, containers);
+   }
+ 
++  public LeafNodeIterator highKeyLeafNodeIteratorFrom(long bound, boolean reverse) {
++    return art.leafNodeIteratorFrom(bound, reverse, containers);
++  }
++
+   /**
+    * replace the specified position one with a fresh container
+    * @param containerIdx the position of the container
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
+index 3b3c6769..b8c70095 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java
+@@ -8,6 +8,7 @@ import java.io.ObjectInput;
+ import java.io.ObjectOutput;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
++import java.util.Arrays;
+ import java.util.Iterator;
+ import java.util.Objects;
+ import org.roaringbitmap.ArrayContainer;
+@@ -352,6 +353,24 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+     return new ForwardPeekableIterator(leafNodeIterator);
+   }
+ 
++  // for testing only
++  LeafNodeIterator getLeafNodeIterator() {
++    return highLowContainer.highKeyLeafNodeIterator(false);
++  }
++
++  /**
++   * Produce an iterator over the values in this bitmap starting from `minval`.
++   *
++   * @param minval the lower bound of the iterator returned
++   * @return a custom iterator over set bits, the bits are traversed in ascending sorted order
++   */
++  public PeekableLongIterator getLongIteratorFrom(long minval) {
++    LeafNodeIterator leafNodeIterator = highLowContainer.highKeyLeafNodeIteratorFrom(minval, false);
++    ForwardPeekableIterator fpi = new ForwardPeekableIterator(leafNodeIterator);
++    fpi.advanceIfNeeded(minval); // make sure the lower end is advanced as well
++    return fpi;
++  }
++
+   @Override
+   public boolean contains(long x) {
+     byte[] high = LongUtils.highPart(x);
+@@ -571,6 +590,19 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+     return new ReversePeekableIterator(leafNodeIterator);
+   }
+ 
++  /**
++   * Produce an iterator over the values in this bitmap starting from `maxval`.
++   *
++   * @param maxval the upper bound of the iterator returned
++   * @return a custom iterator over set bits, the bits are traversed in descending sorted order
++   */
++  public PeekableLongIterator getReverseLongIteratorFrom(long maxval) {
++    LeafNodeIterator leafNodeIterator = highLowContainer.highKeyLeafNodeIteratorFrom(maxval, true);
++    ReversePeekableIterator rpi = new ReversePeekableIterator(leafNodeIterator);
++    rpi.advanceIfNeeded(maxval); // make sure the lower end is advanced as well
++    return rpi;
++  }
++
+   @Override
+   public void removeLong(long x) {
+     byte[] high = LongUtils.highPart(x);
+@@ -723,7 +755,6 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+       boolean hasNext = true;
+       if (!hasNextCalled) {
+         hasNext = hasNext();
+-        hasNextCalled = false;
+       }
+       if (hasNext) {
+         char low = charIterator.next();
+@@ -736,31 +767,54 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+ 
+     @Override
+     public void advanceIfNeeded(long minval) {
+-      if((hasNextCalled || this.hasNext()) && compare(this.peekNext(), minval)) {
++      if (!hasNextCalled) {
++        if (!hasNext()) {
++          return;
++        }
++      }
++      if(compare(this.peekNext(), minval)) {
+         return;
+       }
+       //empty bitset
+       if(this.high == null) {
+         return;
+       }
+-      byte[] high = LongUtils.highPart(minval);
+ 
+-      //need to advance the iterator
+-      while(LongUtils.compareHigh(this.high, high) != 0 && keyIte.hasNext()) {
+-        LeafNode leafNode = keyIte.next();
+-        this.high = leafNode.getKeyBytes();
+-        if(LongUtils.compareHigh(this.high, high) == 0) {
+-          long containerIdx = leafNode.getContainerIdx();
+-          Container container = highLowContainer.getContainer(containerIdx);
+-          charIterator = getIterator(container);
+-          if(!charIterator.hasNext()){
+-            return;
+-          }  
++      byte[] minHigh = LongUtils.highPart(minval);
++      if (!Arrays.equals(this.high, minHigh)) {
++        // advance outer
++        if (keyIte.hasNext()) {
++          LeafNode leafNode = keyIte.peekNext();
++          this.high = leafNode.getKeyBytes();
++          if (Arrays.equals(this.high, minHigh)) {
++            long containerIdx = leafNode.getContainerIdx();
++            Container container = highLowContainer.getContainer(containerIdx);
++            charIterator = getIterator(container);
++            if(!charIterator.hasNext()){
++              return;
++            }
++          } else {
++            keyIte.seek(minval);
++            if (keyIte.hasNext()) {
++              leafNode = keyIte.next();
++              this.high = leafNode.getKeyBytes();
++              long containerIdx = leafNode.getContainerIdx();
++              Container container = highLowContainer.getContainer(containerIdx);
++              charIterator = getIterator(container);
++              if(!charIterator.hasNext()){
++                return;
++              }
++            } else {
++              return;
++            }
++          }
+         }
+       }
+ 
++      // advance inner
+       char low = LongUtils.lowPart(minval);
+       charIterator.advanceIfNeeded(low);
++      hasNextCalled = false;
+     }
+ 
+     @Override
+@@ -768,7 +822,6 @@ public class Roaring64Bitmap implements Externalizable, LongBitmapDataProvider {
+       boolean hasNext = true;
+       if (!hasNextCalled) {
+         hasNext = hasNext();
+-        hasNextCalled = true;
+       }
+       if (hasNext) {
+         char low = charIterator.peekNext();

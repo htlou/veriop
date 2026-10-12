@@ -1,0 +1,9 @@
+# xxHash `268fde4`: inline-only long-hash helpers
+
+**Verdict: scoped `EQUIV` for functional XXH3 long-hash outputs in defined C executions.** The exact historical [parent](old/xxhash.h) and [child](new/xxhash.h) headers differ only in the inline-control preprocessor branch for `XXH3_hashLong_64b_withSecret` and `XXH3_hashLong_128b_withSecret`; neither function body changes. [The reproducer](check_helpers.py) verifies that this is the only changed file, both complete function definitions match, every `XXH_NO_INLINE` and `XXH_FORCE_INLINE` definition retains `static` linkage, and both saved versions match their historical Git objects.
+
+At Clang `-O1 -march=x86-64-v3`, [the retained helper IR](helper-check/result.json) differs only by `noinline` versus `alwaysinline`. Alive2 checks each function in both directions after stripping identical alias annotations and metadata intrinsics that this installed Alive2 cannot parse. All four [logs](helper-check/64-forward.log) report one correct transformation, zero failed transformations, and zero errors; the IR bodies are syntactically equal after that normalization. The normalization changes no executable instruction or memory operation.
+
+The earlier [public-call Alive2 check](r_newcheck/result.json) still cannot decide the affected 256-byte `withSecret` path because the old target calls an opaque helper while the new target inlines it. Exact source identity outside the two inline-control declarations closes that functional source-level gap: each public caller invokes the same helper body with the same arguments, whether that body is inlined or called. This does not prove identical machine code, timing, compiler diagnostics, or stack traces across architectures and optimization levels. No official historical before/after benchmark score was measured.
+
+Run `python3 history-eq/c/xxHash/268fde4/check_helpers.py` from the project root to regenerate the IR and all four Alive2 results.

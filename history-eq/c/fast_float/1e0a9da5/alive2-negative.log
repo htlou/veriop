@@ -1,0 +1,103 @@
+
+----------------------------------------
+define i64 @old_read8(ptr nowrite noundef %#0) nofree willreturn memory(argmem: read) {
+#1:
+  %#2 = load i16, ptr nowrite noundef %#0, align 2
+  %#3 = and i16 %#2, 255
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#5 = load i16, ptr %#4, align 2
+  %#6 = shl i16 %#5, 8
+  %#7 = or disjoint i16 %#6, %#3
+  %#8 = zext i16 %#7 to i64
+  %#9 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#10 = load <4 x i16>, ptr %#9, align 2
+  %#11 = and <4 x i16> %#10, { 255, 255, 255, 255 }
+  %#12 = zext nneg <4 x i16> %#11 to <4 x i64>
+  %#13 = shl nsw nuw <4 x i64> %#12, { 16, 24, 32, 40 }
+  %#14 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#15 = load i16, ptr %#14, align 2
+  %#16 = and i16 %#15, 255
+  %#17 = zext nneg i16 %#16 to i64
+  %#18 = shl nsw nuw i64 %#17, 48
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 14
+  %#20 = load i16, ptr %#19, align 2
+  %#21 = and i16 %#20, 255
+  %#22 = zext nneg i16 %#21 to i64
+  %#23 = shl nuw i64 %#22, 56
+  %#24 = reduce_or <4 x i64> %#13
+  %#25 = or i64 %#24, %#18
+  %#26 = or disjoint i64 %#23, %#8
+  %#27 = or i64 %#25, %#26
+  ret i64 %#27
+}
+=>
+define i64 @new_read8_bad(ptr nowrite noundef %#0) nofree willreturn memory(argmem: read) {
+#1:
+  %#2 = load <8 x i16>, ptr nowrite noundef %#0, align 2
+  %#3 = trunc <8 x i16> %#2 to <8 x i8>
+  %#4 = bitcast <8 x i8> %#3 to <1 x i64>
+  %#5 = extractelement <1 x i64> %#4, i64 0
+  %#6 = xor i64 %#5, 1
+  ret i64 %#6
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=12, attrs=3) / Address=#x14
+
+Source:
+i16 %#2 = #x0000 (0)
+i16 %#3 = #x0000 (0)
+ptr %#4 = pointer(non-local, block_id=1, offset=14, attrs=3) / Address=#x16
+i16 %#5 = #x0000 (0)
+i16 %#6 = #x0000 (0)
+i16 %#7 = #x0000 (0)
+i64 %#8 = #x0000000000000000 (0)
+ptr %#9 = pointer(non-local, block_id=1, offset=16, attrs=3) / Address=#x18
+<4 x i16> %#10 = < #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0) >
+<4 x i16> %#11 = < #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0) >
+<4 x i64> %#12 = < #x0000000000000000 (0), #x0000000000000000 (0), #x0000000000000000 (0), #x0000000000000000 (0) >
+<4 x i64> %#13 = < #x0000000000000000 (0), #x0000000000000000 (0), #x0000000000000000 (0), #x0000000000000000 (0) >
+ptr %#14 = pointer(non-local, block_id=1, offset=24, attrs=3) / Address=#x20
+i16 %#15 = #x0000 (0)
+i16 %#16 = #x0000 (0)
+i64 %#17 = #x0000000000000000 (0)
+i64 %#18 = #x0000000000000000 (0)
+ptr %#19 = pointer(non-local, block_id=1, offset=26, attrs=3) / Address=#x22
+i16 %#20 = #x0000 (0)
+i16 %#21 = #x0000 (0)
+i64 %#22 = #x0000000000000000 (0)
+i64 %#23 = #x0000000000000000 (0)
+i64 %#24 = #x0000000000000000 (0)
+i64 %#25 = #x0000000000000000 (0)
+i64 %#26 = #x0000000000000000 (0)
+i64 %#27 = #x0000000000000000 (0)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 2	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 132	align: 8	alloc type: 0	alive: true	address: 8
+Contents:
+10: #x0000
+12: #x0000
+8: #x0000
+9: #x0000
+7: #x0000
+6: #x0000
+13: #x0000
+11: #x0000
+*: poison
+
+
+Target:
+<8 x i16> %#2 = < #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0), #x0000 (0) >
+<8 x i8> %#3 = < #x00 (0), #x00 (0), #x00 (0), #x00 (0), #x00 (0), #x00 (0), #x00 (0), #x00 (0) >
+<1 x i64> %#4 = < #x0000000000000000 (0) >
+i64 %#5 = #x0000000000000000 (0)
+i64 %#6 = #x0000000000000001 (1)
+Source value: #x0000000000000000 (0)
+Target value: #x0000000000000001 (1)
+

@@ -1,0 +1,64 @@
+{
+ "commit": "f7280a3",
+ "date": "2020-03-09",
+ "subject": "Don't over-allocate XXH32/XXH64, don't hardcode",
+ "selected_by": "manual-scan",
+ "perf_evidence": "\"Don't over-allocate XXH32/XXH64 ... XXH32_state_t and XXH64_state_t are no longer overaligned\": XXH32/XXH64_createState use plain malloc instead of the 64-byte-aligning over-allocating XXH_malloc (memory/allocation cost).",
+ "change_summary": "xxhash.h: XXH_malloc/XXH_free become plain malloc/free; the aligning allocator is renamed XXH_alignedMalloc/XXH_alignedFree (generic power-of-2 alignment) in xxh3.h and used only by XXH3_createState/freeState.",
+ "units": [
+  {
+   "name": "XXH32_createState/freeState (create, reset(seed), digest, free)",
+   "level": "api",
+   "verdict": "REFINES",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f7280a3/r_api_t5",
+   "evidence": "fwd correct; bwd counterexample: old (as tgt) malloc returns null -> returns 0, new returns the hash: clang elides the new malloc/free pair entirely (heap-to-nothing), the old over-allocating version keeps malloc (may fail)"
+  },
+  {
+   "name": "XXH64_createState/freeState (create, reset(seed), digest, free; and create+free only)",
+   "level": "api",
+   "verdict": "REFINES",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f7280a3/r_api_t6",
+   "evidence": "fwd correct, bwd incorrect (same allocation-failure counterexample); create+free-only target r_api_t4: fwd correct, bwd incorrect"
+  },
+  {
+   "name": "XXH3_createState/freeState (XXH_malloc -> XXH_alignedMalloc rename/generalisation)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f7280a3/r_api_t7",
+   "evidence": "create+free target: Alive2 fwd+bwd correct (both keep malloc/free)"
+  },
+  {
+   "name": "heap states with data: XXH32 20 B, XXH64 40 B, XXH3 100 B (create, reset, update, digest, free)",
+   "level": "api",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/f7280a3/r_api_t1",
+   "evidence": "SMT timeouts (60 s) in both directions for r_api_t1/t2/t3"
+  }
+ ],
+ "commit_verdict": "UNKNOWN",
+ "raw_verdict": "UNKNOWN",
+ "coverage": "partial",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "Allocation-only change. Alive2 models malloc as possibly returning NULL. For the checked empty-input XXH32/XXH64 paths, the new code refines the old: clang removes the new malloc/free pair, while the old over-allocating version retains a malloc that may fail. This is a proven one-way result for those units only. Data-bearing API paths timed out in both directions, so the commit-level verdict is UNKNOWN. Harness wrap_api.c (identical for old/new): heap state via XXH*_createState, return 0 if NULL. Runner c/xxHash/4f43b71/xx_alive_d.py with Alive2 malloc/free modeling."
+}

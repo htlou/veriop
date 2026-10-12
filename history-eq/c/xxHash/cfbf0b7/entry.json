@@ -1,0 +1,40 @@
+{
+  "commit": "cfbf0b7",
+  "date": "2022-11-10",
+  "subject": "customize full accumulating loop for ARM64 SVE",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit reports at least 2x improvement by keeping SVE accumulators in registers through the full loop.",
+  "change_summary": "Rewrites the ARM64 SVE XXH3 stripe-accumulation loop and adds prefetches.",
+  "units": [
+    {
+      "name": "raw one-stripe SVE accumulation",
+      "level": "raw",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/cfbf0b7/r_sve_raw",
+      "evidence": "Alive2 rejects llvm.aarch64.sve.ptrue scalable-vector instructions on both sides."
+    },
+    {
+      "name": "public XXH3_64bits, 256 bytes, SVE path",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "non-x86-target-intrinsics",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/cfbf0b7/r_api256_sve",
+      "evidence": "The public SVE target has the same unsupported ptrue instruction in both Alive2 directions."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": "UNSUPPORTED",
+  "coverage": "partial",
+  "unsupported_reason": "non-x86-target-intrinsics",
+  "not_equiv_kind": null,
+  "notes": "Unchanged x86 and non-SVE AArch64 controls pass, but they do not exercise the optimized loop."
+}

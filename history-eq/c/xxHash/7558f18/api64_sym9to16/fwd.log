@@ -1,0 +1,92 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/7558f18/api64_sym9to16/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/7558f18/api64_sym9to16/new.ll
+
+----------------------------------------
+define i64 @target_xxh3_64(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: read) {
+#3:
+  %#6 = add i64 noundef %#1, -17
+  %#7 = icmp ult i64 %#6, -8
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = add i64 noundef %#2, noundef %#1
+  %#9 = mul i64 %#8, -7046029288634856825
+  %#10 = load i64, ptr nowrite noundef %#0, align 1
+  %#11 = add i64 %#10, 2568260970027576377
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#13 = gep inbounds ptr %#12, 1 x i64 -8
+  %#14 = load i64, ptr %#13, align 1
+  %#15 = add i64 %#14, -639039334258736852
+  %#16 = zext i64 %#11 to i128
+  %#17 = zext i64 %#15 to i128
+  %#18 = mul nuw i128 %#17, %#16
+  %#19 = trunc i128 %#18 to i64
+  %#20 = lshr i128 %#18, 64
+  %#21 = trunc nuw i128 %#20 to i64
+  %#22 = add i64 %#9, %#19
+  %#23 = add i64 %#22, %#21
+  %#24 = lshr i64 %#23, 29
+  %#25 = xor i64 %#24, %#23
+  %#26 = mul i64 %#25, 1609587929392839161
+  %#27 = lshr i64 %#26, 32
+  %#28 = xor i64 %#27, %#26
+  br label %#5
+
+#5:
+  %#29 = phi i64 [ %#28, %#4 ], [ 0, %#3 ]
+  ret i64 %#29
+}
+=>
+define i64 @target_xxh3_64(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: read) {
+#3:
+  %#6 = add i64 noundef %#1, -17
+  %#7 = icmp ult i64 %#6, -8
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = add i64 noundef %#2, noundef %#1
+  %#9 = mul i64 %#8, -7046029288634856825
+  %#10 = load i64, ptr nowrite noundef %#0, align 1
+  %#11 = add i64 %#10, 2568260970027576377
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#13 = gep inbounds ptr %#12, 1 x i64 -8
+  %#14 = load i64, ptr %#13, align 1
+  %#15 = add i64 %#14, -639039334258736852
+  %#16 = lshr i64 %#11, 32
+  %#17 = lshr i64 %#15, 32
+  %#18 = and i64 %#11, 4294967295
+  %#19 = and i64 %#15, 4294967295
+  %#20 = mul nuw i64 %#19, %#18
+  %#21 = lshr i64 %#20, 32
+  %#22 = mul nuw i64 %#19, %#16
+  %#23 = add nuw i64 %#21, %#22
+  %#24 = lshr i64 %#23, 32
+  %#25 = mul nuw i64 %#17, %#18
+  %#26 = and i64 %#23, 4294967295
+  %#27 = add nuw i64 %#26, %#25
+  %#28 = lshr i64 %#27, 32
+  %#29 = mul nuw i64 %#17, %#16
+  %#30 = and i64 %#20, 4294967295
+  %#31 = shl i64 %#27, 32
+  %#32 = add i64 %#29, %#9
+  %#33 = add i64 %#32, %#30
+  %#34 = add i64 %#33, %#24
+  %#35 = add i64 %#34, %#28
+  %#36 = add i64 %#35, %#31
+  %#37 = lshr i64 %#36, 29
+  %#38 = xor i64 %#37, %#36
+  %#39 = mul i64 %#38, 1609587929392839161
+  %#40 = lshr i64 %#39, 32
+  %#41 = xor i64 %#40, %#39
+  br label %#5
+
+#5:
+  %#42 = phi i64 [ %#41, %#4 ], [ 0, %#3 ]
+  ret i64 %#42
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

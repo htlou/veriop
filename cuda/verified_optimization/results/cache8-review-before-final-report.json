@@ -1,0 +1,20 @@
+{
+  "scope": "One private CUDA RMSNorm kernel and its host dispatch; no public API changes",
+  "checks": {
+    "dispatch_bounds": "Cached 8x1024 tile selected only in original ncols>=1024 branch and ncols<=8192, with all fusion flags false",
+    "load_store_bounds": "Every cached read and output store uses the same col<ncols guard",
+    "inplace": "22 complete formal instances include separate and in-place variants; same original block reduction barrier",
+    "fallback": "Generic cache_size=0 remains selected for small, large, scaled and fused paths",
+    "numerics": "No new lower precision, approximation or flags; preserves per-thread accumulation and block reduction",
+    "source_style": "git diff --check; ASCII code; reuse existing reduction and kernel instead of a separate implementation",
+    "tests": "101 existing RMS_NORM,NORM repository tests pass on CUDA against CPU; GPU paired comparisons pass so far",
+    "performance": "Primary gains positive on changed cases; held-out runs still required",
+    "proof_limit": "Concrete one-row launches; Volta real-valued semantics, not IEEE bit equivalence"
+  },
+  "remaining": [
+    "Complete held-out timing",
+    "Save candidate commit if retained",
+    "Final requirement audit",
+    "Hardware counter access denied; achieved occupancy/DRAM bandwidth/warp efficiency missing"
+  ]
+}

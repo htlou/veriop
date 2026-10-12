@@ -1,0 +1,76 @@
+{
+ "commit": "63e083c",
+ "date": "2025-01-12",
+ "subject": "feat(xxhash3): Support LASX instruction set and refactor LSX implement",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Message: '1. Use __lsx_vmul_d directly instead of using 2 32-bit multiply to emulate a 64-bit multiply. 2. Add LASX support.' (fewer instructions; 256-bit SIMD path).",
+ "change_summary": "XXH3_scrambleAcc_lsx: acc*=PRIME32_1 via one __lsx_vmul_d with a 64-bit splat instead of two vmulwev.d.wu + shift + add. New XXH_VECTOR=XXH_LASX (accumulate_512_lasx / scrambleAcc_lasx on 256-bit vectors), preferred over LSX when __loongarch_asx.",
+ "units": [
+  {
+   "name": "XXH3_scrambleAcc_lsx (emulated -> vmul.d), loongarch64 -mlsx, as compiled",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/63e083c/r_lsx",
+   "evidence": "failed-to-prove, unknown libcalls llvm.loongarch.lsx.* (target_acc512 IR identical but also only Timeout with uninterpreted calls)"
+  },
+  {
+   "name": "XXH3_scrambleAcc_lsx, LSX intrinsics modeled (+opt / +O2)",
+   "level": "raw",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/63e083c/r_lsx_model_O2",
+   "evidence": "Timeout (600 s) both directions in r_lsx_model, r_lsx_model_opt, r_lsx_model_O2 (64-bit multiplier identity)"
+  },
+  {
+   "name": "XXH3_accumulate_512 + scrambleAcc LSX -> LASX, loongarch64 -mlasx, as compiled",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/63e083c/r_lasx",
+   "evidence": "failed-to-prove, unknown libcalls llvm.loongarch.{lsx,lasx}.*"
+  },
+  {
+   "name": "XXH3_accumulate_512 LSX -> LASX, intrinsics modeled",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/63e083c/r_lasx_model",
+   "evidence": "fwd+bwd correct with la_model.py semantics"
+  },
+  {
+   "name": "XXH3_scrambleAcc LSX(emulated mul) -> LASX(xvmul.d), intrinsics modeled (+O2)",
+   "level": "raw",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/63e083c/r_lasx_model_O2",
+   "evidence": "Timeout (600 s) both directions in r_lasx_model and r_lasx_model_O2"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "non-x86-target-intrinsics",
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). Default loongarch64 (LSX) target IR identical for the APIs (ident_la64_default/) - the LSX accumulate is unchanged; only scrambleAcc_lsx changed. Flags: --target loongarch64-linux-gnu, cflags '-O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -nostdlibinc -isystem _work2020/cross_sysinc -mlsx|-mlasx' + '-DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000'; wrapper wrap_simd.c uses the library dispatch macros with value-arg inputs in local arrays. Plain Alive2 cannot conclude: LSX/LASX builtins stay as llvm.loongarch.{lsx,lasx}.* calls and are approximated as unknown libcalls ('Couldn't prove the correctness ... Alive2 approximated the semantics'). Secondary analysis: la_model.py replaces each intrinsic by generic IR with its ISA semantics (vld=unaligned load, vxor/vadd/vmul.d lane-wise, vsrli/vslli shifts, vmulwev.d.wu = zext(even 32-bit lanes) products, vreplgr2vr = splat, vshuf4i.w = per-128-bit-lane word shuffle), identically on both sides; *_O2 dirs additionally re-normalize both sides with opt default<O2> (no vectorizers) and strip nocapture. With -mlasx the old side uses the LSX path and the new side the LASX path. Result modulo the model: LASX accumulate_512 EQUIV to old LSX accumulate; both scramble changes (the advertised perf change) UNKNOWN because the solver cannot prove (lo32(x)*P) + ((hi32(x)*P)<<32) == x*P mod 2^64 within 600 s. initsecret control EQUIV; api_len1024 not unrolled (not pursued)."
+}

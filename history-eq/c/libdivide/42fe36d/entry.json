@@ -1,0 +1,52 @@
+{
+  "commit": "42fe36d",
+  "date": "2014-07-09",
+  "subject": "Use intrinsic MSVC functions for counting leading/trailing zeros.",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit substitutes MSVC bit-scan intrinsics for portable leading/trailing-zero scans.",
+  "change_summary": "Changes the MSVC x64 count-leading/trailing-zero implementation used by divider generation.",
+  "units": [
+    {
+      "name": "raw 32/64-bit count-leading/trailing-zero helpers, unrestricted input",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 65,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "artifact_dir": "c/libdivide/42fe36d/raw_u65",
+      "evidence": "Alive2 gives zero-input counterexamples for ctz32 and ctz64; clz helpers pass."
+    },
+    {
+      "name": "bit-count helpers under the library's nonzero-input precondition",
+      "level": "precond",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 65,
+      "precondition": "input != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/42fe36d/raw_u65",
+      "evidence": "All four nonzero/preconditioned clz/ctz helper targets pass bidirectional Alive2 with unroll 65."
+    },
+    {
+      "name": "public signed/unsigned 32/64-bit generated division",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 65,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/42fe36d/api_u65",
+      "evidence": "The two 32-bit API targets time out; the two 64-bit API targets exhaust SMT memory. Neither failure proves an equivalence or counterexample."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The checked configuration models MSVC using Clang's x86_64-pc-windows-msvc target. A solver memout is classified UNKNOWN by METHOD.md even though the older result.json labels it UNSUPPORTED. No public-API counterexample was found."
+}

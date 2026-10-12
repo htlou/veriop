@@ -1,0 +1,412 @@
+
+----------------------------------------
+declare void @__assert_fail(noundef ptr, noundef ptr, noundef i32, noundef ptr) noreturn
+
+@.str.6 = constant 12 bytes, align 1
+@.str.1 = constant 63 bytes, align 1
+@__PRETTY_FUNCTION__.ggml_vec_dot_q4_0_q8_0 = constant 123 bytes, align 1
+@ggml_table_f32_f16 = global 262144 bytes, align 16
+@.str.7 = constant 9 bytes, align 1
+
+define void @ggml_vec_dot_q4_0_q8_0(i32 noundef %#0, ptr noread noundef %#1, i64 noundef %#2, ptr nowrite noundef %#3, i64 noundef %#4, ptr nowrite noundef %#5, i64 noundef %#6, i32 noundef %#7) {
+init:
+  br label %#8
+
+#8:
+  %#19 = sdiv i32 noundef %#0, 32
+  %#20 = and i32 noundef %#0, 31
+  %#21 = icmp eq i32 %#20, 0
+  br i1 %#21, label %#10, label %#9
+
+#9:
+  tail call void @__assert_fail(nonnull noundef ptr @.str.6, nonnull noundef ptr @.str.1, noundef i32 3918, nonnull noundef ptr @__PRETTY_FUNCTION__.ggml_vec_dot_q4_0_q8_0) noreturn
+  assume i1 0
+
+#10:
+  %#22 = icmp eq i32 noundef %#7, 1
+  br i1 %#22, label %#11, label %#18
+
+#11:
+  %#23 = icmp sgt i32 noundef %#0, 31
+  br i1 %#23, label %#12, label %#14
+
+#12:
+  %#24 = zext nneg i32 %#19 to i64
+  br label %#13
+
+#13:
+  %#25 = phi i64 [ 0, %#12 ], [ %#65, %#13 ]
+  %#26 = phi <8 x float> [ { 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000 }, %#12 ], [ %#64, %#13 ]
+  %#27 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#25
+  %#28 = load i16, ptr %#27, align 2
+  %#29 = zext i16 %#28 to i64
+  %#30 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#29
+  %#31 = load float, ptr %#30, align 4
+  %#32 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#25
+  %#33 = load i16, ptr %#32, align 2
+  %#34 = zext i16 %#33 to i64
+  %#35 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#34
+  %#36 = load float, ptr %#35, align 4
+  %#37 = fmul float %#31, %#36
+  %#38 = insertelement <8 x float> poison, float %#37, i64 0
+  %#39 = shufflevector <8 x float> %#38, <8 x float> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#40 = gep inbounds nuw ptr %#27, 1 x i64 2
+  %#41 = load <2 x i64>, ptr %#40, align 1
+  %#42 = gep inbounds nuw ptr %#32, 1 x i64 2
+  %#43 = load <16 x i8>, ptr %#42, align 1
+  %#44 = bitcast <2 x i64> %#41 to <16 x i8>
+  %#45 = and <16 x i8> %#44, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#46 = add nsw <16 x i8> %#45, { 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248 }
+  %#47 = x86_ssse3_psign_b_128 <16 x i8> %#46, <16 x i8> %#46
+  %#48 = x86_ssse3_psign_b_128 <16 x i8> %#43, <16 x i8> %#46
+  %#49 = x86_ssse3_pmadd_ub_sw_128 <16 x i8> %#47, <16 x i8> %#48
+  %#50 = x86_sse2_pmadd_wd <8 x i16> { 1, 1, 1, 1, 1, 1, 1, 1 }, <8 x i16> %#49
+  %#51 = lshr <2 x i64> %#41, { 4, 4 }
+  %#52 = gep inbounds nuw ptr %#32, 1 x i64 18
+  %#53 = load <16 x i8>, ptr %#52, align 1
+  %#54 = bitcast <2 x i64> %#51 to <16 x i8>
+  %#55 = and <16 x i8> %#54, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#56 = add nsw <16 x i8> %#55, { 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248 }
+  %#57 = x86_ssse3_psign_b_128 <16 x i8> %#56, <16 x i8> %#56
+  %#58 = x86_ssse3_psign_b_128 <16 x i8> %#53, <16 x i8> %#56
+  %#59 = x86_ssse3_pmadd_ub_sw_128 <16 x i8> %#57, <16 x i8> %#58
+  %#60 = x86_sse2_pmadd_wd <8 x i16> { 1, 1, 1, 1, 1, 1, 1, 1 }, <8 x i16> %#59
+  %#61 = shufflevector <4 x i32> %#60, <4 x i32> %#50, 0, 1, 2, 3, 4, 5, 6, 7
+  %#62 = sitofp <8 x i32> %#61 to <8 x float>
+  %#63 = fmul <8 x float> %#39, %#62
+  %#64 = fadd <8 x float> %#26, %#63
+  %#65 = add nsw nuw i64 %#25, 1
+  %#66 = icmp eq i64 %#65, %#24
+  br i1 %#66, label %#14, label %#13
+
+#14:
+  %#67 = phi <8 x float> [ { 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000 }, %#11 ], [ %#64, %#13 ]
+  %#68 = phi i32 [ 0, %#11 ], [ %#19, %#13 ]
+  %#69 = shufflevector <8 x float> %#67, <8 x float> poison, 4, 5, 6, 7
+  %#70 = shufflevector <8 x float> %#67, <8 x float> poison, 0, 1, 2, 3
+  %#71 = fadd <4 x float> %#69, %#70
+  %#72 = shufflevector <4 x float> %#71, <4 x float> poison, 2, 3, 4294967295, 4294967295
+  %#73 = fadd <4 x float> %#71, %#72
+  %#74 = shufflevector <4 x float> %#73, <4 x float> poison, 1, 4294967295, 4294967295, 4294967295
+  %#75 = fadd <4 x float> %#73, %#74
+  %#76 = extractelement <4 x float> %#75, i64 0
+  %#77 = icmp slt i32 %#68, %#19
+  br i1 %#77, label %#15, label %#17
+
+#15:
+  %#78 = zext i32 %#68 to i64
+  br label %#16
+
+#16:
+  %#79 = phi i64 [ %#78, %#15 ], [ %#163, %#16 ]
+  %#80 = phi float [ %#76, %#15 ], [ %#162, %#16 ]
+  %#81 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#79, 1 x i64 2, 1 x i64 0
+  %#82 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#79, 1 x i64 2, 1 x i64 4
+  %#83 = load <4 x i8>, ptr %#81, align 1
+  %#84 = load <4 x i8>, ptr %#82, align 1
+  %#85 = zext <4 x i8> %#83 to <4 x i32>
+  %#86 = zext <4 x i8> %#84 to <4 x i32>
+  %#87 = and <4 x i32> %#85, { 15, 15, 15, 15 }
+  %#88 = and <4 x i32> %#86, { 15, 15, 15, 15 }
+  %#89 = add nsw <4 x i32> %#87, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#90 = add nsw <4 x i32> %#88, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#91 = lshr <4 x i32> %#85, { 4, 4, 4, 4 }
+  %#92 = lshr <4 x i32> %#86, { 4, 4, 4, 4 }
+  %#93 = add nsw <4 x i32> %#91, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#94 = add nsw <4 x i32> %#92, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#95 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 0
+  %#96 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 4
+  %#97 = load <4 x i8>, ptr %#95, align 1
+  %#98 = load <4 x i8>, ptr %#96, align 1
+  %#99 = sext <4 x i8> %#97 to <4 x i32>
+  %#100 = sext <4 x i8> %#98 to <4 x i32>
+  %#101 = mul nsw <4 x i32> %#89, %#99
+  %#102 = mul nsw <4 x i32> %#90, %#100
+  %#103 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 16
+  %#104 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 20
+  %#105 = load <4 x i8>, ptr %#103, align 1
+  %#106 = load <4 x i8>, ptr %#104, align 1
+  %#107 = sext <4 x i8> %#105 to <4 x i32>
+  %#108 = sext <4 x i8> %#106 to <4 x i32>
+  %#109 = mul nsw <4 x i32> %#93, %#107
+  %#110 = mul nsw <4 x i32> %#94, %#108
+  %#111 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#79, 1 x i64 2, 1 x i64 8
+  %#112 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#79, 1 x i64 2, 1 x i64 12
+  %#113 = load <4 x i8>, ptr %#111, align 1
+  %#114 = load <4 x i8>, ptr %#112, align 1
+  %#115 = zext <4 x i8> %#113 to <4 x i32>
+  %#116 = zext <4 x i8> %#114 to <4 x i32>
+  %#117 = and <4 x i32> %#115, { 15, 15, 15, 15 }
+  %#118 = and <4 x i32> %#116, { 15, 15, 15, 15 }
+  %#119 = add nsw <4 x i32> %#117, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#120 = add nsw <4 x i32> %#118, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#121 = lshr <4 x i32> %#115, { 4, 4, 4, 4 }
+  %#122 = lshr <4 x i32> %#116, { 4, 4, 4, 4 }
+  %#123 = add nsw <4 x i32> %#121, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#124 = add nsw <4 x i32> %#122, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#125 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 8
+  %#126 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 12
+  %#127 = load <4 x i8>, ptr %#125, align 1
+  %#128 = load <4 x i8>, ptr %#126, align 1
+  %#129 = sext <4 x i8> %#127 to <4 x i32>
+  %#130 = sext <4 x i8> %#128 to <4 x i32>
+  %#131 = mul nsw <4 x i32> %#119, %#129
+  %#132 = mul nsw <4 x i32> %#120, %#130
+  %#133 = add nsw <4 x i32> %#131, %#101
+  %#134 = add nsw <4 x i32> %#132, %#102
+  %#135 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 24
+  %#136 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79, 1 x i64 2, 1 x i64 28
+  %#137 = load <4 x i8>, ptr %#135, align 1
+  %#138 = load <4 x i8>, ptr %#136, align 1
+  %#139 = sext <4 x i8> %#137 to <4 x i32>
+  %#140 = sext <4 x i8> %#138 to <4 x i32>
+  %#141 = mul nsw <4 x i32> %#123, %#139
+  %#142 = mul nsw <4 x i32> %#124, %#140
+  %#143 = add nsw <4 x i32> %#141, %#109
+  %#144 = add nsw <4 x i32> %#142, %#110
+  %#145 = add nsw <4 x i32> %#144, %#143
+  %#146 = reduce_add <4 x i32> %#145
+  %#147 = add nsw <4 x i32> %#134, %#133
+  %#148 = reduce_add <4 x i32> %#147
+  %#149 = add nsw i32 %#146, %#148
+  %#150 = sitofp i32 %#149 to float
+  %#151 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#79
+  %#152 = load i16, ptr %#151, align 2
+  %#153 = zext i16 %#152 to i64
+  %#154 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#153
+  %#155 = load float, ptr %#154, align 4
+  %#156 = fmul float %#155, %#150
+  %#157 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#79
+  %#158 = load i16, ptr %#157, align 2
+  %#159 = zext i16 %#158 to i64
+  %#160 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#159
+  %#161 = load float, ptr %#160, align 4
+  %#162 = fmuladd float %#156, float %#161, float %#80
+  %#163 = add nsw nuw i64 %#79, 1
+  %#164 = trunc nuw i64 %#163 to i32
+  %#165 = icmp sgt i32 %#19, %#164
+  br i1 %#165, label %#16, label %#17
+
+#17:
+  %#166 = phi float [ %#76, %#14 ], [ %#162, %#16 ]
+  store float %#166, ptr noread noundef %#1, align 4
+  ret void
+
+#18:
+  tail call void @__assert_fail(nonnull noundef ptr @.str.7, nonnull noundef ptr @.str.1, noundef i32 3922, nonnull noundef ptr @__PRETTY_FUNCTION__.ggml_vec_dot_q4_0_q8_0) noreturn
+  assume i1 0
+}
+=>
+declare void @__assert_fail(noundef ptr, noundef ptr, noundef i32, noundef ptr) noreturn
+
+@.str.6 = constant 12 bytes, align 1
+@.str.1 = constant 63 bytes, align 1
+@__PRETTY_FUNCTION__.ggml_vec_dot_q4_0_q8_0 = constant 123 bytes, align 1
+@ggml_table_f32_f16 = global 262144 bytes, align 16
+@.str.7 = constant 9 bytes, align 1
+
+define void @ggml_vec_dot_q4_0_q8_0(i32 noundef %#0, ptr noread noundef %#1, i64 noundef %#2, ptr nowrite noundef %#3, i64 noundef %#4, ptr nowrite noundef %#5, i64 noundef %#6, i32 noundef %#7) {
+init:
+  br label %#8
+
+#8:
+  %#20 = sdiv i32 noundef %#0, 32
+  %#21 = and i32 noundef %#0, 31
+  %#22 = icmp eq i32 %#21, 0
+  br i1 %#22, label %#10, label %#9
+
+#9:
+  tail call void @__assert_fail(nonnull noundef ptr @.str.6, nonnull noundef ptr @.str.1, noundef i32 3924, nonnull noundef ptr @__PRETTY_FUNCTION__.ggml_vec_dot_q4_0_q8_0) noreturn
+  assume i1 0
+
+#10:
+  %#23 = icmp eq i32 noundef %#7, 1
+  br i1 %#23, label %#11, label %#19
+
+#11:
+  %#24 = icmp sgt i32 noundef %#0, 63
+  br i1 %#24, label %#12, label %#15
+
+#12:
+  %#25 = zext nneg i32 %#20 to i64
+  br label %#13
+
+#13:
+  %#26 = phi i64 [ 0, %#12 ], [ %#108, %#13 ]
+  %#27 = phi <8 x float> [ { 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000 }, %#12 ], [ %#92, %#13 ]
+  %#28 = phi <8 x float> [ { 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000 }, %#12 ], [ %#107, %#13 ]
+  %#29 = or disjoint i64 %#26, 1
+  %#30 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#26
+  %#31 = gep inbounds nuw ptr %#30, 1 x i64 2
+  %#32 = load <2 x i64>, ptr %#31, align 1
+  %#33 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#29
+  %#34 = gep inbounds nuw ptr %#33, 1 x i64 2
+  %#35 = load <2 x i64>, ptr %#34, align 1
+  %#36 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#26
+  %#37 = gep inbounds nuw ptr %#36, 1 x i64 2
+  %#38 = load <16 x i8>, ptr %#37, align 1
+  %#39 = gep inbounds nuw ptr %#36, 1 x i64 18
+  %#40 = load <16 x i8>, ptr %#39, align 1
+  %#41 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#29
+  %#42 = gep inbounds nuw ptr %#41, 1 x i64 2
+  %#43 = load <16 x i8>, ptr %#42, align 1
+  %#44 = gep inbounds nuw ptr %#41, 1 x i64 18
+  %#45 = load <16 x i8>, ptr %#44, align 1
+  %#46 = bitcast <2 x i64> %#32 to <16 x i8>
+  %#47 = and <16 x i8> %#46, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#48 = add nsw <16 x i8> %#47, { 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248 }
+  %#49 = bitcast <2 x i64> %#32 to <8 x i16>
+  %#50 = lshr <8 x i16> %#49, { 4, 4, 4, 4, 4, 4, 4, 4 }
+  %#51 = bitcast <8 x i16> %#50 to <16 x i8>
+  %#52 = and <16 x i8> %#51, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#53 = add nsw <16 x i8> %#52, { 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248 }
+  %#54 = bitcast <2 x i64> %#35 to <16 x i8>
+  %#55 = and <16 x i8> %#54, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#56 = add nsw <16 x i8> %#55, { 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248 }
+  %#57 = bitcast <2 x i64> %#35 to <8 x i16>
+  %#58 = lshr <8 x i16> %#57, { 4, 4, 4, 4, 4, 4, 4, 4 }
+  %#59 = bitcast <8 x i16> %#58 to <16 x i8>
+  %#60 = and <16 x i8> %#59, { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }
+  %#61 = add nsw <16 x i8> %#60, { 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248 }
+  %#62 = x86_ssse3_psign_b_128 <16 x i8> %#48, <16 x i8> %#48
+  %#63 = x86_ssse3_psign_b_128 <16 x i8> %#38, <16 x i8> %#48
+  %#64 = x86_ssse3_pmadd_ub_sw_128 <16 x i8> %#62, <16 x i8> %#63
+  %#65 = x86_ssse3_psign_b_128 <16 x i8> %#53, <16 x i8> %#53
+  %#66 = x86_ssse3_psign_b_128 <16 x i8> %#40, <16 x i8> %#53
+  %#67 = x86_ssse3_pmadd_ub_sw_128 <16 x i8> %#65, <16 x i8> %#66
+  %#68 = x86_ssse3_psign_b_128 <16 x i8> %#56, <16 x i8> %#56
+  %#69 = x86_ssse3_psign_b_128 <16 x i8> %#43, <16 x i8> %#56
+  %#70 = x86_ssse3_pmadd_ub_sw_128 <16 x i8> %#68, <16 x i8> %#69
+  %#71 = x86_ssse3_psign_b_128 <16 x i8> %#61, <16 x i8> %#61
+  %#72 = x86_ssse3_psign_b_128 <16 x i8> %#45, <16 x i8> %#61
+  %#73 = x86_ssse3_pmadd_ub_sw_128 <16 x i8> %#71, <16 x i8> %#72
+  %#74 = x86_sse2_pmadd_wd <8 x i16> %#64, <8 x i16> { 1, 1, 1, 1, 1, 1, 1, 1 }
+  %#75 = x86_sse2_pmadd_wd <8 x i16> %#67, <8 x i16> { 1, 1, 1, 1, 1, 1, 1, 1 }
+  %#76 = x86_sse2_pmadd_wd <8 x i16> %#70, <8 x i16> { 1, 1, 1, 1, 1, 1, 1, 1 }
+  %#77 = x86_sse2_pmadd_wd <8 x i16> %#73, <8 x i16> { 1, 1, 1, 1, 1, 1, 1, 1 }
+  %#78 = load i16, ptr %#36, align 2
+  %#79 = zext i16 %#78 to i64
+  %#80 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#79
+  %#81 = load float, ptr %#80, align 4
+  %#82 = load i16, ptr %#30, align 2
+  %#83 = zext i16 %#82 to i64
+  %#84 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#83
+  %#85 = load float, ptr %#84, align 4
+  %#86 = fmul float %#81, %#85
+  %#87 = insertelement <8 x float> poison, float %#86, i64 0
+  %#88 = shufflevector <8 x float> %#87, <8 x float> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#89 = shufflevector <4 x i32> %#74, <4 x i32> %#75, 0, 1, 2, 3, 4, 5, 6, 7
+  %#90 = sitofp <8 x i32> %#89 to <8 x float>
+  %#91 = fmul <8 x float> %#88, %#90
+  %#92 = fadd <8 x float> %#27, %#91
+  %#93 = load i16, ptr %#41, align 2
+  %#94 = zext i16 %#93 to i64
+  %#95 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#94
+  %#96 = load float, ptr %#95, align 4
+  %#97 = load i16, ptr %#33, align 2
+  %#98 = zext i16 %#97 to i64
+  %#99 = gep inbounds nuw ptr @ggml_table_f32_f16, 262144 x i64 0, 4 x i64 %#98
+  %#100 = load float, ptr %#99, align 4
+  %#101 = fmul float %#96, %#100
+  %#102 = insertelement <8 x float> poison, float %#101, i64 0
+  %#103 = shufflevector <8 x float> %#102, <8 x float> poison, 0, 0, 0, 0, 0, 0, 0, 0
+  %#104 = shufflevector <4 x i32> %#76, <4 x i32> %#77, 0, 1, 2, 3, 4, 5, 6, 7
+  %#105 = sitofp <8 x i32> %#104 to <8 x float>
+  %#106 = fmul <8 x float> %#103, %#105
+  %#107 = fadd <8 x float> %#28, %#106
+  %#108 = add nsw nuw i64 %#26, 2
+  %#109 = or disjoint i64 %#108, 1
+  %#110 = icmp samesign ult i64 %#109, %#25
+  br i1 %#110, label %#13, label %#14
+
+#14:
+  %#111 = trunc nsw nuw i64 %#108 to i32
+  %#112 = fadd <8 x float> %#107, %#92
+  br label %#15
+
+#15:
+  %#113 = phi i32 [ 0, %#11 ], [ %#111, %#14 ]
+  %#114 = phi <8 x float> [ { 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000 }, %#11 ], [ %#112, %#14 ]
+  %#115 = shufflevector <8 x float> %#114, <8 x float> poison, 4, 5, 6, 7
+  %#116 = shufflevector <8 x float> %#114, <8 x float> poison, 0, 1, 2, 3
+  %#117 = fadd <4 x float> %#115, %#116
+  %#118 = shufflevector <4 x float> %#117, <4 x float> poison, 2, 3, 4294967295, 4294967295
+  %#119 = fadd <4 x float> %#117, %#118
+  %#120 = shufflevector <4 x float> %#119, <4 x float> poison, 1, 4294967295, 4294967295, 4294967295
+  %#121 = fadd <4 x float> %#119, %#120
+  %#122 = extractelement <4 x float> %#121, i64 0
+  %#123 = icmp slt i32 %#113, %#20
+  br i1 %#123, label %#16, label %#18
+
+#16:
+  %#124 = zext nneg i32 %#113 to i64
+  %#125 = zext i32 %#20 to i64
+  br label %#17
+
+#17:
+  %#126 = phi i64 [ %#124, %#16 ], [ %#210, %#17 ]
+  %#127 = phi float [ %#122, %#16 ], [ %#209, %#17 ]
+  %#128 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#126, 1 x i64 2, 1 x i64 0
+  %#129 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#126, 1 x i64 2, 1 x i64 4
+  %#130 = load <4 x i8>, ptr %#128, align 1
+  %#131 = load <4 x i8>, ptr %#129, align 1
+  %#132 = zext <4 x i8> %#130 to <4 x i32>
+  %#133 = zext <4 x i8> %#131 to <4 x i32>
+  %#134 = and <4 x i32> %#132, { 15, 15, 15, 15 }
+  %#135 = and <4 x i32> %#133, { 15, 15, 15, 15 }
+  %#136 = add nsw <4 x i32> %#134, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#137 = add nsw <4 x i32> %#135, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#138 = lshr <4 x i32> %#132, { 4, 4, 4, 4 }
+  %#139 = lshr <4 x i32> %#133, { 4, 4, 4, 4 }
+  %#140 = add nsw <4 x i32> %#138, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#141 = add nsw <4 x i32> %#139, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#142 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 0
+  %#143 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 4
+  %#144 = load <4 x i8>, ptr %#142, align 1
+  %#145 = load <4 x i8>, ptr %#143, align 1
+  %#146 = sext <4 x i8> %#144 to <4 x i32>
+  %#147 = sext <4 x i8> %#145 to <4 x i32>
+  %#148 = mul nsw <4 x i32> %#136, %#146
+  %#149 = mul nsw <4 x i32> %#137, %#147
+  %#150 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 16
+  %#151 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 20
+  %#152 = load <4 x i8>, ptr %#150, align 1
+  %#153 = load <4 x i8>, ptr %#151, align 1
+  %#154 = sext <4 x i8> %#152 to <4 x i32>
+  %#155 = sext <4 x i8> %#153 to <4 x i32>
+  %#156 = mul nsw <4 x i32> %#140, %#154
+  %#157 = mul nsw <4 x i32> %#141, %#155
+  %#158 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#126, 1 x i64 2, 1 x i64 8
+  %#159 = gep inbounds nuw ptr nowrite noundef %#3, 18 x i64 %#126, 1 x i64 2, 1 x i64 12
+  %#160 = load <4 x i8>, ptr %#158, align 1
+  %#161 = load <4 x i8>, ptr %#159, align 1
+  %#162 = zext <4 x i8> %#160 to <4 x i32>
+  %#163 = zext <4 x i8> %#161 to <4 x i32>
+  %#164 = and <4 x i32> %#162, { 15, 15, 15, 15 }
+  %#165 = and <4 x i32> %#163, { 15, 15, 15, 15 }
+  %#166 = add nsw <4 x i32> %#164, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#167 = add nsw <4 x i32> %#165, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#168 = lshr <4 x i32> %#162, { 4, 4, 4, 4 }
+  %#169 = lshr <4 x i32> %#163, { 4, 4, 4, 4 }
+  %#170 = add nsw <4 x i32> %#168, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#171 = add nsw <4 x i32> %#169, { 4294967288, 4294967288, 4294967288, 4294967288 }
+  %#172 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 8
+  %#173 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 12
+  %#174 = load <4 x i8>, ptr %#172, align 1
+  %#175 = load <4 x i8>, ptr %#173, align 1
+  %#176 = sext <4 x i8> %#174 to <4 x i32>
+  %#177 = sext <4 x i8> %#175 to <4 x i32>
+  %#178 = mul nsw <4 x i32> %#166, %#176
+  %#179 = mul nsw <4 x i32> %#167, %#177
+  %#180 = add nsw <4 x i32> %#178, %#148
+  %#181 = add nsw <4 x i32> %#179, %#149
+  %#182 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 24
+  %#183 = gep inbounds nuw ptr nowrite noundef %#5, 34 x i64 %#126, 1 x i64 2, 1 x i64 28
+  %#184 = load <4 x i8>, ptr %#182, align 1
+  %#185 = load <4 x i8>, ptr %#183, align 1
+  %#186 = sext <4 x i8> %#184 to <4 x i32>
+  %#187 = sext <4 x i8> %#185 to <4 x i32>
+  %#188 = mul nsw <4 x i32> %#170, %#186
+  %#189 = mul nsw <4 x i32> %#171, %#187
+  %#190 = add nsw <4 x i32> %#188, %#156
+  %#191 = add nsw <4 x i32

@@ -1,0 +1,54 @@
+
+----------------------------------------
+declare void @ZSTD_updateDUBT(noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare i64 @ZSTD_DUBT_findBestMatch(noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef i32, noundef i32)
+
+define i64 @target(ptr noundef %#0, ptr noundef %#1, ptr noundef %#2, ptr noundef %#3, ptr noundef %#4, i32 noundef %#5, i32 noundef %#6) {
+#7:
+  %#10 = load ptr, ptr noundef %#0, align 8
+  %#11 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#12 = load i32, ptr %#11, align 8
+  %#13 = zext i32 %#12 to i64
+  %#14 = gep inbounds nuw ptr %#10, 1 x i64 %#13
+  %#15 = icmp ult ptr noundef %#2, %#14
+  br i1 %#15, label %#9, label %#8
+
+#8:
+  tail call void @ZSTD_updateDUBT(nonnull noundef ptr noundef %#0, noundef ptr noundef %#1, noundef ptr noundef %#2, noundef ptr noundef %#3, noundef i32 noundef %#5)
+  %#16 = tail call i64 @ZSTD_DUBT_findBestMatch(nonnull noundef ptr noundef %#0, noundef ptr noundef %#1, noundef ptr noundef %#2, noundef ptr noundef %#3, noundef ptr noundef %#4, noundef i32 noundef %#5, noundef i32 noundef %#6)
+  br label %#9
+
+#9:
+  %#17 = phi i64 [ %#16, %#8 ], [ 0, %#7 ]
+  ret i64 %#17
+}
+=>
+declare void @ZSTD_updateDUBT(noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef i32)
+declare i64 @ZSTD_DUBT_findBestMatch(noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef i32, noundef i32)
+
+define i64 @target(ptr noundef %#0, ptr noundef %#1, ptr noundef %#2, ptr noundef %#3, ptr noundef %#4, i32 noundef %#5, i32 noundef %#6) {
+#7:
+  %#10 = load ptr, ptr noundef %#0, align 8
+  %#11 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#12 = load i32, ptr %#11, align 8
+  %#13 = zext i32 %#12 to i64
+  %#14 = gep inbounds nuw ptr %#10, 1 x i64 %#13
+  %#15 = icmp ult ptr noundef %#2, %#14
+  br i1 %#15, label %#9, label %#8
+
+#8:
+  tail call void @ZSTD_updateDUBT(nonnull noundef ptr noundef %#0, noundef ptr noundef %#1, noundef ptr noundef %#2, noundef ptr noundef %#3, noundef i32 noundef %#5)
+  %#16 = tail call i64 @ZSTD_DUBT_findBestMatch(nonnull noundef ptr noundef %#0, noundef ptr noundef %#1, noundef ptr noundef %#2, noundef ptr noundef %#3, noundef ptr noundef %#4, noundef i32 noundef %#5, noundef i32 noundef %#6)
+  br label %#9
+
+#9:
+  %#17 = phi i64 [ %#16, %#8 ], [ 0, %#7 ]
+  ret i64 %#17
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

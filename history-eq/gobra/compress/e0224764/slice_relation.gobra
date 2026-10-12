@@ -1,0 +1,33 @@
+package flate
+
+// The old loop reads a[n:n+8] and b[n:n+8]. The new loop reads the
+// first eight bytes after slicing both inputs forward by n.
+requires 0 <= n && n + 8 <= len(a) && len(a) <= len(b)
+requires acc(&a[n]) && acc(&a[n+1]) && acc(&a[n+2]) && acc(&a[n+3])
+requires acc(&a[n+4]) && acc(&a[n+5]) && acc(&a[n+6]) && acc(&a[n+7])
+requires acc(&b[n]) && acc(&b[n+1]) && acc(&b[n+2]) && acc(&b[n+3])
+requires acc(&b[n+4]) && acc(&b[n+5]) && acc(&b[n+6]) && acc(&b[n+7])
+func sameEightBytes(a, b []byte, n int) {
+    newA := a[n:]
+    newB := b[:len(a)][n:]
+    assert len(newA) == len(newB)
+    assert a[n] == newA[0] && b[n] == newB[0]
+    assert a[n+1] == newA[1] && b[n+1] == newB[1]
+    assert a[n+2] == newA[2] && b[n+2] == newB[2]
+    assert a[n+3] == newA[3] && b[n+3] == newB[3]
+    assert a[n+4] == newA[4] && b[n+4] == newB[4]
+    assert a[n+5] == newA[5] && b[n+5] == newB[5]
+    assert a[n+6] == newA[6] && b[n+6] == newB[6]
+    assert a[n+7] == newA[7] && b[n+7] == newB[7]
+}
+
+// A symbolic tail offset covers every byte compared by the final loop.
+requires 0 <= n && 0 <= i && n + i < len(a) && len(a) <= len(b)
+requires acc(&a[n+i]) && acc(&b[n+i])
+func sameTailByte(a, b []byte, n, i int) {
+    newA := a[n:]
+    newB := b[:len(a)][n:]
+    assert len(newA) == len(newB)
+    assert a[n+i] == newA[i]
+    assert b[n+i] == newB[i]
+}

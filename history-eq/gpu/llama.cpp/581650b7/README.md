@@ -1,0 +1,7 @@
+# llama.cpp `581650b7`: Vulkan `im2col` index update
+
+**Verdict: `EQUIV_PARTIAL`.** The historical shader replaces per-element division and remainder with incremented `current_kx`, `current_ky`, and `current_ix`. [`reproduce.py`](reproduce.py) locks the exact old/new Git blobs to the archived diff, then proves a one-step coordinate invariant for twelve shapes (`OW ∈ {1,32,127}`, `KW,KH ∈ {1,3}`). The source initializes that invariant at `gidx * NUM_ITER`; Z3 also proves that in-range lanes form a prefix for every group index from 0 to 1,000,000 and every `pelements` from 0 to `INT_MAX` in the default `BLOCK_SIZE=32` specialization. A separate 32-bit bitvector check proves the old and new destination-address expressions equal for arbitrary operands. [All fourteen queries](result.json) return `unsat`.
+
+With the same coordinates, the source base, destination address, and conversion expressions agree. Source-read equality additionally assumes the old mixed signed/unsigned height-stride multiplication has the same 32-bit bit pattern as the new explicit `int(oh) * p.s1`. This is source-level address evidence for the checked specialization and shapes. Other `BLOCK_SIZE` values, dimensions, compiled SPIR-V, and device execution remain unverified. No official historical before/after benchmark score was measured.
+
+Run `alive2/.venv/bin/python history-eq/gpu/llama.cpp/581650b7/reproduce.py` from the project root.

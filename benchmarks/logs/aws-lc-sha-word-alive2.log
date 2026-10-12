@@ -1,0 +1,37 @@
+
+----------------------------------------
+define i32 @aws_sha_word_bytes(i8 noundef zeroext %#0, i8 noundef zeroext %#1, i8 noundef zeroext %#2, i8 noundef zeroext %#3) nofree willreturn memory(none) {
+#4:
+  %#5 = zext i8 noundef zeroext %#0 to i32
+  %#6 = shl nuw i32 %#5, 24
+  %#7 = zext i8 noundef zeroext %#1 to i32
+  %#8 = shl nsw nuw i32 %#7, 16
+  %#9 = or disjoint i32 %#8, %#6
+  %#10 = zext i8 noundef zeroext %#2 to i32
+  %#11 = shl nsw nuw i32 %#10, 8
+  %#12 = or disjoint i32 %#9, %#11
+  %#13 = zext i8 noundef zeroext %#3 to i32
+  %#14 = or disjoint i32 %#12, %#13
+  ret i32 %#14
+}
+=>
+define i32 @aws_sha_word_load(i8 noundef zeroext %#0, i8 noundef zeroext %#1, i8 noundef zeroext %#2, i8 noundef zeroext %#3) nofree noundef willreturn memory(none) {
+#4:
+  %#5 = zext i8 noundef zeroext %#3 to i32
+  %#6 = shl nuw i32 %#5, 24
+  %#7 = zext i8 noundef zeroext %#2 to i32
+  %#8 = shl nsw nuw i32 %#7, 16
+  %#9 = or disjoint i32 %#6, %#8
+  %#10 = zext i8 noundef zeroext %#1 to i32
+  %#11 = shl nsw nuw i32 %#10, 8
+  %#12 = or disjoint i32 %#9, %#11
+  %#13 = zext i8 noundef zeroext %#0 to i32
+  %#14 = or disjoint i32 %#12, %#13
+  %#15 = bswap i32 %#14
+  assume_welldefined i32 %#15
+  ret i32 %#15
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

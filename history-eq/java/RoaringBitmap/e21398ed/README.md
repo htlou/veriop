@@ -1,0 +1,7 @@
+# RoaringBitmap `e21398ed`: unordered bitmap construction
+
+**Verdict: `UNKNOWN` for the historical `bitmapOfUnordered` behavior.** Parent `884ca461` sorts the input with `partialRadixSort` and inserts it through `DenseOrderedWriter`; child `e21398ed` uses `RoaringBitmapWriter.constantMemory().doPartialRadixSort()`. The [exact source diff](../source-screening/e21398ed.source.diff) also changes writer APIs and adds capacity heuristics. This is more than a local arithmetic replacement.
+
+[The source/build audit](check.py) checks the archived diff against Git and stages every historical `roaringbitmap/src/main/java` file whose blob is locally available. It finds 61 of 66 parent and 63 of 68 child Java files exactly. The same five unchanged support blobs are unavailable on both sides; [the manifest](source-and-build.json) gives their Git IDs. Substituting the current checkout's files fails to compile both revisions: [parent log](compile-old.log) and [child log](compile-new.log) show that the newer `ImmutableBitmapDataProvider` signature is incompatible with the historical classes. This is a dependency mismatch, not a behavior counterexample.
+
+Neither historical side reached execution, so no equivalence or refinement verdict can be inferred for the public bitmap contents or input-array mutation. Reproduction: `python3 -B history-eq/java/RoaringBitmap/e21398ed/check.py`. The missing historical support blobs, or a compatible historical build artifact, are needed to continue. No official before/after benchmark score was measured.

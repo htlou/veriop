@@ -1,0 +1,15 @@
+; benchmark generated from python API
+(set-info :status unknown)
+(declare-fun unrestricted_pair_3 () (_ BitVec 64))
+(declare-fun unrestricted_pair_2 () (_ BitVec 64))
+(declare-fun unrestricted_pair_1 () (_ BitVec 64))
+(declare-fun unrestricted_pair_0 () (_ BitVec 64))
+(assert
+ (let ((?x429 (bvadd (bvmul unrestricted_pair_0 (_ bv1000000 64)) (bvmul unrestricted_pair_1 (_ bv10000 64)))))
+(let ((?x2752 (bvadd (bvadd ?x429 (bvmul unrestricted_pair_2 (_ bv100 64))) unrestricted_pair_3)))
+(let ((?x93 (bvadd (bvadd (bvmul unrestricted_pair_0 (_ bv100 64)) unrestricted_pair_1) (bvshl ?x2752 (_ bv32 64)))))
+(let ((?x296 (bvmul (bvadd unrestricted_pair_1 (bvshl unrestricted_pair_3 (_ bv32 64))) (_ bv42949672960001 64))))
+(let ((?x229 (bvmul (bvadd unrestricted_pair_0 (bvshl unrestricted_pair_2 (_ bv32 64))) (_ bv4294967296000100 64))))
+(let ((?x201 (bvadd ?x229 ?x296)))
+(and (distinct ?x201 ?x93) true))))))))
+(check-sat)

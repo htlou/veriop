@@ -1,0 +1,9 @@
+# xxHash `a4ecded`: `_withSecret()` inline-hint change
+
+The exact historical `xxhash.h` blobs are `42cba79534bb6b6c5ef0826c716caa50603dc833` (parent) and `b757c4a55cd2646ef53634f8f625f525ce2ecc17` (child). The commit's executable change replaces `XXH_NO_INLINE` with `XXH_FORCE_INLINE` on `XXH3_hashLong_64b_withSecret`; its body is unchanged. The old no-inline call versus new inlined loop defeated the earlier direct Alive2 public-wrapper comparison.
+
+The [replay script](verify.sh) fixes the scalar x86 configuration and a 256-byte public `XXH3_64bits_withSecret` call with a 192-byte secret. It defines the header's `XXH_NO_INLINE_HINTS=1` on **both** revisions to neutralize that changed compiler hint. Under this same setting, Clang 18 emits byte-identical old/new LLVM IR at both `-O0` and `-O2`. The `-O2` target contains the complete hash computation without an opaque xxHash call. After removing `nocapture` and `noalias` attributes symmetrically because this Alive2 build cannot translate them, Alive2 reports one correct transformation and zero errors in **both directions** for each of the fixed public wrapper, its inline entry, and the changed long-secret helper. The six logs are named `<function>.<direction>.log` here.
+
+**Verdict: `EQUIV_PARTIAL`.** The proof covers this scalar fixed-length public specialization and the matched helper bodies under neutralized inlining hints. The exact source diff supports the inference that the change is a compiler inlining decision, but Alive2 has not compared the two original hint configurations end to end. Other lengths, secret sizes, SIMD variants, compiler backends, and complete public APIs remain outside this proof. No official historical benchmark delta was measured.
+
+Run `bash history-eq/c/xxHash/a4ecded/body-proof/verify.sh` from the project root.

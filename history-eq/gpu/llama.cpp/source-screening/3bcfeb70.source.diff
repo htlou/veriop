@@ -1,0 +1,37 @@
+diff --git a/ggml/src/ggml-cpu/CMakeLists.txt b/ggml/src/ggml-cpu/CMakeLists.txt
+index 1c7338eea..83088e147 100644
+--- a/ggml/src/ggml-cpu/CMakeLists.txt
++++ b/ggml/src/ggml-cpu/CMakeLists.txt
+@@ -675,6 +675,12 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
+     target_compile_options(${GGML_CPU_NAME} PRIVATE ${ARCH_FLAGS})
+     target_compile_definitions(${GGML_CPU_NAME} PRIVATE ${ARCH_DEFINITIONS})
+ 
++    if (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT GGML_SYSTEM_ARCH STREQUAL "x86")
++        message(STATUS "Skipping PCH for ${GGML_CPU_NAME}: GCC PCH is only enabled for x86 (arch: ${GGML_SYSTEM_ARCH})")
++    else()
++        target_precompile_headers(${GGML_CPU_NAME} PRIVATE ggml-impl.h)
++    endif()
++
+     if (EMSCRIPTEN)
+         set_target_properties(${GGML_CPU_NAME} PROPERTIES COMPILE_FLAGS "-msimd128")
+     endif()
+diff --git a/ggml/src/ggml-cpu/ops.h b/ggml/src/ggml-cpu/ops.h
+index 4c1642a67..ce2b3e870 100644
+--- a/ggml/src/ggml-cpu/ops.h
++++ b/ggml/src/ggml-cpu/ops.h
+@@ -18,7 +18,15 @@
+ #endif
+ #endif
+ 
++// -Winterference-size was introduced in GCC 12
++#if defined(__cplusplus) && defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Winterference-size"
++#endif
+ static const size_t CACHE_LINE_SIZE_F32 = CACHE_LINE_SIZE/sizeof(float);
++#if defined(__cplusplus) && defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
++#pragma GCC diagnostic pop
++#endif
+ 
+ // Work buffer size for im2col operations in CONV2D
+ #define GGML_IM2COL_WORK_SIZE (16 * 1024 * 1024)

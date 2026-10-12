@@ -1,0 +1,40 @@
+{
+  "commit": "31f1e42",
+  "date": "2025-04-04",
+  "subject": "Preserve order of params when calling libdivide_mullhi (#144)",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message: preserving the parameter order gives 32-bit builds shorter code and less stack use.",
+  "change_summary": "Preserves operand order at signed/unsigned high-multiply calls in the 16/32/64-bit division paths.",
+  "units": [
+    {
+      "name": "x86-64 public branchfree and raw do paths, signed/unsigned 16/32/64-bit",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/31f1e42/x86_64",
+      "evidence": "All 12 targets pass Alive2 forward and backward."
+    },
+    {
+      "name": "i386 public branchfree and raw do paths, signed/unsigned 16/32/64-bit",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/31f1e42/i386",
+      "evidence": "Most targets prove equivalent, but 64-bit targets time out in both directions."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "UNKNOWN",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The advertised codegen improvement concerns 32-bit builds; the i386 64-bit API checks remain inconclusive, so the x86-64 proof does not establish the commit-level relation. Subsequent SMT-to-Lean pilot: c/libdivide/31f1e42/LeanHighMul.lean proves the unsigned portable high-multiply fallback symmetric under 32-bit-half bounds, the signed integer carry kernel symmetric, and all signed 64-bit fallback intermediates within range. The C/LLVM-semantics bridge and composition through the public APIs are not discharged; commit remains UNKNOWN. See results/SMT_TO_LEAN.md."
+}

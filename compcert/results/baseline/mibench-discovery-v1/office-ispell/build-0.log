@@ -1,0 +1,115 @@
+set +e; [ -r local.h ]  ||  cp local.h.samp local.h
+set +vx; \
+for var in BINDIR CC CFLAGS COUNTSUFFIX DEFDICT DEFHASH DEFLANG \
+  ELISPDIR EMACS HASHSUFFIX INSTALL \
+  LANGUAGES LIBDIR LIBES LINT LINTFLAGS \
+  MAKE_SORTTMP MAN1DIR MAN1EXT MAN4DIR MAN4EXT MASTERHASH \
+  MSGLANG REGLIB STATSUFFIX \
+  TERMLIB TEXINFODIR YACC \
+  ; do \
+    cat config.X local.h \
+      | sed -n -e "s/^#define[ 	]*$var[ 	]*"'"'"/$var=/p" \
+      | sed -e 's/".*$/'"'/" -e "s/=/='/" \
+      | tail -1; \
+  done > config.sh; \
+echo 'case "$MAKE_SORTTMP" in "") \
+  SORTTMP="-e /!!SORTTMP!!/s/=.*$/=/";; *) SORTTMP=;; esac' \
+  >> config.sh
+cp config.X config.h
+chmod u+w config.h
+echo '' >> config.h
+echo '/* AUTOMATICALLY-GENERATED SYMBOLS */' >> config.h
+cat local.h config.X \
+  | egrep '^#define[ 	]*SIGNAL_TYPE' \
+  | sed -e 's/TYPE[ 	]*/TYPE_STRING "/' -e 's/$/"/' -e 1q \
+  >> config.h
+cat local.h config.X \
+  | egrep '^#define[ 	]*MASKTYPE' \
+  | sed -e 's/TYPE[ 	]*/TYPE_STRING "/' -e 's/$/"/' -e 1q \
+  >> config.h
++ rm -f msgs.h
++ ln languages/english/msgs.h msgs.h
++ cc -O -c term.c
++ cc -O -c ispell.c
++ cc -O -c correct.c
++ cc -O -c defmt.c
++ cc -O -c dump.c
++ cc -O -c good.c
++ cc -O -c lookup.c
++ cc -O -c hash.c
+lookup.c:69:8: syntax error after 'static' and before 'inited'.
+Ill-formed declaration.
+The following identifier is used as a type, but has not been defined as such:
+  'inited'
+Fatal error; compilation aborted.
+1 error detected.
+good.c:107:14: syntax error after 'register' and before 'n'.
+Ill-formed declaration.
+The following identifier is used as a type, but has not been defined as such:
+  'n'
+Fatal error; compilation aborted.
+1 error detected.
+term.c:271: warning: implicit declaration of function 'isatty' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:377: warning: implicit declaration of function 'unlink' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:420: warning: implicit declaration of function 'kill' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:506: warning: implicit declaration of function 'fork' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:508: warning: implicit declaration of function 'execvp' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:509: warning: implicit declaration of function '_exit' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:513: warning: implicit declaration of function 'wait' is invalid in C99 [-Wimplicit-function-declaration]
+term.c:271: warning: 'isatty' is declared without a function prototype
+term.c:377: warning: 'unlink' is declared without a function prototype
+term.c:420: warning: 'kill' is declared without a function prototype
+term.c:506: warning: 'fork' is declared without a function prototype
+term.c:508: warning: 'execvp' is declared without a function prototype
+term.c:509: warning: '_exit' is declared without a function prototype
+term.c:513: warning: 'wait' is declared without a function prototype
+make: *** [Makefile:187: good.o] Error 2
+make: *** [Makefile:187: lookup.o] Error 2
++ cc -O -c makedent.c
++ cc -O -c tgood.c
+defmt.c:897: warning: implicit declaration of function 'isascii' is invalid in C99 [-Wimplicit-function-declaration]
+defmt.c:897: warning: 'isascii' is declared without a function prototype
+ispell.c:715: warning: implicit declaration of function 'access' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:825: warning: implicit declaration of function 'sleep' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:829: warning: implicit declaration of function 'access' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:833: warning: implicit declaration of function 'sleep' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:836: warning: implicit declaration of function 'fileno' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:838: warning: implicit declaration of function 'mktemp' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:838: warning: comparison between pointer and integer ('int' and 'void *')
+ispell.c:844: warning: implicit declaration of function 'sleep' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:862: warning: implicit declaration of function 'unlink' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:876: warning: implicit declaration of function 'sleep' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:905: warning: implicit declaration of function 'unlink' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:909: warning: implicit declaration of function 'link' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:910: warning: implicit declaration of function 'unlink' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:917: warning: implicit declaration of function 'sleep' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:931: warning: implicit declaration of function 'unlink' is invalid in C99 [-Wimplicit-function-declaration]
+ispell.c:977: warning: implicit declaration of function 'bzero' is invalid in C99 [-Wimplicit-function-declaration]
+correct.c:519: warning: implicit declaration of function 'sleep' is invalid in C99 [-Wimplicit-function-declaration]
+correct.c:1347: warning: implicit declaration of function 'bcopy' is invalid in C99 [-Wimplicit-function-declaration]
+correct.c:1589: warning: implicit declaration of function 'creat' is invalid in C99 [-Wimplicit-function-declaration]
++ cc -O -c tree.c
+proto.h:259: warning: 'index' is declared without a function prototype
+proto.h:260: warning: 'rindex' is declared without a function prototype
+ispell.c:829: warning: 'access' is declared without a function prototype
+ispell.c:836: warning: 'fileno' is declared without a function prototype
+ispell.c:838: warning: 'mktemp' is declared without a function prototype
+ispell.c:909: warning: 'link' is declared without a function prototype
+ispell.c:917: warning: 'sleep' is declared without a function prototype
+ispell.c:931: warning: 'unlink' is declared without a function prototype
+ispell.c:977: warning: 'bzero' is declared without a function prototype
+correct.c:519: warning: 'sleep' is declared without a function prototype
+correct.c:1347: warning: 'bcopy' is declared without a function prototype
+correct.c:1589: warning: 'creat' is declared without a function prototype
++ cc -O -c xgets.c
+makedent.c:137: warning: implicit declaration of function 'bzero' is invalid in C99 [-Wimplicit-function-declaration]
+proto.h:259: warning: 'index' is declared without a function prototype
+makedent.c:137: warning: 'bzero' is declared without a function prototype
+tree.c:104:8: syntax error after 'static' and before 'newwords'.
+Ill-formed declaration.
+The following identifier is used as a type, but has not been defined as such:
+  'newwords'
+Fatal error; compilation aborted.
+1 error detected.
+make: *** [Makefile:187: tree.o] Error 2
+make: Target 'ispell' not remade because of errors.

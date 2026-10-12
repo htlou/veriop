@@ -1,0 +1,7 @@
+# llama.cpp `e9e661bd`: flash-attention warp reduction removal
+
+The exact historical parent `efb6ae96` and child `e9e661bd` differ by removing one `warp_reduce_max` call in each of the f16 and f32 CUDA flash-attention vector kernels. The [source diff](../source-screening/e9e661bd.source.diff) and commit message identify this as a performance optimization. The old code reduces a value before only lane zero stores it; the new code stores lane zero's value directly. That rationale is not itself a proof that every lane's input agrees.
+
+The [reproduction script](reproduce.py) archives each revision's `ggml/` tree by Git object ID, compiles both actual `fattn-vec-{f16,f32}-instance-hs128-f16-f16.cu` translation units with their matching historical headers, and invokes Volta on the `D=128, ncols=1, parallel_blocks=4, no-softcap` specialization. Both builds and all four PTX parses succeed. The [result record](volta-result.json) holds exact commands, SHA-256 hashes, return codes, and checker output; the four PTX artifacts are beside it.
+
+Both f16 and f32 comparisons stop while lowering the **reference** kernel: Volta rejects a `cvt` instruction with `integer-rounding modifier (floor/ceil/trunc/rint not modeled)`. This precedes any equivalence decision. **Verdict: `UNSUPPORTED` for the two selected historical specializations.** Other shapes and the whole commit remain unproved. There is no Kuiper proof or measured official before/after benchmark delta here.

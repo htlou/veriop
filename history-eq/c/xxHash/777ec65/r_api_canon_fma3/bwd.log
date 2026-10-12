@@ -1,0 +1,258 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=300000 --always-verify r_api_canon_fma3/new.ll r_api_canon_fma3/old.ll
+
+----------------------------------------
+define i32 @target_api_xxh32_fromCanonical_ptr(ptr nowrite noundef %#0) nofree willreturn memory(argmem: read) {
+#1:
+  %#2 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 3
+  %#3 = load i8, ptr %#2, align 1
+  %#4 = zext i8 %#3 to i32
+  %#5 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#6 = load i8, ptr %#5, align 1
+  %#7 = zext i8 %#6 to i32
+  %#8 = shl nsw nuw i32 %#7, 8
+  %#9 = or disjoint i32 %#8, %#4
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#11 = load i8, ptr %#10, align 1
+  %#12 = zext i8 %#11 to i32
+  %#13 = shl nsw nuw i32 %#12, 16
+  %#14 = or disjoint i32 %#9, %#13
+  %#15 = load i8, ptr nowrite noundef %#0, align 1
+  %#16 = zext i8 %#15 to i32
+  %#17 = shl nuw i32 %#16, 24
+  %#18 = or disjoint i32 %#14, %#17
+  ret i32 %#18
+}
+=>
+define i32 @target_api_xxh32_fromCanonical_ptr(ptr nowrite noundef %#0) nofree noundef willreturn memory(argmem: read) {
+#1:
+  %#2 = load i32, ptr nowrite noundef %#0, align 1
+  %#3 = bswap i32 %#2
+  assume_welldefined i32 %#3
+  ret i32 %#3
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x03
+
+Source:
+ptr %#2 = pointer(non-local, block_id=1, offset=5, attrs=3) / Address=#x06
+i8 %#3 = #x00 (0)
+i32 %#4 = #x00000000 (0)
+ptr %#5 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x05
+i8 %#6 = #x00 (0)
+i32 %#7 = #x00000000 (0)
+i32 %#8 = #x00000000 (0)
+i32 %#9 = #x00000000 (0)
+ptr %#10 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x04
+i8 %#11 = #x00 (0)
+i32 %#12 = #x00000000 (0)
+i32 %#13 = #x00000000 (0)
+i32 %#14 = #x00000000 (0)
+i8 %#15 = poison
+i32 %#16 = poison
+i32 %#17 = poison
+i32 %#18 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 8	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+2: null, byte offset=0
+3: #x00
+5: #x00
+4: #x00
+*: poison
+
+
+Target:
+i32 %#2 = poison
+i32 %#3 = poison
+void = UB triggered!
+
+
+
+----------------------------------------
+define i64 @target_api_xxh64_fromCanonical_ptr(ptr nowrite noundef %#0) nofree willreturn memory(argmem: read) {
+#1:
+  %#2 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 7
+  %#3 = load i8, ptr %#2, align 1
+  %#4 = zext i8 %#3 to i64
+  %#5 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 6
+  %#6 = load i8, ptr %#5, align 1
+  %#7 = zext i8 %#6 to i64
+  %#8 = shl nsw nuw i64 %#7, 8
+  %#9 = or disjoint i64 %#8, %#4
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#11 = load i8, ptr %#10, align 1
+  %#12 = zext i8 %#11 to i64
+  %#13 = shl nsw nuw i64 %#12, 16
+  %#14 = or disjoint i64 %#9, %#13
+  %#15 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#16 = load i8, ptr %#15, align 1
+  %#17 = zext i8 %#16 to i64
+  %#18 = shl nsw nuw i64 %#17, 24
+  %#19 = or disjoint i64 %#14, %#18
+  %#20 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 3
+  %#21 = load i8, ptr %#20, align 1
+  %#22 = zext i8 %#21 to i64
+  %#23 = shl nsw nuw i64 %#22, 32
+  %#24 = or disjoint i64 %#19, %#23
+  %#25 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 2
+  %#26 = load i8, ptr %#25, align 1
+  %#27 = zext i8 %#26 to i64
+  %#28 = shl nsw nuw i64 %#27, 40
+  %#29 = or i64 %#24, %#28
+  %#30 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 1
+  %#31 = load i8, ptr %#30, align 1
+  %#32 = zext i8 %#31 to i64
+  %#33 = shl nsw nuw i64 %#32, 48
+  %#34 = or i64 %#29, %#33
+  %#35 = load i8, ptr nowrite noundef %#0, align 1
+  %#36 = zext i8 %#35 to i64
+  %#37 = shl nuw i64 %#36, 56
+  %#38 = or i64 %#34, %#37
+  ret i64 %#38
+}
+=>
+define i64 @target_api_xxh64_fromCanonical_ptr(ptr nowrite noundef %#0) nofree noundef willreturn memory(argmem: read) {
+#1:
+  %#2 = load i64, ptr nowrite noundef %#0, align 1
+  %#3 = bswap i64 %#2
+  assume_welldefined i64 %#3
+  ret i64 %#3
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=6, attrs=3) / Address=#x07
+
+Source:
+ptr %#2 = pointer(non-local, block_id=1, offset=13, attrs=3) / Address=#x0e
+i8 %#3 = #x00 (0)
+i64 %#4 = #x0000000000000000 (0)
+ptr %#5 = pointer(non-local, block_id=1, offset=12, attrs=3) / Address=#x0d
+i8 %#6 = #x00 (0)
+i64 %#7 = #x0000000000000000 (0)
+i64 %#8 = #x0000000000000000 (0)
+i64 %#9 = #x0000000000000000 (0)
+ptr %#10 = pointer(non-local, block_id=1, offset=11, attrs=3) / Address=#x0c
+i8 %#11 = #x00 (0)
+i64 %#12 = #x0000000000000000 (0)
+i64 %#13 = #x0000000000000000 (0)
+i64 %#14 = #x0000000000000000 (0)
+ptr %#15 = pointer(non-local, block_id=1, offset=10, attrs=3) / Address=#x0b
+i8 %#16 = #x00 (0)
+i64 %#17 = #x0000000000000000 (0)
+i64 %#18 = #x0000000000000000 (0)
+i64 %#19 = #x0000000000000000 (0)
+ptr %#20 = pointer(non-local, block_id=1, offset=9, attrs=3) / Address=#x0a
+i8 %#21 = poison
+i64 %#22 = poison
+i64 %#23 = poison
+i64 %#24 = poison
+ptr %#25 = pointer(non-local, block_id=1, offset=8, attrs=3) / Address=#x09
+i8 %#26 = #x00 (0)
+i64 %#27 = #x0000000000000000 (0)
+i64 %#28 = #x0000000000000000 (0)
+i64 %#29 = poison
+ptr %#30 = pointer(non-local, block_id=1, offset=7, attrs=3) / Address=#x08
+i8 %#31 = #x00 (0)
+i64 %#32 = #x0000000000000000 (0)
+i64 %#33 = #x0000000000000000 (0)
+i64 %#34 = poison
+i8 %#35 = #x00 (0)
+i64 %#36 = #x0000000000000000 (0)
+i64 %#37 = #x0000000000000000 (0)
+i64 %#38 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 14	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+13: #x00
+7: #x00
+10: #x00
+12: #x00
+11: #x00
+8: #x00
+6: #x00
+*: poison
+
+
+Target:
+i64 %#2 = poison
+i64 %#3 = poison
+void = UB triggered!
+
+
+
+----------------------------------------
+define i32 @target_api_xxh32_fromCanonical_val(i32 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i32 noundef %#0
+  ret i32 %#2
+}
+=>
+define i32 @target_api_xxh32_fromCanonical_val(i32 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i32 noundef %#0
+  assume_welldefined i32 %#2
+  ret i32 %#2
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_api_xxh64_fromCanonical_val(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i64 noundef %#0
+  ret i64 %#2
+}
+=>
+define i64 @target_api_xxh64_fromCanonical_val(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i64 noundef %#0
+  assume_welldefined i64 %#2
+  ret i64 %#2
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define void @target_api_xxh128_fromCanonical_val(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = bswap i64 noundef %#0
+  %#5 = bswap i64 noundef %#1
+  store i64 %#5, ptr noread noundef initializes((0, 16)) %#2, align 8
+  %#6 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i64 8
+  store i64 %#4, ptr %#6, align 8
+  ret void
+}
+=>
+define void @target_api_xxh128_fromCanonical_val(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = bswap i64 noundef %#0
+  assume_welldefined i64 %#4
+  %#5 = bswap i64 noundef %#1
+  assume_welldefined i64 %#5
+  store i64 %#5, ptr noread noundef initializes((0, 16)) %#2, align 8
+  %#6 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i64 8
+  store i64 %#4, ptr %#6, align 8
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  3 correct transformations
+  2 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

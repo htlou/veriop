@@ -1,0 +1,3171 @@
+{
+  "repo": "zstd",
+  "pin": "49cf51799ea051457f57243527aa2058f999f005",
+  "selection": "fixed 200-candidate draw, followed by seeded top-up candidates until 94 more confirmed optimizations were found; only confirmed optimizations retained",
+  "sample_size": 200,
+  "entries": [
+    {
+      "commit": "007c1c6ff08acac83c7448175a45fe7f2093ded7",
+      "date": "2015-11-22T02:42:28+01:00",
+      "subject": "minor cr improvement",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims a compression-ratio improvement in the compressor.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "007cda88ca1c7819eec966ce030934756d33c8c1",
+      "date": "2024-03-07T16:43:13-08:00",
+      "subject": "prevent XXH64 from being autovectorized by XXH512 by default",
+      "screen": "confirmed_optimization",
+      "reason": "Alive2 models the historical empty GNU inline asm guard as UB. Compiling both exact historical headers and explicitly modeling that empty tied-register guard as identity proves XXH64_round equal in both directions; the original IR remains unsupported, and this is not a whole-library result.",
+      "evidence": "history-eq/c/zstd/007cda88/README.md",
+      "verdict": "UNSUPPORTED",
+      "coverage": "changed AVX-512 XXH64_round compiler-guard branch"
+    },
+    {
+      "commit": "05dffe43a75cf29563ae508d71e7f1085db3ad2b",
+      "date": "2017-11-16T12:18:56-08:00",
+      "subject": "Fixed Btree update",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Fixes tree state and separately disables one-thread MT work to save memory and runtime.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "07cd78d3668271cffc9b586d857455bf47aef4fb",
+      "date": "2025-07-08T17:07:41+00:00",
+      "subject": "AArch64: Add Neon path for convertSequences_noRepcodes",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds a four-way AArch64 NEON sequence-conversion path.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "0c654d22c87a78fb2ff4c28341345a35714606b1",
+      "date": "2018-06-14T14:53:36-04:00",
+      "subject": "Force Inline BtFindBestMatch",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Alive2 proves bidirectional equality of the extracted changed function at -O1 under a shared opaque-callee model; historical headers and whole-compressor context are absent.",
+      "evidence": "history-eq/c/zstd/0c654d22/README.md",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "local ZSTD_BtFindBestMatch control flow and return at -O1 under modeled FORCE_INLINE_TEMPLATE, minimal field layout, and shared external callees"
+    },
+    {
+      "commit": "0cf74fa95751d2ce7e61f394243d5f5e19329927",
+      "date": "2017-01-21T22:06:49-08:00",
+      "subject": "optimized pool allocation by 1 slot",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Alive2 refutes equality of both constructors\u2019 success flags: at 2 threads, the bounded allocator returns NULL for the parent but a valid zeroed region for the child (112-byte buffer budget; 24-byte CCtx budget). This is scoped allocation behavior, not a whole-commit or compression-output verdict; direct Z3 separately proves one-way allocation success in the model. Kuiper was not run.",
+      "evidence": "history-eq/c/zstd/0cf74fa9/README.md",
+      "verdict": "NOT_EQUIV",
+      "coverage": "two exact historical pool constructors under a source-audited bounded calloc; caller-valid nbThreads=2, budget=112 or 24 bytes; complete ZSTDMT_createCCtx and compression unproved",
+      "whole_commit_verdict": "UNKNOWN"
+    },
+    {
+      "commit": "0dbf2874eed427047951e0fae6292d19e9f563b8",
+      "date": "2016-04-08T02:02:12+02:00",
+      "subject": "faster level 1 at 256 KB",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Speeds compression level 1 on 256 KiB inputs.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "1005fc1276347d6661de79a0edeba28006a9a7de",
+      "date": "2016-04-04T13:28:28+02:00",
+      "subject": "reduced memory usage of very hich compression levels in 32-bits mode",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Reduces memory use at high compression levels on 32-bit targets.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "107c5755f426e0da930fc020464e32103480296b",
+      "date": "2015-10-19T02:14:43+01:00",
+      "subject": "small decompression speed improvement",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Alive2 proves a local zero-length wildcopy value mismatch. Exact historical ZSTD_execSequence bodies yield a sanitizer-clean parent return and an ASan-detected eight-byte child overread in one internal-call model; Alive2 reports source-always-UB for that caller and does not decide the relation. Public decompressor reachability and behavior remain unproved.",
+      "evidence": "history-eq/c/zstd/107c5755/README.md",
+      "verdict": "UNKNOWN",
+      "coverage": "source-locked ZSTD_wildcopy helper counterexample and ZSTD_execSequence sanitizer witness; public decompressor and full commit unproved"
+    },
+    {
+      "commit": "15768cabb580fa8fab7a3838861eba307a655b68",
+      "date": "2017-11-16T15:02:28-08:00",
+      "subject": "fixed some complex scenarios",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Fixes streaming edge cases and improves streaming memory use.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "1c62e714ab9f53aefd6478e033ce448597b68fab",
+      "date": "2024-10-20T17:16:17-07:00",
+      "subject": "minor split optimization",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Writes initial split statistics directly to the destination fingerprint.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "1f44b3f778134fa1705da9f8155c268f237bfea9",
+      "date": "2015-11-05T17:32:18+01:00",
+      "subject": "added fast mode",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds a fast compression mode.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "1f6d6815c3fc4b6d1f406e01849c49b15518ba54",
+      "date": "2024-12-16T11:39:25-08:00",
+      "subject": "optimization: instantiate specialized version without Sequence checking code",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Specializes a sequence-check-free compressor loop; upstream reports 4% faster compression.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "220abe6da857142305ab7337b346c826856bcfd1",
+      "date": "2025-01-31T18:19:45-08:00",
+      "subject": "reduced memory usage",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Avoids copying a borrowed dictionary into memory.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "258c0623e1e4e49a8d6ac3471dda3dd4030a2191",
+      "date": "2021-09-01T17:26:19-04:00",
+      "subject": "Extract Single-Segment Variant of ZSTD_dfast",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Extracts a specialized single-segment variant of the double-fast matcher.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "27498ff00fa3790b282bb5dcf8dd09b2a9e3fd60",
+      "date": "2021-03-04T10:50:34-08:00",
+      "subject": "Reduce stack usage of ZSTD_buildCTable()",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Moves normalized counts off a stack high point in CTable construction.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "274f59919db06b63c021a3a949076c59643ad355",
+      "date": "2017-03-30T12:52:14-07:00",
+      "subject": "Changed memory strategy to __packed for gcc",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Uses GCC packed accesses instead of memcpy where the author expects better code generation.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "2849f3a5d1497a0b84d613f03949315a5b430153",
+      "date": "2025-07-17T07:46:01+00:00",
+      "subject": "AArch64: Add SVE2 path for convertSequences_noRepcodes",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds an eight-way AArch64 SVE2 sequence-conversion path.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "287b7d9607fc3a346c6534b61ebe05e3ed3b80e3",
+      "date": "2015-11-22T13:24:05+01:00",
+      "subject": "small hc speed improvement",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims a high-compression speed improvement.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "29157320fb5dca130e13572066273acf75d5f5f0",
+      "date": "2017-01-24T13:18:50+01:00",
+      "subject": "improved ZSTD_compressBlock_opt_extDict_generic",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Improves the optimal external-dictionary block compressor.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "2a62f48bf4df42f3ca389ee891ff76da56623802",
+      "date": "2017-07-11T15:56:40-07:00",
+      "subject": "release input buffers from inside worker thread",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Releases worker input buffers earlier to reduce peak multithread memory.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "2c2c9e7dfdcb8eee5a2b8611647698559d657477",
+      "date": "2021-06-29T09:06:47+01:00",
+      "subject": "Add possible improvements for gcc-11",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Changes decompression code for possible GCC 11 code-generation improvements.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "2ddef7c872c123383aa8b998a3b428bf359a8ce0",
+      "date": "2021-09-08T12:45:42-04:00",
+      "subject": "Write Back Advanced Hash in Long Matches as Well (+Ratio)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Writes advanced hashes on long matches to improve compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "2fbb1d10c164fb927ebaa0b488470eedbf754175",
+      "date": "2021-12-14T22:33:49+01:00",
+      "subject": "Reduce bit tables to 8bit",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Shrinks bit tables by about 1.7 KiB of read-only data.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "30c76989704975b3fe7f3561d751a5ba24d838e8",
+      "date": "2017-03-31T18:27:03-07:00",
+      "subject": "optimize ZSTDMT_compress() memory usage",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Avoids temporary multithread compression buffers when destination space is sufficient.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "338533f741f79439662e05a1a3b7d77cd8eaa050",
+      "date": "2016-03-02T14:36:41+01:00",
+      "subject": "improved price function initialization",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Improves optimal-parser price-function initialization.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "34ba14437aeeb5e678ae7f1dbdfa6333beb2723b",
+      "date": "2025-01-30T18:05:58-08:00",
+      "subject": "minor boundary change",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Changes a match boundary to improve low-level compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "37226c1e9f968dd1a0f4bdbcfaf54716aa88697d",
+      "date": "2017-01-19T10:18:17-08:00",
+      "subject": "Simplified compressChunk job",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Handles the first compression chunk in one call and removes recombination work.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "38654988f3d568df7e07700622da2397de314b3d",
+      "date": "2016-04-21T12:18:47+02:00",
+      "subject": "minor speed improvements 2",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Includes a compression hot-path change under an upstream speed-improvement commit.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "4616fad18b2f8950144cdbcffc081b74cc115fb1",
+      "date": "2017-07-10T17:16:41-07:00",
+      "subject": "improved ZSTDMT_compress() memory usage",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Removes an input buffer from multithread streaming compression.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "48572f52b1c6fe2c7e57206b063ea85980e6c00b",
+      "date": "2021-11-09T12:15:18-05:00",
+      "subject": "Rewrite Fix to Still Auto-Vectorize",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Rewrites a compressor loop to retain auto-vectorization.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "48ef15fb47395dcb57900cd7c247f2dd5af2d5cd",
+      "date": "2020-10-05T15:49:55-07:00",
+      "subject": "[minor improvement] Pass dictSize when selecting parameters",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Uses dictionary size when selecting streaming compression parameters.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "49cf880513c124e1116f80f4ca0c860ffe937151",
+      "date": "2018-04-16T15:37:27-07:00",
+      "subject": "Approximate FSE encoding costs for selection",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Approximates FSE encoding costs to choose a lower-cost mode.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "4b7f45cb04d624d5ae2cc5bbaf234fe450ad8c09",
+      "date": "2021-09-28T07:48:56-07:00",
+      "subject": "Pull hot loop into its own function",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Extracts the compressor hot loop into its own function.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "4ddb1f556680242c5e614e0884143e58810eed54",
+      "date": "2016-01-28T03:24:53+01:00",
+      "subject": "optimized counting of small segments",
+      "screen": "confirmed_optimization",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public FSE_count count-table output for srcSize=0 and maxSymbolValue=255; both Alive2 directions refuted and native historical function bodies disagree",
+      "evidence": "history-eq/c/zstd/4ddb1f55/README.md",
+      "checker_status": "checked",
+      "checker_target": "Alive2 + exact historical native execution"
+    },
+    {
+      "commit": "51f4d566c231faf84abd2cf539c320b96f8ecb73",
+      "date": "2016-09-22T15:57:28+02:00",
+      "subject": "small decompression speed boost for very small data",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "All 160 new static decode cells match an independently reconstructed FSE reference recurrence and pass bidirectional fixed-index Alive2 checks, but the exact historical FSE_buildDTable source and whole decompressor relation are unavailable.",
+      "evidence": "history-eq/c/zstd/51f4d566/README.md",
+      "verdict": "UNKNOWN",
+      "coverage": "static LL/ML/OF decode-cell consistency with a reconstructed reference, not exact historical parent-vs-child decoding"
+    },
+    {
+      "commit": "5d39357bc4a030819778e2ec054825cb72a70af3",
+      "date": "2016-04-07T17:19:00+02:00",
+      "subject": "minor compression speed optimization",
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "Alive2 proves long-length storage and code projection equal in both directions for one sequence under a 128 KiB block bound; exact seqToCodes wrapper and full compressor unresolved",
+      "evidence": "history-eq/c/zstd/5d39357b/README.md"
+    },
+    {
+      "commit": "5dc0a1d65921821eddfcf0a16ef4a3d79be0ba3f",
+      "date": "2019-09-20T16:39:27-07:00",
+      "subject": "HINT_INLINE ZSTD_storeSeq()",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Alive2 recognizes syntactic equality of the modeled extracted ZSTD_storeSeq LLVM body in both directions; forced SMT times out and historical macro dependencies/whole compressor are absent.",
+      "evidence": "history-eq/c/zstd/5dc0a1d6/README.md",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "release-mode extracted ZSTD_storeSeq body at -O1 with modeled MEM_STATIC/HINT_INLINE and shared opaque copy helpers"
+    },
+    {
+      "commit": "61e16ce07c023af170e55344becc6164124ed153",
+      "date": "2016-01-31T02:04:15+01:00",
+      "subject": "minor optimization for small files",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims a small-file compression optimization.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "64205b7832fa0b4433214e26c294545b4c962834",
+      "date": "2021-12-14T15:53:50-05:00",
+      "subject": "Fix performance degradation with -m32 (#2926)",
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "changed ZSTD_copy16 fallback, bidirectional Alive2 under i386 LLVM memory model",
+      "evidence": "history-eq/c/zstd/64205b78/README.md"
+    },
+    {
+      "commit": "64efba4c5ee1e8c9afe92873f79424c9955b82ba",
+      "date": "2022-03-17T09:35:11-07:00",
+      "subject": "Software pipeline for ZSTD_compressBlock_fast_dictMatchState (#3086)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds software pipelining and prefetch to fast dictionary matching.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "6755baf940ff7b822d8a500999ef616e1bd08283",
+      "date": "2021-05-07T15:18:16-07:00",
+      "subject": "update decoder hot loop alignment",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Aligns the decoder hot loop; upstream reports about 1.2% decompression speedup.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "68c14bdff296c87bfc7a5447a29c10407121bdd2",
+      "date": "2020-12-04T16:33:39-08:00",
+      "subject": "minor speed improvement to HUF_readCTable()",
+      "screen": "confirmed_optimization",
+      "verdict": "NOT_EQUIV",
+      "coverage": "exact historical HUF_readCTable plus historical HUF_readStats, fixed valid weight header and caller-owned error-path flag; documented zstd compress/decompress API unresolved",
+      "evidence": "history-eq/c/zstd/68c14bd/README.md",
+      "reason": "Bidirectional Alive2 refutes the exact linked and inlined historical function pair on a concrete advanced-HUF call: hasZeroWeights is 7 before and 1 after; native historical libraries corroborate the witness.",
+      "checker_status": "checked",
+      "checker_target": "Alive2 + exact historical native execution"
+    },
+    {
+      "commit": "68dfd14a8c504bbb27013043e1f3466d5318e019",
+      "date": "2025-03-11T11:53:20-07:00",
+      "subject": "[linux] Opt out of row based match finder for the kernel",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Disables a slower non-SIMD row match finder in the Linux kernel build.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "6a3c34aa58813d55cab5e5c884c95d8ae70b3205",
+      "date": "2018-05-08T16:11:21-07:00",
+      "subject": "opt: estimate cost of both Hufman and FSE symbols",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Estimates Huffman and FSE symbol costs for optimal parsing.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "6a7ede3dfccbf3e0a5928b4224a039c260dcff72",
+      "date": "2021-10-25T10:38:01-04:00",
+      "subject": "Reduce size of dctx by reutilizing dst buffer (#2751)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Reuses a destination buffer to reduce decompression-context size.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "6ae44c0db8d9832dd6d1ac8cdd3435dd686c0d0a",
+      "date": "2021-09-08T16:15:01-04:00",
+      "subject": "Advance Long Index Lookup (+0.5% Speed)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Advances long-match index lookup; upstream reports about 0.5% speedup.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "70c80e19e6c167a0d7eb30a8604fe70a8f81fb8d",
+      "date": "2020-05-12T17:51:16-07:00",
+      "subject": "[greedy] Fix performance instability",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Fixes greedy matcher performance instability.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "7201980650c454fb5d9b4bcedd786b73b1076712",
+      "date": "2020-03-14T15:25:09+08:00",
+      "subject": "Optimize by prefetching on aarch64",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Prefetches match data on AArch64.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "761758982e8546f1a44230d2a47b3974c6162311",
+      "date": "2018-05-11T15:54:06-07:00",
+      "subject": "replaced FSE_count by FSE_count_simple",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Uses a simple FSE counter to reduce stack memory.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "7b9a755ac9a10d211c306f4ee26d7da1a9a07c96",
+      "date": "2020-08-20T17:17:10-04:00",
+      "subject": "Remove Chain Limit on Hash Cache Entries; Slightly Improve Compression",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Removes a hash-chain limit to improve compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "7cbb8bbbbf4d04b49b23267e461fcb4ac42a0c8f",
+      "date": "2018-05-18T15:25:10-07:00",
+      "subject": "[cover] Small compression ratio improvement",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Tunes cover dictionary epochs for a small ratio improvement.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "802ea885efd73572fdd7afcdfd897a4460218cac",
+      "date": "2021-11-15T17:25:24-08:00",
+      "subject": "Reduce function size in fast & dfast",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Outlines fast/dfast variants to reduce code size and excessive PARISC stack use.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "80bc12b33a039d5bef59d7ca4ce8809feabbfbaa",
+      "date": "2021-08-17T12:42:39-04:00",
+      "subject": "Initial Pipelined Implementation for ZSTD_fast",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds a software-pipelined fast compressor.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "812e8f2a16ff7999fc733903db80357e85b2fba8",
+      "date": "2019-07-11T15:31:07-07:00",
+      "subject": "perf improvements for zstd decode (#1668)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Optimizes the decode path; upstream reports 7.5% average speedup on Silesia.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "82b0cd844f833f3e0488356b38410ef65417a278",
+      "date": "2020-07-27T22:08:52-07:00",
+      "subject": "Optimize ZSTD_wildcopy",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Optimizes ZSTD_wildcopy.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "863ec40f1e163969a072453dbec9b1bdec5bce3f",
+      "date": "2016-01-28T17:56:33+01:00",
+      "subject": "minor compression speed improvement",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims a minor compression speed improvement.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "899f2a29f6f70f7812c3f79259b593c3dde67401",
+      "date": "2017-11-20T11:53:20-08:00",
+      "subject": "strategy ZSTD_btopt pinned to (0) variant (faster one)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Selects the faster binary-tree optimal parser variant.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "8c53e526db3bcf5a95f67bd347e1f89c79f4fe94",
+      "date": "2021-12-31T13:03:12-08:00",
+      "subject": "fix performance issue in scenario #2966 (part 1)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Fixes repeated-compression workspace reuse performance.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "8d31e8ec42a736bf7cc70f9f21e9c1afc920c148",
+      "date": "2024-02-26T14:31:12-08:00",
+      "subject": "sizeBlockSequences() also tracks uncompressed size",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Skips an unproductive sub-block compression cycle.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "8e4400463adc7bc7633641d6a485cfef4f28bc31",
+      "date": "2025-07-08T17:05:45+00:00",
+      "subject": "Improve ZSTD_get1BlockSummary",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Removes a scalar summary hot-loop data dependency.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "90a03a95a1a20ce8b8cf4c5036a6869678ff0515",
+      "date": "2016-03-19T14:47:31+01:00",
+      "subject": "minor performance fix (decompression)",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Alive2 proves a conditional equality after all three source-audited callers normalize helper errors, but historical error definitions and a faithful full build are unavailable.",
+      "evidence": "history-eq/c/zstd/90a03a95/README.md",
+      "verdict": "UNKNOWN",
+      "coverage": "changed sequence-table error branch and caller projection under symbolic error-recognition assumptions; whole decompressor unproved"
+    },
+    {
+      "commit": "968f275981448de16810073d3d7687dff332462d",
+      "date": "2015-07-07T16:54:25-08:00",
+      "subject": "Changed allocation strategy to reduce stack usage of ZSTD_compressSequences()",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Changes allocation to reduce ZSTD_compressSequences stack use.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "99435dbbab0361c105b1bc6f5c6aa4ab39c89e96",
+      "date": "2017-11-19T12:58:04-08:00",
+      "subject": "minor : search early-out on sufficient_len for hc3 and rep",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds early-out on sufficient matches for small speed and ratio gains.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "9a211d1f05bd8cb6cb80780bf1880c23204b7b68",
+      "date": "2018-01-12T12:26:47-08:00",
+      "subject": "Load more dictionary positions into table if empty",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Loads more empty-table dictionary positions; upstream reports ratio gains.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "9ca65af81001e440a280cec281cd5f7cf07a5e97",
+      "date": "2016-11-23T17:22:54+01:00",
+      "subject": "zstd_opt.h: improved price function",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Improves the optimal-parser price function.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "a08fabd51a4191b9b1a2d580454ae6b7b805ee35",
+      "date": "2022-10-17T10:24:29-07:00",
+      "subject": "Rough draft speed optimization",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Changes HUF compression under an upstream speed-optimization commit.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "a3c75bad5a4fad5d687709a877392806f7ef9ced",
+      "date": "2015-02-21T03:31:59+01:00",
+      "subject": "Updated FSE Faster speed on barely compressible data",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Speeds FSE on barely compressible data.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "a56ac2815c971c98051e80a9d0d7828038b9d837",
+      "date": "2016-11-29T15:30:23-08:00",
+      "subject": "restored normal decoder speed",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Restores decoder speed after a regression.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "a80d268700d1a8496dd05de50833dfc6bdd750f0",
+      "date": "2021-05-29T18:21:10+01:00",
+      "subject": "Optimize ZSTD_decodeSequence by another x%",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Optimizes ZSTD_decodeSequence for speed.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "af866b3a5854aa7a22853b8a2e545e2d61dfa6c3",
+      "date": "2018-02-20T19:34:43-08:00",
+      "subject": "Split block compresser out of long range matcher",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Separates LDM sequence generation and block compression; upstream notes ratio and speed gains.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "b37e0a9241afe2e353b06ea5ea5a88fa2df4c6c4",
+      "date": "2016-02-15T14:07:07+01:00",
+      "subject": "performance tweak : bt search w/ long repeated segments",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Tweaks binary-tree search on long repeated segments for performance.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "b40287aaef3c13da55ae4f5b80e34fe59eb629d4",
+      "date": "2016-03-17T12:11:16+01:00",
+      "subject": "Improved decompression speed (by @inikep)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims a decompression speed improvement.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "b76c88849748935bfd703a0703770d820e75c6b7",
+      "date": "2018-09-14T15:24:25-07:00",
+      "subject": "ZSTD_dfast: Don't Search Dict Context When Mismatch Was Found",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Skips a dictionary-context search after a mismatch in double-fast compression.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "b83059958246dfcb5b91af9c187fad8c706869a0",
+      "date": "2019-08-27T14:49:23-07:00",
+      "subject": "Improvements in zstd decode performance",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Changes wildcopy for faster decompression.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "b89e8c2aaf945718bf5a99e16d452728f12fc1e2",
+      "date": "2026-08-26T22:51:57-07:00",
+      "subject": "perf: skip CPUID probe in CCtx when BMI2 is enabled at compile time",
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "coverage": "Alive2 proves the heap-context BMI2 argument equal for DYNAMIC_BMI2=1 and different for DYNAMIC_BMI2=0; compressed output and allocation behavior unproved",
+      "evidence": "history-eq/c/zstd/b89e8c2a/README.md",
+      "checker_status": "checked"
+    },
+    {
+      "commit": "bc601bdc6d8a290da9916709dee1178ad5d01b3c",
+      "date": "2019-05-31T15:55:12-07:00",
+      "subject": "first implementation of small window size for btopt",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Uses a smaller btopt window to improve compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "be4605d851ba2e9a2be5bb27999c2018f4c0db6b",
+      "date": "2016-03-21T14:29:26+01:00",
+      "subject": "improved decompression speed",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims improved decompression speed.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "c2abfc5ba40b2c7863080c937b728fb902b9cb5b",
+      "date": "2024-10-15T17:58:33-07:00",
+      "subject": "minor improvement to level 3 dictionary compression ratio",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Improves level-3 dictionary compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "c4f46b94ce6ba497c75b0b44d9e45a0d2872602d",
+      "date": "2017-05-30T17:45:37-07:00",
+      "subject": "ZSTD_createCCtx_advanced() now uses ZSTD_calloc()",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Uses calloc instead of memset during CCtx construction; upstream expects any gain to be tiny.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "c7ae9ffde33a5e114fd71d0a46df75a6e007790b",
+      "date": "2015-10-19T02:36:34+01:00",
+      "subject": "small decompression speed improvement",
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "changed offset-prefix computation for offsetCode 0..26 on x86-64 and i386; public decoder unresolved",
+      "evidence": "history-eq/c/zstd/c7ae9ffd/README.md"
+    },
+    {
+      "commit": "cd1f5829432c6df1a47c26cf9be75495fb2fdb94",
+      "date": "2022-05-11T11:27:34-04:00",
+      "subject": "Hoist Hash Table Writes Up into Each Match Found Block",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Hoists hash-table writes and reports better performance alongside a correctness fix.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "ce52acd7dc7a7afc83433f0f2212942eb3160abb",
+      "date": "2022-06-24T17:07:06+08:00",
+      "subject": "compress:check more bytes to reduce ZSTD_count call",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Checks four bytes early to reduce ZSTD_count calls.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d0f5ba36fb83dfdcae28badd7918d83cb011a6b8",
+      "date": "2019-03-22T12:28:55-07:00",
+      "subject": "[cover] Improvements for small or homogeneous data",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Improves cover dictionary training for small or homogeneous data.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d100670045fb39adcce509d4bbb3ceb4a0091975",
+      "date": "2017-11-19T10:38:02-08:00",
+      "subject": "btopt0 : a bit faster and weaker",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Selects a faster but weaker btopt0 parser variant.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d1760113eca6244d40603997467a22423e2e1a5b",
+      "date": "2017-02-28T00:14:28-08:00",
+      "subject": "Improved speed of ZSTD_decompressStream()",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Delegates streaming decompression to a single pass when destination space suffices.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d31018e223691256aac9c426fcfbeec735a2d6ab",
+      "date": "2024-02-03T14:26:18-08:00",
+      "subject": "finally, a version that generalizes well",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Tunes optimal parsing for better compression ratio on more files.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d365ae34978d9fd3ab83749c84d2634f1d5e86a8",
+      "date": "2016-10-20T11:49:02+02:00",
+      "subject": "zstd_opt.h: small improvement in compression ratio",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Improves optimal-parser compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d7249dafb43825dc2048a6bdce4e3c9b7606e0ae",
+      "date": "2022-05-25T22:26:41+08:00",
+      "subject": "common: apply two stage copy to aarch64",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Applies a faster two-stage wildcopy on AArch64.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d7841d150be6355d9dd06ccc433589c81a8fb1f8",
+      "date": "2022-10-14T22:53:03-04:00",
+      "subject": "Make ZSTD_getDictID_fromDDict() Read DictID from DDict",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Reads a cached DDict ID, avoiding repeated dictionary-header checks.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d8b33a598d9b707732969bd3da02b0fea1b1985c",
+      "date": "2017-06-30T15:44:57-07:00",
+      "subject": "Optimized ZSTDMT single-pass mode speed on large sources",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Limits multithread job size to speed large-source single-pass mode.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "d95123f2e68fc5a0feb222d03cacba5a044f03b6",
+      "date": "2025-05-16T14:57:32+08:00",
+      "subject": "Improve speed of ZSTD_compressSequencesAndLiterals() using RVV",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds RVV acceleration for sequence and literal compression.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "df28e5babdfd927901de9be5856060981daf831f",
+      "date": "2018-11-16T15:02:11-08:00",
+      "subject": "Add ZSTD_DECOMPRESS_MINIMAL Macro, Which Reduces Branching of Decompress Variants",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Adds a minimal-decompress preprocessor path that reduces variant branching.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "df386b3d8d50cef611d7f9693417d63620170bd1",
+      "date": "2020-08-17T17:43:01-04:00",
+      "subject": "Fix Off-By-One Error in Counting DDS Search Attempts",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Fixes duplicate DDS search attempts that slowed matching.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "e3bda594aec7ff2bddc7d5dcd6c945f3c4447116",
+      "date": "2020-08-10T22:15:46-07:00",
+      "subject": "Prefer __builtin_prefetch over inline asm",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Prefers compiler prefetch builtins over inline assembly on AArch64.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "e7ec8f2b9b8ea06f45c54b167d808ead3d3b05db",
+      "date": "2016-03-21T17:23:02+01:00",
+      "subject": "improved ratio",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims an improved compression ratio.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "ee3f4515c1f9ece7d4f56139dc5d2485645beaab",
+      "date": "2015-12-29T22:26:09+01:00",
+      "subject": "faster hc mode with repetitive data (experimental)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Speeds high-compression mode on repetitive data.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "eee87cd6f20522d34db862ec9ef000572c26164a",
+      "date": "2017-11-27T17:13:59-08:00",
+      "subject": "btopt: minor refactor : removed one SET_PRICE() macro invocation",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Removes an optimal-parser price macro call for a stated tiny optimization.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "ef0ff7fe7fd90a94721c2626d1588b053ffc76ce",
+      "date": "2017-07-11T08:54:29-07:00",
+      "subject": "zstdmt: removed margin for improved memory usage",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Removes multithread buffer margin to reduce memory use.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "ef51941822eb12a88afe6bb51867fab6cc65cc9d",
+      "date": "2016-04-21T11:08:43+02:00",
+      "subject": "zst_opt.h: minor compression speed improvement",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ZSTD_getLiteralPrice helper body and cache-field effects under a shared C declaration model; full optimal parser unchecked",
+      "reason": "The old always-enabled cache branch preprocesses to the same helper as the child; Clang IR is identical after symmetric unsupported-attribute removal, and bidirectional Alive2 reports syntactic equality.",
+      "evidence": "history-eq/c/zstd/ef519418/README.md"
+    },
+    {
+      "commit": "efd37a64eaff5a0a26ae2566fdb45dc4a0c91673",
+      "date": "2019-09-19T13:25:03-07:00",
+      "subject": "Optimize decompression and fix wildcopy overread",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Removes wildcopy branches for faster decompression alongside an overread fix.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "f12c1304a80a1b8ba53a3352896ab097b6ea589c",
+      "date": "2015-11-05T18:16:59+01:00",
+      "subject": "integrate fast mode",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Integrates a fast compression mode.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "f36da5b4d9f6e382c7045124c015fdeaec7345ca",
+      "date": "2017-12-29T14:40:33+01:00",
+      "subject": "minor speed optimization : index overflow prevention",
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Alive2 proves equivalence of the changed index-table reducer for size 16; size 32 times out and the full commit remains unproved.",
+      "evidence": "history-eq/c/zstd/f36da5b4/README.md",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "changed ZSTD_reduceTable helper at 16 U32 entries with arbitrary reducer; full commit unproved"
+    },
+    {
+      "commit": "facc09aa0327267c06708acf2cb2e29cd77002c8",
+      "date": "2018-03-11T03:06:52-07:00",
+      "subject": "minor compression level adaptation",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Tunes level 12 for slightly better ratio and speed.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "fb8296f55c23ccb411964f7e79d33243905e02a0",
+      "date": "2015-07-27T19:34:27+01:00",
+      "subject": "Updated fse (faster huff0 32-bits decoding)",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Updates FSE for faster 32-bit Huffman decoding.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "commit": "fc2afcfa646b5d18185f8829f65ec7938c85953a",
+      "date": "2015-11-06T15:40:14+01:00",
+      "subject": "small Cspeed increase",
+      "screen": "confirmed_optimization",
+      "checker_status": "not_run",
+      "reason": "Claims a small compression-speed increase.",
+      "verdict": "UNKNOWN",
+      "coverage": "historical commit message and changed-path screen; exact C source missing; no Alive2 relation run",
+      "evidence": "history-eq/c/zstd/metadata-source-gap-screening.md"
+    },
+    {
+      "draw": 0,
+      "commit": "9b8e453713b3941b21f1192df53ea49d3611d6dd",
+      "subject": "minor CRatio improvement",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit compression-ratio improvement.",
+      "changed_paths": [
+        "lib/zstdhc.c",
+        "lib/zstdhc_static.h"
+      ],
+      "missing_changed_blob_ids": [
+        "e2dfafc1de7fa5f8c56180bec182443d300a4048",
+        "dbc7a3a99381bcb6d79b21e48db195554b4ff5fc",
+        "52e9bb88df2641737df97a11f0d9fda665b1c5e5",
+        "63214a1b5095e5bde63e29b915805ae187ff2576"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 2,
+      "commit": "4d1a0ef51537ff7c5296beac40b9f14a8ba51249",
+      "subject": "minor speed improvement",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit compression-speed improvement.",
+      "changed_paths": [
+        "lib/zstd.c"
+      ],
+      "missing_changed_blob_ids": [
+        "4b4909f2a349faaa97503dad1dfcf4455b8679ca"
+      ],
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "exact old/new ZSTD_execSequence bodies: different destination-buffer bytes after the same dstSize_tooSmall error; valid-stream output unverified",
+      "checker_target": "Alive2 + exact historical native ASan/UBSan witness",
+      "evidence": "history-eq/c/zstd/4d1a0ef5/README.md"
+    },
+    {
+      "draw": 5,
+      "commit": "2cb0740b6b24b42d0255046e5692539c7b8534f8",
+      "subject": "zstdmt: changed naming convention",
+      "screen": "confirmed_optimization",
+      "reason": "Cuts job size to reduce mutex calls in addition to renaming.",
+      "changed_paths": [
+        "doc/zstd_manual.html",
+        "lib/compress/zstdmt_compress.c",
+        "lib/zstd.h"
+      ],
+      "missing_changed_blob_ids": [
+        "b4aed91e5c0886d150b45b2fe64468eddcb7ad4b",
+        "debd37f7a57abe899bda499220177f1cd4db73a0",
+        "72515edb8c81a0b87736680487fd783328d9bf55",
+        "ec5f0bbbdb4f4144665e3f1bf7ca2ff34dbd479e",
+        "e573daf5b3183aece6177007aee5d3693fd3e437",
+        "4c77197d1fe17b3963ec5d932c58d780d3bb6101"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 6,
+      "commit": "0170cf9a7af94d9ffdcdb5cd3ebc35fcd542f2ed",
+      "subject": "minor : modified ZSTD_preserveUnsortedMark() to be more vectorization friendly",
+      "screen": "confirmed_optimization",
+      "reason": "Changes a compressor helper to favor vectorization.",
+      "changed_paths": [
+        "lib/common/fse_decompress.c",
+        "lib/compress/zstd_lazy.c",
+        "lib/decompress/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "8e3f0035f69a09a0e933ee9e6e06656d58c582d8",
+        "4c66c3b77464c1a8053ef71990b133e49d78e422",
+        "7f59eb34a61274fd8ec2a3d7364ea9eb5782d4a8",
+        "844afc051a09c30218d15f883e89f111511fdf63",
+        "1a1fb250673996eabf5b162887e93f654d6e8ae0",
+        "afae80d1cc426d651b5c4a08f22480ecdca8c2d1"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 7,
+      "commit": "ace6a7e746f40a1d525f8f04e3dee0ebfb12e97b",
+      "subject": "Decompose `step` into Two Variables",
+      "screen": "confirmed_optimization",
+      "reason": "Eliminates one addition in the fast compressor.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "8e26cc70313a4eb7a2a0b24ecffb53c217b83316",
+        "918b7299756c20b4767a21e81bd57493b3cc7aab"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 11,
+      "commit": "a243020d3785432b514beff05f2096d0ff72f0ca",
+      "subject": "slightly improved weight calculation",
+      "screen": "confirmed_optimization",
+      "reason": "Changes weight calculation to improve compression ratio.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d4191afa1eb7223334a6b4665a33648eba47dbc8",
+        "1b4882841636a9c58b790793609747838cece970",
+        "8e13aadd8e3dfbe18ad79901ca5c0e2f2f20b862",
+        "18fa87fe5fbff78db2bb69eebd752092d176e765",
+        "274bce1483491c120b021abd9fa2cb3fb66aa8da",
+        "827fb49a42917da22f205098b422dfd004ae7e06"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 13,
+      "commit": "0b9b894b2d1adeec658a8c7d3c6b74f1201297b9",
+      "subject": "reduced ZSTD_DDict memory usage",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces decompression dictionary memory by 128 KiB.",
+      "changed_paths": [
+        "lib/common/fse_decompress.c",
+        "lib/decompress/huf_decompress.c",
+        "lib/decompress/zstd_decompress.c",
+        "programs/fileio.c"
+      ],
+      "missing_changed_blob_ids": [
+        "1479a5e8217b7cbec75548977fa8101157af11a6",
+        "8474a4c079b25d5b84f51cbfdb14d98a150807bc",
+        "889a22a8c8c7b05def84a955ce3692a244e231fe",
+        "0f11f5c1b6ccdc6d622303625afdfe5eb29c5711",
+        "069c07bf2f4c94bb194b3533d8d1b82081297a28",
+        "2646c802883ecb1390e81688c756b81a0e8467d8",
+        "3cbd83ae098861850cdfab557d4701c2124800af",
+        "3b9d51a329f93acf3448ab4ee8aba26c3e2fdae3"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 14,
+      "commit": "a3c3a38b9b956d2689a019b1b29482e86fd98836",
+      "subject": "[lazy] Skip over incompressible data",
+      "screen": "confirmed_optimization",
+      "reason": "Skips incompressible input in the lazy matcher.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_lazy.c",
+        "tests/regression/results.csv"
+      ],
+      "missing_changed_blob_ids": [
+        "a52d2a0ef791967fa0d935b33abb04a8b9e0e447",
+        "a475f0c4a72e66fa018810211190762e271c301a",
+        "b41747cbc0d9aff64d2d7cb9be46c543caf63574",
+        "10f68d010ecd92cfcc9988e87c5e596a5af7ce02",
+        "b3e7bf75752c2323a88ceffdf0e8d227b1fa462e",
+        "5ba88e8678fe36f96b55de8e7bba2c7292fccbfa",
+        "926417def399c521976dbd34cc850e8d7717084c",
+        "d072c0d850b67a71d38d0237592cc9454a4ffbff"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 15,
+      "commit": "b19d5d76ec92f976e0054d929ae79e5b035af26e",
+      "subject": "restored inline for better decompression speed",
+      "screen": "confirmed_optimization",
+      "reason": "Restores inlining for decompression speed.",
+      "changed_paths": [
+        "lib/decompress/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "7263d29bc42b026272fbf7306eaea862b53e5597",
+        "f29560e9efbafdb434bdedac7ecc1ab664c2bc66"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 18,
+      "commit": "e9d1987fd7bbeb669fe23a6f396159b4579c9d21",
+      "subject": "btopt: minor speed optimization",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit optimal-parser speed optimization.",
+      "changed_paths": [
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "66a7da19c8eeb8b8d988c040192f9343948ce7a8",
+        "459fe65713c68584a1994f122b97bcaa06fb1dcc"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 19,
+      "commit": "fadaab8c7c00f6b1589c207e1623ffee7a21e9e7",
+      "subject": "[minor improvement] Pass 0 as the content size in the DDS",
+      "screen": "confirmed_optimization",
+      "reason": "Avoids unneeded content-size accounting in dictionary state.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "b0f0e9eaad88daca91b47a2a0cc3e675f13b224c",
+        "09ec152f325136561b9aaea5e3b7438f18f867c1"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 20,
+      "commit": "10bfd0c0d5c584c5015c5a3a34436f7025fac325",
+      "subject": "Fix ZSTD_execSequence() performance regression",
+      "screen": "confirmed_optimization",
+      "reason": "Repairs a decompression performance regression.",
+      "changed_paths": [
+        "lib/decompress/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "f3ff4ebff413a61cb861380802bc184d37579bad",
+        "ed68d888bfe94aa3e6657c0ce1bc1b375e83c022"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 23,
+      "commit": "7ae67bb18a63a840cdadac884dd8045b5a358555",
+      "subject": "small compression speed gains with using_CDict",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit compression-speed improvement with CDict.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "programs/bench.c"
+      ],
+      "missing_changed_blob_ids": [
+        "9e733b8f2e232e9742d4f500d96c26b8700e4906",
+        "47cf64150895804512d488971e40655e5da54d95",
+        "3a290cc9afc2b896778d6d2821fe071146144bd2",
+        "c477b268266cb9b0774c6dfe89d9075e62c01c7e"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 24,
+      "commit": "abb5c653f1e2ae9c2df9cfa4056ac156d3c13046",
+      "subject": "minor speed improvement for ZSTD_copyCCtx()",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit context-copy speed improvement.",
+      "changed_paths": [
+        "lib/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "3749a89a5019bbf5ac98d9d361669a215f29a8e8",
+        "e9960a91a23c3899d6d67f0e3dbaef43ffc82ed8"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 25,
+      "commit": "afab02098ac3c25ed7c689336dbd2b5d2faeaf97",
+      "subject": "improved decoding speed (660)",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit decoding-speed improvement.",
+      "changed_paths": [
+        "lib/bitstream.h",
+        "lib/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d90c9b24263d251c5a4a1f2732b700dd4e5cba41",
+        "af9151adabf5d5873f5acc0df83b4be85625e90c",
+        "a854aaf75876a0745a8bb2b03ab427bb1034f208",
+        "92af2b35d2c5389e82a5ab94027895ee1bfa55a6"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 27,
+      "commit": "a7737f6a60dfdcd890fa912a197554d59981dcc4",
+      "subject": "improved compression on small files when using same parameters",
+      "screen": "confirmed_optimization",
+      "reason": "Improves compression on small repeated-parameter inputs.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "tests/fuzzer.c"
+      ],
+      "missing_changed_blob_ids": [
+        "47cf64150895804512d488971e40655e5da54d95",
+        "7e30f5a055781c62dec3cdeb4d8104a7c2c29304",
+        "b8b7f0c9341da3a1f7bf42e2fbf0ba928d543244",
+        "323854b323a8b89f5c347d73f97089503bf1ae93"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 29,
+      "commit": "f2d9ef1dc0d491b75877a9200876a7c16dd9694d",
+      "subject": "[cover] Optimize case where d <= 8",
+      "screen": "confirmed_optimization",
+      "reason": "Optimizes a dictionary cover case.",
+      "changed_paths": [
+        "lib/dictBuilder/cover.c",
+        "programs/zstd.1",
+        "programs/zstd.1.md"
+      ],
+      "missing_changed_blob_ids": [
+        "1db42f95b8d488537d918545506bf1f7f341dbab",
+        "4235f112b7fb3a20807ad62c84fc8f741cf05276",
+        "999dc8169fee2b1b796dfee7a3bc31a8dd9a4a5a",
+        "5bd966a841df2654986622c789a299f560fcf268",
+        "f2d04d16f20b85d7bcc6a3366c6ea99cba3ce863",
+        "0919da70265f6fdeec098aa37a02e907b6327999"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 30,
+      "commit": "ae70342561b2544aa02a41bebaa9cf03300fb98e",
+      "subject": "compress: Elide long-offset path on 64-bit",
+      "screen": "confirmed_optimization",
+      "reason": "Elides a long-offset path on 64-bit targets.",
+      "changed_paths": [
+        "lib/compress/zstd_compress_sequences.c"
+      ],
+      "missing_changed_blob_ids": [
+        "7beb9daa603993aebc4add3dd81a0dcbedab57f1",
+        "d14ef9a8c5f4384692f0e8b9acc7dcc137cc2e53"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 31,
+      "commit": "8e0e495ce8aa5e0467e91a8df9fa95bdf41c4dad",
+      "subject": "fixed: compression ratio discrepancy",
+      "screen": "confirmed_optimization",
+      "reason": "Restores a match opportunity and improves compression ratio.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "7ab0485ecadba066d2aaa5d11fd5a509407dd8f2",
+        "9b047e3ab32296b868749485148bf3fbe563d767",
+        "ce012b0ff158149cee847aca80cb70ff4acc5472",
+        "8111fb2260b368ff5c9b67390930e4e7f7507a46",
+        "ca7f7db9075bec7a1488270f6721e990e85b8543",
+        "351c7d01cde238a81c8656d5ff83a600f3099ce9"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 32,
+      "commit": "e928f7e16db5113e09902b822a2ce82e05624f11",
+      "subject": "introduced ext_wksp variants of count to reduce stack memory usage",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces entropy-counting stack memory.",
+      "changed_paths": [
+        "lib/common/fse.h",
+        "lib/common/huf.h",
+        "lib/compress/fse_compress.c",
+        "lib/compress/huf_compress.c",
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "0588651e22cd2215cef65d1b18c9d912cf163f23",
+        "8b07d184db3c92e99e70fa5385a08a8a1b78f6d9",
+        "29bab4b7646fb80863cf43068d87c3378f371be1",
+        "06568f08a7da6dadb45ce5efc3270601a75a25ab",
+        "e4b3dcaca13075ac8361d83cf66ae1ebb4cbe983",
+        "840a3fec50acca1995a245e18043c5b0e85b7652",
+        "3a1c051105d7222f921936bdfdfae28648755d3a",
+        "ff2e82ae8d01666762ccbec3c6f7b4544cba84d8",
+        "e93f6671f54f5dc39eb9f39c649e6e6ffbb64194",
+        "853b0c3bf149881213e29009d76d8a3bdd748899"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 33,
+      "commit": "54144285fd205a533089559468865ace5a7afad1",
+      "subject": "small speed improvement for strategy fast",
+      "screen": "confirmed_optimization",
+      "reason": "Reports strategy-fast speed gains on three corpus inputs.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "bfe4e10227eda2584903a4317552ece0d15dab33",
+        "81c7cd2c80832e52527e8dfbd64751cea672f37e"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 35,
+      "commit": "d1327738c277643f09c972a407083ad73c8ecf7b",
+      "subject": "updated double_fast complementary insertion",
+      "screen": "confirmed_optimization",
+      "reason": "Improves compression ratio with a small stated speed tradeoff.",
+      "changed_paths": [
+        "lib/compress/zstd_double_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "f156da9dfaf132b7b8099c842f761204993a8230",
+        "bdb26ef80eee74e0f44d12835f92796c7e8c4c9d"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 36,
+      "commit": "b3f33ccfb3b4fcc73df82126fd5ecfb751268fc6",
+      "subject": "use ZSTD_decodingBufferSize_min() inside ZSTD_decompressStream()",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces decompression-stream buffer allocation.",
+      "changed_paths": [
+        "lib/decompress/zstd_decompress.c",
+        "tests/zstreamtest.c"
+      ],
+      "missing_changed_blob_ids": [
+        "aeac17d1928364a8dd746b093923c19dac481ef8",
+        "5158d3f32a8c5d29c043177888100e0663771cb7",
+        "d7b2e197a9a510022edbc42710f68318b1f55f71",
+        "8c8adc62d4deb4ef65e223168e94a5f6724a3ddc"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 39,
+      "commit": "d41f707e884f54bd2662b759b2bb96c55f9a12f0",
+      "subject": "minor improvement : remove duplicates with 1 char prefix difference",
+      "screen": "confirmed_optimization",
+      "reason": "Removes near-duplicate dictionary entries.",
+      "changed_paths": [
+        "lib/dictBuilder/zdict.c"
+      ],
+      "missing_changed_blob_ids": [
+        "ed53197ae3080233af8d89514cefb923e8d38ed3",
+        "1b3c74f16dad798c3aed7a5d94e89218bd01ed71"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 44,
+      "commit": "34b545acb07e927fd4c251f5620fb7d41f6d48d1",
+      "subject": "Add a ZSTD_dedicatedDictSearch ZSTD_dictMode_e to Allow Const Propagation",
+      "screen": "confirmed_optimization",
+      "reason": "Enables constant propagation and reports 1.5% speed gain.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_lazy.c",
+        "lib/compress/zstd_lazy.h"
+      ],
+      "missing_changed_blob_ids": [
+        "8aa754dba102230b0152ae3f1a6e361ea79cff03",
+        "f8019b0eeddfff4ba60630515bf587f1d02d11a1",
+        "812dd7ac863c6f39b3fe77ede0189b6cc4ec08eb",
+        "8f4d2c55478d1fc6d563899a5cba2a462ffc6f0a",
+        "c6bcff87696038fff5b4a02aca3619bb2c2abb92",
+        "b3143070d7466b8949c61472058bbebbc15412d0",
+        "5e5eb514bb71696df0b7f0ced48e0d00f05b2dd2",
+        "9898e90c00eb549c2add1f814a83ec65cd7e026b"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 45,
+      "commit": "2b942881ac258727cbc9870e27c7d60206350a17",
+      "subject": "improved 4reps in ZSTD_compressBlock_lazy_generic",
+      "screen": "confirmed_optimization",
+      "reason": "Improves four-repcodes handling in the lazy compressor.",
+      "changed_paths": [
+        "lib/zstd_compress.c",
+        "lib/zstd_decompress.c",
+        "lib/zstd_internal.h",
+        "programs/Makefile",
+        "programs/bench.c"
+      ],
+      "missing_changed_blob_ids": [
+        "397e761892225815386e2b7c17a93357dc16a0b7",
+        "e9b9d4a6e6e75d637bd7f44560775b9e5b15eadd",
+        "f0475bf25a7aafeffbcb69ab7460b688ef8d155d",
+        "651087c4ded40341a408f7fd4064c2d4fe644a32",
+        "0abdcdfa92d99f89185b52ad7048a062336fda52",
+        "5809f875493ced66f97de1e73a6b392d5477d83b",
+        "ca2ba99fc7ede9e20c6d38cfd145fa4eb5344f33",
+        "cd432f79049322edf1fad163d1157b334d695a74",
+        "5808c2ecc84c8de791857b9d0d441e8218279442",
+        "20f2ee0ab0397009e5a3530774949e3798d48fbd"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 46,
+      "commit": "ca0135c2fd562058a099a20bb0c2e569d354f08b",
+      "subject": "new Formulation",
+      "screen": "confirmed_optimization",
+      "reason": "Reformulates the optimal parser with stated speed intent.",
+      "changed_paths": [
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "2c48ae55e449bf822d229db9cab3acd572a41a64",
+        "143e101a645b422da7839fa647897be760f353e8"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 48,
+      "commit": "1aff63b114d0ca329d6066d9d9d5ce002dbf9f59",
+      "subject": "opt: shift all costs by 8 bits (* 256)",
+      "screen": "confirmed_optimization",
+      "reason": "Uses fractional-bit costs in optimal parsing.",
+      "changed_paths": [
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "a107fccc24efaa979452c8d0b6cd5849aa401cae",
+        "d800254cc91f3e7ef6f995bf0539c9499a0123fd"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 50,
+      "commit": "2dd76037be46a8b7589ed95cece4cff5df62330c",
+      "subject": "zstd cli can increase level when input is too slow",
+      "screen": "confirmed_optimization",
+      "reason": "Adapts CLI compression level to slow input throughput.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstdmt_compress.c",
+        "lib/zstd.h",
+        "programs/fileio.c"
+      ],
+      "missing_changed_blob_ids": [
+        "ed3aab871b9e4ca5e58c10b11d7d7f2e5afd83d8",
+        "2121fe74989ed33e1088708515c4ec9a4c2855f5",
+        "74f9dc29c23ca5ef60dd6ecab3f8c1b4559e19e7",
+        "d2f06e4ee72777846eaab2a58ffeeaa53f5c00ad",
+        "0c20bb76841a6b3ff7014fe37e3d0041cc08a73f",
+        "edd0079c957a6be9c1d71fe4d34252c3e6fdcdb0",
+        "c1587f8f89724f2d923eaa5051c42a4e092f7a32",
+        "b62e25703baa2202a5a0b3e220d376bdf1caa486"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 53,
+      "commit": "3cbfac1cdb7635b799809575208cc0318055a1fc",
+      "subject": "updated levels 15-20",
+      "screen": "confirmed_optimization",
+      "reason": "Retunes compression levels for ratio and speed.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "44f8c68a8972d49bedb8b1c7451f32c9667b1c43",
+        "ebc9c1854d5edd7c28e2539f10b4283f40f41382"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 56,
+      "commit": "a494111385bd7d61dbf8f4e3d817e51d2ba6a81c",
+      "subject": "Move Prefetch Before Insertion; Speed Up ~6%",
+      "screen": "confirmed_optimization",
+      "reason": "Moves prefetch before insertion; reports about 6% speed gain.",
+      "changed_paths": [
+        "lib/compress/zstd_lazy.c"
+      ],
+      "missing_changed_blob_ids": [
+        "45b248472ca4a97e1e4a79ff5eba98ab658e000d",
+        "0ee9f6506cf04928c9f9e4be00b594afca1e34a3"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 59,
+      "commit": "186b1324951f2505469a3415aaf8ddc3398b9fca",
+      "subject": "made search strategy switchable",
+      "screen": "confirmed_optimization",
+      "reason": "Selects branch versus cmov search strategy by a performance heuristic.",
+      "changed_paths": [
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "64618848dade4777e17294630c273612d0ca918f",
+        "0be7ae14e76305e048edeaa4b65dd73f29f70042",
+        "94e6300eb487a50f9a2f1a9bfa68e657c6d8dc7c",
+        "3c6e751314305fcddb6e2b2a486d6a4b9bfa9ece"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 60,
+      "commit": "7db552676ebad975e81726d486e6530b35267cae",
+      "subject": "reduced pool queue to 0 to save memory",
+      "screen": "confirmed_optimization",
+      "reason": "Shrinks worker queue to save memory and tunes dispatch.",
+      "changed_paths": [
+        "lib/common/pool.c",
+        "lib/compress/zstdmt_compress.c",
+        "lib/legacy/zstd_legacy.h"
+      ],
+      "missing_changed_blob_ids": [
+        "bcea21ca0269570aed09ecc79bcddf66726571fb",
+        "a227044f7f1ce302895d990e4d3e900a49b91273",
+        "02bb7c593fc93cf5e284f908e642b3c88de54938",
+        "8564bc439214df313b80684735aedf3d17022710",
+        "6342192eec973b57d82f489d50bf068289b899be",
+        "1126e24669f33e362a26e15aa126c1bb19064698"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 61,
+      "commit": "5c2f2ebfdb8fc8e074269ad4f85ac79267cc36fe",
+      "subject": "zstdmt via compress_generic: reduce opportunity to free/create mtctx",
+      "screen": "confirmed_optimization",
+      "reason": "Avoids repeated multithreaded context creation.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstdmt_compress.c",
+        "lib/compress/zstdmt_compress.h"
+      ],
+      "missing_changed_blob_ids": [
+        "ebc9c1854d5edd7c28e2539f10b4283f40f41382",
+        "0a2d589d7149d4a8cfba61dd438f511fe9eb3212",
+        "a5e996d3ebf51e2ffcb64d55a297d9a3011a07ba",
+        "659992f346155550c9083c0626d6bf64dcb4fbb5",
+        "4209cf3c5ac283b470c1ddcd95c13294e5b63339",
+        "d12f0adb8d4cf1ca5332055d52167b85248cbadc"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 63,
+      "commit": "387840af79a86660c8f83bcd6cc4de584de9f3a6",
+      "subject": "Re-Order Operations for Slightly Better Performance",
+      "screen": "confirmed_optimization",
+      "reason": "Reorders fast-compressor operations for speed.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "ff2faab33fd253a2493918456305a4da89bc6b52",
+        "a1a9ef445e9bd01a94b414a1c387471d0a977733"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 64,
+      "commit": "de68c2ff10f3800f5aec60abd26e63f00b5f32bc",
+      "subject": "Merged ZSTD_preserveUnsortedMark() into ZSTD_reduceIndex()",
+      "screen": "confirmed_optimization",
+      "reason": "Combines two index-maintenance scans into one for speed.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_lazy.c"
+      ],
+      "missing_changed_blob_ids": [
+        "4a825f65fd7ea3c98ce0df44599af9a6a7adaa3b",
+        "3f7ac849a16a884ef94d1fcf224876b021b10964",
+        "cf5936587deab32defee7a2df366abba7998e4b9",
+        "35b153fa37d7ec7bbc0988f39ec18116f300e36d",
+        "844afc051a09c30218d15f883e89f111511fdf63",
+        "8252135d0baa459817d95ec15b0a6ab294cd6c0c"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 65,
+      "commit": "482689b995bd6afb4a7b335bb80b9e60f501e3c2",
+      "subject": "huf log speed optimization: unidirectional scan of logs + break when regressing",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit Huffman-log speed optimization.",
+      "changed_paths": [
+        ".github/dependabot.yml",
+        ".github/workflows/dev-long-tests.yml",
+        ".github/workflows/dev-short-tests.yml",
+        ".github/workflows/publish-release-artifacts.yml",
+        ".github/workflows/scorecards.yml",
+        "build/meson/meson.build",
+        "contrib/linux-kernel/test/test.c",
+        "lib/common/huf.h",
+        "lib/compress/huf_compress.c",
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_lazy.c",
+        "programs/fileio.c",
+        "programs/util.c",
+        "programs/zstdcli.c",
+        "tests/cli-tests/compression/window-resize.sh",
+        "tests/cli-tests/compression/window-resize.sh.stderr.ignore",
+        "tests/cli-tests/compression/window-resize.sh.stdout.glob",
+        "tests/fuzz/zstd_helpers.c",
+        "tests/fuzzer.c",
+        "tests/regression/config.c",
+        "tests/zstreamtest.c"
+      ],
+      "missing_changed_blob_ids": [
+        "5ace4600a1f26e6892982f3e2f069ebfab108d87",
+        "aadc0ab549967bd9732d484bd652f8821fc81034",
+        "ac34c7165e5dbecec4412e4989fe54010e74fd71",
+        "37186b5c9199c6645cba7165548e6217e002103a",
+        "08df1c07cd885129d014516349a5b56f5b6de381",
+        "b5a3ac689bf12b937702040b4ffde9fb67312b82",
+        "4a70fb8c63e9a998868f20a221ae326d505d17db",
+        "2eae4749437fefe8732afc94d34512dc0d455f58",
+        "1c19b48b2ccd744ec574dede27b1e7bece9f6788",
+        "f264760a34c30e38668b26a306347d709898fc71",
+        "98d556aa3bf0a4e588947ad15a27072cfb950457",
+        "6cd1730bb3a23293cdc9749be0e5f0384ae2988a",
+        "67d248e0cbf34c30f3731f189209612b4c14f1bc",
+        "dee99da772ab54d0969a7872a972d85e18e3b827",
+        "595b2f6db5d2cfb9a5ddde0c07fbb0626e2ef158",
+        "a6a5a257c4c2ea3a10977f399c39e9447a3ea2ca",
+        "eb2cb7b94a5a265f90d39b8a07a0327d41e7de19",
+        "adf1f6e7afc6332da0f967f5f8e6e4411fa9bc37",
+        "0069a7b1bee3e0eb66b6e5c78d7cb938b9f61843",
+        "2ee9cf6302560895966d688173b5c8fef827b39e",
+        "d5a7b5cbf954a73bff2b63b0e2e27b0f84933a3d",
+        "96cf602a3006ff26d05cc893b797958e5e01a130",
+        "e80d370110a13ddd9db60bf90364a0bfd91af6ba",
+        "a3af262114365f3cf8767a27c27b00716cb10359",
+        "63b3ae1767f5a391f927628362f05850c7a6abf8",
+        "583c8a5919b1afe032d24e676d24851036795de7",
+        "362f320a9982b3e04385d55c0918b17926888f4d",
+        "3b5e6fe24f36fbae563cf9843ed1307ddce5d482",
+        "b4a6509db1854485e1804e2c97238980b850a15f",
+        "08ce70dd7a031e6eac75de99669e7bedaefb49f5",
+        "81c2d9dba22e70a4ecb1ab483da4698639fec65c",
+        "879e537bc90101313692f99d26e02fc8275b8a67",
+        "57cd110c6bbe9dc97d05692b5fe2aaaeab596dca",
+        "30d0ca5e212f66b064e1991700eb2bd8489fea34",
+        "ce9020f128c0228b0f7229305abb7abded7499c4",
+        "348f72ed42679b32572d7650a459513efeef3328"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 67,
+      "commit": "e557abc8a0380b095b14623ca7c4105a38fdb981",
+      "subject": "new block splitting variant _fromBorders",
+      "screen": "confirmed_optimization",
+      "reason": "Adds a less precise block-split variant for the fast strategy.",
+      "changed_paths": [
+        "lib/compress/hist.c",
+        "lib/compress/hist.h",
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_preSplit.c"
+      ],
+      "missing_changed_blob_ids": [
+        "e2fb431f03ab527ebf0ee8cd86b9f0a408fe63a8",
+        "4ccf9a90a9ead81993135c13ee23a0a2d7cb9bf5",
+        "887896b813bc3b977d13ff95c57ce973da2e42fd",
+        "e6e39d34890aa99373777e6d4cebdfceee5fb60d",
+        "ee939f22740a658b921132139f590c521ba9f445",
+        "5f8f5aba4885ed097a9495c8e535384aed636704",
+        "3f6edb612f3605944c8d63a3259f3d6f3b4c6b53",
+        "d25773950b9a1d283e195e99e2301bad129e8e7d"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 69,
+      "commit": "b01552a07ae20b5ed28fdb2084dbe9dadd1a6d9a",
+      "subject": "force inlining of HUF_decodeSymbol*() functions",
+      "screen": "confirmed_optimization",
+      "reason": "Forces Huffman decoder inlining to repair a compiler-specific slowdown.",
+      "changed_paths": [
+        "lib/decompress/huf_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d2e1bb4ac0c171018d1076621d461a60130c6351",
+        "8b292e7923dbc4ad34980acff50978c9c08a3172"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 70,
+      "commit": "d0a1d45582181efd76350922a240f14d7893c985",
+      "subject": "ZSTDMT_{flush,end}Stream() now block on next job completion when nothing to flush",
+      "screen": "confirmed_optimization",
+      "reason": "Blocks idle stream flushing to avoid CPU spinning and wasted energy.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "fb9183f9e41393a99d291cba640e054362584aa2",
+        "57cc107f7396412e947f423a379e86a53ad67c94"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 71,
+      "commit": "e8a7f5d3ce0ebb36e4ad850ab12463b1127dba17",
+      "subject": "double-fast: changed the trade-off for a smaller positive change",
+      "screen": "confirmed_optimization",
+      "reason": "Retunes the double-fast insertion tradeoff for compression ratio.",
+      "changed_paths": [
+        ".gitignore",
+        "lib/compress/zstd_double_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "0c840b6b67b94d89d4ea8c9f9c37761be41cc362",
+        "4c297053b49477570ec04a0f43833dcfc01ccb4e",
+        "bdb26ef80eee74e0f44d12835f92796c7e8c4c9d",
+        "b65fd41e74219a9e7ed492c789489fb27048c560"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 77,
+      "commit": "335ad5d4d4310f224aaa8cd75b55c371de891641",
+      "subject": "added ZSTD_initDStream_usingDDict() . slightly optimized ZSTD_initDStream() when no dictionary . fixed ZSTD_sizeof_CStream() .",
+      "screen": "confirmed_optimization",
+      "reason": "Optimizes dictionary-free stream initialization alongside a new API.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/decompress/zstd_decompress.c",
+        "tests/zstreamtest.c"
+      ],
+      "missing_changed_blob_ids": [
+        "5409c233a1a71b35ee6c1f5400338a0242321e65",
+        "85a5ff22d71c34d79f7309a613df42871c433e37",
+        "2a1232eeef6632e20fc462287aa5ba259dce12fc",
+        "f3ff4ebff413a61cb861380802bc184d37579bad",
+        "963078d8a45e0197c6910c60fd96c6fce98fe02d",
+        "38b6a76cc6424be0c20e4536927f1e9521d97e65"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 78,
+      "commit": "f6d4a786fc188dfd8498d437879f5f0bd5bc4182",
+      "subject": "reduced zstdmt latency when using small custom section sizes with high compression levels",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces multithreaded latency for small custom sections.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "5f0bf2ab15f864d04ba648940b175626612c2256",
+        "ca9bf6a26406cae7ffd42752bc6daf279f2b5f73"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 81,
+      "commit": "f1cbeec039aa59dadda10f89d49a544311106fbf",
+      "subject": "[superblock] Reduce stack usage by correctly sizing header buffers",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces superblock stack usage.",
+      "changed_paths": [
+        "lib/common/zstd_internal.h",
+        "lib/compress/zstd_compress_superblock.c"
+      ],
+      "missing_changed_blob_ids": [
+        "79887c9edb03690ba5474cd0eb1989a9d77890b5",
+        "f57f8f83f575c1fd96594abc368a8457925257da",
+        "144c120d2c97749d0f01cba75bbbfd7b260359ce"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 82,
+      "commit": "e60cae33cf88b035380aa6d953e08c01f5cbff96",
+      "subject": "Additional ratio optimizations",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit compression-ratio optimizations.",
+      "changed_paths": [
+        "lib/common/huf.h",
+        "lib/compress/huf_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "72ffbcdff1842df785e2194aa9df7b4498cebc25",
+        "5f33d655019c83059bd64d7d8998cc6cf9dbe392",
+        "b738abfe1579a4f061c7dcfbd88f939c42371d5d",
+        "f2686f210132b6913c897cf617d879d9b147a459"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 84,
+      "commit": "0068be94d82ce75bad8faa588f78d66180893f19",
+      "subject": "Faster literals cost evaluation (suggested by @inikep)",
+      "screen": "confirmed_optimization",
+      "reason": "Speeds literal-cost evaluation.",
+      "changed_paths": [
+        "lib/zstd_opt.h"
+      ],
+      "missing_changed_blob_ids": [
+        "6d898400cf831ba53cb20e3ffe6296ad13339d4a",
+        "ec9a2a158ba64283447e6464e2849691f0f5e2ba"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 86,
+      "commit": "dc8dae596a5ddc52d8fe98491855119999a8b8e2",
+      "subject": "overlapped section, for improved compression",
+      "screen": "confirmed_optimization",
+      "reason": "Overlaps sections to improve compression ratio at a CPU cost.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c",
+        "lib/compress/zstdmt_compress.h"
+      ],
+      "missing_changed_blob_ids": [
+        "e5790807812d7d56c5fffdf4b28559c0355df7a8",
+        "99b2e68fbfc19e8e75fd8733a062b9f1ca2e33f4",
+        "c00782e9d5a2130a65ce4f6f9fa65b17c91899b8",
+        "1288c1ed0cc5cb904aa26f14400769cbeec5091b"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 87,
+      "commit": "99e315999c69f3d443c5992e4d21c6b5848e23ed",
+      "subject": "Reduce stack usage of HUF_readDTableX4 and HUF_readDTableX2",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces Huffman table-reading stack usage.",
+      "changed_paths": [
+        "lib/common/huf.h",
+        "lib/decompress/huf_decompress.c",
+        "lib/decompress/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "7873ca3d42a5740c07ae6676f1c1513d10dd1bb8",
+        "801f74c1e75c83e6bfe50d31c1aef2e17896fb74",
+        "d40b3be04c68775872541ba992925ff580d09221",
+        "4011dee3912fe88c82f9a6fbb8fea69cd81154c5",
+        "95d18d4b54c4a963bba3d5fe495ca113dd69db80",
+        "b87925c54a1fe8f89c67ad89304ae5b9da31f0d6"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 89,
+      "commit": "a0d742b1e475691271af354c227f12f838134620",
+      "subject": "introduced HUF_buildCTable_wksp(), to reduce stack memory usage",
+      "screen": "confirmed_optimization",
+      "reason": "Adds a workspace variant to reduce Huffman stack memory.",
+      "changed_paths": [
+        "lib/common/huf.h",
+        "lib/compress/huf_compress.c",
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "06568f08a7da6dadb45ce5efc3270601a75a25ab",
+        "5087d36a20c8630a87732ddc6fe9182715f11438",
+        "4ed093eee41d70523c71d2c1b406980e43b96e2c",
+        "bf464daaf3b4fe84f40c8988a403438035e170e5",
+        "30296989bd307366aed9f2b8d1d43284211fbe2d",
+        "665d09c0febc7f37146bce1478d611c94a3ace90"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 90,
+      "commit": "ae986fcdb861c44ee4267fc4b3dcf0a4cd2ee724",
+      "subject": "Use __assume(0) for unreachable code path in msvc",
+      "screen": "confirmed_optimization",
+      "reason": "Lets MSVC eliminate an unreachable condition check.",
+      "changed_paths": [
+        "lib/common/bitstream.h",
+        "lib/common/entropy_common.c",
+        "lib/common/zstd_internal.h",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_lazy.c",
+        "lib/dictBuilder/zdict.c"
+      ],
+      "missing_changed_blob_ids": [
+        "cefa1196b161b552f76b75f9f2728e70ebe36fa8",
+        "696719eafb4b9d434b4c43474a59b4a2563d0ff1",
+        "dd80b2cccb9e9387bbc2079858593c85a24cc734",
+        "3ac00255f35f6998386e36b549df6d0a3a633e61",
+        "246022c5f2374c2dc08555a8882a0bc6e6bcd2ba",
+        "4db5b00a7aeab8c44329350f6e5b1602532638e9",
+        "bc30daa75df7232478b7ee6c9d6744048fba7562",
+        "cf0b8061ac93a8fef643c51fc6d71cf8fb7323a0",
+        "ac84b479ff7fb7e15e581ee7488caeef568f5875",
+        "cbac712a515546bf5baf4998da1b54435b07839d",
+        "ea00eafc7ab4597eeb648bdc7ab265992cf5a214",
+        "d93b202e7a50740bf77492db9299507db70fa0b5"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 91,
+      "commit": "809f65291266de966ba4262220992f5f7e7903a0",
+      "subject": "Optimize repcode predicate, hardcode hasStep == 0 scenario, cosmetic fixes",
+      "screen": "confirmed_optimization",
+      "reason": "Optimizes the repcode predicate.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "e201e8620481b354e1826d3ddae47b7d88ea4e6e",
+        "c6e9dd33aaa40350d23f3e0ef1b8d9afc0e1379a"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 95,
+      "commit": "458e955c2341f6dd30df626ae2ff2c372d261f9f",
+      "subject": "improved ZSTDMT_compress()",
+      "screen": "confirmed_optimization",
+      "reason": "Uses more threads and overlapping sections to improve compression ratio.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "90f79509be23fb987d0b5c514679940e2519706b",
+        "f9d722b114adeb57863351e292e027e41f35e003"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 97,
+      "commit": "6b88d592fd4eb855a80517f2d1c185b5905cc92b",
+      "subject": "Reduce ZSTD_CHAINLOG_MAX to 29 in 32-bit mode",
+      "screen": "confirmed_optimization",
+      "reason": "Lowers the 32-bit maximum chain log to reduce memory needs.",
+      "changed_paths": [
+        "lib/zstd.h"
+      ],
+      "missing_changed_blob_ids": [
+        "986b81980da6c74cd8150b7ee7a1f4ee977048ce",
+        "deedd364387c3505c291e609a491284a1adfde12"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 101,
+      "commit": "1bee2d5e08208b01e496efa55c36c28422eaf35f",
+      "subject": "slight decompression speed improvement",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit decompression-speed improvement.",
+      "changed_paths": [
+        "lib/decompress/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "6c449fa50597139d14d7155119d525feded55238",
+        "1a1d7ce3e94df6e95e5747358a1a9ce9d15989e4"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 103,
+      "commit": "15e67bfa7e7ec1384e42001ef1eeb5af9a896f02",
+      "subject": "Deduplicate Implementations",
+      "screen": "confirmed_optimization",
+      "reason": "Deduplicates fast-compressor implementations to reduce code size.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d60a0bbe5ae7dcc0b7e4e23396e4247c246f4153",
+        "33a392dfa017c3655747b4ec5ea2d8e00e9be5df"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 104,
+      "commit": "19eb459da38318eb238560ca6087a46fe5c5bbd0",
+      "subject": "[linux-kernel] Don't inline function in zstd_opt.c",
+      "screen": "confirmed_optimization",
+      "reason": "Avoids forced inlining to reduce Linux-kernel build size by measured amounts.",
+      "changed_paths": [
+        "contrib/linux-kernel/Makefile",
+        "contrib/linux-kernel/test/macro-test.sh",
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "f79de67925966ccc4425376d2d0e4cdb3f874e39",
+        "47a4317404bde66d9abef58357db13e2bfd88ab6",
+        "bde6cbb569c29be078b8bf4374586b3c83d0099b",
+        "9ea84aa66b1a212a1ae034e35072662e7a17e18d",
+        "909e06d0588d616c70be0785699ec4f5bc4fb354",
+        "0488589ffbb935fa470af0b3f016da58af119158"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 105,
+      "commit": "1f83b7cfc459c2dbef00dc6276f790370e17aef6",
+      "subject": "fix a minor inefficiency in compress_superblock",
+      "screen": "confirmed_optimization",
+      "reason": "Removes a one-byte sequence-count inefficiency in superblocks.",
+      "changed_paths": [
+        "doc/zstd_compression_format.md",
+        "lib/compress/zstd_compress_superblock.c",
+        "tests/decodecorpus.c"
+      ],
+      "missing_changed_blob_ids": [
+        "3843bf3905513b57da62efdc4c46a543f287620e",
+        "2a69c4c30ae95364a6bfea815e8db862af99501e",
+        "638c4acbe708aa48437a1092616fe9fb6b4b59ba",
+        "dacaf85dbc2510a6fac2d475c6d15fd906b98c4b",
+        "e48eccd6df74ff9de5a5fc2a77a41bdd4d2057f7",
+        "a440ae38af274bf392fdbec593ace5b870ac55ef"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 106,
+      "commit": "a81d9ac42dd1dd291d8863d737f430a91f839574",
+      "subject": "minor bt CSpeed",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit binary-tree compression-speed improvement.",
+      "changed_paths": [
+        "lib/zstdhc.c"
+      ],
+      "missing_changed_blob_ids": [
+        "e2dfafc1de7fa5f8c56180bec182443d300a4048",
+        "44819e6f69f84b9f52731fee615e3ceefadc4d60"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 107,
+      "commit": "3c6b808870672c0d20566ffd62c0725e0f470d23",
+      "subject": "minor decompression speed gains",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit decompression-speed gains.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/decompress/zstd_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "07f23b5ab4ee4c9312b68ed44e48baa2efbe5292",
+        "d43054d86a8a6f7ab94c5ec923c7eb4368e4bbed",
+        "e1ac2004923f96eb6502c1b13a770578e03ea1f5",
+        "a73543ced6af1856bad8fff0265382034655f729"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 108,
+      "commit": "e63896eb5844cb246aad7959ab208aa0a8f152bd",
+      "subject": "small dictionary compression speed improvement",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit dictionary-compression speed improvement.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "e7edf949023572e6b4f074aac237af51286fb37e",
+        "5373e3640dd707f89725725510a45c4d70a37ee2"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 113,
+      "commit": "e8b4011b52c1e4ea4db46f52b77842530025841d",
+      "subject": "Split Lookups in Hash Cache and Chain Table into Two Loops",
+      "screen": "confirmed_optimization",
+      "reason": "Separates hash-cache and chain-table loops for speed.",
+      "changed_paths": [
+        "lib/compress/zstd_lazy.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d8ed30a937462f69291ab2327f5b4bd282f1e5f5",
+        "d393984014e2a0f17d39e7fcb4f59e6445da9f30"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 115,
+      "commit": "42c1e642704c2c4d1f402296376b59393c25ca1c",
+      "subject": "slightly improved ratio at -22",
+      "screen": "confirmed_optimization",
+      "reason": "Recovers compression ratio at level 22.",
+      "changed_paths": [
+        "lib/compress/zstd_lazy.c",
+        "lib/compress/zstd_opt.c",
+        "tests/paramgrill.c"
+      ],
+      "missing_changed_blob_ids": [
+        "cd3d1530aacdee18d35a8b58cd25b6a4be09164d",
+        "a2c658bd3b3aa83f0555aca653b0a227b94ace9e",
+        "7fd866f0a6a4f8a8337ea6db8984b9cd05db6007",
+        "7508aa1bc0bbf15054ed5e305dc329ed466864ba",
+        "5560e82f64d2a08209ea220cc66b1be9344a725a",
+        "081a284e42fb46a58d3516b838e15648c4c02e22"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 120,
+      "commit": "635783da123cef1027a9d7d6fe452ca36d26d58f",
+      "subject": "btultra2 and very small srcSize",
+      "screen": "confirmed_optimization",
+      "reason": "Avoids unhelpful probability estimation on small inputs to improve ratio.",
+      "changed_paths": [
+        "lib/compress/zstd_opt.c",
+        "programs/benchzstd.c"
+      ],
+      "missing_changed_blob_ids": [
+        "ce233f47f51caa1fb1f919d85c88134613936ab3",
+        "be9fc7dc0f3a728f154644a6d0e6aba823d0f6ae",
+        "90357b5b5772a73298259cfb1948e129069f04bb",
+        "30864f478b4295ff24cb7b838b03374195d40538"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 122,
+      "commit": "718f00ff6fe42db7e6ba09a7f7992b3e85283f77",
+      "subject": "Optimize decompression speed for gcc and clang (#1892)",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit compiler-specific decompression-speed optimization.",
+      "changed_paths": [
+        "lib/common/bitstream.h",
+        "lib/common/compiler.h",
+        "lib/decompress/huf_decompress.c",
+        "lib/decompress/zstd_decompress_block.c"
+      ],
+      "missing_changed_blob_ids": [
+        "1c294b80d13f608089278147ecd2cbf70e19f1c1",
+        "fe3148eebd0ee5150aa15e9ebdcbf3585712c5fb",
+        "1877a0c1d9be02168dfff4afac4000483f950f61",
+        "228845aa923c796bdaafcc227f8a52407b5c197d",
+        "12c1fce5151ff4e32c86b27702621c9611dd5e70",
+        "732e1c93bfcab48b3be79a4fa117d7d44dc6a0ba",
+        "767e5f9a0b08db650c65f842d6da673359feed67",
+        "ce43c5255455c1cf1d5f7eec2d8078b4019e40a2"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 124,
+      "commit": "7c05b9aec3e18bf733cccff6dda97ea269bb8594",
+      "subject": "Remove expensive assert in --rsyncable hot loop",
+      "screen": "confirmed_optimization",
+      "reason": "Removes an expensive assertion from a hot loop.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "4ac2249bd3e6458293edc53e1008946fc1769a8a",
+        "0c10eb603df662998d223a283940521ef818bec8"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 127,
+      "commit": "39f2491bfc70db883d45265af0f764d1e80cfa69",
+      "subject": "Use Look-Ahead Hash for Next Long Check after Short Match (+0.5% Speed)",
+      "screen": "confirmed_optimization",
+      "reason": "Speeds a long-match look-ahead at a small ratio cost.",
+      "changed_paths": [
+        "lib/compress/zstd_double_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "4e38e4662e00fbb36e3780148140862c59fc3f34",
+        "45770b886b976120b197442f32b5463889ee52f7"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 130,
+      "commit": "83095970e699c2430dc2266f2472e1393aaf0822",
+      "subject": "free cdictLocal faster, suggested by @terrelln",
+      "screen": "confirmed_optimization",
+      "reason": "Speeds local compressed-dictionary release.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "499c531c7e876ce3c3f4d46e377f5f29ad4a85b4",
+        "f07143c1a936f0d35bc0a1611ada9a7c011684fc"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 131,
+      "commit": "b6a4d5a8ba29bc873c95098103f57f987cfacd23",
+      "subject": "minor +10% speed improvement for scalar ZSTD_get1BlockSummary()",
+      "screen": "confirmed_optimization",
+      "reason": "Reports a ten-percent scalar block-summary speed gain.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d5e3d1c7856befbfa44c1e7a11597a69aab757f5",
+        "11933fb3c1538495927c399d19afc104bd5a998f"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 132,
+      "commit": "7c24c3e6ce8faa5a6d23ef9d11c71a0a106b3bb3",
+      "subject": "Give Up on Searching End of Block",
+      "screen": "confirmed_optimization",
+      "reason": "Avoids costly end-of-block match searches.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "f7df666811ea8b79eefa23898970bb5ec057cf67",
+        "50bceef74b4bc1afd9f87611107a984e3862cd22"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 134,
+      "commit": "cbbc114e5db96a14b2bdee19ce48b8e6f2aa18b1",
+      "subject": "lib: allow integrations to override BMI2 dispatch",
+      "screen": "confirmed_optimization",
+      "reason": "Allows kernel integrations to resolve BMI2 dispatch through CPU alternatives.",
+      "changed_paths": [
+        "contrib/linux-kernel/test/macro-test.sh",
+        "lib/BUCK",
+        "lib/common/bmi2.h",
+        "lib/common/entropy_common.c",
+        "lib/common/fse_decompress.c",
+        "lib/common/portability_macros.h",
+        "lib/compress/huf_compress.c",
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_compress_sequences.c",
+        "lib/decompress/huf_decompress.c",
+        "lib/decompress/zstd_decompress.c",
+        "lib/decompress/zstd_decompress_block.c",
+        "lib/decompress/zstd_decompress_internal.h"
+      ],
+      "missing_changed_blob_ids": [
+        "9ea84aa66b1a212a1ae034e35072662e7a17e18d",
+        "5d10cfa10db2949012a4c30883e643f3426c117e",
+        "d73c8f00baeb80418582b3483449fa0c9a359510",
+        "0da22a25bbf4ccb3bbb9941bab91d6550e9b4eab",
+        "bcca634e4192c800333871de7951a9ce8dbcc275",
+        "6f2194e7934846af1e7808fea41d18e6227c4481",
+        "e233bc5ff1bd204208a9f08265781b29dad579bc",
+        "2968a9109964205d876348bd7e76fc51e4ea82ad",
+        "a7769cba1f3cd061b2388fad94c860cbf191276f",
+        "ae86ba18b8f77f9239d292201e81502935fb12e2",
+        "7e6e01b47592e1560d6a6fd1bdd1506e0ab97a62",
+        "4087ab7ebc7c074263cfeed2c7eb3370994e6b92",
+        "34a22394f7b07b87a50288ba0ae68400000ab2e9",
+        "07b9732b4d456271cc895646644f32ba88beee4b"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 135,
+      "commit": "3b1aba42cc8705ed6c6c3819bc1cfa3fbf312de2",
+      "subject": "[fse] Reduce stack usage of FSE_decompress_wksp() by 512 bytes",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces FSE decompression stack use by 512 bytes.",
+      "changed_paths": [
+        "lib/common/fse.h",
+        "lib/common/fse_decompress.c",
+        "lib/common/huf.h"
+      ],
+      "missing_changed_blob_ids": [
+        "52924469c9a94729abcd8415173001b509e9d3f3",
+        "1f922c35ac696679c6e2d8f2928e96c742d11bed",
+        "c575db0de313056e72daa6338326fe25502b757c",
+        "cc45babd9f178d26d8f8218bfaca02a050eee739",
+        "a470157493752b6261e04c98becade506153bdcf",
+        "139793bfc500ed2f63b223fcb6336d41bfc184a2"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 136,
+      "commit": "7c3d1cb3ab9b43745c65bb1796960dbbaa237a02",
+      "subject": "Enable STATIC_BMI2 for gcc/clang",
+      "screen": "confirmed_optimization",
+      "reason": "Enables static BMI2 selection for compiler-specific speed gains.",
+      "changed_paths": [
+        "lib/common/bitstream.h",
+        "lib/common/compiler.h"
+      ],
+      "missing_changed_blob_ids": [
+        "43a2216780588a0058c807d91761b4f9ebcf5f5d",
+        "731630ea44b79b77032aa4be72d10cd0c612d8cd",
+        "6c7100e835a3f7eb8c5fb02871969780fed4fb05"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 138,
+      "commit": "1bdf0410713b25a5c3419e12f32ab16eac62ba86",
+      "subject": "Track Step Rather than Recalculating (+0.5% Speed)",
+      "screen": "confirmed_optimization",
+      "reason": "Tracks a step value rather than recomputing it for speed.",
+      "changed_paths": [
+        "lib/compress/zstd_double_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "ee902e19e91da94dfc47191a24f9a81dc19ef84b",
+        "73a8e08ebfe5540c99a54606da1b1c34856235ef"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 139,
+      "commit": "54c4babd8f67d40cbc63c2cd2cd77914ec80d4ee",
+      "subject": "Always check Huffman tables for ZSTD_lazy+",
+      "screen": "confirmed_optimization",
+      "reason": "Chooses Huffman table reuse versus rebuilding for better compression ratio.",
+      "changed_paths": [
+        "lib/common/huf.h",
+        "lib/compress/huf_compress.c",
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "1315f1190e46df7216f95868c2fe68e3dba08a4f",
+        "691f2e764bf62113640c68227ae402e399735076",
+        "d103c3b22ffde1f8c885c7d322f8a85eb356ebd6",
+        "fe11aafb8f14013e7154b17bcac3f2dc337ab94b",
+        "432323e21e9544c63c68dd5e3c80e5d98fc6db21",
+        "15f063e184741eadae8e673150790fd699ba53af"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 141,
+      "commit": "cdb9481e388139a3ca534c46f58959971f4755d4",
+      "subject": "[libzstd] Optimize ZSTD_insertBt1() for repetitive data",
+      "screen": "confirmed_optimization",
+      "reason": "Optimizes repetitive-data binary-tree insertion.",
+      "changed_paths": [
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "12b56c70def508dc5263d589e94f16896dc2757b",
+        "cf46e7501b25269e7d46a65879cc761b5e9ac8b4"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 142,
+      "commit": "86db60752d1f813642054d12d704663c7757d434",
+      "subject": "optimization: bail out faster in presence of incompressible data",
+      "screen": "confirmed_optimization",
+      "reason": "Exits earlier on incompressible input.",
+      "changed_paths": [
+        "lib/compress/zstd_compress_superblock.c"
+      ],
+      "missing_changed_blob_ids": [
+        "e9038c472c0195f01716eedebbbb314359718c4e",
+        "a9e9493bed3b8101367a880a334fcea16b330318"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 143,
+      "commit": "fa5e01c467b994f35e9ca321dfb510766033bfd8",
+      "subject": "Add Space-Optimized Helper Variable to Lib Makefile",
+      "screen": "confirmed_optimization",
+      "reason": "Adds a build option targeting minimum library size.",
+      "changed_paths": [
+        "lib/Makefile",
+        "lib/README.md"
+      ],
+      "missing_changed_blob_ids": [
+        "ac38867a93134687c0af80b6e5b49048063e38ef",
+        "025de8e54d70480af551ec3a80cc85596ef6d45a",
+        "0062c0d63e0452dca7fe7eea79100d5df00746e1",
+        "6ccffb13868caf287515c7af2895e3a49445f503"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 144,
+      "commit": "12c47d32624df633b9dd3402273529cff7705228",
+      "subject": "improved speed of the Sequences converter",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit sequence-conversion speed improvement.",
+      "changed_paths": [
+        "doc/zstd_manual.html",
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/zstd.h",
+        "tests/Makefile",
+        "tests/fullbench.c",
+        "tests/fuzzer.c"
+      ],
+      "missing_changed_blob_ids": [
+        "7cfeda22d365478e46e552aa309d66e7a85992f5",
+        "2c4c4b0e80bdb65d452b65ced7de4d638acc1aab",
+        "c4f699eb0afc0148a25b7b82892f57429546fa9f",
+        "70a9731bfbe1c03e25312e86f3a6d9c1ad735c71",
+        "bbcf4a7d5e85bf756940e73b645d40c74f1e8769",
+        "2d4ecc89f1867635224d45ebf7f4ca37b099cba4",
+        "68e78b3cac00c1835f3c5375677596dcb2f1e282",
+        "3fb02619c8dcfa9777f6e6b236b839df90f94959",
+        "f24d5cb7b144a64449aa78db8e5c5dc330c42908",
+        "982181de8fba465ca19c13bf3584d3881ff0a64a",
+        "c42c923c1b8d5b2c09eef20be9f5d3f84c9c5437",
+        "3f5044c719c4a3f50330e28290a9ca97edbbcff0",
+        "b200317084e7db336196f10035fd67a078737f53",
+        "09572e90972d91126411ced6ff70cdde3e3ff397"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 145,
+      "commit": "a419777eb12392159aefd6c28fd1e3cc8862ce2e",
+      "subject": "Allow compressor to repeat Huffman tables",
+      "screen": "confirmed_optimization",
+      "reason": "Reuses prior Huffman tables when they improve compression.",
+      "changed_paths": [
+        "lib/common/huf.h",
+        "lib/compress/huf_compress.c",
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "9427ae8cb24493a78eea6bbf7af46bc5102d6252",
+        "89a226ea0ea7b4cbc6417ad971d506340517dccb",
+        "7869ccf64f380030edce553c98dd1888e0dc00cb",
+        "8b914cbc658f14c5024c232d0e733f42ec960230",
+        "ec758db00c37450781fecb79dd4af2efa43390ed",
+        "538cb685cdd5077b384c30b84673331f3f9fa9ca"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 151,
+      "commit": "c2555f8c6f2787add261a082e8fadcc1c0af68ae",
+      "subject": "[lib] Fix fuzzer timeouts by backing off overflow correction",
+      "screen": "confirmed_optimization",
+      "reason": "Backs off overflow correction to reduce fuzzer runtime.",
+      "changed_paths": [
+        "lib/compress/zstd_compress_internal.h"
+      ],
+      "missing_changed_blob_ids": [
+        "03974ae3addcbbaa46e6969be0d5c58ffe25431a",
+        "3b04fd09f641d03d8386a093bafc0b83d5973ba3"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 152,
+      "commit": "6025465e42dfce6d3312b14a80e7614bc52b362c",
+      "subject": "ZSTDMT : minor CCtx memory optimization",
+      "screen": "confirmed_optimization",
+      "reason": "Reduces multithreaded compression-context memory.",
+      "changed_paths": [
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "47b8923ace07d7d5839b78dd99b5d8597ed6c45d",
+        "0dadda284ae3128f1ab58ff2f1bd71e925da55df"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 153,
+      "commit": "1db5947591a61222065af19d2bdeb79524b87086",
+      "subject": "improve decompression speed of long variant by ~+5%",
+      "screen": "confirmed_optimization",
+      "reason": "Reports about five-percent decompression-speed gain from prefetching.",
+      "changed_paths": [
+        "lib/decompress/zstd_decompress_block.c"
+      ],
+      "missing_changed_blob_ids": [
+        "028be0bf0b2fa2ec719eb219c7655f4d3c2b10c6",
+        "90acc855ff051fd913bcba75655dfaf27901bed1"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 154,
+      "commit": "82a49c88f917c73b56780398fee65665a6e2a25e",
+      "subject": "Increment Step by 1 not 2",
+      "screen": "confirmed_optimization",
+      "reason": "Adjusts incompressible-data stepping to improve ratio at similar speed.",
+      "changed_paths": [
+        "lib/compress/zstd_fast.c"
+      ],
+      "missing_changed_blob_ids": [
+        "852f4286f87e5132846899726634e5cf824d4e4b",
+        "2bae2f70e0f44ac9b8fc718f408ed173a3d4fa9e"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 155,
+      "commit": "a8ebc1403557dcce0ebef1161bbd73d10a5a6eef",
+      "subject": "Update bitstream.h",
+      "screen": "confirmed_optimization",
+      "reason": "Uses profiler evidence to improve MSVC bitstream inlining.",
+      "changed_paths": [
+        "lib/common/bitstream.h"
+      ],
+      "missing_changed_blob_ids": [
+        "2ae8b7c7394836d4335e6810735b0849d15c21af",
+        "bd51f4927d4d11a68972c108fe4b19c020094a86"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 156,
+      "commit": "b241e9deb7d207f87658f79856b2717a19c25162",
+      "subject": "small compression improvement",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit compression improvement.",
+      "changed_paths": [
+        "lib/zstdhc.c",
+        "lib/zstdhc_static.h",
+        "programs/paramgrill.c"
+      ],
+      "missing_changed_blob_ids": [
+        "716213fd3ad6532d234a7e4414d28f1539880426",
+        "e90b7f3a646fd0af9cdd47b314bf9a0c236518e2",
+        "06174fcdeca7e32cdb734e78e108b0531f387a42",
+        "bbe1571347b267ba9a755d08009804b066cfd847",
+        "f7cfef98e52cd09ac2ff6edf29623fa6fa6a33d2",
+        "40033a6a341cdb1c4a7543833a3fbf7c82b3e63a"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 157,
+      "commit": "91f4c23e634a1d260f290f00b6d870a56cd59ab6",
+      "subject": "Add salt into row hash (#3528 part 2) (#3533)",
+      "screen": "confirmed_optimization",
+      "reason": "Salts row hashes to avoid compression regressions.",
+      "changed_paths": [
+        "lib/common/bits.h",
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_lazy.c"
+      ],
+      "missing_changed_blob_ids": [
+        "4a9bbf58c5d89da16ed88577cfe27b0918d769f5",
+        "def56c474c380d9a734fbc249c1029e2a9c5ec54",
+        "49aa385466d3eb404dde1f61420e6c076fafac60",
+        "77cb82e2178bfb405d5209493f54825c2c719cb8",
+        "789820ad0c9f1794116c6cccc067217c1df50c51",
+        "0435e4c37231fbcaf9bf14775d3836e1d489d901",
+        "d41478e99fe7b0ca1d669316f3c799e61d09bb57",
+        "b3e7bf75752c2323a88ceffdf0e8d227b1fa462e"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 158,
+      "commit": "020b960e13499cb2cd524cc6b7ddb0ccbd76c361",
+      "subject": "[cover] Make optimization faster",
+      "screen": "confirmed_optimization",
+      "reason": "Speeds cover dictionary optimization.",
+      "changed_paths": [
+        "lib/dictBuilder/cover.c",
+        "programs/zstd.1",
+        "programs/zstd.1.md"
+      ],
+      "missing_changed_blob_ids": [
+        "4235f112b7fb3a20807ad62c84fc8f741cf05276",
+        "0e156bd5852e58aebe88f29c8d02fa919a99823e",
+        "5bd966a841df2654986622c789a299f560fcf268",
+        "648c3365cc74b8e4a5bc37c83c7bd16bc634e6c9",
+        "0919da70265f6fdeec098aa37a02e907b6327999",
+        "ea346cfb7fbf5a3f8e9eaff5d7fa843ab579e5d4"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 159,
+      "commit": "1e65711ca5b2be520a6cb0bbee82366bb7d55a02",
+      "subject": "a couple performance improvement changes for ldm",
+      "screen": "confirmed_optimization",
+      "reason": "Explicit long-distance matching performance improvements.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/compress/zstd_ldm.c",
+        "lib/compress/zstd_ldm.h",
+        "lib/compress/zstdmt_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "9e704a4b20f1d264d7d79c3b1d961d43023934e0",
+        "c90fb320e612b3e6c9a78fa73e18951fd84d937e",
+        "b7c901ba11d1a3ba516700d1b97b6db5d7289e88",
+        "bbd3b4ea179efd6bbd9a16c3ceb55ec681910b34",
+        "7102e4227df6141d6a5fc9d0068f855de72356b2",
+        "e9137f0630e5d16dd8dce08f1686be0612841974",
+        "1a642a4560a27bedfedbc6b33201a0c43547a1c0",
+        "c3ead0878dbd3ec09701aabeed42cef95ba665f3"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 163,
+      "commit": "07c6ff588ed1af5066bf0584b5013d48eda880fe",
+      "subject": "[FSE][HUF] Inline error checks",
+      "screen": "confirmed_optimization",
+      "reason": "Inlines entropy error checks based on compiler optimization remarks.",
+      "changed_paths": [
+        "lib/common/fse_decompress.c",
+        "lib/compress/fse_compress.c",
+        "lib/compress/huf_compress.c",
+        "lib/decompress/huf_decompress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "8474a4c079b25d5b84f51cbfdb14d98a150807bc",
+        "1a19779894246780cc319fee83ff8f9573a11427",
+        "3a03627cc60e065e33f058ad96bdcf2dd5fba0c6",
+        "05ccc3fd5d0887f81b7614af840ee36a339f24d4",
+        "953cb5f2142230d93708f42773de1f25e1a38f2c",
+        "2a47c18205260fae8faa5eabf70007c3e48e112f",
+        "0a47a3d74035aa29f9e8884c8a184e0d3f2c7163",
+        "39530a64f4cb889ee2d60e8699e77b5d253b2b78"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 165,
+      "commit": "ee5b72582389835d02c4c94e51cc998f9fce540a",
+      "subject": "ZSTD_initCStream() optimization : do not allocate a CDict when no dictionary used",
+      "screen": "confirmed_optimization",
+      "reason": "Avoids allocating a dictionary object when none is used.",
+      "changed_paths": [
+        "lib/compress/zstd_compress.c",
+        "lib/zstd.h"
+      ],
+      "missing_changed_blob_ids": [
+        "85a5ff22d71c34d79f7309a613df42871c433e37",
+        "e7f7d991119f637bae4a3d37fad49c0f31a54f87",
+        "89b6c8274a21f98d1574ad3ff286d412762b8f3a",
+        "ea5caf148373f835f766c2cc8bf949587cf4e422"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 166,
+      "commit": "61efb2a047b308b6f0c265e1eae9ca8a062268e4",
+      "subject": "Add ZSTD_d_maxBlockSize parameter",
+      "screen": "confirmed_optimization",
+      "reason": "Adds a maximum-block-size parameter to reduce streaming memory.",
+      "changed_paths": [
+        "lib/decompress/zstd_decompress.c",
+        "lib/decompress/zstd_decompress_internal.h",
+        "lib/zstd.h",
+        "tests/fuzz/simple_round_trip.c",
+        "tests/fuzz/stream_round_trip.c",
+        "tests/fuzzer.c",
+        "tests/zstreamtest.c"
+      ],
+      "missing_changed_blob_ids": [
+        "94b90481b525ad7ccaab37a14db6ad0ae1f9d456",
+        "94eb95151b53da4b421a8cb62b64f5280a72c19d",
+        "25aaebe500180d2f57b4bbd7bd63eab0287c01f3",
+        "83a7a0115fdba0fbc26b9a4933af292734ac8e62",
+        "e5c3f8b68b72e926b0720d7a2efec3f94792d92e",
+        "e94f101897051ac90495bafdc206e7ba1971a6cf",
+        "0fe46391764411a3bcd44ab3a7db354ab0f9b1af",
+        "660092e6106c8c2a0d736723f63adb87dbda4cab",
+        "7d277a857a671334a8ca0ceb254df5a7c240ed97",
+        "c2d6707a1ced37592838d6e3cf442b4ed107344b",
+        "07ddfefd6db9be5f450148765b0a99a7d4e9ddb3",
+        "b049a9e09ba2590c5c4888afa128f82e6d8184ae",
+        "14c4af82fb76c1fb5675829668cc70a3e17b72ed",
+        "85d0fc81fe0efc2af0647665f77563f16d0fb9cd"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 169,
+      "commit": "4489daec09f5fe058f107ed4828f4fff0c563004",
+      "subject": "slightly adjusted default-distribution threshold",
+      "screen": "confirmed_optimization",
+      "reason": "Retunes strategy thresholds for compression and decompression speed.",
+      "changed_paths": [
+        "doc/zstd_manual.html",
+        "lib/compress/zstd_compress.c"
+      ],
+      "missing_changed_blob_ids": [
+        "6bf731dd991fb306df2034641af7438907ff13e9",
+        "bd792008bd274cc7caac92d1232909331cda2989",
+        "96ffe244ad2a20320c76cb196e339dd367701e3f",
+        "c66862524a33807ea22fef6d66ea976934fbdf77"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 171,
+      "commit": "18fc3d3cd5d48121e0a4ea4c2f5c46ac12c328af",
+      "subject": "introduced bit-fractional cost evaluation",
+      "screen": "confirmed_optimization",
+      "reason": "Uses fractional costs to improve ratio with a stated speed tradeoff.",
+      "changed_paths": [
+        "lib/compress/zstd_compress_internal.h",
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "d9edfc31c6f18e54f00d5a8b6dc8ef7e8fe1d321",
+        "8e13aadd8e3dfbe18ad79901ca5c0e2f2f20b862",
+        "fa46816119341cded2a9b58d75a235f095a96247",
+        "274bce1483491c120b021abd9fa2cb3fb66aa8da"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    },
+    {
+      "draw": 172,
+      "commit": "e2c0e3d4371ec4b61a16609cacf1d517dc48cb36",
+      "subject": "slightly nudge choices towards less sequences",
+      "screen": "confirmed_optimization",
+      "reason": "Nudges choices to fewer sequences and improves corner-case compression.",
+      "changed_paths": [
+        "lib/compress/zstd_opt.c"
+      ],
+      "missing_changed_blob_ids": [
+        "2a699c2ac937187f832da699df3f9e0bee6f28e9",
+        "e66019aa886762fe6d550b0aca028ed5b047510d"
+      ],
+      "checker_status": "not_run",
+      "verdict": "UNKNOWN",
+      "coverage": "historical message/path intent screen; exact changed C source missing"
+    }
+  ],
+  "summary": {
+    "UNKNOWN": 188,
+    "UNSUPPORTED": 1,
+    "EQUIV_PARTIAL": 7,
+    "NOT_EQUIV": 4
+  }
+}

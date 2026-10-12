@@ -1,0 +1,406 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
+index a4987e8d..057a20f3 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java
+@@ -227,9 +227,9 @@ public class Art {
+       node4.prefixLength = (byte) commonPrefix;
+       System.arraycopy(key, depth, node4.prefix, 0, commonPrefix);
+       // generate two leaf nodes as the children of the fresh node4
+-      Node4.insert(node4, leafNode, prefix[depth + commonPrefix]);
++      node4.insert(leafNode, prefix[depth + commonPrefix]);
+       LeafNode anotherLeaf = new LeafNode(key, containerIdx);
+-      Node4.insert(node4, anotherLeaf, key[depth + commonPrefix]);
++      node4.insert(anotherLeaf, key[depth + commonPrefix]);
+       // replace the current node with this internal node4
+       return node4;
+     }
+@@ -246,7 +246,7 @@ public class Art {
+         System.arraycopy(branchNode.prefix, 0, node4.prefix, 0, mismatchPos);
+         // split the current internal node, spawn a fresh node4 and let the
+         // current internal node as its children.
+-        Node4.insert(node4, branchNode, branchNode.prefix[mismatchPos]);
++        node4.insert(branchNode, branchNode.prefix[mismatchPos]);
+         int nodeOriginalPrefixLength = branchNode.prefixLength;
+         branchNode.prefixLength = (byte) (nodeOriginalPrefixLength - (mismatchPos + (byte) 1));
+         // move the remained common prefix of the initial internal node
+@@ -256,7 +256,7 @@ public class Art {
+           branchNode.prefix = EMPTY_BYTES;
+         }
+         LeafNode leafNode = new LeafNode(key, containerIdx);
+-        Node4.insert(node4, leafNode, key[mismatchPos + depth]);
++        node4.insert(leafNode, key[mismatchPos + depth]);
+         return node4;
+       }
+       depth += branchNode.prefixLength;
+@@ -273,8 +273,7 @@ public class Art {
+     }
+     // insert the key as a child leaf node of the current internal node
+     LeafNode leafNode = new LeafNode(key, containerIdx);
+-    Node freshOne = BranchNode.insertLeaf(branchNode, leafNode, key[depth]);
+-    return freshOne;
++    return branchNode.insert(leafNode, key[depth]);
+   }
+ 
+   // find common prefix length
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
+index df7eca96..bbbd9816 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java
+@@ -6,8 +6,6 @@ import java.nio.ByteBuffer;
+ 
+ public abstract class BranchNode extends Node {
+ 
+-    // node type
+-    protected NodeType nodeType;
+     // length of compressed path(prefix)
+     protected byte prefixLength;
+     // the compressed path path (prefix)
+@@ -20,16 +18,15 @@ public abstract class BranchNode extends Node {
+     /**
+      * constructor
+      *
+-     * @param nodeType             the node type
+      * @param compressedPrefixSize the prefix byte array size,less than or equal to 6
+      */
+-    public BranchNode(NodeType nodeType, int compressedPrefixSize) {
++    public BranchNode(int compressedPrefixSize) {
+         super();
+-        this.nodeType = nodeType;
+         this.prefixLength = (byte) compressedPrefixSize;
+         prefix = new byte[prefixLength];
+         count = 0;
+     }
++    protected abstract NodeType nodeType();
+ 
+     /**
+      * search the position of the input byte key in the node's key byte array part
+@@ -90,26 +87,11 @@ public abstract class BranchNode extends Node {
+     /**
+      * insert the LeafNode as a child of the current internal node
+      *
+-     * @param current   current internal node
+      * @param childNode the leaf node
+      * @param key       the key byte reference to the child leaf node
+      * @return an adaptive changed node of the input 'current' node
+      */
+-    public static BranchNode insertLeaf(BranchNode current, Node childNode, byte key) {
+-        switch (current.nodeType) {
+-            case NODE4:
+-                return Node4.insert(current, childNode, key);
+-            case NODE16:
+-                return Node16.insert(current, childNode, key);
+-            case NODE48:
+-                return Node48.insert(current, childNode, key);
+-            case NODE256:
+-                return Node256.insert(current, childNode, key);
+-            default:
+-                throw new IllegalArgumentException("Not supported node type!");
+-        }
+-    }
+-
++    protected abstract BranchNode insert(Node childNode, byte key);
+     /**
+      * copy the prefix between two nodes
+      *
+@@ -213,7 +195,7 @@ public abstract class BranchNode extends Node {
+     @Override
+     protected void serializeHeader(DataOutput dataOutput) throws IOException {
+         // first byte: node type
+-        dataOutput.writeByte((byte) this.nodeType.ordinal());
++        dataOutput.writeByte((byte) this.nodeType().ordinal());
+         // non null object count
+         dataOutput.writeShort(Short.reverseBytes(this.count));
+         dataOutput.writeByte(this.prefixLength);
+@@ -224,7 +206,7 @@ public abstract class BranchNode extends Node {
+ 
+     @Override
+     protected void serializeHeader(ByteBuffer byteBuffer) throws IOException {
+-        byteBuffer.put((byte) this.nodeType.ordinal());
++        byteBuffer.put((byte) this.nodeType().ordinal());
+         byteBuffer.putShort(this.count);
+         byteBuffer.put(this.prefixLength);
+         if (prefixLength > 0) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
+index 89344ed4..6b67f53c 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java
+@@ -15,7 +15,12 @@ public class Node16 extends BranchNode {
+   Node[] children = new Node[16];
+ 
+   public Node16(int compressionLength) {
+-    super(NodeType.NODE16, compressionLength);
++    super(compressionLength);
++  }
++
++  @Override
++  protected NodeType nodeType() {
++    return NodeType.NODE16;
+   }
+ 
+   @Override
+@@ -139,53 +144,52 @@ public class Node16 extends BranchNode {
+   /**
+    * insert a child into the node with the key byte
+    *
+-   * @param node the node16 to insert into
+    * @param child the child node to be inserted
+    * @param key the key byte
+    * @return the adaptive changed node of the parent node16
+    */
+-  public static BranchNode insert(BranchNode node, Node child, byte key) {
+-    Node16 currentNode16 = (Node16) node;
+-    if (currentNode16.count < 8) {
++  @Override
++  protected BranchNode insert(Node child, byte key) {
++    if (this.count < 8) {
+       // first
+-      byte[] bytes = LongUtils.toBDBytes(currentNode16.firstV);
+-      bytes[currentNode16.count] = key;
+-      currentNode16.children[currentNode16.count] = child;
+-      sortSmallByteArray(bytes, currentNode16.children, 0, currentNode16.count);
+-      currentNode16.count++;
+-      currentNode16.firstV = LongUtils.fromBDBytes(bytes);
+-      return currentNode16;
+-    } else if (currentNode16.count < 16) {
++      byte[] bytes = LongUtils.toBDBytes(this.firstV);
++      bytes[this.count] = key;
++      this.children[this.count] = child;
++      sortSmallByteArray(bytes, this.children, 0, this.count);
++      this.count++;
++      this.firstV = LongUtils.fromBDBytes(bytes);
++      return this;
++    } else if (this.count < 16) {
+       // second
+       ByteBuffer byteBuffer = ByteBuffer.allocate(16).order(ByteOrder.BIG_ENDIAN);
+-      byteBuffer.putLong(currentNode16.firstV);
+-      byteBuffer.putLong(currentNode16.secondV);
+-      byteBuffer.put(currentNode16.count, key);
+-      currentNode16.children[currentNode16.count] = child;
+-      sortSmallByteArray(byteBuffer.array(), currentNode16.children, 0, currentNode16.count);
+-      currentNode16.count++;
+-      currentNode16.firstV = byteBuffer.getLong(0);
+-      currentNode16.secondV = byteBuffer.getLong(8);
+-      return currentNode16;
++      byteBuffer.putLong(this.firstV);
++      byteBuffer.putLong(this.secondV);
++      byteBuffer.put(this.count, key);
++      this.children[this.count] = child;
++      sortSmallByteArray(byteBuffer.array(), this.children, 0, this.count);
++      this.count++;
++      this.firstV = byteBuffer.getLong(0);
++      this.secondV = byteBuffer.getLong(8);
++      return this;
+     } else {
+-      Node48 node48 = new Node48(currentNode16.prefixLength);
++      Node48 node48 = new Node48(this.prefixLength);
+       for (int i = 0; i < 8; i++) {
+-        int unsignedIdx = Byte.toUnsignedInt((byte) (currentNode16.firstV >>> ((7 - i) << 3)));
++        int unsignedIdx = Byte.toUnsignedInt((byte) (this.firstV >>> ((7 - i) << 3)));
+         // i won't be beyond 48
+         Node48.setOneByte(unsignedIdx, (byte) i, node48.childIndex);
+-        node48.children[i] = currentNode16.children[i];
++        node48.children[i] = this.children[i];
+       }
+-      byte[] secondBytes = LongUtils.toBDBytes(currentNode16.secondV);
+-      for (int i = 8; i < currentNode16.count; i++) {
++      byte[] secondBytes = LongUtils.toBDBytes(this.secondV);
++      for (int i = 8; i < this.count; i++) {
+         byte v = secondBytes[i - 8];
+         int unsignedIdx = Byte.toUnsignedInt(v);
+         // i won't be beyond 48
+         Node48.setOneByte(unsignedIdx, (byte) i, node48.childIndex);
+-        node48.children[i] = currentNode16.children[i];
++        node48.children[i] = this.children[i];
+       }
+-      copyPrefix(currentNode16, node48);
+-      node48.count = currentNode16.count;
+-      BranchNode freshOne = Node48.insert(node48, child, key);
++      copyPrefix(this, node48);
++      node48.count = this.count;
++      BranchNode freshOne = node48.insert(child, key);
+       return freshOne;
+     }
+   }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
+index 938c562b..516101c9 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java
+@@ -16,7 +16,12 @@ public class Node256 extends BranchNode {
+   private static final long LONG_MASK = 0xffffffffffffffffL;
+ 
+   public Node256(int compressedPrefixSize) {
+-    super(NodeType.NODE256, compressedPrefixSize);
++    super(compressedPrefixSize);
++  }
++
++  @Override
++  protected NodeType nodeType() {
++    return NodeType.NODE256;
+   }
+ 
+   @Override
+@@ -126,18 +131,17 @@ public class Node256 extends BranchNode {
+   /**
+    * insert the child node into the node256 node with the key byte
+    *
+-   * @param currentNode the node256
+    * @param child the child node
+    * @param key the key byte
+    * @return the node256 node
+    */
+-  public static Node256 insert(Node currentNode, Node child, byte key) {
+-    Node256 node256 = (Node256) currentNode;
+-    node256.count++;
++  @Override
++  protected Node256 insert(Node child, byte key) {
++    this.count++;
+     int i = Byte.toUnsignedInt(key);
+-    node256.children[i] = child;
+-    setBit(key, node256.bitmapMask);
+-    return node256;
++    this.children[i] = child;
++    setBit(key, this.bitmapMask);
++    return this;
+   }
+ 
+   static void setBit(byte key, long[] bitmapMask) {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
+index e6c922f9..e95dbe12 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java
+@@ -14,7 +14,12 @@ public class Node4 extends BranchNode {
+   Node[] children = new Node[4];
+ 
+   public Node4(int compressedPrefixSize) {
+-    super(NodeType.NODE4, compressedPrefixSize);
++    super(compressedPrefixSize);
++  }
++
++  @Override
++  protected NodeType nodeType() {
++    return NodeType.NODE4;
+   }
+ 
+   @Override
+@@ -81,30 +86,29 @@ public class Node4 extends BranchNode {
+   }
+ 
+   /**
+-   * insert the child node into the node4 with the key byte
++   * insert the child node into this with the key byte
+    *
+-   * @param node the node4 to insert into
+    * @param childNode the child node
+    * @param key the key byte
+    * @return the input node4 or an adaptive generated node16
+    */
+-  public static BranchNode insert(BranchNode node, Node childNode, byte key) {
+-    Node4 current = (Node4) node;
+-    if (current.count < 4) {
++  @Override
++  protected BranchNode insert(Node childNode, byte key) {
++    if (this.count < 4) {
+       // insert leaf into current node
+-      current.key = IntegerUtil.setByte(current.key, key, current.count);
+-      current.children[current.count] = childNode;
+-      current.count++;
+-      insertionSort(current);
+-      return current;
++      this.key = IntegerUtil.setByte(this.key, key, this.count);
++      this.children[this.count] = childNode;
++      this.count++;
++      insertionSort(this);
++      return this;
+     } else {
+       // grow to Node16
+-      Node16 node16 = new Node16(current.prefixLength);
++      Node16 node16 = new Node16(this.prefixLength);
+       node16.count = 4;
+-      node16.firstV = LongUtils.initWithFirst4Byte(current.key);
+-      System.arraycopy(current.children, 0, node16.children, 0, 4);
+-      copyPrefix(current, node16);
+-      BranchNode freshOne = Node16.insert(node16, childNode, key);
++      node16.firstV = LongUtils.initWithFirst4Byte(this.key);
++      System.arraycopy(children, 0, node16.children, 0, 4);
++      copyPrefix(this, node16);
++      BranchNode freshOne = node16.insert(childNode, key);
+       return freshOne;
+     }
+   }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
+index a6121f8f..d6304e2f 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java
+@@ -22,10 +22,15 @@ public class Node48 extends BranchNode {
+   static final long INIT_LONG_VALUE = 0xFFffFFffFFffFFffL;
+ 
+   public Node48(int compressedPrefixSize) {
+-    super(NodeType.NODE48, compressedPrefixSize);
++    super(compressedPrefixSize);
+     Arrays.fill(childIndex, INIT_LONG_VALUE);
+   }
+ 
++  @Override
++  protected NodeType nodeType() {
++    return NodeType.NODE48;
++  }
++
+   @Override
+   public int getChildPos(byte k) {
+     int unsignedIdx = Byte.toUnsignedInt(k);
+@@ -168,39 +173,38 @@ public class Node48 extends BranchNode {
+   /**
+    * insert a child node into the node48 node with the key byte
+    *
+-   * @param currentNode the node4
+    * @param child the child node
+    * @param key the key byte
+    * @return the node48 or an adaptive generated node256
+    */
+-  public static BranchNode insert(BranchNode currentNode, Node child, byte key) {
+-    Node48 node48 = (Node48) currentNode;
+-    if (node48.count < 48) {
++  @Override
++  protected BranchNode insert(Node child, byte key) {
++    if (this.count < 48) {
+       // insert leaf node into current node
+-      int pos = node48.count;
+-      if (node48.children[pos] != null) {
++      int pos = this.count;
++      if (this.children[pos] != null) {
+         pos = 0;
+-        while (node48.children[pos] != null) {
++        while (this.children[pos] != null) {
+           pos++;
+         }
+       }
+-      node48.children[pos] = child;
++      this.children[pos] = child;
+       int unsignedByte = Byte.toUnsignedInt(key);
+-      setOneByte(unsignedByte, (byte) pos, node48.childIndex);
+-      node48.count++;
+-      return node48;
++      setOneByte(unsignedByte, (byte) pos, this.childIndex);
++      this.count++;
++      return this;
+     } else {
+       // grow to Node256
+-      Node256 node256 = new Node256(node48.prefixLength);
++      Node256 node256 = new Node256(this.prefixLength);
+       int currentPos = ILLEGAL_IDX;
+-      while ((currentPos = node48.getNextLargerPos(currentPos)) != ILLEGAL_IDX) {
+-        Node childNode = node48.getChild(currentPos);
++      while ((currentPos = this.getNextLargerPos(currentPos)) != ILLEGAL_IDX) {
++        Node childNode = this.getChild(currentPos);
+         node256.children[currentPos] = childNode;
+         Node256.setBit((byte) currentPos, node256.bitmapMask);
+       }
+-      node256.count = node48.count;
+-      copyPrefix(node48, node256);
+-      BranchNode freshOne = Node256.insert(node256, child, key);
++      node256.count = this.count;
++      copyPrefix(this, node256);
++      BranchNode freshOne = node256.insert(child, key);
+       return freshOne;
+     }
+   }

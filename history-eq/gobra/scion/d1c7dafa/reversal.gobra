@@ -1,0 +1,45 @@
+package reversal
+
+requires 1 <= n && n <= 3
+func same(n int, info [3]int, seg [3]int) {
+    oldInfo := info
+    oldSeg := seg
+    newInfo := info
+    newSeg := seg
+
+    i := 0
+    j := n - 1
+    invariant 0 <= i && i <= 1
+    invariant i == 1 ==> n > 1
+    invariant j == n - 1 - i
+    invariant i == 0 ==> oldInfo[0] == info[0] && oldInfo[1] == info[1] && oldInfo[2] == info[2]
+    invariant i == 0 ==> oldSeg[0] == seg[0] && oldSeg[1] == seg[1] && oldSeg[2] == seg[2]
+    invariant i == 1 && n == 2 ==> oldInfo[0] == info[1] && oldInfo[1] == info[0] && oldInfo[2] == info[2]
+    invariant i == 1 && n == 2 ==> oldSeg[0] == seg[1] && oldSeg[1] == seg[0] && oldSeg[2] == seg[2]
+    invariant i == 1 && n == 3 ==> oldInfo[0] == info[2] && oldInfo[1] == info[1] && oldInfo[2] == info[0]
+    invariant i == 1 && n == 3 ==> oldSeg[0] == seg[2] && oldSeg[1] == seg[1] && oldSeg[2] == seg[0]
+    decreases j - i
+    for i < j {
+        oldInfo[i], oldInfo[j] = oldInfo[j], oldInfo[i]
+        oldSeg[i], oldSeg[j] = oldSeg[j], oldSeg[i]
+        i, j = i + 1, j - 1
+    }
+
+    if n > 1 {
+        l := n - 1
+        newInfo[0], newInfo[l] = newInfo[l], newInfo[0]
+        newSeg[0], newSeg[l] = newSeg[l], newSeg[0]
+    }
+    if n == 1 {
+        assert i == 0
+        assert oldInfo[0] == info[0] && newInfo[0] == info[0]
+    } else if n == 2 {
+        assert i == 1
+        assert oldInfo[0] == info[1] && newInfo[0] == info[1]
+    } else {
+        assert n == 3 && i == 1
+        assert oldInfo[0] == info[2] && newInfo[0] == info[2]
+    }
+    assert oldInfo[0] == newInfo[0] && oldInfo[1] == newInfo[1] && oldInfo[2] == newInfo[2]
+    assert oldSeg[0] == newSeg[0] && oldSeg[1] == newSeg[1] && oldSeg[2] == newSeg[2]
+}

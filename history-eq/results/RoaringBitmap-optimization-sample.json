@@ -1,0 +1,1619 @@
+{
+  "repo": "RoaringBitmap",
+  "pin": "7f2b0a58f392d745035c06b15b6699ef05a1211a",
+  "selection": "all identified performance commits after screening all pinned source-changing non-merge commits",
+  "sample_size": 89,
+  "entries": [
+    {
+      "commit": "684531c13877fbdacccf02262b32e6faf889d76f",
+      "date": "2026-08-05T17:40:22-04:00",
+      "subject": "Optimize rank(0xFFFF) to use container cardinality (#845)",
+      "history_index": 4,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "well-formed ArrayContainer.rank(0xFFFF); five other changed container classes unproved",
+      "evidence": "history-eq/java/RoaringBitmap/684531c1/README.md",
+      "reason": "Seven Z3 obligations prove the old rank search returns cardinality for well-formed ArrayContainer state; KeY remains open.",
+      "checker_target": "Z3 QF_BV source-mapped lemma",
+      "checker_status": "checked"
+    },
+    {
+      "commit": "ef131a71e0aa6cd67b4ea649c957b1cd4c52b141",
+      "date": "2026-07-23T14:22:42-04:00",
+      "subject": "Avoid O(N^2) operations in some cases (#840)",
+      "history_index": 7,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_BOUNDED",
+      "coverage": "Ordinary and buffer in-place OR, XOR, and lazy OR on all pairs of three-key, two-low-bit canonical bitmaps in two high-key families",
+      "reason": "Both exact changed historical class sets passed 24,576 exhaustive finite-domain cases per API against an independent set oracle; unchanged helper classes came from a pinned newer JAR, and larger domains remain unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/ef131a71/README.md"
+    },
+    {
+      "commit": "46d5e104e86c3f57fe8bc983fd3f484a1fb5779a",
+      "date": "2026-07-10T09:47:29-04:00",
+      "subject": "Reuse ART shuttle stack entries instead of allocating per node (#831)",
+      "history_index": 8,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "423c1e8b7e96333218429ded9a3ab5df17a5bfab",
+      "date": "2026-03-17T17:50:45+01:00",
+      "subject": "Preallocate container array to exact size when converting between bitmap types (#827)",
+      "history_index": 13,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/CopyOnWriteRoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "empty RoaringArray and MutableRoaringArray capacity constructor paths; append/copy loops and copy-on-write flags unproved",
+      "evidence": "history-eq/java/RoaringBitmap/423c1e8b/README.md",
+      "reason": "KeY closed the exact-source-mapped empty-array constructor relation with zero open goals; a capacity-off-by-one mutant remains unproved"
+    },
+    {
+      "commit": "3eff29091820a040c282fc891f6c99d737de455b",
+      "date": "2026-01-23T15:33:07+01:00",
+      "subject": "avoid intersection with already empty container (#816)",
+      "history_index": 15,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the absorbing-zero law for the early-exit intersection step; historical container isEmpty/iand laws and the removed negative-index guards remain unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/3eff2909/README.md",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "per-word bitwise intersection early exit for all mask sequences and initial accumulators; whole aggregation paths unproved"
+    },
+    {
+      "commit": "d8dcfb17b963b612471b912c08c732aab9d04d2f",
+      "date": "2025-11-27T06:43:42+01:00",
+      "subject": "Rank long (#811)",
+      "history_index": 18,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the old scan and early-exit scan have equal rank results for arbitrary cardinalities and local ranks under strictly increasing container keys; historical full-class invariants and public methods are not proved.",
+      "evidence": "history-eq/java/RoaringBitmap/d8dcfb17/README.md",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "changed rankLong and rangeCardinality loop early-exit decisions in ordinary and immutable bitmap methods under a sorted-key precondition"
+    },
+    {
+      "commit": "232f2e7bddb5133aa4666139094e3d48efbf7e48",
+      "date": "2025-11-27T06:25:22+01:00",
+      "subject": "Avoid computing cardinality for run container (#812)",
+      "history_index": 19,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the local run-container result/storage relation under explicit contains/remove/cardinality laws; full historical helper implementations and public methods remain unchecked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "conditional checkedRemove run-container branch in ordinary and buffered classes; whole commit unknown",
+      "evidence": "history-eq/java/RoaringBitmap/232f2e7b/README.md"
+    },
+    {
+      "commit": "a698be65e0e9dd4c62988b103dbe3f825a50515b",
+      "date": "2025-08-18T22:40:37+01:00",
+      "subject": "empty arrays and copying (#794)",
+      "history_index": 22,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "NOT_EQUIV",
+      "checker_status": "checked",
+      "checker_target": "KeY",
+      "source_status": "changed_blobs_available",
+      "reason": "Exact historical BranchNode native pair (false/true) and KeY prove fresh old zero-prefix arrays versus a shared new prefix; a same-package subclass observes protected array identity.",
+      "evidence": "history-eq/java/RoaringBitmap/a698be65/README.md",
+      "coverage": "protected prefix identity for two zero-length Node4 instances; bitmap contents untested"
+    },
+    {
+      "commit": "f10f8b740735a6a3e48eae6bab78b48dffe73590",
+      "date": "2025-08-17T20:48:12+01:00",
+      "subject": "avoid double dipping",
+      "history_index": 23,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java"
+      ],
+      "screen": "confirmed_optimization",
+      "reason": "KeY local relation proved 0 open goals with shared unchanged helper results and normal node-index bounds; full Art loop not loaded",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "changed child-lookup step for Node4/16/48/256",
+      "evidence": "history-eq/java/RoaringBitmap/f10f8b74/README.md"
+    },
+    {
+      "commit": "6aa9546c787047712646363a698cecb7f06c63f8",
+      "date": "2025-08-17T18:29:31+01:00",
+      "subject": "remove allocations from lookups",
+      "history_index": 25,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/longlong/LongUtils.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "ea3bcaa86786ee1a7bf7d15060d0d74a90058594",
+      "date": "2025-08-11T02:22:12+01:00",
+      "subject": "remove prefixLength to save some memory. (#788)",
+      "history_index": 27,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "c8204540d155613706a17e3161da40b2cfa4341c",
+      "date": "2025-08-10T18:29:01+01:00",
+      "subject": "remove nodeType from Branch nodes (its hardly used) (#787)",
+      "history_index": 28,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact-source audit plus KeY prove the serialized node-type byte unchanged for all four concrete node kinds; insertion/rebalancing and full class behavior remain unchecked.",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "four concrete node kinds, type-byte component of both serializeHeader overloads; whole commit unknown",
+      "evidence": "history-eq/java/RoaringBitmap/c8204540/README.md"
+    },
+    {
+      "commit": "5090452712d0e91f2888eb7dddda2192c1dccf36",
+      "date": "2025-08-05T00:26:09+01:00",
+      "subject": "2 changes (#782)",
+      "history_index": 29,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/LeafNode.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/longlong/LongUtils.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact historical LeafNode classes and unchanged Node.serialize(ByteBuffer) entry point produce different buffer positions and contents after the same BufferOverflowException with four writable key bytes; a separate KeY key-arithmetic attempt remains open.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public Node.serialize(ByteBuffer) on an 8-byte buffer (4-byte header plus 4 available key bytes); full-capacity serialization and other changed paths unproved",
+      "evidence": "history-eq/java/RoaringBitmap/50904527/README.md"
+    },
+    {
+      "commit": "9ecff9e86a85b358a435eb8ccfc33d83fa09ac91",
+      "date": "2025-08-04T18:19:37+01:00",
+      "subject": "[64 bit bitmaps) Split non-leaf - BranchNode from leaf nodes (to reduce memory footprint) (#786)",
+      "history_index": 30,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/BranchNode.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/LeafNode.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node16.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node256.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node4.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node48.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/SearchResult.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "UNKNOWN",
+      "coverage": "exact historical ART classes; ten finite differential workloads for public operations under a pinned newer support JAR",
+      "reason": "Both revisions compile and pass matching insert/find/traverse/serialize/deserialize/remove probes, but no all-input KeY or other relational proof is established; the HighLowContainer caller and iterator-removal behavior remain unchecked.",
+      "evidence": "history-eq/java/RoaringBitmap/9ecff9e8/README.md"
+    },
+    {
+      "commit": "600b7c47fbe0d1d235217e00ce454f10300fafdb",
+      "date": "2025-07-30T19:26:27+01:00",
+      "subject": "make isEmpty faster (#778)",
+      "history_index": 32,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the deciding branch and an exact-source stored-empty witness returns true before and false after; public XOR corroboration uses mixed dependencies, so whole-commit behavior remains unproved",
+      "verdict": "NOT_EQUIV",
+      "coverage": "Roaring64Bitmap.isEmpty on an internal high-low index storing an empty RunContainer; public XOR reachability and whole historical build unverified",
+      "evidence": "history-eq/java/RoaringBitmap/600b7c47/README.md"
+    },
+    {
+      "commit": "462a9035375ff68e759efe45070f27cd7c6f17b9",
+      "date": "2025-07-28T23:04:17+01:00",
+      "subject": "share empty arrays (#779)",
+      "history_index": 34,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/art/Node.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "79f1debc980dcecd7b645df3d5a50b3d00a400de",
+      "date": "2024-07-16T14:02:19+02:00",
+      "subject": "Skip over empty words in RunContainer#contains(BitmapContainer) (#739)",
+      "history_index": 51,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "75a97ad1e509e1e8765def1be2216aed99cc1009",
+      "date": "2024-06-20T18:41:54+03:00",
+      "subject": "improve: Optimize RoaringBitSet.get(int fromIndex, int toIndex) (#727)",
+      "history_index": 57,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitSet.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact changed classes and historical BitSetUtil compile with a newer pinned RoaringBitmap dependency; their public range results differ at get(1,0), but the historical RoaringBitmap dependency is unavailable, so the whole historical pair is unverified.",
+      "evidence": "history-eq/java/RoaringBitmap/75a97ad1/README.md",
+      "verdict": "UNKNOWN",
+      "coverage": "public RoaringBitSet.get boundary behavior in a mixed-dependency runtime; complete historical bitmapOfRange/and/addOffset unavailable"
+    },
+    {
+      "commit": "45d9c57cf148fab56bd2a0729db95df8348b9c7a",
+      "date": "2024-06-18T09:08:19-04:00",
+      "subject": "Move instance field to static, everywhere (#726)",
+      "history_index": 58,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "bea55d46dfe97c3e76d67f26a335c31014f04d77",
+      "date": "2024-04-20T09:44:19+10:00",
+      "subject": "Avoid intermediate arrays for other container types (#716)",
+      "history_index": 64,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitSetUtil.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Container.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact-source audit and Z3 prove the ArrayContainer bit-setting step preserves each corresponding word; caller bounds, RunContainer, and whole-commit behavior remain unchecked.",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ArrayContainer bit-setting step for every Java char and arbitrary word/position, assuming valid zero-initialized destination slice; whole commit unknown",
+      "evidence": "history-eq/java/RoaringBitmap/bea55d46/README.md"
+    },
+    {
+      "commit": "9079e41f913842d4ce53eec4f36c0c14e41dd587",
+      "date": "2024-04-18T01:03:51+10:00",
+      "subject": "Avoid getCardinality in RunContainer.toBitmapContainer (#715)",
+      "history_index": 65,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "run-cardinality accumulation in changed toBitmapContainer method",
+      "evidence": "history-eq/java/RoaringBitmap/9079e41f/README.md",
+      "reason": "KeY closed the per-run arithmetic and whole accumulation relation for arbitrary packed char arrays with up to 32768 runs; full historical classes were not loaded"
+    },
+    {
+      "commit": "028f3a5f40d08ade26724fad16e4fdf7256b46ea",
+      "date": "2024-01-28T18:07:10+01:00",
+      "subject": "Optimized creation of bitmap by range (#686)",
+      "history_index": 69,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "coverage": "pointwise range membership for RoaringBitmap.bitmapOfRange; added mutable factory unchecked",
+      "evidence": "history-eq/java/RoaringBitmap/028f3a5f/README.md",
+      "reason": "KeY left four goals open; independent Z3 proved the source-mapped membership formula under documented helper assumptions"
+    },
+    {
+      "commit": "2786fbbda00e2022f32547da1082a506e71598d6",
+      "date": "2024-01-28T18:06:20+01:00",
+      "subject": "Optimized check for value presence in run container (#705)",
+      "history_index": 70,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "reason": "Exact historical changed method bodies run on a constructor-valid public-dispatch witness: parent true, child false; KeY closes the decisive first-zero-word branch relation",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public Container.contains(Container) with RunContainer(100,101) receiver and empty BitmapContainer argument",
+      "evidence": "history-eq/java/RoaringBitmap/2786fbbd/README.md",
+      "checker_status": "checked",
+      "checker_target": "exact-method Java witness + KeY local proof"
+    },
+    {
+      "commit": "7270c92cd19f7144f2d4ef170c7b43bd88faf003",
+      "date": "2024-01-27T16:02:25+01:00",
+      "subject": "Select from both sides (#703)",
+      "history_index": 73,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves that forward and reverse scans use the same within-word select rank once the same target word is reached; loop traversal and whole public API remain unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/7270c92c/README.md",
+      "checker_target": "KeY 3.0.0",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "both bitmap-container source variants; within-word rank algebra for valid j, cardinality <=65536"
+    },
+    {
+      "commit": "87a0309ac879596ca8b3a6358bb2f116d0c56e07",
+      "date": "2024-01-27T15:57:21+01:00",
+      "subject": "Avoid array reallocation (#701)",
+      "history_index": 74,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ordinary BitmapContainer.limit 1024-word copy/zero versus prefix-copy result array; mappeable and deserialization paths unchecked",
+      "reason": "KeY proves all output words equal for arbitrary fixed-length input and every valid usedwords count, modeling JDK array copy operations with explicit loops.",
+      "evidence": "history-eq/java/RoaringBitmap/87a0309a/README.md"
+    },
+    {
+      "commit": "e7bfb1b4fd2c258de0c4f11939a31f68f2faa00a",
+      "date": "2024-01-27T15:53:23+01:00",
+      "subject": "bitwise and instead of conditional (#699)",
+      "history_index": 76,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RangeBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringArray.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "6d5dcff3527215ce6b50a67aa237523da2421692",
+      "date": "2024-01-27T15:51:30+01:00",
+      "subject": "avoid one negation (#697)",
+      "history_index": 77,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RangeBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV",
+      "coverage": "all three changed Java long expressions and the sole changed file; Java source semantics",
+      "evidence": "history-eq/java/RoaringBitmap/6d5dcff3/README.md",
+      "reason": "Exact historical file differs only by three De Morgan replacements; Z3 proves their 64-bit operands equal for every input. KeY remains open independently.",
+      "checker_target": "Z3 QF_BV + exact Git source audit",
+      "checker_status": "checked"
+    },
+    {
+      "commit": "ac6a98de1126a3d523c9ed1f0ba74ac2d04e3ebe",
+      "date": "2024-01-27T15:50:21+01:00",
+      "subject": "AddOffset() optimization for array containers (#696)",
+      "history_index": 78,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Util.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Ten exact historical source classes per side execute a normal empty-container witness; pinned newer jar supplies unavailable unchanged dependencies. KeY local attempts do not close.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "Public Util.addOffset(empty ArrayContainer, 1) and BufferUtil.addOffset(empty MappeableArrayContainer, 1): parent returns two empty containers, child throws NoSuchElementException",
+      "evidence": "history-eq/java/RoaringBitmap/ac6a98de/README.md"
+    },
+    {
+      "commit": "a8c6c4a52cc9dbc266f9acb9c32071d287d7ad4e",
+      "date": "2024-01-27T15:35:26+01:00",
+      "subject": "Code deduplication in operations over array containers when conversion from array containers to bitmap (#683)",
+      "history_index": 79,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact-source audit and Z3 prove per-bit XOR update relation for the ordinary ArrayContainer high-cardinality branch under unique-value invariant; cardinality, return type, other operations, and Mappeable path remain unchecked.",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ordinary ArrayContainer.xor high-cardinality branch, per-bit updates for valid unique left values; whole commit unknown",
+      "evidence": "history-eq/java/RoaringBitmap/a8c6c4a5/README.md"
+    },
+    {
+      "commit": "8dd4a5ec22531704ab834db66af89804c17fe37e",
+      "date": "2023-11-18T00:25:06+01:00",
+      "subject": "avoid ior() with full container (#681)",
+      "history_index": 82,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public static RoaringBitmap.orNot retained-input side effect for a nonfinal RunContainer key; exact changed classes with a pinned newer support jar for five unavailable unchanged blobs",
+      "reason": "The parent in-place ior(full) mutates the retained input from 999 to 65536 bits; the child returns the same result while leaving the input at 999 bits. Exact historical orNot and RunContainer classes run in a source-audited differential witness, with a local KeY branch proof. The historical RoaringArray dependency blob is unavailable and supplied by a pinned newer jar.",
+      "evidence": "history-eq/java/RoaringBitmap/8dd4a5ec/README.md"
+    },
+    {
+      "commit": "c79d0d66c2f93c56af3cf6a28c5b328f02824a8a",
+      "date": "2023-11-18T00:19:33+01:00",
+      "subject": "Methods for replacing children for Node various type optimized (#675)",
+      "history_index": 85,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Node256.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Node4.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Node48.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "checker_target": "exact historical Java public binary API",
+      "verdict": "NOT_EQUIV",
+      "coverage": "external old binary client invoking Node48.replaceChildren on an empty node",
+      "reason": "Client succeeds before and throws IllegalAccessError after public-to-package-private access change; ART contents are not compared.",
+      "evidence": "history-eq/java/RoaringBitmap/c79d0d66/README.md"
+    },
+    {
+      "commit": "53ba593e8a1fb288a705837dc3bad057f2a50bc0",
+      "date": "2023-11-17T23:45:31+01:00",
+      "subject": "Avoid computing cardinality for run container  (#685)",
+      "history_index": 86,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the source-derived RunContainer/MappeableRunContainer early-return decision matches contains, and the old cardinality result matches the new absence result under the standard add-one contract; complete historical classes and setter effects remain unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/53ba593e/README.md",
+      "checker_target": "KeY 3.0 local branch relation",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "run-container checkedAdd return decision under add-one contract; no full-class or complete-method proof"
+    },
+    {
+      "commit": "28482341ca11a62b24bd8b30a8889aa87f266289",
+      "date": "2023-11-03T02:34:04+01:00",
+      "subject": "real iand between run and array container (#668)",
+      "history_index": 87,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact historical Java classes disagree on returned sets for an empty run and on retained-receiver state for a nonempty run; KeY closes fixed-input local branch lemmas.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "Four public ArrayContainer/MappeableArrayContainer iand/iandNot(RunContainer) methods: valid {0,1} array with empty run gives different returned sets; valid {1,5} array with [5,6) run gives different retained-receiver state",
+      "evidence": "history-eq/java/RoaringBitmap/28482341/README.md"
+    },
+    {
+      "commit": "443fd309998cdddf18a95677ef0fe477001349bc",
+      "date": "2023-11-03T02:33:37+01:00",
+      "subject": "AdvanceIfNeeded on bitmap container optimized (#665)",
+      "history_index": 88,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public BitmapContainer.getReverseCharIterator().advanceIfNeeded/hasNext on valid 1024-word bitmap with bit 1 set",
+      "reason": "Source-audited Java extraction gives old hasNext=false and new hasNext=true after advanceIfNeeded(0). KeY attempt remains open and is not claimed as proof.",
+      "evidence": "history-eq/java/RoaringBitmap/443fd309/README.md"
+    },
+    {
+      "commit": "5a4d2e6c46f06de2afd963160b0826a8e330a8e4",
+      "date": "2023-11-02T21:41:11+01:00",
+      "subject": "AddOffset optimization (#669)",
+      "history_index": 89,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "current-key and next-key append guards in both AddOffset methods for arbitrary Java int key",
+      "reason": "KeY proves both source-audited guard relations with 0 open goals; complete container offset and exceptions unchecked.",
+      "evidence": "history-eq/java/RoaringBitmap/5a4d2e6c/README.md"
+    },
+    {
+      "commit": "23a855bf2c1d31d6e29143c699a8219a17ca0d75",
+      "date": "2023-11-02T21:25:28+01:00",
+      "subject": "More performant LongUtils.compareHigh() (#639)",
+      "history_index": 90,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArraysShim.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/KeyIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/LeafNode.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/LongUtils.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "reason": "Old binary client returns normally with exact parent LongUtils but throws NoSuchMethodError for two removed public signatures with exact child LongUtils; KeY toLong goal remains open.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "existing public LongUtils binary client calling compareHigh(byte[],byte[]) and isMaxHigh(byte[]); other changed APIs and files unverified",
+      "evidence": "history-eq/java/RoaringBitmap/23a855bf/README.md",
+      "checker_status": "checked",
+      "checker_target": "exact historical Java binary client + KeY attempt + Z3 lemma"
+    },
+    {
+      "commit": "0be3468ed826e1c163e4280ba63e1f71f7519be6",
+      "date": "2023-11-02T18:42:45+01:00",
+      "subject": "more effective buffer copying when limiting mappable container (#664)",
+      "history_index": 91,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "ae1ff83c94c77449b20c7b67b165d1107390fa93",
+      "date": "2023-11-02T18:41:15+01:00",
+      "subject": "Binary search on part of array only (#670)",
+      "history_index": 92,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "418a2929e83809ed4deb97071f65fb23ef054735",
+      "date": "2023-07-24T16:27:44+02:00",
+      "subject": "useless operation removed (#636)",
+      "history_index": 104,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV",
+      "checker_status": "checked",
+      "checker_target": "KeY",
+      "source_status": "changed_blobs_available",
+      "reason": "Exact one-line source deletion and KeY's zero-goal dead-store lemma show equal complete return state for normally completing Node16.insert calls.",
+      "evidence": "history-eq/java/RoaringBitmap/418a2929/README.md",
+      "coverage": "normal single-threaded Node16.insert return state for the count<8 branch; exceptional execution, concurrent or reflective observation, and full historical dependency build unverified"
+    },
+    {
+      "commit": "1de68254774c3d1932ee025cb331f60dd4e904d0",
+      "date": "2023-07-24T16:27:21+02:00",
+      "subject": "Avoid intermediate byte array creation (#635)",
+      "history_index": 105,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY leaves eight local byte-relation goals open; independent QF_BV Z3 proves the changed byte values equal for every long and all eight indices, but allocation and full conversion remain unproved.",
+      "verdict": "UNKNOWN",
+      "coverage": "Node16 firstV byte lookup for indices 0..7; full conversion and allocation behavior unproved",
+      "evidence": "history-eq/java/RoaringBitmap/1de68254/README.md"
+    },
+    {
+      "commit": "34bce1bae5591347d1992daae0cdb041a409cc1d",
+      "date": "2023-07-24T16:25:12+02:00",
+      "subject": "More performant integer shift left by bytes (#633)",
+      "history_index": 106,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/IntegerUtil.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "NOT_EQUIV",
+      "coverage": "unrestricted public IntegerUtil.shiftLeftFromSpecifiedPosition; historical runtime witnesses at invalid positions/counts, with a local KeY boundary proof",
+      "reason": "The old System.arraycopy throws at pos=4,count=0 while the new zero-count branch returns normally; exact historical Java executions differ. KeY proves the local bounds/result condition, but its full System.arraycopy relation leaves six goals open.",
+      "evidence": "history-eq/java/RoaringBitmap/34bce1ba/README.md",
+      "checker_status": "checked",
+      "checker_target": "exact historical Java witness + KeY local proof"
+    },
+    {
+      "commit": "7d3eec51ef8aaa83ba058178f35e939ae1aaaac6",
+      "date": "2023-07-24T16:23:51+02:00",
+      "subject": "More performant toString() methods (#642)",
+      "history_index": 107,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/insights/NaiveWriterRecommender.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64NavigableMap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Installed KeY cannot resolve java.lang.StringBuilder, including a minimal old/new append relation; no semantic verdict.",
+      "verdict": "UNSUPPORTED",
+      "coverage": "Eleven changed historical Java toString/recommender paths using StringBuilder; KeY frontend feature probe before proof search",
+      "evidence": "history-eq/java/RoaringBitmap/7d3eec51/README.md"
+    },
+    {
+      "commit": "6a23ee08266ac0b34b6d1a4fad47e6103b0c864a",
+      "date": "2023-07-24T16:22:09+02:00",
+      "subject": "more specific method for value decrement (#640)",
+      "history_index": 109,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV",
+      "checker_status": "checked",
+      "checker_target": "KeY",
+      "source_status": "changed_blobs_available",
+      "reason": "Exact one-call source substitution and KeY prove the entire valid buffer state equal after the private zero-index decrement.",
+      "evidence": "history-eq/java/RoaringBitmap/6a23ee08/README.md",
+      "coverage": "single-threaded normal functional state of MappeableRunContainer with valid absolute CharBuffer access; no reflection or stack-trace observation; exceptional resource behavior, reflection, concurrent observation, timing, and full historical dependency build are not checked"
+    },
+    {
+      "commit": "b5b4af69b5b136c2f65955d0101bcce9b4798b1d",
+      "date": "2023-07-24T16:21:16+02:00",
+      "subject": "Optimized getCardinality() for (Mappeable)RunContainer (#643)",
+      "history_index": 110,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact old/new production Java builds pass; KeY proves the changed run-index/stride-two summation relation for all valid two-char-per-run arrays, while full classes remain outside proof.",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "changed getCardinality summation steps for 0..32768 runs; full historical classes not loaded into KeY",
+      "evidence": "history-eq/java/RoaringBitmap/b5b4af69/README.md"
+    },
+    {
+      "commit": "b2ad9b336d07f66b103f5f64c15da88dc87424de",
+      "date": "2023-01-04T20:00:16+00:00",
+      "subject": "clone smallest bitmap, adjust naive/workshy and thresholds (#612)",
+      "history_index": 119,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "NOT_EQUIV",
+      "checker_status": "checked",
+      "checker_target": "KeY",
+      "source_status": "changed_blobs_available",
+      "reason": "Exact historical FastAggregation native pair changes caller-visible scratch-buffer clearing and short-buffer exception behavior for three empty bitmaps.",
+      "evidence": "history-eq/java/RoaringBitmap/b2ad9b33/README.md",
+      "coverage": "FastAggregation.and(long[], RoaringBitmap...) with three empty bitmaps; common current built dependencies; buffer counterpart and whole commit untested"
+    },
+    {
+      "commit": "d2b1384ae0bb5d9ba7465458f70404c7261a3be2",
+      "date": "2022-05-23T19:06:44+02:00",
+      "subject": "andCardinality/orCardinality without materialising a bitmap (#561)",
+      "history_index": 141,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "7c75138da88f48baf3857bda1fc4781d0537e036",
+      "date": "2022-02-14T23:53:37+00:00",
+      "subject": "one pass between implementation (#547)",
+      "history_index": 145,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RangeBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "918a374f8c3a7f0fed0f6d248c8cebf530101142",
+      "date": "2022-02-13T21:20:11+00:00",
+      "subject": "remove relative ByteBuffer operations (#546)",
+      "history_index": 146,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RangeBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "bc06196c13e212cfbd1f740cdd9b98c6dd4e50d3",
+      "date": "2021-11-30T14:23:27+01:00",
+      "subject": "ior fission + benchmark to show iand fission is unprofitable (#543)",
+      "history_index": 148,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "unrestricted public BitmapContainer constructor and ior(BitmapContainer), with unequal backing-array lengths",
+      "reason": "For a one-word left bitmap and zero-word right bitmap, the parent reads b2.bitmap[0] and throws, while the child skips the loop and returns. KeY proves the source guard/bounds divergence and a native extracted-method witness confirms the outcomes.",
+      "evidence": "history-eq/java/RoaringBitmap/bc06196c/README.md"
+    },
+    {
+      "commit": "66f6d16b4e15718e41b3e7a45b092654d0f7d8b4",
+      "date": "2021-11-26T20:11:10+01:00",
+      "subject": "ixor optimisation (#542)",
+      "history_index": 149,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public BitmapContainer.ixor retained-input side effect on equal canonical 5000-bit containers",
+      "reason": "The parent returns an empty array result but retains its 5000-bit input; the child returns the same result after clearing the original input. Native source-audited witness plus local KeY/Z3 proof.",
+      "evidence": "history-eq/java/RoaringBitmap/66f6d16b/README.md"
+    },
+    {
+      "commit": "f9746aedd164b1918731ed86ca3ab39ba4e42415",
+      "date": "2021-11-10T21:35:57+00:00",
+      "subject": "avoid checking if bitmap has run compression more than once, avoid some duplication, replace some PascalCase with camelCase (#539)",
+      "history_index": 150,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringArray.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the historical old/new explicit-offset byte address is equal for a stable cookie, size 4..65536, and valid k; small-container scan, memory access, exceptions and full API remain unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/f9746aed/README.md",
+      "checker_target": "KeY 3.0.0",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ImmutableRoaringArray explicit-offset address calculation only; stable buffer header, 4<=size<=65536, 0<=k<size"
+    },
+    {
+      "commit": "5eb5c2b13ed74bd91ba1f4efdbfd66ee002526c7",
+      "date": "2021-11-07T00:33:58+00:00",
+      "subject": "don't round up number of slices (#536)",
+      "history_index": 152,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RangeBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "0c90ddff1847dd8f74b6f8e1676ce87dc63a7cbe",
+      "date": "2021-09-15T17:50:28+01:00",
+      "subject": "skip work when it can be determined the bitmap would later be cleared within a horizontal slice",
+      "history_index": 162,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RangeBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "e232bbd642878a590367248f48ccd1a1907e5656",
+      "date": "2021-08-22T18:20:53+02:00",
+      "subject": "avoid allocations when modifying node keys, specify behaviour of shiftLeftFromSpecifiedPosition",
+      "history_index": 164,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/IntegerUtil.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact historical public IntegerUtil.setByte throws on pos=4 in the parent and returns in the child; a reduced KeY boundary relation closes.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "unrestricted public IntegerUtil.setByte API at invalid array positions; valid positions not universally proved",
+      "evidence": "history-eq/java/RoaringBitmap/e232bbd6/README.md"
+    },
+    {
+      "commit": "efdf655c557c81496be5559a12792242d32fb752",
+      "date": "2021-05-07T13:43:42+02:00",
+      "subject": "Faster advanceIfNeeded for Roaring64Bitmap iterators (#480)",
+      "history_index": 176,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/AbstractShuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Art.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/BackwardShuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/ForwardShuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/LeafNodeIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/art/Shuttle.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/HighLowContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64Bitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "existing public LeafNodeIterator.next() on a valid empty Art, after hasNext() returned false",
+      "reason": "Exact historical Java classes return null before and throw NoSuchElementException after for the same empty iterator call.",
+      "evidence": "history-eq/java/RoaringBitmap/efdf655c/README.md"
+    },
+    {
+      "commit": "5f24b720aa72f9b46bf2bb0db4ce7a9912b3d073",
+      "date": "2021-04-09T01:14:21+02:00",
+      "subject": "partial radix sort with early exit",
+      "history_index": 179,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Util.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "12f1d205b475fe39c7ee31fada2c3811dc61c0e8",
+      "date": "2021-04-08T11:51:28-04:00",
+      "subject": "Simplifying and speeding up partialRadixSort (#473)",
+      "history_index": 180,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Util.java"
+      ],
+      "screen": "confirmed_optimization",
+      "reason": "Exact historical methods compile and match on 8,320 deterministic arrays; direct QF_BV Z3 proves both changed radix bucket formulas for every int, while KeY leaves the whole-array method unproved",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial: both changed 8-bit radix bucket formulas for every 32-bit int; complete int[] sort unproved",
+      "evidence": "history-eq/java/RoaringBitmap/12f1d205/README.md"
+    },
+    {
+      "commit": "c9dc48eb803850b2df073560ce02191c3c1d865b",
+      "date": "2021-04-07T11:20:25-04:00",
+      "subject": "Optimizations related to issue 470 (#471)",
+      "history_index": 181,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Util.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "checker_target": "KeY relation over both exact historical Util.partialRadixSort method bodies",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "KeY proves arbitrary-array two-swap reference parity and equal two-element final buffers conditional on equal per-pass writes; complete historical sort remains unknown; 8,320 native controls",
+      "reason": "Two source-mapped KeY buffer-control relations close with zero open goals; the exact whole-method KeY relation still leaves one goal open.",
+      "evidence": "history-eq/java/RoaringBitmap/c9dc48eb/README.md"
+    },
+    {
+      "commit": "baf283d3a927b92f4b86cb82cccd2d0d68daa148",
+      "date": "2020-07-01T22:02:28+01:00",
+      "subject": "implement workshyand for iterator inputs (#412)",
+      "history_index": 198,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "f97296518a6647275cbd6101cbf68de55687a96d",
+      "date": "2020-06-02T20:30:10-04:00",
+      "subject": "This is a version of Richard's function that uses *maybe* a bit less memory. (#408)",
+      "history_index": 201,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact historical aggregation classes compile; an old binary client returns true with the parent and throws NoSuchMethodError with the child for both public methods.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "Public binary API: existing FastAggregation and BufferFastAggregation workShyAnd varargs clients",
+      "evidence": "history-eq/java/RoaringBitmap/f9729651/README.md"
+    },
+    {
+      "commit": "f7b0874f1f6e3a9022947e77f7173105e36789e2",
+      "date": "2020-05-30T22:05:35+02:00",
+      "subject": "handle small aggregations with naive_and",
+      "history_index": 202,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/PointableRoaringArray.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "cb7099321771e64c18e9d122d5293533e99a68cf",
+      "date": "2020-05-30T01:51:40+02:00",
+      "subject": "implement new bitmap intersection algorithm",
+      "history_index": 206,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Util.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "b274fe181ae94a810280b2c8ae62deef86ecef1f",
+      "date": "2020-04-20T00:22:46+01:00",
+      "subject": "more efficient RunContainer/BitmapContainer operations",
+      "history_index": 212,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Parent membership test is true; optimized signed > 0 range-mask test is false for the negative long bit-63 mask. Z3 closes the concrete bit-vector relation; KeY leaves one goal open.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "Public RunContainer.intersects(BitmapContainer) and MappeableRunContainer.intersects(MappeableBitmapContainer) for valid run [63,64) and bitmap with only bit 63 set; source-mapped QF_BV result, no full historical JVM build",
+      "evidence": "history-eq/java/RoaringBitmap/b274fe18/README.md"
+    },
+    {
+      "commit": "c1ea7f01ad0a443082e3db8c0e65b9005940c76a",
+      "date": "2020-04-08T23:07:49+01:00",
+      "subject": "Ornot #376 (#389)",
+      "history_index": 216,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Container.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "existing public Container.iorNot(RunContainer,int) on an ArrayContainer with bit 10, empty right RunContainer, and endOfRange 5",
+      "reason": "The exact historical target classes return a result without bit 10 before and with bit 10 after, using the same fallback jar for unchanged dependencies.",
+      "evidence": "history-eq/java/RoaringBitmap/c1ea7f01/README.md"
+    },
+    {
+      "commit": "73a09574cddf37a918933859e7a2b2b5e67a3590",
+      "date": "2020-04-07T14:45:46+01:00",
+      "subject": "add specialised andNotCardinality for improved performance (#378)",
+      "history_index": 220,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "The same valid public bitmap inputs return 1 in the parent and 2 in the child. Both historical ordinary bitmap source trees compile and execute with one identical missing, unchanged buffer-class source substituted on both sides. KeY's local loop-branch goal remains open.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public RoaringBitmap.andNotCardinality for two left singleton containers at keys 1 and 2 and one right singleton container at key 2; mixed unchanged buffer dependency",
+      "evidence": "history-eq/java/RoaringBitmap/73a09574/README.md"
+    },
+    {
+      "commit": "8e76afda92aaf3a30a645351b4f0e9bc532d3662",
+      "date": "2020-04-06T12:19:23-04:00",
+      "subject": "Removing a counterproductive optimization. (#375)",
+      "history_index": 223,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "reason": "historical Java binaries disagree for a 2^31-element receiver and singleton subset; KeY proves removed guard changes the observed branch",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public RoaringBitmap.contains and ImmutableRoaringBitmap.contains (buffered instance)",
+      "evidence": "history-eq/java/RoaringBitmap/8e76afda/README.md",
+      "checker_status": "checked",
+      "checker_target": "exact historical Java binaries + KeY local proof"
+    },
+    {
+      "commit": "bc7275ed96161131e046f44533919d301de2fcd3",
+      "date": "2019-12-07T18:13:04+00:00",
+      "subject": "Replace emulated unsigned shorts with chars (#364)",
+      "history_index": 226,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/AppendableStorage.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayBatchIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitSetUtil.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/CharIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ConstantMemoryContainerAppender.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Container.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ContainerAppender.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ContainerPointer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/IntIteratorFlyweight.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ParallelAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/PeekableCharIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/PeekableCharRankIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/PeekableShortIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/PeekableShortRankIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ReverseIntIteratorFlyweight.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringArray.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunBatchIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/ShortIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/Util.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/WordStorage.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ArrayBatchIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferBitSetUtil.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferFastAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferIntIteratorFlyweight.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferParallelAggregation.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferReverseIntIteratorFlyweight.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringArray.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainerPointer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/PointableRoaringArray.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/buffer/RunBatchIterator.java",
+        "RoaringBitmap/src/main/java/org/roaringbitmap/longlong/Roaring64NavigableMap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "old binary-client compatibility for the public ShortIterator type",
+      "reason": "The exact parent exports ShortIterator and the child renames it to CharIterator; an unchanged client compiled against the parent loads before and throws NoClassDefFoundError after. Bitmap contents and other signedness paths remain unchecked.",
+      "evidence": "history-eq/java/RoaringBitmap/bc7275ed/README.md"
+    },
+    {
+      "commit": "ee879373071c6ef94b076254b62a994bae303bbb",
+      "date": "2019-09-05T14:39:31+01:00",
+      "subject": "stop ContainerAppender from capturing its builder (#359)",
+      "history_index": 229,
+      "changed_paths": [
+        "RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "NOT_EQUIV",
+      "checker_status": "checked",
+      "checker_target": "KeY",
+      "source_status": "changed_blobs_available",
+      "reason": "Exact historical writer/appender native pair and KeY show changed capture timing; an overridden createUnderlying observes capacity 9 before versus 4 after reset.",
+      "evidence": "history-eq/java/RoaringBitmap/ee879373/README.md",
+      "coverage": "Wizard.get/initialCapacity and ContainerAppender.reset callback argument; bitmap contents untested"
+    },
+    {
+      "commit": "a36e73cf345b899cfde20239b7fa35ea5e9667e0",
+      "date": "2019-04-22T16:01:43+01:00",
+      "subject": "flyweight container batch iterators (#329)",
+      "history_index": 237,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/BitmapBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/ContainerBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RunBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/ArrayBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/BitmapBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/RoaringBatchIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/RunBatchIterator.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "2f3b4093186944456268a91a566195ac2cd3af16",
+      "date": "2019-04-16T00:17:14+01:00",
+      "subject": "optimise array add for append-only (#328)",
+      "history_index": 239,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "KeY proves the old search insertion index and zero-shift length match the direct append path under a free-slot and unsigned-append precondition; other add paths and complete historical classes are unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/2f3b4093/README.md",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ordinary array-container append-path index and shift relation for arbitrary 16-bit values, cardinality 0..4095, and available capacity"
+    },
+    {
+      "commit": "2ff67501ff9ddf7a556f4aac229828154d889348",
+      "date": "2019-04-16T00:13:01+01:00",
+      "subject": "avoid resizing keys when keys are already at optimal size (#327)",
+      "history_index": 240,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact old/new extendArray guards differ only when size + k equals capacity. KeY proves old/new previously used char-key entries and capacity safety at that boundary for capacity <= 100000; Z3 discharges the large-capacity arithmetic. Value-reference arrays and whole public APIs remain unproved.",
+      "verdict": "EQUIV_PARTIAL",
+      "evidence": "history-eq/java/RoaringBitmap/2ff67501/README.md"
+    },
+    {
+      "commit": "9ab993e11480c6a461f0eeb38e3984995c1ffc8a",
+      "date": "2019-03-20T16:04:09+01:00",
+      "subject": "Faster deserialization by loading BitmapContainer in a single .readFully (#320)",
+      "history_index": 244,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/insights/BitmapAnalyser.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/insights/BitmapStatistics.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/insights/NaiveWriterRecommender.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "exact historical bitmap-payload blocks: parent deserialize(DataInput) versus optimized child deserialize(DataInput, byte[]) with an eight-byte scratch buffer",
+      "reason": "For a valid 4,104-bit bitmap payload, the parent consumes all 8,192 bytes and reads a nonzero word; the child copies zero words and consumes only 119 bytes.",
+      "evidence": "history-eq/java/RoaringBitmap/9ab993e1/README.md"
+    },
+    {
+      "commit": "7742f8876a5370fa95ed105cca05f09ab0c1d6bf",
+      "date": "2018-12-21T16:41:23+00:00",
+      "subject": "avoid potentially costly write barrier when container instance hasn't changed (#294)",
+      "history_index": 252,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ContainerAppender.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "partial",
+      "evidence": "history-eq/java/RoaringBitmap/7742f887/README.md",
+      "reason": "KeY proved the changed field update equal under a shared add result and sequential Java semantics"
+    },
+    {
+      "commit": "8800009c2ea603463d026f83371fd0012f452ae5",
+      "date": "2018-12-21T16:41:01+00:00",
+      "subject": "externalise buffer to allow reuse (#296)",
+      "history_index": 253,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/BatchIntIterator.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/BatchIterator.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "8f062d05e93599f0fafb8cfb920411cd0e5b2f87",
+      "date": "2018-12-17T20:15:14+00:00",
+      "subject": "Mismatch intrinsic (#290)",
+      "history_index": 255,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "public RunContainer.equals on two canonical one-run containers constructed from [1,2) and [1,3)",
+      "reason": "Exact historical constructor, accessors, private equality and ArraysShim code compiled in minimal shells; native witness returns false before and true after. Public equals(Object) dispatch is unchanged and source-audited. KeY attempt remains open and is not claimed as proof.",
+      "evidence": "history-eq/java/RoaringBitmap/8f062d05/README.md"
+    },
+    {
+      "commit": "55b5744c7553293aa163624952bd7434c98baef3",
+      "date": "2018-10-30T22:52:59+00:00",
+      "subject": "remove optimiseForBitmaps because it's usually a bad idea (#279)",
+      "history_index": 260,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "checker_target": "exact historical Java public binary API",
+      "verdict": "NOT_EQUIV",
+      "coverage": "old binary client calling removed Wizard.optimiseForBitmaps method",
+      "reason": "Client returns true with parent and throws NoSuchMethodError with child; bitmap contents are not compared.",
+      "evidence": "history-eq/java/RoaringBitmap/55b5744c/README.md"
+    },
+    {
+      "commit": "e21398ed25e38c54dcb351413d0f8fde42398f15",
+      "date": "2018-10-26T19:20:21+01:00",
+      "subject": "generalise bitmap construction and expose heuristics (#276)",
+      "history_index": 262,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/AppendableStorage.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/BitmapDataProvider.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/ConstantMemoryContainerAppender.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/Container.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/ContainerAppender.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/DenseOrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmapWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/SparseOrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/WordStorage.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact changed source diff audited, but five unchanged historical Java support blobs are missing. Current replacements produce 164 Java signature errors on both revisions; no public bitmapOfUnordered execution or relation check was possible.",
+      "verdict": "UNKNOWN",
+      "source_status": "changed_blobs_available",
+      "checker_target": "historical Java build then public API comparison",
+      "coverage": "Parent and child source/build attempt only; bitmap contents and input-array mutation remain unverified.",
+      "evidence": "history-eq/java/RoaringBitmap/e21398ed/README.md"
+    },
+    {
+      "commit": "fa8233e235bd778fe576d086af7b6f08f066abdd",
+      "date": "2018-10-19T14:30:17+01:00",
+      "subject": "refine and allow writing behind in ordered writer (#275)",
+      "history_index": 264,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/AdaptiveOrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/DenseOrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/SparseOrderedWriter.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "checked",
+      "checker_target": "KeY source-mapped branch projection",
+      "source_status": "changed_blobs_available",
+      "reason": "Exact historical source and KeY prove the descending-key branch switches from throw to underlying insertion; full add and whole commit are unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/fa8233e2/README.md",
+      "coverage": "SparseOrderedWriter.add at currentKey=1,value=1: branch choice only; historical dependency build incomplete"
+    },
+    {
+      "commit": "09591e17a2c4277a0db72dfa32b5b7e3a498a3c8",
+      "date": "2018-09-04T16:41:43-03:00",
+      "subject": "[WIP] Make OrderedWriter work better with sparse RoaringBitmaps (#270)",
+      "history_index": 267,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/AdaptiveOrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/DenseOrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/SparseOrderedWriter.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "An old client compiled against exact parent OrderedWriter constructs it successfully, but with the exact child interface loaded it throws InstantiationError; compile-only stubs supply unavailable unchanged dependencies.",
+      "verdict": "NOT_EQUIV",
+      "coverage": "Public binary API: the old OrderedWriter no-argument constructor versus the new interface",
+      "evidence": "history-eq/java/RoaringBitmap/09591e17/README.md"
+    },
+    {
+      "commit": "60048a62c3ce0a9ea560f06eaefb95cf982f7a92",
+      "date": "2018-04-02T14:21:15+01:00",
+      "subject": "replace cardinality checks with emptiness checks (#241)",
+      "history_index": 282,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/Container.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "07532e22b15865daff50ace84a818ee18332e8d9",
+      "date": "2018-03-18T19:48:44-07:00",
+      "subject": "Proposed fix - Avoid double copy in in-place array add (#232)",
+      "history_index": 285,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "MappeableArrayContainer.iadd expansion with a constructor-supplied ShortBuffer: caller-visible buffer position after the call",
+      "reason": "The exact historical target classes leave the same bitmap values but different supplied-buffer positions in a reconstructed Java witness; a KeY local relation proves the expansion-position difference under 0 <= initialPosition < limit. Four nearby earlier dependency blobs substitute for missing unchanged historical dependencies, so this is not a full historical library build.",
+      "evidence": "history-eq/java/RoaringBitmap/07532e22/README.md"
+    },
+    {
+      "commit": "56f9b9543d2cfb8568b3348880f6fe25e304e7fa",
+      "date": "2018-03-16T18:19:18-07:00",
+      "subject": "Fix to avoid double copy in in-place array OR (#230)",
+      "history_index": 286,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "NOT_EQUIV",
+      "coverage": "MappeableArrayContainer.ior expansion with a constructor-supplied ShortBuffer: caller-visible buffer position after the call",
+      "reason": "The exact historical target classes leave the same bitmap values but different supplied-buffer positions in a reconstructed Java witness; a KeY local relation proves the expansion-position difference under 0 <= initialPosition < limit. Four nearby earlier dependency blobs substitute for missing unchanged historical dependencies, so this is not a full historical library build.",
+      "evidence": "history-eq/java/RoaringBitmap/56f9b954/README.md"
+    },
+    {
+      "commit": "33200d55fc622b37c443f8e869d146376bac4fa8",
+      "date": "2018-03-10T16:26:53+00:00",
+      "subject": "use tzcnt, blsr instead of blsi, popcnt, xor (#227)",
+      "history_index": 287,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/Util.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferBitSetUtil.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "cc4e51997891497c36c5a7f745fa26744f73dcfc",
+      "date": "2018-03-08T17:22:34+01:00",
+      "subject": "Static instance of OR collector (#226)",
+      "history_index": 288,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ParallelAggregation.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferParallelAggregation.java"
+      ],
+      "screen": "confirmed_optimization",
+      "verdict": "UNKNOWN",
+      "checker_status": "not_run",
+      "checker_target": "KeY",
+      "source_status": "missing_changed_blob",
+      "reason": "Commit message and changed Java paths identify an optimization of an existing operation; no old/new KeY relation has run.",
+      "evidence": "history-eq/java/RoaringBitmap/full-source-screening.md"
+    },
+    {
+      "commit": "76cd34c685ce3027515711b332fe3c63b8f01c90",
+      "date": "2018-02-14T00:59:18+01:00",
+      "subject": "Trim() is not releasing all unused bytes (#217)",
+      "history_index": 293,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringArray.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MutableRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "active key and container-reference prefix after trim; full historical trim unproved",
+      "evidence": "history-eq/java/RoaringBitmap/76cd34c6/README.md",
+      "reason": "KeY proves an explicit-copy model preserves the active prefix for arbitrary valid arrays; direct Arrays.copyOf verification failed in installed KeY"
+    },
+    {
+      "commit": "7f280458007333c917ff61301290f68dcec0b471",
+      "date": "2018-02-12T22:56:01+01:00",
+      "subject": "Bitmap add range performance (#214)",
+      "history_index": 295,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/Container.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact-source constructor mapping plus Z3 short-cast identity and a zero-open-goal KeY local relation; whole commit not proved.",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "RunContainer.full and MappeableRunContainer.full packed one-run state; range factories and public bitmap behavior unchecked",
+      "evidence": "history-eq/java/RoaringBitmap/7f280458/README.md"
+    },
+    {
+      "commit": "7a4df65d930d15d89d385af81a11c80b4133c5e6",
+      "date": "2018-02-06T23:11:46+01:00",
+      "subject": "AC.andNot(RC) (#169)",
+      "history_index": 296,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/Util.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/BufferUtil.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "EQUIV_PARTIAL",
+      "coverage": "ordinary ArrayContainer.andNot(RunContainer), exactly one source value and one valid run; Z3 proves the source-mapped relation for all such 16-bit values and run bounds; KeY leaves 2 goals open",
+      "reason": "A source-locked QF_BV relation proves equal retained-value decisions for every one-value/one-run input. Longer arrays, multiple runs, and the mapped-buffer method remain unproved.",
+      "evidence": "history-eq/java/RoaringBitmap/7a4df65d/README.md"
+    },
+    {
+      "commit": "6125ee9910d7f5f4f12d7d2e625eb499ddab4520",
+      "date": "2017-12-23T14:17:05+00:00",
+      "subject": "Speed up incremental sequential writes and batch creation from unsorted data (#199)",
+      "history_index": 304,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/OrderedWriter.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java",
+        "roaringbitmap/src/main/java/org/roaringbitmap/Util.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "reason": "Exact source audit shows additive bitmapOfUnordered, partialRadixSort, and OrderedWriter APIs with no parent same-entrypoint implementation; existing bitmapOf body is unchanged. Cross-API comparison requires a separate state-observation relation because the new API sorts caller data in place.",
+      "verdict": "UNSUPPORTED",
+      "coverage": "same-entrypoint historical before/after equivalence; cross-API refinement not specified or checked",
+      "evidence": "history-eq/java/RoaringBitmap/6125ee99/README.md"
+    },
+    {
+      "commit": "5350c57e1990d48fa24f5bdcbe736c1c6b9acdd4",
+      "date": "2017-12-19T02:51:09+01:00",
+      "subject": "Faster .rank .select (#192)",
+      "history_index": 305,
+      "changed_paths": [
+        "roaringbitmap/src/main/java/org/roaringbitmap/FastRankRoaringBitmap.java"
+      ],
+      "screen": "confirmed_optimization",
+      "checker_status": "checked",
+      "verdict": "UNKNOWN",
+      "coverage": "exact historical base and fast rank/cache methods after inherited deserialization, with a two-container support model",
+      "reason": "The source-mapped model gives base rank 2 and fast rank 3 after deserialization, but the exact historical RoaringArray.deserialize dependency is unavailable, so a real historical input witness is not yet established.",
+      "evidence": "history-eq/java/RoaringBitmap/5350c57e/README.md"
+    }
+  ],
+  "summary": {
+    "EQUIV_PARTIAL": 24,
+    "EQUIV_BOUNDED": 1,
+    "UNKNOWN": 30,
+    "NOT_EQUIV": 29,
+    "EQUIV": 3,
+    "UNSUPPORTED": 2
+  }
+}

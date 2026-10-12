@@ -1,0 +1,7 @@
+# llama.cpp `0e148a57`: SYCL USM allocation threshold
+
+The exact historical parent `32b741c3` selects system USM allocation for buffers of at least 1 GiB; child `0e148a57` raises the threshold to 4 GiB ([production diff](../source-screening/0e148a57.source.diff)). This is an intentional performance-policy change. The unchanged caller passes a 2 MiB-aligned size to `check_usm_system` and then allocates from host memory when it returns true or device memory when it returns false.
+
+[Source extraction](extract.py) reads the two exact Git blobs, checks that the helper differs only in this predicate, and inserts each historical expression verbatim into a small [Alive2 wrapper](wrapper.c). The wrapper models the helper's boolean return, including the unchanged device-support guard; it does not model SYCL allocation or model-inference outputs. [Alive2's bidirectional result](alive2/result.json) is unbounded `NOT_EQUIV`: for system-USM enabled, device support true, and size **2,147,483,648 bytes (2 GiB)**, the old helper returns true and the new one false. The [forward](alive2/fwd.log) and [reverse](alive2/bwd.log) logs each contain that concrete counterexample.
+
+**Fixed-sample verdict: `NOT_EQUIV` for the allocation-policy decision.** The caller consequently chooses a different memory kind at that size. This does not assert that the resulting model calculation differs, nor is it an Alive2 proof of the whole SYCL backend. No official historical benchmark delta is measured here.

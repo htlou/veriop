@@ -1,0 +1,4168 @@
+41,46d40
+< pub fn core::num::{u32}::trailing_zeros(_1: u32) -> u32
+< = <opaque>
+< 
+< pub fn core::num::{u16}::trailing_zeros(_1: u16) -> u32
+< = <opaque>
+< 
+82,85d75
+< pub unsafe fn core::ptr::const_ptr::{*const T}::read<T>(_1: *const T) -> T
+< = <opaque>
+< 
+< #[track_caller]
+246d235
+<   cur: usize,
+258a248
+>     // / The size of the input.
+260d249
+<     // / The number of bytes from the input that are encoded.
+412,451d400
+< fn lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_cur_hash<'_0>(self: &'_0 lz4_flex::block::compress::Encoder) -> usize
+< {
+<     let _0: usize; // return
+<     let self: &'1 lz4_flex::block::compress::Encoder; // arg #1
+<     let _2: usize; // anonymous local
+<     let _3: u32; // anonymous local
+<     let _4: u32; // anonymous local
+<     let _5: &'2 lz4_flex::block::compress::Encoder; // anonymous local
+<     let _6: usize; // anonymous local
+<     let _7: u8; // anonymous local
+< 
+<     storage_live(_0)
+<     storage_live(_2)
+<     storage_live(_3)
+<     storage_live(_4)
+<     storage_live(_5)
+<     _5 = &(*self)
+<     storage_live(_6)
+<     _6 = copy (*self).cur
+<     _4 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_batch<'4>(move _5, move _6)
+<     ↳⚡ storage_dead(self)
+<         unwind_continue
+<     storage_dead(_6)
+<     storage_dead(_5)
+<     _3 = lz4_flex::block::hash(move _4)
+<     ↳⚡ storage_dead(self)
+<         unwind_continue
+<     storage_dead(_4)
+<     _2 = cast<u32, usize>(move _3)
+<     storage_dead(_3)
+<     storage_live(_7)
+<     _7 = copy (*self).dict_bitshift
+<     _0 = move _2 panic.>> move _7
+<     storage_dead(_7)
+<     storage_dead(_2)
+<     storage_dead(self)
+<     return
+< }
+< 
+< #[inline(hint)]
+635,674d583
+< fn lz4_flex::block::compress::read_u16_ptr(input: *const u8) -> u16
+< {
+<     let _0: u16; // return
+<     let input: *const u8; // arg #1
+<     let num: u16; // local
+<     let _3: (); // anonymous local
+<     let _4: *const u8; // anonymous local
+<     let _5: *mut u8; // anonymous local
+<     let _6: *mut u16; // anonymous local
+<     let _7: &'1 mut u16; // anonymous local
+< 
+<     storage_live(_0)
+<     storage_live(num)
+<     num = const 0u16
+<     fake_read(num)
+<     set_type(typeof(num) == u16)
+<     storage_live(_3)
+<     storage_live(_4)
+<     _4 = copy input
+<     storage_live(_5)
+<     storage_live(_6)
+<     storage_live(_7)
+<     _7 = &mut num
+<     _6 = &raw mut (*_7)
+<     _5 = cast<*mut u16, *mut u8>(move _6)
+<     storage_dead(_6)
+<     _3 = core::ptr::copy_nonoverlapping<u8>(move _4, move _5, const 2usize)
+<     ↳⚡ storage_dead(input)
+<         unwind_continue
+<     storage_dead(_5)
+<     storage_dead(_4)
+<     storage_dead(_7)
+<     storage_dead(_3)
+<     _0 = copy num
+<     storage_dead(num)
+<     storage_dead(input)
+<     return
+< }
+< 
+< #[inline(hint)]
+720,759d628
+< #[inline(hint)]
+< fn lz4_flex::block::compress::read_u32_ptr(input: *const u8) -> u32
+< {
+<     let _0: u32; // return
+<     let input: *const u8; // arg #1
+<     let num: u32; // local
+<     let _3: (); // anonymous local
+<     let _4: *const u8; // anonymous local
+<     let _5: *mut u8; // anonymous local
+<     let _6: *mut u32; // anonymous local
+<     let _7: &'1 mut u32; // anonymous local
+< 
+<     storage_live(_0)
+<     storage_live(num)
+<     num = const 0u32
+<     fake_read(num)
+<     set_type(typeof(num) == u32)
+<     storage_live(_3)
+<     storage_live(_4)
+<     _4 = copy input
+<     storage_live(_5)
+<     storage_live(_6)
+<     storage_live(_7)
+<     _7 = &mut num
+<     _6 = &raw mut (*_7)
+<     _5 = cast<*mut u32, *mut u8>(move _6)
+<     storage_dead(_6)
+<     _3 = core::ptr::copy_nonoverlapping<u8>(move _4, move _5, const 4usize)
+<     ↳⚡ storage_dead(input)
+<         unwind_continue
+<     storage_dead(_5)
+<     storage_dead(_4)
+<     storage_dead(_7)
+<     storage_dead(_3)
+<     _0 = copy num
+<     storage_dead(num)
+<     storage_dead(input)
+<     return
+< }
+< 
+773c642
+< unsafe fn lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes<'_0>(self: &'_0 lz4_flex::block::compress::Encoder, first: *const u8, second: *const u8) -> usize
+---
+> unsafe fn lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes<'_0, '_1>(self: &'_0 lz4_flex::block::compress::Encoder, first: *const u8, second: *const u8, cur: &'_1 mut usize) -> usize
+779,781c648,650
+<     let pos: usize; // local
+<     let _5: bool; // anonymous local
+<     let _6: usize; // anonymous local
+---
+>     let cur: &'3 mut usize; // arg #4
+>     let start: usize; // local
+>     let _6: bool; // anonymous local
+788c657
+<     let _13: usize; // anonymous local
+---
+>     let diff: usize; // local
+790,799c659,668
+<     let diff_15: usize; // local
+<     let _16: usize; // anonymous local
+<     let _17: *const u8; // anonymous local
+<     let _18: *const u8; // anonymous local
+<     let _19: usize; // anonymous local
+<     let _20: usize; // anonymous local
+<     let _21: *const u8; // anonymous local
+<     let _22: *const u8; // anonymous local
+<     let _23: usize; // anonymous local
+<     let _24: bool; // anonymous local
+---
+>     let _15: *const u8; // anonymous local
+>     let _16: *const u8; // anonymous local
+>     let _17: usize; // anonymous local
+>     let _18: usize; // anonymous local
+>     let _19: *const u8; // anonymous local
+>     let _20: bool; // anonymous local
+>     let _21: usize; // anonymous local
+>     let _22: usize; // anonymous local
+>     let _23: *const u8; // anonymous local
+>     let _24: *const u8; // anonymous local
+801c670
+<     let _26: usize; // anonymous local
+---
+>     let _26: u32; // anonymous local
+804c673
+<     let _29: u32; // anonymous local
+---
+>     let _29: usize; // anonymous local
+807c676
+<     let _32: bool; // anonymous local
+---
+>     let _32: usize; // anonymous local
+810,880d678
+<     let _35: usize; // anonymous local
+<     let _36: usize; // anonymous local
+<     let _37: usize; // anonymous local
+<     let _38: usize; // anonymous local
+<     let _39: usize; // anonymous local
+<     let _40: usize; // anonymous local
+<     let _41: usize; // anonymous local
+<     let diff_42: u32; // local
+<     let _43: u32; // anonymous local
+<     let _44: *const u8; // anonymous local
+<     let _45: *const u8; // anonymous local
+<     let _46: usize; // anonymous local
+<     let _47: u32; // anonymous local
+<     let _48: *const u8; // anonymous local
+<     let _49: *const u8; // anonymous local
+<     let _50: usize; // anonymous local
+<     let _51: bool; // anonymous local
+<     let _52: u32; // anonymous local
+<     let _53: usize; // anonymous local
+<     let _54: usize; // anonymous local
+<     let _55: usize; // anonymous local
+<     let _56: usize; // anonymous local
+<     let _57: u32; // anonymous local
+<     let _58: u32; // anonymous local
+<     let _59: u32; // anonymous local
+<     let _60: usize; // anonymous local
+<     let _61: bool; // anonymous local
+<     let _62: usize; // anonymous local
+<     let _63: usize; // anonymous local
+<     let _64: usize; // anonymous local
+<     let _65: usize; // anonymous local
+<     let _66: usize; // anonymous local
+<     let _67: usize; // anonymous local
+<     let _68: usize; // anonymous local
+<     let _69: usize; // anonymous local
+<     let _70: usize; // anonymous local
+<     let diff_71: u16; // local
+<     let _72: u16; // anonymous local
+<     let _73: *const u8; // anonymous local
+<     let _74: *const u8; // anonymous local
+<     let _75: usize; // anonymous local
+<     let _76: u16; // anonymous local
+<     let _77: *const u8; // anonymous local
+<     let _78: *const u8; // anonymous local
+<     let _79: usize; // anonymous local
+<     let _80: bool; // anonymous local
+<     let _81: u16; // anonymous local
+<     let _82: usize; // anonymous local
+<     let _83: usize; // anonymous local
+<     let _84: usize; // anonymous local
+<     let _85: usize; // anonymous local
+<     let _86: u32; // anonymous local
+<     let _87: u32; // anonymous local
+<     let _88: u16; // anonymous local
+<     let _89: usize; // anonymous local
+<     let _90: bool; // anonymous local
+<     let _91: usize; // anonymous local
+<     let _92: usize; // anonymous local
+<     let _93: usize; // anonymous local
+<     let _94: usize; // anonymous local
+<     let _95: usize; // anonymous local
+<     let _96: usize; // anonymous local
+<     let _97: usize; // anonymous local
+<     let _98: usize; // anonymous local
+<     let _99: usize; // anonymous local
+<     let _100: bool; // anonymous local
+<     let _101: u8; // anonymous local
+<     let _102: *const u8; // anonymous local
+<     let _103: u8; // anonymous local
+<     let _104: *const u8; // anonymous local
+<     let _105: usize; // anonymous local
+882a681
+>     storage_live(_10)
+884,886c683,684
+<     storage_live(_12)
+<     storage_live(_13)
+<     storage_live(_26)
+---
+>     storage_live(_22)
+>     storage_live(_28)
+888,904c686,689
+<     storage_live(_38)
+<     storage_live(_39)
+<     storage_live(_40)
+<     storage_live(_54)
+<     storage_live(_60)
+<     storage_live(_67)
+<     storage_live(_68)
+<     storage_live(_69)
+<     storage_live(_83)
+<     storage_live(_89)
+<     storage_live(_96)
+<     storage_live(_97)
+<     storage_live(_98)
+<     storage_live(_105)
+<     storage_live(pos)
+<     pos = const 0usize
+<     fake_read(pos)
+---
+>     storage_live(_34)
+>     storage_live(start)
+>     start = copy (*cur)
+>     fake_read(start)
+907d691
+<         storage_live(_5)
+912,917c696,698
+<         _9 = copy (*self).cur
+<         storage_live(_10)
+<         _10 = copy pos
+<         _11 = copy _9 panic.+ copy _10
+<         _8 = move _11
+<         storage_dead(_10)
+---
+>         _9 = copy (*cur)
+>         _10 = copy _9 panic.+ copy lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes::STEP_SIZE
+>         _8 = move _10
+919,920c700,701
+<         _12 = copy _8 panic.+ copy lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes::STEP_SIZE
+<         _7 = move _12
+---
+>         _11 = copy _8 panic.+ copy lz4_flex::block::END_OFFSET
+>         _7 = move _11
+922,931c703,711
+<         _13 = copy _7 panic.+ copy lz4_flex::block::END_OFFSET
+<         _6 = move _13
+<         storage_dead(_7)
+<         storage_live(_14)
+<         _14 = copy (*self).input_size
+<         _5 = move _6 < move _14
+<         if move _5 {
+<             storage_dead(_14)
+<             storage_dead(_6)
+<             storage_live(diff_15)
+---
+>         storage_live(_12)
+>         _12 = copy (*self).input_size
+>         _6 = move _7 < move _12
+>         if move _6 {
+>             storage_dead(_12)
+>             storage_dead(_7)
+>             storage_live(diff)
+>             storage_live(_14)
+>             storage_live(_15)
+932a713
+>             _16 = copy first
+934,978c715,717
+<             storage_live(_18)
+<             _18 = copy first
+<             storage_live(_19)
+<             _19 = copy pos
+<             _17 = core::ptr::const_ptr::{*const T}::add<u8>(move _18, move _19)
+<             ↳⚡ storage_dead(_105)
+<                 storage_dead(_98)
+<                 storage_dead(_97)
+<                 storage_dead(_96)
+<                 storage_dead(_89)
+<                 storage_dead(_83)
+<                 storage_dead(_69)
+<                 storage_dead(_68)
+<                 storage_dead(_67)
+<                 storage_dead(_60)
+<                 storage_dead(_54)
+<                 storage_dead(_40)
+<                 storage_dead(_39)
+<                 storage_dead(_38)
+<                 storage_dead(_31)
+<                 storage_dead(_26)
+<                 storage_dead(_13)
+<                 storage_dead(_12)
+<                 storage_dead(_11)
+<                 storage_dead(second)
+<                 storage_dead(first)
+<                 storage_dead(self)
+<                 unwind_continue
+<             storage_dead(_19)
+<             storage_dead(_18)
+<             _16 = lz4_flex::block::compress::read_usize_ptr(move _17)
+<             ↳⚡ storage_dead(_105)
+<                 storage_dead(_98)
+<                 storage_dead(_97)
+<                 storage_dead(_96)
+<                 storage_dead(_89)
+<                 storage_dead(_83)
+<                 storage_dead(_69)
+<                 storage_dead(_68)
+<                 storage_dead(_67)
+<                 storage_dead(_60)
+<                 storage_dead(_54)
+<                 storage_dead(_40)
+<                 storage_dead(_39)
+<                 storage_dead(_38)
+---
+>             _17 = copy (*cur)
+>             _15 = core::ptr::const_ptr::{*const T}::add<u8>(move _16, move _17)
+>             ↳⚡ storage_dead(_34)
+980,982c719,720
+<                 storage_dead(_26)
+<                 storage_dead(_13)
+<                 storage_dead(_12)
+---
+>                 storage_dead(_28)
+>                 storage_dead(_22)
+983a722,723
+>                 storage_dead(_10)
+>                 storage_dead(cur)
+989,1009c729,731
+<             storage_live(_20)
+<             storage_live(_21)
+<             storage_live(_22)
+<             _22 = copy second
+<             storage_live(_23)
+<             _23 = copy pos
+<             _21 = core::ptr::const_ptr::{*const T}::add<u8>(move _22, move _23)
+<             ↳⚡ storage_dead(_105)
+<                 storage_dead(_98)
+<                 storage_dead(_97)
+<                 storage_dead(_96)
+<                 storage_dead(_89)
+<                 storage_dead(_83)
+<                 storage_dead(_69)
+<                 storage_dead(_68)
+<                 storage_dead(_67)
+<                 storage_dead(_60)
+<                 storage_dead(_54)
+<                 storage_dead(_40)
+<                 storage_dead(_39)
+<                 storage_dead(_38)
+---
+>             storage_dead(_16)
+>             _14 = lz4_flex::block::compress::read_usize_ptr(move _15)
+>             ↳⚡ storage_dead(_34)
+1011,1013c733,734
+<                 storage_dead(_26)
+<                 storage_dead(_13)
+<                 storage_dead(_12)
+---
+>                 storage_dead(_28)
+>                 storage_dead(_22)
+1014a736,737
+>                 storage_dead(_10)
+>                 storage_dead(cur)
+1019,1035c742,747
+<             storage_dead(_23)
+<             storage_dead(_22)
+<             _20 = lz4_flex::block::compress::read_usize_ptr(move _21)
+<             ↳⚡ storage_dead(_105)
+<                 storage_dead(_98)
+<                 storage_dead(_97)
+<                 storage_dead(_96)
+<                 storage_dead(_89)
+<                 storage_dead(_83)
+<                 storage_dead(_69)
+<                 storage_dead(_68)
+<                 storage_dead(_67)
+<                 storage_dead(_60)
+<                 storage_dead(_54)
+<                 storage_dead(_40)
+<                 storage_dead(_39)
+<                 storage_dead(_38)
+---
+>             storage_dead(_15)
+>             storage_live(_18)
+>             storage_live(_19)
+>             _19 = copy second
+>             _18 = lz4_flex::block::compress::read_usize_ptr(move _19)
+>             ↳⚡ storage_dead(_34)
+1037,1039c749,750
+<                 storage_dead(_26)
+<                 storage_dead(_13)
+<                 storage_dead(_12)
+---
+>                 storage_dead(_28)
+>                 storage_dead(_22)
+1040a752,753
+>                 storage_dead(_10)
+>                 storage_dead(cur)
+1045,1054c758,767
+<             storage_dead(_21)
+<             diff_15 = move _16 ^ move _20
+<             storage_dead(_20)
+<             storage_dead(_16)
+<             fake_read(diff_15)
+<             storage_live(_24)
+<             storage_live(_25)
+<             _25 = copy diff_15
+<             _24 = move _25 == const 0usize
+<             if move _24 {
+---
+>             storage_dead(_19)
+>             diff = move _14 ^ move _18
+>             storage_dead(_18)
+>             storage_dead(_14)
+>             fake_read(diff)
+>             storage_live(_20)
+>             storage_live(_21)
+>             _21 = copy diff
+>             _20 = move _21 == const 0usize
+>             if move _20 {
+1056c769,771
+<                 storage_dead(_25)
+---
+>                 storage_dead(_21)
+>                 storage_live(_25)
+>                 storage_live(_26)
+1058,1077c773,775
+<                 _27 = copy pos
+<                 storage_live(_28)
+<                 storage_live(_29)
+<                 storage_live(_30)
+<                 _30 = copy diff_15
+<                 _29 = lz4_flex::block::compress::get_common_bytes(move _30)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+---
+>                 _27 = copy diff
+>                 _26 = lz4_flex::block::compress::get_common_bytes(move _27)
+>                 ↳⚡ storage_dead(_34)
+1079,1081c777,778
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+---
+>                     storage_dead(_28)
+>                     storage_dead(_22)
+1082a780,781
+>                     storage_dead(_10)
+>                     storage_dead(cur)
+1086a786,797
+>                 storage_dead(_27)
+>                 _25 = cast<u32, usize>(move _26)
+>                 storage_dead(_26)
+>                 _28 = copy (*cur) panic.+ copy _25
+>                 (*cur) = move _28
+>                 storage_dead(_25)
+>                 storage_live(_29)
+>                 _29 = copy (*cur)
+>                 storage_live(_30)
+>                 _30 = copy start
+>                 _31 = copy _29 panic.- copy _30
+>                 _0 = move _31
+1088d798
+<                 _28 = cast<u32, usize>(move _29)
+1090,1091c800,829
+<                 _31 = copy _27 panic.+ copy _28
+<                 _0 = move _31
+---
+>                 storage_dead(_20)
+>                 storage_dead(diff)
+>                 storage_dead(_6)
+>                 // compare 4 bytes block
+>                 // #[cfg(target_pointer_width = "64")]{
+>                 //     if cur + pos + 4 + END_OFFSET < self.input_size  {
+>                 //         let diff = read_u32_ptr(first.add(pos)) ^ read_u32_ptr(second.add(pos));
+>                 //         if diff == 0{
+>                 //             return pos + 4;
+>                 //         }else {
+>                 //             return pos + (diff.trailing_zeros() >> 3) as usize
+>                 //         }
+>                 //     }
+>                 // }
+>                 // // compare 2 bytes block
+>                 // if cur + pos + 2 + END_OFFSET < self.input_size  {
+>                 //     let diff = read_u16_ptr(first.add(pos)) ^ read_u16_ptr(second.add(pos));
+>                 //     if diff == 0{
+>                 //         return pos + 2;
+>                 //     }else {
+>                 //         return pos + (diff.trailing_zeros() >> 3) as usize
+>                 //     }
+>                 // }
+>                 // // TODO add end_pos_check, last 5 bytes should be literals
+>                 // if cur + pos + 1 + END_OFFSET < self.input_size  && first.read() == second.read(){
+>                 //     pos +=1;
+>                 // }
+>                 storage_dead(start)
+>                 storage_dead(_34)
+>                 storage_dead(_31)
+1093,1097c831,838
+<                 storage_dead(_27)
+<                 storage_dead(_24)
+<                 storage_dead(diff_15)
+<                 storage_dead(_5)
+<                 break 0
+---
+>                 storage_dead(_22)
+>                 storage_dead(_11)
+>                 storage_dead(_10)
+>                 storage_dead(cur)
+>                 storage_dead(second)
+>                 storage_dead(first)
+>                 storage_dead(self)
+>                 return
+1099,1101c840,857
+<             storage_dead(_25)
+<             _26 = copy pos panic.+ copy lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes::STEP_SIZE
+<             pos = move _26
+---
+>             storage_dead(_21)
+>             _22 = copy (*cur) panic.+ copy lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes::STEP_SIZE
+>             (*cur) = move _22
+>             storage_live(_23)
+>             storage_live(_24)
+>             _24 = copy second
+>             _23 = core::ptr::const_ptr::{*const T}::add<u8>(move _24, copy lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes::STEP_SIZE)
+>             ↳⚡ storage_dead(_34)
+>                 storage_dead(_31)
+>                 storage_dead(_28)
+>                 storage_dead(_22)
+>                 storage_dead(_11)
+>                 storage_dead(_10)
+>                 storage_dead(cur)
+>                 storage_dead(second)
+>                 storage_dead(first)
+>                 storage_dead(self)
+>                 unwind_continue
+1103,1104c859,863
+<             storage_dead(diff_15)
+<             storage_dead(_5)
+---
+>             second = move _23
+>             storage_dead(_23)
+>             storage_dead(_20)
+>             storage_dead(diff)
+>             storage_dead(_6)
+1107,1644d865
+<             storage_dead(_14)
+<             storage_dead(_6)
+<             storage_dead(_5)
+<             storage_live(_32)
+<             storage_live(_33)
+<             storage_live(_34)
+<             storage_live(_35)
+<             storage_live(_36)
+<             // compare 4 bytes block
+<             _36 = copy (*self).cur
+<             storage_live(_37)
+<             _37 = copy pos
+<             _38 = copy _36 panic.+ copy _37
+<             _35 = move _38
+<             storage_dead(_37)
+<             storage_dead(_36)
+<             _39 = copy _35 panic.+ const 4usize
+<             _34 = move _39
+<             storage_dead(_35)
+<             _40 = copy _34 panic.+ copy lz4_flex::block::END_OFFSET
+<             _33 = move _40
+<             storage_dead(_34)
+<             storage_live(_41)
+<             _41 = copy (*self).input_size
+<             _32 = move _33 < move _41
+<             if move _32 {
+<                 storage_dead(_41)
+<                 storage_dead(_33)
+<                 storage_live(diff_42)
+<                 storage_live(_43)
+<                 storage_live(_44)
+<                 storage_live(_45)
+<                 _45 = copy first
+<                 storage_live(_46)
+<                 _46 = copy pos
+<                 _44 = core::ptr::const_ptr::{*const T}::add<u8>(move _45, move _46)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_46)
+<                 storage_dead(_45)
+<                 _43 = lz4_flex::block::compress::read_u32_ptr(move _44)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_44)
+<                 storage_live(_47)
+<                 storage_live(_48)
+<                 storage_live(_49)
+<                 _49 = copy second
+<                 storage_live(_50)
+<                 _50 = copy pos
+<                 _48 = core::ptr::const_ptr::{*const T}::add<u8>(move _49, move _50)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_50)
+<                 storage_dead(_49)
+<                 _47 = lz4_flex::block::compress::read_u32_ptr(move _48)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_48)
+<                 diff_42 = move _43 ^ move _47
+<                 storage_dead(_47)
+<                 storage_dead(_43)
+<                 fake_read(diff_42)
+<                 storage_live(_51)
+<                 storage_live(_52)
+<                 _52 = copy diff_42
+<                 _51 = move _52 == const 0u32
+<                 if move _51 {
+<                     storage_dead(_52)
+<                     storage_live(_53)
+<                     _53 = copy pos
+<                     _54 = copy _53 panic.+ const 4usize
+<                     _0 = move _54
+<                     storage_dead(_53)
+<                 } else {
+<                     storage_dead(_52)
+<                     storage_live(_55)
+<                     _55 = copy pos
+<                     storage_live(_56)
+<                     storage_live(_57)
+<                     storage_live(_58)
+<                     storage_live(_59)
+<                     _59 = copy diff_42
+<                     _58 = core::num::{u32}::trailing_zeros(move _59)
+<                     ↳⚡ storage_dead(_105)
+<                         storage_dead(_98)
+<                         storage_dead(_97)
+<                         storage_dead(_96)
+<                         storage_dead(_89)
+<                         storage_dead(_83)
+<                         storage_dead(_69)
+<                         storage_dead(_68)
+<                         storage_dead(_67)
+<                         storage_dead(_60)
+<                         storage_dead(_54)
+<                         storage_dead(_40)
+<                         storage_dead(_39)
+<                         storage_dead(_38)
+<                         storage_dead(_31)
+<                         storage_dead(_26)
+<                         storage_dead(_13)
+<                         storage_dead(_12)
+<                         storage_dead(_11)
+<                         storage_dead(second)
+<                         storage_dead(first)
+<                         storage_dead(self)
+<                         unwind_continue
+<                     storage_dead(_59)
+<                     _57 = move _58 panic.>> const 3i32
+<                     storage_dead(_58)
+<                     _56 = cast<u32, usize>(move _57)
+<                     storage_dead(_57)
+<                     _60 = copy _55 panic.+ copy _56
+<                     _0 = move _60
+<                     storage_dead(_56)
+<                     storage_dead(_55)
+<                 }
+<                 storage_dead(_51)
+<                 storage_dead(diff_42)
+<                 storage_dead(_32)
+<             } else {
+<                 storage_dead(_41)
+<                 storage_dead(_33)
+<                 storage_dead(_32)
+<                 storage_live(_61)
+<                 storage_live(_62)
+<                 storage_live(_63)
+<                 storage_live(_64)
+<                 storage_live(_65)
+<                 // compare 2 bytes block
+<                 _65 = copy (*self).cur
+<                 storage_live(_66)
+<                 _66 = copy pos
+<                 _67 = copy _65 panic.+ copy _66
+<                 _64 = move _67
+<                 storage_dead(_66)
+<                 storage_dead(_65)
+<                 _68 = copy _64 panic.+ const 2usize
+<                 _63 = move _68
+<                 storage_dead(_64)
+<                 _69 = copy _63 panic.+ copy lz4_flex::block::END_OFFSET
+<                 _62 = move _69
+<                 storage_dead(_63)
+<                 storage_live(_70)
+<                 _70 = copy (*self).input_size
+<                 _61 = move _62 < move _70
+<                 if move _61 {
+<                 } else {
+<                     storage_dead(_70)
+<                     storage_dead(_62)
+<                     storage_dead(_61)
+<                     storage_live(_90)
+<                     storage_live(_91)
+<                     storage_live(_92)
+<                     storage_live(_93)
+<                     storage_live(_94)
+<                     // TODO add end_pos_check, last 5 bytes should be literals
+<                     _94 = copy (*self).cur
+<                     storage_live(_95)
+<                     _95 = copy pos
+<                     _96 = copy _94 panic.+ copy _95
+<                     _93 = move _96
+<                     storage_dead(_95)
+<                     storage_dead(_94)
+<                     _97 = copy _93 panic.+ const 1usize
+<                     _92 = move _97
+<                     storage_dead(_93)
+<                     _98 = copy _92 panic.+ copy lz4_flex::block::END_OFFSET
+<                     _91 = move _98
+<                     storage_dead(_92)
+<                     storage_live(_99)
+<                     _99 = copy (*self).input_size
+<                     _90 = move _91 < move _99
+<                     if move _90 {
+<                         storage_dead(_99)
+<                         storage_dead(_91)
+<                         storage_live(_100)
+<                         storage_live(_101)
+<                         storage_live(_102)
+<                         _102 = copy first
+<                         _101 = core::ptr::const_ptr::{*const T}::read<u8>(move _102)
+<                         ↳⚡ storage_dead(_105)
+<                             storage_dead(_98)
+<                             storage_dead(_97)
+<                             storage_dead(_96)
+<                             storage_dead(_89)
+<                             storage_dead(_83)
+<                             storage_dead(_69)
+<                             storage_dead(_68)
+<                             storage_dead(_67)
+<                             storage_dead(_60)
+<                             storage_dead(_54)
+<                             storage_dead(_40)
+<                             storage_dead(_39)
+<                             storage_dead(_38)
+<                             storage_dead(_31)
+<                             storage_dead(_26)
+<                             storage_dead(_13)
+<                             storage_dead(_12)
+<                             storage_dead(_11)
+<                             storage_dead(second)
+<                             storage_dead(first)
+<                             storage_dead(self)
+<                             unwind_continue
+<                         storage_dead(_102)
+<                         storage_live(_103)
+<                         storage_live(_104)
+<                         _104 = copy second
+<                         _103 = core::ptr::const_ptr::{*const T}::read<u8>(move _104)
+<                         ↳⚡ storage_dead(_105)
+<                             storage_dead(_98)
+<                             storage_dead(_97)
+<                             storage_dead(_96)
+<                             storage_dead(_89)
+<                             storage_dead(_83)
+<                             storage_dead(_69)
+<                             storage_dead(_68)
+<                             storage_dead(_67)
+<                             storage_dead(_60)
+<                             storage_dead(_54)
+<                             storage_dead(_40)
+<                             storage_dead(_39)
+<                             storage_dead(_38)
+<                             storage_dead(_31)
+<                             storage_dead(_26)
+<                             storage_dead(_13)
+<                             storage_dead(_12)
+<                             storage_dead(_11)
+<                             storage_dead(second)
+<                             storage_dead(first)
+<                             storage_dead(self)
+<                             unwind_continue
+<                         storage_dead(_104)
+<                         _100 = move _101 == move _103
+<                         if move _100 {
+<                             storage_dead(_103)
+<                             storage_dead(_101)
+<                             _105 = copy pos panic.+ const 1usize
+<                             pos = move _105
+<                         } else {
+<                             storage_dead(_103)
+<                             storage_dead(_101)
+<                         }
+<                     } else {
+<                         storage_dead(_99)
+<                         storage_dead(_91)
+<                     }
+<                     storage_dead(_100)
+<                     storage_dead(_90)
+<                     _0 = copy pos
+<                     storage_dead(pos)
+<                     storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     return
+<                 }
+<                 storage_dead(_70)
+<                 storage_dead(_62)
+<                 storage_live(diff_71)
+<                 storage_live(_72)
+<                 storage_live(_73)
+<                 storage_live(_74)
+<                 _74 = copy first
+<                 storage_live(_75)
+<                 _75 = copy pos
+<                 _73 = core::ptr::const_ptr::{*const T}::add<u8>(move _74, move _75)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_75)
+<                 storage_dead(_74)
+<                 _72 = lz4_flex::block::compress::read_u16_ptr(move _73)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_73)
+<                 storage_live(_76)
+<                 storage_live(_77)
+<                 storage_live(_78)
+<                 _78 = copy second
+<                 storage_live(_79)
+<                 _79 = copy pos
+<                 _77 = core::ptr::const_ptr::{*const T}::add<u8>(move _78, move _79)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_79)
+<                 storage_dead(_78)
+<                 _76 = lz4_flex::block::compress::read_u16_ptr(move _77)
+<                 ↳⚡ storage_dead(_105)
+<                     storage_dead(_98)
+<                     storage_dead(_97)
+<                     storage_dead(_96)
+<                     storage_dead(_89)
+<                     storage_dead(_83)
+<                     storage_dead(_69)
+<                     storage_dead(_68)
+<                     storage_dead(_67)
+<                     storage_dead(_60)
+<                     storage_dead(_54)
+<                     storage_dead(_40)
+<                     storage_dead(_39)
+<                     storage_dead(_38)
+<                     storage_dead(_31)
+<                     storage_dead(_26)
+<                     storage_dead(_13)
+<                     storage_dead(_12)
+<                     storage_dead(_11)
+<                     storage_dead(second)
+<                     storage_dead(first)
+<                     storage_dead(self)
+<                     unwind_continue
+<                 storage_dead(_77)
+<                 diff_71 = move _72 ^ move _76
+<                 storage_dead(_76)
+<                 storage_dead(_72)
+<                 fake_read(diff_71)
+<                 storage_live(_80)
+<                 storage_live(_81)
+<                 _81 = copy diff_71
+<                 _80 = move _81 == const 0u16
+<                 if move _80 {
+<                     storage_dead(_81)
+<                     storage_live(_82)
+<                     _82 = copy pos
+<                     _83 = copy _82 panic.+ const 2usize
+<                     _0 = move _83
+<                     storage_dead(_82)
+<                 } else {
+<                     storage_dead(_81)
+<                     storage_live(_84)
+<                     _84 = copy pos
+<                     storage_live(_85)
+<                     storage_live(_86)
+<                     storage_live(_87)
+<                     storage_live(_88)
+<                     _88 = copy diff_71
+<                     _87 = core::num::{u16}::trailing_zeros(move _88)
+<                     ↳⚡ storage_dead(_105)
+<                         storage_dead(_98)
+<                         storage_dead(_97)
+<                         storage_dead(_96)
+<                         storage_dead(_89)
+<                         storage_dead(_83)
+<                         storage_dead(_69)
+<                         storage_dead(_68)
+<                         storage_dead(_67)
+<                         storage_dead(_60)
+<                         storage_dead(_54)
+<                         storage_dead(_40)
+<                         storage_dead(_39)
+<                         storage_dead(_38)
+<                         storage_dead(_31)
+<                         storage_dead(_26)
+<                         storage_dead(_13)
+<                         storage_dead(_12)
+<                         storage_dead(_11)
+<                         storage_dead(second)
+<                         storage_dead(first)
+<                         storage_dead(self)
+<                         unwind_continue
+<                     storage_dead(_88)
+<                     _86 = move _87 panic.>> const 3i32
+<                     storage_dead(_87)
+<                     _85 = cast<u32, usize>(move _86)
+<                     storage_dead(_86)
+<                     _89 = copy _84 panic.+ copy _85
+<                     _0 = move _89
+<                     storage_dead(_85)
+<                     storage_dead(_84)
+<                 }
+<                 storage_dead(_80)
+<                 storage_dead(diff_71)
+<                 storage_dead(_61)
+<             }
+1648,1665d868
+<     storage_dead(pos)
+<     storage_dead(_105)
+<     storage_dead(_98)
+<     storage_dead(_97)
+<     storage_dead(_96)
+<     storage_dead(_89)
+<     storage_dead(_83)
+<     storage_dead(_69)
+<     storage_dead(_68)
+<     storage_dead(_67)
+<     storage_dead(_60)
+<     storage_dead(_54)
+<     storage_dead(_40)
+<     storage_dead(_39)
+<     storage_dead(_38)
+<     storage_dead(_31)
+<     storage_dead(_26)
+<     storage_dead(_13)
+1666a870,884
+>     storage_dead(_7)
+>     storage_dead(_6)
+>     storage_live(_32)
+>     _32 = copy (*cur)
+>     storage_live(_33)
+>     _33 = copy start
+>     _34 = copy _32 panic.- copy _33
+>     _0 = move _34
+>     storage_dead(_33)
+>     storage_dead(_32)
+>     storage_dead(start)
+>     storage_dead(_34)
+>     storage_dead(_31)
+>     storage_dead(_28)
+>     storage_dead(_22)
+1667a886,887
+>     storage_dead(_10)
+>     storage_dead(cur)
+1684c904
+<     let _8: *mut u8; // anonymous local
+---
+>     let _8: usize; // anonymous local
+1686,1688c906,908
+<     let _10: (); // anonymous local
+<     let _11: *const u8; // anonymous local
+<     let _12: *mut u8; // anonymous local
+---
+>     let _10: usize; // anonymous local
+>     let _11: *mut u8; // anonymous local
+>     let _12: (); // anonymous local
+1690,1692c910,914
+<     let _14: *const u8; // anonymous local
+<     let _15: *mut u8; // anonymous local
+<     let _16: *mut u8; // anonymous local
+---
+>     let _14: *mut u8; // anonymous local
+>     let _15: *const u8; // anonymous local
+>     let _16: *const u8; // anonymous local
+>     let _17: *mut u8; // anonymous local
+>     let _18: *mut u8; // anonymous local
+1712d933
+<         _8 = copy dst_ptr
+1714,1715c935,943
+<         _9 = copy dst_ptr_end
+<         _7 = move _8 < move _9
+---
+>         _9 = copy dst_ptr
+>         _8 = cast_expose<*mut u8, usize>(move _9)
+>         storage_dead(_9)
+>         storage_live(_10)
+>         storage_live(_11)
+>         _11 = copy dst_ptr_end
+>         _10 = cast_expose<*mut u8, usize>(move _11)
+>         storage_dead(_11)
+>         _7 = move _8 < move _10
+1717c945
+<             storage_dead(_9)
+---
+>             storage_dead(_10)
+1719,1721d946
+<             storage_live(_10)
+<             storage_live(_11)
+<             _11 = copy source
+1723,1731d947
+<             _12 = copy dst_ptr
+<             _10 = core::ptr::copy_nonoverlapping<u8>(move _11, move _12, const 16usize)
+<             ↳⚡ storage_dead(num_items)
+<                 storage_dead(dst_ptr)
+<                 storage_dead(source)
+<                 unwind_continue
+<             storage_dead(_12)
+<             storage_dead(_11)
+<             storage_dead(_10)
+1732a949
+>             _13 = copy source
+1734,1735c951,952
+<             _14 = copy source
+<             _13 = core::ptr::const_ptr::{*const T}::add<u8>(move _14, const 16usize)
+---
+>             _14 = copy dst_ptr
+>             _12 = core::ptr::copy_nonoverlapping<u8>(move _13, move _14, const 16usize)
+1741d957
+<             source = move _13
+1742a959
+>             storage_dead(_12)
+1745,1746c962,963
+<             _16 = copy dst_ptr
+<             _15 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _16, const 16usize)
+---
+>             _16 = copy source
+>             _15 = core::ptr::const_ptr::{*const T}::add<u8>(move _16, const 16usize)
+1752c969
+<             dst_ptr = move _15
+---
+>             source = move _15
+1753a971,981
+>             storage_live(_17)
+>             storage_live(_18)
+>             _18 = copy dst_ptr
+>             _17 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _18, const 16usize)
+>             ↳⚡ storage_dead(num_items)
+>                 storage_dead(dst_ptr)
+>                 storage_dead(source)
+>                 unwind_continue
+>             storage_dead(_18)
+>             dst_ptr = move _17
+>             storage_dead(_17)
+1760c988
+<     storage_dead(_9)
+---
+>     storage_dead(_10)
+2296a1525
+>     let cur: usize; // local
+2298,2306c1527,1536
+<     let hash_39: usize; // local
+<     let _40: &'9 lz4_flex::block::compress::Encoder; // anonymous local
+<     let _41: usize; // anonymous local
+<     let _42: &'11 mut usize; // anonymous local
+<     let _43: &'13 mut [usize]; // anonymous local
+<     let _44: &'14 mut [usize]; // anonymous local
+<     let _45: &'16 mut alloc::vec::Vec<usize>; // anonymous local
+<     let _46: usize; // anonymous local
+<     let _47: usize; // anonymous local
+---
+>     let hash_40: usize; // local
+>     let _41: &'9 lz4_flex::block::compress::Encoder; // anonymous local
+>     let _42: usize; // anonymous local
+>     let _43: usize; // anonymous local
+>     let _44: &'11 mut usize; // anonymous local
+>     let _45: &'13 mut [usize]; // anonymous local
+>     let _46: &'14 mut [usize]; // anonymous local
+>     let _47: &'16 mut alloc::vec::Vec<usize>; // anonymous local
+>     let _48: usize; // anonymous local
+>     let _49: usize; // anonymous local
+2308,2310c1538
+<     let _49: &'17 lz4_flex::block::compress::Encoder; // anonymous local
+<     let end_pos_check: usize; // local
+<     let _51: usize; // anonymous local
+---
+>     let _51: &'17 lz4_flex::block::compress::Encoder; // anonymous local
+2312c1540,1543
+<     let _53: usize; // anonymous local
+---
+>     let end_pos_check: usize; // local
+>     let _54: usize; // anonymous local
+>     let _55: usize; // anonymous local
+>     let _56: usize; // anonymous local
+2317,2320c1548
+<     let _58: bool; // anonymous local
+<     let _59: usize; // anonymous local
+<     let _60: usize; // anonymous local
+<     let hash_61: usize; // local
+---
+>     let _61: bool; // anonymous local
+2323,2324c1551,1552
+<     let _64: usize; // anonymous local
+<     let _65: bool; // anonymous local
+---
+>     let hash_64: usize; // local
+>     let _65: usize; // anonymous local
+2327c1555
+<     let _68: &'18 mut lz4_flex::block::compress::Encoder; // anonymous local
+---
+>     let _68: bool; // anonymous local
+2329,2343c1557,1571
+<     let _70: *mut u8; // anonymous local
+<     let _71: usize; // anonymous local
+<     let _72: &'20 usize; // anonymous local
+<     let _73: &'22 [usize]; // anonymous local
+<     let _74: &'23 [usize]; // anonymous local
+<     let _75: &'25 alloc::vec::Vec<usize>; // anonymous local
+<     let _76: usize; // anonymous local
+<     let _77: usize; // anonymous local
+<     let _78: &'26 mut usize; // anonymous local
+<     let _79: &'27 mut [usize]; // anonymous local
+<     let _80: &'28 mut [usize]; // anonymous local
+<     let _81: &'29 mut alloc::vec::Vec<usize>; // anonymous local
+<     let _82: usize; // anonymous local
+<     let _83: usize; // anonymous local
+<     let _84: &'30 lz4_flex::block::compress::Encoder; // anonymous local
+---
+>     let _70: usize; // anonymous local
+>     let _71: &'18 mut lz4_flex::block::compress::Encoder; // anonymous local
+>     let _72: usize; // anonymous local
+>     let _73: *mut u8; // anonymous local
+>     let _74: usize; // anonymous local
+>     let _75: &'20 usize; // anonymous local
+>     let _76: &'22 [usize]; // anonymous local
+>     let _77: &'23 [usize]; // anonymous local
+>     let _78: &'25 alloc::vec::Vec<usize>; // anonymous local
+>     let _79: usize; // anonymous local
+>     let _80: usize; // anonymous local
+>     let _81: &'26 mut usize; // anonymous local
+>     let _82: &'27 mut [usize]; // anonymous local
+>     let _83: &'28 mut [usize]; // anonymous local
+>     let _84: &'29 mut alloc::vec::Vec<usize>; // anonymous local
+2345,2346c1573,1574
+<     let _86: bool; // anonymous local
+<     let _87: usize; // anonymous local
+---
+>     let _86: usize; // anonymous local
+>     let _87: &'30 lz4_flex::block::compress::Encoder; // anonymous local
+2348c1576
+<     let _89: usize; // anonymous local
+---
+>     let _89: bool; // anonymous local
+2350,2351c1578,1579
+<     let _91: u32; // anonymous local
+<     let _92: &'31 lz4_flex::block::compress::Encoder; // anonymous local
+---
+>     let _91: usize; // anonymous local
+>     let _92: usize; // anonymous local
+2354c1582
+<     let _95: &'32 lz4_flex::block::compress::Encoder; // anonymous local
+---
+>     let _95: &'31 lz4_flex::block::compress::Encoder; // anonymous local
+2356,2357c1584,1585
+<     let offset: u16; // local
+<     let _98: usize; // anonymous local
+---
+>     let _97: u32; // anonymous local
+>     let _98: &'32 lz4_flex::block::compress::Encoder; // anonymous local
+2359c1587
+<     let _100: usize; // anonymous local
+---
+>     let offset: u16; // local
+2361,2364c1589,1592
+<     let match_length: usize; // local
+<     let _103: &'33 lz4_flex::block::compress::Encoder; // anonymous local
+<     let _104: *const u8; // anonymous local
+<     let _105: *const u8; // anonymous local
+---
+>     let _102: usize; // anonymous local
+>     let _103: usize; // anonymous local
+>     let _104: usize; // anonymous local
+>     let lit_len_105: usize; // local
+2368,2370c1596,1598
+<     let _109: *const u8; // anonymous local
+<     let _110: *const u8; // anonymous local
+<     let _111: usize; // anonymous local
+---
+>     let _109: usize; // anonymous local
+>     let token_110: u8; // local
+>     let _111: bool; // anonymous local
+2372,2378c1600,1606
+<     let _113: usize; // anonymous local
+<     let lit_len_114: usize; // local
+<     let _115: usize; // anonymous local
+<     let _116: usize; // anonymous local
+<     let _117: usize; // anonymous local
+<     let token_118: u8; // local
+<     let _119: bool; // anonymous local
+---
+>     let _113: u8; // anonymous local
+>     let _114: usize; // anonymous local
+>     let match_length: usize; // local
+>     let _116: &'33 lz4_flex::block::compress::Encoder; // anonymous local
+>     let _117: *const u8; // anonymous local
+>     let _118: *const u8; // anonymous local
+>     let _119: *const u8; // anonymous local
+2380c1608
+<     let _121: u8; // anonymous local
+---
+>     let _121: usize; // anonymous local
+2382,2398c1610,1626
+<     let _123: usize; // anonymous local
+<     let _124: usize; // anonymous local
+<     let _125: usize; // anonymous local
+<     let _126: usize; // anonymous local
+<     let _127: u8; // anonymous local
+<     let _128: bool; // anonymous local
+<     let _129: usize; // anonymous local
+<     let _130: usize; // anonymous local
+<     let _131: (); // anonymous local
+<     let _132: &'34 mut *mut u8; // anonymous local
+<     let _133: &'35 mut *mut u8; // anonymous local
+<     let _134: u8; // anonymous local
+<     let _135: bool; // anonymous local
+<     let _136: usize; // anonymous local
+<     let _137: core::ops::control_flow::ControlFlow<core::result::Result<!, core::io::error::Error>, ()>; // anonymous local
+<     let _138: core::result::Result<(), core::io::error::Error>; // anonymous local
+<     let _139: &'36 mut lz4_flex::block::compress::Encoder; // anonymous local
+---
+>     let _123: &'34 mut usize; // anonymous local
+>     let _124: &'35 mut usize; // anonymous local
+>     let _125: u8; // anonymous local
+>     let _126: bool; // anonymous local
+>     let _127: usize; // anonymous local
+>     let _128: usize; // anonymous local
+>     let _129: (); // anonymous local
+>     let _130: &'36 mut *mut u8; // anonymous local
+>     let _131: &'37 mut *mut u8; // anonymous local
+>     let _132: u8; // anonymous local
+>     let _133: bool; // anonymous local
+>     let _134: usize; // anonymous local
+>     let _135: core::ops::control_flow::ControlFlow<core::result::Result<!, core::io::error::Error>, ()>; // anonymous local
+>     let _136: core::result::Result<(), core::io::error::Error>; // anonymous local
+>     let _137: &'38 mut lz4_flex::block::compress::Encoder; // anonymous local
+>     let _138: usize; // anonymous local
+>     let _139: usize; // anonymous local
+2400,2407c1628,1635
+<     let _141: usize; // anonymous local
+<     let _142: usize; // anonymous local
+<     let residual_143: core::result::Result<!, core::io::error::Error>; // local
+<     let _144: core::result::Result<!, core::io::error::Error>; // anonymous local
+<     let val_145: (); // local
+<     let _146: (); // anonymous local
+<     let _147: *const u8; // anonymous local
+<     let _148: *const u8; // anonymous local
+---
+>     let residual_141: core::result::Result<!, core::io::error::Error>; // local
+>     let _142: core::result::Result<!, core::io::error::Error>; // anonymous local
+>     let val_143: (); // local
+>     let _144: (); // anonymous local
+>     let _145: *const u8; // anonymous local
+>     let _146: *const u8; // anonymous local
+>     let _147: usize; // anonymous local
+>     let _148: *mut u8; // anonymous local
+2410,2419c1638,1647
+<     let _151: usize; // anonymous local
+<     let _152: *mut u8; // anonymous local
+<     let _153: *mut u8; // anonymous local
+<     let _154: usize; // anonymous local
+<     let _155: (); // anonymous local
+<     let _156: *const u8; // anonymous local
+<     let _157: *const u16; // anonymous local
+<     let _158: &'38 u16; // anonymous local
+<     let _159: u16; // anonymous local
+<     let _160: u16; // anonymous local
+---
+>     let _151: *mut u8; // anonymous local
+>     let _152: usize; // anonymous local
+>     let _153: (); // anonymous local
+>     let _154: *const u8; // anonymous local
+>     let _155: *const u16; // anonymous local
+>     let _156: &'40 u16; // anonymous local
+>     let _157: u16; // anonymous local
+>     let _158: u16; // anonymous local
+>     let _159: *mut u8; // anonymous local
+>     let _160: *mut u8; // anonymous local
+2421,2427c1649,1655
+<     let _162: *mut u8; // anonymous local
+<     let _163: *mut u8; // anonymous local
+<     let _164: bool; // anonymous local
+<     let _165: usize; // anonymous local
+<     let _166: core::ops::control_flow::ControlFlow<core::result::Result<!, core::io::error::Error>, ()>; // anonymous local
+<     let _167: core::result::Result<(), core::io::error::Error>; // anonymous local
+<     let _168: &'39 mut lz4_flex::block::compress::Encoder; // anonymous local
+---
+>     let _162: bool; // anonymous local
+>     let _163: usize; // anonymous local
+>     let _164: core::ops::control_flow::ControlFlow<core::result::Result<!, core::io::error::Error>, ()>; // anonymous local
+>     let _165: core::result::Result<(), core::io::error::Error>; // anonymous local
+>     let _166: &'41 mut lz4_flex::block::compress::Encoder; // anonymous local
+>     let _167: usize; // anonymous local
+>     let _168: usize; // anonymous local
+2429,2434c1657,1662
+<     let _170: usize; // anonymous local
+<     let _171: usize; // anonymous local
+<     let residual_172: core::result::Result<!, core::io::error::Error>; // local
+<     let _173: core::result::Result<!, core::io::error::Error>; // anonymous local
+<     let val_174: (); // local
+<     let _175: usize; // anonymous local
+---
+>     let residual_170: core::result::Result<!, core::io::error::Error>; // local
+>     let _171: core::result::Result<!, core::io::error::Error>; // anonymous local
+>     let val_172: (); // local
+>     let _173: usize; // anonymous local
+>     let _174: usize; // anonymous local
+>     let _175: &'42 lz4_flex::block::compress::Encoder; // anonymous local
+2436,2437d1663
+<     let _177: &'40 lz4_flex::block::compress::Encoder; // anonymous local
+<     let _178: usize; // anonymous local
+2442,2447c1668,1673
+<     storage_live(_47)
+<     storage_live(_53)
+<     storage_live(_59)
+<     storage_live(_64)
+<     storage_live(_89)
+<     storage_live(_101)
+---
+>     storage_live(_49)
+>     storage_live(_56)
+>     storage_live(_62)
+>     storage_live(_67)
+>     storage_live(_92)
+>     storage_live(_104)
+2449,2454c1675,1678
+<     storage_live(_113)
+<     storage_live(_117)
+<     storage_live(_125)
+<     storage_live(_126)
+<     storage_live(_142)
+<     storage_live(_171)
+---
+>     storage_live(_109)
+>     storage_live(_122)
+>     storage_live(_140)
+>     storage_live(_169)
+2475a1700,1702
+>         storage_live(cur)
+>         cur = const 0usize
+>         fake_read(cur)
+2477c1704
+<         start = copy (*self).cur
+---
+>         start = copy cur
+2479,2488c1706,1715
+<         storage_live(hash_39)
+<         storage_live(_40)
+<         _40 = &(*self)
+<         hash_39 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_cur_hash<'42>(move _40)
+<         ↳⚡ storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>         storage_live(hash_40)
+>         storage_live(_41)
+>         _41 = &(*self)
+>         storage_live(_42)
+>         _42 = copy cur
+>         hash_40 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_hash_at<'44>(move _41, move _42)
+>         ↳⚡ storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+2490,2495c1717,1722
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+2500,2504c1727,1729
+<         storage_dead(_40)
+<         fake_read(hash_39)
+<         storage_live(_41)
+<         _41 = copy (*self).cur
+<         storage_live(_42)
+---
+>         storage_dead(_42)
+>         storage_dead(_41)
+>         fake_read(hash_40)
+2505a1731
+>         _43 = copy cur
+2508,2515c1734,1741
+<         _45 = &mut (*self).dict
+<         _44 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'44, usize, alloc::alloc::Global>(move _45)
+<         ↳⚡ storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>         storage_live(_46)
+>         storage_live(_47)
+>         _47 = &mut (*self).dict
+>         _46 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'46, usize, alloc::alloc::Global>(move _47)
+>         ↳⚡ storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+2517,2522c1743,1748
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+2527,2537c1753,1761
+<         _43 = &two-phase-mut (*_44) with_metadata(copy _44.metadata)
+<         storage_dead(_45)
+<         storage_live(_46)
+<         _46 = copy hash_39
+<         _42 = core::slice::{[T]}::get_unchecked_mut<'48, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _43, move _46)
+<         ↳⚡ storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>         _45 = &two-phase-mut (*_46) with_metadata(copy _46.metadata)
+>         storage_dead(_47)
+>         storage_live(_48)
+>         _48 = copy hash_40
+>         _44 = core::slice::{[T]}::get_unchecked_mut<'50, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _45, move _48)
+>         ↳⚡ storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+2539,2544c1763,1768
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+2549c1773,1775
+<         storage_dead(_46)
+---
+>         storage_dead(_48)
+>         storage_dead(_45)
+>         (*_44) = move _43
+2551,2552c1777
+<         (*_42) = move _41
+<         storage_dead(_41)
+---
+>         storage_dead(_46)
+2554,2556c1779,1780
+<         storage_dead(_42)
+<         _47 = copy (*self).cur panic.+ const 1usize
+<         (*self).cur = move _47
+---
+>         _49 = copy cur panic.+ const 1usize
+>         cur = move _49
+2558,2566c1782,1790
+<         storage_live(_49)
+<         _49 = &(*self)
+<         forward_hash = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_cur_hash<'50>(move _49)
+<         ↳⚡ storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>         storage_live(_51)
+>         _51 = &(*self)
+>         storage_live(_52)
+>         _52 = copy cur
+>         forward_hash = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_hash_at<'52>(move _51, move _52)
+>         ↳⚡ storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+2568,2573c1792,1797
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+2578,2586d1801
+<         storage_dead(_49)
+<         fake_read(forward_hash)
+<         storage_live(end_pos_check)
+<         storage_live(_51)
+<         _51 = copy (*self).input_size
+<         storage_live(_52)
+<         _52 = cast<u32, usize>(copy lz4_flex::block::MFLIMIT)
+<         _53 = copy _51 panic.- copy _52
+<         end_pos_check = move _53
+2588a1804,1813
+>         fake_read(forward_hash)
+>         storage_live(end_pos_check)
+>         storage_live(_54)
+>         _54 = copy (*self).input_size
+>         storage_live(_55)
+>         _55 = cast<u32, usize>(copy lz4_flex::block::MFLIMIT)
+>         _56 = copy _54 panic.- copy _55
+>         end_pos_check = move _56
+>         storage_dead(_55)
+>         storage_dead(_54)
+2599c1824
+<             next_cur = copy (*self).cur
+---
+>             next_cur = copy cur
+2603,2616c1828,1830
+<                 storage_live(_58)
+<                 _59 = copy non_match_count panic.+ const 1usize
+<                 non_match_count = move _59
+<                 storage_live(_60)
+<                 _60 = copy non_match_count
+<                 step_size = move _60 panic.>> copy lz4_flex::block::LZ4_SKIPTRIGGER
+<                 storage_dead(_60)
+<                 storage_live(hash_61)
+<                 hash_61 = copy forward_hash
+<                 fake_read(hash_61)
+<                 storage_live(_62)
+<                 _62 = copy next_cur
+<                 (*self).cur = move _62
+<                 storage_dead(_62)
+---
+>                 storage_live(_61)
+>                 _62 = copy non_match_count panic.+ const 1usize
+>                 non_match_count = move _62
+2618,2620c1832,1833
+<                 _63 = copy step_size
+<                 _64 = copy next_cur panic.+ copy _63
+<                 next_cur = move _64
+---
+>                 _63 = copy non_match_count
+>                 step_size = move _63 panic.>> copy lz4_flex::block::LZ4_SKIPTRIGGER
+2621a1835,1837
+>                 storage_live(hash_64)
+>                 hash_64 = copy forward_hash
+>                 fake_read(hash_64)
+2622a1839,1841
+>                 _65 = copy next_cur
+>                 cur = move _65
+>                 storage_dead(_65)
+2624,2643c1843,1866
+<                 _66 = copy (*self).cur
+<                 storage_live(_67)
+<                 _67 = copy end_pos_check
+<                 _65 = move _66 > move _67
+<                 if move _65 {
+<                     storage_dead(_67)
+<                     storage_dead(_66)
+<                     storage_live(_68)
+<                     _68 = &two-phase-mut (*self)
+<                     storage_live(_69)
+<                     _69 = copy start
+<                     storage_live(_70)
+<                     _70 = copy out_ptr_start
+<                     _0 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::handle_last_literals<'63>(move _68, move _69, move _70)
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                 _66 = copy step_size
+>                 _67 = copy next_cur panic.+ copy _66
+>                 next_cur = move _67
+>                 storage_dead(_66)
+>                 storage_live(_68)
+>                 storage_live(_69)
+>                 _69 = copy cur
+>                 storage_live(_70)
+>                 _70 = copy end_pos_check
+>                 _68 = move _69 > move _70
+>                 if move _68 {
+>                     storage_dead(_70)
+>                     storage_dead(_69)
+>                     storage_live(_71)
+>                     _71 = &two-phase-mut (*self)
+>                     storage_live(_72)
+>                     _72 = copy start
+>                     storage_live(_73)
+>                     _73 = copy out_ptr_start
+>                     _0 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::handle_last_literals<'65>(move _71, move _72, move _73)
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+2645,2650c1868,1873
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+2655,2656c1878,1880
+<                     storage_dead(_70)
+<                     storage_dead(_69)
+---
+>                     storage_dead(_73)
+>                     storage_dead(_72)
+>                     storage_dead(_71)
+2658d1881
+<                     storage_dead(_65)
+2667,2668c1890,1891
+<                     storage_dead(hash_61)
+<                     storage_dead(_58)
+---
+>                     storage_dead(hash_64)
+>                     storage_dead(_61)
+2671,2676c1894,1896
+<                     storage_dead(_67)
+<                     storage_dead(_66)
+<                     storage_dead(_65)
+<                     storage_live(_71)
+<                     storage_live(_72)
+<                     storage_live(_73)
+---
+>                     storage_dead(_70)
+>                     storage_dead(_69)
+>                     storage_dead(_68)
+2679,2686c1899,1907
+<                     _75 = &(*self).dict
+<                     _74 = alloc::vec::{impl core::ops::deref::Deref<[T]> for alloc::vec::Vec<T>}::deref<'65, usize, alloc::alloc::Global>(move _75)
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                     storage_live(_76)
+>                     storage_live(_77)
+>                     storage_live(_78)
+>                     _78 = &(*self).dict
+>                     _77 = alloc::vec::{impl core::ops::deref::Deref<[T]> for alloc::vec::Vec<T>}::deref<'67, usize, alloc::alloc::Global>(move _78)
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+2688,2693c1909,1914
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+2698,2708c1919,1927
+<                     _73 = &(*_74) with_metadata(copy _74.metadata)
+<                     storage_dead(_75)
+<                     storage_live(_76)
+<                     _76 = copy hash_61
+<                     _72 = core::slice::{[T]}::get_unchecked<'67, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _73, move _76)
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                     _76 = &(*_77) with_metadata(copy _77.metadata)
+>                     storage_dead(_78)
+>                     storage_live(_79)
+>                     _79 = copy hash_64
+>                     _75 = core::slice::{[T]}::get_unchecked<'69, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _76, move _79)
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+2710,2715c1929,1934
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+2719a1939
+>                     storage_dead(_79)
+2721,2724c1941,1942
+<                     storage_dead(_73)
+<                     _71 = copy (*_72)
+<                     candidate = move _71
+<                     storage_dead(_71)
+---
+>                     _74 = copy (*_75)
+>                     candidate = move _74
+2726,2730c1944,1945
+<                     storage_dead(_72)
+<                     storage_live(_77)
+<                     _77 = copy (*self).cur
+<                     storage_live(_78)
+<                     storage_live(_79)
+---
+>                     storage_dead(_77)
+>                     storage_dead(_75)
+2731a1947
+>                     _80 = copy cur
+2733,2753d1948
+<                     _81 = &mut (*self).dict
+<                     _80 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'69, usize, alloc::alloc::Global>(move _81)
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+<                         storage_dead(_108)
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+<                         storage_dead(_37)
+<                         storage_dead(_23)
+<                         storage_dead(self)
+<                         unwind_continue
+<                     _79 = &two-phase-mut (*_80) with_metadata(copy _80.metadata)
+<                     storage_dead(_81)
+2755,2762c1950,1957
+<                     _82 = copy hash_61
+<                     _78 = core::slice::{[T]}::get_unchecked_mut<'71, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _79, move _82)
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                     storage_live(_83)
+>                     storage_live(_84)
+>                     _84 = &mut (*self).dict
+>                     _83 = alloc::vec::{impl core::ops::deref::DerefMut<[T]> for alloc::vec::Vec<T>}::deref_mut<'71, usize, alloc::alloc::Global>(move _84)
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+2764,2769c1959,1964
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+2774,2782c1969,1970
+<                     storage_dead(_82)
+<                     storage_dead(_79)
+<                     (*_78) = move _77
+<                     storage_dead(_77)
+<                     storage_dead(_80)
+<                     storage_dead(_78)
+<                     storage_live(_83)
+<                     storage_live(_84)
+<                     _84 = &(*self)
+---
+>                     _82 = &two-phase-mut (*_83) with_metadata(copy _83.metadata)
+>                     storage_dead(_84)
+2784,2791c1972,1977
+<                     _85 = copy next_cur
+<                     _83 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_hash_at<'73>(move _84, move _85)
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                     _85 = copy hash_64
+>                     _81 = core::slice::{[T]}::get_unchecked_mut<'73, usize, usize, usize>[core::slice::index::{impl core::slice::index::SliceIndex<[T], T> for usize}<usize>](move _82, move _85)
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+2793,2798c1979,1984
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+2804,2805c1990,1992
+<                     storage_dead(_84)
+<                     forward_hash = move _83
+---
+>                     storage_dead(_82)
+>                     (*_81) = move _80
+>                     storage_dead(_80)
+2806a1994
+>                     storage_dead(_81)
+2808a1997
+>                     _87 = &(*self)
+2810,2812c1999,2015
+<                     _88 = copy candidate
+<                     _89 = copy _88 panic.+ copy lz4_flex::block::MAX_DISTANCE
+<                     _87 = move _89
+---
+>                     _88 = copy next_cur
+>                     _86 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_hash_at<'75>(move _87, move _88)
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+>                         storage_dead(_108)
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+>                         storage_dead(_37)
+>                         storage_dead(_23)
+>                         storage_dead(self)
+>                         unwind_continue
+2813a2017,2020
+>                     storage_dead(_87)
+>                     forward_hash = move _86
+>                     storage_dead(_86)
+>                     storage_live(_89)
+2815,2817c2022,2031
+<                     _90 = copy (*self).cur
+<                     _86 = move _87 < move _90
+<                     if move _86 {
+---
+>                     storage_live(_91)
+>                     _91 = copy candidate
+>                     _92 = copy _91 panic.+ copy lz4_flex::block::MAX_DISTANCE
+>                     _90 = move _92
+>                     storage_dead(_91)
+>                     storage_live(_93)
+>                     _93 = copy cur
+>                     _89 = move _90 < move _93
+>                     if move _89 {
+>                         storage_dead(_93)
+2819,2820c2033
+<                         storage_dead(_87)
+<                         _58 = const true
+---
+>                         _61 = const true
+2822,2846d2034
+<                         storage_dead(_90)
+<                         storage_dead(_87)
+<                         storage_live(_91)
+<                         storage_live(_92)
+<                         _92 = &(*self)
+<                         storage_live(_93)
+<                         _93 = copy candidate
+<                         _91 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_batch<'75>(move _92, move _93)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+<                             storage_dead(_108)
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+<                             storage_dead(_37)
+<                             storage_dead(_23)
+<                             storage_dead(self)
+<                             unwind_continue
+2848c2036
+<                         storage_dead(_92)
+---
+>                         storage_dead(_90)
+2853c2041
+<                         _96 = copy (*self).cur
+---
+>                         _96 = copy candidate
+2855,2860c2043,2046
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+2862,2867c2048,2053
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+2874,2883c2060
+<                         _58 = move _91 != move _94
+<                         storage_dead(_94)
+<                         storage_dead(_91)
+<                     }
+<                     storage_dead(_86)
+<                     storage_dead(hash_61)
+<                     if move _58 {
+<                     } else {
+<                         storage_dead(_58)
+<                         storage_live(offset)
+---
+>                         storage_live(_97)
+2884a2062
+>                         _98 = &(*self)
+2886,2891c2064,2080
+<                         _99 = copy (*self).cur
+<                         storage_live(_100)
+<                         _100 = copy candidate
+<                         _101 = copy _99 panic.- copy _100
+<                         _98 = move _101
+<                         storage_dead(_100)
+---
+>                         _99 = copy cur
+>                         _97 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_batch<'79>(move _98, move _99)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+>                             storage_dead(_108)
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+>                             storage_dead(_37)
+>                             storage_dead(_23)
+>                             storage_dead(self)
+>                             unwind_continue
+2893d2081
+<                         offset = cast<usize, u16>(move _98)
+2895,2896c2083,2095
+<                         fake_read(offset)
+<                         storage_live(match_length)
+---
+>                         _61 = move _94 != move _97
+>                         storage_dead(_97)
+>                         storage_dead(_94)
+>                     }
+>                     storage_dead(_89)
+>                     storage_dead(hash_64)
+>                     if move _61 {
+>                     } else {
+>                         storage_dead(_61)
+>                         storage_live(offset)
+>                         storage_live(_101)
+>                         storage_live(_102)
+>                         _102 = copy cur
+2898,2901c2097,2105
+<                         _103 = &(*self)
+<                         storage_live(_104)
+<                         storage_live(_105)
+<                         _105 = copy (*self).input
+---
+>                         _103 = copy candidate
+>                         _104 = copy _102 panic.- copy _103
+>                         _101 = move _104
+>                         storage_dead(_103)
+>                         storage_dead(_102)
+>                         offset = cast<usize, u16>(move _101)
+>                         storage_dead(_101)
+>                         fake_read(offset)
+>                         storage_live(lit_len_105)
+2902a2107,2108
+>                         // The length (in bytes) of the literals section.
+>                         _106 = copy cur
+2904,2906c2110,2112
+<                         _107 = copy (*self).cur
+<                         _108 = copy _107 panic.+ copy lz4_flex::block::MINMATCH
+<                         _106 = move _108
+---
+>                         _107 = copy start
+>                         _108 = copy _106 panic.- copy _107
+>                         lit_len_105 = move _108
+2908,2925d2113
+<                         _104 = core::ptr::const_ptr::{*const T}::add<u8>(move _105, move _106)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+<                             storage_dead(_108)
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+<                             storage_dead(_37)
+<                             storage_dead(_23)
+<                             storage_dead(self)
+<                             unwind_continue
+2927,2930c2115,2118
+<                         storage_dead(_105)
+<                         storage_live(_109)
+<                         storage_live(_110)
+<                         _110 = copy (*self).input
+---
+>                         fake_read(lit_len_105)
+>                         _109 = copy cur panic.+ copy lz4_flex::block::MINMATCH
+>                         cur = move _109
+>                         storage_live(token_110)
+2933,2942c2121,2132
+<                         _112 = copy candidate
+<                         _113 = copy _112 panic.+ copy lz4_flex::block::MINMATCH
+<                         _111 = move _113
+<                         storage_dead(_112)
+<                         _109 = core::ptr::const_ptr::{*const T}::add<u8>(move _110, move _111)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+---
+>                         // Generate the higher half of the token.
+>                         _112 = copy lit_len_105
+>                         _111 = move _112 < const 15usize
+>                         if move _111 {
+>                             storage_dead(_112)
+>                             storage_live(_113)
+>                             storage_live(_114)
+>                             // Since we can fit the literals length into it, there is no need for saturation.
+>                             _114 = copy lit_len_105
+>                             _113 = cast<usize, u8>(move _114)
+>                             storage_dead(_114)
+>                             token_110 = move _113 panic.<< const 4i32
+2943a2134,2160
+>                         } else {
+>                             storage_dead(_112)
+>                             // We were unable to fit the literals into it, so we saturate to 0xF. We will later
+>                             // write the extensional value through LSIC encoding.
+>                             token_110 = const 240u8
+>                         }
+>                         storage_dead(_111)
+>                         fake_read(token_110)
+>                         storage_live(match_length)
+>                         storage_live(_116)
+>                         _116 = &(*self)
+>                         storage_live(_117)
+>                         _117 = copy (*self).input
+>                         storage_live(_118)
+>                         storage_live(_119)
+>                         _119 = copy (*self).input
+>                         storage_live(_120)
+>                         storage_live(_121)
+>                         _121 = copy candidate
+>                         _122 = copy _121 panic.+ copy lz4_flex::block::MINMATCH
+>                         _120 = move _122
+>                         storage_dead(_121)
+>                         _118 = core::ptr::const_ptr::{*const T}::add<u8>(move _119, move _120)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+2945,2950c2162,2167
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+2955,2963c2172,2182
+<                         storage_dead(_111)
+<                         storage_dead(_110)
+<                         match_length = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes<'79>(move _103, move _104, move _109)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         storage_dead(_120)
+>                         storage_dead(_119)
+>                         storage_live(_123)
+>                         storage_live(_124)
+>                         _124 = &mut cur
+>                         _123 = &two-phase-mut (*_124)
+>                         match_length = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::count_same_bytes<'82, '83>(move _116, move _117, move _118, move _123)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+2965,2970c2184,2189
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+2975,2986c2194,2196
+<                         storage_dead(_109)
+<                         storage_dead(_104)
+<                         storage_dead(_103)
+<                         fake_read(match_length)
+<                         storage_live(lit_len_114)
+<                         storage_live(_115)
+<                         // The length (in bytes) of the literals section.
+<                         _115 = copy (*self).cur
+<                         storage_live(_116)
+<                         _116 = copy start
+<                         _117 = copy _115 panic.- copy _116
+<                         lit_len_114 = move _117
+---
+>                         storage_dead(_123)
+>                         storage_dead(_118)
+>                         storage_dead(_117)
+2988,3019c2198
+<                         storage_dead(_115)
+<                         fake_read(lit_len_114)
+<                         storage_live(token_118)
+<                         storage_live(_119)
+<                         storage_live(_120)
+<                         // Generate the higher half of the token.
+<                         _120 = copy lit_len_114
+<                         _119 = move _120 < const 15usize
+<                         if move _119 {
+<                             storage_dead(_120)
+<                             storage_live(_121)
+<                             storage_live(_122)
+<                             // Since we can fit the literals length into it, there is no need for saturation.
+<                             _122 = copy lit_len_114
+<                             _121 = cast<usize, u8>(move _122)
+<                             storage_dead(_122)
+<                             token_118 = move _121 panic.<< const 4i32
+<                             storage_dead(_121)
+<                         } else {
+<                             storage_dead(_120)
+<                             // We were unable to fit the literals into it, so we saturate to 0xF. We will later
+<                             // write the extensional value through LSIC encoding.
+<                             token_118 = const 240u8
+<                         }
+<                         storage_dead(_119)
+<                         fake_read(token_118)
+<                         storage_live(_123)
+<                         storage_live(_124)
+<                         // Generate the lower half of the token, the duplicates length.
+<                         _124 = copy match_length
+<                         _125 = copy _124 panic.+ const 4usize
+<                         _123 = move _125
+---
+>                         fake_read(match_length)
+3021,3023c2200,2201
+<                         _126 = copy (*self).cur panic.+ copy _123
+<                         (*self).cur = move _126
+<                         storage_dead(_123)
+---
+>                         storage_live(_125)
+>                         storage_live(_126)
+3025,3026c2203,2204
+<                         storage_live(_128)
+<                         storage_live(_129)
+---
+>                         // Generate the lower half of the token, the duplicates length.
+>                         // cur += match_length + MINMATCH;
+3028,3032c2206,2210
+<                         _129 = copy match_length
+<                         _128 = move _129 < const 15usize
+<                         if move _128 {
+<                             storage_dead(_129)
+<                             storage_live(_130)
+---
+>                         _127 = copy match_length
+>                         _126 = move _127 < const 15usize
+>                         if move _126 {
+>                             storage_dead(_127)
+>                             storage_live(_128)
+3034,3036c2212,2214
+<                             _130 = copy match_length
+<                             _127 = cast<usize, u8>(move _130)
+<                             storage_dead(_130)
+---
+>                             _128 = copy match_length
+>                             _125 = cast<usize, u8>(move _128)
+>                             storage_dead(_128)
+3038c2216
+<                             storage_dead(_129)
+---
+>                             storage_dead(_127)
+3041c2219
+<                             _127 = const 15u8
+---
+>                             _125 = const 15u8
+3043,3045c2221,2225
+<                         storage_dead(_128)
+<                         token_118 = copy token_118 | move _127
+<                         storage_dead(_127)
+---
+>                         storage_dead(_126)
+>                         token_110 = copy token_110 | move _125
+>                         storage_dead(_125)
+>                         storage_live(_129)
+>                         storage_live(_130)
+3047,3048d2226
+<                         storage_live(_132)
+<                         storage_live(_133)
+3050,3060c2228,2236
+<                         _133 = &mut (*self).output_ptr
+<                         _132 = &two-phase-mut (*_133)
+<                         storage_live(_134)
+<                         _134 = copy token_118
+<                         _131 = lz4_flex::block::compress::push_unsafe<'81>(move _132, move _134)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         _131 = &mut (*self).output_ptr
+>                         _130 = &two-phase-mut (*_131)
+>                         storage_live(_132)
+>                         _132 = copy token_110
+>                         _129 = lz4_flex::block::compress::push_unsafe<'85>(move _130, move _132)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3062,3067c2238,2243
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3072d2247
+<                         storage_dead(_134)
+3074c2249
+<                         storage_dead(_133)
+---
+>                         storage_dead(_130)
+3076,3077c2251,2253
+<                         storage_live(_135)
+<                         storage_live(_136)
+---
+>                         storage_dead(_129)
+>                         storage_live(_133)
+>                         storage_live(_134)
+3080,3083c2256,2261
+<                         _136 = copy lit_len_114
+<                         _135 = move _136 >= const 15usize
+<                         if move _135 {
+<                             storage_dead(_136)
+---
+>                         _134 = copy lit_len_105
+>                         _133 = move _134 >= const 15usize
+>                         if move _133 {
+>                             storage_dead(_134)
+>                             storage_live(_135)
+>                             storage_live(_136)
+3084a2263
+>                             _137 = &two-phase-mut (*self)
+3087,3100c2266,2274
+<                             _139 = &two-phase-mut (*self)
+<                             storage_live(_140)
+<                             storage_live(_141)
+<                             _141 = copy lit_len_114
+<                             _142 = copy _141 panic.- const 15usize
+<                             _140 = move _142
+<                             storage_dead(_141)
+<                             _138 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::write_integer<'83>(move _139, move _140)
+<                             ↳⚡ storage_dead(_171)
+<                                 storage_dead(_142)
+<                                 storage_dead(_126)
+<                                 storage_dead(_125)
+<                                 storage_dead(_117)
+<                                 storage_dead(_113)
+---
+>                             _139 = copy lit_len_105
+>                             _140 = copy _139 panic.- const 15usize
+>                             _138 = move _140
+>                             storage_dead(_139)
+>                             _136 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::write_integer<'87>(move _137, move _138)
+>                             ↳⚡ storage_dead(_169)
+>                                 storage_dead(_140)
+>                                 storage_dead(_122)
+>                                 storage_dead(_109)
+3102,3107c2276,2281
+<                                 storage_dead(_101)
+<                                 storage_dead(_89)
+<                                 storage_dead(_64)
+<                                 storage_dead(_59)
+<                                 storage_dead(_53)
+<                                 storage_dead(_47)
+---
+>                                 storage_dead(_104)
+>                                 storage_dead(_92)
+>                                 storage_dead(_67)
+>                                 storage_dead(_62)
+>                                 storage_dead(_56)
+>                                 storage_dead(_49)
+3112,3121c2286,2293
+<                             storage_dead(_140)
+<                             storage_dead(_139)
+<                             _137 = core::result::{impl core::ops::try_trait::Try for core::result::Result<T, E>}::branch<(), core::io::error::Error>(move _138)
+<                             ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'84, (), core::io::error::Error>] _138
+<                                 ↳⚡ storage_dead(_171)
+<                                     storage_dead(_142)
+<                                     storage_dead(_126)
+<                                     storage_dead(_125)
+<                                     storage_dead(_117)
+<                                     storage_dead(_113)
+---
+>                             storage_dead(_138)
+>                             storage_dead(_137)
+>                             _135 = core::result::{impl core::ops::try_trait::Try for core::result::Result<T, E>}::branch<(), core::io::error::Error>(move _136)
+>                             ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'88, (), core::io::error::Error>] _136
+>                                 ↳⚡ storage_dead(_169)
+>                                     storage_dead(_140)
+>                                     storage_dead(_122)
+>                                     storage_dead(_109)
+3123,3128c2295,2300
+<                                     storage_dead(_101)
+<                                     storage_dead(_89)
+<                                     storage_dead(_64)
+<                                     storage_dead(_59)
+<                                     storage_dead(_53)
+<                                     storage_dead(_47)
+---
+>                                     storage_dead(_104)
+>                                     storage_dead(_92)
+>                                     storage_dead(_67)
+>                                     storage_dead(_62)
+>                                     storage_dead(_56)
+>                                     storage_dead(_49)
+3133,3138c2305,2308
+<                                 storage_dead(_171)
+<                                 storage_dead(_142)
+<                                 storage_dead(_126)
+<                                 storage_dead(_125)
+<                                 storage_dead(_117)
+<                                 storage_dead(_113)
+---
+>                                 storage_dead(_169)
+>                                 storage_dead(_140)
+>                                 storage_dead(_122)
+>                                 storage_dead(_109)
+3140,3145c2310,2315
+<                                 storage_dead(_101)
+<                                 storage_dead(_89)
+<                                 storage_dead(_64)
+<                                 storage_dead(_59)
+<                                 storage_dead(_53)
+<                                 storage_dead(_47)
+---
+>                                 storage_dead(_104)
+>                                 storage_dead(_92)
+>                                 storage_dead(_67)
+>                                 storage_dead(_62)
+>                                 storage_dead(_56)
+>                                 storage_dead(_49)
+3150,3151c2320,2321
+<                             storage_dead(_138)
+<                             match _137 {
+---
+>                             storage_dead(_136)
+>                             match _135 {
+3155,3166c2325,2334
+<                                     storage_live(residual_143)
+<                                     residual_143 = move (_137 as variant core::ops::control_flow::ControlFlow::Break)._0
+<                                     storage_live(_144)
+<                                     _144 = move residual_143
+<                                     _0 = core::result::{impl core::ops::try_trait::FromResidual<core::result::Result<!, E>> for core::result::Result<T, F>}::from_residual<usize, core::io::error::Error, core::io::error::Error>[core::convert::{impl core::convert::From<T> for T}<core::io::error::Error>](move _144)
+<                                     ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'86, !, core::io::error::Error>] _144
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                     storage_live(residual_141)
+>                                     residual_141 = move (_135 as variant core::ops::control_flow::ControlFlow::Break)._0
+>                                     storage_live(_142)
+>                                     _142 = move residual_141
+>                                     _0 = core::result::{impl core::ops::try_trait::FromResidual<core::result::Result<!, E>> for core::result::Result<T, F>}::from_residual<usize, core::io::error::Error, core::io::error::Error>[core::convert::{impl core::convert::From<T> for T}<core::io::error::Error>](move _142)
+>                                     ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'90, !, core::io::error::Error>] _142
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3168,3173c2336,2341
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3178,3184c2346,2350
+<                                         conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'88, !, core::io::error::Error>] residual_143
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                         conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'92, !, core::io::error::Error>] residual_141
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3186,3191c2352,2357
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3196,3202c2362,2366
+<                                         conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'90, core::result::Result<!, core::io::error::Error>, ()>] _137
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                         conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'94, core::result::Result<!, core::io::error::Error>, ()>] _135
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3204,3209c2368,2373
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3214,3219c2378,2381
+<                                         storage_dead(_171)
+<                                         storage_dead(_142)
+<                                         storage_dead(_126)
+<                                         storage_dead(_125)
+<                                         storage_dead(_117)
+<                                         storage_dead(_113)
+---
+>                                         storage_dead(_169)
+>                                         storage_dead(_140)
+>                                         storage_dead(_122)
+>                                         storage_dead(_109)
+3221,3226c2383,2388
+<                                         storage_dead(_101)
+<                                         storage_dead(_89)
+<                                         storage_dead(_64)
+<                                         storage_dead(_59)
+<                                         storage_dead(_53)
+<                                         storage_dead(_47)
+---
+>                                         storage_dead(_104)
+>                                         storage_dead(_92)
+>                                         storage_dead(_67)
+>                                         storage_dead(_62)
+>                                         storage_dead(_56)
+>                                         storage_dead(_49)
+3231,3239c2393,2399
+<                                     storage_dead(_144)
+<                                     conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'87, !, core::io::error::Error>] residual_143
+<                                     ↳⚡ conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'90, core::result::Result<!, core::io::error::Error>, ()>] _137
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                     storage_dead(_142)
+>                                     conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'91, !, core::io::error::Error>] residual_141
+>                                     ↳⚡ conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'94, core::result::Result<!, core::io::error::Error>, ()>] _135
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3241,3246c2401,2406
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3251,3256c2411,2414
+<                                         storage_dead(_171)
+<                                         storage_dead(_142)
+<                                         storage_dead(_126)
+<                                         storage_dead(_125)
+<                                         storage_dead(_117)
+<                                         storage_dead(_113)
+---
+>                                         storage_dead(_169)
+>                                         storage_dead(_140)
+>                                         storage_dead(_122)
+>                                         storage_dead(_109)
+3258,3263c2416,2421
+<                                         storage_dead(_101)
+<                                         storage_dead(_89)
+<                                         storage_dead(_64)
+<                                         storage_dead(_59)
+<                                         storage_dead(_53)
+<                                         storage_dead(_47)
+---
+>                                         storage_dead(_104)
+>                                         storage_dead(_92)
+>                                         storage_dead(_67)
+>                                         storage_dead(_62)
+>                                         storage_dead(_56)
+>                                         storage_dead(_49)
+3268,3275c2426,2431
+<                                     storage_dead(residual_143)
+<                                     conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'89, core::result::Result<!, core::io::error::Error>, ()>] _137
+<                                     ↳⚡ storage_dead(_171)
+<                                         storage_dead(_142)
+<                                         storage_dead(_126)
+<                                         storage_dead(_125)
+<                                         storage_dead(_117)
+<                                         storage_dead(_113)
+---
+>                                     storage_dead(residual_141)
+>                                     conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'93, core::result::Result<!, core::io::error::Error>, ()>] _135
+>                                     ↳⚡ storage_dead(_169)
+>                                         storage_dead(_140)
+>                                         storage_dead(_122)
+>                                         storage_dead(_109)
+3277,3282c2433,2438
+<                                         storage_dead(_101)
+<                                         storage_dead(_89)
+<                                         storage_dead(_64)
+<                                         storage_dead(_59)
+<                                         storage_dead(_53)
+<                                         storage_dead(_47)
+---
+>                                         storage_dead(_104)
+>                                         storage_dead(_92)
+>                                         storage_dead(_67)
+>                                         storage_dead(_62)
+>                                         storage_dead(_56)
+>                                         storage_dead(_49)
+3287d2442
+<                                     storage_dead(_137)
+3288a2444
+>                                     storage_dead(_133)
+3293,3294d2448
+<                                     storage_dead(token_118)
+<                                     storage_dead(lit_len_114)
+3295a2450,2451
+>                                     storage_dead(token_110)
+>                                     storage_dead(lit_len_105)
+3300,3309c2456,2463
+<                             storage_live(val_145)
+<                             val_145 = copy (_137 as variant core::ops::control_flow::ControlFlow::Continue)._0
+<                             storage_dead(val_145)
+<                             conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'85, core::result::Result<!, core::io::error::Error>, ()>] _137
+<                             ↳⚡ storage_dead(_171)
+<                                 storage_dead(_142)
+<                                 storage_dead(_126)
+<                                 storage_dead(_125)
+<                                 storage_dead(_117)
+<                                 storage_dead(_113)
+---
+>                             storage_live(val_143)
+>                             val_143 = copy (_135 as variant core::ops::control_flow::ControlFlow::Continue)._0
+>                             storage_dead(val_143)
+>                             conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'89, core::result::Result<!, core::io::error::Error>, ()>] _135
+>                             ↳⚡ storage_dead(_169)
+>                                 storage_dead(_140)
+>                                 storage_dead(_122)
+>                                 storage_dead(_109)
+3311,3316c2465,2470
+<                                 storage_dead(_101)
+<                                 storage_dead(_89)
+<                                 storage_dead(_64)
+<                                 storage_dead(_59)
+<                                 storage_dead(_53)
+<                                 storage_dead(_47)
+---
+>                                 storage_dead(_104)
+>                                 storage_dead(_92)
+>                                 storage_dead(_67)
+>                                 storage_dead(_62)
+>                                 storage_dead(_56)
+>                                 storage_dead(_49)
+3321c2475
+<                             storage_dead(_137)
+---
+>                             storage_dead(_135)
+3323c2477
+<                             storage_dead(_136)
+---
+>                             storage_dead(_134)
+3325c2479,2481
+<                         storage_dead(_135)
+---
+>                         storage_dead(_133)
+>                         storage_live(_144)
+>                         storage_live(_145)
+3326a2483
+>                         _146 = copy (*self).input
+3327a2485,2503
+>                         _147 = copy start
+>                         _145 = core::ptr::const_ptr::{*const T}::add<u8>(move _146, move _147)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+>                             storage_dead(_108)
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+>                             storage_dead(_37)
+>                             storage_dead(_23)
+>                             storage_dead(self)
+>                             unwind_continue
+>                         storage_dead(_147)
+>                         storage_dead(_146)
+3329c2505
+<                         _148 = copy (*self).input
+---
+>                         _148 = copy (*self).output_ptr
+3331,3338c2507,2512
+<                         _149 = copy start
+<                         _147 = core::ptr::const_ptr::{*const T}::add<u8>(move _148, move _149)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         _149 = copy lit_len_105
+>                         _144 = lz4_flex::block::wild_copy_from_src(move _145, move _148, move _149)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3340,3345c2514,2519
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3351a2526,2527
+>                         storage_dead(_145)
+>                         storage_dead(_144)
+3353d2528
+<                         _150 = copy (*self).output_ptr
+3355,3362c2530,2537
+<                         _151 = copy lit_len_114
+<                         _146 = lz4_flex::block::wild_copy_from_src(move _147, move _150, move _151)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         _151 = copy (*self).output_ptr
+>                         storage_live(_152)
+>                         _152 = copy lit_len_105
+>                         _150 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _151, move _152)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3364,3369c2539,2544
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3373a2549
+>                         storage_dead(_152)
+3374a2551
+>                         (*self).output_ptr = move _150
+3376,3378d2552
+<                         storage_dead(_147)
+<                         storage_dead(_146)
+<                         storage_live(_152)
+3380d2553
+<                         _153 = copy (*self).output_ptr
+3382,3389c2555,2564
+<                         _154 = copy lit_len_114
+<                         _152 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _153, move _154)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         storage_live(_155)
+>                         storage_live(_156)
+>                         storage_live(_157)
+>                         storage_live(_158)
+>                         _158 = copy offset
+>                         _157 = core::num::{u16}::to_le(move _158)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3391,3396c2566,2571
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3401,3408c2576,2580
+<                         storage_dead(_154)
+<                         storage_dead(_153)
+<                         (*self).output_ptr = move _152
+<                         storage_dead(_152)
+<                         storage_live(_155)
+<                         storage_live(_156)
+<                         storage_live(_157)
+<                         storage_live(_158)
+---
+>                         storage_dead(_158)
+>                         _156 = &_157
+>                         _155 = &raw const (*_156)
+>                         _154 = cast<*const u16, *const u8>(move _155)
+>                         storage_dead(_155)
+3410,3418c2582,2587
+<                         storage_live(_160)
+<                         _160 = copy offset
+<                         _159 = core::num::{u16}::to_le(move _160)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         _159 = copy (*self).output_ptr
+>                         _153 = core::ptr::copy_nonoverlapping<u8>(move _154, move _159, const 2usize)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3420,3425c2589,2594
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3430,3433c2599,2600
+<                         storage_dead(_160)
+<                         _158 = &_159
+<                         _157 = &raw const (*_158)
+<                         _156 = cast<*const u16, *const u8>(move _157)
+---
+>                         storage_dead(_159)
+>                         storage_dead(_154)
+3434a2602,2604
+>                         storage_dead(_156)
+>                         storage_dead(_153)
+>                         storage_live(_160)
+3437,3443c2607,2611
+<                         _155 = core::ptr::copy_nonoverlapping<u8>(move _156, move _161, const 2usize)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         _160 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _161, const 2usize)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3445,3450c2613,2618
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3456,3459c2624,2625
+<                         storage_dead(_156)
+<                         storage_dead(_159)
+<                         storage_dead(_158)
+<                         storage_dead(_155)
+---
+>                         (*self).output_ptr = move _160
+>                         storage_dead(_160)
+3462,3489c2628,2633
+<                         _163 = copy (*self).output_ptr
+<                         _162 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _163, const 2usize)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+<                             storage_dead(_108)
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+<                             storage_dead(_37)
+<                             storage_dead(_23)
+<                             storage_dead(self)
+<                             unwind_continue
+<                         storage_dead(_163)
+<                         (*self).output_ptr = move _162
+<                         storage_dead(_162)
+<                         storage_live(_164)
+<                         storage_live(_165)
+<                         _165 = copy match_length
+<                         _164 = move _165 >= const 15usize
+<                         if move _164 {
+<                             storage_dead(_165)
+---
+>                         _163 = copy match_length
+>                         _162 = move _163 >= const 15usize
+>                         if move _162 {
+>                             storage_dead(_163)
+>                             storage_live(_164)
+>                             storage_live(_165)
+3490a2635
+>                             _166 = &two-phase-mut (*self)
+3493,3506c2638,2646
+<                             _168 = &two-phase-mut (*self)
+<                             storage_live(_169)
+<                             storage_live(_170)
+<                             _170 = copy match_length
+<                             _171 = copy _170 panic.- const 15usize
+<                             _169 = move _171
+<                             storage_dead(_170)
+<                             _167 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::write_integer<'92>(move _168, move _169)
+<                             ↳⚡ storage_dead(_171)
+<                                 storage_dead(_142)
+<                                 storage_dead(_126)
+<                                 storage_dead(_125)
+<                                 storage_dead(_117)
+<                                 storage_dead(_113)
+---
+>                             _168 = copy match_length
+>                             _169 = copy _168 panic.- const 15usize
+>                             _167 = move _169
+>                             storage_dead(_168)
+>                             _165 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::write_integer<'96>(move _166, move _167)
+>                             ↳⚡ storage_dead(_169)
+>                                 storage_dead(_140)
+>                                 storage_dead(_122)
+>                                 storage_dead(_109)
+3508,3513c2648,2653
+<                                 storage_dead(_101)
+<                                 storage_dead(_89)
+<                                 storage_dead(_64)
+<                                 storage_dead(_59)
+<                                 storage_dead(_53)
+<                                 storage_dead(_47)
+---
+>                                 storage_dead(_104)
+>                                 storage_dead(_92)
+>                                 storage_dead(_67)
+>                                 storage_dead(_62)
+>                                 storage_dead(_56)
+>                                 storage_dead(_49)
+3518,3527c2658,2665
+<                             storage_dead(_169)
+<                             storage_dead(_168)
+<                             _166 = core::result::{impl core::ops::try_trait::Try for core::result::Result<T, E>}::branch<(), core::io::error::Error>(move _167)
+<                             ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'95, (), core::io::error::Error>] _167
+<                                 ↳⚡ storage_dead(_171)
+<                                     storage_dead(_142)
+<                                     storage_dead(_126)
+<                                     storage_dead(_125)
+<                                     storage_dead(_117)
+<                                     storage_dead(_113)
+---
+>                             storage_dead(_167)
+>                             storage_dead(_166)
+>                             _164 = core::result::{impl core::ops::try_trait::Try for core::result::Result<T, E>}::branch<(), core::io::error::Error>(move _165)
+>                             ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'99, (), core::io::error::Error>] _165
+>                                 ↳⚡ storage_dead(_169)
+>                                     storage_dead(_140)
+>                                     storage_dead(_122)
+>                                     storage_dead(_109)
+3529,3534c2667,2672
+<                                     storage_dead(_101)
+<                                     storage_dead(_89)
+<                                     storage_dead(_64)
+<                                     storage_dead(_59)
+<                                     storage_dead(_53)
+<                                     storage_dead(_47)
+---
+>                                     storage_dead(_104)
+>                                     storage_dead(_92)
+>                                     storage_dead(_67)
+>                                     storage_dead(_62)
+>                                     storage_dead(_56)
+>                                     storage_dead(_49)
+3539,3544c2677,2680
+<                                 storage_dead(_171)
+<                                 storage_dead(_142)
+<                                 storage_dead(_126)
+<                                 storage_dead(_125)
+<                                 storage_dead(_117)
+<                                 storage_dead(_113)
+---
+>                                 storage_dead(_169)
+>                                 storage_dead(_140)
+>                                 storage_dead(_122)
+>                                 storage_dead(_109)
+3546,3551c2682,2687
+<                                 storage_dead(_101)
+<                                 storage_dead(_89)
+<                                 storage_dead(_64)
+<                                 storage_dead(_59)
+<                                 storage_dead(_53)
+<                                 storage_dead(_47)
+---
+>                                 storage_dead(_104)
+>                                 storage_dead(_92)
+>                                 storage_dead(_67)
+>                                 storage_dead(_62)
+>                                 storage_dead(_56)
+>                                 storage_dead(_49)
+3556,3557c2692,2693
+<                             storage_dead(_167)
+<                             match _166 {
+---
+>                             storage_dead(_165)
+>                             match _164 {
+3561,3572c2697,2706
+<                                     storage_live(residual_172)
+<                                     residual_172 = move (_166 as variant core::ops::control_flow::ControlFlow::Break)._0
+<                                     storage_live(_173)
+<                                     _173 = move residual_172
+<                                     _0 = core::result::{impl core::ops::try_trait::FromResidual<core::result::Result<!, E>> for core::result::Result<T, F>}::from_residual<usize, core::io::error::Error, core::io::error::Error>[core::convert::{impl core::convert::From<T> for T}<core::io::error::Error>](move _173)
+<                                     ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'97, !, core::io::error::Error>] _173
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                     storage_live(residual_170)
+>                                     residual_170 = move (_164 as variant core::ops::control_flow::ControlFlow::Break)._0
+>                                     storage_live(_171)
+>                                     _171 = move residual_170
+>                                     _0 = core::result::{impl core::ops::try_trait::FromResidual<core::result::Result<!, E>> for core::result::Result<T, F>}::from_residual<usize, core::io::error::Error, core::io::error::Error>[core::convert::{impl core::convert::From<T> for T}<core::io::error::Error>](move _171)
+>                                     ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'101, !, core::io::error::Error>] _171
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3574,3579c2708,2713
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3584,3590c2718,2722
+<                                         conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'99, !, core::io::error::Error>] residual_172
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                         conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'103, !, core::io::error::Error>] residual_170
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3592,3597c2724,2729
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3602,3608c2734,2738
+<                                         conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'101, core::result::Result<!, core::io::error::Error>, ()>] _166
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                         conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'105, core::result::Result<!, core::io::error::Error>, ()>] _164
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3610,3615c2740,2745
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3620,3625c2750,2753
+<                                         storage_dead(_171)
+<                                         storage_dead(_142)
+<                                         storage_dead(_126)
+<                                         storage_dead(_125)
+<                                         storage_dead(_117)
+<                                         storage_dead(_113)
+---
+>                                         storage_dead(_169)
+>                                         storage_dead(_140)
+>                                         storage_dead(_122)
+>                                         storage_dead(_109)
+3627,3632c2755,2760
+<                                         storage_dead(_101)
+<                                         storage_dead(_89)
+<                                         storage_dead(_64)
+<                                         storage_dead(_59)
+<                                         storage_dead(_53)
+<                                         storage_dead(_47)
+---
+>                                         storage_dead(_104)
+>                                         storage_dead(_92)
+>                                         storage_dead(_67)
+>                                         storage_dead(_62)
+>                                         storage_dead(_56)
+>                                         storage_dead(_49)
+3637,3645c2765,2771
+<                                     storage_dead(_173)
+<                                     conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'98, !, core::io::error::Error>] residual_172
+<                                     ↳⚡ conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'101, core::result::Result<!, core::io::error::Error>, ()>] _166
+<                                         ↳⚡ storage_dead(_171)
+<                                             storage_dead(_142)
+<                                             storage_dead(_126)
+<                                             storage_dead(_125)
+<                                             storage_dead(_117)
+<                                             storage_dead(_113)
+---
+>                                     storage_dead(_171)
+>                                     conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'102, !, core::io::error::Error>] residual_170
+>                                     ↳⚡ conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'105, core::result::Result<!, core::io::error::Error>, ()>] _164
+>                                         ↳⚡ storage_dead(_169)
+>                                             storage_dead(_140)
+>                                             storage_dead(_122)
+>                                             storage_dead(_109)
+3647,3652c2773,2778
+<                                             storage_dead(_101)
+<                                             storage_dead(_89)
+<                                             storage_dead(_64)
+<                                             storage_dead(_59)
+<                                             storage_dead(_53)
+<                                             storage_dead(_47)
+---
+>                                             storage_dead(_104)
+>                                             storage_dead(_92)
+>                                             storage_dead(_67)
+>                                             storage_dead(_62)
+>                                             storage_dead(_56)
+>                                             storage_dead(_49)
+3657,3662c2783,2786
+<                                         storage_dead(_171)
+<                                         storage_dead(_142)
+<                                         storage_dead(_126)
+<                                         storage_dead(_125)
+<                                         storage_dead(_117)
+<                                         storage_dead(_113)
+---
+>                                         storage_dead(_169)
+>                                         storage_dead(_140)
+>                                         storage_dead(_122)
+>                                         storage_dead(_109)
+3664,3669c2788,2793
+<                                         storage_dead(_101)
+<                                         storage_dead(_89)
+<                                         storage_dead(_64)
+<                                         storage_dead(_59)
+<                                         storage_dead(_53)
+<                                         storage_dead(_47)
+---
+>                                         storage_dead(_104)
+>                                         storage_dead(_92)
+>                                         storage_dead(_67)
+>                                         storage_dead(_62)
+>                                         storage_dead(_56)
+>                                         storage_dead(_49)
+3674,3681c2798,2803
+<                                     storage_dead(residual_172)
+<                                     conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'100, core::result::Result<!, core::io::error::Error>, ()>] _166
+<                                     ↳⚡ storage_dead(_171)
+<                                         storage_dead(_142)
+<                                         storage_dead(_126)
+<                                         storage_dead(_125)
+<                                         storage_dead(_117)
+<                                         storage_dead(_113)
+---
+>                                     storage_dead(residual_170)
+>                                     conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'104, core::result::Result<!, core::io::error::Error>, ()>] _164
+>                                     ↳⚡ storage_dead(_169)
+>                                         storage_dead(_140)
+>                                         storage_dead(_122)
+>                                         storage_dead(_109)
+3683,3688c2805,2810
+<                                         storage_dead(_101)
+<                                         storage_dead(_89)
+<                                         storage_dead(_64)
+<                                         storage_dead(_59)
+<                                         storage_dead(_53)
+<                                         storage_dead(_47)
+---
+>                                         storage_dead(_104)
+>                                         storage_dead(_92)
+>                                         storage_dead(_67)
+>                                         storage_dead(_62)
+>                                         storage_dead(_56)
+>                                         storage_dead(_49)
+3693d2814
+<                                     storage_dead(_166)
+3695,3696c2816
+<                                     storage_dead(token_118)
+<                                     storage_dead(lit_len_114)
+---
+>                                     storage_dead(_162)
+3697a2818,2819
+>                                     storage_dead(token_110)
+>                                     storage_dead(lit_len_105)
+3702,3711c2824,2831
+<                             storage_live(val_174)
+<                             val_174 = copy (_166 as variant core::ops::control_flow::ControlFlow::Continue)._0
+<                             storage_dead(val_174)
+<                             conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'96, core::result::Result<!, core::io::error::Error>, ()>] _166
+<                             ↳⚡ storage_dead(_171)
+<                                 storage_dead(_142)
+<                                 storage_dead(_126)
+<                                 storage_dead(_125)
+<                                 storage_dead(_117)
+<                                 storage_dead(_113)
+---
+>                             storage_live(val_172)
+>                             val_172 = copy (_164 as variant core::ops::control_flow::ControlFlow::Continue)._0
+>                             storage_dead(val_172)
+>                             conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'100, core::result::Result<!, core::io::error::Error>, ()>] _164
+>                             ↳⚡ storage_dead(_169)
+>                                 storage_dead(_140)
+>                                 storage_dead(_122)
+>                                 storage_dead(_109)
+3713,3718c2833,2838
+<                                 storage_dead(_101)
+<                                 storage_dead(_89)
+<                                 storage_dead(_64)
+<                                 storage_dead(_59)
+<                                 storage_dead(_53)
+<                                 storage_dead(_47)
+---
+>                                 storage_dead(_104)
+>                                 storage_dead(_92)
+>                                 storage_dead(_67)
+>                                 storage_dead(_62)
+>                                 storage_dead(_56)
+>                                 storage_dead(_49)
+3723c2843
+<                             storage_dead(_166)
+---
+>                             storage_dead(_164)
+3725c2845
+<                             storage_dead(_165)
+---
+>                             storage_dead(_163)
+3727c2847,2852
+<                         storage_dead(_164)
+---
+>                         storage_dead(_162)
+>                         storage_live(_173)
+>                         _173 = copy cur
+>                         start = move _173
+>                         storage_dead(_173)
+>                         storage_live(_174)
+3729,3731c2854
+<                         _175 = copy (*self).cur
+<                         start = move _175
+<                         storage_dead(_175)
+---
+>                         _175 = &(*self)
+3733,3743c2856,2861
+<                         storage_live(_177)
+<                         _177 = &(*self)
+<                         storage_live(_178)
+<                         _178 = copy next_cur
+<                         _176 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_hash_at<'94>(move _177, move _178)
+<                         ↳⚡ storage_dead(_171)
+<                             storage_dead(_142)
+<                             storage_dead(_126)
+<                             storage_dead(_125)
+<                             storage_dead(_117)
+<                             storage_dead(_113)
+---
+>                         _176 = copy next_cur
+>                         _174 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::get_hash_at<'98>(move _175, move _176)
+>                         ↳⚡ storage_dead(_169)
+>                             storage_dead(_140)
+>                             storage_dead(_122)
+>                             storage_dead(_109)
+3745,3750c2863,2868
+<                             storage_dead(_101)
+<                             storage_dead(_89)
+<                             storage_dead(_64)
+<                             storage_dead(_59)
+<                             storage_dead(_53)
+<                             storage_dead(_47)
+---
+>                             storage_dead(_104)
+>                             storage_dead(_92)
+>                             storage_dead(_67)
+>                             storage_dead(_62)
+>                             storage_dead(_56)
+>                             storage_dead(_49)
+3755,3757d2872
+<                         storage_dead(_178)
+<                         storage_dead(_177)
+<                         forward_hash = move _176
+3759,3760c2874,2876
+<                         storage_dead(token_118)
+<                         storage_dead(lit_len_114)
+---
+>                         storage_dead(_175)
+>                         forward_hash = move _174
+>                         storage_dead(_174)
+3761a2878,2879
+>                         storage_dead(token_110)
+>                         storage_dead(lit_len_105)
+3769c2887
+<                     storage_dead(_58)
+---
+>                     storage_dead(_61)
+3782c2900
+<         storage_dead(hash_39)
+---
+>         storage_dead(hash_40)
+3783a2902
+>         storage_dead(cur)
+3785,3790c2904,2907
+<         storage_dead(_171)
+<         storage_dead(_142)
+<         storage_dead(_126)
+<         storage_dead(_125)
+<         storage_dead(_117)
+<         storage_dead(_113)
+---
+>         storage_dead(_169)
+>         storage_dead(_140)
+>         storage_dead(_122)
+>         storage_dead(_109)
+3792,3797c2909,2914
+<         storage_dead(_101)
+<         storage_dead(_89)
+<         storage_dead(_64)
+<         storage_dead(_59)
+<         storage_dead(_53)
+<         storage_dead(_47)
+---
+>         storage_dead(_104)
+>         storage_dead(_92)
+>         storage_dead(_67)
+>         storage_dead(_62)
+>         storage_dead(_56)
+>         storage_dead(_49)
+3835,3841c2952,2956
+<     _12 = lz4_flex::block::compress::push_unsafe<'46>(move _13, move _15)
+<     ↳⚡ storage_dead(_171)
+<         storage_dead(_142)
+<         storage_dead(_126)
+<         storage_dead(_125)
+<         storage_dead(_117)
+<         storage_dead(_113)
+---
+>     _12 = lz4_flex::block::compress::push_unsafe<'48>(move _13, move _15)
+>     ↳⚡ storage_dead(_169)
+>         storage_dead(_140)
+>         storage_dead(_122)
+>         storage_dead(_109)
+3843,3848c2958,2963
+<         storage_dead(_101)
+<         storage_dead(_89)
+<         storage_dead(_64)
+<         storage_dead(_59)
+<         storage_dead(_53)
+<         storage_dead(_47)
+---
+>         storage_dead(_104)
+>         storage_dead(_92)
+>         storage_dead(_67)
+>         storage_dead(_62)
+>         storage_dead(_56)
+>         storage_dead(_49)
+3873,3879c2988,2992
+<         _19 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::write_integer<'52>(move _20, move _21)
+<         ↳⚡ storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>         _19 = lz4_flex::block::compress::{lz4_flex::block::compress::Encoder}::write_integer<'54>(move _20, move _21)
+>         ↳⚡ storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+3881,3886c2994,2999
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+3894,3900c3007,3011
+<         ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'55, (), core::io::error::Error>] _19
+<             ↳⚡ storage_dead(_171)
+<                 storage_dead(_142)
+<                 storage_dead(_126)
+<                 storage_dead(_125)
+<                 storage_dead(_117)
+<                 storage_dead(_113)
+---
+>         ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'57, (), core::io::error::Error>] _19
+>             ↳⚡ storage_dead(_169)
+>                 storage_dead(_140)
+>                 storage_dead(_122)
+>                 storage_dead(_109)
+3902,3907c3013,3018
+<                 storage_dead(_101)
+<                 storage_dead(_89)
+<                 storage_dead(_64)
+<                 storage_dead(_59)
+<                 storage_dead(_53)
+<                 storage_dead(_47)
+---
+>                 storage_dead(_104)
+>                 storage_dead(_92)
+>                 storage_dead(_67)
+>                 storage_dead(_62)
+>                 storage_dead(_56)
+>                 storage_dead(_49)
+3912,3917c3023,3026
+<             storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>             storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+3919,3924c3028,3033
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+3935,3941c3044,3048
+<                 conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'56, core::result::Result<!, core::io::error::Error>, ()>] _18
+<                 ↳⚡ storage_dead(_171)
+<                     storage_dead(_142)
+<                     storage_dead(_126)
+<                     storage_dead(_125)
+<                     storage_dead(_117)
+<                     storage_dead(_113)
+---
+>                 conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'58, core::result::Result<!, core::io::error::Error>, ()>] _18
+>                 ↳⚡ storage_dead(_169)
+>                     storage_dead(_140)
+>                     storage_dead(_122)
+>                     storage_dead(_109)
+3943,3948c3050,3055
+<                     storage_dead(_101)
+<                     storage_dead(_89)
+<                     storage_dead(_64)
+<                     storage_dead(_59)
+<                     storage_dead(_53)
+<                     storage_dead(_47)
+---
+>                     storage_dead(_104)
+>                     storage_dead(_92)
+>                     storage_dead(_67)
+>                     storage_dead(_62)
+>                     storage_dead(_56)
+>                     storage_dead(_49)
+3964,3970c3071,3075
+<                 _27 = lz4_flex::block::compress::copy_into_vec<'54>(move _28, move _30, move _31)
+<                 ↳⚡ storage_dead(_171)
+<                     storage_dead(_142)
+<                     storage_dead(_126)
+<                     storage_dead(_125)
+<                     storage_dead(_117)
+<                     storage_dead(_113)
+---
+>                 _27 = lz4_flex::block::compress::copy_into_vec<'56>(move _28, move _30, move _31)
+>                 ↳⚡ storage_dead(_169)
+>                     storage_dead(_140)
+>                     storage_dead(_122)
+>                     storage_dead(_109)
+3972,3977c3077,3082
+<                     storage_dead(_101)
+<                     storage_dead(_89)
+<                     storage_dead(_64)
+<                     storage_dead(_59)
+<                     storage_dead(_53)
+<                     storage_dead(_47)
+---
+>                     storage_dead(_104)
+>                     storage_dead(_92)
+>                     storage_dead(_67)
+>                     storage_dead(_62)
+>                     storage_dead(_56)
+>                     storage_dead(_49)
+4011,4017c3116,3120
+<                 ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'57, !, core::io::error::Error>] _25
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                 ↳⚡ conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'59, !, core::io::error::Error>] _25
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+4019,4024c3122,3127
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+4029,4035c3132,3136
+<                     conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'59, !, core::io::error::Error>] residual_24
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                     conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'61, !, core::io::error::Error>] residual_24
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+4037,4042c3138,3143
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+4047,4053c3148,3152
+<                     conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'61, core::result::Result<!, core::io::error::Error>, ()>] _18
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                     conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'63, core::result::Result<!, core::io::error::Error>, ()>] _18
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+4055,4060c3154,3159
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+4065,4070c3164,3167
+<                     storage_dead(_171)
+<                     storage_dead(_142)
+<                     storage_dead(_126)
+<                     storage_dead(_125)
+<                     storage_dead(_117)
+<                     storage_dead(_113)
+---
+>                     storage_dead(_169)
+>                     storage_dead(_140)
+>                     storage_dead(_122)
+>                     storage_dead(_109)
+4072,4077c3169,3174
+<                     storage_dead(_101)
+<                     storage_dead(_89)
+<                     storage_dead(_64)
+<                     storage_dead(_59)
+<                     storage_dead(_53)
+<                     storage_dead(_47)
+---
+>                     storage_dead(_104)
+>                     storage_dead(_92)
+>                     storage_dead(_67)
+>                     storage_dead(_62)
+>                     storage_dead(_56)
+>                     storage_dead(_49)
+4083,4090c3180,3185
+<                 conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'58, !, core::io::error::Error>] residual_24
+<                 ↳⚡ conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'61, core::result::Result<!, core::io::error::Error>, ()>] _18
+<                     ↳⚡ storage_dead(_171)
+<                         storage_dead(_142)
+<                         storage_dead(_126)
+<                         storage_dead(_125)
+<                         storage_dead(_117)
+<                         storage_dead(_113)
+---
+>                 conditional_drop[core::result::Result::{impl core::marker::Destruct for core::result::Result<T, E>}::drop_glue<'60, !, core::io::error::Error>] residual_24
+>                 ↳⚡ conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'63, core::result::Result<!, core::io::error::Error>, ()>] _18
+>                     ↳⚡ storage_dead(_169)
+>                         storage_dead(_140)
+>                         storage_dead(_122)
+>                         storage_dead(_109)
+4092,4097c3187,3192
+<                         storage_dead(_101)
+<                         storage_dead(_89)
+<                         storage_dead(_64)
+<                         storage_dead(_59)
+<                         storage_dead(_53)
+<                         storage_dead(_47)
+---
+>                         storage_dead(_104)
+>                         storage_dead(_92)
+>                         storage_dead(_67)
+>                         storage_dead(_62)
+>                         storage_dead(_56)
+>                         storage_dead(_49)
+4102,4107c3197,3200
+<                     storage_dead(_171)
+<                     storage_dead(_142)
+<                     storage_dead(_126)
+<                     storage_dead(_125)
+<                     storage_dead(_117)
+<                     storage_dead(_113)
+---
+>                     storage_dead(_169)
+>                     storage_dead(_140)
+>                     storage_dead(_122)
+>                     storage_dead(_109)
+4109,4114c3202,3207
+<                     storage_dead(_101)
+<                     storage_dead(_89)
+<                     storage_dead(_64)
+<                     storage_dead(_59)
+<                     storage_dead(_53)
+<                     storage_dead(_47)
+---
+>                     storage_dead(_104)
+>                     storage_dead(_92)
+>                     storage_dead(_67)
+>                     storage_dead(_62)
+>                     storage_dead(_56)
+>                     storage_dead(_49)
+4120,4126c3213,3217
+<                 conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'60, core::result::Result<!, core::io::error::Error>, ()>] _18
+<                 ↳⚡ storage_dead(_171)
+<                     storage_dead(_142)
+<                     storage_dead(_126)
+<                     storage_dead(_125)
+<                     storage_dead(_117)
+<                     storage_dead(_113)
+---
+>                 conditional_drop[core::ops::control_flow::ControlFlow::{impl core::marker::Destruct for core::ops::control_flow::ControlFlow<B, C>}::drop_glue<'62, core::result::Result<!, core::io::error::Error>, ()>] _18
+>                 ↳⚡ storage_dead(_169)
+>                     storage_dead(_140)
+>                     storage_dead(_122)
+>                     storage_dead(_109)
+4128,4133c3219,3224
+<                     storage_dead(_101)
+<                     storage_dead(_89)
+<                     storage_dead(_64)
+<                     storage_dead(_59)
+<                     storage_dead(_53)
+<                     storage_dead(_47)
+---
+>                     storage_dead(_104)
+>                     storage_dead(_92)
+>                     storage_dead(_67)
+>                     storage_dead(_62)
+>                     storage_dead(_56)
+>                     storage_dead(_49)
+4154,4160c3245,3249
+<         _27 = lz4_flex::block::compress::copy_into_vec<'54>(move _28, move _30, move _31)
+<         ↳⚡ storage_dead(_171)
+<             storage_dead(_142)
+<             storage_dead(_126)
+<             storage_dead(_125)
+<             storage_dead(_117)
+<             storage_dead(_113)
+---
+>         _27 = lz4_flex::block::compress::copy_into_vec<'56>(move _28, move _30, move _31)
+>         ↳⚡ storage_dead(_169)
+>             storage_dead(_140)
+>             storage_dead(_122)
+>             storage_dead(_109)
+4162,4167c3251,3256
+<             storage_dead(_101)
+<             storage_dead(_89)
+<             storage_dead(_64)
+<             storage_dead(_59)
+<             storage_dead(_53)
+<             storage_dead(_47)
+---
+>             storage_dead(_104)
+>             storage_dead(_92)
+>             storage_dead(_67)
+>             storage_dead(_62)
+>             storage_dead(_56)
+>             storage_dead(_49)
+4199,4204c3288,3291
+<     storage_dead(_171)
+<     storage_dead(_142)
+<     storage_dead(_126)
+<     storage_dead(_125)
+<     storage_dead(_117)
+<     storage_dead(_113)
+---
+>     storage_dead(_169)
+>     storage_dead(_140)
+>     storage_dead(_122)
+>     storage_dead(_109)
+4206,4211c3293,3298
+<     storage_dead(_101)
+<     storage_dead(_89)
+<     storage_dead(_64)
+<     storage_dead(_59)
+<     storage_dead(_53)
+<     storage_dead(_47)
+---
+>     storage_dead(_104)
+>     storage_dead(_92)
+>     storage_dead(_67)
+>     storage_dead(_62)
+>     storage_dead(_56)
+>     storage_dead(_49)
+5601c4688,4689
+<     ↳⚡ conditional_drop[alloc::vec::Vec::{impl core::marker::Destruct for alloc::vec::Vec<T>}::drop_glue<'14, usize, alloc::alloc::Global>] dict
+---
+>     ↳⚡ // cur: 0,
+>         conditional_drop[alloc::vec::Vec::{impl core::marker::Destruct for alloc::vec::Vec<T>}::drop_glue<'14, usize, alloc::alloc::Global>] dict
+5721c4809
+<     _25 = lz4_flex::block::compress::Encoder { input: move _26, input_size: move _28, output_ptr: move _30, cur: const 0usize, dict_bitshift: move _32, dict: move _33 }
+---
+>     _25 = lz4_flex::block::compress::Encoder { input: move _26, input_size: move _28, output_ptr: move _30, dict_bitshift: move _32, dict: move _33 }
+5916,5917c5004,5005
+< Source: 'src/block/compress.rs', lines 166:4-292:5
+< Source: 'src/block/compress.rs', lines 166:4-292:5
+---
+> Source: 'src/block/compress.rs', lines 166:4-297:5
+> Source: 'src/block/compress.rs', lines 166:4-297:5
+5924c5012
+< Source: 'src/block/compress.rs', lines 63:64-63:74
+---
+> Source: 'src/block/compress.rs', lines 61:64-61:74
+5926,5927c5014,5015
+< Definition span: 'src/block/compress.rs', lines 61:4-65:5
+< Source: 'src/block/compress.rs', lines 63:64-63:74
+---
+> Definition span: 'src/block/compress.rs', lines 59:4-63:5
+> Source: 'src/block/compress.rs', lines 61:64-61:74
+5930c5018
+< Source: 'src/block/mod.rs', lines 56:14-56:35
+---
+> Source: 'src/block/mod.rs', lines 56:14-56:32
+5933c5021
+< Source: 'src/block/mod.rs', lines 56:14-56:35
+---
+> Source: 'src/block/mod.rs', lines 56:14-56:32
+5936c5024
+< Source: 'src/block/compress.rs', lines 374:48-374:56
+---
+> Source: 'src/block/compress.rs', lines 379:48-379:56
+5938,5951c5026,5027
+< Definition span: 'src/block/compress.rs', lines 372:0-376:1
+< Source: 'src/block/compress.rs', lines 374:48-374:56
+< Compiler source: interp/Interp.ml, line 617
+< 
+< Source: 'src/block/compress.rs', lines 368:48-368:56
+< Name pattern: 'lz4_flex::block::compress::read_u32_ptr'
+< Definition span: 'src/block/compress.rs', lines 366:0-370:1
+< Source: 'src/block/compress.rs', lines 368:48-368:56
+< Compiler source: interp/Interp.ml, line 617
+< 
+< Source: 'src/block/compress.rs', lines 380:48-380:56
+< Name pattern: 'lz4_flex::block::compress::read_u16_ptr'
+< Definition span: 'src/block/compress.rs', lines 378:0-382:1
+< Source: 'src/block/compress.rs', lines 380:48-380:56
+---
+> Definition span: 'src/block/compress.rs', lines 377:0-381:1
+> Source: 'src/block/compress.rs', lines 379:48-379:56

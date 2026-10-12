@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""Compiler adapter for profiling-only edge counters; no production use."""
+import hashlib,json,os,subprocess,sys
+from pathlib import Path
+root=Path(__file__).resolve().parents[1];sys.path.insert(0,str(root/'c3'))
+from instrument import assemble
+real=root/'repos/c3-profiler/ccomp';args=sys.argv[1:]
+sources=[a for a in args if a.endswith('.c') and Path(a).is_file()]
+if not sources or any(a in args for a in ['-E','-S','-M','-MM']):raise SystemExit(subprocess.run([str(real),*args]).returncode)
+folder=Path(os.environ['VERIOP_PROFILE_DIR']);folder.mkdir(parents=True,exist_ok=True)
+key=hashlib.sha256(json.dumps([str(Path.cwd()),args]).encode()).hexdigest()[:24]
+d=folder/key;d.mkdir(exist_ok=False)
+output=Path(args[args.index('-o')+1]) if '-o' in args else Path(sources[0]).with_suffix('.o')
+base=[];i=0
+while i<len(args):
+ a=args[i]
+ if a=='-o':i+=2;continue
+ if a in sources or a=='-c' or a.startswith(('-l','-Wl,')) or a.endswith(('.o','.a','.so')):i+=1;continue
+ base.append(a);i+=1
+objects={}
+for index,src in enumerate(sources):
+ prefix=d/f'{index:03d}';obj=output if '-c' in args else prefix.with_suffix('.o')
+ cmd=[str(real),*base,'-c',src,'-o',str(prefix.with_suffix('.original.o'))]
+ p=subprocess.run(cmd,env=os.environ|{'VERIOP_PROFILE_OUTPUT':str(prefix)})
+ if p.returncode:raise SystemExit(p.returncode)
+ assemble(prefix,obj);objects[src]=str(obj.resolve())
+(d/'command.json').write_text(json.dumps(dict(cwd=str(Path.cwd()),args=args,real_compiler=str(real),sources_sha256={src:hashlib.sha256(Path(src).read_bytes()).hexdigest() for src in sources}),indent=2)+'\n')
+if '-c' in args:assert len(sources)==1;raise SystemExit(0)
+raise SystemExit(subprocess.run([str(real),*[objects.get(a,a) for a in args]]).returncode)

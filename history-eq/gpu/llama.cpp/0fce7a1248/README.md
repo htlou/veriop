@@ -1,0 +1,7 @@
+# llama.cpp `0fce7a1248` — Vulkan pipeline-name strings
+
+**Verdict: `EQUIV_PARTIAL` for pipeline-name and entrypoint values at the existing `ggml_vk_load_shaders` call sites, assuming the required string allocations succeed.** Removing the child's six-call `std::string` adapter, restoring the old parameter types, and redirecting those six calls makes the complete historical `ggml-vulkan.cpp` source byte-identical to its parent. The [reproducer](reproduce.py) checks this against both exact Git revisions and records matching SHA-256 hashes in [result.json](result.json).
+
+The child passes `name.c_str()` only while the source string remains alive; the main lambda immediately copies the name into `pipeline->name` and `get_subgroup_size` converts it to a `std::string`. The six routed names use only literal ASCII fragments, decimal `std::to_string`, and `_f16`/`_f32` suffixes, so they contain no embedded NUL. A native C++ check exercises 1,032 names with those forms; an embedded-NUL negative control confirms why the actual-name condition matters. A source scan checks that the other 296 direct call sites use literal or stringized names and the literal `"main"` entrypoint.
+
+This is a source and C++ conversion check, not an Alive2 proof of asynchronous Vulkan compilation or a full device execution. The historical commit concerns host compilation overhead; no official before/after benchmark score was measured. Kuiper and Volta were not run on this host-only change.

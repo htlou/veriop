@@ -1,0 +1,418 @@
+=================== dda2dfb
+dda2dfb 2026-05-12
+SVE and SVE2 optimizations (#159)
+ CMakeLists.txt  | 28 +++++++++++++++++++++++++
+ README.md       |  1 +
+ doc/C-API.md    |  3 ++-
+ doc/CPP-API.md  |  3 ++-
+ libdivide.h     | 65 ++++++++++++++++++++++++++++++++++-----------------------
+ test/tester.cpp |  3 +++
+ 6 files changed, 75 insertions(+), 28 deletions(-)
+=================== c2d2be3
+c2d2be3 2026-02-24
+Faster remainder computation
+As the true final quotient is known at the end and the remainder must be less than den, it is sufficient to compute it as numlo - quotient*den (both of numlo and den must be of the original values, i.e. not the normalized ones).
+ libdivide.h | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+=================== a7b5cde
+a7b5cde 2025-04-04
+Add missing function specifiers to match their declaration (#143)
+All these function are declared with `static LIBDIVIDE_INLINE`, but do not have them at definition
+ libdivide.h | 84 ++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 42 insertions(+), 42 deletions(-)
+=================== 31f1e42
+31f1e42 2025-04-04
+Preserve order of params when calling libdivide_mullhi (#144)
+* Preserve order of params when calling libdivide_mullhi
+This change improves code generation in 32-bit builds (shorter code, uses less stack).
+* comments
+ libdivide.h | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+=================== bbb68f1
+bbb68f1 2025-04-01
+Avoid casting for unrelated types (#140)
+ libdivide.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+=================== 70d2a45
+70d2a45 2025-03-15
+Define LIBDIVIDE_INLINE as __forceinline for ms compiler
+ libdivide.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+=================== af1db19
+af1db19 2024-11-04
+Automate release process (#124)
+* Add patch version to conform to full semantic versioning spec and build LIBDIVIDE_VERSION from the version components
+* GitHub Workflow to create a release PR
+* Add GH acation to create a draft release
+* Generate a run summary that will be displayed in the GH UI.
+* Update documentation: separate out development instructions from usage and use relative links everywhere.
+* Typos, prompts, alignment
+* Embed version string directly in libdivide.h
+* Remove space from filename
+* Example commands: remove prompts for easier copy/paste, use 'pwsh' tag for better syntax highlighting
+* Add back original doc from ridiculousfish
+* Move doc to RELEASE.md
+* Improve release type descriptions
+* Additional release process details.
+* Fix typo
+---------
+Co-authored-by: Kim Walisch <kim.walisch@gmail.com>
+ .github/release.yml                   |  8 +++
+ .github/workflows/prepare_release.yml | 98 +++++++++++++++++++++++++++++++++++
+ README.md                             | 89 ++++++++++---------------------
+ doc/RELEASE.md                        | 13 +++++
+ libdivide.h                           |  4 +-
+ test/avr/readme.md                    | 14 ++---
+ test/tester.cpp                       |  1 +
+ 7 files changed, 156 insertions(+), 71 deletions(-)
+=================== e72d827
+e72d827 2024-10-17
+Add GitHub Actions (#122)
+* GitHub Action: AVR build & unit test
+* Only run benchmark test on Release builds.
+* Switch to GitHub actions
+* Add manual run
+* Use workflow_call instead of workflow_run
+workflow_run will "only trigger a workflow run if the workflow file is on the default branch."
+* Use the ClangCL toolset on Windows+CLang
+* Lookup the C compiler & force build tests on
+* Simplify matrix, force tests on & clang fuzzing
+* Turn off clang fuzzers -  compilation errors
+* Split Windows builds into separate jobs
+There is quite a big difference in the compiler toolchains.
+* Use marketplace cmake action
+* Windows: need to use MSVC command prompt
+So compilers are in the path.
+* Use MSVC compile options for clang-cl
+* Windows: specify generators
+* clang-cl: disable __umulh/__mulh intrinsics prior to VS2022
+ .github/workflows/avr_build_test.yml |  40 ++++++++++++
+ .github/workflows/canary_build.yml   |  48 ++++++++++++++
+ .github/workflows/full_build.yml     | 121 +++++++++++++++++++++++++++++++++++
+ CMakeLists.txt                       |  39 +++++++----
+ CMakeSanitize                        |  27 ++++----
+ README.md                            |   2 +-
+ libdivide.h                          |  11 +++-
+ test/DivideTest.h                    |   6 +-
+ test/avr/platformio.ini              |  31 +++++++--
+ test/avr/simavr_env.py               |  16 -----
+ test/avr/src/main.cpp                |   4 +-
+ test/avr/test/main.cpp               |  62 ++++++++++++++++++
+ test/avr_type_helpers.h              |   4 +-
+ test/outputs.h                       |  95 +++++++++++++++++++--------
+ 14 files changed, 425 insertions(+), 81 deletions(-)
+=================== 3bd3438
+3bd3438 2022-10-17
+Fix GCC unused function warning
+<source>:565:30: error: unused function 'libdivide_u128_shift' [-Werror,-Wunused-function]
+static LIBDIVIDE_INLINE void libdivide_u128_shift(
+ libdivide.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+=================== ef645e2
+ef645e2 2021-07-07
+Apply LIBDIVIDE_INLINE to all functions (#81)
+ appveyor.yml | 2 ++
+ libdivide.h  | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+=================== a551b6c
+a551b6c 2021-07-06
+Add a C99 test program (#79)
+* Add C99 test program
+* Fix C99 issues
+Change out static_cast to C-style cast
+Rename functions to avoid overloading:
+  libdivide_s64_signbits_vec512
+  libdivide_s64_signbits_vec256
+  libdivide_s64_signbits_vec128
+ CMakeLists.txt           |  5 +++
+ appveyor.yml             |  6 ++++
+ libdivide.code-workspace |  3 +-
+ libdivide.h              | 50 +++++++++++++-------------
+ test/test_c99.c          | 93 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 131 insertions(+), 26 deletions(-)
+=================== f011b0e
+f011b0e 2021-07-01
+Add 16 bit support (#75)
+* Documentation update
+* Cross compilation of ARM target
+* Speed up tester
+* Simplify quick/slow tests
+    AVR == quick (not as thorough)
+    Everything else == slow (comprehensive)
+* Reduce RAM usage - important for AVR, where it's limited.
+ CMakeLists.txt                |  20 +-
+ appveyor.yml                  |   2 +-
+ doc/C-API.md                  |  12 +
+ libdivide.code-workspace      |  46 +++-
+ libdivide.h                   | 620 +++++++++++++++++++++++++++++++++++++++---
+ test/DivideTest.h             | 382 +++++++++++++-------------
+ test/avr/platformio.ini       |  21 +-
+ test/avr/readme.md            |   8 +-
+ test/avr/src/main.cpp         |   8 +-
+ test/avr_type_helpers.h       |  24 +-
+ test/benchmark.cpp            |  12 +-
+ test/benchmark.h              |  34 ++-
+ test/benchmark_branchfree.cpp |  60 ++--
+ test/outputs.h                |   9 +
+ test/tester.cpp               |  53 +++-
+ test/type_mappings.h          |   2 +
+ 16 files changed, 1012 insertions(+), 301 deletions(-)
+=================== 61ae9cb
+61ae9cb 2021-04-02
+Mark most functions as forced-inline
+This improves performance for optimization levels like O2 and Os.
+ libdivide.h | 317 ++++++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 178 insertions(+), 139 deletions(-)
+=================== c8edb85
+c8edb85 2021-03-06
+Do not use __uint128_t in 128_div_64_to_64
+This routine performs a 128 / 64 -> 64 bit division.
+The __uint128_t version performs a full-width division which is much
+slower than necessary, under LLVM compiler-rt.
+ libdivide.h | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+=================== 78fc01d
+78fc01d 2021-03-06
+Allow using all vector types simultaneously
+Prior to this change, libdivide supported at most one vector type (SSE2, AVX2,
+AVX512), selected at configure time. With this change all vector types may be
+supported simultaneously.
+A nice advantage here is easier testing. Now all vector widths may be tested
+simultaneously instead of requiring separate build directories for each one.
+Also migrate the benchmark tool from C to C++. This was written in C because at
+the time clang did not support C++ (!) and I was curious about performance
+under clang. Now that C++ is supported by clang, we can use its niceties.
+This requires an API change. Instead of 'do_vector' we now tag it with the
+vector width. So the new functions are:
+	libdivide_s32_do_vec128
+	libdivide_s64_do_vec128
+	libdivide_u32_do_vec128
+	libdivide_u64_do_vec128
+	libdivide_s32_do_vec256
+	libdivide_s64_do_vec256
+	libdivide_u32_do_vec256
+	libdivide_u64_do_vec256
+ CMakeLists.txt     | 133 +++++----
+ doc/C-API.md       |  48 ++--
+ doc/CPP-API.md     |   2 +-
+ libdivide.h        | 351 +++++++++++++----------
+ test/benchmark.c   | 827 -----------------------------------------------------
+ test/benchmark.cpp | 516 +++++++++++++++++++++++++++++++++
+ test/tester.cpp    |  48 ++--
+ 7 files changed, 815 insertions(+), 1110 deletions(-)
+=================== 8e9bf17
+8e9bf17 2021-03-06
+Reimplement vectorized high-multiplies
+The previous implementations were taken from StackOverflow, but the
+licensing there is ambiguous. Revert back to the previous implementation
+which was bespoke and so covered by the libdivide license, and use it in
+all vector regimes.
+One new idea relative to the old implementation is to use a shuffle
+instead of a shift when moving the high 32 bits of packed 64 bit values
+into lower lanes. The advantage of a shuffle is that it preserves the
+source register which saves us a mov.
+ libdivide.h | 121 +++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 67 insertions(+), 54 deletions(-)
+=================== c2ee283
+c2ee283 2019-12-10
+Accelerate counting of leading zeros
+Replace the algorithm for counting leading zeros (in the case of no builtin function)
+by one that searches the number in larger chunks first.
+This can speed up the counting by up to 10x in the case of small numbers (lots of zeros).
+ libdivide.h | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+=================== 2422199
+2422199 2019-06-14
+Speed up unsigned branchfull divider
+ libdivide.h | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
+=================== 4a1d5a7
+4a1d5a7 2019-06-13
+Support +-1 divider for signed branchfree
+ libdivide.h      | 12 ------------
+ test/benchmark.c | 14 ++++++--------
+ test/tester.cpp  |  6 ++++--
+ 3 files changed, 10 insertions(+), 22 deletions(-)
+=================== 0464eb8
+0464eb8 2019-06-12
+Simplify inline usage
+ libdivide.h | 94 +++++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 45 insertions(+), 49 deletions(-)
+=================== c4623c3
+c4623c3 2019-06-11
+Replace anonymous namespace with inline specifiers
+ libdivide.h | 100 +++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 48 insertions(+), 52 deletions(-)
+=================== bf79e0e
+bf79e0e 2019-06-03
+Fast libdivide_mullhi_u64_flat_vector()
+ libdivide.h | 42 +++++++++++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 23 deletions(-)
+=================== e3fa9bd
+e3fa9bd 2019-05-28
+Optimize libdivide_128_div_64_to_64() using __uint128_t
+ libdivide.h | 58 ++++++++++++++++++++++------------------------------------
+ 1 file changed, 22 insertions(+), 36 deletions(-)
+=================== e0ae0fa
+e0ae0fa 2019-05-28
+Optimize libdivide_128_div_64_to_64() using _udiv128
+ CHANGELOG.md |  2 +-
+ libdivide.h  | 39 ++++++++++++++++++++++++++++-----------
+ 2 files changed, 29 insertions(+), 12 deletions(-)
+=================== 5e54530
+5e54530 2019-05-27
+Improve libdivide_128_div_64_to_64()
+ libdivide.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+=================== 4b4dd82
+4b4dd82 2018-01-21
+MSVC workaround for branchfree_divider
+Workaround for MSVC bug, MSVC still reports __cplusplus as 199711L
+ libdivide.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+=================== 637f089
+637f089 2018-01-18
+Improved error handling
+ libdivide.h | 62 ++++++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 47 insertions(+), 15 deletions(-)
+=================== 5444a28
+5444a28 2018-01-17
+Add libdivide::branchfree_divider<T> for C++11 or later
+ libdivide.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+=================== 8614144
+8614144 2018-01-17
+Minor u64 recover speedup
+ libdivide.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+=================== ae6b69a
+ae6b69a 2016-08-06
+Remove unused libdivide__count_trailing_zeros*()
+The libdivide__count_trailing_zeros*() are not used anymore. Also there
+is a performance bug in libdivide__count_trailing_zeros64() where the
+__LP64__ macro is beeing used which does not work on Windows/MinGW (see
+related https://github.com/ridiculousfish/libdivide/pull/10). Rather
+than fix the unused code it is better to simply delete it.
+ libdivide.h | 44 --------------------------------------------
+ 1 file changed, 44 deletions(-)
+=================== 6a17b66
+6a17b66 2016-08-04
+Fix MSVC compiler warning C4146
+Fixes many warnings when compiling using MSVC /W2.
+```
+Build started
+git clone -q --branch=master https://github.com/kimwalisch/libdivide.git C:\projects\libdivide
+git checkout -qf 4ce4e9e294cd3d6904c7c0160d2900b6545d6319
+"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /%platform%
+Setting SDK environment relative to C:\Program Files\Microsoft SDKs\Windows\v7.1\.
+Targeting Windows 7 x64 Debug
+cl /nologo /W2 /O2 /EHsc /DLIBDIVIDE_USE_SSE2=1 libdivide_test.cpp
+libdivide_test.cpp
+c:\projects\libdivide\libdivide.h(1200) : warning C4146: unary minus operator applied to unsigned type, result still unsigned
+c:\projects\libdivide\libdivide.h(1491) : warning C4146: unary minus operator applied to unsigned type, result still unsigned
+libdivide_test.cpp(196) : warning C4146: unary minus operator applied to unsigned type, result still unsigned
+        libdivide_test.cpp(188) : while compiling class template member function 'void DivideTest<T>::run(void)'
+        with
+        [
+            T=uint32_t
+        ]
+ libdivide.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+=================== ce682f2
+ce682f2 2016-08-04
+Use __mulh(), __umulh() intrinsics for MSVC x64
+Implement improvement from https://github.com/ridiculousfish/libdivide/issues/19.
+This commit also fixes use of non existent _M_64 macro.
+ libdivide.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+=================== 7788a1f
+7788a1f 2016-04-09
+Remove shift masks in branchfree vector paths
+ libdivide.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+=================== b031fb3
+b031fb3 2016-04-09
+Save 1 instruction in libdivide_u*_branchfree_do()
+ libdivide.h | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+=================== 79b0338
+79b0338 2016-04-03
+Check the shift_path bit instead of compare m in s32 branchfree
+Saves an instruction under gcc
+ libdivide.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+=================== e24ff83
+e24ff83 2016-04-01
+Implement unsigned branchfrees as new type
+ libdivide.h           | 55 +++++++++++++++++++++++++++++++++++++--------------
+ libdivide_benchmark.c | 18 ++++++++---------
+ 2 files changed, 49 insertions(+), 24 deletions(-)
+=================== 2617268
+2617268 2016-04-01
+Reimplement branchfree as a new type
+Allows for different representations for branchfree and normal code
+ libdivide.h        | 268 ++++++++++++++++++++++++++++++++++++-----------------
+ libdivide_test.cpp |  77 ++++++++-------
+ 2 files changed, 223 insertions(+), 122 deletions(-)
+=================== 3f69462
+3f69462 2016-03-29
+Fix s32 benchmark errors
+ libdivide.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+=================== ac3fe82
+ac3fe82 2016-03-29
+Fix s64 benchmark errors
+ libdivide.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+=================== 90e0234
+90e0234 2016-03-28
+Clean up and correct signed branchfree versions
+ libdivide.h | 48 +++++++++++++++++-------------------------------
+ 1 file changed, 17 insertions(+), 31 deletions(-)
+=================== e63aac8
+e63aac8 2016-03-28
+Implement libdivide_s64_branchfree_do
+ libdivide.h | 69 ++++++++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 55 insertions(+), 14 deletions(-)
+=================== 292ddc3
+292ddc3 2016-03-28
+Initial pass at branchfree s32 implementation
+ libdivide.h        | 94 +++++++++++++++++++++++++++++++++++++++++-------------
+ libdivide_test.cpp |  3 +-
+ 2 files changed, 74 insertions(+), 23 deletions(-)
+=================== c679134
+c679134 2016-03-23
+Implement u64 branchfree
+ libdivide.h | 70 +++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 43 insertions(+), 27 deletions(-)
+=================== 703a791
+703a791 2016-03-22
+First pass at u32 branchfree
+ libdivide.h        | 137 +++++++++++++++++++++++++++++++++++++++++------------
+ libdivide_test.cpp |   6 +++
+ 2 files changed, 113 insertions(+), 30 deletions(-)
+=================== 6119240
+6119240 2016-03-28
+Mark LIBDIVIDE_API as inline
+Avoids unused function warnings
+ libdivide.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+=================== 9473c28
+9473c28 2016-03-23
+Incorporate BranchFree variant into C++ API and tests
+Not yet turned on
+ libdivide.h        | 135 +++++++++++++++++++++++++++++++++++------------------
+ libdivide_test.cpp |  18 ++++---
+ 2 files changed, 101 insertions(+), 52 deletions(-)
+=================== f2e3734
+f2e3734 2014-07-09
+Avoid wrong bit-shifting.
+Fixes Coverity issue CID#1222015
+ libdivide.h | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+=================== 42fe36d
+42fe36d 2014-07-09
+Use intrinsic MSVC functions for counting leading/trailing zeros.
+Around 2.5 faster for 64-bit numbers.
+ libdivide.h | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)

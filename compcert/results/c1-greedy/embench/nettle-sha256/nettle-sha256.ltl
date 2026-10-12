@@ -1,0 +1,1362 @@
+_nettle_write_be32() {
+   51:	R12 = ESI; 
+   50:	R8 = EDI; R8 = R8 >>lu 2; 
+   49:	EDI = EDI &l 3; 
+   48:	EBP = EDI; EBP = lowlong(EBP); 
+   47:	R10 = 0L; 
+   46:	if (R10 <lu R8) goto 45 else goto 27
+   45:	
+   44:	R9 = int32[EDX + R10 * 4 + 0]; 
+   43:	R9 = R9 >>u 24; 
+   42:	
+   41:	int8u[R12 + 0] = R9; 
+   40:	R9 = int32[EDX + R10 * 4 + 0]; 
+   39:	R9 = R9 >>u 16; 
+   38:	
+   37:	int8u[R12 + 1] = R9; 
+   36:	ESI = int32[EDX + R10 * 4 + 0]; 
+   35:	ESI = ESI >>u 8; 
+   34:	
+   33:	int8u[R12 + 2] = ESI; 
+   32:	R11 = int32[EDX + R10 * 4 + 0]; 
+   31:	
+   30:	int8u[R12 + 3] = R11; 
+   29:	R10 = R10 + 1 (long); 
+   28:	R12 = R12 + 4 (long); goto 46
+   27:	if (EBP !=u 0) goto 26 else goto 1
+   26:	
+   25:	EBX = int32[EDX + R10 * 4 + 0]; 
+   24:	ECX = EBP; 
+   23:	if (ECX ==s 1) goto 7 else goto 22
+   22:	if (ECX ==s 2) goto 13 else goto 21
+   21:	if (ECX ==s 3) goto 19 else goto 20
+   20:	call "abort"; 
+   19:	EBP = EBP + -1 (int); 
+   18:	
+   17:	EDI = long32unsigned(EBP); 
+   16:	EAX = EBX; EAX = EAX >>u 8; 
+   15:	
+   14:	int8u[R12 + EDI + 0] = EAX; 
+   13:	EBP = EBP + -1 (int); 
+   12:	
+   11:	EDX = long32unsigned(EBP); 
+   10:	EDI = EBX; EDI = EDI >>u 16; 
+    9:	
+    8:	int8u[R12 + EDX + 0] = EDI; 
+    7:	EAX = EBP + -1 (int); 
+    6:	
+    5:	ESI = long32unsigned(EAX); 
+    4:	EBX = EBX >>u 24; 
+    3:	
+    2:	int8u[R12 + ESI + 0] = EBX; 
+    1:	return
+}
+
+_nettle_sha256_compress() {
+ 1087:	local(0,long) = EDX; R8 = ESI; local(10,long) = EDI; 
+ 1086:	EDX = 0; 
+ 1085:	EAX = stack(0) (long); 
+ 1084:	R10 = long32unsigned(EDX); 
+ 1083:	ECX = int8u[R8 + 0]; 
+ 1082:	ECX = ECX << 24; 
+ 1081:	R11 = int8u[R8 + 1]; 
+ 1080:	R11 = R11 << 16; 
+ 1079:	ECX = ECX | R11; 
+ 1078:	R11 = int8u[R8 + 2]; 
+ 1077:	R11 = R11 << 8; 
+ 1076:	ECX = ECX | R11; 
+ 1075:	ESI = int8u[R8 + 3]; 
+ 1074:	ECX = ECX | ESI; 
+ 1073:	int32[EAX + R10 * 4 + 0] = ECX; 
+ 1072:	EDX = EDX + 1 (int); 
+ 1071:	R8 = R8 + 4 (long); 
+ 1070:	if (EDX <u 16) goto 1085 else goto 1069
+ 1069:	ESI = local(10,long); R9 = int32[ESI + 0]; 
+ 1068:	R10 = int32[ESI + 4]; 
+ 1067:	R11 = int32[ESI + 8]; 
+ 1066:	EDX = local(10,long); ECX = int32[EDX + 12]; 
+ 1065:	R8 = int32[EDX + 16]; 
+ 1064:	ESI = int32[EDX + 20]; 
+ 1063:	EDX = local(10,long); EAX = int32[EDX + 24]; 
+ 1062:	EDX = int32[EDX + 28]; 
+ 1061:	EDI = 0; local(20,int) = EDI; 
+ 1060:	EDI = stack(0) (long); 
+ 1059:	EBP = R8; EBP = EBP ror 6; 
+ 1058:	EBX = R8; EBX = EBX ror 11; 
+ 1057:	EBP = EBP ^ EBX; 
+ 1056:	EBX = R8; EBX = EBX ror 25; 
+ 1055:	EBP = EBP ^ EBX; 
+ 1054:	EBX = ESI; EBX = EBX ^ EAX; 
+ 1053:	R12 = R8; R12 = R12 & EBX; 
+ 1052:	EBX = EAX; EBX = EBX ^ R12; 
+ 1051:	EBP = EBP + EBX + 0 (int); 
+ 1050:	EBX = local(0,long); EBX = int32[EBX + 0]; 
+ 1049:	EBP = EBP + EBX + 0 (int); 
+ 1048:	EBX = int32[EDI + 0]; 
+ 1047:	EBX = EBP + EBX + 0 (int); 
+ 1046:	R12 = EDX + EBX + 0 (int); 
+ 1045:	ECX = ECX + R12 + 0 (int); 
+ 1044:	R13 = R9; R13 = R13 ror 2; 
+ 1043:	EDX = R9; EDX = EDX ror 13; 
+ 1042:	R13 = R13 ^ EDX; 
+ 1041:	EDX = R9; EDX = EDX ror 22; 
+ 1040:	R13 = R13 ^ EDX; 
+ 1039:	EDX = R9; EDX = EDX & R10; 
+ 1038:	EBP = R9; EBP = EBP ^ R10; 
+ 1037:	EBX = R11; EBX = EBX & EBP; 
+ 1036:	EDX = EDX ^ EBX; 
+ 1035:	EDX = R13 + EDX + 0 (int); 
+ 1034:	EDX = R12 + EDX + 0 (int); 
+ 1033:	EBP = ECX; EBP = EBP ror 6; 
+ 1032:	EBX = ECX; EBX = EBX ror 11; 
+ 1031:	EBP = EBP ^ EBX; 
+ 1030:	EBX = ECX; EBX = EBX ror 25; 
+ 1029:	EBP = EBP ^ EBX; 
+ 1028:	EBX = R8; EBX = EBX ^ ESI; 
+ 1027:	R12 = ECX; R12 = R12 & EBX; 
+ 1026:	EBX = ESI; EBX = EBX ^ R12; 
+ 1025:	EBP = EBP + EBX + 0 (int); 
+ 1024:	EBX = local(0,long); EBX = int32[EBX + 4]; 
+ 1023:	EBP = EBP + EBX + 0 (int); 
+ 1022:	EBX = int32[EDI + 4]; 
+ 1021:	EBX = EBP + EBX + 0 (int); 
+ 1020:	R12 = EAX + EBX + 0 (int); 
+ 1019:	R11 = R11 + R12 + 0 (int); 
+ 1018:	EBP = EDX; EBP = EBP ror 2; 
+ 1017:	EAX = EDX; EAX = EAX ror 13; 
+ 1016:	EBP = EBP ^ EAX; 
+ 1015:	EAX = EDX; EAX = EAX ror 22; 
+ 1014:	EBP = EBP ^ EAX; 
+ 1013:	EBX = EDX; EBX = EBX & R9; 
+ 1012:	R13 = EDX; R13 = R13 ^ R9; 
+ 1011:	EAX = R10; EAX = EAX & R13; 
+ 1010:	EBX = EBX ^ EAX; 
+ 1009:	EAX = EBP + EBX + 0 (int); 
+ 1008:	EAX = R12 + EAX + 0 (int); 
+ 1007:	EBP = R11; EBP = EBP ror 6; 
+ 1006:	EBX = R11; EBX = EBX ror 11; 
+ 1005:	EBP = EBP ^ EBX; 
+ 1004:	EBX = R11; EBX = EBX ror 25; 
+ 1003:	EBP = EBP ^ EBX; 
+ 1002:	EBX = ECX; EBX = EBX ^ R8; 
+ 1001:	R12 = R11; R12 = R12 & EBX; 
+ 1000:	EBX = R8; EBX = EBX ^ R12; 
+  999:	EBP = EBP + EBX + 0 (int); 
+  998:	EBX = local(0,long); EBX = int32[EBX + 8]; 
+  997:	EBP = EBP + EBX + 0 (int); 
+  996:	EBX = int32[EDI + 8]; 
+  995:	EBX = EBP + EBX + 0 (int); 
+  994:	R12 = ESI + EBX + 0 (int); 
+  993:	R10 = R10 + R12 + 0 (int); 
+  992:	R13 = EAX; R13 = R13 ror 2; 
+  991:	ESI = EAX; ESI = ESI ror 13; 
+  990:	R13 = R13 ^ ESI; 
+  989:	ESI = EAX; ESI = ESI ror 22; 
+  988:	R13 = R13 ^ ESI; 
+  987:	ESI = EAX; ESI = ESI & EDX; 
+  986:	EBP = EAX; EBP = EBP ^ EDX; 
+  985:	EBX = R9; EBX = EBX & EBP; 
+  984:	ESI = ESI ^ EBX; 
+  983:	ESI = R13 + ESI + 0 (int); 
+  982:	ESI = R12 + ESI + 0 (int); 
+  981:	EBP = R10; EBP = EBP ror 6; 
+  980:	EBX = R10; EBX = EBX ror 11; 
+  979:	EBP = EBP ^ EBX; 
+  978:	EBX = R10; EBX = EBX ror 25; 
+  977:	EBP = EBP ^ EBX; 
+  976:	EBX = R11; EBX = EBX ^ ECX; 
+  975:	R12 = R10; R12 = R12 & EBX; 
+  974:	EBX = ECX; EBX = EBX ^ R12; 
+  973:	EBP = EBP + EBX + 0 (int); 
+  972:	EBX = local(0,long); EBX = int32[EBX + 12]; 
+  971:	EBX = EBP + EBX + 0 (int); 
+  970:	EBP = int32[EDI + 12]; 
+  969:	EBX = EBX + EBP + 0 (int); 
+  968:	R12 = R8 + EBX + 0 (int); 
+  967:	R9 = R9 + R12 + 0 (int); 
+  966:	EBP = ESI; EBP = EBP ror 2; 
+  965:	R8 = ESI; R8 = R8 ror 13; 
+  964:	EBP = EBP ^ R8; 
+  963:	R8 = ESI; R8 = R8 ror 22; 
+  962:	EBP = EBP ^ R8; 
+  961:	EBX = ESI; EBX = EBX & EAX; 
+  960:	R13 = ESI; R13 = R13 ^ EAX; 
+  959:	R8 = EDX; R8 = R8 & R13; 
+  958:	EBX = EBX ^ R8; 
+  957:	R8 = EBP + EBX + 0 (int); 
+  956:	R8 = R12 + R8 + 0 (int); 
+  955:	EBP = R9; EBP = EBP ror 6; 
+  954:	EBX = R9; EBX = EBX ror 11; 
+  953:	EBP = EBP ^ EBX; 
+  952:	EBX = R9; EBX = EBX ror 25; 
+  951:	EBP = EBP ^ EBX; 
+  950:	EBX = R10; EBX = EBX ^ R11; 
+  949:	R12 = R9; R12 = R12 & EBX; 
+  948:	EBX = R11; EBX = EBX ^ R12; 
+  947:	EBP = EBP + EBX + 0 (int); 
+  946:	EBX = local(0,long); EBX = int32[EBX + 16]; 
+  945:	EBP = EBP + EBX + 0 (int); 
+  944:	EBX = int32[EDI + 16]; 
+  943:	EBX = EBP + EBX + 0 (int); 
+  942:	R12 = ECX + EBX + 0 (int); 
+  941:	EDX = EDX + R12 + 0 (int); 
+  940:	R13 = R8; R13 = R13 ror 2; 
+  939:	ECX = R8; ECX = ECX ror 13; 
+  938:	R13 = R13 ^ ECX; 
+  937:	ECX = R8; ECX = ECX ror 22; 
+  936:	R13 = R13 ^ ECX; 
+  935:	ECX = R8; ECX = ECX & ESI; 
+  934:	EBP = R8; EBP = EBP ^ ESI; 
+  933:	EBX = EAX; EBX = EBX & EBP; 
+  932:	ECX = ECX ^ EBX; 
+  931:	ECX = R13 + ECX + 0 (int); 
+  930:	ECX = R12 + ECX + 0 (int); 
+  929:	EBP = EDX; EBP = EBP ror 6; 
+  928:	EBX = EDX; EBX = EBX ror 11; 
+  927:	EBP = EBP ^ EBX; 
+  926:	EBX = EDX; EBX = EBX ror 25; 
+  925:	EBP = EBP ^ EBX; 
+  924:	EBX = R9; EBX = EBX ^ R10; 
+  923:	R12 = EDX; R12 = R12 & EBX; 
+  922:	EBX = R10; EBX = EBX ^ R12; 
+  921:	EBP = EBP + EBX + 0 (int); 
+  920:	EBX = local(0,long); EBX = int32[EBX + 20]; 
+  919:	EBP = EBP + EBX + 0 (int); 
+  918:	EBX = int32[EDI + 20]; 
+  917:	EBX = EBP + EBX + 0 (int); 
+  916:	R12 = R11 + EBX + 0 (int); 
+  915:	EAX = EAX + R12 + 0 (int); 
+  914:	EBP = ECX; EBP = EBP ror 2; 
+  913:	R11 = ECX; R11 = R11 ror 13; 
+  912:	EBP = EBP ^ R11; 
+  911:	R11 = ECX; R11 = R11 ror 22; 
+  910:	EBP = EBP ^ R11; 
+  909:	EBX = ECX; EBX = EBX & R8; 
+  908:	R13 = ECX; R13 = R13 ^ R8; 
+  907:	R11 = ESI; R11 = R11 & R13; 
+  906:	EBX = EBX ^ R11; 
+  905:	R11 = EBP + EBX + 0 (int); 
+  904:	R11 = R12 + R11 + 0 (int); 
+  903:	EBP = EAX; EBP = EBP ror 6; 
+  902:	EBX = EAX; EBX = EBX ror 11; 
+  901:	EBP = EBP ^ EBX; 
+  900:	EBX = EAX; EBX = EBX ror 25; 
+  899:	EBP = EBP ^ EBX; 
+  898:	EBX = EDX; EBX = EBX ^ R9; 
+  897:	R12 = EAX; R12 = R12 & EBX; 
+  896:	EBX = R9; EBX = EBX ^ R12; 
+  895:	EBP = EBP + EBX + 0 (int); 
+  894:	EBX = local(0,long); EBX = int32[EBX + 24]; 
+  893:	EBX = EBP + EBX + 0 (int); 
+  892:	EBP = int32[EDI + 24]; 
+  891:	EBX = EBX + EBP + 0 (int); 
+  890:	R12 = R10 + EBX + 0 (int); 
+  889:	ESI = ESI + R12 + 0 (int); 
+  888:	R13 = R11; R13 = R13 ror 2; 
+  887:	R10 = R11; R10 = R10 ror 13; 
+  886:	R13 = R13 ^ R10; 
+  885:	R10 = R11; R10 = R10 ror 22; 
+  884:	R13 = R13 ^ R10; 
+  883:	R10 = R11; R10 = R10 & ECX; 
+  882:	EBP = R11; EBP = EBP ^ ECX; 
+  881:	EBX = R8; EBX = EBX & EBP; 
+  880:	R10 = R10 ^ EBX; 
+  879:	R10 = R13 + R10 + 0 (int); 
+  878:	R10 = R12 + R10 + 0 (int); 
+  877:	EBP = ESI; EBP = EBP ror 6; 
+  876:	EBX = ESI; EBX = EBX ror 11; 
+  875:	EBP = EBP ^ EBX; 
+  874:	EBX = ESI; EBX = EBX ror 25; 
+  873:	EBP = EBP ^ EBX; 
+  872:	EBX = EAX; EBX = EBX ^ EDX; 
+  871:	R12 = ESI; R12 = R12 & EBX; 
+  870:	EBX = EDX; EBX = EBX ^ R12; 
+  869:	EBP = EBP + EBX + 0 (int); 
+  868:	EBX = local(0,long); EBX = int32[EBX + 28]; 
+  867:	EBP = EBP + EBX + 0 (int); 
+  866:	EBX = int32[EDI + 28]; 
+  865:	EBX = EBP + EBX + 0 (int); 
+  864:	R12 = R9 + EBX + 0 (int); 
+  863:	R8 = R8 + R12 + 0 (int); 
+  862:	EBP = R10; EBP = EBP ror 2; 
+  861:	R9 = R10; R9 = R9 ror 13; 
+  860:	EBP = EBP ^ R9; 
+  859:	R9 = R10; R9 = R9 ror 22; 
+  858:	EBP = EBP ^ R9; 
+  857:	EBX = R10; EBX = EBX & R11; 
+  856:	R13 = R10; R13 = R13 ^ R11; 
+  855:	R9 = ECX; R9 = R9 & R13; 
+  854:	EBX = EBX ^ R9; 
+  853:	R9 = EBP + EBX + 0 (int); 
+  852:	R9 = R12 + R9 + 0 (int); 
+  851:	EBX = local(20,int); EBX = EBX + 8 (int); local(20,int) = EBX; 
+  850:	EBX = local(0,long); EBX = EBX + 32 (long); local(0,long) = EBX; 
+  849:	EDI = EDI + 32 (long); 
+  848:	EBX = local(20,int); if (EBX <u 16) goto 847 else goto 846
+  847:	goto 1059
+  846:	
+  845:	EDI = local(20,int); if (EDI <u 64) goto 844 else goto 25
+  844:	
+  843:	R12 = int32[stack(0)]; 
+  842:	EBP = int32[stack(56)]; 
+  841:	
+  840:	EDI = EBP; EDI = (EDI, EBP) << 15; 
+  839:	
+  838:	
+  837:	EBX = EBP; EBP = (EBP, EBX) << 13; 
+  836:	EDI = EDI ^ EBP; 
+  835:	local(2,int) = EBX; 
+  834:	EBX = local(2,int); EBX = EBX >>u 10; 
+  833:	EDI = EDI ^ EBX; 
+  832:	EBX = int32[stack(36)]; local(12,int) = EBX; 
+  831:	EBX = EDI + EBX + 0 (int); 
+  830:	R13 = int32[stack(4)]; 
+  829:	
+  828:	EDI = R13; EDI = (EDI, R13) << 25; 
+  827:	
+  826:	EBP = R13; 
+  825:	R13 = (R13, EBP) << 14; 
+  824:	EDI = EDI ^ R13; 
+  823:	
+  822:	R13 = EBP; R13 = R13 >>u 3; 
+  821:	EDI = EDI ^ R13; 
+  820:	EDI = EBX + EDI + 0 (int); 
+  819:	EDI = R12 + EDI + 0 (int); 
+  818:	int32[stack(0)] = EDI; 
+  817:	R12 = R8; R12 = R12 ror 6; 
+  816:	EBX = R8; EBX = EBX ror 11; 
+  815:	R12 = R12 ^ EBX; 
+  814:	EBX = R8; EBX = EBX ror 25; 
+  813:	R12 = R12 ^ EBX; 
+  812:	EBX = ESI; EBX = EBX ^ EAX; 
+  811:	R13 = R8; R13 = R13 & EBX; 
+  810:	EBX = EAX; EBX = EBX ^ R13; 
+  809:	EBX = R12 + EBX + 0 (int); 
+  808:	R12 = local(0,long); R12 = int32[R12 + 0]; 
+  807:	EBX = EBX + R12 + 0 (int); 
+  806:	EBX = EBX + EDI + 0 (int); 
+  805:	R13 = EDX + EBX + 0 (int); 
+  804:	EBX = ECX + R13 + 0 (int); 
+  803:	ECX = R9; ECX = ECX ror 2; 
+  802:	EDX = R9; EDX = EDX ror 13; 
+  801:	ECX = ECX ^ EDX; 
+  800:	EDX = R9; EDX = EDX ror 22; 
+  799:	ECX = ECX ^ EDX; 
+  798:	R12 = R9; R12 = R12 & R10; 
+  797:	EDX = R9; EDX = EDX ^ R10; 
+  796:	R14 = R11; R14 = R14 & EDX; 
+  795:	R12 = R12 ^ R14; 
+  794:	ECX = ECX + R12 + 0 (int); 
+  793:	EDX = R13 + ECX + 0 (int); 
+  792:	
+  791:	R12 = int32[stack(60)]; 
+  790:	
+  789:	R13 = R12; R12 = (R12, R13) << 15; 
+  788:	ECX = R13; 
+  787:	
+  786:	ECX = (ECX, R13) << 13; 
+  785:	R12 = R12 ^ ECX; 
+  784:	ECX = R13; local(4,int) = ECX; 
+  783:	ECX = local(4,int); ECX = ECX >>u 10; 
+  782:	R12 = R12 ^ ECX; 
+  781:	ECX = int32[stack(40)]; local(14,int) = ECX; 
+  780:	R13 = R12 + ECX + 0 (int); 
+  779:	ECX = int32[stack(8)]; 
+  778:	R12 = ECX; 
+  777:	ECX = (ECX, R12) << 25; 
+  776:	
+  775:	
+  774:	R14 = R12; R14 = (R14, R12) << 14; 
+  773:	ECX = ECX ^ R14; 
+  772:	
+  771:	R14 = R12; R14 = R14 >>u 3; 
+  770:	ECX = ECX ^ R14; 
+  769:	ECX = R13 + ECX + 0 (int); 
+  768:	EBP = EBP + ECX + 0 (int); 
+  767:	int32[stack(4)] = EBP; 
+  766:	R13 = EBX; R13 = R13 ror 6; 
+  765:	ECX = EBX; ECX = ECX ror 11; 
+  764:	R13 = R13 ^ ECX; 
+  763:	ECX = EBX; ECX = ECX ror 25; 
+  762:	R13 = R13 ^ ECX; 
+  761:	ECX = R8; ECX = ECX ^ ESI; 
+  760:	R14 = EBX; R14 = R14 & ECX; 
+  759:	ECX = ESI; ECX = ECX ^ R14; 
+  758:	R13 = R13 + ECX + 0 (int); 
+  757:	ECX = local(0,long); ECX = int32[ECX + 4]; 
+  756:	ECX = R13 + ECX + 0 (int); 
+  755:	ECX = ECX + EBP + 0 (int); 
+  754:	R14 = EAX + ECX + 0 (int); 
+  753:	EAX = R11 + R14 + 0 (int); 
+  752:	R15 = EDX; R15 = R15 ror 2; 
+  751:	R11 = EDX; R11 = R11 ror 13; 
+  750:	R15 = R15 ^ R11; 
+  749:	ECX = EDX; ECX = ECX ror 22; 
+  748:	R15 = R15 ^ ECX; 
+  747:	ECX = EDX; ECX = ECX & R9; 
+  746:	R13 = EDX; R13 = R13 ^ R9; 
+  745:	R11 = R10; R11 = R11 & R13; 
+  744:	ECX = ECX ^ R11; 
+  743:	ECX = R15 + ECX + 0 (int); 
+  742:	R11 = R14 + ECX + 0 (int); 
+  741:	ECX = R12; 
+  740:	
+  739:	
+  738:	R12 = EDI; R12 = (R12, EDI) << 15; 
+  737:	
+  736:	R13 = EDI; 
+  735:	EDI = (EDI, R13) << 13; 
+  734:	R12 = R12 ^ EDI; 
+  733:	local(6,int) = R13; 
+  732:	EDI = local(6,int); EDI = EDI >>u 10; 
+  731:	R12 = R12 ^ EDI; 
+  730:	EDI = int32[stack(44)]; local(15,int) = EDI; 
+  729:	R12 = R12 + EDI + 0 (int); 
+  728:	R14 = int32[stack(12)]; 
+  727:	
+  726:	EDI = R14; EDI = (EDI, R14) << 25; 
+  725:	
+  724:	R13 = R14; 
+  723:	R14 = (R14, R13) << 14; 
+  722:	EDI = EDI ^ R14; 
+  721:	
+  720:	R14 = R13; R14 = R14 >>u 3; 
+  719:	EDI = EDI ^ R14; 
+  718:	EDI = R12 + EDI + 0 (int); 
+  717:	R12 = ECX + EDI + 0 (int); 
+  716:	int32[stack(8)] = R12; 
+  715:	EDI = EAX; EDI = EDI ror 6; 
+  714:	ECX = EAX; ECX = ECX ror 11; 
+  713:	EDI = EDI ^ ECX; 
+  712:	ECX = EAX; ECX = ECX ror 25; 
+  711:	EDI = EDI ^ ECX; 
+  710:	ECX = EBX; ECX = ECX ^ R8; 
+  709:	R14 = EAX; R14 = R14 & ECX; 
+  708:	ECX = R8; ECX = ECX ^ R14; 
+  707:	EDI = EDI + ECX + 0 (int); 
+  706:	ECX = local(0,long); ECX = int32[ECX + 8]; 
+  705:	ECX = EDI + ECX + 0 (int); 
+  704:	ECX = ECX + R12 + 0 (int); 
+  703:	R14 = ESI + ECX + 0 (int); 
+  702:	ECX = R10 + R14 + 0 (int); 
+  701:	ESI = R11; ESI = ESI ror 2; 
+  700:	R10 = R11; R10 = R10 ror 13; 
+  699:	ESI = ESI ^ R10; 
+  698:	R10 = R11; R10 = R10 ror 22; 
+  697:	ESI = ESI ^ R10; 
+  696:	R15 = R11; R15 = R15 & EDX; 
+  695:	EDI = R11; EDI = EDI ^ EDX; 
+  694:	R10 = R9; R10 = R10 & EDI; 
+  693:	R15 = R15 ^ R10; 
+  692:	EDI = ESI + R15 + 0 (int); 
+  691:	R10 = R14 + EDI + 0 (int); 
+  690:	ESI = R13; 
+  689:	
+  688:	R13 = EBP; 
+  687:	EBP = (EBP, R13) << 15; 
+  686:	
+  685:	
+  684:	EDI = R13; EDI = (EDI, R13) << 13; 
+  683:	EBP = EBP ^ EDI; 
+  682:	local(5,int) = R13; 
+  681:	EDI = local(5,int); EDI = EDI >>u 10; 
+  680:	EBP = EBP ^ EDI; 
+  679:	EDI = int32[stack(48)]; local(16,int) = EDI; 
+  678:	R13 = EBP + EDI + 0 (int); 
+  677:	EDI = int32[stack(16)]; 
+  676:	EBP = EDI; 
+  675:	EDI = (EDI, EBP) << 25; 
+  674:	
+  673:	
+  672:	R14 = EBP; R14 = (R14, EBP) << 14; 
+  671:	EDI = EDI ^ R14; 
+  670:	
+  669:	R14 = EBP; R14 = R14 >>u 3; 
+  668:	EDI = EDI ^ R14; 
+  667:	EDI = R13 + EDI + 0 (int); 
+  666:	EDI = ESI + EDI + 0 (int); 
+  665:	int32[stack(12)] = EDI; 
+  664:	R13 = ECX; R13 = R13 ror 6; 
+  663:	ESI = ECX; ESI = ESI ror 11; 
+  662:	R13 = R13 ^ ESI; 
+  661:	ESI = ECX; ESI = ESI ror 25; 
+  660:	R13 = R13 ^ ESI; 
+  659:	ESI = EAX; ESI = ESI ^ EBX; 
+  658:	R14 = ECX; R14 = R14 & ESI; 
+  657:	ESI = EBX; ESI = ESI ^ R14; 
+  656:	R13 = R13 + ESI + 0 (int); 
+  655:	ESI = local(0,long); ESI = int32[ESI + 12]; 
+  654:	ESI = R13 + ESI + 0 (int); 
+  653:	ESI = ESI + EDI + 0 (int); 
+  652:	R14 = R8 + ESI + 0 (int); 
+  651:	ESI = R9 + R14 + 0 (int); 
+  650:	R13 = R10; R13 = R13 ror 2; 
+  649:	R8 = R10; R8 = R8 ror 13; 
+  648:	R13 = R13 ^ R8; 
+  647:	R8 = R10; R8 = R8 ror 22; 
+  646:	R13 = R13 ^ R8; 
+  645:	R9 = R10; R9 = R9 & R11; 
+  644:	R15 = R10; R15 = R15 ^ R11; 
+  643:	R8 = EDX; R8 = R8 & R15; 
+  642:	R9 = R9 ^ R8; 
+  641:	R8 = R13 + R9 + 0 (int); 
+  640:	R9 = R14 + R8 + 0 (int); 
+  639:	R8 = EBP; 
+  638:	R13 = R12; 
+  637:	
+  636:	R12 = R13; R12 = (R12, R13) << 15; 
+  635:	
+  634:	
+  633:	EBP = R13; R13 = (R13, EBP) << 13; 
+  632:	R12 = R12 ^ R13; 
+  631:	local(3,int) = EBP; 
+  630:	EBP = local(3,int); EBP = EBP >>u 10; 
+  629:	R12 = R12 ^ EBP; 
+  628:	EBP = int32[stack(52)]; local(18,int) = EBP; 
+  627:	R13 = R12 + EBP + 0 (int); 
+  626:	R14 = int32[stack(20)]; 
+  625:	
+  624:	EBP = R14; EBP = (EBP, R14) << 25; 
+  623:	
+  622:	R12 = R14; 
+  621:	R14 = (R14, R12) << 14; 
+  620:	EBP = EBP ^ R14; 
+  619:	
+  618:	R14 = R12; R14 = R14 >>u 3; 
+  617:	EBP = EBP ^ R14; 
+  616:	EBP = R13 + EBP + 0 (int); 
+  615:	EBP = R8 + EBP + 0 (int); 
+  614:	int32[stack(16)] = EBP; 
+  613:	R13 = ESI; R13 = R13 ror 6; 
+  612:	R8 = ESI; R8 = R8 ror 11; 
+  611:	R13 = R13 ^ R8; 
+  610:	R8 = ESI; R8 = R8 ror 25; 
+  609:	R13 = R13 ^ R8; 
+  608:	R8 = ECX; R8 = R8 ^ EAX; 
+  607:	R14 = ESI; R14 = R14 & R8; 
+  606:	R8 = EAX; R8 = R8 ^ R14; 
+  605:	R8 = R13 + R8 + 0 (int); 
+  604:	R13 = local(0,long); R13 = int32[R13 + 16]; 
+  603:	R8 = R8 + R13 + 0 (int); 
+  602:	R8 = R8 + EBP + 0 (int); 
+  601:	R14 = EBX + R8 + 0 (int); 
+  600:	EBX = EDX + R14 + 0 (int); 
+  599:	R8 = R9; R8 = R8 ror 2; 
+  598:	EDX = R9; EDX = EDX ror 13; 
+  597:	R8 = R8 ^ EDX; 
+  596:	EDX = R9; EDX = EDX ror 22; 
+  595:	R8 = R8 ^ EDX; 
+  594:	R13 = R9; R13 = R13 & R10; 
+  593:	EDX = R9; EDX = EDX ^ R10; 
+  592:	R15 = R11; R15 = R15 & EDX; 
+  591:	R13 = R13 ^ R15; 
+  590:	EDX = R8 + R13 + 0 (int); 
+  589:	R8 = R14 + EDX + 0 (int); 
+  588:	EDX = R12; 
+  587:	
+  586:	R12 = EDI; 
+  585:	EDI = (EDI, R12) << 15; 
+  584:	
+  583:	
+  582:	R13 = R12; R13 = (R13, R12) << 13; 
+  581:	EDI = EDI ^ R13; 
+  580:	local(9,int) = R12; 
+  579:	R12 = local(9,int); R12 = R12 >>u 10; 
+  578:	EDI = EDI ^ R12; 
+  577:	R12 = local(2,int); local(17,int) = R12; 
+  576:	R12 = EDI + R12 + 0 (int); 
+  575:	EDI = int32[stack(24)]; 
+  574:	R13 = EDI; 
+  573:	EDI = (EDI, R13) << 25; 
+  572:	
+  571:	
+  570:	R14 = R13; R14 = (R14, R13) << 14; 
+  569:	EDI = EDI ^ R14; 
+  568:	
+  567:	R14 = R13; R14 = R14 >>u 3; 
+  566:	EDI = EDI ^ R14; 
+  565:	EDI = R12 + EDI + 0 (int); 
+  564:	R12 = EDX + EDI + 0 (int); 
+  563:	int32[stack(20)] = R12; 
+  562:	EDI = EBX; EDI = EDI ror 6; 
+  561:	EDX = EBX; EDX = EDX ror 11; 
+  560:	EDI = EDI ^ EDX; 
+  559:	EDX = EBX; EDX = EDX ror 25; 
+  558:	EDI = EDI ^ EDX; 
+  557:	EDX = ESI; EDX = EDX ^ ECX; 
+  556:	R14 = EBX; R14 = R14 & EDX; 
+  555:	EDX = ECX; EDX = EDX ^ R14; 
+  554:	EDI = EDI + EDX + 0 (int); 
+  553:	EDX = local(0,long); EDX = int32[EDX + 20]; 
+  552:	EDX = EDI + EDX + 0 (int); 
+  551:	EDX = EDX + R12 + 0 (int); 
+  550:	R14 = EAX + EDX + 0 (int); 
+  549:	R11 = R11 + R14 + 0 (int); 
+  548:	R15 = R8; R15 = R15 ror 2; 
+  547:	EDI = R8; EDI = EDI ror 13; 
+  546:	R15 = R15 ^ EDI; 
+  545:	EDX = R8; EDX = EDX ror 22; 
+  544:	R15 = R15 ^ EDX; 
+  543:	EDX = R8; EDX = EDX & R9; 
+  542:	EAX = R8; EAX = EAX ^ R9; 
+  541:	EDI = R10; EDI = EDI & EAX; 
+  540:	EDX = EDX ^ EDI; 
+  539:	EDX = R15 + EDX + 0 (int); 
+  538:	EDI = R14 + EDX + 0 (int); 
+  537:	EDX = R13; 
+  536:	
+  535:	
+  534:	EAX = EBP; EAX = (EAX, EBP) << 15; 
+  533:	
+  532:	R13 = EBP; 
+  531:	EBP = (EBP, R13) << 13; 
+  530:	EAX = EAX ^ EBP; 
+  529:	local(8,int) = R13; 
+  528:	EBP = local(8,int); EBP = EBP >>u 10; 
+  527:	EAX = EAX ^ EBP; 
+  526:	EBP = local(4,int); local(19,int) = EBP; 
+  525:	R13 = EAX + EBP + 0 (int); 
+  524:	R14 = int32[stack(28)]; 
+  523:	
+  522:	EAX = R14; EAX = (EAX, R14) << 25; 
+  521:	
+  520:	EBP = R14; 
+  519:	R14 = (R14, EBP) << 14; 
+  518:	EAX = EAX ^ R14; 
+  517:	
+  516:	R14 = EBP; R14 = R14 >>u 3; 
+  515:	EAX = EAX ^ R14; 
+  514:	EAX = R13 + EAX + 0 (int); 
+  513:	EDX = EDX + EAX + 0 (int); 
+  512:	int32[stack(24)] = EDX; 
+  511:	R13 = R11; R13 = R13 ror 6; 
+  510:	EAX = R11; EAX = EAX ror 11; 
+  509:	R13 = R13 ^ EAX; 
+  508:	EAX = R11; EAX = EAX ror 25; 
+  507:	R13 = R13 ^ EAX; 
+  506:	EAX = EBX; EAX = EAX ^ ESI; 
+  505:	R14 = R11; R14 = R14 & EAX; 
+  504:	EAX = ESI; EAX = EAX ^ R14; 
+  503:	EAX = R13 + EAX + 0 (int); 
+  502:	R13 = local(0,long); R13 = int32[R13 + 24]; 
+  501:	EAX = EAX + R13 + 0 (int); 
+  500:	EAX = EAX + EDX + 0 (int); 
+  499:	R14 = ECX + EAX + 0 (int); 
+  498:	ECX = R10 + R14 + 0 (int); 
+  497:	R10 = EDI; R10 = R10 ror 2; 
+  496:	EAX = EDI; EAX = EAX ror 13; 
+  495:	R10 = R10 ^ EAX; 
+  494:	EAX = EDI; EAX = EAX ror 22; 
+  493:	R10 = R10 ^ EAX; 
+  492:	R15 = EDI; R15 = R15 & R8; 
+  491:	EAX = EDI; EAX = EAX ^ R8; 
+  490:	R13 = R9; R13 = R13 & EAX; 
+  489:	R15 = R15 ^ R13; 
+  488:	R10 = R10 + R15 + 0 (int); 
+  487:	EAX = R14 + R10 + 0 (int); 
+  486:	R10 = EBP; 
+  485:	
+  484:	EBP = R12; 
+  483:	R12 = (R12, EBP) << 15; 
+  482:	
+  481:	
+  480:	R13 = EBP; R13 = (R13, EBP) << 13; 
+  479:	R12 = R12 ^ R13; 
+  478:	local(7,int) = EBP; 
+  477:	EBP = local(7,int); EBP = EBP >>u 10; 
+  476:	R12 = R12 ^ EBP; 
+  475:	EBP = local(6,int); local(13,int) = EBP; 
+  474:	R13 = R12 + EBP + 0 (int); 
+  473:	EBP = int32[stack(32)]; 
+  472:	R12 = EBP; 
+  471:	EBP = (EBP, R12) << 25; 
+  470:	
+  469:	
+  468:	R14 = R12; R14 = (R14, R12) << 14; 
+  467:	EBP = EBP ^ R14; 
+  466:	
+  465:	R14 = R12; R14 = R14 >>u 3; 
+  464:	EBP = EBP ^ R14; 
+  463:	EBP = R13 + EBP + 0 (int); 
+  462:	R10 = R10 + EBP + 0 (int); 
+  461:	int32[stack(28)] = R10; 
+  460:	R13 = ECX; R13 = R13 ror 6; 
+  459:	EBP = ECX; EBP = EBP ror 11; 
+  458:	R13 = R13 ^ EBP; 
+  457:	EBP = ECX; EBP = EBP ror 25; 
+  456:	R13 = R13 ^ EBP; 
+  455:	EBP = R11; EBP = EBP ^ EBX; 
+  454:	R14 = ECX; R14 = R14 & EBP; 
+  453:	EBP = EBX; EBP = EBP ^ R14; 
+  452:	R13 = R13 + EBP + 0 (int); 
+  451:	EBP = local(0,long); EBP = int32[EBP + 28]; 
+  450:	EBP = R13 + EBP + 0 (int); 
+  449:	EBP = EBP + R10 + 0 (int); 
+  448:	R14 = ESI + EBP + 0 (int); 
+  447:	EBP = R9 + R14 + 0 (int); 
+  446:	R13 = EAX; R13 = R13 ror 2; 
+  445:	ESI = EAX; ESI = ESI ror 13; 
+  444:	R13 = R13 ^ ESI; 
+  443:	ESI = EAX; ESI = ESI ror 22; 
+  442:	R13 = R13 ^ ESI; 
+  441:	R9 = EAX; R9 = R9 & EDI; 
+  440:	R15 = EAX; R15 = R15 ^ EDI; 
+  439:	ESI = R8; ESI = ESI & R15; 
+  438:	R9 = R9 ^ ESI; 
+  437:	R9 = R13 + R9 + 0 (int); 
+  436:	R9 = R14 + R9 + 0 (int); 
+  435:	ESI = R12; 
+  434:	
+  433:	
+  432:	R13 = EDX; R13 = (R13, EDX) << 15; 
+  431:	
+  430:	R12 = EDX; 
+  429:	EDX = (EDX, R12) << 13; 
+  428:	R13 = R13 ^ EDX; 
+  427:	local(6,int) = R12; 
+  426:	EDX = local(6,int); EDX = EDX >>u 10; 
+  425:	R13 = R13 ^ EDX; 
+  424:	EDX = local(5,int); 
+  423:	R12 = R13 + EDX + 0 (int); 
+  422:	R14 = local(12,int); 
+  421:	
+  420:	EDX = R14; EDX = (EDX, R14) << 25; 
+  419:	
+  418:	R13 = R14; 
+  417:	R14 = (R14, R13) << 14; 
+  416:	EDX = EDX ^ R14; 
+  415:	
+  414:	R14 = R13; R14 = R14 >>u 3; 
+  413:	EDX = EDX ^ R14; 
+  412:	EDX = R12 + EDX + 0 (int); 
+  411:	ESI = ESI + EDX + 0 (int); 
+  410:	int32[stack(32)] = ESI; 
+  409:	R12 = EBP; R12 = R12 ror 6; 
+  408:	EDX = EBP; EDX = EDX ror 11; 
+  407:	R12 = R12 ^ EDX; 
+  406:	EDX = EBP; EDX = EDX ror 25; 
+  405:	R12 = R12 ^ EDX; 
+  404:	EDX = ECX; EDX = EDX ^ R11; 
+  403:	R14 = EBP; R14 = R14 & EDX; 
+  402:	EDX = R11; EDX = EDX ^ R14; 
+  401:	EDX = R12 + EDX + 0 (int); 
+  400:	R12 = local(0,long); R12 = int32[R12 + 32]; 
+  399:	EDX = EDX + R12 + 0 (int); 
+  398:	EDX = EDX + ESI + 0 (int); 
+  397:	R14 = EBX + EDX + 0 (int); 
+  396:	EDX = R8 + R14 + 0 (int); 
+  395:	R8 = R9; R8 = R8 ror 2; 
+  394:	EBX = R9; EBX = EBX ror 13; 
+  393:	R8 = R8 ^ EBX; 
+  392:	EBX = R9; EBX = EBX ror 22; 
+  391:	R8 = R8 ^ EBX; 
+  390:	R12 = R9; R12 = R12 & EAX; 
+  389:	EBX = R9; EBX = EBX ^ EAX; 
+  388:	R15 = EDI; R15 = R15 & EBX; 
+  387:	R12 = R12 ^ R15; 
+  386:	R8 = R8 + R12 + 0 (int); 
+  385:	R12 = R14 + R8 + 0 (int); 
+  384:	R8 = R13; 
+  383:	
+  382:	
+  381:	EBX = R10; EBX = (EBX, R10) << 15; 
+  380:	
+  379:	
+  378:	R13 = R10; R13 = (R13, R10) << 13; 
+  377:	EBX = EBX ^ R13; 
+  376:	local(4,int) = R10; 
+  375:	R10 = local(4,int); R10 = R10 >>u 10; 
+  374:	EBX = EBX ^ R10; 
+  373:	R10 = local(3,int); 
+  372:	R13 = EBX + R10 + 0 (int); 
+  371:	R10 = local(14,int); 
+  370:	EBX = R10; 
+  369:	R10 = (R10, EBX) << 25; 
+  368:	
+  367:	
+  366:	R14 = EBX; R14 = (R14, EBX) << 14; 
+  365:	R10 = R10 ^ R14; 
+  364:	
+  363:	R14 = EBX; R14 = R14 >>u 3; 
+  362:	R10 = R10 ^ R14; 
+  361:	R10 = R13 + R10 + 0 (int); 
+  360:	R14 = R8 + R10 + 0 (int); 
+  359:	int32[stack(36)] = R14; 
+  358:	R10 = EDX; R10 = R10 ror 6; 
+  357:	R8 = EDX; R8 = R8 ror 11; 
+  356:	R10 = R10 ^ R8; 
+  355:	R8 = EDX; R8 = R8 ror 25; 
+  354:	R10 = R10 ^ R8; 
+  353:	R8 = EBP; R8 = R8 ^ ECX; 
+  352:	R13 = EDX; R13 = R13 & R8; 
+  351:	R8 = ECX; R8 = R8 ^ R13; 
+  350:	R8 = R10 + R8 + 0 (int); 
+  349:	R10 = local(0,long); R10 = int32[R10 + 36]; 
+  348:	R8 = R8 + R10 + 0 (int); 
+  347:	R8 = R8 + R14 + 0 (int); 
+  346:	R13 = R11 + R8 + 0 (int); 
+  345:	R8 = EDI + R13 + 0 (int); 
+  344:	R15 = R12; R15 = R15 ror 2; 
+  343:	EDI = R12; EDI = EDI ror 13; 
+  342:	R15 = R15 ^ EDI; 
+  341:	R10 = R12; R10 = R10 ror 22; 
+  340:	R15 = R15 ^ R10; 
+  339:	EDI = R12; EDI = EDI & R9; 
+  338:	R11 = R12; R11 = R11 ^ R9; 
+  337:	R10 = EAX; R10 = R10 & R11; 
+  336:	EDI = EDI ^ R10; 
+  335:	EDI = R15 + EDI + 0 (int); 
+  334:	R10 = R13 + EDI + 0 (int); 
+  333:	R11 = EBX; 
+  332:	
+  331:	
+  330:	EDI = ESI; EDI = (EDI, ESI) << 15; 
+  329:	
+  328:	
+  327:	EBX = ESI; ESI = (ESI, EBX) << 13; 
+  326:	EDI = EDI ^ ESI; 
+  325:	local(2,int) = EBX; 
+  324:	ESI = local(2,int); ESI = ESI >>u 10; 
+  323:	EDI = EDI ^ ESI; 
+  322:	ESI = local(9,int); 
+  321:	EBX = EDI + ESI + 0 (int); 
+  320:	R13 = local(15,int); 
+  319:	
+  318:	ESI = R13; ESI = (ESI, R13) << 25; 
+  317:	
+  316:	EDI = R13; 
+  315:	R13 = (R13, EDI) << 14; 
+  314:	ESI = ESI ^ R13; 
+  313:	
+  312:	R13 = EDI; R13 = R13 >>u 3; 
+  311:	ESI = ESI ^ R13; 
+  310:	ESI = EBX + ESI + 0 (int); 
+  309:	R13 = R11 + ESI + 0 (int); 
+  308:	int32[stack(40)] = R13; 
+  307:	ESI = R8; ESI = ESI ror 6; 
+  306:	R11 = R8; R11 = R11 ror 11; 
+  305:	ESI = ESI ^ R11; 
+  304:	R11 = R8; R11 = R11 ror 25; 
+  303:	ESI = ESI ^ R11; 
+  302:	R11 = EDX; R11 = R11 ^ EBP; 
+  301:	EBX = R8; EBX = EBX & R11; 
+  300:	R11 = EBP; R11 = R11 ^ EBX; 
+  299:	R11 = ESI + R11 + 0 (int); 
+  298:	ESI = local(0,long); ESI = int32[ESI + 40]; 
+  297:	ESI = R11 + ESI + 0 (int); 
+  296:	ESI = ESI + R13 + 0 (int); 
+  295:	ESI = ECX + ESI + 0 (int); 
+  294:	EBX = EAX + ESI + 0 (int); 
+  293:	R11 = R10; R11 = R11 ror 2; 
+  292:	EAX = R10; EAX = EAX ror 13; 
+  291:	R11 = R11 ^ EAX; 
+  290:	EAX = R10; EAX = EAX ror 22; 
+  289:	R11 = R11 ^ EAX; 
+  288:	R15 = R10; R15 = R15 & R12; 
+  287:	ECX = R10; ECX = ECX ^ R12; 
+  286:	EAX = R9; EAX = EAX & ECX; 
+  285:	R15 = R15 ^ EAX; 
+  284:	ECX = R11 + R15 + 0 (int); 
+  283:	ESI = ESI + ECX + 0 (int); 
+  282:	
+  281:	
+  280:	EAX = R14; 
+  279:	R14 = (R14, EAX) << 15; 
+  278:	
+  277:	
+  276:	R11 = EAX; R11 = (R11, EAX) << 13; 
+  275:	R14 = R14 ^ R11; 
+  274:	
+  273:	EAX = EAX >>u 10; 
+  272:	R14 = R14 ^ EAX; 
+  271:	R11 = local(8,int); 
+  270:	EAX = R14 + R11 + 0 (int); 
+  269:	R11 = local(16,int); 
+  268:	ECX = R11; 
+  267:	R11 = (R11, ECX) << 25; 
+  266:	
+  265:	
+  264:	R14 = ECX; R14 = (R14, ECX) << 14; 
+  263:	R11 = R11 ^ R14; 
+  262:	
+  261:	R14 = ECX; R14 = R14 >>u 3; 
+  260:	R11 = R11 ^ R14; 
+  259:	R11 = EAX + R11 + 0 (int); 
+  258:	R11 = EDI + R11 + 0 (int); 
+  257:	int32[stack(44)] = R11; 
+  256:	EAX = EBX; EAX = EAX ror 6; 
+  255:	EDI = EBX; EDI = EDI ror 11; 
+  254:	EAX = EAX ^ EDI; 
+  253:	EDI = EBX; EDI = EDI ror 25; 
+  252:	EAX = EAX ^ EDI; 
+  251:	EDI = R8; EDI = EDI ^ EDX; 
+  250:	R14 = EBX; R14 = R14 & EDI; 
+  249:	EDI = EDX; EDI = EDI ^ R14; 
+  248:	EDI = EAX + EDI + 0 (int); 
+  247:	EAX = local(0,long); EAX = int32[EAX + 44]; 
+  246:	EAX = EDI + EAX + 0 (int); 
+  245:	EAX = EAX + R11 + 0 (int); 
+  244:	R14 = EBP + EAX + 0 (int); 
+  243:	EDI = R9 + R14 + 0 (int); 
+  242:	EBP = ESI; EBP = EBP ror 2; 
+  241:	R9 = ESI; R9 = R9 ror 13; 
+  240:	EBP = EBP ^ R9; 
+  239:	EAX = ESI; EAX = EAX ror 22; 
+  238:	EBP = EBP ^ EAX; 
+  237:	EAX = ESI; EAX = EAX & R10; 
+  236:	R15 = ESI; R15 = R15 ^ R10; 
+  235:	R9 = R12; R9 = R9 & R15; 
+  234:	EAX = EAX ^ R9; 
+  233:	R9 = EBP + EAX + 0 (int); 
+  232:	R9 = R14 + R9 + 0 (int); 
+  231:	EAX = ECX; 
+  230:	
+  229:	
+  228:	EBP = R13; EBP = (EBP, R13) << 15; 
+  227:	
+  226:	ECX = R13; 
+  225:	R13 = (R13, ECX) << 13; 
+  224:	EBP = EBP ^ R13; 
+  223:	
+  222:	ECX = ECX >>u 10; 
+  221:	EBP = EBP ^ ECX; 
+  220:	ECX = local(7,int); 
+  219:	EBP = EBP + ECX + 0 (int); 
+  218:	R14 = local(18,int); 
+  217:	
+  216:	ECX = R14; ECX = (ECX, R14) << 25; 
+  215:	
+  214:	R13 = R14; 
+  213:	R14 = (R14, R13) << 14; 
+  212:	ECX = ECX ^ R14; 
+  211:	
+  210:	R14 = R13; R14 = R14 >>u 3; 
+  209:	ECX = ECX ^ R14; 
+  208:	ECX = EBP + ECX + 0 (int); 
+  207:	EBP = EAX + ECX + 0 (int); 
+  206:	int32[stack(48)] = EBP; 
+  205:	ECX = EDI; ECX = ECX ror 6; 
+  204:	EAX = EDI; EAX = EAX ror 11; 
+  203:	ECX = ECX ^ EAX; 
+  202:	EAX = EDI; EAX = EAX ror 25; 
+  201:	ECX = ECX ^ EAX; 
+  200:	EAX = EBX; EAX = EAX ^ R8; 
+  199:	R14 = EDI; R14 = R14 & EAX; 
+  198:	EAX = R8; EAX = EAX ^ R14; 
+  197:	EAX = ECX + EAX + 0 (int); 
+  196:	ECX = local(0,long); ECX = int32[ECX + 48]; 
+  195:	EAX = EAX + ECX + 0 (int); 
+  194:	EAX = EAX + EBP + 0 (int); 
+  193:	R14 = EDX + EAX + 0 (int); 
+  192:	EDX = R12 + R14 + 0 (int); 
+  191:	EAX = R9; EAX = EAX ror 2; 
+  190:	ECX = R9; ECX = ECX ror 13; 
+  189:	EAX = EAX ^ ECX; 
+  188:	ECX = R9; ECX = ECX ror 22; 
+  187:	EAX = EAX ^ ECX; 
+  186:	R12 = R9; R12 = R12 & ESI; 
+  185:	ECX = R9; ECX = ECX ^ ESI; 
+  184:	R15 = R10; R15 = R15 & ECX; 
+  183:	R12 = R12 ^ R15; 
+  182:	EAX = EAX + R12 + 0 (int); 
+  181:	ECX = R14 + EAX + 0 (int); 
+  180:	EAX = R13; 
+  179:	
+  178:	R12 = R11; 
+  177:	R11 = (R11, R12) << 15; 
+  176:	
+  175:	
+  174:	R13 = R12; R13 = (R13, R12) << 13; 
+  173:	R11 = R11 ^ R13; 
+  172:	
+  171:	R12 = R12 >>u 10; 
+  170:	R11 = R11 ^ R12; 
+  169:	R12 = local(6,int); 
+  168:	R12 = R11 + R12 + 0 (int); 
+  167:	R11 = local(17,int); 
+  166:	R13 = R11; 
+  165:	R11 = (R11, R13) << 25; 
+  164:	
+  163:	
+  162:	R14 = R13; R14 = (R14, R13) << 14; 
+  161:	R11 = R11 ^ R14; 
+  160:	
+  159:	R14 = R13; R14 = R14 >>u 3; 
+  158:	R11 = R11 ^ R14; 
+  157:	R11 = R12 + R11 + 0 (int); 
+  156:	R12 = EAX + R11 + 0 (int); 
+  155:	int32[stack(52)] = R12; 
+  154:	EAX = EDX; EAX = EAX ror 6; 
+  153:	R11 = EDX; R11 = R11 ror 11; 
+  152:	EAX = EAX ^ R11; 
+  151:	R11 = EDX; R11 = R11 ror 25; 
+  150:	EAX = EAX ^ R11; 
+  149:	R11 = EDI; R11 = R11 ^ EBX; 
+  148:	R14 = EDX; R14 = R14 & R11; 
+  147:	R11 = EBX; R11 = R11 ^ R14; 
+  146:	EAX = EAX + R11 + 0 (int); 
+  145:	R11 = local(0,long); R11 = int32[R11 + 52]; 
+  144:	R11 = EAX + R11 + 0 (int); 
+  143:	EAX = R11 + R12 + 0 (int); 
+  142:	R14 = R8 + EAX + 0 (int); 
+  141:	EAX = R10 + R14 + 0 (int); 
+  140:	R15 = ECX; R15 = R15 ror 2; 
+  139:	R10 = ECX; R10 = R10 ror 13; 
+  138:	R15 = R15 ^ R10; 
+  137:	R8 = ECX; R8 = R8 ror 22; 
+  136:	R15 = R15 ^ R8; 
+  135:	R10 = ECX; R10 = R10 & R9; 
+  134:	R8 = ECX; R8 = R8 ^ R9; 
+  133:	R11 = ESI; R11 = R11 & R8; 
+  132:	R10 = R10 ^ R11; 
+  131:	R8 = R15 + R10 + 0 (int); 
+  130:	R11 = R14 + R8 + 0 (int); 
+  129:	
+  128:	
+  127:	
+  126:	R8 = EBP; R8 = (R8, EBP) << 15; 
+  125:	
+  124:	R10 = EBP; 
+  123:	EBP = (EBP, R10) << 13; 
+  122:	R8 = R8 ^ EBP; 
+  121:	
+  120:	R10 = R10 >>u 10; 
+  119:	R8 = R8 ^ R10; 
+  118:	R10 = local(4,int); 
+  117:	EBP = R8 + R10 + 0 (int); 
+  116:	R14 = local(19,int); 
+  115:	
+  114:	R10 = R14; R10 = (R10, R14) << 25; 
+  113:	
+  112:	R8 = R14; 
+  111:	R14 = (R14, R8) << 14; 
+  110:	R10 = R10 ^ R14; 
+  109:	
+  108:	R14 = R8; R14 = R14 >>u 3; 
+  107:	R10 = R10 ^ R14; 
+  106:	R10 = EBP + R10 + 0 (int); 
+  105:	R14 = R13 + R10 + 0 (int); 
+  104:	int32[stack(56)] = R14; 
+  103:	EBP = EAX; EBP = EBP ror 6; 
+  102:	R10 = EAX; R10 = R10 ror 11; 
+  101:	EBP = EBP ^ R10; 
+  100:	R10 = EAX; R10 = R10 ror 25; 
+   99:	EBP = EBP ^ R10; 
+   98:	R10 = EDX; R10 = R10 ^ EDI; 
+   97:	R13 = EAX; R13 = R13 & R10; 
+   96:	R10 = EDI; R10 = R10 ^ R13; 
+   95:	R10 = EBP + R10 + 0 (int); 
+   94:	EBP = local(0,long); EBP = int32[EBP + 56]; 
+   93:	R10 = R10 + EBP + 0 (int); 
+   92:	R10 = R10 + R14 + 0 (int); 
+   91:	R13 = EBX + R10 + 0 (int); 
+   90:	ESI = ESI + R13 + 0 (int); 
+   89:	EBX = R11; EBX = EBX ror 2; 
+   88:	R10 = R11; R10 = R10 ror 13; 
+   87:	EBX = EBX ^ R10; 
+   86:	R10 = R11; R10 = R10 ror 22; 
+   85:	EBX = EBX ^ R10; 
+   84:	R14 = R11; R14 = R14 & ECX; 
+   83:	R10 = R11; R10 = R10 ^ ECX; 
+   82:	EBP = R9; EBP = EBP & R10; 
+   81:	R14 = R14 ^ EBP; 
+   80:	R10 = EBX + R14 + 0 (int); 
+   79:	R10 = R13 + R10 + 0 (int); 
+   78:	
+   77:	
+   76:	EBX = R12; 
+   75:	R12 = (R12, EBX) << 15; 
+   74:	
+   73:	
+   72:	EBP = EBX; EBP = (EBP, EBX) << 13; 
+   71:	R12 = R12 ^ EBP; 
+   70:	
+   69:	EBX = EBX >>u 10; 
+   68:	R12 = R12 ^ EBX; 
+   67:	EBX = local(2,int); 
+   66:	R12 = R12 + EBX + 0 (int); 
+   65:	EBP = local(13,int); 
+   64:	EBX = EBP; 
+   63:	EBP = (EBP, EBX) << 25; R13 = EBP; 
+   62:	
+   61:	
+   60:	EBP = EBX; EBP = (EBP, EBX) << 14; 
+   59:	R13 = R13 ^ EBP; EBP = R13; 
+   58:	
+   57:	EBX = EBX >>u 3; 
+   56:	EBP = EBP ^ EBX; 
+   55:	EBX = R12 + EBP + 0 (int); 
+   54:	EBX = R8 + EBX + 0 (int); 
+   53:	int32[stack(60)] = EBX; 
+   52:	R8 = ESI; R8 = R8 ror 6; 
+   51:	EBP = ESI; EBP = EBP ror 11; 
+   50:	R8 = R8 ^ EBP; 
+   49:	EBP = ESI; EBP = EBP ror 25; 
+   48:	R8 = R8 ^ EBP; 
+   47:	R12 = EAX; R12 = R12 ^ EDX; 
+   46:	EBP = ESI; EBP = EBP & R12; 
+   45:	R12 = EDX; R12 = R12 ^ EBP; 
+   44:	EBP = R8 + R12 + 0 (int); 
+   43:	R8 = local(0,long); R8 = int32[R8 + 60]; 
+   42:	R8 = EBP + R8 + 0 (int); 
+   41:	R8 = R8 + EBX + 0 (int); 
+   40:	EBX = EDI + R8 + 0 (int); 
+   39:	R8 = R9 + EBX + 0 (int); 
+   38:	EDI = R10; EDI = EDI ror 2; 
+   37:	R9 = R10; R9 = R9 ror 13; 
+   36:	EDI = EDI ^ R9; 
+   35:	R9 = R10; R9 = R9 ror 22; 
+   34:	EDI = EDI ^ R9; 
+   33:	R12 = R10; R12 = R12 & R11; 
+   32:	R9 = R10; R9 = R9 ^ R11; 
+   31:	EBP = ECX; EBP = EBP & R9; 
+   30:	R12 = R12 ^ EBP; 
+   29:	EDI = EDI + R12 + 0 (int); 
+   28:	R9 = EBX + EDI + 0 (int); 
+   27:	EDI = local(20,int); EDI = EDI + 16 (int); local(20,int) = EDI; 
+   26:	EDI = local(0,long); EDI = EDI + 64 (long); local(0,long) = EDI; goto 845
+   25:	EDI = local(10,long); EBX = int32[EDI + 0]; 
+   24:	R9 = EBX + R9 + 0 (int); 
+   23:	int32[EDI + 0] = R9; 
+   22:	R9 = local(10,long); EDI = int32[R9 + 4]; 
+   21:	R10 = EDI + R10 + 0 (int); 
+   20:	int32[R9 + 4] = R10; 
+   19:	EDI = local(10,long); R9 = int32[EDI + 8]; 
+   18:	R9 = R9 + R11 + 0 (int); 
+   17:	int32[EDI + 8] = R9; 
+   16:	EDI = local(10,long); R9 = int32[EDI + 12]; 
+   15:	ECX = R9 + ECX + 0 (int); 
+   14:	int32[EDI + 12] = ECX; 
+   13:	EDI = local(10,long); ECX = int32[EDI + 16]; 
+   12:	R8 = ECX + R8 + 0 (int); 
+   11:	int32[EDI + 16] = R8; 
+   10:	EDI = local(10,long); R8 = int32[EDI + 20]; 
+    9:	R8 = R8 + ESI + 0 (int); 
+    8:	int32[EDI + 20] = R8; 
+    7:	R11 = local(10,long); R8 = int32[R11 + 24]; 
+    6:	EDI = R8 + EAX + 0 (int); 
+    5:	int32[R11 + 24] = EDI; 
+    4:	EAX = local(10,long); ECX = int32[EAX + 28]; 
+    3:	R9 = ECX + EDX + 0 (int); 
+    2:	int32[EAX + 28] = R9; 
+    1:	return
+}
+
+sha256_init() {
+    9:	EBX = EDI; 
+    8:	ESI = H0 + 0 (long); 
+    7:	EDX = 32L; 
+    6:	EDI = EBX; call "memcpy"; 
+    5:	EAX = 0L; 
+    4:	int64[EBX + 32] = EAX; 
+    3:	EDX = 0; 
+    2:	int32[EBX + 104] = EDX; 
+    1:	return
+}
+
+sha256_update() {
+   50:	R12 = EDX; EBP = ESI; EBX = EDI; 
+   49:	
+   48:	ESI = int32[EBX + 104]; 
+   47:	if (ESI !=u 0) goto 46 else goto 14
+   46:	R13 = 64L; 
+   45:	
+   44:	ECX = long32unsigned(ESI); 
+   43:	R13 = R13 -l ECX; 
+   42:	R13 = lowlong(R13); 
+   41:	EDX = long32unsigned(R13); 
+   40:	if (EBP <lu EDX) goto 24 else goto 39
+   39:	
+   38:	
+   37:	EDI = EBX + ECX + 40 (long); 
+   36:	
+   35:	ESI = R12; call "memcpy"; 
+   34:	ESI = EBX + 40 (long); 
+   33:	EDX = K + 0 (long); 
+   32:	EDI = EBX; call "_nettle_sha256_compress"; 
+   31:	R8 = int64[EBX + 32]; 
+   30:	EAX = R8 + 1 (long); 
+   29:	int64[EBX + 32] = EAX; 
+   28:	EAX = long32unsigned(R13); 
+   27:	R12 = R12 + EAX + 0 (long); 
+   26:	
+   25:	EBP = EBP -l EAX; goto 13
+   24:	
+   23:	
+   22:	EDI = EBX + ECX + 40 (long); 
+   21:	EDX = EBP; ESI = R12; call "memcpy"; 
+   20:	R8 = int32[EBX + 104]; 
+   19:	R9 = long32unsigned(R8); 
+   18:	EDX = R9 + EBP + 0 (long); 
+   17:	EDX = lowlong(EDX); 
+   16:	int32[EBX + 104] = EDX; 
+   15:	goto 1
+   14:	
+   13:	if (EBP >=lu 64) goto 12 else goto 5
+   12:	EDX = K + 0 (long); 
+   11:	ESI = R12; EDI = EBX; call "_nettle_sha256_compress"; 
+   10:	R10 = int64[EBX + 32]; 
+    9:	EDX = R10 + 1 (long); 
+    8:	int64[EBX + 32] = EDX; 
+    7:	R12 = R12 + 64 (long); 
+    6:	EBP = EBP + -64 (long); goto 13
+    5:	EDI = EBX + 40 (long); 
+    4:	EDX = EBP; ESI = R12; call "memcpy"; 
+    3:	EBP = lowlong(EBP); 
+    2:	int32[EBX + 104] = EBP; 
+    1:	return
+}
+
+sha256_digest() {
+   89:	EBX = EDX; EBP = EDI; 
+   88:	
+   87:	
+   86:	R12 = ESI; 
+   85:	
+   84:	if (R12 >lu 32) goto 83 else goto 81
+   83:	EDI = 1; 
+   82:	call "exit"; 
+   81:	
+   80:	R13 = int32[EBP + 104]; 
+   79:	R11 = long32unsigned(R13); 
+   78:	if (R11 >=lu 64) goto 77 else goto 75
+   77:	EDI = 1; 
+   76:	call "exit"; 
+   75:	
+   74:	EDX = R13 + 1 (int); 
+   73:	ESI = long32unsigned(R13); 
+   72:	EDI = 128; 
+   71:	int8u[EBP + ESI + 40] = EDI; 
+   70:	EAX = long32unsigned(EDX); 
+   69:	if (EAX >lu 56) goto 68 else goto 57
+   68:	
+   67:	EDI = EBP + EAX + 40 (long); 
+   66:	ESI = 0; 
+   65:	EDX = 64L; 
+   64:	
+   63:	EDX = EDX -l EAX; 
+   62:	call "memset"; 
+   61:	ESI = EBP + 40 (long); 
+   60:	EDX = K + 0 (long); 
+   59:	EDI = EBP; call "_nettle_sha256_compress"; 
+   58:	EDX = 0; 
+   57:	EAX = long32unsigned(EDX); 
+   56:	EDI = EBP + EAX + 40 (long); 
+   55:	ESI = 0; 
+   54:	EDX = 56L; 
+   53:	
+   52:	EDX = EDX -l EAX; 
+   51:	call "memset"; 
+   50:	ESI = int64[EBP + 32]; 
+   49:	ESI = ESI <<l 9; 
+   48:	EDI = int32[EBP + 104]; 
+   47:	EDI = EDI * 8 + 0 (int); 
+   46:	R9 = long32unsigned(EDI); 
+   45:	ESI = ESI |l R9; 
+   44:	R10 = ESI; R10 = R10 >>lu 56; 
+   43:	
+   42:	R10 = lowlong(R10); 
+   41:	
+   40:	int8u[EBP + 96] = R10; 
+   39:	R8 = ESI; R8 = R8 >>lu 48; 
+   38:	
+   37:	R8 = lowlong(R8); 
+   36:	
+   35:	int8u[EBP + 97] = R8; 
+   34:	ECX = ESI; ECX = ECX >>lu 40; 
+   33:	
+   32:	ECX = lowlong(ECX); 
+   31:	
+   30:	int8u[EBP + 98] = ECX; 
+   29:	R11 = ESI; R11 = R11 >>lu 32; 
+   28:	
+   27:	R11 = lowlong(R11); 
+   26:	
+   25:	int8u[EBP + 99] = R11; 
+   24:	EDI = ESI; EDI = EDI >>lu 24; 
+   23:	
+   22:	EDI = lowlong(EDI); 
+   21:	
+   20:	int8u[EBP + 100] = EDI; 
+   19:	EDX = ESI; EDX = EDX >>lu 16; 
+   18:	
+   17:	EDX = lowlong(EDX); 
+   16:	
+   15:	int8u[EBP + 101] = EDX; 
+   14:	R9 = ESI; R9 = R9 >>lu 8; 
+   13:	
+   12:	R9 = lowlong(R9); 
+   11:	
+   10:	int8u[EBP + 102] = R9; 
+    9:	
+    8:	ESI = lowlong(ESI); 
+    7:	
+    6:	int8u[EBP + 103] = ESI; 
+    5:	ESI = EBP + 40 (long); 
+    4:	EDX = K + 0 (long); 
+    3:	EDI = EBP; call "_nettle_sha256_compress"; 
+    2:	EDX = EBP; ESI = EBX; EDI = R12; call "_nettle_write_be32"; 
+    1:	EDI = EBP; tailcall "sha256_init"
+}
+
+verify_benchmark() {
+   13:	
+   12:	EAX = 1; 
+   11:	ESI = 0L; 
+   10:	ECX = 0; 
+    9:	EDI = hash + 0 (long); 
+    8:	EDX = int8u[EDI + ESI + 0]; 
+    7:	EDI = &buffer; 
+    6:	R8 = int8u[EDI + ESI + 0]; 
+    5:	ECX = EDX !=s R8 ?int ECX : EAX; EAX = ECX; 
+    4:	ESI = ESI + 1 (long); 
+    3:	if (ESI <lu 8) goto 10 else goto 2
+    2:	
+    1:	return
+}
+
+initialise_benchmark() {
+    2:	
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 475; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   24:	EBX = EDI; 
+   23:	EBP = 0; 
+   22:	if (EBP <s EBX) goto 21 else goto 2
+   21:	EDI = &buffer; 
+   20:	ESI = 0; 
+   19:	EDX = 32L; 
+   18:	call "memset"; 
+   17:	
+   16:	EDI = stack(0) (long); 
+   15:	call "sha256_init"; 
+   14:	
+   13:	EDI = stack(0) (long); 
+   12:	ESI = 56L; 
+   11:	EDX = msg + 0 (long); 
+   10:	call "sha256_update"; 
+    9:	
+    8:	EDI = stack(0) (long); 
+    7:	
+    6:	ESI = 32L; 
+    5:	EDX = &buffer; 
+    4:	call "sha256_digest"; 
+    3:	EBP = EBP + 1 (int); goto 22
+    2:	EAX = 0; 
+    1:	return
+}
+

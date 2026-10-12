@@ -1,0 +1,50 @@
+
+----------------------------------------
+define void @target(ptr nowrite noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  tail memcpy ptr noread noundef %#1 align 1, ptr nowrite noundef %#0 align 4, i64 16
+  %#3 = gep inbounds ptr nowrite noundef %#0, 1 x i64 24
+  %#4 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#4 align 1, ptr %#3 align 4, i64 16
+  %#5 = gep inbounds ptr nowrite noundef %#0, 1 x i64 48
+  %#6 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#6 align 1, ptr %#5 align 4, i64 16
+  %#7 = gep inbounds ptr nowrite noundef %#0, 1 x i64 80
+  %#8 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#8 align 1, ptr %#7 align 4, i64 16
+  %#9 = gep inbounds ptr nowrite noundef %#0, 1 x i64 104
+  %#10 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#10 align 1, ptr %#9 align 4, i64 16
+  %#11 = gep inbounds ptr nowrite noundef %#0, 1 x i64 128
+  %#12 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#12 align 1, ptr %#11 align 4, i64 16
+  ret void
+}
+=>
+define void @target(ptr nowrite noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  tail memcpy ptr noread noundef %#1 align 1, ptr nowrite noundef %#0 align 1, i64 16
+  %#3 = gep inbounds ptr nowrite noundef %#0, 1 x i64 24
+  %#4 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#4 align 1, ptr %#3 align 1, i64 16
+  %#5 = gep inbounds ptr nowrite noundef %#0, 1 x i64 48
+  %#6 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#6 align 1, ptr %#5 align 1, i64 16
+  %#7 = gep inbounds ptr nowrite noundef %#0, 1 x i64 80
+  %#8 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#8 align 1, ptr %#7 align 1, i64 16
+  %#9 = gep inbounds ptr nowrite noundef %#0, 1 x i64 104
+  %#10 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#10 align 1, ptr %#9 align 1, i64 16
+  %#11 = gep inbounds ptr nowrite noundef %#0, 1 x i64 128
+  %#12 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#12 align 1, ptr %#11 align 1, i64 16
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,30 @@
+(set-logic QF_BV)
+(declare-const before (_ BitVec 64))
+(declare-const x (_ BitVec 16))
+(define-fun mask () (_ BitVec 64) (bvshl #x0000000000000001 ((_ zero_extend 48) (bvand x #x003f))))
+; A valid ArrayContainer has no repeated char: this left bit was not set yet.
+(push 1)
+(assert (= (bvand before mask) #x0000000000000000))
+; Parent toggles the left bit; child BitmapContainer.loadData sets it.
+(assert (not (= (bvxor before mask) (bvor before mask))))
+(check-sat)
+(pop 1)
+; The right array is toggled by both versions, regardless of overlap.
+(declare-const old_right (_ BitVec 64))
+(declare-const new_right (_ BitVec 64))
+(push 1)
+(assert (= old_right new_right))
+(assert (not (= (bvxor old_right mask) (bvxor new_right mask))))
+(check-sat)
+(pop 1)
+; Parent processes right then left; XOR updates commute, so reorder left first.
+(declare-const y (_ BitVec 16))
+(define-fun other_mask () (_ BitVec 64) (bvshl #x0000000000000001 ((_ zero_extend 48) (bvand y #x003f))))
+(push 1)
+(assert (not (= (bvxor (bvxor before other_mask) mask)
+                (bvxor (bvxor before mask) other_mask))))
+(check-sat)
+(pop 1)
+; Negative control: without uniqueness, toggling and setting can differ.
+(assert (not (= (bvxor before mask) (bvor before mask))))
+(check-sat)

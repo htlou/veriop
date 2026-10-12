@@ -1,0 +1,41 @@
+package zstd
+
+// The historical parent and child expressions occur in load3232.
+requires 0 <= i && i + 4 <= len(b)
+requires acc(&b[i])
+requires acc(&b[i+1])
+requires acc(&b[i+2])
+requires acc(&b[i+3])
+func sameFour(b []byte, i int) {
+    prior := b[i:]
+    after := b[:len(b):len(b)][i:]
+    assert len(prior) == len(after)
+    assert prior[0] == after[0]
+    assert prior[1] == after[1]
+    assert prior[2] == after[2]
+    assert prior[3] == after[3]
+}
+
+// The same rewrite occurs in load6432, which reads eight bytes.
+requires 0 <= i && i + 8 <= len(b)
+requires acc(&b[i])
+requires acc(&b[i+1])
+requires acc(&b[i+2])
+requires acc(&b[i+3])
+requires acc(&b[i+4])
+requires acc(&b[i+5])
+requires acc(&b[i+6])
+requires acc(&b[i+7])
+func sameEight(b []byte, i int) {
+    prior := b[i:]
+    after := b[:len(b):len(b)][i:]
+    assert len(prior) == len(after)
+    assert prior[0] == after[0]
+    assert prior[1] == after[1]
+    assert prior[2] == after[2]
+    assert prior[3] == after[3]
+    assert prior[4] == after[4]
+    assert prior[5] == after[5]
+    assert prior[6] == after[6]
+    assert prior[7] == after[7]
+}

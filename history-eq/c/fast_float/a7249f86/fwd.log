@@ -1,0 +1,974 @@
+
+----------------------------------------
+declare i64 @_Z19parse_twenty_digitsILb1EEmmm(noundef i64, noundef i64) noundef
+
+define i64 @target_error(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#3 = tail call i64 @_Z19parse_twenty_digitsILb1EEmmm(noundef i64 noundef %#0, noundef i64 noundef %#1) noundef
+  ret i64 %#3
+}
+=>
+declare i64 @_Z19parse_twenty_digitsILb1EEmmm(noundef i64, noundef i64) noundef
+
+define i64 @target_error(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#3 = tail call i64 @_Z19parse_twenty_digitsILb1EEmmm(noundef i64 noundef %#0, noundef i64 noundef %#1) noundef
+  ret i64 %#3
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(noundef ptr, noundef ptr, nonnull dereferenceable(8) noundef align(8) ptr, i64, i64)
+
+define i64 @_Z19parse_twenty_digitsILb1EEmmm(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#6 = alloca i64 20, align 16, dead
+  %#7 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#6
+  %#8 = trunc i64 noundef %#0 to i8
+  %#9 = and i8 %#8, 7
+  %#10 = add nsw nuw i8 %#9, 49
+  store i8 %#10, ptr %#6, align 16
+  br label %#3
+
+#3:
+  %#11 = phi i64 [ 1, %#2 ], [ %#69, %#5 ]
+  %#12 = shl nsw nuw i64 %#11, 2
+  %#13 = lshr i64 noundef %#0, %#12
+  %#14 = freeze i64 %#13
+  %#15 = and i64 %#14, 15
+  %#16 = add nsw nuw i64 %#15, 246
+  %#17 = icmp samesign ult i64 %#15, 10
+  %#18 = select i1 %#17, i64 %#15, i64 %#16
+  %#19 = trunc i64 %#18 to i8
+  %#20 = or disjoint i8 %#19, 48
+  %#21 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#11
+  store i8 %#20, ptr %#21, align 1
+  %#22 = add nsw nuw i64 %#11, 1
+  %#23 = icmp eq i64 %#22, 16
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  %#24 = and i64 noundef %#1, 15
+  %#25 = add nsw nuw i64 %#24, 246
+  %#26 = icmp samesign ult i64 %#24, 10
+  %#27 = select i1 %#26, i64 %#24, i64 %#25
+  %#28 = trunc i64 %#27 to i8
+  %#29 = or disjoint i8 %#28, 48
+  %#30 = gep inbounds nuw ptr %#6, 1 x i64 16
+  store i8 %#29, ptr %#30, align 16
+  %#31 = lshr i64 noundef %#1, 4
+  %#32 = and i64 %#31, 15
+  %#33 = add nsw nuw i64 %#32, 246
+  %#34 = icmp samesign ult i64 %#32, 10
+  %#35 = select i1 %#34, i64 %#32, i64 %#33
+  %#36 = trunc i64 %#35 to i8
+  %#37 = or disjoint i8 %#36, 48
+  %#38 = gep inbounds nuw ptr %#6, 1 x i64 17
+  store i8 %#37, ptr %#38, align 1
+  %#39 = lshr i64 noundef %#1, 8
+  %#40 = and i64 %#39, 15
+  %#41 = add nsw nuw i64 %#40, 246
+  %#42 = icmp samesign ult i64 %#40, 10
+  %#43 = select i1 %#42, i64 %#40, i64 %#41
+  %#44 = trunc i64 %#43 to i8
+  %#45 = or disjoint i8 %#44, 48
+  %#46 = gep inbounds nuw ptr %#6, 1 x i64 18
+  store i8 %#45, ptr %#46, align 2
+  %#47 = lshr i64 noundef %#1, 12
+  %#48 = and i64 %#47, 15
+  %#49 = add nsw nuw i64 %#48, 246
+  %#50 = icmp samesign ult i64 %#48, 10
+  %#51 = select i1 %#50, i64 %#48, i64 %#49
+  %#52 = trunc i64 %#51 to i8
+  %#53 = or disjoint i8 %#52, 48
+  %#54 = gep inbounds nuw ptr %#6, 1 x i64 19
+  store i8 %#53, ptr %#54, align 1
+  start_lifetime ptr %#7
+  store i64 0, ptr %#7, align 8
+  %#55 = gep inbounds nuw ptr %#6, 1 x i64 20
+  %#56 = call {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(nonnull noundef ptr %#6, nonnull noundef ptr %#55, nonnull dereferenceable(8) noundef align(8) ptr %#7, i64 5, i64 42949673006)
+  %#57 = extractvalue {ptr, i32, i32} %#56, 1
+  %#58 = sext i32 %#57 to i64
+  end_lifetime ptr %#7
+  end_lifetime ptr %#6
+  ret i64 %#58
+
+#5:
+  %#59 = shl nsw nuw i64 %#22, 2
+  %#60 = lshr i64 noundef %#0, %#59
+  %#61 = freeze i64 %#60
+  %#62 = and i64 %#61, 15
+  %#63 = add nsw nuw i64 %#62, 246
+  %#64 = icmp samesign ult i64 %#62, 10
+  %#65 = select i1 %#64, i64 %#62, i64 %#63
+  %#66 = trunc i64 %#65 to i8
+  %#67 = or disjoint i8 %#66, 48
+  %#68 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#22
+  store i8 %#67, ptr %#68, align 1
+  %#69 = add nsw nuw i64 %#11, 2
+  br label %#3
+}
+=>
+declare {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(noundef ptr, noundef ptr, nonnull dereferenceable(8) noundef align(8) ptr, i64, i64)
+
+define i64 @_Z19parse_twenty_digitsILb1EEmmm(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#6 = alloca i64 20, align 16, dead
+  %#7 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#6
+  %#8 = trunc i64 noundef %#0 to i8
+  %#9 = and i8 %#8, 7
+  %#10 = add nsw nuw i8 %#9, 49
+  store i8 %#10, ptr %#6, align 16
+  br label %#3
+
+#3:
+  %#11 = phi i64 [ 1, %#2 ], [ %#69, %#5 ]
+  %#12 = shl nsw nuw i64 %#11, 2
+  %#13 = lshr i64 noundef %#0, %#12
+  %#14 = freeze i64 %#13
+  %#15 = and i64 %#14, 15
+  %#16 = add nsw nuw i64 %#15, 246
+  %#17 = icmp samesign ult i64 %#15, 10
+  %#18 = select i1 %#17, i64 %#15, i64 %#16
+  %#19 = trunc i64 %#18 to i8
+  %#20 = or disjoint i8 %#19, 48
+  %#21 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#11
+  store i8 %#20, ptr %#21, align 1
+  %#22 = add nsw nuw i64 %#11, 1
+  %#23 = icmp eq i64 %#22, 16
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  %#24 = and i64 noundef %#1, 15
+  %#25 = add nsw nuw i64 %#24, 246
+  %#26 = icmp samesign ult i64 %#24, 10
+  %#27 = select i1 %#26, i64 %#24, i64 %#25
+  %#28 = trunc i64 %#27 to i8
+  %#29 = or disjoint i8 %#28, 48
+  %#30 = gep inbounds nuw ptr %#6, 1 x i64 16
+  store i8 %#29, ptr %#30, align 16
+  %#31 = lshr i64 noundef %#1, 4
+  %#32 = and i64 %#31, 15
+  %#33 = add nsw nuw i64 %#32, 246
+  %#34 = icmp samesign ult i64 %#32, 10
+  %#35 = select i1 %#34, i64 %#32, i64 %#33
+  %#36 = trunc i64 %#35 to i8
+  %#37 = or disjoint i8 %#36, 48
+  %#38 = gep inbounds nuw ptr %#6, 1 x i64 17
+  store i8 %#37, ptr %#38, align 1
+  %#39 = lshr i64 noundef %#1, 8
+  %#40 = and i64 %#39, 15
+  %#41 = add nsw nuw i64 %#40, 246
+  %#42 = icmp samesign ult i64 %#40, 10
+  %#43 = select i1 %#42, i64 %#40, i64 %#41
+  %#44 = trunc i64 %#43 to i8
+  %#45 = or disjoint i8 %#44, 48
+  %#46 = gep inbounds nuw ptr %#6, 1 x i64 18
+  store i8 %#45, ptr %#46, align 2
+  %#47 = lshr i64 noundef %#1, 12
+  %#48 = and i64 %#47, 15
+  %#49 = add nsw nuw i64 %#48, 246
+  %#50 = icmp samesign ult i64 %#48, 10
+  %#51 = select i1 %#50, i64 %#48, i64 %#49
+  %#52 = trunc i64 %#51 to i8
+  %#53 = or disjoint i8 %#52, 48
+  %#54 = gep inbounds nuw ptr %#6, 1 x i64 19
+  store i8 %#53, ptr %#54, align 1
+  start_lifetime ptr %#7
+  store i64 0, ptr %#7, align 8
+  %#55 = gep inbounds nuw ptr %#6, 1 x i64 20
+  %#56 = call {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(nonnull noundef ptr %#6, nonnull noundef ptr %#55, nonnull dereferenceable(8) noundef align(8) ptr %#7, i64 5, i64 42949673006)
+  %#57 = extractvalue {ptr, i32, i32} %#56, 1
+  %#58 = sext i32 %#57 to i64
+  end_lifetime ptr %#7
+  end_lifetime ptr %#6
+  ret i64 %#58
+
+#5:
+  %#59 = shl nsw nuw i64 %#22, 2
+  %#60 = lshr i64 noundef %#0, %#59
+  %#61 = freeze i64 %#60
+  %#62 = and i64 %#61, 15
+  %#63 = add nsw nuw i64 %#62, 246
+  %#64 = icmp samesign ult i64 %#62, 10
+  %#65 = select i1 %#64, i64 %#62, i64 %#63
+  %#66 = trunc i64 %#65 to i8
+  %#67 = or disjoint i8 %#66, 48
+  %#68 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#22
+  store i8 %#67, ptr %#68, align 1
+  %#69 = add nsw nuw i64 %#11, 2
+  br label %#3
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+declare i64 @_Z19parse_twenty_digitsILb0EEmmm(noundef i64, noundef i64) noundef
+
+define i64 @target_value(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#3 = tail call i64 @_Z19parse_twenty_digitsILb0EEmmm(noundef i64 noundef %#0, noundef i64 noundef %#1) noundef
+  ret i64 %#3
+}
+=>
+declare i64 @_Z19parse_twenty_digitsILb0EEmmm(noundef i64, noundef i64) noundef
+
+define i64 @target_value(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#3 = tail call i64 @_Z19parse_twenty_digitsILb0EEmmm(noundef i64 noundef %#0, noundef i64 noundef %#1) noundef
+  ret i64 %#3
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(noundef ptr, noundef ptr, nonnull dereferenceable(8) noundef align(8) ptr, i64, i64)
+
+define i64 @_Z19parse_twenty_digitsILb0EEmmm(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#6 = alloca i64 20, align 16, dead
+  %#7 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#6
+  %#8 = trunc i64 noundef %#0 to i8
+  %#9 = and i8 %#8, 7
+  %#10 = add nsw nuw i8 %#9, 49
+  store i8 %#10, ptr %#6, align 16
+  br label %#3
+
+#3:
+  %#11 = phi i64 [ 1, %#2 ], [ %#68, %#5 ]
+  %#12 = shl nsw nuw i64 %#11, 2
+  %#13 = lshr i64 noundef %#0, %#12
+  %#14 = freeze i64 %#13
+  %#15 = and i64 %#14, 15
+  %#16 = add nsw nuw i64 %#15, 246
+  %#17 = icmp samesign ult i64 %#15, 10
+  %#18 = select i1 %#17, i64 %#15, i64 %#16
+  %#19 = trunc i64 %#18 to i8
+  %#20 = or disjoint i8 %#19, 48
+  %#21 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#11
+  store i8 %#20, ptr %#21, align 1
+  %#22 = add nsw nuw i64 %#11, 1
+  %#23 = icmp eq i64 %#22, 16
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  %#24 = and i64 noundef %#1, 15
+  %#25 = add nsw nuw i64 %#24, 246
+  %#26 = icmp samesign ult i64 %#24, 10
+  %#27 = select i1 %#26, i64 %#24, i64 %#25
+  %#28 = trunc i64 %#27 to i8
+  %#29 = or disjoint i8 %#28, 48
+  %#30 = gep inbounds nuw ptr %#6, 1 x i64 16
+  store i8 %#29, ptr %#30, align 16
+  %#31 = lshr i64 noundef %#1, 4
+  %#32 = and i64 %#31, 15
+  %#33 = add nsw nuw i64 %#32, 246
+  %#34 = icmp samesign ult i64 %#32, 10
+  %#35 = select i1 %#34, i64 %#32, i64 %#33
+  %#36 = trunc i64 %#35 to i8
+  %#37 = or disjoint i8 %#36, 48
+  %#38 = gep inbounds nuw ptr %#6, 1 x i64 17
+  store i8 %#37, ptr %#38, align 1
+  %#39 = lshr i64 noundef %#1, 8
+  %#40 = and i64 %#39, 15
+  %#41 = add nsw nuw i64 %#40, 246
+  %#42 = icmp samesign ult i64 %#40, 10
+  %#43 = select i1 %#42, i64 %#40, i64 %#41
+  %#44 = trunc i64 %#43 to i8
+  %#45 = or disjoint i8 %#44, 48
+  %#46 = gep inbounds nuw ptr %#6, 1 x i64 18
+  store i8 %#45, ptr %#46, align 2
+  %#47 = lshr i64 noundef %#1, 12
+  %#48 = and i64 %#47, 15
+  %#49 = add nsw nuw i64 %#48, 246
+  %#50 = icmp samesign ult i64 %#48, 10
+  %#51 = select i1 %#50, i64 %#48, i64 %#49
+  %#52 = trunc i64 %#51 to i8
+  %#53 = or disjoint i8 %#52, 48
+  %#54 = gep inbounds nuw ptr %#6, 1 x i64 19
+  store i8 %#53, ptr %#54, align 1
+  start_lifetime ptr %#7
+  store i64 0, ptr %#7, align 8
+  %#55 = gep inbounds nuw ptr %#6, 1 x i64 20
+  %#56 = call {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(nonnull noundef ptr %#6, nonnull noundef ptr %#55, nonnull dereferenceable(8) noundef align(8) ptr %#7, i64 5, i64 42949673006)
+  %#57 = load i64, ptr %#7, align 8
+  end_lifetime ptr %#7
+  end_lifetime ptr %#6
+  ret i64 %#57
+
+#5:
+  %#58 = shl nsw nuw i64 %#22, 2
+  %#59 = lshr i64 noundef %#0, %#58
+  %#60 = freeze i64 %#59
+  %#61 = and i64 %#60, 15
+  %#62 = add nsw nuw i64 %#61, 246
+  %#63 = icmp samesign ult i64 %#61, 10
+  %#64 = select i1 %#63, i64 %#61, i64 %#62
+  %#65 = trunc i64 %#64 to i8
+  %#66 = or disjoint i8 %#65, 48
+  %#67 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#22
+  store i8 %#66, ptr %#67, align 1
+  %#68 = add nsw nuw i64 %#11, 2
+  br label %#3
+}
+=>
+declare {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(noundef ptr, noundef ptr, nonnull dereferenceable(8) noundef align(8) ptr, i64, i64)
+
+define i64 @_Z19parse_twenty_digitsILb0EEmmm(i64 noundef %#0, i64 noundef %#1) noundef {
+#2:
+  %#6 = alloca i64 20, align 16, dead
+  %#7 = alloca i64 8, align 8, dead
+  start_lifetime ptr %#6
+  %#8 = trunc i64 noundef %#0 to i8
+  %#9 = and i8 %#8, 7
+  %#10 = add nsw nuw i8 %#9, 49
+  store i8 %#10, ptr %#6, align 16
+  br label %#3
+
+#3:
+  %#11 = phi i64 [ 1, %#2 ], [ %#68, %#5 ]
+  %#12 = shl nsw nuw i64 %#11, 2
+  %#13 = lshr i64 noundef %#0, %#12
+  %#14 = freeze i64 %#13
+  %#15 = and i64 %#14, 15
+  %#16 = add nsw nuw i64 %#15, 246
+  %#17 = icmp samesign ult i64 %#15, 10
+  %#18 = select i1 %#17, i64 %#15, i64 %#16
+  %#19 = trunc i64 %#18 to i8
+  %#20 = or disjoint i8 %#19, 48
+  %#21 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#11
+  store i8 %#20, ptr %#21, align 1
+  %#22 = add nsw nuw i64 %#11, 1
+  %#23 = icmp eq i64 %#22, 16
+  br i1 %#23, label %#4, label %#5
+
+#4:
+  %#24 = and i64 noundef %#1, 15
+  %#25 = add nsw nuw i64 %#24, 246
+  %#26 = icmp samesign ult i64 %#24, 10
+  %#27 = select i1 %#26, i64 %#24, i64 %#25
+  %#28 = trunc i64 %#27 to i8
+  %#29 = or disjoint i8 %#28, 48
+  %#30 = gep inbounds nuw ptr %#6, 1 x i64 16
+  store i8 %#29, ptr %#30, align 16
+  %#31 = lshr i64 noundef %#1, 4
+  %#32 = and i64 %#31, 15
+  %#33 = add nsw nuw i64 %#32, 246
+  %#34 = icmp samesign ult i64 %#32, 10
+  %#35 = select i1 %#34, i64 %#32, i64 %#33
+  %#36 = trunc i64 %#35 to i8
+  %#37 = or disjoint i8 %#36, 48
+  %#38 = gep inbounds nuw ptr %#6, 1 x i64 17
+  store i8 %#37, ptr %#38, align 1
+  %#39 = lshr i64 noundef %#1, 8
+  %#40 = and i64 %#39, 15
+  %#41 = add nsw nuw i64 %#40, 246
+  %#42 = icmp samesign ult i64 %#40, 10
+  %#43 = select i1 %#42, i64 %#40, i64 %#41
+  %#44 = trunc i64 %#43 to i8
+  %#45 = or disjoint i8 %#44, 48
+  %#46 = gep inbounds nuw ptr %#6, 1 x i64 18
+  store i8 %#45, ptr %#46, align 2
+  %#47 = lshr i64 noundef %#1, 12
+  %#48 = and i64 %#47, 15
+  %#49 = add nsw nuw i64 %#48, 246
+  %#50 = icmp samesign ult i64 %#48, 10
+  %#51 = select i1 %#50, i64 %#48, i64 %#49
+  %#52 = trunc i64 %#51 to i8
+  %#53 = or disjoint i8 %#52, 48
+  %#54 = gep inbounds nuw ptr %#6, 1 x i64 19
+  store i8 %#53, ptr %#54, align 1
+  start_lifetime ptr %#7
+  store i64 0, ptr %#7, align 8
+  %#55 = gep inbounds nuw ptr %#6, 1 x i64 20
+  %#56 = call {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(nonnull noundef ptr %#6, nonnull noundef ptr %#55, nonnull dereferenceable(8) noundef align(8) ptr %#7, i64 5, i64 42949673006)
+  %#57 = load i64, ptr %#7, align 8
+  end_lifetime ptr %#7
+  end_lifetime ptr %#6
+  ret i64 %#57
+
+#5:
+  %#58 = shl nsw nuw i64 %#22, 2
+  %#59 = lshr i64 noundef %#0, %#58
+  %#60 = freeze i64 %#59
+  %#61 = and i64 %#60, 15
+  %#62 = add nsw nuw i64 %#61, 246
+  %#63 = icmp samesign ult i64 %#61, 10
+  %#64 = select i1 %#63, i64 %#61, i64 %#62
+  %#65 = trunc i64 %#64 to i8
+  %#66 = or disjoint i8 %#65, 48
+  %#67 = gep inbounds nuw ptr %#6, 20 x i64 0, 1 x i64 %#22
+  store i8 %#66, ptr %#67, align 1
+  %#68 = add nsw nuw i64 %#11, 2
+  br label %#3
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+@_ZN10fast_float9space_lutIvE5valueE = constant 256 bytes, align 16
+@_ZN10fast_float8int_lutsIvE7chdigitE = constant 256 bytes, align 16
+@_ZN10fast_float8int_lutsIvE13maxdigits_u64E = constant 280 bytes, align 16
+@_ZN10fast_float8int_lutsIvE12min_safe_u64E = constant 280 bytes, align 16
+
+define {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(ptr noundef %#0, ptr noundef %#1, ptr nonnull dereferenceable(8) noundef align(8) %#2, i64 %#3, i64 %#4) {
+init:
+  store [35 x i64] { -9223372036854775808, -6289078614652622815, 4611686018427387904, 7450580596923828125, 4738381338321616896, 3909821048582988049, -9223372036854775808, -6289078614652622815, -8446744073709551616, 5559917313492231481, 2218611106740436992, 8650415919381337933, 2177953337809371136, 6568408355712890625, 1152921504606846976, 2862423051509815793, 6746640616477458432, -3265617043834753317, 1638400000000000000, 3243919932521508681, 6221821273427820544, -6853907749170801807, 876488338465357824, 1490116119384765625, 2481152873203736576, 4052555153018976267, 6502111422497947648, -8186115360750949427, -2503514073709551616, 787662783788549761, 1152921504606846976, 1667889514952984961, 2386420683693101056, 3379220508056640625, 4738381338321616896 }, ptr @_ZN10fast_float8int_lutsIvE12min_safe_u64E, align 16
+  store [35 x i64] { 64, 41, 32, 28, 25, 23, 22, 21, 20, 19, 18, 18, 17, 17, 16, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 14, 13, 13, 13, 13, 13, 13 }, ptr @_ZN10fast_float8int_lutsIvE13maxdigits_u64E, align 16
+  store [256 x i8] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255, 255, 255, 255, 255, 255, 255, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 255, 255, 255, 255, 255, 255, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, ptr @_ZN10fast_float8int_lutsIvE7chdigitE, align 16
+  store {[33 x i8], [223 x i8]} { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, ptr @_ZN10fast_float9space_lutIvE5valueE, align 16
+  br label %#5
+
+#5:
+  %#40 = ptrtoint ptr noundef %#0 to i64
+  %#41 = ptrtoint ptr noundef %#1 to i64
+  %#42 = lshr i64 %#4, 32
+  %#43 = trunc nuw i64 %#42 to i32
+  %#44 = and i64 %#3, 256
+  %#45 = icmp eq i64 %#44, 0
+  %#46 = icmp eq ptr noundef %#0, noundef %#1
+  %#47 = or i1 %#45, %#46
+  br i1 %#47, label %#10, label %#6
+
+#6:
+  %#48 = sub i64 %#41, %#40
+  %#49 = gep ptr noundef %#0, 1 x i64 %#48
+  br label %#7
+
+#7:
+  %#50 = phi ptr [ %#56, %#8 ], [ noundef %#0, %#6 ]
+  %#51 = load i8, ptr %#50, align 1
+  %#52 = zext i8 %#51 to i64
+  %#53 = gep inbounds nuw ptr @_ZN10fast_float9space_lutIvE5valueE, 256 x i64 0, 1 x i64 %#52
+  %#54 = load i8, ptr %#53, align 1
+  %#54_range = !range i8 %#54, i8 0, i8 2
+  assume_welldefined i8 %#54_range
+  %#55 = trunc nuw i8 %#54_range to i1
+  br i1 %#55, label %#8, label %#9
+
+#8:
+  %#56 = gep inbounds nuw ptr %#50, 1 x i64 1
+  %#57 = icmp eq ptr %#56, noundef %#1
+  br i1 %#57, label %#9, label %#7
+
+#9:
+  %#58 = phi ptr [ %#50, %#7 ], [ %#49, %#8 ]
+  %#59 = ptrtoint ptr %#58 to i64
+  br label %#10
+
+#10:
+  %#60 = phi i64 [ %#59, %#9 ], [ %#40, %#5 ]
+  %#61 = phi ptr [ %#58, %#9 ], [ noundef %#0, %#5 ]
+  %#62 = icmp eq ptr %#61, noundef %#1
+  %#63 = add i32 %#43, 4294967259
+  %#64 = icmp ult i32 %#63, 4294967261
+  %#65 = select i1 %#62, i1 1, i1 %#64
+  br i1 %#65, label %#39, label %#11
+
+#11:
+  %#66 = load i8, ptr %#61, align 1
+  %#67 = icmp eq i8 %#66, 45
+  br i1 %#67, label %#39, label %#12
+
+#12:
+  %#68 = and i64 %#3, 128
+  %#69 = icmp ne i64 %#68, 0
+  %#70 = icmp eq i8 %#66, 43
+  %#71 = and i1 %#69, %#70
+  %#72 = zext i1 %#71 to i64
+  %#73 = gep inbounds nuw ptr %#61, 1 x i64 %#72
+  %#74 = icmp eq ptr %#73, noundef %#1
+  br i1 %#74, label %#16, label %#13
+
+#13:
+  %#75 = sub i64 %#41, %#60
+  %#76 = gep ptr %#61, 1 x i64 %#75
+  br label %#14
+
+#14:
+  %#77 = phi ptr [ %#80, %#15 ], [ %#73, %#13 ]
+  %#78 = load i8, ptr %#77, align 1
+  %#79 = icmp eq i8 %#78, 48
+  br i1 %#79, label %#15, label %#16
+
+#15:
+  %#80 = gep inbounds nuw ptr %#77, 1 x i64 1
+  %#81 = icmp eq ptr %#80, noundef %#1
+  br i1 %#81, label %#16, label %#14
+
+#16:
+  %#82 = phi ptr [ %#73, %#12 ], [ %#77, %#14 ], [ %#76, %#15 ]
+  %#83 = icmp ugt ptr %#82, %#73
+  %#84 = icmp eq i64 %#42, 10
+  br i1 %#84, label %#17, label %#25
+
+#17:
+  %#85 = ptrtoint ptr %#82 to i64
+  %#86 = sub i64 %#41, %#85
+  %#87 = icmp sgt i64 %#86, 7
+  br i1 %#87, label %#18, label %#21
+
+#18:
+  %#88 = phi i64 [ %#107, %#19 ], [ 0, %#17 ]
+  %#89 = phi ptr [ %#108, %#19 ], [ %#82, %#17 ]
+  %#90 = load i64, ptr %#89, align 1
+  %#91 = add i64 %#90, 5063812098665367110
+  %#92 = add i64 %#90, -3472328296227680304
+  %#93 = or i64 %#91, %#92
+  %#94 = and i64 %#93, -9187201950435737472
+  %#95 = icmp eq i64 %#94, 0
+  br i1 %#95, label %#19, label %#20
+
+#19:
+  %#96 = mul i64 %#88, 100000000
+  %#97 = mul i64 %#92, 10
+  %#98 = lshr i64 %#92, 8
+  %#99 = add i64 %#97, %#98
+  %#100 = and i64 %#99, 1095216660735
+  %#101 = mul i64 %#100, 4294967296000100
+  %#102 = lshr i64 %#99, 16
+  %#103 = and i64 %#102, 1095216660735
+  %#104 = mul i64 %#103, 42949672960001
+  %#105 = add i64 %#104, %#101
+  %#106 = lshr i64 %#105, 32
+  %#107 = add i64 %#106, %#96
+  %#108 = gep inbounds nuw ptr %#89, 1 x i64 8
+  %#109 = ptrtoint ptr %#108 to i64
+  %#110 = sub i64 %#41, %#109
+  %#111 = icmp sgt i64 %#110, 7
+  br i1 %#111, label %#18, label %#21
+
+#20:
+  %#112 = trunc i64 %#90 to i32
+  br label %#23
+
+#21:
+  %#113 = phi ptr [ %#82, %#17 ], [ %#108, %#19 ]
+  %#114 = phi i64 [ 0, %#17 ], [ %#107, %#19 ]
+  %#115 = phi i64 [ %#86, %#17 ], [ %#110, %#19 ]
+  %#116 = icmp sgt i64 %#115, 3
+  br i1 %#116, label %#22, label %#25
+
+#22:
+  %#117 = load i32, ptr %#113, align 1
+  br label %#23
+
+#23:
+  %#118 = phi i32 [ %#117, %#22 ], [ %#112, %#20 ]
+  %#119 = phi ptr [ %#113, %#22 ], [ %#89, %#20 ]
+  %#120 = phi i64 [ %#114, %#22 ], [ %#88, %#20 ]
+  %#121 = add i32 %#118, 1179010630
+  %#122 = add i32 %#118, 3486502864
+  %#123 = or i32 %#121, %#122
+  %#124 = and i32 %#123, 2155905152
+  %#125 = icmp eq i32 %#124, 0
+  br i1 %#125, label %#24, label %#25
+
+#24:
+  %#126 = mul i64 %#120, 10000
+  %#127 = mul i32 %#122, 10
+  %#128 = lshr i32 %#122, 8
+  %#129 = add i32 %#127, %#128
+  %#130 = and i32 %#129, 16711935
+  %#131 = mul i32 %#130, 6553601
+  %#132 = lshr i32 %#131, 16
+  %#133 = zext nneg i32 %#132 to i64
+  %#134 = add i64 %#126, %#133
+  %#135 = gep inbounds nuw ptr %#119, 1 x i64 4
+  br label %#25
+
+#25:
+  %#136 = phi ptr [ %#82, %#16 ], [ %#135, %#24 ], [ %#119, %#23 ], [ %#113, %#21 ]
+  %#137 = phi i64 [ 0, %#16 ], [ %#134, %#24 ], [ %#120, %#23 ], [ %#114, %#21 ]
+  %#138 = ptrtoint ptr %#136 to i64
+  %#139 = icmp eq ptr %#136, noundef %#1
+  br i1 %#139, label %#30, label %#26
+
+#26:
+  %#140 = sub i64 %#41, %#138
+  %#141 = gep ptr %#136, 1 x i64 %#140
+  br label %#27
+
+#27:
+  %#142 = phi i64 [ %#152, %#28 ], [ %#137, %#26 ]
+  %#143 = phi ptr [ %#153, %#28 ], [ %#136, %#26 ]
+  %#144 = load i8, ptr %#143, align 1
+  %#145 = zext i8 %#144 to i64
+  %#146 = gep inbounds nuw ptr @_ZN10fast_float8int_lutsIvE7chdigitE, 256 x i64 0, 1 x i64 %#145
+  %#147 = load i8, ptr %#146, align 1
+  %#148 = zext i8 %#147 to i32
+  %#149 = icmp slt i32 %#148, %#43
+  br i1 %#149, label %#28, label %#29
+
+#28:
+  %#150 = mul i64 %#142, %#42
+  %#151 = zext i8 %#147 to i64
+  %#152 = add i64 %#150, %#151
+  %#153 = gep inbounds nuw ptr %#143, 1 x i64 1
+  %#154 = icmp eq ptr %#153, noundef %#1
+  br i1 %#154, label %#29, label %#27
+
+#29:
+  %#155 = phi ptr [ %#141, %#28 ], [ %#143, %#27 ]
+  %#156 = phi i64 [ %#152, %#28 ], [ %#142, %#27 ]
+  %#157 = ptrtoint ptr %#155 to i64
+  br label %#30
+
+#30:
+  %#158 = phi i64 [ %#157, %#29 ], [ %#138, %#25 ]
+  %#159 = phi ptr [ %#155, %#29 ], [ %#136, %#25 ]
+  %#160 = phi i64 [ %#156, %#29 ], [ %#137, %#25 ]
+  %#161 = ptrtoint ptr %#82 to i64
+  %#162 = sub i64 %#158, %#161
+  %#163 = icmp eq ptr %#159, %#82, offsetonly
+  br i1 %#163, label %#31, label %#32
+
+#31:
+  br i1 %#83, label %#38, label %#39
+
+#32:
+  %#164 = add i64 %#4, -8589934592
+  %#165 = ashr i64 %#164, 32
+  %#166 = gep inbounds ptr @_ZN10fast_float8int_lutsIvE13maxdigits_u64E, 280 x i64 0, 8 x i64 %#165
+  %#167 = load i64, ptr %#166, align 8
+  %#168 = icmp ugt i64 %#162, %#167
+  br i1 %#168, label %#39, label %#33
+
+#33:
+  %#169 = icmp eq i64 %#162, %#167
+  br i1 %#169, label %#34, label %#38
+
+#34:
+  %#170 = gep inbounds ptr @_ZN10fast_float8int_lutsIvE12min_safe_u64E, 280 x i64 0, 8 x i64 %#165
+  %#171 = load i64, ptr %#170, align 8
+  %#172 = icmp ult i64 %#160, %#171
+  br i1 %#172, label %#39, label %#35
+
+#35:
+  %#173 = ashr i64 %#4, 32
+  br label %#36
+
+#36:
+  %#174 = phi ptr [ %#82, %#35 ], [ %#186, %#37 ]
+  %#175 = phi i64 [ 0, %#35 ], [ %#185, %#37 ]
+  %#176 = load i8, ptr %#174, align 1
+  %#177 = zext i8 %#176 to i64
+  %#178 = gep inbounds nuw ptr @_ZN10fast_float8int_lutsIvE7chdigitE, 256 x i64 0, 1 x i64 %#177
+  %#179 = load i8, ptr %#178, align 1
+  %#180 = zext i8 %#179 to i64
+  %#181 = xor i64 %#180, -1
+  %#182 = udiv i64 %#181, %#173
+  %#183 = icmp ugt i64 %#175, %#182
+  br i1 %#183, label %#39, label %#37
+
+#37:
+  %#184 = mul i64 %#175, %#173
+  %#185 = add i64 %#184, %#180
+  %#186 = gep inbounds nuw ptr %#174, 1 x i64 1
+  %#187 = icmp eq ptr %#186, %#159, offsetonly
+  br i1 %#187, label %#38, label %#36
+
+#38:
+  %#188 = phi i64 [ 0, %#31 ], [ %#160, %#33 ], [ %#160, %#37 ]
+  store i64 %#188, ptr nonnull dereferenceable(8) noundef align(8) %#2, align 8
+  br label %#39
+
+#39:
+  %#189 = phi ptr [ %#61, %#10 ], [ %#61, %#11 ], [ %#61, %#31 ], [ %#159, %#34 ], [ %#159, %#32 ], [ %#159, %#38 ], [ %#159, %#36 ]
+  %#190 = phi i32 [ 22, %#10 ], [ 22, %#11 ], [ 22, %#31 ], [ 34, %#34 ], [ 34, %#32 ], [ 0, %#38 ], [ 34, %#36 ]
+  %#191 = insertvalue {ptr, i32, i32} poison, ptr %#189, 0
+  %#192 = insertvalue {ptr, i32, i32} %#191, i32 %#190, 1
+  ret {ptr, i32, i32} %#192
+}
+=>
+@_ZN10fast_float9space_lutIvE5valueE = constant 256 bytes, align 16
+@_ZN10fast_float8int_lutsIvE7chdigitE = constant 256 bytes, align 16
+@_ZN10fast_float8int_lutsIvE13maxdigits_u64E = constant 280 bytes, align 16
+@_ZN10fast_float8int_lutsIvE12min_safe_u64E = constant 280 bytes, align 16
+
+define {ptr, i32, i32} @_ZN10fast_float23from_chars_int_advancedImcEENS_19from_chars_result_tIT0_EEPKS2_S5_RT_NS_15parse_options_tIS2_EE(ptr noundef %#0, ptr noundef %#1, ptr nonnull dereferenceable(8) noundef align(8) %#2, i64 %#3, i64 %#4) {
+init:
+  store [35 x i64] { -9223372036854775808, -6289078614652622815, 4611686018427387904, 7450580596923828125, 4738381338321616896, 3909821048582988049, -9223372036854775808, -6289078614652622815, -8446744073709551616, 5559917313492231481, 2218611106740436992, 8650415919381337933, 2177953337809371136, 6568408355712890625, 1152921504606846976, 2862423051509815793, 6746640616477458432, -3265617043834753317, 1638400000000000000, 3243919932521508681, 6221821273427820544, -6853907749170801807, 876488338465357824, 1490116119384765625, 2481152873203736576, 4052555153018976267, 6502111422497947648, -8186115360750949427, -2503514073709551616, 787662783788549761, 1152921504606846976, 1667889514952984961, 2386420683693101056, 3379220508056640625, 4738381338321616896 }, ptr @_ZN10fast_float8int_lutsIvE12min_safe_u64E, align 16
+  store [35 x i64] { 64, 41, 32, 28, 25, 23, 22, 21, 20, 19, 18, 18, 17, 17, 16, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 14, 13, 13, 13, 13, 13, 13 }, ptr @_ZN10fast_float8int_lutsIvE13maxdigits_u64E, align 16
+  store [256 x i8] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255, 255, 255, 255, 255, 255, 255, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 255, 255, 255, 255, 255, 255, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, ptr @_ZN10fast_float8int_lutsIvE7chdigitE, align 16
+  store {[33 x i8], [223 x i8]} { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, ptr @_ZN10fast_float9space_lutIvE5valueE, align 16
+  br label %#5
+
+#5:
+  %#38 = ptrtoint ptr noundef %#0 to i64
+  %#39 = ptrtoint ptr noundef %#1 to i64
+  %#40 = lshr i64 %#4, 32
+  %#41 = trunc nuw i64 %#40 to i32
+  %#42 = and i64 %#3, 256
+  %#43 = icmp eq i64 %#42, 0
+  %#44 = icmp eq ptr noundef %#0, noundef %#1
+  %#45 = or i1 %#43, %#44
+  br i1 %#45, label %#10, label %#6
+
+#6:
+  %#46 = sub i64 %#39, %#38
+  %#47 = gep ptr noundef %#0, 1 x i64 %#46
+  br label %#7
+
+#7:
+  %#48 = phi ptr [ %#54, %#8 ], [ noundef %#0, %#6 ]
+  %#49 = load i8, ptr %#48, align 1
+  %#50 = zext i8 %#49 to i64
+  %#51 = gep inbounds nuw ptr @_ZN10fast_float9space_lutIvE5valueE, 256 x i64 0, 1 x i64 %#50
+  %#52 = load i8, ptr %#51, align 1
+  %#52_range = !range i8 %#52, i8 0, i8 2
+  assume_welldefined i8 %#52_range
+  %#53 = trunc nuw i8 %#52_range to i1
+  br i1 %#53, label %#8, label %#9
+
+#8:
+  %#54 = gep inbounds nuw ptr %#48, 1 x i64 1
+  %#55 = icmp eq ptr %#54, noundef %#1
+  br i1 %#55, label %#9, label %#7
+
+#9:
+  %#56 = phi ptr [ %#48, %#7 ], [ %#47, %#8 ]
+  %#57 = ptrtoint ptr %#56 to i64
+  br label %#10
+
+#10:
+  %#58 = phi i64 [ %#57, %#9 ], [ %#38, %#5 ]
+  %#59 = phi ptr [ %#56, %#9 ], [ noundef %#0, %#5 ]
+  %#60 = icmp eq ptr %#59, noundef %#1
+  %#61 = add i32 %#41, 4294967259
+  %#62 = icmp ult i32 %#61, 4294967261
+  %#63 = select i1 %#60, i1 1, i1 %#62
+  br i1 %#63, label %#37, label %#11
+
+#11:
+  %#64 = load i8, ptr %#59, align 1
+  %#65 = icmp eq i8 %#64, 45
+  br i1 %#65, label %#37, label %#12
+
+#12:
+  %#66 = and i64 %#3, 128
+  %#67 = icmp ne i64 %#66, 0
+  %#68 = icmp eq i8 %#64, 43
+  %#69 = and i1 %#67, %#68
+  %#70 = zext i1 %#69 to i64
+  %#71 = gep inbounds nuw ptr %#59, 1 x i64 %#70
+  %#72 = icmp eq ptr %#71, noundef %#1
+  br i1 %#72, label %#16, label %#13
+
+#13:
+  %#73 = sub i64 %#39, %#58
+  %#74 = gep ptr %#59, 1 x i64 %#73
+  br label %#14
+
+#14:
+  %#75 = phi ptr [ %#78, %#15 ], [ %#71, %#13 ]
+  %#76 = load i8, ptr %#75, align 1
+  %#77 = icmp eq i8 %#76, 48
+  br i1 %#77, label %#15, label %#16
+
+#15:
+  %#78 = gep inbounds nuw ptr %#75, 1 x i64 1
+  %#79 = icmp eq ptr %#78, noundef %#1
+  br i1 %#79, label %#16, label %#14
+
+#16:
+  %#80 = phi ptr [ %#71, %#12 ], [ %#75, %#14 ], [ %#74, %#15 ]
+  %#81 = icmp ugt ptr %#80, %#71
+  %#82 = icmp eq i64 %#40, 10
+  br i1 %#82, label %#17, label %#25
+
+#17:
+  %#83 = ptrtoint ptr %#80 to i64
+  %#84 = sub i64 %#39, %#83
+  %#85 = icmp sgt i64 %#84, 7
+  br i1 %#85, label %#18, label %#21
+
+#18:
+  %#86 = phi i64 [ %#105, %#19 ], [ 0, %#17 ]
+  %#87 = phi ptr [ %#106, %#19 ], [ %#80, %#17 ]
+  %#88 = load i64, ptr %#87, align 1
+  %#89 = add i64 %#88, 5063812098665367110
+  %#90 = add i64 %#88, -3472328296227680304
+  %#91 = or i64 %#89, %#90
+  %#92 = and i64 %#91, -9187201950435737472
+  %#93 = icmp eq i64 %#92, 0
+  br i1 %#93, label %#19, label %#20
+
+#19:
+  %#94 = mul i64 %#86, 100000000
+  %#95 = mul i64 %#90, 10
+  %#96 = lshr i64 %#90, 8
+  %#97 = add i64 %#95, %#96
+  %#98 = and i64 %#97, 1095216660735
+  %#99 = mul i64 %#98, 4294967296000100
+  %#100 = lshr i64 %#97, 16
+  %#101 = and i64 %#100, 1095216660735
+  %#102 = mul i64 %#101, 42949672960001
+  %#103 = add i64 %#102, %#99
+  %#104 = lshr i64 %#103, 32
+  %#105 = add i64 %#104, %#94
+  %#106 = gep inbounds nuw ptr %#87, 1 x i64 8
+  %#107 = ptrtoint ptr %#106 to i64
+  %#108 = sub i64 %#39, %#107
+  %#109 = icmp sgt i64 %#108, 7
+  br i1 %#109, label %#18, label %#21
+
+#20:
+  %#110 = trunc i64 %#88 to i32
+  br label %#23
+
+#21:
+  %#111 = phi ptr [ %#80, %#17 ], [ %#106, %#19 ]
+  %#112 = phi i64 [ 0, %#17 ], [ %#105, %#19 ]
+  %#113 = phi i64 [ %#84, %#17 ], [ %#108, %#19 ]
+  %#114 = icmp sgt i64 %#113, 3
+  br i1 %#114, label %#22, label %#25
+
+#22:
+  %#115 = load i32, ptr %#111, align 1
+  br label %#23
+
+#23:
+  %#116 = phi i32 [ %#115, %#22 ], [ %#110, %#20 ]
+  %#117 = phi ptr [ %#111, %#22 ], [ %#87, %#20 ]
+  %#118 = phi i64 [ %#112, %#22 ], [ %#86, %#20 ]
+  %#119 = add i32 %#116, 1179010630
+  %#120 = add i32 %#116, 3486502864
+  %#121 = or i32 %#119, %#120
+  %#122 = and i32 %#121, 2155905152
+  %#123 = icmp eq i32 %#122, 0
+  br i1 %#123, label %#24, label %#25
+
+#24:
+  %#124 = mul i64 %#118, 10000
+  %#125 = mul i32 %#120, 10
+  %#126 = lshr i32 %#120, 8
+  %#127 = add i32 %#125, %#126
+  %#128 = and i32 %#127, 16711935
+  %#129 = mul i32 %#128, 6553601
+  %#130 = lshr i32 %#129, 16
+  %#131 = zext nneg i32 %#130 to i64
+  %#132 = add i64 %#124, %#131
+  %#133 = gep inbounds nuw ptr %#117, 1 x i64 4
+  br label %#25
+
+#25:
+  %#134 = phi ptr [ %#80, %#16 ], [ %#133, %#24 ], [ %#117, %#23 ], [ %#111, %#21 ]
+  %#135 = phi i64 [ 0, %#16 ], [ %#132, %#24 ], [ %#118, %#23 ], [ %#112, %#21 ]
+  %#136 = ptrtoint ptr %#134 to i64
+  %#137 = icmp eq ptr %#134, noundef %#1
+  br i1 %#137, label %#30, label %#26
+
+#26:
+  %#138 = sub i64 %#39, %#136
+  %#139 = gep ptr %#134, 1 x i64 %#138
+  br label %#27
+
+#27:
+  %#140 = phi i64 [ %#150, %#28 ], [ %#135, %#26 ]
+  %#141 = phi ptr [ %#151, %#28 ], [ %#134, %#26 ]
+  %#142 = load i8, ptr %#141, align 1
+  %#143 = zext i8 %#142 to i64
+  %#144 = gep inbounds nuw ptr @_ZN10fast_float8int_lutsIvE7chdigitE, 256 x i64 0, 1 x i64 %#143
+  %#145 = load i8, ptr %#144, align 1
+  %#146 = zext i8 %#145 to i32
+  %#147 = icmp slt i32 %#146, %#41
+  br i1 %#147, label %#28, label %#29
+
+#28:
+  %#148 = mul i64 %#140, %#40
+  %#149 = zext i8 %#145 to i64
+  %#150 = add i64 %#148, %#149
+  %#151 = gep inbounds nuw ptr %#141, 1 x i64 1
+  %#152 = icmp eq ptr %#151, noundef %#1
+  br i1 %#152, label %#29, label %#27
+
+#29:
+  %#153 = phi ptr [ %#139, %#28 ], [ %#141, %#27 ]
+  %#154 = phi i64 [ %#150, %#28 ], [ %#140, %#27 ]
+  %#155 = ptrtoint ptr %#153 to i64
+  br label %#30
+
+#30:
+  %#156 = phi i64 [ %#155, %#29 ], [ %#136, %#25 ]
+  %#157 = phi ptr [ %#153, %#29 ], [ %#134, %#25 ]
+  %#158 = phi i64 [ %#154, %#29 ], [ %#135, %#25 ]
+  %#159 = ptrtoint ptr %#80 to i64
+  %#160 = sub i64 %#156, %#159
+  %#161 = icmp eq ptr %#157, %#80, offsetonly
+  br i1 %#161, label %#31, label %#32
+
+#31:
+  br i1 %#81, label %#36, label %#37
+
+#32:
+  %#162 = add i64 %#4, -8589934592
+  %#163 = ashr i64 %#162, 32
+  %#164 = gep inbounds ptr @_ZN10fast_float8int_lutsIvE13maxdigits_u64E, 280 x i64 0, 8 x i64 %#163
+  %#165 = load i64, ptr %#164, align 8
+  %#166 = icmp ugt i64 %#160, %#165
+  br i1 %#166, label %#37, label %#33
+
+#33:
+  %#167 = icmp eq i64 %#160, %#165
+  br i1 %#167, label %#34, label %#36
+
+#34:
+  %#168 = gep inbounds ptr @_ZN10fast_float8int_lutsIvE12min_safe_u64E, 280 x i64 0, 8 x i64 %#163
+  %#169 = load i64, ptr %#168, align 8
+  %#170 = udiv i64 -1, %#169
+  %#171 = load i8, ptr %#80, align 1
+  %#172 = zext i8 %#171 to i64
+  %#173 = gep inbounds nuw ptr @_ZN10fast_float8int_lutsIvE7chdigitE, 256 x i64 0, 1 x i64 %#172
+  %#174 = load i8, ptr %#173, align 1
+  %#175 = zext i8 %#174 to i64
+  %#176 = icmp ult i64 %#170, %#175
+  br i1 %#176, label %#37, label %#35
+
+#35:
+  %#177 = icmp eq i64 %#170, %#175
+  %#178 = mul i64 %#170, %#169
+  %#179 = icmp ult i64 %#158, %#178
+  %#180 = select i1 %#177, i1 %#179, i1 0
+  br i1 %#180, label %#37, label %#36
+
+#36:
+  %#181 = phi i64 [ 0, %#31 ], [ %#158, %#35 ], [ %#158, %#33 ]
+  store i64 %#181, ptr nonnull dereferenceable(8) noundef align(8) %#2, align 8
+  br label %#37
+
+#37:
+  %#182 = phi ptr [ %#59, %#10 ], [ %#59, %#11 ], [ %#59, %#31 ], [ %#157, %#34 ], [ %#157, %#32 ], [ %#157, %#35 ], [ %#157, %#36 ]
+  %#183 = phi i32 [ 22, %#10 ], [ 22, %#11 ], [ 22, %#31 ], [ 34, %#34 ], [ 34, %#32 ], [ 34, %#35 ], [ 0, %#36 ]
+  %#184 = insertvalue {ptr, i32, i32} poison, ptr %#182, 0
+  %#185 = insertvalue {ptr, i32, i32} %#184, i32 %#183, 1
+  ret {ptr, i32, i32} %#185
+}
+WARNING: slow vcgen! Took 74.09 s
+ERROR: Timeout
+
+Summary:
+  2 correct transformations
+  0 incorrect transformations
+  3 failed-to-prove transformations
+  0 Alive2 errors

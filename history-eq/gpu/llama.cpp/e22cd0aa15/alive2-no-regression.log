@@ -1,0 +1,103 @@
+
+----------------------------------------
+define i1 @select_small_batch(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree noundef willreturn zeroext memory(none) {
+#4:
+  %#9 = and i32 noundef %#2, 127
+  %#10 = or i32 %#9, noundef %#1
+  %#11 = icmp eq i32 %#10, 0
+  br i1 %#11, label %#5, label %#8
+
+#5:
+  %#12 = icmp ult i32 noundef %#0, 4
+  %#13 = and i32 noundef %#0, 4294967294
+  %#14 = icmp eq i32 %#13, 6
+  %#15 = or i1 %#12, %#14
+  %#16 = icmp eq i32 noundef %#0, 8
+  %#17 = or i1 %#16, %#15
+  %#18 = icmp eq i32 noundef %#0, 39
+  %#19 = or i1 %#18, %#17
+  %#20 = icmp eq i32 noundef %#0, 20
+  %#21 = or i1 %#20, %#19
+  %#22 = add i32 noundef %#3, 4294967294
+  %#23 = icmp ult i32 %#22, 7
+  %#24 = and i1 %#23, %#21
+  br i1 %#24, label %#8, label %#6
+
+#6:
+  %#25 = add i32 noundef %#0, 4294967284
+  %#26 = icmp ult i32 %#25, 3
+  br i1 %#26, label %#7, label %#8
+
+#7:
+  %#27 = add i32 noundef %#3, 4294967292
+  %#28 = icmp ult i32 %#27, 5
+  br label %#8
+
+#8:
+  %#29 = phi i1 [ 0, %#4 ], [ 1, %#5 ], [ %#28, %#7 ], [ 0, %#6 ]
+  ret i1 %#29
+}
+=>
+define i1 @select_small_batch(i32 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn zeroext memory(none) {
+#4:
+  %#11 = and i32 noundef %#2, 127
+  %#12 = or i32 %#11, noundef %#1
+  %#13 = icmp eq i32 %#12, 0
+  br i1 %#13, label %#5, label %#10
+
+#5:
+  %#14 = icmp ult i32 noundef %#0, 4
+  %#15 = and i32 noundef %#0, 4294967294
+  %#16 = icmp eq i32 %#15, 6
+  %#17 = or i1 %#14, %#16
+  %#18 = icmp eq i32 noundef %#0, 8
+  %#19 = or i1 %#18, %#17
+  %#20 = icmp eq i32 noundef %#0, 39
+  %#21 = or i1 %#20, %#19
+  %#22 = icmp eq i32 noundef %#0, 20
+  %#23 = or i1 %#22, %#21
+  %#24 = add i32 noundef %#3, 4294967294
+  %#25 = icmp ult i32 %#24, 7
+  %#26 = and i1 %#25, %#23
+  br i1 %#26, label %#7, label %#6
+
+#6:
+  %#27 = icmp eq i32 %#15, 12
+  %#28 = icmp eq i32 noundef %#0, 14
+  %#29 = or i1 %#28, %#27
+  %#30 = add i32 noundef %#3, 4294967292
+  %#31 = icmp ult i32 %#30, 5
+  %#32 = and i1 %#29, %#31
+  br i1 %#32, label %#7, label %#10
+
+#7:
+  %#33 = icmp eq i32 noundef %#0, 30
+  %#34 = or i1 %#14, %#33
+  %#35 = or i1 %#34, %#16
+  %#36 = or i1 %#18, %#35
+  %#37 = or i1 %#20, %#36
+  %#38 = or i1 %#22, %#37
+  %#39 = and i1 %#25, %#38
+  br i1 %#39, label %#10, label %#8
+
+#8:
+  %#40 = add nsw i32 noundef %#0, 4294967286
+  %#41 = icmp ult i32 %#40, 5
+  br i1 %#41, label %#9, label %#10
+
+#9:
+  %#42 = add nsw i32 noundef %#3, 4294967292
+  %#43 = icmp ult i32 %#42, 5
+  br label %#10
+
+#10:
+  %#44 = phi i1 [ 0, %#4 ], [ 0, %#6 ], [ 1, %#7 ], [ %#43, %#9 ], [ 0, %#8 ]
+  ret i1 %#44
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

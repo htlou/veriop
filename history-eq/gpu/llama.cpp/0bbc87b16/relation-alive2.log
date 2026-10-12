@@ -1,0 +1,53 @@
+
+----------------------------------------
+define i64 @relation(i64 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree noundef willreturn memory(none) {
+#4:
+  ret i64 1
+}
+=>
+define i64 @relation(i64 noundef %#0, i32 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn memory(none) {
+#4:
+  %#10 = icmp ne i32 noundef %#1, 4098
+  %#11 = icmp eq i32 noundef %#3, 0
+  %#12 = or i1 %#10, %#11
+  br i1 %#12, label %#9, label %#5
+
+#5:
+  %#13 = icmp eq i32 noundef %#2, 1
+  %#14 = icmp ult i32 noundef %#3, 32
+  %#15 = and i1 %#13, %#14
+  br i1 %#15, label %#6, label %#7
+
+#6:
+  %#16 = zext nneg i32 noundef %#3 to i64
+  %#17 = mul nsw nuw i64 %#16, 500000000
+  br label %#9
+
+#7:
+  %#18 = icmp ugt i32 noundef %#3, 23
+  %#19 = or i1 %#13, %#18
+  br i1 %#19, label %#9, label %#8
+
+#8:
+  %#20 = zext nneg i32 noundef %#3 to i64
+  %#21 = mul nsw nuw i64 %#20, 2000000000
+  br label %#9
+
+#9:
+  %#22 = phi i64 [ %#17, %#6 ], [ %#21, %#8 ], [ 200000000000, %#7 ], [ 200000000000, %#4 ]
+  %#23 = udiv i64 noundef %#0, 40
+  %#24 = umin i64 %#22, %#23
+  %#range_0_%#24 = !range i64 %#24, i64 0, i64 461168601842738791
+  assume_welldefined i64 %#range_0_%#24
+  %#25 = icmp samesign ult i64 %#range_0_%#24, 200000000001
+  %#26 = zext i1 %#25 to i64
+  %#range_1_%#26 = !range i64 %#26, i64 0, i64 2
+  ret i64 %#range_1_%#26
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

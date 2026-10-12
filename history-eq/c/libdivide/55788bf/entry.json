@@ -1,0 +1,40 @@
+{
+  "commit": "55788bf",
+  "date": "2016-03-19",
+  "subject": "Change default constructor to leave divider unitialized",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit message says the change avoids unnecessary work when creating arrays of dividers.",
+  "change_summary": "The C++ divider default constructor stops initializing its divisor to one.",
+  "units": [
+    {
+      "name": "public C++ default-constructed signed-64 divider used for division",
+      "level": "api",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "artifact_dir": "c/libdivide/55788bf/O1",
+      "evidence": "Alive2 old->new gives a concrete target-more-poisonous counterexample at x=3: old returns 3, new returns poison. The reverse check succeeds."
+    },
+    {
+      "name": "default construct then assign a divisor before dividing",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "dv != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/55788bf/O1",
+      "evidence": "Both target_default_then_assign and target_array_init are bidirectionally correct with unroll 4."
+    }
+  ],
+  "commit_verdict": "NOT_EQUIV",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": "ub-domain-change",
+  "notes": "This is an intentional C++ API contract change. Only representative signed-64 and initialized unsigned divider paths were checked; the single API counterexample is sufficient to refute full equivalence. O2/O3 optimize the undefined path away, so the O1 witness is decisive for this compiled configuration only. The wrapper disables unchanged x86 inline assembly on both sides."
+}

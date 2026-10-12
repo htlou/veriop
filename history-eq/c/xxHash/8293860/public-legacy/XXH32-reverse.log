@@ -1,0 +1,164 @@
+
+----------------------------------------
+declare i32 @XXH32_finalize(noundef i32, nowrite noundef ptr, noundef i64) nofree willreturn memory(argmem: read)
+
+define i32 @XXH32(ptr nowrite noundef %#0, i64 noundef %#1, i32 noundef %#2) nofree memory(argmem: read) {
+#3:
+  %#9 = icmp ugt i64 noundef %#1, 15
+  br i1 %#9, label %#5, label %#4
+
+#4:
+  %#10 = add i32 noundef %#2, 374761393
+  br label %#8
+
+#5:
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#12 = gep inbounds ptr %#11, 1 x i64 -15
+  %#13 = add i32 noundef %#2, 606290984
+  %#14 = add i32 noundef %#2, 2246822519
+  %#15 = add i32 noundef %#2, 1640531535
+  br label %#6
+
+#6:
+  %#16 = phi ptr [ nowrite noundef %#0, %#5 ], [ %#48, %#6 ]
+  %#17 = phi i32 [ %#13, %#5 ], [ %#26, %#6 ]
+  %#18 = phi i32 [ %#14, %#5 ], [ %#33, %#6 ]
+  %#19 = phi i32 [ noundef %#2, %#5 ], [ %#40, %#6 ]
+  %#20 = phi i32 [ %#15, %#5 ], [ %#47, %#6 ]
+  %#21 = load i32, ptr %#16, align 1
+  %#22 = mul i32 %#21, 2246822519
+  %#23 = add i32 %#22, %#17
+  %#24 = fshl i32 %#23, i32 %#23, i32 13
+  %#25 = mul i32 %#24, 2654435761
+  %#26 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#25) nofree nothrow memory(none)
+  %#27 = gep inbounds nuw ptr %#16, 1 x i64 4
+  %#28 = load i32, ptr %#27, align 1
+  %#29 = mul i32 %#28, 2246822519
+  %#30 = add i32 %#29, %#18
+  %#31 = fshl i32 %#30, i32 %#30, i32 13
+  %#32 = mul i32 %#31, 2654435761
+  %#33 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#32) nofree nothrow memory(none)
+  %#34 = gep inbounds nuw ptr %#16, 1 x i64 8
+  %#35 = load i32, ptr %#34, align 1
+  %#36 = mul i32 %#35, 2246822519
+  %#37 = add i32 %#36, %#19
+  %#38 = fshl i32 %#37, i32 %#37, i32 13
+  %#39 = mul i32 %#38, 2654435761
+  %#40 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#39) nofree nothrow memory(none)
+  %#41 = gep inbounds nuw ptr %#16, 1 x i64 12
+  %#42 = load i32, ptr %#41, align 1
+  %#43 = mul i32 %#42, 2246822519
+  %#44 = add i32 %#43, %#20
+  %#45 = fshl i32 %#44, i32 %#44, i32 13
+  %#46 = mul i32 %#45, 2654435761
+  %#47 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#46) nofree nothrow memory(none)
+  %#48 = gep inbounds nuw ptr %#16, 1 x i64 16
+  %#49 = icmp ult ptr %#48, %#12, offsetonly
+  br i1 %#49, label %#6, label %#7
+
+#7:
+  %#50 = fshl i32 %#26, i32 %#26, i32 1
+  %#51 = fshl i32 %#33, i32 %#33, i32 7
+  %#52 = add i32 %#51, %#50
+  %#53 = fshl i32 %#40, i32 %#40, i32 12
+  %#54 = add i32 %#52, %#53
+  %#55 = fshl i32 %#47, i32 %#47, i32 18
+  %#56 = add i32 %#54, %#55
+  br label %#8
+
+#8:
+  %#57 = phi i32 [ %#56, %#7 ], [ %#10, %#4 ]
+  %#58 = phi ptr [ %#48, %#7 ], [ nowrite noundef %#0, %#4 ]
+  %#59 = trunc i64 noundef %#1 to i32
+  %#60 = add i32 %#57, %#59
+  %#61 = and i64 noundef %#1, 15
+  %#range_0_%#61 = !range i64 %#61, i64 0, i64 4294967296, welldefined
+  %#range_1_%#range_0_%#61 = !range i64 %#range_0_%#61, i64 0, i64 4294967296, welldefined
+  %#62 = tail call i32 @XXH32_finalize(noundef i32 %#60, nowrite noundef ptr %#58, noundef i64 %#range_1_%#range_0_%#61) nofree willreturn memory(argmem: read)
+  ret i32 %#62
+}
+=>
+declare i32 @XXH32_finalize(noundef i32, nowrite noundef ptr, noundef i64) nofree willreturn memory(argmem: read)
+
+define i32 @XXH32(ptr nowrite noundef %#0, i64 noundef %#1, i32 noundef %#2) nofree memory(argmem: read) {
+#3:
+  %#9 = icmp ugt i64 noundef %#1, 15
+  br i1 %#9, label %#5, label %#4
+
+#4:
+  %#10 = add i32 noundef %#2, 374761393
+  br label %#8
+
+#5:
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#12 = gep inbounds ptr %#11, 1 x i64 -15
+  %#13 = add i32 noundef %#2, 606290984
+  %#14 = add i32 noundef %#2, 2246822519
+  %#15 = add i32 noundef %#2, 1640531535
+  br label %#6
+
+#6:
+  %#16 = phi ptr [ nowrite noundef %#0, %#5 ], [ %#48, %#6 ]
+  %#17 = phi i32 [ %#13, %#5 ], [ %#26, %#6 ]
+  %#18 = phi i32 [ %#14, %#5 ], [ %#33, %#6 ]
+  %#19 = phi i32 [ noundef %#2, %#5 ], [ %#40, %#6 ]
+  %#20 = phi i32 [ %#15, %#5 ], [ %#47, %#6 ]
+  %#21 = load i32, ptr %#16, align 1
+  %#22 = mul i32 %#21, 2246822519
+  %#23 = add i32 %#22, %#17
+  %#24 = fshl i32 %#23, i32 %#23, i32 13
+  %#25 = mul i32 %#24, 2654435761
+  %#26 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#25) nofree nothrow memory(none)
+  %#27 = gep inbounds nuw ptr %#16, 1 x i64 4
+  %#28 = load i32, ptr %#27, align 1
+  %#29 = mul i32 %#28, 2246822519
+  %#30 = add i32 %#29, %#18
+  %#31 = fshl i32 %#30, i32 %#30, i32 13
+  %#32 = mul i32 %#31, 2654435761
+  %#33 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#32) nofree nothrow memory(none)
+  %#34 = gep inbounds nuw ptr %#16, 1 x i64 8
+  %#35 = load i32, ptr %#34, align 1
+  %#36 = mul i32 %#35, 2246822519
+  %#37 = add i32 %#36, %#19
+  %#38 = fshl i32 %#37, i32 %#37, i32 13
+  %#39 = mul i32 %#38, 2654435761
+  %#40 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#39) nofree nothrow memory(none)
+  %#41 = gep inbounds nuw ptr %#16, 1 x i64 12
+  %#42 = load i32, ptr %#41, align 1
+  %#43 = mul i32 %#42, 2246822519
+  %#44 = add i32 %#43, %#20
+  %#45 = fshl i32 %#44, i32 %#44, i32 13
+  %#46 = mul i32 %#45, 2654435761
+  %#47 = tail call i32 asm , =r,0,~{dirflag},~{fpsr},~{flags}(i32 %#46) nofree nothrow memory(none)
+  %#48 = gep inbounds nuw ptr %#16, 1 x i64 16
+  %#49 = icmp ult ptr %#48, %#12, offsetonly
+  br i1 %#49, label %#6, label %#7
+
+#7:
+  %#50 = fshl i32 %#26, i32 %#26, i32 1
+  %#51 = fshl i32 %#33, i32 %#33, i32 7
+  %#52 = add i32 %#51, %#50
+  %#53 = fshl i32 %#40, i32 %#40, i32 12
+  %#54 = add i32 %#52, %#53
+  %#55 = fshl i32 %#47, i32 %#47, i32 18
+  %#56 = add i32 %#54, %#55
+  br label %#8
+
+#8:
+  %#57 = phi i32 [ %#56, %#7 ], [ %#10, %#4 ]
+  %#58 = phi ptr [ %#48, %#7 ], [ nowrite noundef %#0, %#4 ]
+  %#59 = trunc i64 noundef %#1 to i32
+  %#60 = add i32 %#57, %#59
+  %#61 = and i64 noundef %#1, 15
+  %#range_0_%#61 = !range i64 %#61, i64 0, i64 4294967296, welldefined
+  %#range_1_%#range_0_%#61 = !range i64 %#range_0_%#61, i64 0, i64 4294967296, welldefined
+  %#62 = tail call i32 @XXH32_finalize(noundef i32 %#60, nowrite noundef ptr %#58, noundef i64 %#range_1_%#range_0_%#61) nofree willreturn memory(argmem: read)
+  ret i32 %#62
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,7 @@
+# xxHash `755445db88`: fixed-length 128-bit API checks
+
+**Scoped verdict: `EQUIV_PARTIAL`.** The [recheck](recheck_128.py) verifies the exact historical parent and child `xxhash.h` Git blob IDs, rebuilds [the API wrapper](wrap_api_fixed.c) with Clang 20 for x86-64-v3, then runs Alive2 in both directions for nine 128-bit targets. All [18 checks](recheck-128-result.json) report one correct transformation, zero incorrect, zero failed to prove, and zero Alive2 errors. The eight `XXH3_128bits_withSeed` targets fix lengths 129, 159, 160, 191, 192, 200, 224, and 240; the ninth fixes length 200 for `XXH3_128bits_withSecret`, retaining its `secSize >= 136` guard. Input bytes, seed, and eligible secret contents remain symbolic subject to valid pointer objects.
+
+The installed Alive2 rejects Clang 20's `nocapture` and alias-scope metadata. The script removes these attributes and the associated no-alias declaration intrinsics **on both sides** before comparison. Its result records the normalized IR hashes and per-target logs; the selected target bodies contain no inline assembly. Run `python3 -B history-eq/c/xxHash/755445d/recheck_128.py` from the project root to regenerate them.
+
+Other lengths, the 64-bit paths, other build configurations, and whole-commit behavior remain unproved. This is an Alive2 result, not a Kuiper result. No official historical before/after xxHash benchmark score was measured.

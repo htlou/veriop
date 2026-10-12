@@ -1,0 +1,33 @@
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+uint64_t __veriop_counts_a0c0e1f1b0c911b86d7a[23];
+static const struct {const char *key;unsigned from,to,index;} edges[]={{"0678905fd08e6f0b0525873c45031657",16,15,0},
+{"0678905fd08e6f0b0525873c45031657",8,7,1},
+{"0678905fd08e6f0b0525873c45031657",4,3,2},
+{"0678905fd08e6f0b0525873c45031657",20,19,3},
+{"0678905fd08e6f0b0525873c45031657",12,11,4},
+{"0678905fd08e6f0b0525873c45031657",2,1,5},
+{"0678905fd08e6f0b0525873c45031657",18,17,6},
+{"0678905fd08e6f0b0525873c45031657",10,9,7},
+{"0678905fd08e6f0b0525873c45031657",6,5,8},
+{"0678905fd08e6f0b0525873c45031657",22,21,9},
+{"0678905fd08e6f0b0525873c45031657",14,13,10},
+{"0678905fd08e6f0b0525873c45031657",17,16,11},
+{"0678905fd08e6f0b0525873c45031657",9,8,12},
+{"0678905fd08e6f0b0525873c45031657",5,4,13},
+{"0678905fd08e6f0b0525873c45031657",21,20,14},
+{"0678905fd08e6f0b0525873c45031657",13,12,15},
+{"0678905fd08e6f0b0525873c45031657",3,2,16},
+{"0678905fd08e6f0b0525873c45031657",19,18,17},
+{"0678905fd08e6f0b0525873c45031657",11,10,18},
+{"0678905fd08e6f0b0525873c45031657",7,6,19},
+{"0678905fd08e6f0b0525873c45031657",23,22,20},
+{"0678905fd08e6f0b0525873c45031657",15,14,21},
+{"0678905fd08e6f0b0525873c45031657",0,22,22}};
+__attribute__((destructor)) static void dump_edges(void) {
+ const char *path=getenv("VERIOP_EDGE_COUNTS"); if(!path) return;
+ FILE *f=fopen(path,"a"); if(!f) {perror("profile output"); abort();}
+ for(unsigned i=0;i<23;i++) fprintf(f,"%s %u %u %llu\n",edges[i].key,edges[i].from,edges[i].to,(unsigned long long)__veriop_counts_a0c0e1f1b0c911b86d7a[edges[i].index]);
+ if(fclose(f)) abort();
+}

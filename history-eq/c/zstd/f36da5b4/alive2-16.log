@@ -1,0 +1,49 @@
+
+----------------------------------------
+define void @old16(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#3 = load <4 x i32>, ptr noundef %#0, align 4
+  %#4 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#5 = shufflevector <4 x i32> %#4, <4 x i32> poison, 0, 0, 0, 0
+  %#6 = usub_sat <4 x i32> %#3, %#5
+  store <4 x i32> %#6, ptr noundef %#0, align 4
+  %#7 = gep inbounds nuw ptr noundef %#0, 1 x i64 16
+  %#8 = load <4 x i32>, ptr %#7, align 4
+  %#9 = usub_sat <4 x i32> %#8, %#5
+  store <4 x i32> %#9, ptr %#7, align 4
+  %#10 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#11 = load <4 x i32>, ptr %#10, align 4
+  %#12 = usub_sat <4 x i32> %#11, %#5
+  store <4 x i32> %#12, ptr %#10, align 4
+  %#13 = gep inbounds nuw ptr noundef %#0, 1 x i64 48
+  %#14 = load <4 x i32>, ptr %#13, align 4
+  %#15 = usub_sat <4 x i32> %#14, %#5
+  store <4 x i32> %#15, ptr %#13, align 4
+  ret void
+}
+=>
+define void @new16(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#3 = load <4 x i32>, ptr noundef %#0, align 4
+  %#4 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#5 = shufflevector <4 x i32> %#4, <4 x i32> poison, 0, 0, 0, 0
+  %#6 = usub_sat <4 x i32> %#3, %#5
+  store <4 x i32> %#6, ptr noundef %#0, align 4
+  %#7 = gep inbounds nuw ptr noundef %#0, 1 x i64 16
+  %#8 = load <4 x i32>, ptr %#7, align 4
+  %#9 = usub_sat <4 x i32> %#8, %#5
+  store <4 x i32> %#9, ptr %#7, align 4
+  %#10 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#11 = load <4 x i32>, ptr %#10, align 4
+  %#12 = usub_sat <4 x i32> %#11, %#5
+  store <4 x i32> %#12, ptr %#10, align 4
+  %#13 = gep inbounds nuw ptr noundef %#0, 1 x i64 48
+  %#14 = load <4 x i32>, ptr %#13, align 4
+  %#15 = usub_sat <4 x i32> %#14, %#5
+  store <4 x i32> %#15, ptr %#13, align 4
+  ret void
+}
+Transformation seems to be correct!
+
+These functions seem to be equivalent!
+

@@ -1,0 +1,12 @@
+(set-logic QF_LIA)
+(declare-const local_at_lane0 Int)
+(declare-const local_at_lane1 Int)
+(assert (<= 0 local_at_lane0))
+(assert (< local_at_lane0 2))
+(assert (<= 0 local_at_lane1))
+(assert (< local_at_lane1 2))
+(assert (distinct local_at_lane0 local_at_lane1))
+; Old scans input index 0 at subgroup lane 0; new loads LocalInvocationIndex.
+(assert (not (= 0 local_at_lane0)))
+(check-sat)
+(get-value (local_at_lane0 local_at_lane1))

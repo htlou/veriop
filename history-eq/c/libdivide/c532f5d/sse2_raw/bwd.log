@@ -1,0 +1,996 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/c532f5d/sse2_raw/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/c532f5d/sse2_raw/old.ll
+
+----------------------------------------
+define <2 x i64> @target_u32_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = zext i8 noundef zeroext %#2 to i32
+  %#10 = icmp sgt i8 noundef zeroext %#2, 255
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = and i32 %#9, 31
+  %#12 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#13 = insertelement <4 x i32> poison, i32 %#11, i64 0
+  %#14 = shufflevector <4 x i32> %#13, <4 x i32> poison, 0, 0, 0, 0
+  %#15 = lshr <4 x i32> %#12, %#14
+  br label %#8
+
+#5:
+  %#16 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#17 = shufflevector <4 x i32> %#16, <4 x i32> poison, 0, 0, 0, 0
+  %#18 = bitcast <4 x i32> %#17 to <2 x i64>
+  %#19 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#20 = and <2 x i64> %#18, { 4294967295, 4294967295 }
+  %#21 = mul nuw <2 x i64> %#20, %#19
+  %#22 = lshr <2 x i64> %#21, { 32, 32 }
+  %#23 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#24 = mul nuw <2 x i64> %#20, %#23
+  %#25 = and <2 x i64> %#24, { -4294967296, -4294967296 }
+  %#26 = or disjoint <2 x i64> %#22, %#25
+  %#27 = icmp samesign ult i8 noundef zeroext %#2, 64
+  br i1 %#27, label %#6, label %#7
+
+#6:
+  %#28 = bitcast <2 x i64> %#26 to <4 x i32>
+  %#29 = x86_sse2_psrli_d <4 x i32> %#28, i32 %#9
+  br label %#8
+
+#7:
+  %#30 = and i32 %#9, 31
+  %#31 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#32 = bitcast <2 x i64> %#26 to <4 x i32>
+  %#33 = sub <4 x i32> %#31, %#32
+  %#34 = lshr <4 x i32> %#33, { 1, 1, 1, 1 }
+  %#35 = add <4 x i32> %#34, %#32
+  %#36 = insertelement <4 x i32> poison, i32 %#30, i64 0
+  %#37 = shufflevector <4 x i32> %#36, <4 x i32> poison, 0, 0, 0, 0
+  %#38 = lshr <4 x i32> %#35, %#37
+  br label %#8
+
+#8:
+  %#39 = phi <4 x i32> [ %#15, %#4 ], [ %#38, %#7 ], [ %#29, %#6 ]
+  %#40 = bitcast <4 x i32> %#39 to <2 x i64>
+  ret <2 x i64> %#40
+}
+=>
+define <2 x i64> @target_u32_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = zext i8 noundef zeroext %#2 to i32
+  %#10 = icmp sgt i8 noundef zeroext %#2, 255
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = and i32 %#9, 31
+  %#12 = insertelement <4 x i32> poison, i32 %#11, i64 0
+  %#13 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#14 = shufflevector <4 x i32> %#12, <4 x i32> poison, 0, 0, 0, 0
+  %#15 = lshr <4 x i32> %#13, %#14
+  br label %#8
+
+#5:
+  %#16 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#17 = shufflevector <4 x i32> %#16, <4 x i32> poison, 0, 0, 0, 0
+  %#18 = bitcast <4 x i32> %#17 to <2 x i64>
+  %#19 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#20 = and <2 x i64> %#18, { 4294967295, 4294967295 }
+  %#21 = mul nuw <2 x i64> %#20, %#19
+  %#22 = lshr <2 x i64> %#21, { 32, 32 }
+  %#23 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#24 = mul nuw <2 x i64> %#20, %#23
+  %#25 = and <2 x i64> %#24, { -4294967296, -4294967296 }
+  %#26 = or disjoint <2 x i64> %#22, %#25
+  %#27 = icmp samesign ult i8 noundef zeroext %#2, 64
+  br i1 %#27, label %#6, label %#7
+
+#6:
+  %#28 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#9, i64 0
+  %#29 = bitcast <2 x i64> %#26 to <4 x i32>
+  %#30 = x86_sse2_psrl_d <4 x i32> %#29, <4 x i32> %#28
+  br label %#8
+
+#7:
+  %#31 = and i32 %#9, 31
+  %#32 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#33 = bitcast <2 x i64> %#26 to <4 x i32>
+  %#34 = sub <4 x i32> %#32, %#33
+  %#35 = lshr <4 x i32> %#34, { 1, 1, 1, 1 }
+  %#36 = add <4 x i32> %#35, %#33
+  %#37 = insertelement <4 x i32> poison, i32 %#31, i64 0
+  %#38 = shufflevector <4 x i32> %#37, <4 x i32> poison, 0, 0, 0, 0
+  %#39 = lshr <4 x i32> %#36, %#38
+  br label %#8
+
+#8:
+  %#40 = phi <4 x i32> [ %#15, %#4 ], [ %#39, %#7 ], [ %#30, %#6 ]
+  %#41 = bitcast <4 x i32> %#40 to <2 x i64>
+  ret <2 x i64> %#41
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_u32_bf_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#5 = shufflevector <4 x i32> %#4, <4 x i32> poison, 0, 0, 0, 0
+  %#6 = bitcast <4 x i32> %#5 to <2 x i64>
+  %#7 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#8 = and <2 x i64> %#6, { 4294967295, 4294967295 }
+  %#9 = mul nuw <2 x i64> %#8, %#7
+  %#10 = lshr <2 x i64> %#9, { 32, 32 }
+  %#11 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#12 = mul nuw <2 x i64> %#8, %#11
+  %#13 = and <2 x i64> %#12, { -4294967296, -4294967296 }
+  %#14 = or disjoint <2 x i64> %#10, %#13
+  %#15 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#16 = bitcast <2 x i64> %#14 to <4 x i32>
+  %#17 = sub <4 x i32> %#15, %#16
+  %#18 = lshr <4 x i32> %#17, { 1, 1, 1, 1 }
+  %#19 = add <4 x i32> %#18, %#16
+  %#20 = zext i8 noundef zeroext %#2 to i32
+  %#21 = x86_sse2_psrli_d <4 x i32> %#19, i32 %#20
+  %#22 = bitcast <4 x i32> %#21 to <2 x i64>
+  ret <2 x i64> %#22
+}
+=>
+define <2 x i64> @target_u32_bf_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#5 = shufflevector <4 x i32> %#4, <4 x i32> poison, 0, 0, 0, 0
+  %#6 = bitcast <4 x i32> %#5 to <2 x i64>
+  %#7 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#8 = and <2 x i64> %#6, { 4294967295, 4294967295 }
+  %#9 = mul nuw <2 x i64> %#8, %#7
+  %#10 = lshr <2 x i64> %#9, { 32, 32 }
+  %#11 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#12 = mul nuw <2 x i64> %#8, %#11
+  %#13 = and <2 x i64> %#12, { -4294967296, -4294967296 }
+  %#14 = or disjoint <2 x i64> %#10, %#13
+  %#15 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#16 = bitcast <2 x i64> %#14 to <4 x i32>
+  %#17 = sub <4 x i32> %#15, %#16
+  %#18 = lshr <4 x i32> %#17, { 1, 1, 1, 1 }
+  %#19 = add <4 x i32> %#18, %#16
+  %#20 = zext i8 noundef zeroext %#2 to i32
+  %#21 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#20, i64 0
+  %#22 = x86_sse2_psrl_d <4 x i32> %#19, <4 x i32> %#21
+  %#23 = bitcast <4 x i32> %#22 to <2 x i64>
+  ret <2 x i64> %#23
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_s32_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = zext i8 noundef zeroext %#2 to i32
+  %#10 = and i32 %#9, 32
+  %#11 = icmp eq i32 %#10, 0
+  br i1 %#11, label %#5, label %#4
+
+#4:
+  %#12 = and i32 %#9, 31
+  %#13 = shl nsw i32 4294967295, %#12
+  %#14 = xor i32 %#13, 4294967295
+  %#15 = insertelement <4 x i32> poison, i32 %#14, i64 0
+  %#16 = shufflevector <4 x i32> %#15, <4 x i32> poison, 0, 0, 0, 0
+  %#17 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#18 = icmp slt <4 x i32> %#17, { 0, 0, 0, 0 }
+  %#19 = select <4 x i1> %#18, <4 x i32> %#16, <4 x i32> { 0, 0, 0, 0 }
+  %#20 = add <4 x i32> %#19, %#17
+  %#21 = insertelement <4 x i32> poison, i32 %#12, i64 0
+  %#22 = shufflevector <4 x i32> %#21, <4 x i32> poison, 0, 0, 0, 0
+  %#23 = ashr <4 x i32> %#20, %#22
+  %#24 = ashr i8 noundef zeroext %#2, 7
+  %#25 = sext i8 %#24 to i32
+  %#26 = insertelement <4 x i32> poison, i32 %#25, i64 0
+  %#27 = shufflevector <4 x i32> %#26, <4 x i32> poison, 0, 0, 0, 0
+  %#28 = xor <4 x i32> %#23, %#27
+  %#29 = sub <4 x i32> %#28, %#27
+  br label %#8
+
+#5:
+  %#30 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#31 = shufflevector <4 x i32> %#30, <4 x i32> poison, 0, 0, 0, 0
+  %#32 = bitcast <4 x i32> %#31 to <2 x i64>
+  %#33 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#34 = and <2 x i64> %#32, { 4294967295, 4294967295 }
+  %#35 = mul nuw <2 x i64> %#34, %#33
+  %#36 = lshr <2 x i64> %#35, { 32, 32 }
+  %#37 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#38 = mul nuw <2 x i64> %#34, %#37
+  %#39 = and <2 x i64> %#38, { -4294967296, -4294967296 }
+  %#40 = or disjoint <2 x i64> %#36, %#39
+  %#41 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#42 = bitcast <2 x i64> %#40 to <4 x i32>
+  %#43 = icmp slt <4 x i32> %#41, { 0, 0, 0, 0 }
+  %#44 = select <4 x i1> %#43, <4 x i32> %#31, <4 x i32> { 0, 0, 0, 0 }
+  %#45 = icmp slt <4 x i32> %#31, { 0, 0, 0, 0 }
+  %#46 = select <4 x i1> %#45, <4 x i32> %#41, <4 x i32> { 0, 0, 0, 0 }
+  %#47 = add <4 x i32> %#46, %#44
+  %#48 = sub <4 x i32> %#42, %#47
+  %#49 = and i32 %#9, 64
+  %#50 = icmp eq i32 %#49, 0
+  br i1 %#50, label %#7, label %#6
+
+#6:
+  %#51 = ashr i8 noundef zeroext %#2, 7
+  %#52 = sext i8 %#51 to i32
+  %#53 = insertelement <4 x i32> poison, i32 %#52, i64 0
+  %#54 = shufflevector <4 x i32> %#53, <4 x i32> poison, 0, 0, 0, 0
+  %#55 = xor <4 x i32> %#54, %#41
+  %#56 = sub <4 x i32> %#55, %#54
+  %#57 = add <4 x i32> %#56, %#48
+  br label %#7
+
+#7:
+  %#58 = phi <4 x i32> [ %#57, %#6 ], [ %#48, %#5 ]
+  %#59 = and i32 %#9, 31
+  %#60 = insertelement <4 x i32> poison, i32 %#59, i64 0
+  %#61 = shufflevector <4 x i32> %#60, <4 x i32> poison, 0, 0, 0, 0
+  %#62 = ashr <4 x i32> %#58, %#61
+  %#63 = lshr <4 x i32> %#62, { 31, 31, 31, 31 }
+  %#64 = add <4 x i32> %#63, %#62
+  br label %#8
+
+#8:
+  %#65 = phi <4 x i32> [ %#29, %#4 ], [ %#64, %#7 ]
+  %#66 = bitcast <4 x i32> %#65 to <2 x i64>
+  ret <2 x i64> %#66
+}
+=>
+define <2 x i64> @target_s32_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = zext i8 noundef zeroext %#2 to i32
+  %#10 = and i32 %#9, 32
+  %#11 = icmp eq i32 %#10, 0
+  br i1 %#11, label %#5, label %#4
+
+#4:
+  %#12 = and i32 %#9, 31
+  %#13 = shl nsw i32 4294967295, %#12
+  %#14 = xor i32 %#13, 4294967295
+  %#15 = insertelement <4 x i32> poison, i32 %#14, i64 0
+  %#16 = shufflevector <4 x i32> %#15, <4 x i32> poison, 0, 0, 0, 0
+  %#17 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#18 = icmp slt <4 x i32> %#17, { 0, 0, 0, 0 }
+  %#19 = select <4 x i1> %#18, <4 x i32> %#16, <4 x i32> { 0, 0, 0, 0 }
+  %#20 = add <4 x i32> %#19, %#17
+  %#21 = insertelement <4 x i32> poison, i32 %#12, i64 0
+  %#22 = shufflevector <4 x i32> %#21, <4 x i32> poison, 0, 0, 0, 0
+  %#23 = ashr <4 x i32> %#20, %#22
+  %#24 = ashr i8 noundef zeroext %#2, 7
+  %#25 = sext i8 %#24 to i32
+  %#26 = insertelement <4 x i32> poison, i32 %#25, i64 0
+  %#27 = shufflevector <4 x i32> %#26, <4 x i32> poison, 0, 0, 0, 0
+  %#28 = xor <4 x i32> %#23, %#27
+  %#29 = sub <4 x i32> %#28, %#27
+  br label %#8
+
+#5:
+  %#30 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#31 = shufflevector <4 x i32> %#30, <4 x i32> poison, 0, 0, 0, 0
+  %#32 = bitcast <4 x i32> %#31 to <2 x i64>
+  %#33 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#34 = and <2 x i64> %#32, { 4294967295, 4294967295 }
+  %#35 = mul nuw <2 x i64> %#34, %#33
+  %#36 = lshr <2 x i64> %#35, { 32, 32 }
+  %#37 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#38 = mul nuw <2 x i64> %#34, %#37
+  %#39 = and <2 x i64> %#38, { -4294967296, -4294967296 }
+  %#40 = or disjoint <2 x i64> %#36, %#39
+  %#41 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#42 = bitcast <2 x i64> %#40 to <4 x i32>
+  %#43 = icmp slt <4 x i32> %#41, { 0, 0, 0, 0 }
+  %#44 = select <4 x i1> %#43, <4 x i32> %#31, <4 x i32> { 0, 0, 0, 0 }
+  %#45 = icmp slt <4 x i32> %#31, { 0, 0, 0, 0 }
+  %#46 = select <4 x i1> %#45, <4 x i32> %#41, <4 x i32> { 0, 0, 0, 0 }
+  %#47 = add <4 x i32> %#46, %#44
+  %#48 = sub <4 x i32> %#42, %#47
+  %#49 = and i32 %#9, 64
+  %#50 = icmp eq i32 %#49, 0
+  br i1 %#50, label %#7, label %#6
+
+#6:
+  %#51 = ashr i8 noundef zeroext %#2, 7
+  %#52 = sext i8 %#51 to i32
+  %#53 = insertelement <4 x i32> poison, i32 %#52, i64 0
+  %#54 = shufflevector <4 x i32> %#53, <4 x i32> poison, 0, 0, 0, 0
+  %#55 = xor <4 x i32> %#54, %#41
+  %#56 = sub <4 x i32> %#55, %#54
+  %#57 = add <4 x i32> %#56, %#48
+  br label %#7
+
+#7:
+  %#58 = phi <4 x i32> [ %#57, %#6 ], [ %#48, %#5 ]
+  %#59 = and i32 %#9, 31
+  %#60 = insertelement <4 x i32> poison, i32 %#59, i64 0
+  %#61 = shufflevector <4 x i32> %#60, <4 x i32> poison, 0, 0, 0, 0
+  %#62 = ashr <4 x i32> %#58, %#61
+  %#63 = lshr <4 x i32> %#62, { 31, 31, 31, 31 }
+  %#64 = add <4 x i32> %#63, %#62
+  br label %#8
+
+#8:
+  %#65 = phi <4 x i32> [ %#29, %#4 ], [ %#64, %#7 ]
+  %#66 = bitcast <4 x i32> %#65 to <2 x i64>
+  ret <2 x i64> %#66
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_s32_bf_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 31
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i32
+  %#7 = insertelement <4 x i32> poison, i32 %#6, i64 0
+  %#8 = shufflevector <4 x i32> %#7, <4 x i32> poison, 0, 0, 0, 0
+  %#9 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#10 = shufflevector <4 x i32> %#9, <4 x i32> poison, 0, 0, 0, 0
+  %#11 = bitcast <4 x i32> %#10 to <2 x i64>
+  %#12 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#13 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#14 = mul nuw <2 x i64> %#13, %#12
+  %#15 = lshr <2 x i64> %#14, { 32, 32 }
+  %#16 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#17 = mul nuw <2 x i64> %#13, %#16
+  %#18 = and <2 x i64> %#17, { -4294967296, -4294967296 }
+  %#19 = or disjoint <2 x i64> %#15, %#18
+  %#20 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#21 = bitcast <2 x i64> %#19 to <4 x i32>
+  %#22 = icmp slt <4 x i32> %#20, { 0, 0, 0, 0 }
+  %#23 = select <4 x i1> %#22, <4 x i32> %#10, <4 x i32> { 0, 0, 0, 0 }
+  %#24 = icmp slt <4 x i32> %#10, { 0, 0, 0, 0 }
+  %#25 = select <4 x i1> %#24, <4 x i32> %#20, <4 x i32> { 0, 0, 0, 0 }
+  %#26 = add <4 x i32> %#23, %#25
+  %#27 = sub <4 x i32> %#20, %#26
+  %#28 = add <4 x i32> %#27, %#21
+  %#29 = icmp eq i32 noundef %#1, 0
+  %#30 = sext i1 %#29 to i32
+  %#31 = zext nneg i8 %#4 to i32
+  %#32 = shl nuw i32 1, %#31
+  %#33 = add i32 %#32, %#30
+  %#34 = insertelement <4 x i32> poison, i32 %#33, i64 0
+  %#35 = shufflevector <4 x i32> %#34, <4 x i32> poison, 0, 0, 0, 0
+  %#36 = icmp slt <4 x i32> %#28, { 0, 0, 0, 0 }
+  %#37 = select <4 x i1> %#36, <4 x i32> %#35, <4 x i32> { 0, 0, 0, 0 }
+  %#38 = add <4 x i32> %#37, %#28
+  %#39 = insertelement <4 x i32> poison, i32 %#31, i64 0
+  %#40 = shufflevector <4 x i32> %#39, <4 x i32> poison, 0, 0, 0, 0
+  %#41 = ashr <4 x i32> %#38, %#40
+  %#42 = xor <4 x i32> %#41, %#8
+  %#43 = sub <4 x i32> %#42, %#8
+  %#44 = bitcast <4 x i32> %#43 to <2 x i64>
+  ret <2 x i64> %#44
+}
+=>
+define <2 x i64> @target_s32_bf_raw(<2 x i64> noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 31
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i32
+  %#7 = insertelement <4 x i32> poison, i32 %#6, i64 0
+  %#8 = shufflevector <4 x i32> %#7, <4 x i32> poison, 0, 0, 0, 0
+  %#9 = insertelement <4 x i32> poison, i32 noundef %#1, i64 0
+  %#10 = shufflevector <4 x i32> %#9, <4 x i32> poison, 0, 0, 0, 0
+  %#11 = bitcast <4 x i32> %#10 to <2 x i64>
+  %#12 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#13 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#14 = mul nuw <2 x i64> %#13, %#12
+  %#15 = lshr <2 x i64> %#14, { 32, 32 }
+  %#16 = lshr <2 x i64> noundef %#0, { 32, 32 }
+  %#17 = mul nuw <2 x i64> %#13, %#16
+  %#18 = and <2 x i64> %#17, { -4294967296, -4294967296 }
+  %#19 = or disjoint <2 x i64> %#15, %#18
+  %#20 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#21 = bitcast <2 x i64> %#19 to <4 x i32>
+  %#22 = icmp slt <4 x i32> %#20, { 0, 0, 0, 0 }
+  %#23 = select <4 x i1> %#22, <4 x i32> %#10, <4 x i32> { 0, 0, 0, 0 }
+  %#24 = icmp slt <4 x i32> %#10, { 0, 0, 0, 0 }
+  %#25 = select <4 x i1> %#24, <4 x i32> %#20, <4 x i32> { 0, 0, 0, 0 }
+  %#26 = add <4 x i32> %#23, %#25
+  %#27 = sub <4 x i32> %#20, %#26
+  %#28 = add <4 x i32> %#27, %#21
+  %#29 = icmp eq i32 noundef %#1, 0
+  %#30 = sext i1 %#29 to i32
+  %#31 = zext nneg i8 %#4 to i32
+  %#32 = shl nuw i32 1, %#31
+  %#33 = add i32 %#32, %#30
+  %#34 = insertelement <4 x i32> poison, i32 %#33, i64 0
+  %#35 = shufflevector <4 x i32> %#34, <4 x i32> poison, 0, 0, 0, 0
+  %#36 = icmp slt <4 x i32> %#28, { 0, 0, 0, 0 }
+  %#37 = select <4 x i1> %#36, <4 x i32> %#35, <4 x i32> { 0, 0, 0, 0 }
+  %#38 = add <4 x i32> %#37, %#28
+  %#39 = insertelement <4 x i32> poison, i32 %#31, i64 0
+  %#40 = shufflevector <4 x i32> %#39, <4 x i32> poison, 0, 0, 0, 0
+  %#41 = ashr <4 x i32> %#38, %#40
+  %#42 = xor <4 x i32> %#41, %#8
+  %#43 = sub <4 x i32> %#42, %#8
+  %#44 = bitcast <4 x i32> %#43 to <2 x i64>
+  ret <2 x i64> %#44
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_u64_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = zext i8 noundef zeroext %#2 to i32
+  %#10 = icmp sgt i8 noundef zeroext %#2, 255
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = and i32 %#9, 63
+  %#12 = zext nneg i32 %#11 to i64
+  %#13 = insertelement <2 x i64> poison, i64 %#12, i64 0
+  %#14 = shufflevector <2 x i64> %#13, <2 x i64> poison, 0, 0
+  %#15 = lshr <2 x i64> noundef %#0, %#14
+  br label %#8
+
+#5:
+  %#16 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#17 = shufflevector <2 x i64> %#16, <2 x i64> poison, 0, 0
+  %#18 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#19 = shufflevector <4 x i32> %#18, <4 x i32> poison, 1, 0, 3, 2
+  %#20 = bitcast <4 x i32> %#19 to <2 x i64>
+  %#21 = bitcast <2 x i64> %#17 to <4 x i32>
+  %#22 = shufflevector <4 x i32> %#21, <4 x i32> poison, 1, 0, 3, 2
+  %#23 = bitcast <4 x i32> %#22 to <2 x i64>
+  %#24 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#25 = and <2 x i64> %#17, { 4294967295, 4294967295 }
+  %#26 = mul nuw <2 x i64> %#25, %#24
+  %#27 = and <2 x i64> %#23, { 4294967295, 4294967295 }
+  %#28 = mul nuw <2 x i64> %#27, %#24
+  %#29 = and <2 x i64> %#20, { 4294967295, 4294967295 }
+  %#30 = mul nuw <2 x i64> %#29, %#25
+  %#31 = mul nuw <2 x i64> %#27, %#29
+  %#32 = lshr <2 x i64> %#26, { 32, 32 }
+  %#33 = add nuw <2 x i64> %#28, %#32
+  %#34 = and <2 x i64> %#33, { 4294967295, 4294967295 }
+  %#35 = lshr <2 x i64> %#33, { 32, 32 }
+  %#36 = add nuw <2 x i64> %#34, %#30
+  %#37 = lshr <2 x i64> %#36, { 32, 32 }
+  %#38 = add nuw <2 x i64> %#35, %#31
+  %#39 = add nuw <2 x i64> %#38, %#37
+  %#40 = icmp samesign ult i8 noundef zeroext %#2, 64
+  br i1 %#40, label %#6, label %#7
+
+#6:
+  %#41 = x86_sse2_psrli_q <2 x i64> %#39, i32 %#9
+  br label %#8
+
+#7:
+  %#42 = and i32 %#9, 63
+  %#43 = sub <2 x i64> noundef %#0, %#39
+  %#44 = lshr <2 x i64> %#43, { 1, 1 }
+  %#45 = add <2 x i64> %#44, %#39
+  %#46 = zext nneg i32 %#42 to i64
+  %#47 = insertelement <2 x i64> poison, i64 %#46, i64 0
+  %#48 = shufflevector <2 x i64> %#47, <2 x i64> poison, 0, 0
+  %#49 = lshr <2 x i64> %#45, %#48
+  br label %#8
+
+#8:
+  %#50 = phi <2 x i64> [ %#15, %#4 ], [ %#49, %#7 ], [ %#41, %#6 ]
+  ret <2 x i64> %#50
+}
+=>
+define <2 x i64> @target_u64_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = zext i8 noundef zeroext %#2 to i32
+  %#10 = icmp sgt i8 noundef zeroext %#2, 255
+  br i1 %#10, label %#5, label %#4
+
+#4:
+  %#11 = and i32 %#9, 63
+  %#12 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#11, i64 0
+  %#13 = bitcast <4 x i32> %#12 to <2 x i64>
+  %#14 = shufflevector <2 x i64> %#13, <2 x i64> poison, 0, 0
+  %#15 = lshr <2 x i64> noundef %#0, %#14
+  br label %#8
+
+#5:
+  %#16 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#17 = shufflevector <2 x i64> %#16, <2 x i64> poison, 0, 0
+  %#18 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#19 = shufflevector <4 x i32> %#18, <4 x i32> poison, 1, 0, 3, 2
+  %#20 = bitcast <4 x i32> %#19 to <2 x i64>
+  %#21 = bitcast <2 x i64> %#17 to <4 x i32>
+  %#22 = shufflevector <4 x i32> %#21, <4 x i32> poison, 1, 0, 3, 2
+  %#23 = bitcast <4 x i32> %#22 to <2 x i64>
+  %#24 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#25 = and <2 x i64> %#17, { 4294967295, 4294967295 }
+  %#26 = mul nuw <2 x i64> %#25, %#24
+  %#27 = and <2 x i64> %#23, { 4294967295, 4294967295 }
+  %#28 = mul nuw <2 x i64> %#27, %#24
+  %#29 = and <2 x i64> %#20, { 4294967295, 4294967295 }
+  %#30 = mul nuw <2 x i64> %#29, %#25
+  %#31 = mul nuw <2 x i64> %#27, %#29
+  %#32 = lshr <2 x i64> %#26, { 32, 32 }
+  %#33 = add nuw <2 x i64> %#28, %#32
+  %#34 = and <2 x i64> %#33, { 4294967295, 4294967295 }
+  %#35 = lshr <2 x i64> %#33, { 32, 32 }
+  %#36 = add nuw <2 x i64> %#34, %#30
+  %#37 = lshr <2 x i64> %#36, { 32, 32 }
+  %#38 = add nuw <2 x i64> %#35, %#31
+  %#39 = add nuw <2 x i64> %#38, %#37
+  %#40 = icmp samesign ult i8 noundef zeroext %#2, 64
+  br i1 %#40, label %#6, label %#7
+
+#6:
+  %#41 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#9, i64 0
+  %#42 = bitcast <4 x i32> %#41 to <2 x i64>
+  %#43 = x86_sse2_psrl_q <2 x i64> %#39, <2 x i64> %#42
+  br label %#8
+
+#7:
+  %#44 = and i32 %#9, 63
+  %#45 = sub <2 x i64> noundef %#0, %#39
+  %#46 = lshr <2 x i64> %#45, { 1, 1 }
+  %#47 = add <2 x i64> %#46, %#39
+  %#48 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#44, i64 0
+  %#49 = bitcast <4 x i32> %#48 to <2 x i64>
+  %#50 = shufflevector <2 x i64> %#49, <2 x i64> poison, 0, 0
+  %#51 = lshr <2 x i64> %#47, %#50
+  br label %#8
+
+#8:
+  %#52 = phi <2 x i64> [ %#15, %#4 ], [ %#51, %#7 ], [ %#43, %#6 ]
+  ret <2 x i64> %#52
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_u64_bf_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#5 = shufflevector <2 x i64> %#4, <2 x i64> poison, 0, 0
+  %#6 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#7 = shufflevector <4 x i32> %#6, <4 x i32> poison, 1, 0, 3, 2
+  %#8 = bitcast <4 x i32> %#7 to <2 x i64>
+  %#9 = bitcast <2 x i64> %#5 to <4 x i32>
+  %#10 = shufflevector <4 x i32> %#9, <4 x i32> poison, 1, 0, 3, 2
+  %#11 = bitcast <4 x i32> %#10 to <2 x i64>
+  %#12 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#13 = and <2 x i64> %#5, { 4294967295, 4294967295 }
+  %#14 = mul nuw <2 x i64> %#13, %#12
+  %#15 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#16 = mul nuw <2 x i64> %#15, %#12
+  %#17 = and <2 x i64> %#8, { 4294967295, 4294967295 }
+  %#18 = mul nuw <2 x i64> %#17, %#13
+  %#19 = mul nuw <2 x i64> %#15, %#17
+  %#20 = lshr <2 x i64> %#14, { 32, 32 }
+  %#21 = add nuw <2 x i64> %#16, %#20
+  %#22 = and <2 x i64> %#21, { 4294967295, 4294967295 }
+  %#23 = lshr <2 x i64> %#21, { 32, 32 }
+  %#24 = add nuw <2 x i64> %#22, %#18
+  %#25 = lshr <2 x i64> %#24, { 32, 32 }
+  %#26 = add nuw <2 x i64> %#23, %#19
+  %#27 = add nuw <2 x i64> %#26, %#25
+  %#28 = sub <2 x i64> noundef %#0, %#27
+  %#29 = lshr <2 x i64> %#28, { 1, 1 }
+  %#30 = add <2 x i64> %#29, %#27
+  %#31 = zext i8 noundef zeroext %#2 to i32
+  %#32 = x86_sse2_psrli_q <2 x i64> %#30, i32 %#31
+  ret <2 x i64> %#32
+}
+=>
+define <2 x i64> @target_u64_bf_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#5 = shufflevector <2 x i64> %#4, <2 x i64> poison, 0, 0
+  %#6 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#7 = shufflevector <4 x i32> %#6, <4 x i32> poison, 1, 0, 3, 2
+  %#8 = bitcast <4 x i32> %#7 to <2 x i64>
+  %#9 = bitcast <2 x i64> %#5 to <4 x i32>
+  %#10 = shufflevector <4 x i32> %#9, <4 x i32> poison, 1, 0, 3, 2
+  %#11 = bitcast <4 x i32> %#10 to <2 x i64>
+  %#12 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#13 = and <2 x i64> %#5, { 4294967295, 4294967295 }
+  %#14 = mul nuw <2 x i64> %#13, %#12
+  %#15 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#16 = mul nuw <2 x i64> %#15, %#12
+  %#17 = and <2 x i64> %#8, { 4294967295, 4294967295 }
+  %#18 = mul nuw <2 x i64> %#17, %#13
+  %#19 = mul nuw <2 x i64> %#15, %#17
+  %#20 = lshr <2 x i64> %#14, { 32, 32 }
+  %#21 = add nuw <2 x i64> %#16, %#20
+  %#22 = and <2 x i64> %#21, { 4294967295, 4294967295 }
+  %#23 = lshr <2 x i64> %#21, { 32, 32 }
+  %#24 = add nuw <2 x i64> %#22, %#18
+  %#25 = lshr <2 x i64> %#24, { 32, 32 }
+  %#26 = add nuw <2 x i64> %#23, %#19
+  %#27 = add nuw <2 x i64> %#26, %#25
+  %#28 = sub <2 x i64> noundef %#0, %#27
+  %#29 = lshr <2 x i64> %#28, { 1, 1 }
+  %#30 = add <2 x i64> %#29, %#27
+  %#31 = zext i8 noundef zeroext %#2 to i32
+  %#32 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#31, i64 0
+  %#33 = bitcast <4 x i32> %#32 to <2 x i64>
+  %#34 = x86_sse2_psrl_q <2 x i64> %#30, <2 x i64> %#33
+  ret <2 x i64> %#34
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_s64_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i64 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#11 = shufflevector <2 x i64> %#10, <2 x i64> poison, 0, 0
+  %#12 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#13 = shufflevector <4 x i32> %#12, <4 x i32> poison, 1, 0, 3, 2
+  %#14 = bitcast <4 x i32> %#13 to <2 x i64>
+  %#15 = bitcast <2 x i64> %#11 to <4 x i32>
+  %#16 = shufflevector <4 x i32> %#15, <4 x i32> poison, 1, 0, 3, 2
+  %#17 = bitcast <4 x i32> %#16 to <2 x i64>
+  %#18 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#19 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#20 = mul nuw <2 x i64> %#19, %#18
+  %#21 = and <2 x i64> %#17, { 4294967295, 4294967295 }
+  %#22 = mul nuw <2 x i64> %#21, %#18
+  %#23 = and <2 x i64> %#14, { 4294967295, 4294967295 }
+  %#24 = mul nuw <2 x i64> %#23, %#19
+  %#25 = mul nuw <2 x i64> %#21, %#23
+  %#26 = lshr <2 x i64> %#20, { 32, 32 }
+  %#27 = add nuw <2 x i64> %#22, %#26
+  %#28 = and <2 x i64> %#27, { 4294967295, 4294967295 }
+  %#29 = lshr <2 x i64> %#27, { 32, 32 }
+  %#30 = add nuw <2 x i64> %#28, %#24
+  %#31 = lshr <2 x i64> %#30, { 32, 32 }
+  %#32 = ashr <4 x i32> %#12, { 0, 31, 0, 31 }
+  %#33 = shufflevector <4 x i32> %#32, <4 x i32> poison, 1, 1, 3, 3
+  %#34 = bitcast <4 x i32> %#33 to <2 x i64>
+  %#35 = and <2 x i64> %#11, %#34
+  %#36 = ashr <4 x i32> %#15, { 0, 31, 0, 31 }
+  %#37 = shufflevector <4 x i32> %#36, <4 x i32> poison, 1, 1, 3, 3
+  %#38 = bitcast <4 x i32> %#37 to <2 x i64>
+  %#39 = and <2 x i64> noundef %#0, %#38
+  %#40 = add <2 x i64> %#39, %#35
+  %#41 = sub <2 x i64> %#25, %#40
+  %#42 = add <2 x i64> %#41, %#29
+  %#43 = add <2 x i64> %#42, %#31
+  %#44 = zext i8 noundef zeroext %#2 to i32
+  %#45 = and i32 %#44, 64
+  %#46 = icmp eq i32 %#45, 0
+  br i1 %#46, label %#6, label %#5
+
+#5:
+  %#47 = ashr i8 noundef zeroext %#2, 7
+  %#48 = sext i8 %#47 to i32
+  %#49 = insertelement <4 x i32> poison, i32 %#48, i64 0
+  %#50 = shufflevector <4 x i32> %#49, <4 x i32> poison, 0, 0, 0, 0
+  %#51 = bitcast <4 x i32> %#50 to <2 x i64>
+  %#52 = xor <2 x i64> noundef %#0, %#51
+  %#53 = sub <2 x i64> %#52, %#51
+  %#54 = add <2 x i64> %#53, %#43
+  br label %#6
+
+#6:
+  %#55 = phi <2 x i64> [ %#54, %#5 ], [ %#43, %#4 ]
+  %#56 = and i32 %#44, 63
+  %#57 = xor i32 %#56, 63
+  %#58 = zext nneg i32 %#57 to i64
+  %#59 = shl nuw i64 1, %#58
+  %#60 = insertelement <2 x i64> poison, i64 %#59, i64 0
+  %#61 = shufflevector <2 x i64> %#60, <2 x i64> poison, 0, 0
+  %#62 = zext nneg i32 %#56 to i64
+  %#63 = insertelement <2 x i64> poison, i64 %#62, i64 0
+  %#64 = shufflevector <2 x i64> %#63, <2 x i64> poison, 0, 0
+  %#65 = lshr <2 x i64> %#55, %#64
+  %#66 = xor <2 x i64> %#65, %#61
+  %#67 = sub <2 x i64> %#66, %#61
+  %#68 = lshr <2 x i64> %#67, { 63, 63 }
+  %#69 = add <2 x i64> %#68, %#67
+  br label %#8
+
+#7:
+  %#70 = and i8 noundef zeroext %#2, 63
+  %#71 = zext nneg i8 %#70 to i64
+  %#72 = shl nsw i64 -1, %#71
+  %#73 = xor i64 %#72, -1
+  %#74 = insertelement <2 x i64> poison, i64 %#73, i64 0
+  %#75 = shufflevector <2 x i64> %#74, <2 x i64> poison, 0, 0
+  %#76 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#77 = ashr <4 x i32> %#76, { 0, 31, 0, 31 }
+  %#78 = shufflevector <4 x i32> %#77, <4 x i32> poison, 1, 1, 3, 3
+  %#79 = bitcast <4 x i32> %#78 to <2 x i64>
+  %#80 = and <2 x i64> %#75, %#79
+  %#81 = add <2 x i64> %#80, noundef %#0
+  %#82 = xor i8 %#70, 63
+  %#83 = zext nneg i8 %#82 to i64
+  %#84 = shl nuw i64 1, %#83
+  %#85 = insertelement <2 x i64> poison, i64 %#84, i64 0
+  %#86 = shufflevector <2 x i64> %#85, <2 x i64> poison, 0, 0
+  %#87 = insertelement <2 x i64> poison, i64 %#71, i64 0
+  %#88 = shufflevector <2 x i64> %#87, <2 x i64> poison, 0, 0
+  %#89 = lshr <2 x i64> %#81, %#88
+  %#90 = xor <2 x i64> %#89, %#86
+  %#91 = sub <2 x i64> %#90, %#86
+  %#92 = ashr i8 noundef zeroext %#2, 7
+  %#93 = sext i8 %#92 to i32
+  %#94 = insertelement <4 x i32> poison, i32 %#93, i64 0
+  %#95 = shufflevector <4 x i32> %#94, <4 x i32> poison, 0, 0, 0, 0
+  %#96 = bitcast <4 x i32> %#95 to <2 x i64>
+  %#97 = xor <2 x i64> %#91, %#96
+  %#98 = sub <2 x i64> %#97, %#96
+  br label %#8
+
+#8:
+  %#99 = phi <2 x i64> [ %#98, %#7 ], [ %#69, %#6 ]
+  ret <2 x i64> %#99
+}
+=>
+define <2 x i64> @target_s64_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i64 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#11 = shufflevector <2 x i64> %#10, <2 x i64> poison, 0, 0
+  %#12 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#13 = shufflevector <4 x i32> %#12, <4 x i32> poison, 1, 0, 3, 2
+  %#14 = bitcast <4 x i32> %#13 to <2 x i64>
+  %#15 = bitcast <2 x i64> %#11 to <4 x i32>
+  %#16 = shufflevector <4 x i32> %#15, <4 x i32> poison, 1, 0, 3, 2
+  %#17 = bitcast <4 x i32> %#16 to <2 x i64>
+  %#18 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#19 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#20 = mul nuw <2 x i64> %#19, %#18
+  %#21 = and <2 x i64> %#17, { 4294967295, 4294967295 }
+  %#22 = mul nuw <2 x i64> %#21, %#18
+  %#23 = and <2 x i64> %#14, { 4294967295, 4294967295 }
+  %#24 = mul nuw <2 x i64> %#23, %#19
+  %#25 = mul nuw <2 x i64> %#21, %#23
+  %#26 = lshr <2 x i64> %#20, { 32, 32 }
+  %#27 = add nuw <2 x i64> %#22, %#26
+  %#28 = and <2 x i64> %#27, { 4294967295, 4294967295 }
+  %#29 = lshr <2 x i64> %#27, { 32, 32 }
+  %#30 = add nuw <2 x i64> %#28, %#24
+  %#31 = lshr <2 x i64> %#30, { 32, 32 }
+  %#32 = ashr <4 x i32> %#12, { 0, 31, 0, 31 }
+  %#33 = shufflevector <4 x i32> %#32, <4 x i32> poison, 1, 1, 3, 3
+  %#34 = bitcast <4 x i32> %#33 to <2 x i64>
+  %#35 = and <2 x i64> %#11, %#34
+  %#36 = ashr <4 x i32> %#15, { 0, 31, 0, 31 }
+  %#37 = shufflevector <4 x i32> %#36, <4 x i32> poison, 1, 1, 3, 3
+  %#38 = bitcast <4 x i32> %#37 to <2 x i64>
+  %#39 = and <2 x i64> noundef %#0, %#38
+  %#40 = add <2 x i64> %#39, %#35
+  %#41 = sub <2 x i64> %#25, %#40
+  %#42 = add <2 x i64> %#41, %#29
+  %#43 = add <2 x i64> %#42, %#31
+  %#44 = zext i8 noundef zeroext %#2 to i32
+  %#45 = and i32 %#44, 64
+  %#46 = icmp eq i32 %#45, 0
+  br i1 %#46, label %#6, label %#5
+
+#5:
+  %#47 = ashr i8 noundef zeroext %#2, 7
+  %#48 = sext i8 %#47 to i32
+  %#49 = insertelement <4 x i32> poison, i32 %#48, i64 0
+  %#50 = shufflevector <4 x i32> %#49, <4 x i32> poison, 0, 0, 0, 0
+  %#51 = bitcast <4 x i32> %#50 to <2 x i64>
+  %#52 = xor <2 x i64> noundef %#0, %#51
+  %#53 = sub <2 x i64> %#52, %#51
+  %#54 = add <2 x i64> %#53, %#43
+  br label %#6
+
+#6:
+  %#55 = phi <2 x i64> [ %#54, %#5 ], [ %#43, %#4 ]
+  %#56 = and i32 %#44, 63
+  %#57 = xor i32 %#56, 63
+  %#58 = zext nneg i32 %#57 to i64
+  %#59 = shl nuw i64 1, %#58
+  %#60 = insertelement <2 x i64> poison, i64 %#59, i64 0
+  %#61 = shufflevector <2 x i64> %#60, <2 x i64> poison, 0, 0
+  %#62 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#56, i64 0
+  %#63 = bitcast <4 x i32> %#62 to <2 x i64>
+  %#64 = shufflevector <2 x i64> %#63, <2 x i64> poison, 0, 0
+  %#65 = lshr <2 x i64> %#55, %#64
+  %#66 = xor <2 x i64> %#65, %#61
+  %#67 = sub <2 x i64> %#66, %#61
+  %#68 = lshr <2 x i64> %#67, { 63, 63 }
+  %#69 = add <2 x i64> %#68, %#67
+  br label %#8
+
+#7:
+  %#70 = and i8 noundef zeroext %#2, 63
+  %#71 = zext nneg i8 %#70 to i32
+  %#72 = zext nneg i8 %#70 to i64
+  %#73 = shl nsw i64 -1, %#72
+  %#74 = xor i64 %#73, -1
+  %#75 = insertelement <2 x i64> poison, i64 %#74, i64 0
+  %#76 = shufflevector <2 x i64> %#75, <2 x i64> poison, 0, 0
+  %#77 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#78 = ashr <4 x i32> %#77, { 0, 31, 0, 31 }
+  %#79 = shufflevector <4 x i32> %#78, <4 x i32> poison, 1, 1, 3, 3
+  %#80 = bitcast <4 x i32> %#79 to <2 x i64>
+  %#81 = and <2 x i64> %#76, %#80
+  %#82 = add <2 x i64> %#81, noundef %#0
+  %#83 = xor i32 %#71, 63
+  %#84 = zext nneg i32 %#83 to i64
+  %#85 = shl nuw i64 1, %#84
+  %#86 = insertelement <2 x i64> poison, i64 %#85, i64 0
+  %#87 = shufflevector <2 x i64> %#86, <2 x i64> poison, 0, 0
+  %#88 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#71, i64 0
+  %#89 = bitcast <4 x i32> %#88 to <2 x i64>
+  %#90 = shufflevector <2 x i64> %#89, <2 x i64> poison, 0, 0
+  %#91 = lshr <2 x i64> %#82, %#90
+  %#92 = xor <2 x i64> %#91, %#87
+  %#93 = sub <2 x i64> %#92, %#87
+  %#94 = ashr i8 noundef zeroext %#2, 7
+  %#95 = sext i8 %#94 to i32
+  %#96 = insertelement <4 x i32> poison, i32 %#95, i64 0
+  %#97 = shufflevector <4 x i32> %#96, <4 x i32> poison, 0, 0, 0, 0
+  %#98 = bitcast <4 x i32> %#97 to <2 x i64>
+  %#99 = xor <2 x i64> %#93, %#98
+  %#100 = sub <2 x i64> %#99, %#98
+  br label %#8
+
+#8:
+  %#101 = phi <2 x i64> [ %#100, %#7 ], [ %#69, %#6 ]
+  ret <2 x i64> %#101
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define <2 x i64> @target_s64_bf_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 63
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i32
+  %#7 = insertelement <4 x i32> poison, i32 %#6, i64 0
+  %#8 = shufflevector <4 x i32> %#7, <4 x i32> poison, 0, 0, 0, 0
+  %#9 = bitcast <4 x i32> %#8 to <2 x i64>
+  %#10 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#11 = shufflevector <2 x i64> %#10, <2 x i64> poison, 0, 0
+  %#12 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#13 = shufflevector <4 x i32> %#12, <4 x i32> poison, 1, 0, 3, 2
+  %#14 = bitcast <4 x i32> %#13 to <2 x i64>
+  %#15 = bitcast <2 x i64> %#11 to <4 x i32>
+  %#16 = shufflevector <4 x i32> %#15, <4 x i32> poison, 1, 0, 3, 2
+  %#17 = bitcast <4 x i32> %#16 to <2 x i64>
+  %#18 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#19 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#20 = mul nuw <2 x i64> %#19, %#18
+  %#21 = and <2 x i64> %#17, { 4294967295, 4294967295 }
+  %#22 = mul nuw <2 x i64> %#21, %#18
+  %#23 = and <2 x i64> %#14, { 4294967295, 4294967295 }
+  %#24 = mul nuw <2 x i64> %#23, %#19
+  %#25 = mul nuw <2 x i64> %#21, %#23
+  %#26 = lshr <2 x i64> %#20, { 32, 32 }
+  %#27 = add nuw <2 x i64> %#22, %#26
+  %#28 = and <2 x i64> %#27, { 4294967295, 4294967295 }
+  %#29 = lshr <2 x i64> %#27, { 32, 32 }
+  %#30 = add nuw <2 x i64> %#28, %#24
+  %#31 = lshr <2 x i64> %#30, { 32, 32 }
+  %#32 = ashr <4 x i32> %#12, { 0, 31, 0, 31 }
+  %#33 = shufflevector <4 x i32> %#32, <4 x i32> poison, 1, 1, 3, 3
+  %#34 = bitcast <4 x i32> %#33 to <2 x i64>
+  %#35 = and <2 x i64> %#11, %#34
+  %#36 = ashr <4 x i32> %#15, { 0, 31, 0, 31 }
+  %#37 = shufflevector <4 x i32> %#36, <4 x i32> poison, 1, 1, 3, 3
+  %#38 = bitcast <4 x i32> %#37 to <2 x i64>
+  %#39 = and <2 x i64> noundef %#0, %#38
+  %#40 = add <2 x i64> %#35, %#39
+  %#41 = sub <2 x i64> noundef %#0, %#40
+  %#42 = add <2 x i64> %#41, %#25
+  %#43 = add <2 x i64> %#42, %#29
+  %#44 = add <2 x i64> %#43, %#31
+  %#45 = icmp eq i64 noundef %#1, 0
+  %#46 = bitcast <2 x i64> %#44 to <4 x i32>
+  %#47 = ashr <4 x i32> %#46, { 0, 31, 0, 31 }
+  %#48 = shufflevector <4 x i32> %#47, <4 x i32> poison, 1, 1, 3, 3
+  %#49 = bitcast <4 x i32> %#48 to <2 x i64>
+  %#50 = zext nneg i8 %#4 to i64
+  %#51 = shl nuw i64 1, %#50
+  %#52 = sext i1 %#45 to i64
+  %#53 = add i64 %#51, %#52
+  %#54 = insertelement <2 x i64> poison, i64 %#53, i64 0
+  %#55 = shufflevector <2 x i64> %#54, <2 x i64> poison, 0, 0
+  %#56 = and <2 x i64> %#55, %#49
+  %#57 = add <2 x i64> %#56, %#44
+  %#58 = xor i8 %#4, 63
+  %#59 = zext nneg i8 %#58 to i64
+  %#60 = shl nuw i64 1, %#59
+  %#61 = insertelement <2 x i64> poison, i64 %#60, i64 0
+  %#62 = shufflevector <2 x i64> %#61, <2 x i64> poison, 0, 0
+  %#63 = insertelement <2 x i64> poison, i64 %#50, i64 0
+  %#64 = shufflevector <2 x i64> %#63, <2 x i64> poison, 0, 0
+  %#65 = lshr <2 x i64> %#57, %#64
+  %#66 = xor <2 x i64> %#65, %#62
+  %#67 = sub <2 x i64> %#66, %#62
+  %#68 = xor <2 x i64> %#67, %#9
+  %#69 = sub <2 x i64> %#68, %#9
+  ret <2 x i64> %#69
+}
+=>
+define <2 x i64> @target_s64_bf_raw(<2 x i64> noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 63
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i32
+  %#7 = insertelement <4 x i32> poison, i32 %#6, i64 0
+  %#8 = shufflevector <4 x i32> %#7, <4 x i32> poison, 0, 0, 0, 0
+  %#9 = bitcast <4 x i32> %#8 to <2 x i64>
+  %#10 = insertelement <2 x i64> poison, i64 noundef %#1, i64 0
+  %#11 = shufflevector <2 x i64> %#10, <2 x i64> poison, 0, 0
+  %#12 = bitcast <2 x i64> noundef %#0 to <4 x i32>
+  %#13 = shufflevector <4 x i32> %#12, <4 x i32> poison, 1, 0, 3, 2
+  %#14 = bitcast <4 x i32> %#13 to <2 x i64>
+  %#15 = bitcast <2 x i64> %#11 to <4 x i32>
+  %#16 = shufflevector <4 x i32> %#15, <4 x i32> poison, 1, 0, 3, 2
+  %#17 = bitcast <4 x i32> %#16 to <2 x i64>
+  %#18 = and <2 x i64> noundef %#0, { 4294967295, 4294967295 }
+  %#19 = and <2 x i64> %#11, { 4294967295, 4294967295 }
+  %#20 = mul nuw <2 x i64> %#19, %#18
+  %#21 = and <2 x i64> %#17, { 4294967295, 4294967295 }
+  %#22 = mul nuw <2 x i64> %#21, %#18
+  %#23 = and <2 x i64> %#14, { 4294967295, 4294967295 }
+  %#24 = mul nuw <2 x i64> %#23, %#19
+  %#25 = mul nuw <2 x i64> %#21, %#23
+  %#26 = lshr <2 x i64> %#20, { 32, 32 }
+  %#27 = add nuw <2 x i64> %#22, %#26
+  %#28 = and <2 x i64> %#27, { 4294967295, 4294967295 }
+  %#29 = lshr <2 x i64> %#27, { 32, 32 }
+  %#30 = add nuw <2 x i64> %#28, %#24
+  %#31 = lshr <2 x i64> %#30, { 32, 32 }
+  %#32 = ashr <4 x i32> %#12, { 0, 31, 0, 31 }
+  %#33 = shufflevector <4 x i32> %#32, <4 x i32> poison, 1, 1, 3, 3
+  %#34 = bitcast <4 x i32> %#33 to <2 x i64>
+  %#35 = and <2 x i64> %#11, %#34
+  %#36 = ashr <4 x i32> %#15, { 0, 31, 0, 31 }
+  %#37 = shufflevector <4 x i32> %#36, <4 x i32> poison, 1, 1, 3, 3
+  %#38 = bitcast <4 x i32> %#37 to <2 x i64>
+  %#39 = and <2 x i64> noundef %#0, %#38
+  %#40 = add <2 x i64> %#35, %#39
+  %#41 = sub <2 x i64> noundef %#0, %#40
+  %#42 = add <2 x i64> %#41, %#25
+  %#43 = add <2 x i64> %#42, %#29
+  %#44 = add <2 x i64> %#43, %#31
+  %#45 = icmp eq i64 noundef %#1, 0
+  %#46 = bitcast <2 x i64> %#44 to <4 x i32>
+  %#47 = ashr <4 x i32> %#46, { 0, 31, 0, 31 }
+  %#48 = shufflevector <4 x i32> %#47, <4 x i32> poison, 1, 1, 3, 3
+  %#49 = bitcast <4 x i32> %#48 to <2 x i64>
+  %#50 = zext nneg i8 %#4 to i32
+  %#51 = zext nneg i8 %#4 to i64
+  %#52 = shl nuw i64 1, %#51
+  %#53 = sext i1 %#45 to i64
+  %#54 = add i64 %#52, %#53
+  %#55 = insertelement <2 x i64> poison, i64 %#54, i64 0
+  %#56 = shufflevector <2 x i64> %#55, <2 x i64> poison, 0, 0
+  %#57 = and <2 x i64> %#56, %#49
+  %#58 = add <2 x i64> %#57, %#44
+  %#59 = xor i32 %#50, 63
+  %#60 = zext nneg i32 %#59 to i64
+  %#61 = shl nuw i64 1, %#60
+  %#62 = insertelement <2 x i64> poison, i64 %#61, i64 0
+  %#63 = shufflevector <2 x i64> %#62, <2 x i64> poison, 0, 0
+  %#64 = insertelement <4 x i32> { poison, 0, poison, poison }, i32 %#50, i64 0
+  %#65 = bitcast <4 x i32> %#64 to <2 x i64>
+  %#66 = shufflevector <2 x i64> %#65, <2 x i64> poison, 0, 0
+  %#67 = lshr <2 x i64> %#58, %#66
+  %#68 = xor <2 x i64> %#67, %#63
+  %#69 = sub <2 x i64> %#68, %#63
+  %#70 = xor <2 x i64> %#69, %#9
+  %#71 = sub <2 x i64> %#70, %#9
+  ret <2 x i64> %#71
+}
+Transformation seems to be correct!
+
+Summary:
+  8 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

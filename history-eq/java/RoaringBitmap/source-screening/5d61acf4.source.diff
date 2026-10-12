@@ -1,0 +1,789 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayBatchIterator.java
+new file mode 100644
+index 00000000..3b1b1f1f
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayBatchIterator.java
+@@ -0,0 +1,28 @@
++package org.roaringbitmap;
++
++import static org.roaringbitmap.Util.toIntUnsigned;
++
++public class ArrayBatchIterator implements ContainerBatchIterator {
++
++  private int index = 0;
++  private final ArrayContainer array;
++
++  public ArrayBatchIterator(ArrayContainer array) {
++    this.array = array;
++  }
++
++  @Override
++  public int next(int key, int[] buffer) {
++    int consumed = 0;
++    short[] data = array.content;
++    while (consumed < buffer.length && index < array.getCardinality()) {
++      buffer[consumed++] = key + toIntUnsigned(data[index++]);
++    }
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return index < array.getCardinality();
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+index 45cfccfe..8b2472b5 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ArrayContainer.java
+@@ -430,6 +430,11 @@ public final class ArrayContainer extends Container implements Cloneable {
+     return new ArrayContainerShortIterator(this);
+   }
+ 
++  @Override
++  public ContainerBatchIterator getBatchIterator() {
++    return new ArrayBatchIterator(this);
++  }
++
+ 
+   @Override
+   public int getSizeInBytes() {
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/BatchIterator.java
+new file mode 100644
+index 00000000..fe56e794
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BatchIterator.java
+@@ -0,0 +1,19 @@
++package org.roaringbitmap;
++
++public interface BatchIterator {
++
++  /**
++   * Writes the next batch of integers onto the buffer,
++   * and returns how many were written. Aims to fill
++   * the buffer.
++   * @param buffer - the target to write onto
++   * @return how many values were written during the call.
++   */
++  int nextBatch(int[] buffer);
++
++  /**
++   * Returns true is there are more values to get.
++   * @return whether the iterator is exhaused or not.
++   */
++  boolean hasNext();
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapBatchIterator.java
+new file mode 100644
+index 00000000..7a9da880
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapBatchIterator.java
+@@ -0,0 +1,37 @@
++package org.roaringbitmap;
++
++import static java.lang.Long.numberOfTrailingZeros;
++
++public class BitmapBatchIterator implements ContainerBatchIterator {
++
++  private int wordIndex = 0;
++  private long word;
++  private final BitmapContainer bitmap;
++
++  public BitmapBatchIterator(BitmapContainer bitmap) {
++    this.bitmap = bitmap;
++    word = bitmap.bitmap[0];
++  }
++
++  @Override
++  public int next(int key, int[] buffer) {
++    int consumed = 0;
++    while (consumed < buffer.length) {
++      while (word == 0) {
++        ++wordIndex;
++        if (wordIndex == 1024) {
++          return consumed;
++        }
++        word = bitmap.bitmap[wordIndex];
++      }
++      buffer[consumed++] = key + (64 * wordIndex) + numberOfTrailingZeros(word);
++      word &= (word - 1);
++    }
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return wordIndex < 1024;
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index eb4f1cdc..704f58f4 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -507,6 +507,11 @@ public final class BitmapContainer extends Container implements Cloneable {
+     return new BitmapContainerShortIterator(this.bitmap);
+   }
+ 
++  @Override
++  public ContainerBatchIterator getBatchIterator() {
++    return new BitmapBatchIterator(this);
++  }
++
+   @Override
+   public int getSizeInBytes() {
+     return this.bitmap.length * 8;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+index a00d1533..58d0e8d6 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/Container.java
+@@ -321,6 +321,12 @@ public abstract class Container implements Iterable<Short>, Cloneable, Externali
+    */
+   public abstract PeekableShortIterator getShortIterator();
+ 
++  /**
++   * Gets an iterator to visit the contents of the container in batches
++   * @return iterator
++   */
++  public abstract ContainerBatchIterator getBatchIterator();
++
+   /**
+    * Computes an estimate of the memory usage of this container. The estimate is not meant to be
+    * exact.
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ContainerBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/ContainerBatchIterator.java
+new file mode 100644
+index 00000000..2e0cc502
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ContainerBatchIterator.java
+@@ -0,0 +1,20 @@
++package org.roaringbitmap;
++
++public interface ContainerBatchIterator {
++
++  /**
++   * Fills the buffer with values prefixed by the key,
++   * and returns how much of the buffer was used.
++   * @param key the prefix of the values
++   * @param buffer the buffer to write values onto
++   * @return how many values were written.
++   */
++  int next(int key, int[] buffer);
++
++  /**
++   * Whether the underlying container is exhausted or not
++   * @return true if there is data remaining
++   */
++  boolean hasNext();
++
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/ImmutableBitmapDataProvider.java b/roaringbitmap/src/main/java/org/roaringbitmap/ImmutableBitmapDataProvider.java
+index 51a7ebf8..82c70407 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/ImmutableBitmapDataProvider.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/ImmutableBitmapDataProvider.java
+@@ -20,7 +20,7 @@ public interface ImmutableBitmapDataProvider {
+    * @param x integer value
+    * @return whether the integer value is included.
+    */
+-  public boolean contains(int x);
++  boolean contains(int x);
+ 
+   /**
+    * Returns the number of distinct integers added to the bitmap (e.g., number of bits set).
+@@ -28,7 +28,7 @@ public interface ImmutableBitmapDataProvider {
+    *
+    * @return the cardinality
+    */
+-  public int getCardinality();
++  int getCardinality();
+   
+   /**
+    * Returns the number of distinct integers added to the bitmap (e.g., number of bits set).
+@@ -36,7 +36,7 @@ public interface ImmutableBitmapDataProvider {
+    *
+    * @return the cardinality
+    */
+-  public long getLongCardinality();
++  long getLongCardinality();
+ 
+   /**
+    * Visit all values in the bitmap and pass them to the consumer.
+@@ -56,18 +56,24 @@ public interface ImmutableBitmapDataProvider {
+    * </pre>
+    * @param ic the consumer
+    */
+-  public void forEach(IntConsumer ic);
++  void forEach(IntConsumer ic);
+ 
+   /**
+    * For better performance, consider the Use the {@link #forEach forEach} method.
+    * @return a custom iterator over set bits, the bits are traversed in ascending sorted order
+    */
+-  public PeekableIntIterator getIntIterator();
++  PeekableIntIterator getIntIterator();
+ 
+   /**
+    * @return a custom iterator over set bits, the bits are traversed in descending sorted order
+    */
+-  public IntIterator getReverseIntIterator();
++  IntIterator getReverseIntIterator();
++
++  /**
++   * This iterator may be faster than others
++   * @return iterator which works on batches of data.
++   */
++  BatchIterator getBatchIterator();
+ 
+   /**
+    * Estimate of the memory usage of this data structure.
+@@ -76,7 +82,7 @@ public interface ImmutableBitmapDataProvider {
+    *
+    * @return estimated memory usage.
+    */
+-  public int getSizeInBytes();
++  int getSizeInBytes();
+   
+   /**
+    * Estimate of the memory usage of this data structure. Provides
+@@ -84,14 +90,14 @@ public interface ImmutableBitmapDataProvider {
+    *
+    * @return estimated memory usage.
+    */
+-  public long getLongSizeInBytes();
++  long getLongSizeInBytes();
+ 
+   /**
+    * Checks whether the bitmap is empty.
+    *
+    * @return true if this bitmap contains no set bit
+    */
+-  public boolean isEmpty();
++  boolean isEmpty();
+ 
+   /**
+    * Create a new bitmap of the same class, containing at most maxcardinality integers.
+@@ -99,7 +105,7 @@ public interface ImmutableBitmapDataProvider {
+    * @param x maximal cardinality
+    * @return a new bitmap with cardinality no more than maxcardinality
+    */
+-  public ImmutableBitmapDataProvider limit(int x);
++  ImmutableBitmapDataProvider limit(int x);
+ 
+   /**
+    * Rank returns the number of integers that are smaller or equal to x (rank(infinity) would be
+@@ -112,7 +118,7 @@ public interface ImmutableBitmapDataProvider {
+    * @return the rank
+    * @see <a href="https://en.wikipedia.org/wiki/Ranking#Ranking_in_statistics">Ranking in statistics</a> 
+    */
+-  public int rank(int x);
++  int rank(int x);
+   
+   /**
+    * Rank returns the number of integers that are smaller or equal to x (rankLong(infinity) would be
+@@ -124,7 +130,7 @@ public interface ImmutableBitmapDataProvider {
+    * @return the rank
+    * @see <a href="https://en.wikipedia.org/wiki/Ranking#Ranking_in_statistics">Ranking in statistics</a> 
+    */
+-  public long rankLong(int x);
++  long rankLong(int x);
+ 
+   /**
+    * Return the jth value stored in this bitmap. The provided value 
+@@ -137,7 +143,7 @@ public interface ImmutableBitmapDataProvider {
+    * @return the value
+    * @see <a href="https://en.wikipedia.org/wiki/Selection_algorithm">Selection algorithm</a> 
+    */
+-  public int select(int j);
++  int select(int j);
+ 
+   /**
+    * Get the first (smallest) integer in this RoaringBitmap,
+@@ -145,7 +151,7 @@ public interface ImmutableBitmapDataProvider {
+    * @return the first (smallest) integer
+    * @throws NoSuchElementException if empty
+    */
+-  public int first();
++  int first();
+ 
+   /**
+    * Get the last (largest) integer in this RoaringBitmap,
+@@ -153,7 +159,7 @@ public interface ImmutableBitmapDataProvider {
+    * @return the last (largest) integer
+    * @throws NoSuchElementException if empty
+    */
+-  public int last();
++  int last();
+ 
+   /**
+    * Serialize this bitmap.
+@@ -163,7 +169,7 @@ public interface ImmutableBitmapDataProvider {
+    * @param out the DataOutput stream
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
+-  public void serialize(DataOutput out) throws IOException;
++  void serialize(DataOutput out) throws IOException;
+ 
+   /**
+    * Report the number of bytes required to serialize this bitmap. This is the number of bytes
+@@ -172,13 +178,13 @@ public interface ImmutableBitmapDataProvider {
+    *
+    * @return the size in bytes
+    */
+-  public int serializedSizeInBytes();
++  int serializedSizeInBytes();
+ 
+   /**
+    * Return the set values as an array. The integer values are in sorted order.
+    *
+    * @return array representing the set values.
+    */
+-  public int[] toArray();
++  int[] toArray();
+ 
+ }
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBatchIterator.java
+new file mode 100644
+index 00000000..e03905a4
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBatchIterator.java
+@@ -0,0 +1,43 @@
++package org.roaringbitmap;
++
++public class RoaringBatchIterator implements BatchIterator {
++
++  private final RoaringArray highLowContainer;
++  int index = 0;
++  int key;
++  ContainerBatchIterator iterator;
++
++  public RoaringBatchIterator(RoaringArray highLowContainer) {
++    this.highLowContainer = highLowContainer;
++    nextIterator();
++  }
++
++  @Override
++  public int nextBatch(int[] buffer) {
++    int consumed = 0;
++    if (iterator.hasNext()) {
++      consumed += iterator.next(key, buffer);
++    } else {
++      ++index;
++      nextIterator();
++      if (null != iterator) {
++        return nextBatch(buffer);
++      }
++    }
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return null != iterator;
++  }
++
++  private void nextIterator() {
++    if (index < highLowContainer.size()) {
++      iterator = highLowContainer.getContainerAtIndex(index).getBatchIterator();
++      key = highLowContainer.getKeyAtIndex(index) << 16;
++    } else {
++      iterator = null;
++    }
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+index 9aa6e1d6..9c486807 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+@@ -1566,6 +1566,12 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
+     return new RoaringReverseIntIterator();
+   }
+ 
++
++  @Override
++  public RoaringBatchIterator getBatchIterator() {
++    return new RoaringBatchIterator(highLowContainer);
++  }
++
+   /**
+    * Estimate of the memory usage of this data structure. This can be expected to be within 1% of
+    * the true memory usage.
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RunBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/RunBatchIterator.java
+new file mode 100644
+index 00000000..d79742d9
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RunBatchIterator.java
+@@ -0,0 +1,42 @@
++package org.roaringbitmap;
++
++import static org.roaringbitmap.Util.toIntUnsigned;
++
++public class RunBatchIterator implements ContainerBatchIterator {
++
++  private final RunContainer runs;
++  private int run = 0;
++  private int cursor = 0;
++
++  public RunBatchIterator(RunContainer runs) {
++    this.runs = runs;
++  }
++
++  @Override
++  public int next(int key, int[] buffer) {
++    int consumed = 0;
++    do {
++      int runStart = toIntUnsigned(runs.getValue(run));
++      int runLength = toIntUnsigned(runs.getLength(run));
++      int chunkStart = runStart + cursor;
++      int chunkEnd = chunkStart + Math.min(runLength - cursor, buffer.length - consumed - 1);
++      int chunk = chunkEnd - chunkStart + 1;
++      for (int i = 0; i < chunk; ++i) {
++        buffer[consumed + i] = key + chunkStart + i;
++      }
++      consumed += chunk;
++      if (runStart + runLength == chunkEnd) {
++        ++run;
++        cursor = 0;
++      } else {
++        cursor += chunk;
++      }
++    } while (consumed < buffer.length && run != runs.numberOfRuns());
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return run < runs.numberOfRuns();
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+index 4265edbd..2d63b6cc 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/RunContainer.java
+@@ -1057,6 +1057,11 @@ public final class RunContainer extends Container implements Cloneable {
+     return new RunContainerShortIterator(this);
+   }
+ 
++  @Override
++  public ContainerBatchIterator getBatchIterator() {
++    return new RunBatchIterator(this);
++  }
++
+   @Override
+   public int getSizeInBytes() {
+     return this.nbrruns * 4 + 4;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ArrayBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ArrayBatchIterator.java
+new file mode 100644
+index 00000000..118a809f
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ArrayBatchIterator.java
+@@ -0,0 +1,32 @@
++package org.roaringbitmap.buffer;
++
++import org.roaringbitmap.ContainerBatchIterator;
++
++import java.nio.ShortBuffer;
++
++import static org.roaringbitmap.buffer.BufferUtil.toIntUnsigned;
++
++public class ArrayBatchIterator implements ContainerBatchIterator {
++
++  private int index = 0;
++  private final MappeableArrayContainer array;
++
++  public ArrayBatchIterator(MappeableArrayContainer array) {
++    this.array = array;
++  }
++
++  @Override
++  public int next(int key, int[] buffer) {
++    int consumed = 0;
++    ShortBuffer data = array.content;
++    while (consumed < buffer.length && index < array.getCardinality()) {
++      buffer[consumed++] = key + toIntUnsigned(data.get(index++));
++    }
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return index < array.getCardinality();
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BitmapBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BitmapBatchIterator.java
+new file mode 100644
+index 00000000..17fc67fb
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/BitmapBatchIterator.java
+@@ -0,0 +1,39 @@
++package org.roaringbitmap.buffer;
++
++import org.roaringbitmap.ContainerBatchIterator;
++
++import static java.lang.Long.numberOfTrailingZeros;
++
++public class BitmapBatchIterator implements ContainerBatchIterator {
++
++  private int wordIndex = 0;
++  private long word;
++  private final MappeableBitmapContainer bitmap;
++
++  public BitmapBatchIterator(MappeableBitmapContainer bitmap) {
++    this.bitmap = bitmap;
++    word = bitmap.bitmap.get(0);
++  }
++
++  @Override
++  public int next(int key, int[] buffer) {
++    int consumed = 0;
++    while (consumed < buffer.length) {
++      while (word == 0) {
++        ++wordIndex;
++        if (wordIndex == 1024) {
++          return consumed;
++        }
++        word = bitmap.bitmap.get(wordIndex);
++      }
++      buffer[consumed++] = key + (64 * wordIndex) + numberOfTrailingZeros(word);
++      word &= (word - 1);
++    }
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return wordIndex < 1024;
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
+index a4c887da..e153afb6 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
+@@ -1224,6 +1224,11 @@ public class ImmutableRoaringBitmap
+     return new ImmutableRoaringReverseIntIterator();
+   }
+ 
++  @Override
++  public BatchIterator getBatchIterator() {
++    return new RoaringBatchIterator(null == highLowContainer ? null : getContainerPointer());
++  }
++
+   /**
+    * Estimate of the memory usage of this data structure. This can be expected to be within 1% of
+    * the true memory usage. If exact measures are needed, we recommend using dedicated libraries
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+index f7f950a4..9b1f3a03 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableArrayContainer.java
+@@ -4,12 +4,7 @@
+ 
+ package org.roaringbitmap.buffer;
+ 
+-import org.roaringbitmap.ArrayContainer;
+-import org.roaringbitmap.Container;
+-import org.roaringbitmap.IntConsumer;
+-import org.roaringbitmap.PeekableShortIterator;
+-import org.roaringbitmap.ShortIterator;
+-import org.roaringbitmap.Util;
++import org.roaringbitmap.*;
+ 
+ import java.io.*;
+ import java.nio.ByteBuffer;
+@@ -503,6 +498,11 @@ public final class MappeableArrayContainer extends MappeableContainer implements
+     return new MappeableArrayContainerShortIterator(this);
+   }
+ 
++  @Override
++  public ContainerBatchIterator getBatchIterator() {
++    return new ArrayBatchIterator(this);
++  }
++
+   @Override
+   public int getSizeInBytes() {
+     return this.cardinality * 2;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+index 76fd0db2..a55788f8 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableBitmapContainer.java
+@@ -4,12 +4,7 @@
+ 
+ package org.roaringbitmap.buffer;
+ 
+-import org.roaringbitmap.BitmapContainer;
+-import org.roaringbitmap.Container;
+-import org.roaringbitmap.IntConsumer;
+-import org.roaringbitmap.PeekableShortIterator;
+-import org.roaringbitmap.ShortIterator;
+-import org.roaringbitmap.Util;
++import org.roaringbitmap.*;
+ 
+ import java.io.*;
+ import java.nio.ByteBuffer;
+@@ -581,6 +576,11 @@ public final class MappeableBitmapContainer extends MappeableContainer implement
+     return new MappeableBitmapContainerShortIterator(this);
+   }
+ 
++  @Override
++  public ContainerBatchIterator getBatchIterator() {
++    return new BitmapBatchIterator(this);
++  }
++
+   @Override
+   public int getSizeInBytes() {
+     return this.bitmap.limit() * 8;
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
+index b68a7438..e05ccba5 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableContainer.java
+@@ -4,10 +4,7 @@
+ 
+ package org.roaringbitmap.buffer;
+ 
+-import org.roaringbitmap.Container;
+-import org.roaringbitmap.IntConsumer;
+-import org.roaringbitmap.PeekableShortIterator;
+-import org.roaringbitmap.ShortIterator;
++import org.roaringbitmap.*;
+ 
+ import java.io.DataOutput;
+ import java.io.Externalizable;
+@@ -304,6 +301,11 @@ public abstract class MappeableContainer implements Iterable<Short>, Cloneable,
+    */
+   public abstract PeekableShortIterator getShortIterator();
+ 
++  /**
++   * Gets an iterator to visit the contents of the container in batches
++   * @return iterator
++   */
++  public abstract ContainerBatchIterator getBatchIterator();
+   
+   /**
+    * Iterate through the values of this container and pass them
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+index d5b73804..0332e0e7 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/MappeableRunContainer.java
+@@ -4,11 +4,7 @@
+ package org.roaringbitmap.buffer;
+ 
+ 
+-import org.roaringbitmap.Container;
+-import org.roaringbitmap.IntConsumer;
+-import org.roaringbitmap.PeekableShortIterator;
+-import org.roaringbitmap.RunContainer;
+-import org.roaringbitmap.ShortIterator;
++import org.roaringbitmap.*;
+ 
+ import java.io.*;
+ import java.nio.ByteBuffer;
+@@ -962,6 +958,11 @@ public final class MappeableRunContainer extends MappeableContainer implements C
+     return new MappeableRunContainerShortIterator(this);
+   }
+ 
++  @Override
++  public ContainerBatchIterator getBatchIterator() {
++    return new RunBatchIterator(this);
++  }
++
+   @Override
+   public int getSizeInBytes() {
+     return this.nbrruns * 4 + 4; // not sure about how exact it will be
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/RoaringBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/RoaringBatchIterator.java
+new file mode 100644
+index 00000000..196d2ac1
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/RoaringBatchIterator.java
+@@ -0,0 +1,46 @@
++package org.roaringbitmap.buffer;
++
++import org.roaringbitmap.BatchIterator;
++import org.roaringbitmap.ContainerBatchIterator;
++
++public class RoaringBatchIterator implements BatchIterator {
++
++  private final MappeableContainerPointer containerPointer;
++  int index = 0;
++  int key;
++  ContainerBatchIterator iterator;
++
++  public RoaringBatchIterator(MappeableContainerPointer containerPointer) {
++    this.containerPointer = containerPointer;
++    nextIterator();
++  }
++
++  @Override
++  public int nextBatch(int[] buffer) {
++    int consumed = 0;
++    if (iterator.hasNext()) {
++      consumed += iterator.next(key, buffer);
++    } else {
++      containerPointer.advance();
++      nextIterator();
++      if (null != iterator) {
++        return nextBatch(buffer);
++      }
++    }
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return null != iterator;
++  }
++
++  private void nextIterator() {
++    if (null != containerPointer && containerPointer.hasContainer()) {
++      iterator = containerPointer.getContainer().getBatchIterator();
++      key = containerPointer.key() << 16;
++    } else {
++      iterator = null;
++    }
++  }
++}
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/buffer/RunBatchIterator.java b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/RunBatchIterator.java
+new file mode 100644
+index 00000000..98894268
+--- /dev/null
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/buffer/RunBatchIterator.java
+@@ -0,0 +1,44 @@
++package org.roaringbitmap.buffer;
++
++import org.roaringbitmap.ContainerBatchIterator;
++
++import static org.roaringbitmap.buffer.BufferUtil.toIntUnsigned;
++
++public class RunBatchIterator implements ContainerBatchIterator {
++
++  private final MappeableRunContainer runs;
++  private int run = 0;
++  private int cursor = 0;
++
++  public RunBatchIterator(MappeableRunContainer runs) {
++    this.runs = runs;
++  }
++
++  @Override
++  public int next(int key, int[] buffer) {
++    int consumed = 0;
++    do {
++      int runStart = toIntUnsigned(runs.getValue(run));
++      int runLength = toIntUnsigned(runs.getLength(run));
++      int chunkStart = runStart + cursor;
++      int chunkEnd = chunkStart + Math.min(runLength - cursor, buffer.length - consumed - 1);
++      int chunk = chunkEnd - chunkStart + 1;
++      for (int i = 0; i < chunk; ++i) {
++        buffer[consumed + i] = key + chunkStart + i;
++      }
++      consumed += chunk;
++      if (runStart + runLength == chunkEnd) {
++        ++run;
++        cursor = 0;
++      } else {
++        cursor += chunk;
++      }
++    } while (consumed < buffer.length && run != runs.numberOfRuns());
++    return consumed;
++  }
++
++  @Override
++  public boolean hasNext() {
++    return run < runs.numberOfRuns();
++  }
++}

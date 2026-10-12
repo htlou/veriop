@@ -1,0 +1,67 @@
+[
+  {
+    "name": "encode::add_padding",
+    "level": "raw",
+    "verdict": "NOT_EQUIV",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": "other",
+    "artifact_dir": "rust/rust-base64/lean/C9687b03",
+    "evidence": "C9687b03Proof.add_padding_not_equiv: Old.encode.add_padding 1#usize s3 \u2260 New.encode.add_padding 1#usize s3 (s3 = 3 zero bytes; old returns 2 pads via old_add_padding_spec, new returns 3 via new_add_padding_spec). Internal parameter-meaning change (input len -> unpadded encoded len); add_padding_rel proves Old L s = New k s whenever (3-L%3)%3 = (4-k%4)%4.",
+    "hypotheses": [],
+    "notes": "Not user-visible by itself (pub(crate) helper); api unit below.",
+    "primary": false
+  },
+  {
+    "name": "encode::encode_with_padding<E: Engine>",
+    "level": "api",
+    "verdict": "EQUIV_UNDER_PRECOND",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": "For the given engine/input/output: whenever engine.internal_encode(input, output) returns normally with (k, out'), k = input.len()/3*4 + [0,2,3][input.len()%3] (the unpadded base64 length; Lean: h_contract : \u2200 k out', instO.internal_encode engine input output = ok (k, out') \u2192 k.val = unpaddedLen input.length). No condition on output length is needed; panics/divergence of internal_encode are covered (both sides fail/diverge identically).",
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/lean/C9687b03",
+    "evidence": "C9687b03Proof.encode_with_padding_equiv (plain equality of Result, incl. both massert debug assertions, the index_mut slicing and checked_add/expect)",
+    "hypotheses": [
+      "instO.internal_encode = instN.internal_encode (same Engine impl, duplicated by Old/New namespaces)",
+      "instO.config = instN.config",
+      "instO.ConfigInst.encode_padding = instN.ConfigInst.encode_padding",
+      "h_contract (library contract above)"
+    ],
+    "notes": "Extraction tag ewp: charon --start-from base64::encode::encode_with_padding --opaque base64::engine::Engine --opaque base64::chunked_encoder. Generic over engine; DecodeEstimate types may differ.",
+    "primary": true
+  },
+  {
+    "name": "chunked_encoder::ChunkedEncoder::encode",
+    "level": "raw",
+    "verdict": "UNSUPPORTED",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": "aeneas-error",
+    "not_equiv_kind": null,
+    "artifact_dir": "rust/rust-base64/work/9687b03 (Chunk*, Chunkm*, Chunknl* logs)",
+    "evidence": "Aeneas: 'Internal error, please file an issue' Source: src/chunked_encoder.rs lines 49:12-54:13 (the `if encode_padding && !more_input_left { b64_bytes_written += add_padding(..., &mut encode_buf[b64_bytes_written..]) }` block inside the while loop; old side lines 49:12-53:13); same with --monomorphize-mut=except-types --remove-adt-clauses --remove-associated-types=* and without -loops-to-rec. Charon succeeded.",
+    "hypotheses": [],
+    "notes": "Charon args: --start-from base64::chunked_encoder --opaque base64::engine::Engine; cargo: --no-default-features --features std.",
+    "primary": true
+  },
+  {
+    "name": "Engine::encode_slice / encode for GeneralPurpose (concrete public API)",
+    "level": "api",
+    "verdict": "UNKNOWN",
+    "bounded": false,
+    "unroll": 0,
+    "precondition": null,
+    "unsupported_reason": null,
+    "not_equiv_kind": null,
+    "artifact_dir": null,
+    "evidence": "Not attempted: would need a loop proof that GeneralPurpose::internal_encode returns the unpadded length (discharging h_contract of encode_with_padding_equiv).",
+    "hypotheses": [],
+    "notes": "Not attempted within budget; generic encode_with_padding result covers it modulo the internal_encode contract.",
+    "primary": true
+  }
+]

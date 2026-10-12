@@ -1,0 +1,91 @@
+diff --git a/ggml/src/ggml-cuda/ggml-cuda.cu b/ggml/src/ggml-cuda/ggml-cuda.cu
+index 23d1c0692..dc3e8fd62 100644
+--- a/ggml/src/ggml-cuda/ggml-cuda.cu
++++ b/ggml/src/ggml-cuda/ggml-cuda.cu
+@@ -2570,6 +2570,7 @@ static void ggml_cuda_mul_mat(ggml_backend_cuda_context & ctx, const ggml_tensor
+             use_mul_mat_q           = use_mul_mat_q             && ggml_cuda_should_use_mmq(src0->type, cc, src1->ne[1], /*n_experts=*/0);
+             use_mul_mat_f           = use_mul_mat_f             && ggml_cuda_should_use_mmf(src0->type, cc, warp_size, src0->ne, src0->nb, src1->ne[1], /*mul_mat_id=*/false);
+             use_mul_mat_vec_f       = use_mul_mat_vec_f         && ggml_cuda_should_use_mmvf(src0->type, cc, src0->ne, src0->nb, src1->ne[1]);
++            use_mul_mat_vec_q       = use_mul_mat_vec_q         && ggml_cuda_should_use_mmvq(src0->type, cc, src1->ne[1]);
+             any_gpus_with_slow_fp16 = any_gpus_with_slow_fp16   || !fast_fp16_hardware_available(cc);
+         }
+     } else {
+@@ -2578,6 +2579,7 @@ static void ggml_cuda_mul_mat(ggml_backend_cuda_context & ctx, const ggml_tensor
+         use_mul_mat_q           = use_mul_mat_q             && ggml_cuda_should_use_mmq(src0->type, cc, src1->ne[1], /*n_experts=*/0);
+         use_mul_mat_f           = use_mul_mat_f             && ggml_cuda_should_use_mmf(src0->type, cc, warp_size, src0->ne, src0->nb, src1->ne[1], /*mul_mat_id=*/false);
+         use_mul_mat_vec_f       = use_mul_mat_vec_f         && ggml_cuda_should_use_mmvf(src0->type, cc, src0->ne, src0->nb, src1->ne[1]);
++        use_mul_mat_vec_q       = use_mul_mat_vec_q         && ggml_cuda_should_use_mmvq(src0->type, cc, src1->ne[1]);
+         any_gpus_with_slow_fp16 = any_gpus_with_slow_fp16   || !fast_fp16_hardware_available(cc);
+     }
+ 
+diff --git a/ggml/src/ggml-cuda/mmvq.cu b/ggml/src/ggml-cuda/mmvq.cu
+index 13b8b8552..873ff05a0 100644
+--- a/ggml/src/ggml-cuda/mmvq.cu
++++ b/ggml/src/ggml-cuda/mmvq.cu
+@@ -271,6 +271,53 @@ int get_mmvq_mmid_max_batch(ggml_type type, int cc) {
+     return MMVQ_MAX_BATCH_SIZE;
+ }
+ 
++bool ggml_cuda_should_use_mmvq(enum ggml_type type, int cc, int64_t ne11) {
++    if (GGML_CUDA_CC_IS_CDNA(cc)) {
++        if (GGML_CUDA_CC_IS_CDNA1(cc)) {
++            switch (type) {
++                case GGML_TYPE_Q4_0:
++                case GGML_TYPE_Q4_1:
++                    return ne11 <= 7;
++                case GGML_TYPE_Q5_1:
++                    return ne11 <= 7;
++                case GGML_TYPE_Q8_0:
++                    return ne11 <= 6;
++                case GGML_TYPE_Q2_K:
++                    return ne11 <= 4;
++                case GGML_TYPE_Q3_K:
++                    return ne11 <= 3;
++                case GGML_TYPE_Q4_K:
++                    return ne11 <= 2;
++                case GGML_TYPE_Q5_K:
++                    return ne11 <= 3;
++                case GGML_TYPE_Q6_K:
++                    return ne11 <= 4;
++                case GGML_TYPE_IQ1_S:
++                    return ne11 <= 5;
++                case GGML_TYPE_IQ2_XXS:
++                case GGML_TYPE_IQ3_S:
++                case GGML_TYPE_IQ4_XS:
++                    return ne11 <= 6;
++                default:
++                    return ne11 <= MMVQ_MAX_BATCH_SIZE;
++            }
++        }
++        switch (type) { // tuned for CDNA2
++            case GGML_TYPE_Q2_K:
++                return ne11 <= 5;
++            case GGML_TYPE_Q3_K:
++            case GGML_TYPE_Q4_K:
++            case GGML_TYPE_Q5_K:
++                return ne11 <= 3;
++            case GGML_TYPE_Q6_K:
++                return ne11 <= 5;
++            default:
++                return ne11 <= MMVQ_MAX_BATCH_SIZE;
++        }
++    }
++    return ne11 <= MMVQ_MAX_BATCH_SIZE;
++}
++
+ // Device constexpr: returns the max batch size for the current arch+type at compile time.
+ template <ggml_type type>
+ static constexpr __device__ int get_mmvq_mmid_max_batch_for_device() {
+diff --git a/ggml/src/ggml-cuda/mmvq.cuh b/ggml/src/ggml-cuda/mmvq.cuh
+index 6bf0a8e86..5605bf7a4 100644
+--- a/ggml/src/ggml-cuda/mmvq.cuh
++++ b/ggml/src/ggml-cuda/mmvq.cuh
+@@ -2,6 +2,8 @@
+ 
+ #define MMVQ_MAX_BATCH_SIZE 8 // Max. batch size for which to use MMVQ kernels.
+ 
++bool ggml_cuda_should_use_mmvq(enum ggml_type type, int cc, int64_t ne11);
++
+ // Returns the maximum batch size for which MMVQ should be used for MUL_MAT_ID,
+ // based on the quantization type and GPU architecture (compute capability).
+ int get_mmvq_mmid_max_batch(ggml_type type, int cc);

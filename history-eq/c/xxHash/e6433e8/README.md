@@ -1,0 +1,7 @@
+# xxHash `e6433e8`: restored Clang loop-unroll pragma
+
+**Verdict: full source-level equivalence for this historical commit.** Its only C source change adds a guarded loop-unroll pragma to `XXH3_accumulate` and removes an unused `U64 t` local from the ARM multiply path. The other changed file is CI configuration. [The audit](full-source-proof/audit.json) checks exact Git blob IDs, the complete before/after source edit, and that `t` has no use in its branch.
+
+Run `python3 history-eq/c/xxHash/e6433e8/check_full_equiv.py` from the project root. Pinned Clang 20 compiles both historical `xxhash.c` translation units at `-O0`; executable LLVM IR is byte-identical and only the new loop-unroll metadata differs. Alive2 then checks **all 49 emitted functions in both directions**: 49 correct, 0 incorrect, 0 failed-to-prove, 0 errors each way. [Forward log](full-source-proof/alive-forward.log), [backward log](full-source-proof/alive-backward.log), both IR files, and [per-function result](full-source-proof/result.json) are retained. There is no input-length bound.
+
+The LLVM check defines `restrict` away on both sides, allowing additional aliasing; the source audit checks that original declarations are unchanged. The ARM branch is covered by the exact-source audit, not by x86 LLVM code generation. This result concerns source/LLVM behavior and does not certify an optimized native build. Earlier `-O3` long-input queries timed out; they remain diagnostic rather than the basis for this verdict.

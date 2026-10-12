@@ -1,0 +1,27 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=30000 --always-verify r_t/old.ll r_t/new.ll
+
+----------------------------------------
+declare i64 @XXH3_len_129to240_64b(nowrite noundef ptr, noundef i64) nofree willreturn memory(argmem: read)
+
+define i64 @target_xxh3_64_seed_len200(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = tail call i64 @XXH3_len_129to240_64b(nowrite noundef ptr nowrite noundef %#0, noundef i64 noundef %#1) nofree willreturn memory(argmem: read)
+  ret i64 %#3
+}
+=>
+declare i64 @XXH3_len_129to240_64b(nowrite noundef ptr, noundef i64) nofree willreturn memory(read)
+
+define i64 @target_xxh3_64_seed_len200(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(read) {
+#2:
+  %#3 = tail call i64 @XXH3_len_129to240_64b(nowrite noundef ptr nowrite noundef %#0, noundef i64 noundef %#1) nofree willreturn memory(read)
+  ret i64 %#3
+}
+Transformation seems to be correct!
+
+ERROR: Unsupported attribute: noalias
+ERROR: Could not translate 'XXH3_len_129to240_64b' to Alive IR
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  1 Alive2 errors

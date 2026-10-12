@@ -1,0 +1,122 @@
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java
+index c1268967..46d40913 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node16.java
+@@ -243,12 +243,6 @@ public class Node16 extends Node {
+ 
+   @Override
+   public void replaceChildren(Node[] children) {
+-    int pos = this.getNextLargerPos(ILLEGAL_IDX);
+-    int offset = 0;
+-    while (pos != ILLEGAL_IDX) {
+-      this.children[pos] = children[offset];
+-      pos = this.getNextLargerPos(pos);
+-      offset++;
+-    }
++    System.arraycopy(children, 0, this.children, 0, count);
+   }
+ }
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node256.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node256.java
+index de4cf1cf..0f41c4cb 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node256.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node256.java
+@@ -57,13 +57,11 @@ public class Node256 extends Node {
+   public int getMinPos() {
+     for (int i = 0; i < 4; i++) {
+       long longVal = bitmapMask[i];
+-      int v = Long.numberOfTrailingZeros(longVal);
+-      if (v == 64) {
++      if (longVal == 0) {
+         continue;
+-      } else {
+-        int res = i * 64 + v;
+-        return res;
+       }
++      int v = Long.numberOfTrailingZeros(longVal);
++      return i * 64 + v;
+     }
+     return ILLEGAL_IDX;
+   }
+@@ -95,13 +93,11 @@ public class Node256 extends Node {
+   public int getMaxPos() {
+     for (int i = 3; i >= 0; i--) {
+       long longVal = bitmapMask[i];
+-      int v = Long.numberOfLeadingZeros(longVal);
+-      if (v == 64) {
++      if (longVal == 0) {
+         continue;
+-      } else {
+-        int res = i * 64 + (63 - v);
+-        return res;
+       }
++      int v = Long.numberOfLeadingZeros(longVal);
++      return i * 64 + (63 - v);
+     }
+     return ILLEGAL_IDX;
+   }
+@@ -186,11 +182,12 @@ public class Node256 extends Node {
+     int offset = 0;
+     int x = 0;
+     for (long longv : bitmapMask) {
+-      int w = Long.bitCount(longv);
+-      for (int i = 0; i < w; i++) {
++      int w = 0;
++      while (longv != 0) {
+         int pos = x * 64 + numberOfTrailingZeros(longv);
+-        this.children[pos] = children[offset + i];
++        this.children[pos] = children[offset + w];
+         longv &= (longv - 1);
++        w++;
+       }
+       offset += w;
+       x++;
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node4.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node4.java
+index 43445361..205c238d 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node4.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node4.java
+@@ -167,13 +167,7 @@ public class Node4 extends Node {
+ 
+   @Override
+   public void replaceChildren(Node[] children) {
+-    int pos = getNextLargerPos(ILLEGAL_IDX);
+-    int offset = 0;
+-    while (pos != ILLEGAL_IDX) {
+-      this.children[pos] = children[offset];
+-      pos = getNextLargerPos(pos);
+-      offset++;
+-    }
++    System.arraycopy(children, 0, this.children, 0, count);
+   }
+ 
+   /**
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node48.java b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node48.java
+index 87d25e1f..e255fbbe 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node48.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/art/Node48.java
+@@ -268,16 +268,18 @@ public class Node48 extends Node {
+   }
+ 
+   @Override
+-  public void replaceChildren(Node[] children) {
++  void replaceChildren(Node[] children) {
+     int step = 0;
+     for (int i = 0; i < LONGS_USED; i++) {
+-      long longv = childIndex[i];
+-      for (int j = BYTES_PER_LONG - 1; j >= 0; j--) {
+-        byte bytePos = (byte) (longv >>> (j << INDEX_SHIFT));
+-        int unsignedPos = Byte.toUnsignedInt(bytePos);
+-        if (bytePos != EMPTY_VALUE) {
+-          this.children[unsignedPos] = children[step];
+-          step++;
++      long longv = Long.reverseBytes(childIndex[i]);
++      if (longv != INIT_LONG_VALUE) {
++        for (int j = 0; j < BYTES_PER_LONG; j++) {
++          long currentByte = longv & 0xFF;
++          if (currentByte != 0xFF) {
++            this.children[(int) currentByte] = children[step];
++            step++;
++          }
++          longv >>>= 8;
+         }
+       }
+     }

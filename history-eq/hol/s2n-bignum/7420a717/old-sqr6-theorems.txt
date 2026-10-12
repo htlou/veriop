@@ -1,0 +1,41 @@
+  |- forall z x a pc.
+         nonoverlapping (word pc,547) (z,8 * 12) /\
+         (x = z \/ nonoverlapping (x,8 * 6) (z,8 * 12))
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_sqr_6_12_mc /\
+                  read RIP s = word (pc + 10) /\
+                  C_ARGUMENTS [z; x] s /\
+                  bignum_from_memory (x,6) s = a)
+             (\s.
+                  read RIP s = word (pc + 536) /\
+                  bignum_from_memory (z,12) s = a EXP 2)
+             (MAYCHANGE
+              [RIP; RAX; RBP; RBX; RCX; RDX; R8; R9; R10; R11; R12; R13; R14;
+               R15] ,,
+              MAYCHANGE [memory :> bytes (z,8 * 12)] ,,
+              MAYCHANGE SOME_FLAGS)
+
+  |- forall z x a pc stackpointer returnaddress.
+         nonoverlapping (word_sub stackpointer (word 48),56) (z,8 * 12) /\
+         ALL (nonoverlapping (word_sub stackpointer (word 48),48))
+         [word pc,547; x,8 * 6] /\
+         nonoverlapping (word pc,547) (z,8 * 12) /\
+         (x = z \/ nonoverlapping (x,8 * 6) (z,8 * 12))
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_sqr_6_12_mc /\
+                  read RIP s = word pc /\
+                  read RSP s = stackpointer /\
+                  read (memory :> bytes64 stackpointer) s = returnaddress /\
+                  C_ARGUMENTS [z; x] s /\
+                  bignum_from_memory (x,6) s = a)
+             (\s.
+                  read RIP s = returnaddress /\
+                  read RSP s = word_add stackpointer (word 8) /\
+                  bignum_from_memory (z,12) s = a EXP 2)
+             (MAYCHANGE [RIP; RSP; RAX; RCX; RDX; R8; R9; R10; R11] ,,
+              MAYCHANGE
+              [memory :> bytes (z,8 * 12);
+               memory :> bytes (word_sub stackpointer (word 48),48)] ,,
+              MAYCHANGE SOME_FLAGS)

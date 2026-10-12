@@ -1,0 +1,222 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify r_raw/old.ll r_raw/new.ll
+
+----------------------------------------
+define i32 @target_u32_do(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i32 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i32 noundef %#1 to i64
+  %#11 = zext i32 noundef %#0 to i64
+  %#12 = mul nuw i64 %#10, %#11
+  %#13 = lshr i64 %#12, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = lshr i32 %#14, %#15
+  br label %#8
+
+#6:
+  %#19 = sub i32 noundef %#0, %#14
+  %#20 = lshr i32 %#19, 1
+  %#21 = add i32 %#20, %#14
+  %#22 = and i32 %#15, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = and i8 noundef zeroext %#2, 31
+  %#25 = zext nneg i8 %#24 to i32
+  %#26 = lshr i32 noundef %#0, %#25
+  br label %#8
+
+#8:
+  %#27 = phi i32 [ %#26, %#7 ], [ %#23, %#6 ], [ %#18, %#5 ]
+  ret i32 %#27
+}
+=>
+define i32 @target_u32_do(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i32 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i32 noundef %#1 to i64
+  %#11 = zext i32 noundef %#0 to i64
+  %#12 = mul nuw i64 %#10, %#11
+  %#13 = lshr i64 %#12, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = lshr i32 %#14, %#15
+  br label %#8
+
+#6:
+  %#19 = sub i32 noundef %#0, %#14
+  %#20 = lshr i32 %#19, 1
+  %#21 = add i32 %#20, %#14
+  %#22 = and i32 %#15, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext nneg i8 noundef zeroext %#2 to i32
+  %#25 = lshr i32 noundef %#0, %#24
+  br label %#8
+
+#8:
+  %#26 = phi i32 [ %#25, %#7 ], [ %#23, %#6 ], [ %#18, %#5 ]
+  ret i32 %#26
+}
+Transformation doesn't verify!
+
+ERROR: Target is more poisonous than source
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i32 noundef %#1 = #x00000000 (0)
+i8 noundef zeroext %#2 = #x20 (32)
+
+Source:
+i1 %#9 = #x1 (1)
+  >> Jump to %#7
+i8 %#24 = #x00 (0)
+i32 %#25 = #x00000000 (0)
+i32 %#26 = #x00000000 (0)
+  >> Jump to %#8
+i32 %#27 = #x00000000 (0)
+
+Target:
+i1 %#9 = #x1 (1)
+  >> Jump to %#7
+i32 %#24 = #x00000020 (32)
+i32 %#25 = poison
+  >> Jump to %#8
+i32 %#26 = poison
+Source value: #x00000000 (0)
+Target value: poison
+
+
+----------------------------------------
+define i64 @target_u64_do(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i64 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i64 noundef %#1 to i128
+  %#11 = zext i64 noundef %#0 to i128
+  %#12 = mul nuw i128 %#10, %#11
+  %#13 = lshr i128 %#12, 64
+  %#14 = trunc nuw i128 %#13 to i64
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = zext nneg i8 noundef zeroext %#2 to i64
+  %#19 = lshr i64 %#14, %#18
+  br label %#8
+
+#6:
+  %#20 = sub i64 noundef %#0, %#14
+  %#21 = lshr i64 %#20, 1
+  %#22 = add i64 %#21, %#14
+  %#23 = and i32 %#15, 63
+  %#24 = zext nneg i32 %#23 to i64
+  %#25 = lshr i64 %#22, %#24
+  br label %#8
+
+#7:
+  %#26 = and i8 noundef zeroext %#2, 63
+  %#27 = zext nneg i8 %#26 to i64
+  %#28 = lshr i64 noundef %#0, %#27
+  br label %#8
+
+#8:
+  %#29 = phi i64 [ %#28, %#7 ], [ %#25, %#6 ], [ %#19, %#5 ]
+  ret i64 %#29
+}
+=>
+define i64 @target_u64_do(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i64 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i64 noundef %#1 to i128
+  %#11 = zext i64 noundef %#0 to i128
+  %#12 = mul nuw i128 %#10, %#11
+  %#13 = lshr i128 %#12, 64
+  %#14 = trunc nuw i128 %#13 to i64
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = zext nneg i8 noundef zeroext %#2 to i64
+  %#19 = lshr i64 %#14, %#18
+  br label %#8
+
+#6:
+  %#20 = sub i64 noundef %#0, %#14
+  %#21 = lshr i64 %#20, 1
+  %#22 = add i64 %#21, %#14
+  %#23 = and i32 %#15, 63
+  %#24 = zext nneg i32 %#23 to i64
+  %#25 = lshr i64 %#22, %#24
+  br label %#8
+
+#7:
+  %#26 = zext nneg i8 noundef zeroext %#2 to i64
+  %#27 = lshr i64 noundef %#0, %#26
+  br label %#8
+
+#8:
+  %#28 = phi i64 [ %#27, %#7 ], [ %#25, %#6 ], [ %#19, %#5 ]
+  ret i64 %#28
+}
+Transformation doesn't verify!
+
+ERROR: Target is more poisonous than source
+
+Example:
+i64 noundef %#0 = #x0000000000000000 (0)
+i64 noundef %#1 = #x0000000000000000 (0)
+i8 noundef zeroext %#2 = #x40 (64)
+
+Source:
+i1 %#9 = #x1 (1)
+  >> Jump to %#7
+i8 %#26 = #x00 (0)
+i64 %#27 = #x0000000000000000 (0)
+i64 %#28 = #x0000000000000000 (0)
+  >> Jump to %#8
+i64 %#29 = #x0000000000000000 (0)
+
+Target:
+i1 %#9 = #x1 (1)
+  >> Jump to %#7
+i64 %#26 = #x0000000000000040 (64)
+i64 %#27 = poison
+  >> Jump to %#8
+i64 %#28 = poison
+Source value: #x0000000000000000 (0)
+Target value: poison
+
+Summary:
+  0 correct transformations
+  2 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

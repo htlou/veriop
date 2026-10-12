@@ -1,0 +1,94 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/5176062/api_xxh64_len8/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/5176062/api_xxh64_len8/new.ll
+
+----------------------------------------
+define i64 @target_oneshot(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = load i64, ptr nowrite noundef %#0, align 1
+  %#4 = mul i64 %#3, -4417276706812531889
+  %#5 = lshr i64 %#4, 33
+  %#6 = mul i64 %#3, -7788283243316379648
+  %#7 = or disjoint i64 %#5, %#6
+  %#8 = mul i64 %#7, -7046029288634856825
+  %#9 = add i64 noundef %#1, 2870177450012600269
+  %#10 = xor i64 %#8, %#9
+  %#11 = fshl i64 %#10, i64 %#10, i64 27
+  %#12 = mul i64 %#11, -7046029288634856825
+  %#13 = add i64 %#12, -8796714831421723037
+  %#14 = lshr i64 %#13, 33
+  %#15 = xor i64 %#14, %#13
+  %#16 = mul i64 %#15, -4417276706812531889
+  %#17 = lshr i64 %#16, 29
+  %#18 = xor i64 %#17, %#16
+  %#19 = mul i64 %#18, 1609587929392839161
+  %#20 = lshr i64 %#19, 32
+  %#21 = xor i64 %#20, %#19
+  ret i64 %#21
+}
+=>
+define i64 @target_oneshot(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = load i64, ptr nowrite noundef %#0, align 8
+  %#4 = mul i64 %#3, -4417276706812531889
+  %#5 = lshr i64 %#4, 33
+  %#6 = mul i64 %#3, -7788283243316379648
+  %#7 = or disjoint i64 %#5, %#6
+  %#8 = mul i64 %#7, -7046029288634856825
+  %#9 = add i64 noundef %#1, 2870177450012600269
+  %#10 = xor i64 %#8, %#9
+  %#11 = fshl i64 %#10, i64 %#10, i64 27
+  %#12 = mul i64 %#11, -7046029288634856825
+  %#13 = add i64 %#12, -8796714831421723037
+  %#14 = lshr i64 %#13, 33
+  %#15 = xor i64 %#14, %#13
+  %#16 = mul i64 %#15, -4417276706812531889
+  %#17 = lshr i64 %#16, 29
+  %#18 = xor i64 %#17, %#16
+  %#19 = mul i64 %#18, 1609587929392839161
+  %#20 = lshr i64 %#19, 32
+  %#21 = xor i64 %#20, %#19
+  ret i64 %#21
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x02
+i64 noundef %#1 = #x0000000000000003 (3)
+
+Source:
+i64 %#3 = poison
+i64 %#4 = poison
+i64 %#5 = poison
+i64 %#6 = poison
+i64 %#7 = poison
+i64 %#8 = poison
+i64 %#9 = #x27d4eb2f165667d0 (2870177450012600272)
+i64 %#10 = poison
+i64 %#11 = poison
+i64 %#12 = poison
+i64 %#13 = poison
+i64 %#14 = poison
+i64 %#15 = poison
+i64 %#16 = poison
+i64 %#17 = poison
+i64 %#18 = poison
+i64 %#19 = poison
+i64 %#20 = poison
+i64 %#21 = poison
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 12	align: 1	alloc type: 0	alive: true	address: 1
+
+Target:
+i64 %#3 = UB triggered!
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

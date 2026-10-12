@@ -1,0 +1,41 @@
+
+----------------------------------------
+define i32 @target(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = icmp slt i64 noundef %#0, 9
+  %#3 = zext i1 %#2 to i32
+  %#range_0_%#3 = !range i32 %#3, i32 0, i32 2
+  ret i32 %#range_0_%#3
+}
+=>
+define i32 @target(i64 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = icmp slt i64 noundef %#0, 5
+  %#3 = zext i1 %#2 to i32
+  %#range_0_%#3 = !range i32 %#3, i32 0, i32 2
+  ret i32 %#range_0_%#3
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 noundef %#0 = #x0000000000000006 (6)
+
+Source:
+i1 %#2 = #x1 (1)
+i32 %#3 = #x00000001 (1)
+i32 %#range_0_%#3 = #x00000001 (1)
+
+Target:
+i1 %#2 = #x0 (0)
+i32 %#3 = #x00000000 (0)
+i32 %#range_0_%#3 = #x00000000 (0)
+Source value: #x00000001 (1)
+Target value: #x00000000 (0)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

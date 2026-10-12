@@ -1,0 +1,40 @@
+{
+  "commit": "c2ee283",
+  "date": "2019-12-10",
+  "subject": "Accelerate counting of leading zeros",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit replaces the portable bit-by-bit leading-zero scan with byte-wise skipping.",
+  "change_summary": "Rewrites the portable 32-bit leading-zero fallback used by divider generation.",
+  "units": [
+    {
+      "name": "portable count-leading-zeros 32/64 helper",
+      "level": "raw",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 33,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/c2ee283/u33",
+      "evidence": "Both clz32 and clz64 helper targets pass bidirectional Alive2 with source/target unroll 33."
+    },
+    {
+      "name": "public generated 32-bit division and 32/64-bit divider fields",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": true,
+      "unroll": 33,
+      "precondition": "d != 0",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/c2ee283/u33",
+      "evidence": "Six generated-divider/API targets time out in both directions under the same 33-unroll run."
+    }
+  ],
+  "commit_verdict": "UNKNOWN",
+  "raw_verdict": "EQUIV_BOUNDED",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The wrapper selects the portable fallback on both sides by disabling the unchanged compiler-builtin branch; no API equivalence claim follows from the helper-only proof."
+}

@@ -1,0 +1,208 @@
+mulul64() {
+   23:	EAX = ECX; 
+   22:	R10 = EDI; R10 = R10 >>lu 32; 
+   21:	EDI = EDI &l 4294967295; 
+   20:	R8 = ESI; R8 = R8 >>lu 32; 
+   19:	ESI = ESI &l 4294967295; 
+   18:	ECX = EDI; ECX = ECX *l ESI; 
+   17:	R11 = ECX; R11 = R11 &l 4294967295; 
+   16:	ECX = ECX >>lu 32; 
+   15:	R9 = R10; R9 = R9 *l ESI; 
+   14:	R9 = R9 + ECX + 0 (long); 
+   13:	ECX = R9; ECX = ECX &l 4294967295; 
+   12:	R9 = R9 >>lu 32; 
+   11:	EDI = EDI *l R8; 
+   10:	ESI = EDI + ECX + 0 (long); 
+    9:	ECX = ESI; ECX = ECX >>lu 32; 
+    8:	ESI = ESI <<l 32; 
+    7:	ESI = ESI + R11 + 0 (long); 
+    6:	int64[EAX + 0] = ESI; 
+    5:	R10 = R10 *l R8; 
+    4:	EDI = R10 + R9 + 0 (long); 
+    3:	ESI = EDI + ECX + 0 (long); 
+    2:	int64[EDX + 0] = ESI; 
+    1:	return
+}
+
+modul64() {
+   15:	
+   14:	R9 = 1L; 
+   13:	ECX = EDI; ECX = ECX >>ls 63; 
+   12:	EDI = EDI * 2 + 0 (long); 
+   11:	R8 = ESI; R8 = R8 >>lu 63; 
+   10:	EDI = EDI |l R8; 
+    9:	ESI = ESI * 2 + 0 (long); 
+    8:	EAX = EDI; EAX = EAX |l ECX; 
+    7:	if (EAX >=lu EDX) goto 6 else goto 4
+    6:	EDI = EDI -l EDX; 
+    5:	ESI = ESI + 1 (long); 
+    4:	R9 = R9 + 1 (long); 
+    3:	if (R9 <=ls 64) goto 13 else goto 2
+    2:	EAX = EDI; 
+    1:	return
+}
+
+montmul() {
+   37:	EBP = ECX; EBX = EDX; 
+   36:	EDX = stack(0) (long); 
+   35:	ECX = stack(8) (long); 
+   34:	call "mulul64"; 
+   33:	EDI = int64[stack(8)]; 
+   32:	EDI = EDI *l EBP; 
+   31:	EDX = stack(16) (long); 
+   30:	ECX = stack(24) (long); 
+   29:	ESI = EBX; call "mulul64"; 
+   28:	R8 = int64[stack(8)]; 
+   27:	ECX = int64[stack(24)]; 
+   26:	R10 = R8 + ECX + 0 (long); 
+   25:	EDI = int64[stack(0)]; 
+   24:	EAX = int64[stack(16)]; 
+   23:	ESI = EDI + EAX + 0 (long); 
+   22:	EDX = EDI + EAX + 1 (long); 
+   21:	
+   20:	EDX = R10 <lu R8 ?long EDX : ESI; 
+   19:	
+   18:	ESI = EDX <lu EDI; 
+   17:	
+   16:	R9 = EDX ==lu EDI; 
+   15:	
+   14:	R8 = R10 <lu R8; 
+   13:	R9 = R9 & R8; 
+   12:	ESI = ESI | R9; 
+   11:	ESI = long32signed(ESI); 
+   10:	
+    9:	
+    8:	R11 = EDX >=lu EBX; 
+    7:	EDI = long32signed(R11); 
+    6:	ESI = ESI |l EDI; 
+    5:	ESI = (-l ESI); 
+    4:	EBX = EBX &l ESI; 
+    3:	EDX = EDX -l EBX; 
+    2:	EAX = EDX; 
+    1:	return
+}
+
+xbinGCD() {
+   20:	
+   19:	R10 = 1L; 
+   18:	EAX = 0L; 
+   17:	R9 = EDI; 
+   16:	
+   15:	if (EDI >lu 0) goto 14 else goto 3
+   14:	EDI = EDI >>lu 1; 
+   13:	R8 = R10; R8 = R8 &l 1; 
+   12:	if (R8 ==lu 0) goto 5 else goto 11
+   11:	R8 = R10; R8 = R8 ^l ESI; 
+   10:	R8 = R8 >>lu 1; 
+    9:	R10 = R10 &l ESI; 
+    8:	R10 = R8 + R10 + 0 (long); 
+    7:	EAX = EAX >>lu 1; 
+    6:	EAX = EAX + R9 + 0 (long); goto 15
+    5:	R10 = R10 >>lu 1; 
+    4:	EAX = EAX >>lu 1; goto 15
+    3:	_ = volatile store int64(EDX, R10); 
+    2:	_ = volatile store int64(ECX, EAX); 
+    1:	return
+}
+
+warm_caches() {
+    4:	
+    3:	call "benchmark_body"; 
+    2:	
+    1:	return
+}
+
+benchmark() {
+    3:	
+    2:	EDI = 423; 
+    1:	tailcall "benchmark_body"
+}
+
+benchmark_body() {
+   68:	local(2,int) = EDI; 
+   67:	EBP = 0; 
+   66:	ECX = local(2,int); if (EBP <s ECX) goto 65 else goto 2
+   65:	EBX = 0; 
+   64:	R12 = int64[in_m + 0]; 
+   63:	R13 = int64[in_b + 0]; 
+   62:	EAX = int64[in_a + 0]; local(0,long) = EAX; 
+   61:	EDX = stack(16) (long); 
+   60:	ECX = stack(24) (long); 
+   59:	ESI = R13; EDI = local(0,long); call "mulul64"; 
+   58:	EDI = int64[stack(16)]; 
+   57:	ESI = int64[stack(24)]; 
+   56:	EDX = R12; call "modul64"; EDI = EAX; 
+   55:	
+   54:	EDX = stack(16) (long); 
+   53:	ECX = stack(24) (long); 
+   52:	ESI = EDI; call "mulul64"; 
+   51:	EDI = int64[stack(16)]; 
+   50:	ESI = int64[stack(24)]; 
+   49:	EDX = R12; call "modul64"; 
+   48:	EDI = EAX; 
+   47:	EDX = stack(16) (long); 
+   46:	ECX = stack(24) (long); 
+   45:	ESI = EDI; call "mulul64"; 
+   44:	EDI = int64[stack(16)]; 
+   43:	ESI = int64[stack(24)]; 
+   42:	EDX = R12; call "modul64"; R14 = EAX; 
+   41:	
+   40:	EDI = -9223372036854775808L; 
+   39:	EDX = stack(0) (long); 
+   38:	ECX = stack(8) (long); 
+   37:	ESI = R12; call "xbinGCD"; 
+   36:	EDX = volatile load int64(sp + 0); 
+   35:	EAX = volatile load int64(sp + 8); 
+   34:	R15 = 1; 
+   33:	
+   32:	ESI = 0L; 
+   31:	EDI = R12; EDI = EDI *l EAX; 
+   30:	ESI = ESI -l EDI; 
+   29:	R15 = ESI !=lu 1 ?int R15 : EBX; 
+   28:	ESI = 0L; 
+   27:	EDX = R12; EDI = local(0,long); call "modul64"; 
+   26:	EBX = EAX; 
+   25:	ESI = 0L; 
+   24:	EDX = R12; EDI = R13; call "modul64"; ESI = EAX; 
+   23:	
+   22:	ECX = volatile load int64(sp + 8); 
+   21:	EDX = R12; EDI = EBX; call "montmul"; 
+   20:	EDI = EAX; 
+   19:	ECX = volatile load int64(sp + 8); 
+   18:	EDX = R12; ESI = EDI; call "montmul"; EDI = EAX; 
+   17:	
+   16:	ECX = volatile load int64(sp + 8); 
+   15:	EDX = R12; ESI = EDI; call "montmul"; 
+   14:	
+   13:	ESI = volatile load int64(sp + 0); 
+   12:	EDX = stack(32) (long); 
+   11:	ECX = stack(40) (long); 
+   10:	EDI = EAX; call "mulul64"; 
+    9:	EDI = int64[stack(32)]; 
+    8:	ESI = int64[stack(40)]; 
+    7:	EDX = R12; call "modul64"; 
+    6:	
+    5:	EDX = 1; 
+    4:	EDX = EAX !=lu R14 ?int EDX : R15; 
+    3:	EBP = EBP + 1 (int); goto 66
+    2:	EAX = EDX; 
+    1:	return
+}
+
+initialise_benchmark() {
+    8:	
+    7:	EAX = -366962936819156833L; 
+    6:	int64[in_m + 0] = EAX; 
+    5:	EAX = 1473642379452024179L; 
+    4:	int64[in_b + 0] = EAX; 
+    3:	EAX = 380896260630216687L; 
+    2:	int64[in_a + 0] = EAX; 
+    1:	return
+}
+
+verify_benchmark() {
+    3:	
+    2:	EAX = EDI ==s 0; 
+    1:	return
+}
+

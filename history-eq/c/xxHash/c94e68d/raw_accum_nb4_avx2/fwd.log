@@ -1,0 +1,289 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/c94e68d/raw_accum_nb4_avx2/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/c94e68d/raw_accum_nb4_avx2/new.ll
+
+----------------------------------------
+define void @target_accum(ptr noundef %#0, ptr nowrite noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree memory(argmem: readwrite) {
+#4:
+  %#12 = icmp ugt i64 noundef %#3, 4
+  br i1 %#12, label %#11, label %#5
+
+#5:
+  %#13 = load <4 x i64>, ptr noundef %#0, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#15 = load <4 x i64>, ptr %#14, align 8
+  %#16 = icmp eq i64 noundef %#3, 0
+  br i1 %#16, label %#10, label %#6
+
+#6:
+  %#17 = load <4 x i64>, ptr nowrite noundef %#1, align 1
+  %#18 = load <4 x i64>, ptr nowrite noundef %#2, align 1
+  %#19 = xor <4 x i64> %#18, %#17
+  %#20 = bitcast <4 x i64> %#19 to <8 x i32>
+  %#21 = shufflevector <8 x i32> %#20, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#22 = bitcast <8 x i32> %#21 to <4 x i64>
+  %#23 = and <4 x i64> %#19, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#24 = and <4 x i64> %#22, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#25 = mul nuw <4 x i64> %#24, %#23
+  %#26 = add <4 x i64> %#13, %#17
+  %#27 = add <4 x i64> %#26, %#25
+  %#28 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 32
+  %#29 = load <4 x i64>, ptr %#28, align 1
+  %#30 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#31 = load <4 x i64>, ptr %#30, align 1
+  %#32 = xor <4 x i64> %#31, %#29
+  %#33 = bitcast <4 x i64> %#32 to <8 x i32>
+  %#34 = shufflevector <8 x i32> %#33, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#35 = bitcast <8 x i32> %#34 to <4 x i64>
+  %#36 = and <4 x i64> %#32, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#37 = and <4 x i64> %#35, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#38 = mul nuw <4 x i64> %#37, %#36
+  %#39 = add <4 x i64> %#15, %#29
+  %#40 = add <4 x i64> %#39, %#38
+  %#41 = icmp eq i64 noundef %#3, 1
+  br i1 %#41, label %#10, label %#7
+
+#7:
+  %#42 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 64
+  %#43 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 8
+  %#44 = load <4 x i64>, ptr %#42, align 1
+  %#45 = load <4 x i64>, ptr %#43, align 1
+  %#46 = xor <4 x i64> %#45, %#44
+  %#47 = bitcast <4 x i64> %#46 to <8 x i32>
+  %#48 = shufflevector <8 x i32> %#47, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#49 = bitcast <8 x i32> %#48 to <4 x i64>
+  %#50 = and <4 x i64> %#46, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#51 = and <4 x i64> %#49, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#52 = mul nuw <4 x i64> %#51, %#50
+  %#53 = add <4 x i64> %#27, %#44
+  %#54 = add <4 x i64> %#53, %#52
+  %#55 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 96
+  %#56 = load <4 x i64>, ptr %#55, align 1
+  %#57 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 40
+  %#58 = load <4 x i64>, ptr %#57, align 1
+  %#59 = xor <4 x i64> %#58, %#56
+  %#60 = bitcast <4 x i64> %#59 to <8 x i32>
+  %#61 = shufflevector <8 x i32> %#60, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#62 = bitcast <8 x i32> %#61 to <4 x i64>
+  %#63 = and <4 x i64> %#59, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#64 = and <4 x i64> %#62, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#65 = mul nuw <4 x i64> %#64, %#63
+  %#66 = add <4 x i64> %#40, %#56
+  %#67 = add <4 x i64> %#66, %#65
+  %#68 = icmp eq i64 noundef %#3, 2
+  br i1 %#68, label %#10, label %#8
+
+#8:
+  %#69 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 128
+  %#70 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 16
+  %#71 = load <4 x i64>, ptr %#69, align 1
+  %#72 = load <4 x i64>, ptr %#70, align 1
+  %#73 = xor <4 x i64> %#72, %#71
+  %#74 = bitcast <4 x i64> %#73 to <8 x i32>
+  %#75 = shufflevector <8 x i32> %#74, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#76 = bitcast <8 x i32> %#75 to <4 x i64>
+  %#77 = and <4 x i64> %#73, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#78 = and <4 x i64> %#76, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#79 = mul nuw <4 x i64> %#78, %#77
+  %#80 = add <4 x i64> %#54, %#71
+  %#81 = add <4 x i64> %#80, %#79
+  %#82 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 160
+  %#83 = load <4 x i64>, ptr %#82, align 1
+  %#84 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 48
+  %#85 = load <4 x i64>, ptr %#84, align 1
+  %#86 = xor <4 x i64> %#85, %#83
+  %#87 = bitcast <4 x i64> %#86 to <8 x i32>
+  %#88 = shufflevector <8 x i32> %#87, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#89 = bitcast <8 x i32> %#88 to <4 x i64>
+  %#90 = and <4 x i64> %#86, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#91 = and <4 x i64> %#89, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#92 = mul nuw <4 x i64> %#91, %#90
+  %#93 = add <4 x i64> %#67, %#83
+  %#94 = add <4 x i64> %#93, %#92
+  %#95 = icmp eq i64 noundef %#3, 3
+  br i1 %#95, label %#10, label %#9
+
+#9:
+  %#96 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 192
+  %#97 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 24
+  %#98 = load <4 x i64>, ptr %#96, align 1
+  %#99 = load <4 x i64>, ptr %#97, align 1
+  %#100 = xor <4 x i64> %#99, %#98
+  %#101 = bitcast <4 x i64> %#100 to <8 x i32>
+  %#102 = shufflevector <8 x i32> %#101, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#103 = bitcast <8 x i32> %#102 to <4 x i64>
+  %#104 = and <4 x i64> %#100, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#105 = and <4 x i64> %#103, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#106 = mul nuw <4 x i64> %#105, %#104
+  %#107 = add <4 x i64> %#81, %#98
+  %#108 = add <4 x i64> %#107, %#106
+  %#109 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 224
+  %#110 = load <4 x i64>, ptr %#109, align 1
+  %#111 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 56
+  %#112 = load <4 x i64>, ptr %#111, align 1
+  %#113 = xor <4 x i64> %#112, %#110
+  %#114 = bitcast <4 x i64> %#113 to <8 x i32>
+  %#115 = shufflevector <8 x i32> %#114, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#116 = bitcast <8 x i32> %#115 to <4 x i64>
+  %#117 = and <4 x i64> %#113, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#118 = and <4 x i64> %#116, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#119 = mul nuw <4 x i64> %#118, %#117
+  %#120 = add <4 x i64> %#94, %#110
+  %#121 = add <4 x i64> %#120, %#119
+  br label %#10
+
+#10:
+  %#122 = phi <4 x i64> [ %#15, %#5 ], [ %#40, %#6 ], [ %#67, %#7 ], [ %#94, %#8 ], [ %#121, %#9 ]
+  %#123 = phi <4 x i64> [ %#13, %#5 ], [ %#27, %#6 ], [ %#54, %#7 ], [ %#81, %#8 ], [ %#108, %#9 ]
+  store <4 x i64> %#123, ptr noundef %#0, align 8
+  store <4 x i64> %#122, ptr %#14, align 8
+  br label %#11
+
+#11:
+  ret void
+}
+=>
+define void @target_accum(ptr noundef %#0, ptr nowrite noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree memory(argmem: readwrite) {
+#4:
+  %#12 = icmp ugt i64 noundef %#3, 4
+  br i1 %#12, label %#11, label %#5
+
+#5:
+  %#13 = load <4 x i64>, ptr noundef %#0, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#15 = load <4 x i64>, ptr %#14, align 8
+  %#16 = icmp eq i64 noundef %#3, 0
+  br i1 %#16, label %#10, label %#6
+
+#6:
+  %#17 = load <4 x i64>, ptr nowrite noundef %#1, align 1
+  %#18 = load <4 x i64>, ptr nowrite noundef %#2, align 1
+  %#19 = xor <4 x i64> %#18, %#17
+  %#20 = bitcast <4 x i64> %#19 to <8 x i32>
+  %#21 = shufflevector <8 x i32> %#20, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#22 = bitcast <8 x i32> %#21 to <4 x i64>
+  %#23 = and <4 x i64> %#19, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#24 = and <4 x i64> %#22, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#25 = mul nuw <4 x i64> %#24, %#23
+  %#26 = add <4 x i64> %#13, %#17
+  %#27 = add <4 x i64> %#26, %#25
+  %#28 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 32
+  %#29 = load <4 x i64>, ptr %#28, align 1
+  %#30 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#31 = load <4 x i64>, ptr %#30, align 1
+  %#32 = xor <4 x i64> %#31, %#29
+  %#33 = bitcast <4 x i64> %#32 to <8 x i32>
+  %#34 = shufflevector <8 x i32> %#33, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#35 = bitcast <8 x i32> %#34 to <4 x i64>
+  %#36 = and <4 x i64> %#32, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#37 = and <4 x i64> %#35, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#38 = mul nuw <4 x i64> %#37, %#36
+  %#39 = add <4 x i64> %#15, %#29
+  %#40 = add <4 x i64> %#39, %#38
+  %#41 = icmp eq i64 noundef %#3, 1
+  br i1 %#41, label %#10, label %#7
+
+#7:
+  %#42 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 64
+  %#43 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 8
+  %#44 = load <4 x i64>, ptr %#42, align 1
+  %#45 = load <4 x i64>, ptr %#43, align 1
+  %#46 = xor <4 x i64> %#45, %#44
+  %#47 = bitcast <4 x i64> %#46 to <8 x i32>
+  %#48 = shufflevector <8 x i32> %#47, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#49 = bitcast <8 x i32> %#48 to <4 x i64>
+  %#50 = and <4 x i64> %#46, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#51 = and <4 x i64> %#49, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#52 = mul nuw <4 x i64> %#51, %#50
+  %#53 = add <4 x i64> %#27, %#44
+  %#54 = add <4 x i64> %#53, %#52
+  %#55 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 96
+  %#56 = load <4 x i64>, ptr %#55, align 1
+  %#57 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 40
+  %#58 = load <4 x i64>, ptr %#57, align 1
+  %#59 = xor <4 x i64> %#58, %#56
+  %#60 = bitcast <4 x i64> %#59 to <8 x i32>
+  %#61 = shufflevector <8 x i32> %#60, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#62 = bitcast <8 x i32> %#61 to <4 x i64>
+  %#63 = and <4 x i64> %#59, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#64 = and <4 x i64> %#62, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#65 = mul nuw <4 x i64> %#64, %#63
+  %#66 = add <4 x i64> %#40, %#56
+  %#67 = add <4 x i64> %#66, %#65
+  %#68 = icmp eq i64 noundef %#3, 2
+  br i1 %#68, label %#10, label %#8
+
+#8:
+  %#69 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 128
+  %#70 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 16
+  %#71 = load <4 x i64>, ptr %#69, align 1
+  %#72 = load <4 x i64>, ptr %#70, align 1
+  %#73 = xor <4 x i64> %#72, %#71
+  %#74 = bitcast <4 x i64> %#73 to <8 x i32>
+  %#75 = shufflevector <8 x i32> %#74, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#76 = bitcast <8 x i32> %#75 to <4 x i64>
+  %#77 = and <4 x i64> %#73, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#78 = and <4 x i64> %#76, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#79 = mul nuw <4 x i64> %#78, %#77
+  %#80 = add <4 x i64> %#54, %#71
+  %#81 = add <4 x i64> %#80, %#79
+  %#82 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 160
+  %#83 = load <4 x i64>, ptr %#82, align 1
+  %#84 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 48
+  %#85 = load <4 x i64>, ptr %#84, align 1
+  %#86 = xor <4 x i64> %#85, %#83
+  %#87 = bitcast <4 x i64> %#86 to <8 x i32>
+  %#88 = shufflevector <8 x i32> %#87, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#89 = bitcast <8 x i32> %#88 to <4 x i64>
+  %#90 = and <4 x i64> %#86, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#91 = and <4 x i64> %#89, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#92 = mul nuw <4 x i64> %#91, %#90
+  %#93 = add <4 x i64> %#67, %#83
+  %#94 = add <4 x i64> %#93, %#92
+  %#95 = icmp eq i64 noundef %#3, 3
+  br i1 %#95, label %#10, label %#9
+
+#9:
+  %#96 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 192
+  %#97 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 24
+  %#98 = load <4 x i64>, ptr %#96, align 1
+  %#99 = load <4 x i64>, ptr %#97, align 1
+  %#100 = xor <4 x i64> %#99, %#98
+  %#101 = bitcast <4 x i64> %#100 to <8 x i32>
+  %#102 = shufflevector <8 x i32> %#101, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#103 = bitcast <8 x i32> %#102 to <4 x i64>
+  %#104 = and <4 x i64> %#100, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#105 = and <4 x i64> %#103, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#106 = mul nuw <4 x i64> %#105, %#104
+  %#107 = add <4 x i64> %#81, %#98
+  %#108 = add <4 x i64> %#107, %#106
+  %#109 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 224
+  %#110 = load <4 x i64>, ptr %#109, align 1
+  %#111 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 56
+  %#112 = load <4 x i64>, ptr %#111, align 1
+  %#113 = xor <4 x i64> %#112, %#110
+  %#114 = bitcast <4 x i64> %#113 to <8 x i32>
+  %#115 = shufflevector <8 x i32> %#114, <8 x i32> poison, 1, 0, 3, 0, 5, 4, 7, 4
+  %#116 = bitcast <8 x i32> %#115 to <4 x i64>
+  %#117 = and <4 x i64> %#113, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#118 = and <4 x i64> %#116, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#119 = mul nuw <4 x i64> %#118, %#117
+  %#120 = add <4 x i64> %#94, %#110
+  %#121 = add <4 x i64> %#120, %#119
+  br label %#10
+
+#10:
+  %#122 = phi <4 x i64> [ %#15, %#5 ], [ %#40, %#6 ], [ %#67, %#7 ], [ %#94, %#8 ], [ %#121, %#9 ]
+  %#123 = phi <4 x i64> [ %#13, %#5 ], [ %#27, %#6 ], [ %#54, %#7 ], [ %#81, %#8 ], [ %#108, %#9 ]
+  store <4 x i64> %#123, ptr noundef %#0, align 8
+  store <4 x i64> %#122, ptr %#14, align 8
+  br label %#11
+
+#11:
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

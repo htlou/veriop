@@ -1,0 +1,148 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble --func=target_xxh32 --func=target_xxh32_stream --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/288f7dc/api_xxh64_len4_i386/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/288f7dc/api_xxh64_len4_i386/new.ll
+
+----------------------------------------
+define i64 @target_oneshot(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i64 noundef %#1, 2870177450012600265
+  %#4 = load i32, ptr nowrite noundef %#0, align 1
+  %#5 = zext i32 %#4 to i64
+  %#6 = mul i64 %#5, -7046029288634856825
+  %#7 = xor i64 %#6, %#3
+  %#8 = fshl i64 %#7, i64 %#7, i64 23
+  %#9 = mul i64 %#8, -4417276706812531889
+  %#10 = add i64 %#9, 1609587929392839161
+  %#11 = lshr i64 %#10, 33
+  %#12 = xor i64 %#11, %#10
+  %#13 = mul i64 %#12, -4417276706812531889
+  %#14 = lshr i64 %#13, 29
+  %#15 = xor i64 %#14, %#13
+  %#16 = mul i64 %#15, 1609587929392839161
+  %#17 = lshr i64 %#16, 32
+  %#18 = xor i64 %#17, %#16
+  ret i64 %#18
+}
+=>
+define i64 @target_oneshot(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = add i64 noundef %#1, 2870177450012600265
+  %#4 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 1
+  %#5 = load i8, ptr nowrite noundef %#0, align 1
+  %#6 = zext i8 %#5 to i64
+  %#7 = mul i64 %#6, 2870177450012600261
+  %#8 = xor i64 %#7, %#3
+  %#9 = fshl i64 %#8, i64 %#8, i64 11
+  %#10 = mul i64 %#9, -7046029288634856825
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 2
+  %#12 = load i8, ptr %#4, align 1
+  %#13 = zext i8 %#12 to i64
+  %#14 = mul i64 %#13, 2870177450012600261
+  %#15 = xor i64 %#14, %#10
+  %#16 = fshl i64 %#15, i64 %#15, i64 11
+  %#17 = mul i64 %#16, -7046029288634856825
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 3
+  %#19 = load i8, ptr %#11, align 1
+  %#20 = zext i8 %#19 to i64
+  %#21 = mul i64 %#20, 2870177450012600261
+  %#22 = xor i64 %#21, %#17
+  %#23 = fshl i64 %#22, i64 %#22, i64 11
+  %#24 = mul i64 %#23, -7046029288634856825
+  %#25 = load i8, ptr %#18, align 1
+  %#26 = zext i8 %#25 to i64
+  %#27 = mul i64 %#26, 2870177450012600261
+  %#28 = xor i64 %#27, %#24
+  %#29 = fshl i64 %#28, i64 %#28, i64 11
+  %#30 = mul i64 %#29, -7046029288634856825
+  %#31 = lshr i64 %#30, 33
+  %#32 = xor i64 %#31, %#30
+  %#33 = mul i64 %#32, -4417276706812531889
+  %#34 = lshr i64 %#33, 29
+  %#35 = xor i64 %#34, %#33
+  %#36 = mul i64 %#35, 1609587929392839161
+  %#37 = lshr i64 %#36, 32
+  %#38 = xor i64 %#37, %#36
+  ret i64 %#38
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x07
+i64 noundef %#1 = #x0000000000000000 (0)
+
+Source:
+i64 %#3 = #x27d4eb2f165667c9 (2870177450012600265)
+i32 %#4 = #x0042000a (4325386)
+i64 %#5 = #x000000000042000a (4325386)
+i64 %#6 = #x8def47b97203e946 (10227472140589066566, -8219271933120485050)
+i64 %#7 = #xaa3bac9664558e8f (12266587772002078351, -6180156301707473265)
+i64 %#8 = #x4b322ac747d51dd6 (5418440337072135638)
+i64 %#9 = #xed94a6761c5fa70a (17119491109754480394, -1327252963955071222)
+i64 %#10 = #x03eb0e27ba972103 (282334965437767939)
+i64 %#11 = #x0000000001f58713 (32868115)
+i64 %#12 = #x03eb0e27bb62a610 (282334965451105808)
+i64 %#13 = #x0c7b7e145721eef0 (899451176416833264)
+i64 %#14 = #x0000000063dbf0a2 (1675358370)
+i64 %#15 = #x0c7b7e1434fa1e52 (899451175843798610)
+i64 %#16 = #x906ce3d6df3a3fc2 (10406943350954016706, -8039800722755534910)
+i64 %#17 = #x00000000906ce3d6 (2423055318)
+i64 %#18 = #x906ce3d64f56dc14 (10406943348539972628, -8039800725169578988)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 12	align: 2	alloc type: 0	alive: true	address: 6
+Contents:
+2: #x00
+3: #x42
+1: #x0a
+4: #x00
+*: poison
+
+
+Target:
+i64 %#3 = #x27d4eb2f165667c9 (2870177450012600265)
+ptr %#4 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x08
+i8 %#5 = #x0a (10)
+i64 %#6 = #x000000000000000a (10)
+i64 %#7 = #x8e512fd6df600db2 (10255030426416450994, -8191713647293100622)
+i64 %#8 = #xa985c4f9c9366a7b (12215386141414025851, -6231357932295525765)
+i64 %#9 = #x2e27ce49b353dd4c (3325853665772952908)
+i64 %#10 = #x7b7f0dde5e9bab14 (8898846637428550420)
+ptr %#11 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x09
+i8 %#12 = #x00 (0)
+i64 %#13 = #x0000000000000000 (0)
+i64 %#14 = #x0000000000000000 (0)
+i64 %#15 = #x7b7f0dde5e9bab14 (8898846637428550420)
+i64 %#16 = #xf86ef2f4dd58a3db (17901512702343816155, -545231371365735461)
+i64 %#17 = #x19c660b2dc12367d (1857278217649534589)
+ptr %#18 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x0a
+i8 %#19 = #x42 (66)
+i64 %#20 = #x0000000000000042 (66)
+i64 %#21 = #x44e4a223c246c0ca (4964270963736101066)
+i64 %#22 = #x5d22c2911e54f6b7 (6711140323270391479)
+i64 %#23 = #x161488f2a7b5bae9 (1591047144145795817)
+i64 %#24 = #x70d26a5277346adf (8129677179776953055)
+i8 %#25 = #x00 (0)
+i64 %#26 = #x0000000000000000 (0)
+i64 %#27 = #x0000000000000000 (0)
+i64 %#28 = #x70d26a5277346adf (8129677179776953055)
+i64 %#29 = #x935293b9a356fb86 (10615709697184299910, -7831034376525251706)
+i64 %#30 = #xb031c0f347585faa (12696140975640698794, -5750603098068852822)
+i64 %#31 = #x000000005818e079 (1478025337)
+i64 %#32 = #xb031c0f31f40bfd3 (12696140974968061907, -5750603098741489709)
+i64 %#33 = #x9a1796d614cde31d (11103509252521452317, -7343234821188099299)
+i64 %#34 = #x00000004d0bcb6b0 (20681897648)
+i64 %#35 = #x9a1796d2c47155ad (11103509238288307629, -7343234835421243987)
+i64 %#36 = #x95b450b1d1e61a45 (10787335732120132165, -7659408341589419451)
+i64 %#37 = #x0000000095b450b1 (2511622321)
+i64 %#38 = #x95b450b144524af4 (10787335729744857844, -7659408343964693772)
+Source value: #x906ce3d64f56dc14 (10406943348539972628, -8039800725169578988)
+Target value: #x95b450b144524af4 (10787335729744857844, -7659408343964693772)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

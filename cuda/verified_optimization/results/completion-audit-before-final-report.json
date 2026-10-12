@@ -1,0 +1,245 @@
+{
+  "goal_complete": false,
+  "retained_candidate": "cache8",
+  "previous_goal_turn": "progress",
+  "current_goal_turn": "progress",
+  "blocking_condition": "Unprivileged account cannot collect required GPU hardware counters; access requested from user",
+  "checks": [
+    {
+      "requirement": "Pinned production target and baseline source",
+      "status": "pass",
+      "evidence": [
+        "pins.json",
+        "baseline/norm.cu"
+      ],
+      "detail": "llama.cpp 11fe02151f79c41d0d4af7da708755d73b9c0da6; RMSNorm false/false/false"
+    },
+    {
+      "requirement": "Clean production baseline build and launch reconstruction",
+      "status": "pass",
+      "evidence": [
+        "results/llama-build.json",
+        "baseline/llama-compile-entry.json",
+        "README.md"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Minimal reproducible production-kernel benchmark",
+      "status": "pass",
+      "evidence": [
+        "bench/rms.cu",
+        "bench/baseline-ptx-audit.json",
+        "bench/cache8-ptx-audit.json"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Baseline self-equivalence before optimization",
+      "status": "pass",
+      "evidence": [
+        "volta/llama-self-256.log",
+        "volta/llama-self-4096.log",
+        "volta/llama-self-8192.log"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Concrete launch, array, scalar and toolchain properties for every instance",
+      "status": "pass",
+      "evidence": [
+        "volta/cache8-complete-instances.json"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Realistic large dimensions and multiple proof configurations",
+      "status": "pass",
+      "evidence": [
+        "volta/cache8-summary.json"
+      ],
+      "detail": "11 widths including 4096 and 8192; separate and in-place output"
+    },
+    {
+      "requirement": "Baseline latency, register usage, shared memory and occupancy",
+      "status": "pass",
+      "evidence": [
+        "bench/baseline-summary.json",
+        "results/baseline-jit-resources.log"
+      ],
+      "detail": "Occupancy is runtime-calculated theoretical occupancy, not a hardware-counter observation"
+    },
+    {
+      "requirement": "Global load/store and synchronization behavior",
+      "status": "pass",
+      "evidence": [
+        "baseline/norm.cu",
+        "ptx/llama-norm-baseline.ptx",
+        "results/cache8-instruction-profiles.json"
+      ],
+      "detail": "Two input passes and one output pass; one block barrier; symbolic PTX execution counts preserved"
+    },
+    {
+      "requirement": "Achieved memory bandwidth and warp execution efficiency profiling",
+      "status": "missing",
+      "evidence": [
+        "results/llama-ncu-baseline.log",
+        "results/profiling-permission-recheck.txt"
+      ],
+      "detail": "ERR_NVGPUCTRPERM; RmProfilingAdminOnly=1. Effective application byte throughput does not replace these hardware observations."
+    },
+    {
+      "requirement": "Dominant hardware bottleneck determination",
+      "status": "partial",
+      "evidence": [
+        "results/hypotheses.md",
+        "bench/baseline-summary.json"
+      ],
+      "detail": "Timing, PTX and resource evidence support load/control overhead; hardware counters needed to distinguish DRAM/cache/scheduling contributions"
+    },
+    {
+      "requirement": "At least four ranked distinct optimization mechanisms",
+      "status": "pass",
+      "evidence": [
+        "results/hypotheses.md"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Real repository integration and candidate commit",
+      "status": "pass",
+      "evidence": [
+        "candidate/cache8.patch",
+        "candidate/cache8-provenance.json"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Repository correctness tests and source-level API/kernel contract",
+      "status": "pass",
+      "evidence": [
+        "results/cache8-tests.log",
+        "results/cache8-fallback-tests.log",
+        "results/cache8-review.json"
+      ],
+      "detail": "101 primary + 56 related fallback cases, CUDA versus CPU; original block sizes and generic fallback preserved"
+    },
+    {
+      "requirement": "Baseline and candidate PTX archived with identical nvcc settings",
+      "status": "pass",
+      "evidence": [
+        "ptx/llama-norm-baseline.ptx",
+        "ptx/llama-norm-cache8.ptx",
+        "candidate/cache8-compile-audit.json"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Public unmodified Volta at recorded commit",
+      "status": "pass",
+      "evidence": [
+        "pins.json",
+        "volta/cache8-summary.json"
+      ],
+      "detail": "Checker binary hash and clean tracked source verified"
+    },
+    {
+      "requirement": "Complete output equivalence; no partial, unknown or failed result accepted",
+      "status": "pass",
+      "evidence": [
+        "volta/cache8-summary.json",
+        "volta/cache8-complete-instances.json",
+        "../verify_cache8.py"
+      ],
+      "detail": "22 complete one-row instances; all elements, separate or in-place output"
+    },
+    {
+      "requirement": "Race and deadlock checks on both kernels",
+      "status": "pass",
+      "evidence": [
+        "volta/cache8-8192-inplace-reference-safety.log",
+        "volta/cache8-8192-inplace-candidate-safety.log",
+        "results/cache8-proof-suite.log"
+      ],
+      "detail": "44 individual successful safety analyses"
+    },
+    {
+      "requirement": "Same compiled kernels in proof and timing executable",
+      "status": "pass",
+      "evidence": [
+        "bench/baseline-ptx-audit.json",
+        "bench/cache8-ptx-audit.json"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Actual GPU absolute, relative and ULP differential tests within repository tolerance",
+      "status": "pass",
+      "evidence": [
+        "bench/cache8-pairs/summary.json",
+        "bench/cache8-heldout-pairs/summary.json"
+      ],
+      "detail": "All observed errors zero; no formal IEEE-754 equivalence claimed"
+    },
+    {
+      "requirement": "Warmup, >=1000 launches, repeated/interleaved timing, median and dispersion",
+      "status": "pass",
+      "evidence": [
+        "bench/cache8-pairs/summary.json",
+        "bench/cache8-heldout-pairs/summary.json"
+      ],
+      "detail": "200 warmup; 1000 launches/process; 10 alternating pairs per shape"
+    },
+    {
+      "requirement": "Matched GPU, build flags and clock conditions",
+      "status": "pass_with_limitation",
+      "evidence": [
+        "results/cache8-gpu-state-summary.json",
+        "candidate/cache8-compile-audit.json"
+      ],
+      "detail": "Same shared H100 GPU6; all 56 before/after samples report 1980 MHz SM and 2619 MHz memory. In-kernel clocks and other workloads are not exclusively controlled."
+    },
+    {
+      "requirement": "Meaningful reproducible improvement without disproportionate held-out regression",
+      "status": "pass",
+      "evidence": [
+        "bench/cache8-pairs/summary.json",
+        "bench/cache8-heldout-pairs/summary.json"
+      ],
+      "detail": "Changed shapes improve; unchanged controls stay near 1x; all 12 additional held-out timings improve"
+    },
+    {
+      "requirement": "Verification failures classified and reproductions preserved",
+      "status": "pass",
+      "evidence": [
+        "results/target-a-status.json",
+        "volta/aggregate-param.cu",
+        "volta/aggregate-self.log"
+      ],
+      "detail": "No verifier semantic modification; A baseline unsupported ABI reproduced; full-module parser minimization remains incomplete and explicitly documented"
+    },
+    {
+      "requirement": "Required experiment directories, versions, commands, stdout/stderr, raw timings",
+      "status": "pass",
+      "evidence": [
+        "baseline/",
+        "candidate/",
+        "ptx/",
+        "volta/",
+        "bench/",
+        "results/",
+        "candidate/cache8-provenance.json",
+        "results/nvcc-version.txt"
+      ],
+      "detail": ""
+    },
+    {
+      "requirement": "Eight-section final report and research insight",
+      "status": "pending_update",
+      "evidence": [
+        "README.md"
+      ],
+      "detail": "Update report to retained cache8 result and remaining profiling gap"
+    }
+  ]
+}

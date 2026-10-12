@@ -1,0 +1,338 @@
+SHA1_copy_and_swap() {
+   27:	
+   26:	R8 = int32[arch_big_endian + 0]; 
+   25:	if (R8 !=u 0) goto 4 else goto 24
+   24:	
+   23:	
+   22:	if (EDX >s 0) goto 21 else goto 1
+   21:	ECX = int8u[EDI + 0]; 
+   20:	
+   19:	R8 = int8u[EDI + 1]; 
+   18:	
+   17:	EAX = int8u[EDI + 3]; 
+   16:	
+   15:	int8u[ESI + 0] = EAX; 
+   14:	R9 = int8u[EDI + 2]; 
+   13:	
+   12:	int8u[ESI + 1] = R9; 
+   11:	
+   10:	int8u[ESI + 2] = R8; 
+    9:	
+    8:	int8u[ESI + 3] = ECX; 
+    7:	EDI = EDI + 4 (long); 
+    6:	ESI = ESI + 4 (long); 
+    5:	EDX = EDX + -1 (int); goto 22
+    4:	R9 = long32signed(EDX); 
+    3:	EDX = R9 * 4 + 0 (long); 
+    2:	R8 = EDI; EDI = ESI; ESI = R8; call "memcpy"; 
+    1:	return
+}
+
+SHA1_transform() {
+  125:	EBX = EDI; 
+  124:	EDI = EBX + 32 (long); 
+  123:	ESI = stack(0) (long); 
+  122:	EDX = 16; 
+  121:	call "SHA1_copy_and_swap"; 
+  120:	R9 = 16; 
+  119:	R11 = stack(0) (long); 
+  118:	R8 = R9 + -3 (int); 
+  117:	EDI = long32signed(R8); 
+  116:	ESI = int32[R11 + EDI * 4 + 0]; 
+  115:	R11 = stack(0) (long); 
+  114:	R10 = R9 + -8 (int); 
+  113:	R8 = long32signed(R10); 
+  112:	EAX = int32[R11 + R8 * 4 + 0]; 
+  111:	ESI = ESI ^ EAX; 
+  110:	EDI = stack(0) (long); 
+  109:	R11 = R9 + -14 (int); 
+  108:	ECX = long32signed(R11); 
+  107:	R8 = int32[EDI + ECX * 4 + 0]; 
+  106:	ESI = ESI ^ R8; 
+  105:	R10 = stack(0) (long); 
+  104:	EDI = R9 + -16 (int); 
+  103:	EDX = long32signed(EDI); 
+  102:	ECX = int32[R10 + EDX * 4 + 0]; 
+  101:	ESI = ESI ^ ECX; 
+  100:	EDI = stack(0) (long); 
+   99:	ECX = long32signed(R9); 
+   98:	EAX = ESI * 2 + 0 (int); 
+   97:	ESI = ESI >>u 31; 
+   96:	EAX = EAX | ESI; 
+   95:	int32[EDI + ECX * 4 + 0] = EAX; 
+   94:	R9 = R9 + 1 (int); 
+   93:	if (R9 <s 80) goto 119 else goto 92
+   92:	EDI = int32[EBX + 0]; 
+   91:	R8 = int32[EBX + 4]; 
+   90:	R9 = int32[EBX + 8]; 
+   89:	ECX = int32[EBX + 12]; 
+   88:	R11 = int32[EBX + 16]; 
+   87:	EBP = 0; 
+   86:	R10 = R9; R10 = R10 ^ ECX; 
+   85:	EDX = R8; EDX = EDX & R10; 
+   84:	R10 = ECX; R10 = R10 ^ EDX; 
+   83:	EAX = EDI; EAX = EAX ror 27; 
+   82:	R10 = R10 + EAX + 1518500249 (int); 
+   81:	EDX = R10 + R11 + 0 (int); 
+   80:	EAX = stack(0) (long); 
+   79:	R10 = long32signed(EBP); 
+   78:	R10 = int32[EAX + R10 * 4 + 0]; 
+   77:	ESI = EDX + R10 + 0 (int); 
+   76:	R11 = ECX; 
+   75:	ECX = R9; 
+   74:	R9 = R8; R9 = R9 ror 2; 
+   73:	R8 = EDI; 
+   72:	EDI = ESI; 
+   71:	EBP = EBP + 1 (int); 
+   70:	if (EBP <s 20) goto 86 else goto 69
+   69:	
+   68:	if (EBP <s 40) goto 67 else goto 52
+   67:	EAX = R8; EAX = EAX ^ R9; 
+   66:	EAX = EAX ^ ECX; 
+   65:	EDX = EDI; EDX = EDX ror 27; 
+   64:	R10 = EAX + EDX + 1859775393 (int); 
+   63:	R10 = R10 + R11 + 0 (int); 
+   62:	R11 = stack(0) (long); 
+   61:	EDX = long32signed(EBP); 
+   60:	EDX = int32[R11 + EDX * 4 + 0]; 
+   59:	R10 = R10 + EDX + 0 (int); 
+   58:	R11 = ECX; 
+   57:	ECX = R9; 
+   56:	R9 = R8; R9 = R9 ror 2; 
+   55:	R8 = EDI; 
+   54:	EDI = R10; 
+   53:	EBP = EBP + 1 (int); goto 68
+   52:	
+   51:	if (EBP <s 60) goto 50 else goto 33
+   50:	ESI = R8; ESI = ESI & R9; 
+   49:	EAX = R8; EAX = EAX | R9; 
+   48:	EDX = ECX; EDX = EDX & EAX; 
+   47:	ESI = ESI | EDX; 
+   46:	R10 = EDI; R10 = R10 ror 27; 
+   45:	EAX = ESI + R10 + -1894007588 (int); 
+   44:	EAX = EAX + R11 + 0 (int); 
+   43:	R11 = stack(0) (long); 
+   42:	R10 = long32signed(EBP); 
+   41:	EDX = int32[R11 + R10 * 4 + 0]; 
+   40:	ESI = EAX + EDX + 0 (int); 
+   39:	R11 = ECX; 
+   38:	ECX = R9; 
+   37:	R9 = R8; R9 = R9 ror 2; 
+   36:	R8 = EDI; 
+   35:	EDI = ESI; 
+   34:	EBP = EBP + 1 (int); goto 51
+   33:	
+   32:	if (EBP <s 80) goto 31 else goto 16
+   31:	R10 = R8; R10 = R10 ^ R9; 
+   30:	R10 = R10 ^ ECX; 
+   29:	EDX = EDI; EDX = EDX ror 27; 
+   28:	R10 = R10 + EDX + -899497514 (int); 
+   27:	R11 = R10 + R11 + 0 (int); 
+   26:	R10 = stack(0) (long); 
+   25:	EAX = long32signed(EBP); 
+   24:	EDX = int32[R10 + EAX * 4 + 0]; 
+   23:	EDX = R11 + EDX + 0 (int); 
+   22:	R11 = ECX; 
+   21:	ECX = R9; 
+   20:	R9 = R8; R9 = R9 ror 2; 
+   19:	R8 = EDI; 
+   18:	EDI = EDX; 
+   17:	EBP = EBP + 1 (int); goto 32
+   16:	R10 = int32[EBX + 0]; 
+   15:	EDI = R10 + EDI + 0 (int); 
+   14:	int32[EBX + 0] = EDI; 
+   13:	R10 = int32[EBX + 4]; 
+   12:	EAX = R10 + R8 + 0 (int); 
+   11:	int32[EBX + 4] = EAX; 
+   10:	R10 = int32[EBX + 8]; 
+    9:	ESI = R10 + R9 + 0 (int); 
+    8:	int32[EBX + 8] = ESI; 
+    7:	ESI = int32[EBX + 12]; 
+    6:	R9 = ESI + ECX + 0 (int); 
+    5:	int32[EBX + 12] = R9; 
+    4:	EDX = int32[EBX + 16]; 
+    3:	R8 = EDX + R11 + 0 (int); 
+    2:	int32[EBX + 16] = R8; 
+    1:	return
+}
+
+SHA1_init() {
+   18:	
+   17:	ECX = 1732584193; 
+   16:	int32[EDI + 0] = ECX; 
+   15:	R9 = -271733879; 
+   14:	int32[EDI + 4] = R9; 
+   13:	EDX = -1732584194; 
+   12:	int32[EDI + 8] = EDX; 
+   11:	R8 = 271733878; 
+   10:	int32[EDI + 12] = R8; 
+    9:	EAX = -1009589776; 
+    8:	int32[EDI + 16] = EAX; 
+    7:	ESI = 0; 
+    6:	int32[EDI + 28] = ESI; 
+    5:	R10 = 0; 
+    4:	int32[EDI + 20] = R10; 
+    3:	R8 = 0; 
+    2:	int32[EDI + 24] = R8; 
+    1:	return
+}
+
+SHA1_add_data() {
+   54:	EBP = EDX; R12 = ESI; EBX = EDI; 
+   53:	ECX = int32[EBX + 24]; 
+   52:	ESI = EBP * 8 + 0 (long); 
+   51:	ESI = lowlong(ESI); 
+   50:	R11 = ECX + ESI + 0 (int); 
+   49:	int32[EBX + 24] = R11; 
+   48:	if (R11 <u ECX) goto 47 else goto 44
+   47:	EDX = int32[EBX + 20]; 
+   46:	R10 = EDX + 1 (int); 
+   45:	int32[EBX + 20] = R10; 
+   44:	R9 = int32[EBX + 20]; 
+   43:	ECX = EBP; ECX = ECX >>lu 29; 
+   42:	ECX = lowlong(ECX); 
+   41:	EDI = R9 + ECX + 0 (int); 
+   40:	int32[EBX + 20] = EDI; 
+   39:	EAX = int32[EBX + 28]; 
+   38:	if (EAX !=s 0) goto 37 else goto 13
+   37:	R13 = 64; 
+   36:	
+   35:	R13 = R13 - EAX; 
+   34:	EDX = long32unsigned(R13); 
+   33:	if (EBP <lu EDX) goto 32 else goto 23
+   32:	
+   31:	EAX = long32signed(EAX); 
+   30:	EDI = EBX + EAX + 32 (long); 
+   29:	EDX = EBP; ESI = R12; call "memcpy"; 
+   28:	R11 = int32[EBX + 28]; 
+   27:	R9 = long32signed(R11); 
+   26:	EDX = R9 + EBP + 0 (long); 
+   25:	EDX = lowlong(EDX); 
+   24:	int32[EBX + 28] = EDX; goto 1
+   23:	
+   22:	ESI = long32signed(EAX); 
+   21:	EDI = EBX + ESI + 32 (long); 
+   20:	
+   19:	ESI = R12; call "memcpy"; 
+   18:	EDI = EBX; call "SHA1_transform"; 
+   17:	EDI = long32unsigned(R13); 
+   16:	R12 = R12 + EDI + 0 (long); 
+   15:	
+   14:	EBP = EBP -l EDI; goto 12
+   13:	
+   12:	if (EBP >=lu 64) goto 11 else goto 5
+   11:	EDI = EBX + 32 (long); 
+   10:	EDX = 64L; 
+    9:	ESI = R12; call "memcpy"; 
+    8:	EDI = EBX; call "SHA1_transform"; 
+    7:	R12 = R12 + 64 (long); 
+    6:	EBP = EBP + -64 (long); goto 12
+    5:	EDI = EBX + 32 (long); 
+    4:	EDX = EBP; ESI = R12; call "memcpy"; 
+    3:	EBP = lowlong(EBP); 
+    2:	int32[EBX + 28] = EBP; 
+    1:	return
+}
+
+SHA1_finish() {
+   31:	EBP = ESI; EBX = EDI; 
+   30:	ECX = int32[EBX + 28]; 
+   29:	
+   28:	R9 = ECX + 1 (int); 
+   27:	EAX = long32signed(ECX); 
+   26:	R10 = 128; 
+   25:	int8u[EBX + EAX + 32] = R10; 
+   24:	if (R9 >s 56) goto 23 else goto 14
+   23:	R8 = long32signed(R9); 
+   22:	EDI = EBX + R8 + 32 (long); 
+   21:	ESI = 0; 
+   20:	EDX = 64; 
+   19:	EDX = EDX - R9; 
+   18:	EDX = long32signed(EDX); 
+   17:	call "memset"; 
+   16:	EDI = EBX; call "SHA1_transform"; 
+   15:	R9 = 0; 
+   14:	EDX = long32signed(R9); 
+   13:	EDI = EBX + EDX + 32 (long); 
+   12:	ESI = 0; 
+   11:	EAX = 56; 
+   10:	EAX = EAX - R9; 
+    9:	EDX = long32signed(EAX); 
+    8:	call "memset"; 
+    7:	EDI = EBX + 20 (long); 
+    6:	ESI = EBX + 88 (long); 
+    5:	EDX = 2; 
+    4:	call "SHA1_copy_and_swap"; 
+    3:	EDI = EBX; call "SHA1_transform"; 
+    2:	EDX = 5; 
+    1:	ESI = EBP; EDI = EBX; tailcall "SHA1_copy_and_swap"
+}
+
+do_test() {
+   19:	EBP = ESI; EBX = EDI; 
+   18:	EDI = stack(24) (long); 
+   17:	call "SHA1_init"; 
+   16:	EDI = EBX; call "strlen"; EDX = EAX; 
+   15:	EDI = stack(24) (long); 
+   14:	ESI = EBX; call "SHA1_add_data"; 
+   13:	EDI = stack(24) (long); 
+   12:	ESI = stack(0) (long); 
+   11:	call "SHA1_finish"; 
+   10:	EDI = stack(0) (long); 
+    9:	EDX = 20L; 
+    8:	ESI = EBP; call "memcmp"; 
+    7:	
+    6:	EDX = __stringlit_2 + 0 (long); 
+    5:	ECX = __stringlit_1 + 0 (long); 
+    4:	EDX = EAX ==s 0 ?long EDX : ECX; 
+    3:	EDI = __stringlit_3 + 0 (long); 
+    2:	ESI = EBX; call "printf"; 
+    1:	return
+}
+
+main() {
+   43:	
+   42:	EAX = 305419896; 
+   41:	int32[stack(0)] = EAX; 
+   40:	EAX = int8u[stack(0)]; 
+   39:	if (EAX ==s 18) goto 32 else goto 38
+   38:	if (EAX ==s 120) goto 37 else goto 35
+   37:	EAX = 0; 
+   36:	int32[arch_big_endian + 0] = EAX; goto 30
+   35:	EDI = __stringlit_4 + 0 (long); 
+   34:	call "printf"; 
+   33:	EAX = 2; goto 1
+   32:	EAX = 1; 
+   31:	int32[arch_big_endian + 0] = EAX; 
+   30:	EDI = test_input_1 + 0 (long); 
+   29:	ESI = test_output_1 + 0 (long); 
+   28:	call "do_test"; 
+   27:	EDI = test_input_2 + 0 (long); 
+   26:	ESI = test_output_2 + 0 (long); 
+   25:	call "do_test"; 
+   24:	
+   23:	EBX = 200000; 
+   22:	EAX = 0; 
+   21:	EDI = stack(32) (long); 
+   20:	EDX = long32signed(EAX); 
+   19:	
+   18:	int8u[EDI + EDX + 0] = EAX; 
+   17:	EAX = EAX + 1 (int); 
+   16:	if (EAX <s 64) goto 21 else goto 15
+   15:	EDI = stack(96) (long); 
+   14:	call "SHA1_init"; 
+   13:	
+   12:	if (EBX >s 0) goto 11 else goto 6
+   11:	EDI = stack(96) (long); 
+   10:	ESI = stack(32) (long); 
+    9:	EDX = 64L; 
+    8:	call "SHA1_add_data"; 
+    7:	EBX = EBX + -1 (int); goto 12
+    6:	EDI = stack(96) (long); 
+    5:	ESI = stack(8) (long); 
+    4:	call "SHA1_finish"; 
+    3:	
+    2:	EAX = 0; 
+    1:	return
+}
+

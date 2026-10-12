@@ -1,0 +1,7 @@
+# compress `e0224764`: flate match-length loop
+
+**Verdict: `EQUIV_PARTIAL`; full function unverified.** The [historical diff](source.diff) replaces an indexed eight-byte scan and tail with a same-length sliced scan. The parent `flate/matchlen_generic.go` blob was absent locally; [recovery](source-recovery.log) now matches both historical Git blob IDs (`6149384a...` and `b897261a...`). The source comment requires `len(a) <= len(b)`.
+
+[Gobra proves](gobra.log) the changed memory-view relation for arbitrary offsets under that requirement: old `a[n:n+8]`/`b[n:n+8]` and new `a[n:]`/`b[:len(a)][n:]` present identical eight bytes to the load, and the same relation holds for every symbolic tail offset. The proof is in [slice_relation.gobra](slice_relation.gobra). A source-extracted Go test compiles both historical helper bodies with the **current pinned** `internal/le` package and checks 51,600 deterministic byte-array pairs against a common-prefix oracle; [the run passes](go-test.log).
+
+Gobra has **not** proved the complete old and new loops return the same value for every length, nor modeled `le.Load64` end to end. Both exact historical `internal/le` implementation blobs are absent locally, although their parent and child tree IDs agree; the Go test is validation using a later implementation, not a historical build or exhaustive proof. No official before/after benchmark score was measured for this pair. Run `bash history-eq/gobra/compress/e0224764/verify.sh` from the project root to reproduce the checks.

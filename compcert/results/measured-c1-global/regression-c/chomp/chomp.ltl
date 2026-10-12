@@ -1,0 +1,549 @@
+copy_data() {
+   20:	EBX = EDI; 
+   19:	R8 = &ncol; 
+   18:	R10 = int32[R8 + 0]; 
+   17:	R9 = long32signed(R10); 
+   16:	EDI = R9 * 4 + 0 (long); 
+   15:	call "malloc"; 
+   14:	
+   13:	EDI = &ncol; 
+   12:	ECX = int32[EDI + 0]; 
+   11:	
+   10:	EDX = ECX; 
+    9:	ECX = EDX + -1 (int); 
+    8:	if (EDX !=u 0) goto 7 else goto 2
+    7:	EDX = long32signed(ECX); 
+    6:	
+    5:	ESI = int32[EBX + EDX * 4 + 0]; 
+    4:	int32[EAX + EDX * 4 + 0] = ESI; 
+    3:	goto 10
+    2:	
+    1:	return
+}
+
+next_data() {
+   26:	
+   25:	R9 = 0; 
+   24:	EAX = 0; 
+   23:	R8 = &ncol; 
+   22:	ESI = int32[R8 + 0]; 
+   21:	if (R9 !=s ESI) goto 19 else goto 20
+   20:	goto 2
+   19:	
+   18:	if (EAX !=s 1) goto 17 else goto 2
+   17:	ECX = long32signed(R9); 
+   16:	EDX = int32[EDI + ECX * 4 + 0]; 
+   15:	R10 = &nrow; 
+   14:	R11 = int32[R10 + 0]; 
+   13:	if (EDX ==s R11) goto 6 else goto 12
+   12:	
+   11:	
+   10:	
+    9:	EDX = EDX + 1 (int); 
+    8:	int32[EDI + ECX * 4 + 0] = EDX; 
+    7:	EAX = 1; goto 23
+    6:	
+    5:	R8 = 0; 
+    4:	int32[EDI + ECX * 4 + 0] = R8; 
+    3:	R9 = R9 + 1 (int); goto 23
+    2:	
+    1:	return
+}
+
+melt_data() {
+   18:	
+   17:	R8 = &ncol; 
+   16:	EDX = int32[R8 + 0]; 
+   15:	
+   14:	R8 = EDX; 
+   13:	EDX = R8 + -1 (int); 
+   12:	if (R8 !=u 0) goto 11 else goto 1
+   11:	ECX = long32signed(EDX); 
+   10:	R9 = int32[EDI + ECX * 4 + 0]; 
+    9:	
+    8:	EAX = int32[ESI + ECX * 4 + 0]; 
+    7:	if (R9 >s EAX) goto 6 else goto 2
+    6:	
+    5:	
+    4:	
+    3:	int32[EDI + ECX * 4 + 0] = EAX; 
+    2:	goto 14
+    1:	return
+}
+
+equal_data() {
+   17:	
+   16:	R8 = &ncol; 
+   15:	ECX = int32[R8 + 0]; 
+   14:	
+   13:	EDX = ECX; 
+   12:	ECX = EDX + -1 (int); 
+   11:	if (EDX !=u 0) goto 10 else goto 3
+   10:	EAX = long32signed(ECX); 
+    9:	R8 = int32[EDI + EAX * 4 + 0]; 
+    8:	
+    7:	R9 = int32[ESI + EAX * 4 + 0]; 
+    6:	
+    5:	if (R8 ==s R9) goto 4 else goto 2
+    4:	goto 13
+    3:	
+    2:	EAX = ECX <s 0; 
+    1:	return
+}
+
+valid_data() {
+   18:	
+   17:	R9 = 0; 
+   16:	R8 = &nrow; 
+   15:	ECX = int32[R8 + 0]; 
+   14:	
+   13:	R11 = &ncol; 
+   12:	R10 = int32[R11 + 0]; 
+   11:	if (R9 !=s R10) goto 10 else goto 4
+   10:	R10 = long32signed(R9); 
+    9:	EAX = int32[EDI + R10 * 4 + 0]; 
+    8:	if (EAX >s ECX) goto 4 else goto 7
+    7:	
+    6:	ECX = EAX; 
+    5:	R9 = R9 + 1 (int); goto 13
+    4:	EDX = &ncol; 
+    3:	ESI = int32[EDX + 0]; 
+    2:	EAX = R9 ==s ESI; 
+    1:	return
+}
+
+dump_list() {
+    8:	EBX = EDI; 
+    7:	if (EBX !=lu 0) goto 6 else goto 1
+    6:	EDI = int64[EBX + 8]; 
+    5:	call "dump_list"; 
+    4:	EDI = int64[EBX + 0]; 
+    3:	call "free"; 
+    2:	EDI = EBX; tailcall "free"
+    1:	return
+}
+
+dump_play() {
+   10:	EBX = EDI; 
+    9:	if (EBX !=lu 0) goto 8 else goto 1
+    8:	EDI = int64[EBX + 24]; 
+    7:	call "dump_play"; 
+    6:	EDI = int64[EBX + 16]; 
+    5:	call "dump_list"; 
+    4:	EDI = int64[EBX + 8]; 
+    3:	call "free"; 
+    2:	EDI = EBX; tailcall "free"
+    1:	return
+}
+
+get_value() {
+   11:	EBX = EDI; 
+   10:	ECX = &game_tree; 
+    9:	EBP = int64[ECX + 0]; 
+    8:	
+    7:	EDI = int64[EBP + 8]; 
+    6:	ESI = EBX; call "equal_data"; 
+    5:	if (EAX ==u 0) goto 4 else goto 2
+    4:	EBP = int64[EBP + 24]; 
+    3:	goto 7
+    2:	EAX = int32[EBP + 0]; 
+    1:	return
+}
+
+show_data() {
+   18:	EBX = EDI; 
+   17:	EBP = 0; 
+   16:	EDI = &ncol; 
+   15:	R8 = int32[EDI + 0]; 
+   14:	if (EBP !=s R8) goto 13 else goto 1
+   13:	EAX = EBP; 
+   12:	EBP = EAX + 1 (int); 
+   11:	EDI = __stringlit_1 + 0 (long); 
+   10:	R9 = long32signed(EAX); 
+    9:	ESI = int32[EBX + R9 * 4 + 0]; 
+    8:	call "printf"; 
+    7:	ESI = &ncol; 
+    6:	ECX = int32[ESI + 0]; 
+    5:	if (EBP !=s ECX) goto 4 else goto 2
+    4:	EDI = 44; 
+    3:	call "putchar"; 
+    2:	goto 16
+    1:	return
+}
+
+show_move() {
+    7:	EBX = EDI; 
+    6:	EDI = 40; 
+    5:	call "putchar"; 
+    4:	EDI = EBX; call "show_data"; 
+    3:	EDI = __stringlit_2 + 0 (long); 
+    2:	call "printf"; 
+    1:	return
+}
+
+show_list() {
+    8:	EBX = EDI; 
+    7:	
+    6:	if (EBX !=lu 0) goto 5 else goto 1
+    5:	EDI = int64[EBX + 0]; 
+    4:	call "show_move"; 
+    3:	EBX = int64[EBX + 8]; 
+    2:	goto 6
+    1:	return
+}
+
+show_play() {
+   17:	EBX = EDI; 
+   16:	
+   15:	if (EBX !=lu 0) goto 14 else goto 1
+   14:	EDI = __stringlit_3 + 0 (long); 
+   13:	call "printf"; 
+   12:	EDI = int64[EBX + 8]; 
+   11:	call "show_data"; 
+   10:	EDI = __stringlit_4 + 0 (long); 
+    9:	ESI = int32[EBX + 0]; 
+    8:	call "printf"; 
+    7:	EDI = __stringlit_5 + 0 (long); 
+    6:	call "printf"; 
+    5:	EDI = int64[EBX + 16]; 
+    4:	call "show_list"; 
+    3:	EBX = int64[EBX + 24]; 
+    2:	goto 15
+    1:	return
+}
+
+in_wanted() {
+   14:	EBX = EDI; 
+   13:	EAX = &wanted; 
+   12:	EBP = int64[EAX + 0]; 
+   11:	
+   10:	if (EBP !=lu 0) goto 9 else goto 4
+    9:	EDI = int64[EBP + 0]; 
+    8:	ESI = EBX; call "equal_data"; 
+    7:	if (EAX !=u 0) goto 4 else goto 6
+    6:	EBP = int64[EBP + 8]; 
+    5:	goto 10
+    4:	if (EBP ==lu 0) goto 3 else goto 2
+    3:	EAX = 0; goto 1
+    2:	EAX = 1; 
+    1:	return
+}
+
+make_data() {
+   23:	EBX = ESI; EBP = EDI; 
+   22:	ECX = &ncol; 
+   21:	ESI = int32[ECX + 0]; 
+   20:	EAX = long32signed(ESI); 
+   19:	EDI = EAX * 4 + 0 (long); 
+   18:	call "malloc"; 
+   17:	
+   16:	R11 = 0; 
+   15:	if (R11 !=s EBX) goto 14 else goto 9
+   14:	EDX = long32signed(R11); 
+   13:	R8 = &nrow; 
+   12:	ECX = int32[R8 + 0]; 
+   11:	int32[EAX + EDX * 4 + 0] = ECX; 
+   10:	R11 = R11 + 1 (int); goto 15
+    9:	
+    8:	EDX = &ncol; 
+    7:	EDI = int32[EDX + 0]; 
+    6:	if (R11 !=s EDI) goto 5 else goto 2
+    5:	R10 = long32signed(R11); 
+    4:	int32[EAX + R10 * 4 + 0] = EBP; 
+    3:	R11 = R11 + 1 (int); goto 8
+    2:	
+    1:	return
+}
+
+make_list() {
+   71:	EBX = EDX; R12 = ESI; local(2,long) = EDI; 
+   70:	EAX = 1; 
+   69:	int32[R12 + 0] = EAX; 
+   68:	EDI = 16L; 
+   67:	call "malloc"; 
+   66:	R14 = EAX; 
+   65:	R9 = 0L; 
+   64:	int64[R14 + 8] = R9; 
+   63:	R15 = R14; 
+   62:	EBP = 0; 
+   61:	EDI = &nrow; 
+   60:	R11 = int32[EDI + 0]; 
+   59:	if (EBP !=s R11) goto 58 else goto 9
+   58:	R13 = 0; 
+   57:	R8 = &ncol; 
+   56:	R8 = int32[R8 + 0]; 
+   55:	if (R13 !=s R8) goto 54 else goto 10
+   54:	ESI = R13; EDI = EBP; call "make_data"; local(0,long) = EAX; 
+   53:	
+   52:	ESI = local(2,long); EDI = local(0,long); call "melt_data"; 
+   51:	ESI = local(2,long); EDI = local(0,long); call "equal_data"; 
+   50:	if (EAX ==u 0) goto 49 else goto 19
+   49:	EDI = 16L; 
+   48:	call "malloc"; 
+   47:	int64[R15 + 8] = EAX; 
+   46:	EDI = local(0,long); call "copy_data"; 
+   45:	ESI = int64[R15 + 8]; 
+   44:	int64[ESI + 0] = EAX; 
+   43:	ESI = int64[R15 + 8]; 
+   42:	R11 = 0L; 
+   41:	int64[ESI + 8] = R11; 
+   40:	R15 = int64[R15 + 8]; 
+   39:	EDX = int32[R12 + 0]; 
+   38:	if (EDX ==s 1) goto 37 else goto 35
+   37:	EDI = local(0,long); call "get_value"; 
+   36:	int32[R12 + 0] = EAX; 
+   35:	R8 = int32[EBX + 0]; 
+   34:	if (R8 ==u 0) goto 33 else goto 20
+   33:	R10 = int32[R12 + 0]; 
+   32:	
+   31:	if (R10 ==s 0) goto 30 else goto 12
+   30:	EDI = &ncol; 
+   29:	ECX = int32[EDI + 0]; 
+   28:	R13 = ECX + -1 (int); 
+   27:	ECX = &nrow; 
+   26:	R11 = int32[ECX + 0]; 
+   25:	EBP = R11 + -1 (int); 
+   24:	EDI = local(0,long); call "in_wanted"; 
+   23:	if (EAX !=u 0) goto 22 else goto 12
+   22:	R10 = 2; 
+   21:	int32[EBX + 0] = R10; goto 12
+   20:	goto 12
+   19:	if (R13 ==s 0) goto 18 else goto 15
+   18:	EAX = &nrow; 
+   17:	R9 = int32[EAX + 0]; 
+   16:	EBP = R9 + -1 (int); 
+   15:	ECX = &ncol; 
+   14:	EDI = int32[ECX + 0]; 
+   13:	R13 = EDI + -1 (int); 
+   12:	EDI = local(0,long); call "free"; 
+   11:	R13 = R13 + 1 (int); goto 57
+   10:	EBP = EBP + 1 (int); goto 61
+    9:	EBX = int64[R14 + 8]; 
+    8:	EDI = R14; call "free"; 
+    7:	if (EBX !=lu 0) goto 6 else goto 2
+    6:	EAX = 1; 
+    5:	R10 = int32[R12 + 0]; 
+    4:	EAX = EAX - R10; 
+    3:	int32[R12 + 0] = EAX; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+make_play() {
+   59:	
+   58:	int32[stack(0)] = EDI; 
+   57:	EDI = 32L; 
+   56:	call "malloc"; EBP = EAX; 
+   55:	
+   54:	R12 = EBP; 
+   53:	R11 = &game_tree; 
+   52:	EDX = 0L; 
+   51:	int64[R11 + 0] = EDX; 
+   50:	EDI = 0; 
+   49:	ESI = 0; 
+   48:	call "make_data"; EBX = EAX; 
+   47:	
+   46:	R10 = int32[EBX + 0]; 
+   45:	R8 = R10 + -1 (int); 
+   44:	int32[EBX + 0] = R8; 
+   43:	
+   42:	EDI = EBX; call "next_data"; 
+   41:	if (EAX !=u 0) goto 40 else goto 4
+   40:	EDI = EBX; call "valid_data"; 
+   39:	if (EAX !=u 0) goto 38 else goto 5
+   38:	EDI = 32L; 
+   37:	call "malloc"; 
+   36:	int64[R12 + 24] = EAX; 
+   35:	ECX = &game_tree; 
+   34:	EDX = int64[ECX + 0]; 
+   33:	if (EDX ==lu 0) goto 32 else goto 29
+   32:	
+   31:	
+   30:	int64[ECX + 0] = EAX; 
+   29:	EDI = EBX; call "copy_data"; 
+   28:	EDI = int64[R12 + 24]; 
+   27:	int64[EDI + 8] = EAX; 
+   26:	ESI = stack(4) (long); 
+   25:	EDX = stack(0) (long); 
+   24:	EDI = EBX; call "make_list"; 
+   23:	R10 = int64[R12 + 24]; 
+   22:	int64[R10 + 16] = EAX; 
+   21:	R11 = int64[R12 + 24]; 
+   20:	R9 = int32[stack(4)]; 
+   19:	int32[R11 + 0] = R9; 
+   18:	ESI = int64[R12 + 24]; 
+   17:	EDI = 0L; 
+   16:	int64[ESI + 24] = EDI; 
+   15:	R12 = int64[R12 + 24]; 
+   14:	ESI = int32[stack(0)]; 
+   13:	if (ESI ==s 2) goto 12 else goto 5
+   12:	EDI = EBX; call "free"; 
+   11:	ECX = &nrow; 
+   10:	EDI = int32[ECX + 0]; 
+    9:	R9 = &ncol; 
+    8:	ESI = int32[R9 + 0]; 
+    7:	call "make_data"; 
+    6:	EBX = EAX; goto 42
+    5:	goto 42
+    4:	EBX = int64[EBP + 24]; 
+    3:	EDI = EBP; call "free"; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+make_wanted() {
+   45:	EBP = EDI; 
+   44:	EDI = 16L; 
+   43:	call "malloc"; 
+   42:	R14 = EAX; 
+   41:	EDI = 0L; 
+   40:	int64[R14 + 8] = EDI; 
+   39:	R12 = R14; 
+   38:	R13 = 0; 
+   37:	ESI = &nrow; 
+   36:	ECX = int32[ESI + 0]; 
+   35:	if (R13 !=s ECX) goto 34 else goto 5
+   34:	R15 = 0; 
+   33:	R11 = &ncol; 
+   32:	R8 = int32[R11 + 0]; 
+   31:	if (R15 !=s R8) goto 30 else goto 6
+   30:	ESI = R15; EDI = R13; call "make_data"; EBX = EAX; 
+   29:	
+   28:	ESI = EBP; EDI = EBX; call "melt_data"; 
+   27:	ESI = EBP; EDI = EBX; call "equal_data"; 
+   26:	if (EAX ==u 0) goto 25 else goto 15
+   25:	EDI = 16L; 
+   24:	call "malloc"; 
+   23:	int64[R12 + 8] = EAX; 
+   22:	EDI = EBX; call "copy_data"; 
+   21:	R10 = int64[R12 + 8]; 
+   20:	int64[R10 + 0] = EAX; 
+   19:	R9 = int64[R12 + 8]; 
+   18:	R8 = 0L; 
+   17:	int64[R9 + 8] = R8; 
+   16:	R12 = int64[R12 + 8]; goto 8
+   15:	if (R15 ==s 0) goto 14 else goto 11
+   14:	ECX = &nrow; 
+   13:	EDX = int32[ECX + 0]; 
+   12:	R13 = EDX + -1 (int); 
+   11:	EDI = &ncol; 
+   10:	EAX = int32[EDI + 0]; 
+    9:	R15 = EAX + -1 (int); 
+    8:	EDI = EBX; call "free"; 
+    7:	R15 = R15 + 1 (int); goto 33
+    6:	R13 = R13 + 1 (int); goto 37
+    5:	EBX = int64[R14 + 8]; 
+    4:	EDI = R14; call "free"; 
+    3:	EAX = &wanted; 
+    2:	int64[EAX + 0] = EBX; 
+    1:	return
+}
+
+get_good_move() {
+   16:	EBX = EDI; 
+   15:	if (EBX ==lu 0) goto 14 else goto 12
+   14:	EAX = 0L; 
+   13:	return
+   12:	
+   11:	EAX = int64[EBX + 8]; 
+   10:	if (EAX !=lu 0) goto 9 else goto 3
+    9:	EDI = int64[EBX + 0]; 
+    8:	call "get_value"; 
+    7:	
+    6:	if (EAX !=u 0) goto 5 else goto 2
+    5:	EBX = int64[EBX + 8]; 
+    4:	goto 11
+    3:	
+    2:	EDI = int64[EBX + 0]; 
+    1:	tailcall "copy_data"
+}
+
+get_winning_move() {
+    8:	
+    7:	
+    6:	EAX = int64[EDI + 24]; 
+    5:	if (EAX !=lu 0) goto 4 else goto 2
+    4:	EDI = EAX; 
+    3:	goto 6
+    2:	EDI = int64[EDI + 16]; 
+    1:	tailcall "get_good_move"
+}
+
+where() {
+    9:	EBP = ESI; EBX = EDI; 
+    8:	
+    7:	EDI = int64[EBP + 8]; 
+    6:	ESI = EBX; call "equal_data"; 
+    5:	if (EAX ==u 0) goto 4 else goto 2
+    4:	EBP = int64[EBP + 24]; 
+    3:	goto 7
+    2:	EAX = int64[EBP + 16]; 
+    1:	return
+}
+
+get_real_move() {
+   20:	
+   19:	R8 = 0; 
+   18:	int32[ECX + 0] = R8; 
+   17:	
+   16:	R8 = int32[ECX + 0]; 
+   15:	EAX = long32signed(R8); 
+   14:	R9 = int32[EDI + EAX * 4 + 0]; 
+   13:	
+   12:	
+   11:	R10 = int32[ESI + EAX * 4 + 0]; 
+   10:	if (R9 ==s R10) goto 9 else goto 5
+    9:	
+    8:	R8 = R8 + 1 (int); 
+    7:	int32[ECX + 0] = R8; 
+    6:	goto 16
+    5:	
+    4:	
+    3:	
+    2:	int32[EDX + 0] = R9; 
+    1:	return
+}
+
+main() {
+   40:	
+   39:	R10 = &ncol; 
+   38:	R11 = 7; 
+   37:	int32[R10 + 0] = R11; 
+   36:	EDI = &nrow; 
+   35:	EAX = 7; 
+   34:	int32[EDI + 0] = EAX; 
+   33:	EDI = 1; 
+   32:	call "make_play"; EBX = EAX; 
+   31:	
+   30:	R13 = 0; 
+   29:	EDX = &nrow; 
+   28:	EDI = int32[EDX + 0]; 
+   27:	EDX = &ncol; 
+   26:	ESI = int32[EDX + 0]; 
+   25:	call "make_data"; 
+   24:	EBP = EAX; 
+   23:	if (EBP !=lu 0) goto 22 else goto 7
+   22:	ESI = EBX; EDI = EBP; call "where"; EDI = EAX; 
+   21:	call "get_good_move"; 
+   20:	R12 = EAX; 
+   19:	if (R12 !=lu 0) goto 18 else goto 8
+   18:	EDX = stack(0) (long); 
+   17:	ECX = stack(4) (long); 
+   16:	ESI = EBP; EDI = R12; call "get_real_move"; 
+   15:	EDI = __stringlit_6 + 0 (long); 
+   14:	EDX = int32[stack(0)]; 
+   13:	ECX = int32[stack(4)]; 
+   12:	ESI = R13; call "printf"; 
+   11:	EAX = 1; 
+   10:	EAX = EAX - R13; R13 = EAX; 
+    9:	EDI = EBP; call "free"; 
+    8:	EBP = R12; goto 23
+    7:	EDI = EBX; call "dump_play"; 
+    6:	EDI = __stringlit_7 + 0 (long); 
+    5:	ESI = 1; 
+    4:	ESI = ESI - R13; 
+    3:	call "printf"; 
+    2:	EAX = 0; 
+    1:	return
+}
+

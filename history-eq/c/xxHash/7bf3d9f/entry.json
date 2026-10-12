@@ -1,0 +1,40 @@
+{
+  "commit": "7bf3d9f",
+  "date": "2021-03-26",
+  "subject": "removed XXH64's switch finalizer (#521)",
+  "selected_by": "keyword",
+  "perf_evidence": "XXH64 switch finalizer removal",
+  "change_summary": "Replaces switch-based XXH64 tail handling.",
+  "units": [
+    {
+      "name": "Replaces switch-based XXH64 tail handling.",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/7bf3d9f/r_s64_nounroll",
+      "evidence": "All 32 AArch64 and i386 fixed-length one-shot targets prove bidirectionally, as do 32 x86 short and 15 longer targets. Streaming matrix has one timeout and four non-returning targets."
+    },
+    {
+      "name": "Raw XXH64_finalize, all 32 tail residues and both alignments, old switch and rerolled modes on x86-64",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "valid bytes for each tail and alignment requirement; default memory access mode",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/7bf3d9f/finalizer-raw",
+      "evidence": "finalizer-proof-audit.json: 128 bidirectional Alive2 checks, no remaining IR loops"
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The raw finalizer is proved under x86-64 Clang 20/default memory access; source uses only len & 31, so the 32 residue cases cover every size_t length for each tested alignment and old control-flow mode. Whole public APIs, other architectures and memory access configurations remain inconclusive."
+}

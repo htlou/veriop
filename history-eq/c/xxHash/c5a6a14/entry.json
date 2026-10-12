@@ -1,0 +1,40 @@
+{
+  "commit": "c5a6a14",
+  "date": "2024-12-05",
+  "subject": "only enforce inlining of XXH64_finalize() when XXH_INLINE_ALL is enabled",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit changes forced inlining of the XXH64 finalizer to the inline-all build mode, reducing default implementation code size.",
+  "change_summary": "Makes XXH64_finalize static by default and force-inline only under XXH_INLINE_ALL.",
+  "units": [
+    {
+      "name": "public XXH64 one-shot and streaming fixed-length matrix across implementation/inline-all modes",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/c5a6a14/r_impl_hints_dflt_u4",
+      "evidence": "Nine fixed-length one-shot/streaming targets pass both directions in default implementation mode; the inline-all and no-hints variants separately pass the same matrix."
+    },
+    {
+      "name": "public XXH64 one-shot with symbolic length, implementation mode",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/c5a6a14/r_sym_impl_dflt",
+      "evidence": "The symbolic-length XXH64 target passes bidirectional Alive2 with loop unroll 4."
+    }
+  ],
+  "commit_verdict": "EQUIV_BOUNDED",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "Symbolic-length proof is loop bounded; compiler/build combinations beyond the checked Clang configurations are not covered."
+}

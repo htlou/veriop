@@ -1,0 +1,122 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/155f560/api64_len4/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/155f560/api64_len4/old.ll
+
+----------------------------------------
+define i64 @target_xxh3_64(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = load i32, ptr nowrite noundef %#0, align 1
+  %#4 = trunc i64 noundef %#1 to i32
+  %#5 = add i32 %#4, 3103681593
+  %#6 = add i32 %#5, %#3
+  %#7 = lshr i64 noundef %#1, 32
+  %#8 = trunc nuw i64 %#7 to i32
+  %#9 = add i32 %#8, 597969854
+  %#10 = add i32 %#9, %#3
+  %#11 = zext i32 %#6 to i64
+  %#12 = zext i32 %#10 to i64
+  %#13 = or disjoint i64 %#11, 4294967296
+  %#14 = mul i64 %#13, %#12
+  %#15 = add nsw nuw i64 %#11, 4
+  %#16 = add i64 %#15, %#14
+  %#17 = lshr i64 %#16, 29
+  %#18 = xor i64 %#17, %#16
+  %#19 = mul i64 %#18, 1609587929392839161
+  %#20 = lshr i64 %#19, 32
+  %#21 = xor i64 %#20, %#19
+  ret i64 %#21
+}
+=>
+define i64 @target_xxh3_64(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = load i32, ptr nowrite noundef %#0, align 1
+  %#4 = trunc i64 noundef %#1 to i32
+  %#5 = add i32 %#4, 3103681593
+  %#6 = add i32 %#5, %#3
+  %#7 = lshr i64 noundef %#1, 32
+  %#8 = trunc nuw i64 %#7 to i32
+  %#9 = add i32 %#8, 597969854
+  %#10 = add i32 %#9, %#3
+  %#11 = zext i32 %#6 to i64
+  %#12 = zext i32 %#10 to i64
+  %#13 = mul nuw i64 %#12, %#11
+  %#14 = shl nuw i64 %#12, 32
+  %#15 = add nsw nuw i64 %#11, 8709370992879675932
+  %#16 = add i64 %#15, %#13
+  %#17 = add i64 %#16, %#14
+  %#18 = lshr i64 %#17, 29
+  %#19 = xor i64 %#18, %#17
+  %#20 = mul i64 %#19, 1609587929392839161
+  %#21 = lshr i64 %#20, 32
+  %#22 = xor i64 %#21, %#20
+  ret i64 %#22
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x04
+i64 noundef %#1 = #x0000000000000000 (0)
+
+Source:
+i32 %#3 = #x92a92e14 (2460560916, -1834406380)
+i32 %#4 = #x00000000 (0)
+i32 %#5 = #xb8fe6c39 (3103681593, -1191285703)
+i32 %#6 = #x4ba79a4d (1269275213)
+i64 %#7 = #x0000000000000000 (0)
+i32 %#8 = #x00000000 (0)
+i32 %#9 = #x23a44bbe (597969854)
+i32 %#10 = #xb64d79d2 (3058530770, -1236436526)
+i64 %#11 = #x000000004ba79a4d (1269275213)
+i64 %#12 = #x00000000b64d79d2 (3058530770)
+i64 %#13 = #x000000014ba79a4d (5564242509)
+i64 %#14 = #xec2d86ee6e93f82a (17018406925518501930, -1428337148191049686)
+i64 %#15 = #x000000004ba79a51 (1269275217)
+i64 %#16 = #xec2d86eeba3b927b (17018406926787777147, -1428337146921774469)
+i64 %#17 = #x00000007616c3775 (31699253109)
+i64 %#18 = #xec2d86e9db57a50e (17018406905868428558, -1428337167841123058)
+i64 %#19 = #x2060ba83df45289e (2333069682527250590)
+i64 %#20 = #x000000002060ba83 (543210115)
+i64 %#21 = #x2060ba83ff25921d (2333069683062051357)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 8	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+3: #x14
+5: #xa9
+6: #x92
+4: #x2e
+*: poison
+
+
+Target:
+i32 %#3 = #x92a92e14 (2460560916, -1834406380)
+i32 %#4 = #x00000000 (0)
+i32 %#5 = #xb8fe6c39 (3103681593, -1191285703)
+i32 %#6 = #x4ba79a4d (1269275213)
+i64 %#7 = #x0000000000000000 (0)
+i32 %#8 = #x00000000 (0)
+i32 %#9 = #x23a44bbe (597969854)
+i32 %#10 = #xb64d79d2 (3058530770, -1236436526)
+i64 %#11 = #x000000004ba79a4d (1269275213)
+i64 %#12 = #x00000000b64d79d2 (3058530770)
+i64 %#13 = #x35e00d1c6e93f82a (3882117294558804010)
+i64 %#14 = #xb64d79d200000000 (13136289630959697920, -5310454442749853696)
+i64 %#15 = #x78dde6c66356c469 (8709370994148951145)
+i64 %#16 = #xaebdf3e2d1eabc93 (12591488288707755155, -5855255785001796461)
+i64 %#17 = #x650b6db4d1eabc93 (7281033845957901459)
+i64 %#18 = #x00000003285b6da6 (13561982374)
+i64 %#19 = #x650b6db7f9b1d135 (7281033859510161717)
+i64 %#20 = #xd28809ee9239898d (15170386265057626509, -3276357808651925107)
+i64 %#21 = #x00000000d28809ee (3532130798)
+i64 %#22 = #xd28809ee40b18063 (15170386263689756771, -3276357810019794845)
+Source value: #x2060ba83ff25921d (2333069683062051357)
+Target value: #xd28809ee40b18063 (15170386263689756771, -3276357810019794845)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,45 @@
+  |- forall z x y a b pc.
+         nonoverlapping (word pc,1272) (z,8 * 16) /\
+         nonoverlapping (x,8 * 8) (z,8 * 16) /\
+         (y = z \/ nonoverlapping (y,8 * 8) (z,8 * 16))
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_8_16_mc /\
+                  read RIP s = word (pc + 10) /\
+                  C_ARGUMENTS [z; x; y] s /\
+                  bignum_from_memory (x,8) s = a /\
+                  bignum_from_memory (y,8) s = b)
+             (\s.
+                  read RIP s = word (pc + 1261) /\
+                  bignum_from_memory (z,16) s = a * b)
+             (MAYCHANGE
+              [RIP; RAX; RBP; RBX; RCX; RDX; R8; R9; R10; R11; R12; R13; R14;
+               R15] ,,
+              MAYCHANGE [memory :> bytes (z,8 * 16)] ,,
+              MAYCHANGE SOME_FLAGS)
+
+  |- forall z x y a b pc stackpointer returnaddress.
+         nonoverlapping (word_sub stackpointer (word 48),56) (z,8 * 16) /\
+         ALL (nonoverlapping (word_sub stackpointer (word 48),48))
+         [word pc,1272; x,8 * 8; y,8 * 8] /\
+         nonoverlapping (word pc,1272) (z,8 * 16) /\
+         nonoverlapping (x,8 * 8) (z,8 * 16) /\
+         (y = z \/ nonoverlapping (y,8 * 8) (z,8 * 16))
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_8_16_mc /\
+                  read RIP s = word pc /\
+                  read RSP s = stackpointer /\
+                  read (memory :> bytes64 stackpointer) s = returnaddress /\
+                  C_ARGUMENTS [z; x; y] s /\
+                  bignum_from_memory (x,8) s = a /\
+                  bignum_from_memory (y,8) s = b)
+             (\s.
+                  read RIP s = returnaddress /\
+                  read RSP s = word_add stackpointer (word 8) /\
+                  bignum_from_memory (z,16) s = a * b)
+             (MAYCHANGE [RIP; RSP; RAX; RCX; RDX; R8; R9; R10; R11] ,,
+              MAYCHANGE
+              [memory :> bytes (z,8 * 16);
+               memory :> bytes (word_sub stackpointer (word 48),48)] ,,
+              MAYCHANGE SOME_FLAGS)

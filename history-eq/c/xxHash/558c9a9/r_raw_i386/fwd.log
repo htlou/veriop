@@ -1,0 +1,84 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=300000 --always-verify r_raw_i386/old.ll r_raw_i386/new.ll
+
+----------------------------------------
+define i64 @target_raw_mult32to64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = and i64 noundef %#0, 4294967295
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = mul nuw i64 %#4, %#3
+  %#range_0_%#5 = !range i64 %#5, i64 0, i64 -8589934590
+  ret i64 %#range_0_%#5
+}
+=>
+define i64 @target_raw_mult32to64(i64 noundef %#0, i64 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = and i64 noundef %#0, 4294967295
+  %#4 = and i64 noundef %#1, 4294967295
+  %#5 = mul nuw i64 %#4, %#3
+  %#range_0_%#5 = !range i64 %#5, i64 0, i64 -8589934590
+  ret i64 %#range_0_%#5
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define void @target_raw_mult64to128(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = and i64 noundef %#0, 4294967295
+  %#5 = and i64 noundef %#1, 4294967295
+  %#6 = mul nuw i64 %#5, %#4
+  %#7 = lshr i64 noundef %#0, 32
+  %#8 = mul nuw i64 %#5, %#7
+  %#9 = lshr i64 noundef %#1, 32
+  %#10 = mul nuw i64 %#9, %#4
+  %#11 = mul nuw i64 %#9, %#7
+  %#12 = lshr i64 %#6, 32
+  %#13 = and i64 %#8, 4294967295
+  %#14 = add nuw i64 %#13, %#10
+  %#15 = add nuw i64 %#14, %#12
+  %#16 = lshr i64 %#8, 32
+  %#17 = lshr i64 %#15, 32
+  %#18 = add nuw i64 %#16, %#11
+  %#19 = add nuw i64 %#18, %#17
+  %#20 = shl i64 %#15, 32
+  %#21 = and i64 %#6, 4294967295
+  %#22 = or disjoint i64 %#20, %#21
+  store i64 %#22, ptr noread noundef initializes((0, 16)) %#2, align 4
+  %#23 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i32 8
+  store i64 %#19, ptr %#23, align 4
+  ret void
+}
+=>
+define void @target_raw_mult64to128(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = and i64 noundef %#0, 4294967295
+  %#5 = and i64 noundef %#1, 4294967295
+  %#6 = mul nuw i64 %#5, %#4
+  %#7 = lshr i64 noundef %#0, 32
+  %#8 = mul nuw i64 %#5, %#7
+  %#9 = lshr i64 noundef %#1, 32
+  %#10 = mul nuw i64 %#9, %#4
+  %#11 = mul nuw i64 %#9, %#7
+  %#12 = lshr i64 %#6, 32
+  %#13 = and i64 %#8, 4294967295
+  %#14 = add nuw i64 %#13, %#10
+  %#15 = add nuw i64 %#14, %#12
+  %#16 = lshr i64 %#8, 32
+  %#17 = lshr i64 %#15, 32
+  %#18 = add nuw i64 %#16, %#11
+  %#19 = add nuw i64 %#18, %#17
+  %#20 = shl i64 %#15, 32
+  %#21 = and i64 %#6, 4294967295
+  %#22 = or disjoint i64 %#20, %#21
+  store i64 %#22, ptr noread noundef initializes((0, 16)) %#2, align 4
+  %#23 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i32 8
+  store i64 %#19, ptr %#23, align 4
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  2 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,29 @@
+diff --git a/include/fast_float/parse_number.h b/include/fast_float/parse_number.h
+index 0a8092f..0e22afc 100644
+--- a/include/fast_float/parse_number.h
++++ b/include/fast_float/parse_number.h
+@@ -81,10 +81,11 @@ fastfloat_really_inline bool rounds_to_nearest() noexcept {
+   // There might be other ways to prevent compile-time optimizations (e.g., asm).
+   // The value does not need to be std::numeric_limits<float>::min(), any small
+   // value so that 1 + x should round to 1 would do (after accounting for excess
+   // precision, as in 387).
+   static volatile float fmin = std::numeric_limits<float>::min();
++  float fmini = fmin; // we copy it so that it gets loaded at most once.
+   //
+   // Explanation:
+   // Only when fegetround() == FE_TONEAREST do we have that
+   // fmin + 1.0f == 1.0f - fmin.
+   //
+@@ -103,11 +104,11 @@ fastfloat_really_inline bool rounds_to_nearest() noexcept {
+   //  fmin + 1.0f = 0x1 (1)
+   //  1.0f - fmin = 0x1 (1)
+   //
+   // Note: This may fail to be accurate if fast-math has been
+   // enabled, as rounding conventions may not apply.
+-  return (fmin + 1.0f == 1.0f - fmin);
++  return (fmini + 1.0f == 1.0f - fmini);
+ }
+ 
+ } // namespace detail
+ 
+ template<typename T>

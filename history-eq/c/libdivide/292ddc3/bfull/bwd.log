@@ -1,0 +1,1540 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --src-unroll=4 --tgt-unroll=4 /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/292ddc3/bfull/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/292ddc3/bfull/old.ll
+
+----------------------------------------
+define i32 @target_u32_bfull(i32 noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = ctlz i32 noundef %#1, 1
+  %#range_0_%#15 = !range i32 %#15, i32 0, i32 32
+  %#16 = xor i32 %#range_0_%#15, 31
+  %#17 = ctpop i32 noundef %#1
+  %#range_1_%#17 = !range i32 %#17, i32 1, i32 33
+  %#18 = icmp samesign ult i32 %#range_1_%#17, 2
+  br i1 %#18, label %#4, label %#5
+
+#4:
+  %#19 = or disjoint i32 %#16, 128
+  br label %#8
+
+#5:
+  %#20 = shl nuw i32 1, %#16
+  %#21 = zext i32 %#20 to i64
+  %#22 = shl nuw i64 %#21, 32
+  %#23 = zext i32 noundef %#1 to i64
+  %#24 = udiv i64 %#22, %#23
+  %#25 = trunc i64 %#24 to i32
+  %#26 = mul i32 noundef %#1, %#25
+  %#27 = add i32 %#26, noundef %#1
+  %#28 = icmp ult i32 %#27, %#20
+  br i1 %#28, label %#7, label %#6
+
+#6:
+  %#29 = sub i32 0, %#26
+  %#30 = shl nsw nuw i64 %#24, 1
+  %#31 = shl i32 %#29, 1
+  %#32 = icmp uge i32 %#31, noundef %#1
+  %#33 = icmp slt i32 %#29, 0
+  %#34 = or i1 %#33, %#32
+  %#35 = zext i1 %#34 to i64
+  %#36 = or disjoint i64 %#30, %#35
+  %#37 = or disjoint i32 %#16, 64
+  br label %#7
+
+#7:
+  %#38 = phi i32 [ %#37, %#6 ], [ %#16, %#5 ]
+  %#39 = phi i64 [ %#36, %#6 ], [ %#24, %#5 ]
+  %#40 = add nsw nuw i64 %#39, 1
+  %#41 = and i64 %#40, 4294967295
+  br label %#8
+
+#8:
+  %#42 = phi i64 [ 0, %#4 ], [ %#41, %#7 ]
+  %#43 = phi i32 [ %#19, %#4 ], [ %#38, %#7 ]
+  %#44 = and i32 %#43, 128
+  %#45 = icmp eq i32 %#44, 0
+  br i1 %#45, label %#9, label %#12
+
+#9:
+  %#46 = zext i32 noundef %#0 to i64
+  %#47 = mul nuw i64 %#42, %#46
+  %#48 = lshr i64 %#47, 32
+  %#49 = trunc nuw i64 %#48 to i32
+  %#50 = icmp samesign ult i32 %#43, 64
+  br i1 %#50, label %#10, label %#11
+
+#10:
+  %#51 = lshr i32 %#49, %#43
+  br label %#13
+
+#11:
+  %#52 = sub i32 noundef %#0, %#49
+  %#53 = lshr i32 %#52, 1
+  %#54 = add i32 %#53, %#49
+  %#55 = and i32 %#43, 31
+  %#56 = lshr i32 %#54, %#55
+  br label %#13
+
+#12:
+  %#57 = and i32 %#43, 31
+  %#58 = lshr i32 noundef %#0, %#57
+  br label %#13
+
+#13:
+  %#59 = phi i32 [ 0, %#2 ], [ %#58, %#12 ], [ %#56, %#11 ], [ %#51, %#10 ]
+  ret i32 %#59
+}
+=>
+define i32 @target_u32_bfull(i32 noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = ctlz i32 noundef %#1, 1
+  %#range_0_%#15 = !range i32 %#15, i32 0, i32 32
+  %#16 = xor i32 %#range_0_%#15, 31
+  %#17 = ctpop i32 noundef %#1
+  %#range_1_%#17 = !range i32 %#17, i32 1, i32 33
+  %#18 = icmp samesign ult i32 %#range_1_%#17, 2
+  br i1 %#18, label %#4, label %#5
+
+#4:
+  %#19 = or disjoint i32 %#16, 128
+  br label %#8
+
+#5:
+  %#20 = shl nuw i32 1, %#16
+  %#21 = zext i32 %#20 to i64
+  %#22 = shl nuw i64 %#21, 32
+  %#23 = zext i32 noundef %#1 to i64
+  %#24 = udiv i64 %#22, %#23
+  %#25 = trunc i64 %#24 to i32
+  %#26 = mul i32 noundef %#1, %#25
+  %#27 = add i32 %#26, noundef %#1
+  %#28 = icmp ult i32 %#27, %#20
+  br i1 %#28, label %#7, label %#6
+
+#6:
+  %#29 = sub i32 0, %#26
+  %#30 = shl nsw nuw i64 %#24, 1
+  %#31 = shl i32 %#29, 1
+  %#32 = icmp uge i32 %#31, noundef %#1
+  %#33 = icmp slt i32 %#29, 0
+  %#34 = or i1 %#33, %#32
+  %#35 = zext i1 %#34 to i64
+  %#36 = or disjoint i64 %#30, %#35
+  %#37 = or disjoint i32 %#16, 64
+  br label %#7
+
+#7:
+  %#38 = phi i32 [ %#37, %#6 ], [ %#16, %#5 ]
+  %#39 = phi i64 [ %#36, %#6 ], [ %#24, %#5 ]
+  %#40 = add nsw nuw i64 %#39, 1
+  %#41 = and i64 %#40, 4294967295
+  br label %#8
+
+#8:
+  %#42 = phi i64 [ 0, %#4 ], [ %#41, %#7 ]
+  %#43 = phi i32 [ %#19, %#4 ], [ %#38, %#7 ]
+  %#44 = and i32 %#43, 128
+  %#45 = icmp eq i32 %#44, 0
+  br i1 %#45, label %#9, label %#12
+
+#9:
+  %#46 = zext i32 noundef %#0 to i64
+  %#47 = mul nuw i64 %#42, %#46
+  %#48 = lshr i64 %#47, 32
+  %#49 = trunc nuw i64 %#48 to i32
+  %#50 = icmp samesign ult i32 %#43, 64
+  br i1 %#50, label %#10, label %#11
+
+#10:
+  %#51 = lshr i32 %#49, %#43
+  br label %#13
+
+#11:
+  %#52 = sub i32 noundef %#0, %#49
+  %#53 = lshr i32 %#52, 1
+  %#54 = add i32 %#53, %#49
+  %#55 = and i32 %#43, 31
+  %#56 = lshr i32 %#54, %#55
+  br label %#13
+
+#12:
+  %#57 = and i32 %#43, 31
+  %#58 = lshr i32 noundef %#0, %#57
+  br label %#13
+
+#13:
+  %#59 = phi i32 [ 0, %#2 ], [ %#58, %#12 ], [ %#56, %#11 ], [ %#51, %#10 ]
+  ret i32 %#59
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_u64_bfull(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#19 = icmp eq i64 noundef %#1, 0
+  br i1 %#19, label %#18, label %#3
+
+#3:
+  %#20 = ctlz i64 noundef %#1, 1
+  %#range_0_%#20 = !range i64 %#20, i64 0, i64 65
+  %#21 = trunc nsw nuw i64 %#range_0_%#20 to i32
+  %#22 = xor i32 %#21, 63
+  %#23 = ctpop i64 noundef %#1
+  %#range_1_%#23 = !range i64 %#23, i64 1, i64 65
+  %#24 = icmp samesign ult i64 %#range_1_%#23, 2
+  %#25 = zext nneg i32 %#22 to i64
+  br i1 %#24, label %#4, label %#5
+
+#4:
+  %#26 = lshr i64 noundef %#0, %#25
+  br label %#18
+
+#5:
+  %#27 = shl nuw i64 1, %#25
+  %#28 = icmp ult i64 %#27, noundef %#1
+  br i1 %#28, label %#6, label %#15
+
+#6:
+  %#29 = shl i64 noundef %#1, %#range_0_%#20
+  %#30 = shl i64 %#27, %#range_0_%#20
+  %#31 = lshr i64 %#29, 32
+  %#32 = and i64 %#29, 4294967295
+  %#33 = udiv i64 %#30, %#31
+  %#35 = urem i64 %#30, %#31
+  br label %#7
+
+#7:
+  %#36 = phi i64 [ %#33, %#6 ], [ %#42, %#9 ]
+  %#37 = phi i64 [ %#35, %#6 ], [ %#43, %#9 ]
+  %#38 = icmp ugt i64 %#36, 4294967295
+  br i1 %#38, label %#9, label %#8
+
+#8:
+  %#39 = mul nuw i64 %#36, %#32
+  %#40 = shl i64 %#37, 32
+  %#41 = icmp ugt i64 %#39, %#40
+  br i1 %#41, label %#9, label %#10
+
+#9:
+  %#42 = add i64 %#36, -1
+  %#43 = add i64 %#37, %#31
+  %#44 = icmp ult i64 %#43, 4294967296
+  br i1 %#44, label %#7#2, label %#10
+
+#7#2:
+  %#36#2 = phi i64 [ %#42, %#9 ]
+  %#37#2 = phi i64 [ %#43, %#9 ]
+  %#38#2 = icmp ugt i64 %#36#2, 4294967295
+  br i1 %#38#2, label %#9#2, label %#8#2
+
+#8#2:
+  %#39#2 = mul nuw i64 %#36#2, %#32
+  %#40#2 = shl i64 %#37#2, 32
+  %#41#2 = icmp ugt i64 %#39#2, %#40#2
+  br i1 %#41#2, label %#9#2, label %#10
+
+#9#2:
+  %#42#2 = add i64 %#36#2, -1
+  %#43#2 = add i64 %#37#2, %#31
+  %#44#2 = icmp ult i64 %#43#2, 4294967296
+  br i1 %#44#2, label %#7#3, label %#10
+
+#7#3:
+  %#36#3 = phi i64 [ %#42#2, %#9#2 ]
+  %#37#3 = phi i64 [ %#43#2, %#9#2 ]
+  %#38#3 = icmp ugt i64 %#36#3, 4294967295
+  br i1 %#38#3, label %#9#3, label %#8#3
+
+#8#3:
+  %#39#3 = mul nuw i64 %#36#3, %#32
+  %#40#3 = shl i64 %#37#3, 32
+  %#41#3 = icmp ugt i64 %#39#3, %#40#3
+  br i1 %#41#3, label %#9#3, label %#10
+
+#9#3:
+  %#42#3 = add i64 %#36#3, -1
+  %#43#3 = add i64 %#37#3, %#31
+  %#44#3 = icmp ult i64 %#43#3, 4294967296
+  br i1 %#44#3, label %#7#4, label %#10
+
+#7#4:
+  %#36#4 = phi i64 [ %#42#3, %#9#3 ]
+  %#37#4 = phi i64 [ %#43#3, %#9#3 ]
+  %#38#4 = icmp ugt i64 %#36#4, 4294967295
+  br i1 %#38#4, label %#9#4, label %#8#4
+
+#8#4:
+  %#39#4 = mul nuw i64 %#36#4, %#32
+  %#40#4 = shl i64 %#37#4, 32
+  %#41#4 = icmp ugt i64 %#39#4, %#40#4
+  br i1 %#41#4, label %#9#4, label %#10
+
+#9#4:
+  %#42#4 = add i64 %#36#4, -1
+  %#43#4 = add i64 %#37#4, %#31
+  %#44#4 = icmp ult i64 %#43#4, 4294967296
+  br i1 %#44#4, label %#7#exit, label %#10
+
+#7#exit:
+  %#36#exit = phi i64 [ %#42#4, %#9#4 ]
+  %#37#exit = phi i64 [ %#43#4, %#9#4 ]
+  %#38#exit = icmp ugt i64 %#36#exit, 4294967295
+  br i1 %#38#exit, label #sink, label #sink
+
+#10:
+  %#45 = phi i64 [ %#42, %#9 ], [ %#36, %#8 ], [ %#42#2, %#9#2 ], [ %#42#3, %#9#3 ], [ %#42#4, %#9#4 ], [ %#36#2, %#8#2 ], [ %#36#3, %#8#3 ], [ %#36#4, %#8#4 ]
+  %#46 = shl i64 %#30, 32
+  %#47 = mul i64 %#45, %#29
+  %#48 = sub i64 %#46, %#47
+  %#49 = udiv i64 %#48, %#31
+  %#51 = urem i64 %#48, %#31
+  br label %#11
+
+#11:
+  %#52 = phi i64 [ %#49, %#10 ], [ %#58, %#13 ]
+  %#53 = phi i64 [ %#51, %#10 ], [ %#59, %#13 ]
+  %#54 = icmp ugt i64 %#52, 4294967295
+  br i1 %#54, label %#13, label %#12
+
+#12:
+  %#55 = mul nuw i64 %#52, %#32
+  %#56 = shl i64 %#53, 32
+  %#57 = icmp ugt i64 %#55, %#56
+  br i1 %#57, label %#13, label %#14
+
+#13:
+  %#58 = add i64 %#52, -1
+  %#59 = add i64 %#53, %#31
+  %#60 = icmp ult i64 %#59, 4294967296
+  br i1 %#60, label %#11#2, label %#14
+
+#11#2:
+  %#52#2 = phi i64 [ %#58, %#13 ]
+  %#53#2 = phi i64 [ %#59, %#13 ]
+  %#54#2 = icmp ugt i64 %#52#2, 4294967295
+  br i1 %#54#2, label %#13#2, label %#12#2
+
+#12#2:
+  %#55#2 = mul nuw i64 %#52#2, %#32
+  %#56#2 = shl i64 %#53#2, 32
+  %#57#2 = icmp ugt i64 %#55#2, %#56#2
+  br i1 %#57#2, label %#13#2, label %#14
+
+#13#2:
+  %#58#2 = add i64 %#52#2, -1
+  %#59#2 = add i64 %#53#2, %#31
+  %#60#2 = icmp ult i64 %#59#2, 4294967296
+  br i1 %#60#2, label %#11#3, label %#14
+
+#11#3:
+  %#52#3 = phi i64 [ %#58#2, %#13#2 ]
+  %#53#3 = phi i64 [ %#59#2, %#13#2 ]
+  %#54#3 = icmp ugt i64 %#52#3, 4294967295
+  br i1 %#54#3, label %#13#3, label %#12#3
+
+#12#3:
+  %#55#3 = mul nuw i64 %#52#3, %#32
+  %#56#3 = shl i64 %#53#3, 32
+  %#57#3 = icmp ugt i64 %#55#3, %#56#3
+  br i1 %#57#3, label %#13#3, label %#14
+
+#13#3:
+  %#58#3 = add i64 %#52#3, -1
+  %#59#3 = add i64 %#53#3, %#31
+  %#60#3 = icmp ult i64 %#59#3, 4294967296
+  br i1 %#60#3, label %#11#4, label %#14
+
+#11#4:
+  %#52#4 = phi i64 [ %#58#3, %#13#3 ]
+  %#53#4 = phi i64 [ %#59#3, %#13#3 ]
+  %#54#4 = icmp ugt i64 %#52#4, 4294967295
+  br i1 %#54#4, label %#13#4, label %#12#4
+
+#12#4:
+  %#55#4 = mul nuw i64 %#52#4, %#32
+  %#56#4 = shl i64 %#53#4, 32
+  %#57#4 = icmp ugt i64 %#55#4, %#56#4
+  br i1 %#57#4, label %#13#4, label %#14
+
+#13#4:
+  %#58#4 = add i64 %#52#4, -1
+  %#59#4 = add i64 %#53#4, %#31
+  %#60#4 = icmp ult i64 %#59#4, 4294967296
+  br i1 %#60#4, label %#11#exit, label %#14
+
+#11#exit:
+  %#52#exit = phi i64 [ %#58#4, %#13#4 ]
+  %#53#exit = phi i64 [ %#59#4, %#13#4 ]
+  %#54#exit = icmp ugt i64 %#52#exit, 4294967295
+  br i1 %#54#exit, label #sink, label #sink
+
+#14:
+  %#61 = phi i64 [ %#58, %#13 ], [ %#52, %#12 ], [ %#58#2, %#13#2 ], [ %#58#3, %#13#3 ], [ %#58#4, %#13#4 ], [ %#52#2, %#12#2 ], [ %#52#3, %#12#3 ], [ %#52#4, %#12#4 ]
+  %#62 = shl i64 %#48, 32
+  %#63 = mul i64 %#61, %#29
+  %#64 = sub i64 %#62, %#63
+  %#65 = lshr i64 %#64, %#range_0_%#20
+  %#66 = shl i64 %#45, 32
+  %#67 = add i64 %#61, %#66
+  br label %#15
+
+#15:
+  %#68 = phi i64 [ %#65, %#14 ], [ -1, %#5 ]
+  %#69 = phi i64 [ %#67, %#14 ], [ -1, %#5 ]
+  %#70 = sub i64 noundef %#1, %#68
+  %#71 = icmp ult i64 %#70, %#27
+  br i1 %#71, label %#16, label %#17
+
+#16:
+  %#72 = zext nneg i32 %#22 to i64
+  %#73 = add i64 %#69, 1
+  %#74 = zext i64 %#73 to i128
+  %#75 = zext i64 noundef %#0 to i128
+  %#76 = mul nuw i128 %#74, %#75
+  %#77 = lshr i128 %#76, 64
+  %#78 = trunc nuw i128 %#77 to i64
+  %#79 = lshr i64 %#78, %#72
+  br label %#18
+
+#17:
+  %#80 = shl i64 %#69, 1
+  %#81 = icmp slt i64 %#68, 0
+  %#82 = shl i64 %#68, 1
+  %#83 = icmp uge i64 %#82, noundef %#1
+  %#84 = or i1 %#81, %#83
+  %#85 = zext i1 %#84 to i64
+  %#86 = or disjoint i64 %#80, %#85
+  %#87 = add i64 %#86, 1
+  %#88 = zext i64 %#87 to i128
+  %#89 = zext i64 noundef %#0 to i128
+  %#90 = mul nuw i128 %#88, %#89
+  %#91 = lshr i128 %#90, 64
+  %#92 = trunc nuw i128 %#91 to i64
+  %#93 = zext nneg i32 %#22 to i64
+  %#94 = sub i64 noundef %#0, %#92
+  %#95 = lshr i64 %#94, 1
+  %#96 = add i64 %#95, %#92
+  %#97 = lshr i64 %#96, %#93
+  br label %#18
+
+#18:
+  %#98 = phi i64 [ 0, %#2 ], [ %#26, %#4 ], [ %#97, %#17 ], [ %#79, %#16 ]
+  ret i64 %#98
+}
+=>
+define i64 @target_u64_bfull(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#19 = icmp eq i64 noundef %#1, 0
+  br i1 %#19, label %#18, label %#3
+
+#3:
+  %#20 = ctlz i64 noundef %#1, 1
+  %#range_0_%#20 = !range i64 %#20, i64 0, i64 65
+  %#21 = trunc nsw nuw i64 %#range_0_%#20 to i32
+  %#22 = xor i32 %#21, 63
+  %#23 = ctpop i64 noundef %#1
+  %#range_1_%#23 = !range i64 %#23, i64 1, i64 65
+  %#24 = icmp samesign ult i64 %#range_1_%#23, 2
+  %#25 = zext nneg i32 %#22 to i64
+  br i1 %#24, label %#4, label %#5
+
+#4:
+  %#26 = lshr i64 noundef %#0, %#25
+  br label %#18
+
+#5:
+  %#27 = shl nuw i64 1, %#25
+  %#28 = icmp ult i64 %#27, noundef %#1
+  br i1 %#28, label %#6, label %#15
+
+#6:
+  %#29 = shl i64 noundef %#1, %#range_0_%#20
+  %#30 = shl i64 %#27, %#range_0_%#20
+  %#31 = lshr i64 %#29, 32
+  %#32 = and i64 %#29, 4294967295
+  %#33 = udiv i64 %#30, %#31
+  %#35 = urem i64 %#30, %#31
+  br label %#7
+
+#7:
+  %#36 = phi i64 [ %#33, %#6 ], [ %#42, %#9 ]
+  %#37 = phi i64 [ %#35, %#6 ], [ %#43, %#9 ]
+  %#38 = icmp ugt i64 %#36, 4294967295
+  br i1 %#38, label %#9, label %#8
+
+#8:
+  %#39 = mul nuw i64 %#36, %#32
+  %#40 = shl i64 %#37, 32
+  %#41 = icmp ugt i64 %#39, %#40
+  br i1 %#41, label %#9, label %#10
+
+#9:
+  %#42 = add i64 %#36, -1
+  %#43 = add i64 %#37, %#31
+  %#44 = icmp ult i64 %#43, 4294967296
+  br i1 %#44, label %#7#2, label %#10
+
+#7#2:
+  %#36#2 = phi i64 [ %#42, %#9 ]
+  %#37#2 = phi i64 [ %#43, %#9 ]
+  %#38#2 = icmp ugt i64 %#36#2, 4294967295
+  br i1 %#38#2, label %#9#2, label %#8#2
+
+#8#2:
+  %#39#2 = mul nuw i64 %#36#2, %#32
+  %#40#2 = shl i64 %#37#2, 32
+  %#41#2 = icmp ugt i64 %#39#2, %#40#2
+  br i1 %#41#2, label %#9#2, label %#10
+
+#9#2:
+  %#42#2 = add i64 %#36#2, -1
+  %#43#2 = add i64 %#37#2, %#31
+  %#44#2 = icmp ult i64 %#43#2, 4294967296
+  br i1 %#44#2, label %#7#3, label %#10
+
+#7#3:
+  %#36#3 = phi i64 [ %#42#2, %#9#2 ]
+  %#37#3 = phi i64 [ %#43#2, %#9#2 ]
+  %#38#3 = icmp ugt i64 %#36#3, 4294967295
+  br i1 %#38#3, label %#9#3, label %#8#3
+
+#8#3:
+  %#39#3 = mul nuw i64 %#36#3, %#32
+  %#40#3 = shl i64 %#37#3, 32
+  %#41#3 = icmp ugt i64 %#39#3, %#40#3
+  br i1 %#41#3, label %#9#3, label %#10
+
+#9#3:
+  %#42#3 = add i64 %#36#3, -1
+  %#43#3 = add i64 %#37#3, %#31
+  %#44#3 = icmp ult i64 %#43#3, 4294967296
+  br i1 %#44#3, label %#7#4, label %#10
+
+#7#4:
+  %#36#4 = phi i64 [ %#42#3, %#9#3 ]
+  %#37#4 = phi i64 [ %#43#3, %#9#3 ]
+  %#38#4 = icmp ugt i64 %#36#4, 4294967295
+  br i1 %#38#4, label %#9#4, label %#8#4
+
+#8#4:
+  %#39#4 = mul nuw i64 %#36#4, %#32
+  %#40#4 = shl i64 %#37#4, 32
+  %#41#4 = icmp ugt i64 %#39#4, %#40#4
+  br i1 %#41#4, label %#9#4, label %#10
+
+#9#4:
+  %#42#4 = add i64 %#36#4, -1
+  %#43#4 = add i64 %#37#4, %#31
+  %#44#4 = icmp ult i64 %#43#4, 4294967296
+  br i1 %#44#4, label %#7#exit, label %#10
+
+#7#exit:
+  %#36#exit = phi i64 [ %#42#4, %#9#4 ]
+  %#37#exit = phi i64 [ %#43#4, %#9#4 ]
+  %#38#exit = icmp ugt i64 %#36#exit, 4294967295
+  br i1 %#38#exit, label #sink, label #sink
+
+#10:
+  %#45 = phi i64 [ %#42, %#9 ], [ %#36, %#8 ], [ %#42#2, %#9#2 ], [ %#42#3, %#9#3 ], [ %#42#4, %#9#4 ], [ %#36#2, %#8#2 ], [ %#36#3, %#8#3 ], [ %#36#4, %#8#4 ]
+  %#46 = shl i64 %#30, 32
+  %#47 = mul i64 %#45, %#29
+  %#48 = sub i64 %#46, %#47
+  %#49 = udiv i64 %#48, %#31
+  %#51 = urem i64 %#48, %#31
+  br label %#11
+
+#11:
+  %#52 = phi i64 [ %#49, %#10 ], [ %#58, %#13 ]
+  %#53 = phi i64 [ %#51, %#10 ], [ %#59, %#13 ]
+  %#54 = icmp ugt i64 %#52, 4294967295
+  br i1 %#54, label %#13, label %#12
+
+#12:
+  %#55 = mul nuw i64 %#52, %#32
+  %#56 = shl i64 %#53, 32
+  %#57 = icmp ugt i64 %#55, %#56
+  br i1 %#57, label %#13, label %#14
+
+#13:
+  %#58 = add i64 %#52, -1
+  %#59 = add i64 %#53, %#31
+  %#60 = icmp ult i64 %#59, 4294967296
+  br i1 %#60, label %#11#2, label %#14
+
+#11#2:
+  %#52#2 = phi i64 [ %#58, %#13 ]
+  %#53#2 = phi i64 [ %#59, %#13 ]
+  %#54#2 = icmp ugt i64 %#52#2, 4294967295
+  br i1 %#54#2, label %#13#2, label %#12#2
+
+#12#2:
+  %#55#2 = mul nuw i64 %#52#2, %#32
+  %#56#2 = shl i64 %#53#2, 32
+  %#57#2 = icmp ugt i64 %#55#2, %#56#2
+  br i1 %#57#2, label %#13#2, label %#14
+
+#13#2:
+  %#58#2 = add i64 %#52#2, -1
+  %#59#2 = add i64 %#53#2, %#31
+  %#60#2 = icmp ult i64 %#59#2, 4294967296
+  br i1 %#60#2, label %#11#3, label %#14
+
+#11#3:
+  %#52#3 = phi i64 [ %#58#2, %#13#2 ]
+  %#53#3 = phi i64 [ %#59#2, %#13#2 ]
+  %#54#3 = icmp ugt i64 %#52#3, 4294967295
+  br i1 %#54#3, label %#13#3, label %#12#3
+
+#12#3:
+  %#55#3 = mul nuw i64 %#52#3, %#32
+  %#56#3 = shl i64 %#53#3, 32
+  %#57#3 = icmp ugt i64 %#55#3, %#56#3
+  br i1 %#57#3, label %#13#3, label %#14
+
+#13#3:
+  %#58#3 = add i64 %#52#3, -1
+  %#59#3 = add i64 %#53#3, %#31
+  %#60#3 = icmp ult i64 %#59#3, 4294967296
+  br i1 %#60#3, label %#11#4, label %#14
+
+#11#4:
+  %#52#4 = phi i64 [ %#58#3, %#13#3 ]
+  %#53#4 = phi i64 [ %#59#3, %#13#3 ]
+  %#54#4 = icmp ugt i64 %#52#4, 4294967295
+  br i1 %#54#4, label %#13#4, label %#12#4
+
+#12#4:
+  %#55#4 = mul nuw i64 %#52#4, %#32
+  %#56#4 = shl i64 %#53#4, 32
+  %#57#4 = icmp ugt i64 %#55#4, %#56#4
+  br i1 %#57#4, label %#13#4, label %#14
+
+#13#4:
+  %#58#4 = add i64 %#52#4, -1
+  %#59#4 = add i64 %#53#4, %#31
+  %#60#4 = icmp ult i64 %#59#4, 4294967296
+  br i1 %#60#4, label %#11#exit, label %#14
+
+#11#exit:
+  %#52#exit = phi i64 [ %#58#4, %#13#4 ]
+  %#53#exit = phi i64 [ %#59#4, %#13#4 ]
+  %#54#exit = icmp ugt i64 %#52#exit, 4294967295
+  br i1 %#54#exit, label #sink, label #sink
+
+#14:
+  %#61 = phi i64 [ %#58, %#13 ], [ %#52, %#12 ], [ %#58#2, %#13#2 ], [ %#58#3, %#13#3 ], [ %#58#4, %#13#4 ], [ %#52#2, %#12#2 ], [ %#52#3, %#12#3 ], [ %#52#4, %#12#4 ]
+  %#62 = shl i64 %#48, 32
+  %#63 = mul i64 %#61, %#29
+  %#64 = sub i64 %#62, %#63
+  %#65 = lshr i64 %#64, %#range_0_%#20
+  %#66 = shl i64 %#45, 32
+  %#67 = add i64 %#61, %#66
+  br label %#15
+
+#15:
+  %#68 = phi i64 [ %#65, %#14 ], [ -1, %#5 ]
+  %#69 = phi i64 [ %#67, %#14 ], [ -1, %#5 ]
+  %#70 = sub i64 noundef %#1, %#68
+  %#71 = icmp ult i64 %#70, %#27
+  br i1 %#71, label %#16, label %#17
+
+#16:
+  %#72 = zext nneg i32 %#22 to i64
+  %#73 = add i64 %#69, 1
+  %#74 = zext i64 %#73 to i128
+  %#75 = zext i64 noundef %#0 to i128
+  %#76 = mul nuw i128 %#74, %#75
+  %#77 = lshr i128 %#76, 64
+  %#78 = trunc nuw i128 %#77 to i64
+  %#79 = lshr i64 %#78, %#72
+  br label %#18
+
+#17:
+  %#80 = shl i64 %#69, 1
+  %#81 = icmp slt i64 %#68, 0
+  %#82 = shl i64 %#68, 1
+  %#83 = icmp uge i64 %#82, noundef %#1
+  %#84 = or i1 %#81, %#83
+  %#85 = zext i1 %#84 to i64
+  %#86 = or disjoint i64 %#80, %#85
+  %#87 = add i64 %#86, 1
+  %#88 = zext i64 %#87 to i128
+  %#89 = zext i64 noundef %#0 to i128
+  %#90 = mul nuw i128 %#88, %#89
+  %#91 = lshr i128 %#90, 64
+  %#92 = trunc nuw i128 %#91 to i64
+  %#93 = zext nneg i32 %#22 to i64
+  %#94 = sub i64 noundef %#0, %#92
+  %#95 = lshr i64 %#94, 1
+  %#96 = add i64 %#95, %#92
+  %#97 = lshr i64 %#96, %#93
+  br label %#18
+
+#18:
+  %#98 = phi i64 [ 0, %#2 ], [ %#26, %#4 ], [ %#97, %#17 ], [ %#79, %#16 ]
+  ret i64 %#98
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_bfull(i32 noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#15 = icmp eq i32 noundef %#1, 0
+  br i1 %#15, label %#14, label %#3
+
+#3:
+  %#16 = icmp slt i32 noundef %#1, 0
+  %#17 = abs i32 noundef %#1, 1
+  %#18 = ctlz i32 %#17, 1
+  %#range_0_%#18 = !range i32 %#18, i32 0, i32 32
+  %#19 = xor i32 %#range_0_%#18, 31
+  %#20 = ctpop i32 %#17
+  %#range_1_%#20 = !range i32 %#20, i32 1, i32 32
+  %#21 = icmp samesign ult i32 %#range_1_%#20, 2
+  br i1 %#21, label %#4, label %#5
+
+#4:
+  %#22 = lshr i32 noundef %#1, 24
+  %#23 = and i32 %#22, 128
+  %#24 = or disjoint i32 %#19, %#23
+  %#25 = trunc nuw i32 %#24 to i8
+  %#26 = or disjoint i8 %#25, 32
+  br label %#9
+
+#5:
+  %#27 = sub nsw i32 30, %#range_0_%#18
+  %#28 = shl nsw nuw i32 1, %#27
+  %#29 = zext nneg i32 %#28 to i64
+  %#30 = shl nsw nuw i64 %#29, 32
+  %#31 = zext nneg i32 %#17 to i64
+  %#32 = udiv i64 %#30, %#31
+  %#33 = trunc i64 %#32 to i32
+  %#34 = mul i32 %#17, %#33
+  %#35 = add i32 %#34, %#17
+  %#36 = lshr i32 %#35, %#19
+  %#37 = icmp eq i32 %#36, 0
+  br i1 %#37, label %#6, label %#7
+
+#6:
+  %#38 = trunc nsw i32 %#27 to i8
+  br label %#8
+
+#7:
+  %#39 = sub i32 0, %#34
+  %#40 = shl i32 %#33, 1
+  %#41 = shl i32 %#39, 1
+  %#42 = icmp uge i32 %#41, %#17
+  %#43 = icmp slt i32 %#39, 0
+  %#44 = or i1 %#43, %#42
+  %#45 = zext i1 %#44 to i32
+  %#46 = or disjoint i32 %#40, %#45
+  %#47 = trunc nsw nuw i32 %#19 to i8
+  %#48 = or disjoint i8 %#47, 64
+  br label %#8
+
+#8:
+  %#49 = phi i8 [ %#48, %#7 ], [ %#38, %#6 ]
+  %#50 = phi i32 [ %#46, %#7 ], [ %#33, %#6 ]
+  %#51 = add i32 %#50, 1
+  %#52 = xor i32 %#50, 4294967295
+  %#53 = select i1 %#16, i32 %#52, i32 %#51
+  %#54 = or i8 %#49, 128
+  %#55 = select i1 %#16, i8 %#54, i8 %#49
+  %#56 = sext i32 %#53 to i64
+  br label %#9
+
+#9:
+  %#57 = phi i64 [ 0, %#4 ], [ %#56, %#8 ]
+  %#58 = phi i8 [ %#26, %#4 ], [ %#55, %#8 ]
+  %#59 = zext i8 %#58 to i32
+  %#60 = and i32 %#59, 32
+  %#61 = icmp eq i32 %#60, 0
+  br i1 %#61, label %#10, label %#13
+
+#10:
+  %#62 = sext i32 noundef %#0 to i64
+  %#63 = mul nsw i64 %#57, %#62
+  %#64 = lshr i64 %#63, 32
+  %#65 = trunc nuw i64 %#64 to i32
+  %#66 = and i32 %#59, 64
+  %#67 = icmp eq i32 %#66, 0
+  br i1 %#67, label %#12, label %#11
+
+#11:
+  %#68 = ashr i8 %#58, 7
+  %#69 = sext i8 %#68 to i32
+  %#70 = xor i32 noundef %#0, %#69
+  %#71 = sub i32 %#65, %#69
+  %#72 = add i32 %#71, %#70
+  br label %#12
+
+#12:
+  %#73 = phi i32 [ %#72, %#11 ], [ %#65, %#10 ]
+  %#74 = and i32 %#59, 31
+  %#75 = ashr i32 %#73, %#74
+  %#76 = lshr i32 %#75, 31
+  %#77 = add nsw i32 %#76, %#75
+  br label %#14
+
+#13:
+  %#78 = and i8 %#58, 31
+  %#79 = zext nneg i8 %#78 to i32
+  %#80 = shl nsw i32 4294967295, %#79
+  %#81 = xor i32 %#80, 4294967295
+  %#82 = icmp slt i32 noundef %#0, 0
+  %#83 = select i1 %#82, i32 %#81, i32 0
+  %#84 = add nsw i32 %#83, noundef %#0
+  %#85 = ashr i32 %#84, %#79
+  %#86 = ashr i8 %#58, 7
+  %#87 = sext i8 %#86 to i32
+  %#88 = xor i32 %#85, %#87
+  %#89 = sub nsw i32 %#88, %#87
+  br label %#14
+
+#14:
+  %#90 = phi i32 [ 0, %#2 ], [ %#89, %#13 ], [ %#77, %#12 ]
+  ret i32 %#90
+}
+=>
+define i32 @target_s32_bfull(i32 noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i32 noundef %#1, 0
+  %#16 = abs i32 noundef %#1, 1
+  %#17 = ctpop i32 %#16
+  %#range_0_%#17 = !range i32 %#17, i32 1, i32 32
+  %#18 = icmp samesign ult i32 %#range_0_%#17, 2
+  br i1 %#18, label %#4, label %#5
+
+#4:
+  %#19 = cttz i32 noundef %#1, 1
+  %#range_1_%#19 = !range i32 %#19, i32 0, i32 32
+  %#20 = lshr i32 noundef %#1, 24
+  %#21 = and i32 %#20, 128
+  %#22 = or disjoint i32 %#range_1_%#19, %#21
+  %#23 = or disjoint i32 %#22, 32
+  br label %#8
+
+#5:
+  %#24 = ctlz i32 %#16, 1
+  %#range_2_%#24 = !range i32 %#24, i32 0, i32 32
+  %#25 = xor i32 %#range_2_%#24, 31
+  %#26 = sub nsw nuw i32 30, %#range_2_%#24
+  %#27 = shl nsw nuw i32 1, %#26
+  %#28 = zext nneg i32 %#27 to i64
+  %#29 = shl nsw nuw i64 %#28, 32
+  %#30 = zext nneg i32 %#16 to i64
+  %#31 = udiv i64 %#29, %#30
+  %#32 = trunc i64 %#31 to i32
+  %#33 = mul i32 %#16, %#32
+  %#34 = add i32 %#33, %#16
+  %#35 = lshr i32 %#34, %#25
+  %#36 = icmp eq i32 %#35, 0
+  br i1 %#36, label %#7, label %#6
+
+#6:
+  %#37 = sub i32 0, %#33
+  %#38 = shl i32 %#32, 1
+  %#39 = shl i32 %#37, 1
+  %#40 = icmp uge i32 %#39, %#16
+  %#41 = icmp slt i32 %#37, 0
+  %#42 = or i1 %#41, %#40
+  %#43 = zext i1 %#42 to i32
+  %#44 = or disjoint i32 %#38, %#43
+  %#45 = lshr i32 noundef %#1, 24
+  %#46 = and i32 %#45, 128
+  %#47 = or disjoint i32 %#46, %#25
+  %#48 = or disjoint i32 %#47, 64
+  br label %#7
+
+#7:
+  %#49 = phi i32 [ %#48, %#6 ], [ %#26, %#5 ]
+  %#50 = phi i32 [ %#44, %#6 ], [ %#32, %#5 ]
+  %#51 = add i32 %#50, 1
+  %#52 = xor i32 %#50, 4294967295
+  %#53 = select i1 %#15, i32 %#52, i32 %#51
+  %#54 = sext i32 %#53 to i64
+  br label %#8
+
+#8:
+  %#55 = phi i64 [ 0, %#4 ], [ %#54, %#7 ]
+  %#56 = phi i32 [ %#23, %#4 ], [ %#49, %#7 ]
+  %#57 = and i32 %#56, 32
+  %#58 = icmp eq i32 %#57, 0
+  br i1 %#58, label %#9, label %#12
+
+#9:
+  %#59 = sext i32 noundef %#0 to i64
+  %#60 = mul nsw i64 %#55, %#59
+  %#61 = lshr i64 %#60, 32
+  %#62 = trunc nuw i64 %#61 to i32
+  %#63 = and i32 %#56, 64
+  %#64 = icmp eq i32 %#63, 0
+  br i1 %#64, label %#11, label %#10
+
+#10:
+  %#65 = shl nuw i32 %#56, 24
+  %#66 = lshr i32 %#56, 7
+  %#67 = ashr i32 %#65, 31
+  %#68 = xor i32 %#67, noundef %#0
+  %#69 = add i32 %#66, %#62
+  %#70 = add i32 %#69, %#68
+  br label %#11
+
+#11:
+  %#71 = phi i32 [ %#70, %#10 ], [ %#62, %#9 ]
+  %#72 = and i32 %#56, 31
+  %#73 = ashr i32 %#71, %#72
+  %#74 = lshr i32 %#73, 31
+  %#75 = add nsw i32 %#74, %#73
+  br label %#13
+
+#12:
+  %#76 = and i32 %#56, 31
+  %#77 = shl nsw i32 4294967295, %#76
+  %#78 = xor i32 %#77, 4294967295
+  %#79 = icmp slt i32 noundef %#0, 0
+  %#80 = select i1 %#79, i32 %#78, i32 0
+  %#81 = add nsw i32 %#80, noundef %#0
+  %#82 = ashr i32 %#81, %#76
+  %#83 = shl nuw i32 %#56, 24
+  %#84 = ashr i32 %#83, 31
+  %#85 = xor i32 %#82, %#84
+  %#86 = sub nsw i32 %#85, %#84
+  br label %#13
+
+#13:
+  %#87 = phi i32 [ 0, %#2 ], [ %#86, %#12 ], [ %#75, %#11 ]
+  ret i32 %#87
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_bfull(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#24 = icmp eq i64 noundef %#1, 0
+  br i1 %#24, label %#23, label %#3
+
+#3:
+  %#25 = icmp slt i64 noundef %#1, 0
+  %#26 = abs i64 noundef %#1, 1
+  %#27 = ctpop i64 %#26
+  %#range_0_%#27 = !range i64 %#27, i64 1, i64 64
+  %#28 = icmp samesign ult i64 %#range_0_%#27, 2
+  br i1 %#28, label %#4, label %#5
+
+#4:
+  %#29 = cttz i64 noundef %#1, 1
+  %#range_1_%#29 = !range i64 %#29, i64 0, i64 65
+  %#30 = trunc nsw nuw i64 %#range_1_%#29 to i8
+  %#31 = lshr i64 noundef %#1, 56
+  %#32 = trunc nuw i64 %#31 to i8
+  %#33 = and i8 %#32, 128
+  %#34 = or disjoint i8 %#33, %#30
+  br label %#19
+
+#5:
+  %#35 = ctlz i64 %#26, 1
+  %#range_2_%#35 = !range i64 %#35, i64 0, i64 65
+  %#36 = trunc nsw nuw i64 %#range_2_%#35 to i32
+  %#37 = xor i32 %#36, 63
+  %#38 = sub nsw nuw i32 62, %#36
+  %#39 = zext nneg i32 %#38 to i64
+  %#40 = shl nsw nuw i64 1, %#39
+  %#41 = icmp samesign ult i64 %#40, %#26
+  br i1 %#41, label %#6, label %#15
+
+#6:
+  %#42 = shl i64 %#26, %#range_2_%#35
+  %#43 = shl i64 %#40, %#range_2_%#35
+  %#44 = lshr i64 %#42, 32
+  %#45 = and i64 %#42, 4294967294
+  %#46 = udiv i64 %#43, %#44
+  %#48 = urem i64 %#43, %#44
+  br label %#7
+
+#7:
+  %#49 = phi i64 [ %#46, %#6 ], [ %#55, %#9 ]
+  %#50 = phi i64 [ %#48, %#6 ], [ %#56, %#9 ]
+  %#51 = icmp ugt i64 %#49, 4294967295
+  br i1 %#51, label %#9, label %#8
+
+#8:
+  %#52 = mul nuw i64 %#49, %#45
+  %#53 = shl i64 %#50, 32
+  %#54 = icmp ugt i64 %#52, %#53
+  br i1 %#54, label %#9, label %#10
+
+#9:
+  %#55 = add i64 %#49, -1
+  %#56 = add i64 %#50, %#44
+  %#57 = icmp ult i64 %#56, 4294967296
+  br i1 %#57, label %#7#2, label %#10
+
+#7#2:
+  %#49#2 = phi i64 [ %#55, %#9 ]
+  %#50#2 = phi i64 [ %#56, %#9 ]
+  %#51#2 = icmp ugt i64 %#49#2, 4294967295
+  br i1 %#51#2, label %#9#2, label %#8#2
+
+#8#2:
+  %#52#2 = mul nuw i64 %#49#2, %#45
+  %#53#2 = shl i64 %#50#2, 32
+  %#54#2 = icmp ugt i64 %#52#2, %#53#2
+  br i1 %#54#2, label %#9#2, label %#10
+
+#9#2:
+  %#55#2 = add i64 %#49#2, -1
+  %#56#2 = add i64 %#50#2, %#44
+  %#57#2 = icmp ult i64 %#56#2, 4294967296
+  br i1 %#57#2, label %#7#3, label %#10
+
+#7#3:
+  %#49#3 = phi i64 [ %#55#2, %#9#2 ]
+  %#50#3 = phi i64 [ %#56#2, %#9#2 ]
+  %#51#3 = icmp ugt i64 %#49#3, 4294967295
+  br i1 %#51#3, label %#9#3, label %#8#3
+
+#8#3:
+  %#52#3 = mul nuw i64 %#49#3, %#45
+  %#53#3 = shl i64 %#50#3, 32
+  %#54#3 = icmp ugt i64 %#52#3, %#53#3
+  br i1 %#54#3, label %#9#3, label %#10
+
+#9#3:
+  %#55#3 = add i64 %#49#3, -1
+  %#56#3 = add i64 %#50#3, %#44
+  %#57#3 = icmp ult i64 %#56#3, 4294967296
+  br i1 %#57#3, label %#7#4, label %#10
+
+#7#4:
+  %#49#4 = phi i64 [ %#55#3, %#9#3 ]
+  %#50#4 = phi i64 [ %#56#3, %#9#3 ]
+  %#51#4 = icmp ugt i64 %#49#4, 4294967295
+  br i1 %#51#4, label %#9#4, label %#8#4
+
+#8#4:
+  %#52#4 = mul nuw i64 %#49#4, %#45
+  %#53#4 = shl i64 %#50#4, 32
+  %#54#4 = icmp ugt i64 %#52#4, %#53#4
+  br i1 %#54#4, label %#9#4, label %#10
+
+#9#4:
+  %#55#4 = add i64 %#49#4, -1
+  %#56#4 = add i64 %#50#4, %#44
+  %#57#4 = icmp ult i64 %#56#4, 4294967296
+  br i1 %#57#4, label %#7#exit, label %#10
+
+#7#exit:
+  %#49#exit = phi i64 [ %#55#4, %#9#4 ]
+  %#50#exit = phi i64 [ %#56#4, %#9#4 ]
+  %#51#exit = icmp ugt i64 %#49#exit, 4294967295
+  br i1 %#51#exit, label #sink, label #sink
+
+#10:
+  %#58 = phi i64 [ %#55, %#9 ], [ %#49, %#8 ], [ %#55#2, %#9#2 ], [ %#55#3, %#9#3 ], [ %#55#4, %#9#4 ], [ %#49#2, %#8#2 ], [ %#49#3, %#8#3 ], [ %#49#4, %#8#4 ]
+  %#59 = shl i64 %#43, 32
+  %#60 = mul i64 %#58, %#42
+  %#61 = sub i64 %#59, %#60
+  %#62 = udiv i64 %#61, %#44
+  %#64 = urem i64 %#61, %#44
+  br label %#11
+
+#11:
+  %#65 = phi i64 [ %#62, %#10 ], [ %#71, %#13 ]
+  %#66 = phi i64 [ %#64, %#10 ], [ %#72, %#13 ]
+  %#67 = icmp ugt i64 %#65, 4294967295
+  br i1 %#67, label %#13, label %#12
+
+#12:
+  %#68 = mul nuw i64 %#65, %#45
+  %#69 = shl i64 %#66, 32
+  %#70 = icmp ugt i64 %#68, %#69
+  br i1 %#70, label %#13, label %#14
+
+#13:
+  %#71 = add i64 %#65, -1
+  %#72 = add i64 %#66, %#44
+  %#73 = icmp ult i64 %#72, 4294967296
+  br i1 %#73, label %#11#2, label %#14
+
+#11#2:
+  %#65#2 = phi i64 [ %#71, %#13 ]
+  %#66#2 = phi i64 [ %#72, %#13 ]
+  %#67#2 = icmp ugt i64 %#65#2, 4294967295
+  br i1 %#67#2, label %#13#2, label %#12#2
+
+#12#2:
+  %#68#2 = mul nuw i64 %#65#2, %#45
+  %#69#2 = shl i64 %#66#2, 32
+  %#70#2 = icmp ugt i64 %#68#2, %#69#2
+  br i1 %#70#2, label %#13#2, label %#14
+
+#13#2:
+  %#71#2 = add i64 %#65#2, -1
+  %#72#2 = add i64 %#66#2, %#44
+  %#73#2 = icmp ult i64 %#72#2, 4294967296
+  br i1 %#73#2, label %#11#3, label %#14
+
+#11#3:
+  %#65#3 = phi i64 [ %#71#2, %#13#2 ]
+  %#66#3 = phi i64 [ %#72#2, %#13#2 ]
+  %#67#3 = icmp ugt i64 %#65#3, 4294967295
+  br i1 %#67#3, label %#13#3, label %#12#3
+
+#12#3:
+  %#68#3 = mul nuw i64 %#65#3, %#45
+  %#69#3 = shl i64 %#66#3, 32
+  %#70#3 = icmp ugt i64 %#68#3, %#69#3
+  br i1 %#70#3, label %#13#3, label %#14
+
+#13#3:
+  %#71#3 = add i64 %#65#3, -1
+  %#72#3 = add i64 %#66#3, %#44
+  %#73#3 = icmp ult i64 %#72#3, 4294967296
+  br i1 %#73#3, label %#11#4, label %#14
+
+#11#4:
+  %#65#4 = phi i64 [ %#71#3, %#13#3 ]
+  %#66#4 = phi i64 [ %#72#3, %#13#3 ]
+  %#67#4 = icmp ugt i64 %#65#4, 4294967295
+  br i1 %#67#4, label %#13#4, label %#12#4
+
+#12#4:
+  %#68#4 = mul nuw i64 %#65#4, %#45
+  %#69#4 = shl i64 %#66#4, 32
+  %#70#4 = icmp ugt i64 %#68#4, %#69#4
+  br i1 %#70#4, label %#13#4, label %#14
+
+#13#4:
+  %#71#4 = add i64 %#65#4, -1
+  %#72#4 = add i64 %#66#4, %#44
+  %#73#4 = icmp ult i64 %#72#4, 4294967296
+  br i1 %#73#4, label %#11#exit, label %#14
+
+#11#exit:
+  %#65#exit = phi i64 [ %#71#4, %#13#4 ]
+  %#66#exit = phi i64 [ %#72#4, %#13#4 ]
+  %#67#exit = icmp ugt i64 %#65#exit, 4294967295
+  br i1 %#67#exit, label #sink, label #sink
+
+#14:
+  %#74 = phi i64 [ %#71, %#13 ], [ %#65, %#12 ], [ %#71#2, %#13#2 ], [ %#71#3, %#13#3 ], [ %#71#4, %#13#4 ], [ %#65#2, %#12#2 ], [ %#65#3, %#12#3 ], [ %#65#4, %#12#4 ]
+  %#75 = shl i64 %#61, 32
+  %#76 = mul i64 %#74, %#42
+  %#77 = sub i64 %#75, %#76
+  %#78 = lshr i64 %#77, %#range_2_%#35
+  %#79 = shl i64 %#58, 32
+  %#80 = add i64 %#74, %#79
+  br label %#15
+
+#15:
+  %#81 = phi i64 [ %#78, %#14 ], [ -1, %#5 ]
+  %#82 = phi i64 [ %#80, %#14 ], [ -1, %#5 ]
+  %#83 = sub i64 %#26, %#81
+  %#84 = zext nneg i32 %#37 to i64
+  %#85 = lshr i64 %#83, %#84
+  %#86 = icmp eq i64 %#85, 0
+  br i1 %#86, label %#16, label %#17
+
+#16:
+  %#87 = trunc nsw nuw i32 %#38 to i8
+  br label %#18
+
+#17:
+  %#88 = shl i64 %#82, 1
+  %#89 = shl i64 %#81, 1
+  %#90 = icmp uge i64 %#89, %#26
+  %#91 = icmp slt i64 %#81, 0
+  %#92 = or i1 %#91, %#90
+  %#93 = zext i1 %#92 to i64
+  %#94 = or disjoint i64 %#88, %#93
+  %#95 = lshr i64 noundef %#1, 56
+  %#96 = trunc nsw nuw i64 %#95 to i32
+  %#97 = and i32 %#96, 128
+  %#98 = or disjoint i32 %#37, %#97
+  %#99 = trunc nuw i32 %#98 to i8
+  %#100 = or disjoint i8 %#99, 64
+  br label %#18
+
+#18:
+  %#101 = phi i8 [ %#87, %#16 ], [ %#100, %#17 ]
+  %#102 = phi i64 [ %#82, %#16 ], [ %#94, %#17 ]
+  %#103 = add i64 %#102, 1
+  %#104 = xor i64 %#102, -1
+  %#105 = select i1 %#25, i64 %#104, i64 %#103
+  %#106 = icmp eq i64 %#105, 0
+  br i1 %#106, label %#19, label %#20
+
+#19:
+  %#107 = phi i8 [ %#34, %#4 ], [ %#101, %#18 ]
+  %#108 = and i8 %#107, 63
+  %#109 = zext nneg i8 %#108 to i64
+  %#110 = shl nsw i64 -1, %#109
+  %#111 = xor i64 %#110, -1
+  %#112 = icmp slt i64 noundef %#0, 0
+  %#113 = select i1 %#112, i64 %#111, i64 0
+  %#114 = add nsw i64 %#113, noundef %#0
+  %#115 = ashr i64 %#114, %#109
+  %#116 = ashr i8 %#107, 7
+  %#117 = sext i8 %#116 to i64
+  %#118 = xor i64 %#115, %#117
+  %#119 = sub nsw i64 %#118, %#117
+  br label %#23
+
+#20:
+  %#120 = sext i64 %#105 to i128
+  %#121 = sext i64 noundef %#0 to i128
+  %#122 = mul nsw i128 %#120, %#121
+  %#123 = lshr i128 %#122, 64
+  %#124 = trunc nuw i128 %#123 to i64
+  %#125 = zext i8 %#101 to i32
+  %#126 = and i32 %#125, 64
+  %#127 = icmp eq i32 %#126, 0
+  br i1 %#127, label %#22, label %#21
+
+#21:
+  %#128 = ashr i8 %#101, 7
+  %#129 = sext i8 %#128 to i64
+  %#130 = xor i64 noundef %#0, %#129
+  %#131 = sub i64 %#130, %#129
+  %#132 = add nsw i64 %#131, %#124
+  br label %#22
+
+#22:
+  %#133 = phi i64 [ %#132, %#21 ], [ %#124, %#20 ]
+  %#134 = and i32 %#125, 63
+  %#135 = zext nneg i32 %#134 to i64
+  %#136 = ashr i64 %#133, %#135
+  %#137 = lshr i64 %#136, 63
+  %#138 = add nsw i64 %#137, %#136
+  br label %#23
+
+#23:
+  %#139 = phi i64 [ 0, %#2 ], [ %#119, %#19 ], [ %#138, %#22 ]
+  ret i64 %#139
+}
+=>
+define i64 @target_s64_bfull(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#24 = icmp eq i64 noundef %#1, 0
+  br i1 %#24, label %#23, label %#3
+
+#3:
+  %#25 = icmp slt i64 noundef %#1, 0
+  %#26 = abs i64 noundef %#1, 1
+  %#27 = ctpop i64 %#26
+  %#range_0_%#27 = !range i64 %#27, i64 1, i64 64
+  %#28 = icmp samesign ult i64 %#range_0_%#27, 2
+  br i1 %#28, label %#4, label %#5
+
+#4:
+  %#29 = cttz i64 noundef %#1, 1
+  %#range_1_%#29 = !range i64 %#29, i64 0, i64 65
+  %#30 = trunc nsw nuw i64 %#range_1_%#29 to i8
+  %#31 = lshr i64 noundef %#1, 56
+  %#32 = trunc nuw i64 %#31 to i8
+  %#33 = and i8 %#32, 128
+  %#34 = or disjoint i8 %#33, %#30
+  br label %#19
+
+#5:
+  %#35 = ctlz i64 %#26, 1
+  %#range_2_%#35 = !range i64 %#35, i64 0, i64 65
+  %#36 = trunc nsw nuw i64 %#range_2_%#35 to i32
+  %#37 = xor i32 %#36, 63
+  %#38 = sub nsw nuw i32 62, %#36
+  %#39 = zext nneg i32 %#38 to i64
+  %#40 = shl nsw nuw i64 1, %#39
+  %#41 = icmp samesign ult i64 %#40, %#26
+  br i1 %#41, label %#6, label %#15
+
+#6:
+  %#42 = shl i64 %#26, %#range_2_%#35
+  %#43 = shl i64 %#40, %#range_2_%#35
+  %#44 = lshr i64 %#42, 32
+  %#45 = and i64 %#42, 4294967294
+  %#46 = udiv i64 %#43, %#44
+  %#48 = urem i64 %#43, %#44
+  br label %#7
+
+#7:
+  %#49 = phi i64 [ %#46, %#6 ], [ %#55, %#9 ]
+  %#50 = phi i64 [ %#48, %#6 ], [ %#56, %#9 ]
+  %#51 = icmp ugt i64 %#49, 4294967295
+  br i1 %#51, label %#9, label %#8
+
+#8:
+  %#52 = mul nuw i64 %#49, %#45
+  %#53 = shl i64 %#50, 32
+  %#54 = icmp ugt i64 %#52, %#53
+  br i1 %#54, label %#9, label %#10
+
+#9:
+  %#55 = add i64 %#49, -1
+  %#56 = add i64 %#50, %#44
+  %#57 = icmp ult i64 %#56, 4294967296
+  br i1 %#57, label %#7#2, label %#10
+
+#7#2:
+  %#49#2 = phi i64 [ %#55, %#9 ]
+  %#50#2 = phi i64 [ %#56, %#9 ]
+  %#51#2 = icmp ugt i64 %#49#2, 4294967295
+  br i1 %#51#2, label %#9#2, label %#8#2
+
+#8#2:
+  %#52#2 = mul nuw i64 %#49#2, %#45
+  %#53#2 = shl i64 %#50#2, 32
+  %#54#2 = icmp ugt i64 %#52#2, %#53#2
+  br i1 %#54#2, label %#9#2, label %#10
+
+#9#2:
+  %#55#2 = add i64 %#49#2, -1
+  %#56#2 = add i64 %#50#2, %#44
+  %#57#2 = icmp ult i64 %#56#2, 4294967296
+  br i1 %#57#2, label %#7#3, label %#10
+
+#7#3:
+  %#49#3 = phi i64 [ %#55#2, %#9#2 ]
+  %#50#3 = phi i64 [ %#56#2, %#9#2 ]
+  %#51#3 = icmp ugt i64 %#49#3, 4294967295
+  br i1 %#51#3, label %#9#3, label %#8#3
+
+#8#3:
+  %#52#3 = mul nuw i64 %#49#3, %#45
+  %#53#3 = shl i64 %#50#3, 32
+  %#54#3 = icmp ugt i64 %#52#3, %#53#3
+  br i1 %#54#3, label %#9#3, label %#10
+
+#9#3:
+  %#55#3 = add i64 %#49#3, -1
+  %#56#3 = add i64 %#50#3, %#44
+  %#57#3 = icmp ult i64 %#56#3, 4294967296
+  br i1 %#57#3, label %#7#4, label %#10
+
+#7#4:
+  %#49#4 = phi i64 [ %#55#3, %#9#3 ]
+  %#50#4 = phi i64 [ %#56#3, %#9#3 ]
+  %#51#4 = icmp ugt i64 %#49#4, 4294967295
+  br i1 %#51#4, label %#9#4, label %#8#4
+
+#8#4:
+  %#52#4 = mul nuw i64 %#49#4, %#45
+  %#53#4 = shl i64 %#50#4, 32
+  %#54#4 = icmp ugt i64 %#52#4, %#53#4
+  br i1 %#54#4, label %#9#4, label %#10
+
+#9#4:
+  %#55#4 = add i64 %#49#4, -1
+  %#56#4 = add i64 %#50#4, %#44
+  %#57#4 = icmp ult i64 %#56#4, 4294967296
+  br i1 %#57#4, label %#7#exit, label %#10
+
+#7#exit:
+  %#49#exit = phi i64 [ %#55#4, %#9#4 ]
+  %#50#exit = phi i64 [ %#56#4, %#9#4 ]
+  %#51#exit = icmp ugt i64 %#49#exit, 4294967295
+  br i1 %#51#exit, label #sink, label #sink
+
+#10:
+  %#58 = phi i64 [ %#55, %#9 ], [ %#49, %#8 ], [ %#55#2, %#9#2 ], [ %#55#3, %#9#3 ], [ %#55#4, %#9#4 ], [ %#49#2, %#8#2 ], [ %#49#3, %#8#3 ], [ %#49#4, %#8#4 ]
+  %#59 = shl i64 %#43, 32
+  %#60 = mul i64 %#58, %#42
+  %#61 = sub i64 %#59, %#60
+  %#62 = udiv i64 %#61, %#44
+  %#64 = urem i64 %#61, %#44
+  br label %#11
+
+#11:
+  %#65 = phi i64 [ %#62, %#10 ], [ %#71, %#13 ]
+  %#66 = phi i64 [ %#64, %#10 ], [ %#72, %#13 ]
+  %#67 = icmp ugt i64 %#65, 4294967295
+  br i1 %#67, label %#13, label %#12
+
+#12:
+  %#68 = mul nuw i64 %#65, %#45
+  %#69 = shl i64 %#66, 32
+  %#70 = icmp ugt i64 %#68, %#69
+  br i1 %#70, label %#13, label %#14
+
+#13:
+  %#71 = add i64 %#65, -1
+  %#72 = add i64 %#66, %#44
+  %#73 = icmp ult i64 %#72, 4294967296
+  br i1 %#73, label %#11#2, label %#14
+
+#11#2:
+  %#65#2 = phi i64 [ %#71, %#13 ]
+  %#66#2 = phi i64 [ %#72, %#13 ]
+  %#67#2 = icmp ugt i64 %#65#2, 4294967295
+  br i1 %#67#2, label %#13#2, label %#12#2
+
+#12#2:
+  %#68#2 = mul nuw i64 %#65#2, %#45
+  %#69#2 = shl i64 %#66#2, 32
+  %#70#2 = icmp ugt i64 %#68#2, %#69#2
+  br i1 %#70#2, label %#13#2, label %#14
+
+#13#2:
+  %#71#2 = add i64 %#65#2, -1
+  %#72#2 = add i64 %#66#2, %#44
+  %#73#2 = icmp ult i64 %#72#2, 4294967296
+  br i1 %#73#2, label %#11#3, label %#14
+
+#11#3:
+  %#65#3 = phi i64 [ %#71#2, %#13#2 ]
+  %#66#3 = phi i64 [ %#72#2, %#13#2 ]
+  %#67#3 = icmp ugt i64 %#65#3, 4294967295
+  br i1 %#67#3, label %#13#3, label %#12#3
+
+#12#3:
+  %#68#3 = mul nuw i64 %#65#3, %#45
+  %#69#3 = shl i64 %#66#3, 32
+  %#70#3 = icmp ugt i64 %#68#3, %#69#3
+  br i1 %#70#3, label %#13#3, label %#14
+
+#13#3:
+  %#71#3 = add i64 %#65#3, -1
+  %#72#3 = add i64 %#66#3, %#44
+  %#73#3 = icmp ult i64 %#72#3, 4294967296
+  br i1 %#73#3, label %#11#4, label %#14
+
+#11#4:
+  %#65#4 = phi i64 [ %#71#3, %#13#3 ]
+  %#66#4 = phi i64 [ %#72#3, %#13#3 ]
+  %#67#4 = icmp ugt i64 %#65#4, 4294967295
+  br i1 %#67#4, label %#13#4, label %#12#4
+
+#12#4:
+  %#68#4 = mul nuw i64 %#65#4, %#45
+  %#69#4 = shl i64 %#66#4, 32
+  %#70#4 = icmp ugt i64 %#68#4, %#69#4
+  br i1 %#70#4, label %#13#4, label %#14
+
+#13#4:
+  %#71#4 = add i64 %#65#4, -1
+  %#72#4 = add i64 %#66#4, %#44
+  %#73#4 = icmp ult i64 %#72#4, 4294967296
+  br i1 %#73#4, label %#11#exit, label %#14
+
+#11#exit:
+  %#65#exit = phi i64 [ %#71#4, %#13#4 ]
+  %#66#exit = phi i64 [ %#72#4, %#13#4 ]
+  %#67#exit = icmp ugt i64 %#65#exit, 4294967295
+  br i1 %#67#exit, label #sink, label #sink
+
+#14:
+  %#74 = phi i64 [ %#71, %#13 ], [ %#65, %#12 ], [ %#71#2, %#13#2 ], [ %#71#3, %#13#3 ], [ %#71#4, %#13#4 ], [ %#65#2, %#12#2 ], [ %#65#3, %#12#3 ], [ %#65#4, %#12#4 ]
+  %#75 = shl i64 %#61, 32
+  %#76 = mul i64 %#74, %#42
+  %#77 = sub i64 %#75, %#76
+  %#78 = lshr i64 %#77, %#range_2_%#35
+  %#79 = shl i64 %#58, 32
+  %#80 = add i64 %#74, %#79
+  br label %#15
+
+#15:
+  %#81 = phi i64 [ %#78, %#14 ], [ -1, %#5 ]
+  %#82 = phi i64 [ %#80, %#14 ], [ -1, %#5 ]
+  %#83 = sub i64 %#26, %#81
+  %#84 = zext nneg i32 %#37 to i64
+  %#85 = lshr i64 %#83, %#84
+  %#86 = icmp eq i64 %#85, 0
+  br i1 %#86, label %#16, label %#17
+
+#16:
+  %#87 = trunc nsw nuw i32 %#38 to i8
+  br label %#18
+
+#17:
+  %#88 = shl i64 %#82, 1
+  %#89 = shl i64 %#81, 1
+  %#90 = icmp uge i64 %#89, %#26
+  %#91 = icmp slt i64 %#81, 0
+  %#92 = or i1 %#91, %#90
+  %#93 = zext i1 %#92 to i64
+  %#94 = or disjoint i64 %#88, %#93
+  %#95 = lshr i64 noundef %#1, 56
+  %#96 = trunc nsw nuw i64 %#95 to i32
+  %#97 = and i32 %#96, 128
+  %#98 = or disjoint i32 %#37, %#97
+  %#99 = trunc nuw i32 %#98 to i8
+  %#100 = or disjoint i8 %#99, 64
+  br label %#18
+
+#18:
+  %#101 = phi i8 [ %#87, %#16 ], [ %#100, %#17 ]
+  %#102 = phi i64 [ %#82, %#16 ], [ %#94, %#17 ]
+  %#103 = add i64 %#102, 1
+  %#104 = xor i64 %#102, -1
+  %#105 = select i1 %#25, i64 %#104, i64 %#103
+  %#106 = icmp eq i64 %#105, 0
+  br i1 %#106, label %#19, label %#20
+
+#19:
+  %#107 = phi i8 [ %#34, %#4 ], [ %#101, %#18 ]
+  %#108 = and i8 %#107, 63
+  %#109 = zext nneg i8 %#108 to i64
+  %#110 = shl nsw i64 -1, %#109
+  %#111 = xor i64 %#110, -1
+  %#112 = icmp slt i64 noundef %#0, 0
+  %#113 = select i1 %#112, i64 %#111, i64 0
+  %#114 = add nsw i64 %#113, noundef %#0
+  %#115 = ashr i64 %#114, %#109
+  %#116 = ashr i8 %#107, 7
+  %#117 = sext i8 %#116 to i64
+  %#118 = xor i64 %#115, %#117
+  %#119 = sub nsw i64 %#118, %#117
+  br label %#23
+
+#20:
+  %#120 = sext i64 %#105 to i128
+  %#121 = sext i64 noundef %#0 to i128
+  %#122 = mul nsw i128 %#120, %#121
+  %#123 = lshr i128 %#122, 64
+  %#124 = trunc nuw i128 %#123 to i64
+  %#125 = zext i8 %#101 to i32
+  %#126 = and i32 %#125, 64
+  %#127 = icmp eq i32 %#126, 0
+  br i1 %#127, label %#22, label %#21
+
+#21:
+  %#128 = ashr i8 %#101, 7
+  %#129 = sext i8 %#128 to i64
+  %#130 = xor i64 noundef %#0, %#129
+  %#131 = sub i64 %#130, %#129
+  %#132 = add nsw i64 %#131, %#124
+  br label %#22
+
+#22:
+  %#133 = phi i64 [ %#132, %#21 ], [ %#124, %#20 ]
+  %#134 = and i32 %#125, 63
+  %#135 = zext nneg i32 %#134 to i64
+  %#136 = ashr i64 %#133, %#135
+  %#137 = lshr i64 %#136, 63
+  %#138 = add nsw i64 %#137, %#136
+  br label %#23
+
+#23:
+  %#139 = phi i64 [ 0, %#2 ], [ %#119, %#19 ], [ %#138, %#22 ]
+  ret i64 %#139
+}
+Transformation seems to be correct!
+
+Summary:
+  4 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

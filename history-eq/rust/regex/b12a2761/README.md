@@ -1,0 +1,9 @@
+# regex `b12a2761`: avoid a UTF-8 iterator allocation
+
+**Verdict: verified equal/refinement for the changed `Utf8Sequences::new` result in the Aeneas value model, conditional on a shared interpretation of one external conversion function.** The parent is `4c565c8a636aa0e1e13dd801340ad6545fd256e9`; the child is `b12a2761f91320bc8bf8246f88d2884a90034b5a`. The commit replaces an empty vector followed by `push` with a one-element vector. The commit author explicitly reported no specific benchmark, and no official regex benchmark result for this historical change was measured here.
+
+Charon extracted `regex_syntax::utf8::Utf8Sequences::new` from both historical revisions using `--preset=aeneas --start-from regex_syntax::utf8::Utf8Sequences::new -- --lib -p regex-syntax`. Aeneas generated [old](old-lean/Utf8-old.lean) and [new](new-lean/Utf8-new.lean) Lean models successfully; their generation logs are [old](aeneas-old.log) and [new](aeneas-new.log). The generated models contain no `sorry` or `admit`, but each declares the same Rust `u32::from(char)` operation as an uninterpreted axiom in a separate namespace.
+
+[Equivalence.lean](Lean/Equivalence.lean) proves `new_eq_old`: for every pair of input `char`s, if the old and new instances of that external conversion agree on all characters, both constructors return the same sequence of scalar ranges or the same failure result. The proof unfolds the old `Vec::push` and new array-to-vector construction, including the old push's capacity check. It excludes allocator behavior, vector capacity and later iterator methods; these are not represented by the theorem. The explicit conversion agreement is a coupling assumption about an unchanged Rust library operation, not a derived theorem about the two independent generated axioms.
+
+Run `bash history-eq/rust/regex/b12a2761/verify.sh` from the project root to typecheck both historical Aeneas models and the no-`sorry` comparison theorem.

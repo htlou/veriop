@@ -1,0 +1,101 @@
+26c26
+<     let _8: *mut u8; // anonymous local
+---
+>     let _8: usize; // anonymous local
+28,30c28,30
+<     let _10: (); // anonymous local
+<     let _11: *const u8; // anonymous local
+<     let _12: *mut u8; // anonymous local
+---
+>     let _10: usize; // anonymous local
+>     let _11: *mut u8; // anonymous local
+>     let _12: (); // anonymous local
+32,34c32,36
+<     let _14: *const u8; // anonymous local
+<     let _15: *mut u8; // anonymous local
+<     let _16: *mut u8; // anonymous local
+---
+>     let _14: *mut u8; // anonymous local
+>     let _15: *const u8; // anonymous local
+>     let _16: *const u8; // anonymous local
+>     let _17: *mut u8; // anonymous local
+>     let _18: *mut u8; // anonymous local
+54d55
+<         _8 = copy dst_ptr
+56,57c57,65
+<         _9 = copy dst_ptr_end
+<         _7 = move _8 < move _9
+---
+>         _9 = copy dst_ptr
+>         _8 = cast_expose<*mut u8, usize>(move _9)
+>         storage_dead(_9)
+>         storage_live(_10)
+>         storage_live(_11)
+>         _11 = copy dst_ptr_end
+>         _10 = cast_expose<*mut u8, usize>(move _11)
+>         storage_dead(_11)
+>         _7 = move _8 < move _10
+59c67
+<             storage_dead(_9)
+---
+>             storage_dead(_10)
+61,63d68
+<             storage_live(_10)
+<             storage_live(_11)
+<             _11 = copy source
+65,73d69
+<             _12 = copy dst_ptr
+<             _10 = core::ptr::copy_nonoverlapping<u8>(move _11, move _12, const 16usize)
+<             ↳⚡ storage_dead(num_items)
+<                 storage_dead(dst_ptr)
+<                 storage_dead(source)
+<                 unwind_continue
+<             storage_dead(_12)
+<             storage_dead(_11)
+<             storage_dead(_10)
+74a71
+>             _13 = copy source
+76,77c73,74
+<             _14 = copy source
+<             _13 = core::ptr::const_ptr::{*const T}::add<u8>(move _14, const 16usize)
+---
+>             _14 = copy dst_ptr
+>             _12 = core::ptr::copy_nonoverlapping<u8>(move _13, move _14, const 16usize)
+83d79
+<             source = move _13
+84a81
+>             storage_dead(_12)
+87,88c84,85
+<             _16 = copy dst_ptr
+<             _15 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _16, const 16usize)
+---
+>             _16 = copy source
+>             _15 = core::ptr::const_ptr::{*const T}::add<u8>(move _16, const 16usize)
+94c91
+<             dst_ptr = move _15
+---
+>             source = move _15
+95a93,103
+>             storage_live(_17)
+>             storage_live(_18)
+>             _18 = copy dst_ptr
+>             _17 = core::ptr::mut_ptr::{*mut T}::add<u8>(move _18, const 16usize)
+>             ↳⚡ storage_dead(num_items)
+>                 storage_dead(dst_ptr)
+>                 storage_dead(source)
+>                 unwind_continue
+>             storage_dead(_18)
+>             dst_ptr = move _17
+>             storage_dead(_17)
+102c110
+<     storage_dead(_9)
+---
+>     storage_dead(_10)
+115c123
+< Source: 'src/block/mod.rs', lines 56:14-56:35
+---
+> Source: 'src/block/mod.rs', lines 56:14-56:32
+118c126
+< Source: 'src/block/mod.rs', lines 56:14-56:35
+---
+> Source: 'src/block/mod.rs', lines 56:14-56:32

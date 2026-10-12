@@ -1,0 +1,144 @@
+diff --git a/include/fast_float/decimal_to_binary.h b/include/fast_float/decimal_to_binary.h
+index 9487682..5c3b5d1 100644
+--- a/include/fast_float/decimal_to_binary.h
++++ b/include/fast_float/decimal_to_binary.h
+@@ -194,16 +194,31 @@ compute_float(int64_t q, uint64_t w) noexcept {
+ 
+   answer.mantissa += (answer.mantissa & 1); // round up
+   answer.mantissa >>= 1;
+-  if (answer.mantissa >= (uint64_t(2) << binary::mantissa_explicit_bits())) {
++  // Both fix-ups below are rare. They are marked unlikely so that clang keeps
++  // them as branches instead of folding them into conditional moves that
++  // every conversion pays for.
++#ifdef __clang__
++#pragma clang diagnostic push
++#if (!defined(__APPLE_CC__) && __clang_major__ >= 10) || (__clang_major__ >= 13)
++#pragma clang diagnostic ignored "-Wc++20-extensions"
++#endif
++#endif
++  if fastfloat_clang_unlikely (answer.mantissa >=
++                               (uint64_t(2)
++                                << binary::mantissa_explicit_bits())) {
+     answer.mantissa = (uint64_t(1) << binary::mantissa_explicit_bits());
+     answer.power2++; // undo previous addition
+   }
+ 
+   answer.mantissa &= ~(uint64_t(1) << binary::mantissa_explicit_bits());
+-  if (answer.power2 >= binary::infinite_power()) { // infinity
++  if fastfloat_clang_unlikely (answer.power2 >= binary::infinite_power()) {
++    // infinity
+     answer.power2 = binary::infinite_power();
+     answer.mantissa = 0;
+   }
++#ifdef __clang__
++#pragma clang diagnostic pop
++#endif
+   return answer;
+ }
+ 
+diff --git a/include/fast_float/float_common.h b/include/fast_float/float_common.h
+index 1b2594e..9a84383 100644
+--- a/include/fast_float/float_common.h
++++ b/include/fast_float/float_common.h
+@@ -228,6 +228,27 @@ using parse_options = parse_options_t<char>;
+ #define fastfloat_never_inline
+ #endif
+ 
++// fastfloat_really_inline under clang only, a no-op elsewhere. Clang declines
++// to inline the parser into its callers, so the parser instantiation with a
++// compile-time format (from_chars_fixed_format) must force the one thin
++// forwarder between it and the parser body. GCC inlines the chain on its own,
++// and forcing it there changes its inlining order for the worse.
++#ifdef __clang__
++#define fastfloat_clang_really_inline fastfloat_really_inline
++#else
++#define fastfloat_clang_really_inline
++#endif
++
++// fastfloat_unlikely under clang only, a plain condition elsewhere. Clang
++// if-converts rare checks into chains of conditional moves that every
++// conversion executes; the hint keeps them as branches. GCC already emits
++// branches there, and the hint only reorders its blocks, for the worse.
++#ifdef __clang__
++#define fastfloat_clang_unlikely(x) fastfloat_unlikely(x)
++#else
++#define fastfloat_clang_unlikely(x) (x)
++#endif
++
+ // Branch-probability hint marking the rare slow-path branches as cold, so the
+ // optimizer keeps the out-of-line slow-path re-parse off the hot path (and does
+ // not duplicate the force-inlined hot scanner into the caller, which bloated
+diff --git a/include/fast_float/parse_number.h b/include/fast_float/parse_number.h
+index febfdc7..315a438 100644
+--- a/include/fast_float/parse_number.h
++++ b/include/fast_float/parse_number.h
+@@ -139,9 +139,10 @@ fastfloat_really_inline bool rounds_to_nearest() noexcept {
+ 
+ template <typename T> struct from_chars_caller {
+   template <typename UC>
+-  FASTFLOAT_CONSTEXPR20 static from_chars_result_t<UC>
+-  call(UC const *first, UC const *last, T &value,
+-       parse_options_t<UC> options) noexcept {
++  fastfloat_clang_really_inline
++      FASTFLOAT_CONSTEXPR20 static from_chars_result_t<UC>
++      call(UC const *first, UC const *last, T &value,
++           parse_options_t<UC> options) noexcept {
+     return from_chars_advanced(first, last, value, options);
+   }
+ };
+@@ -180,10 +181,29 @@ template <> struct from_chars_caller<std::float64_t> {
+ };
+ #endif
+ 
++#ifdef __clang__
++// Parser instantiated for a format fixed at compile time, so that every test
++// on the format folds away inside it. GCC gets the same effect by inlining the
++// whole parser into each caller, where the format is a constant; clang keeps
++// it out of line and would otherwise re-test each format flag per conversion.
++template <typename T, typename UC, chars_format Fmt>
++FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_fixed_format(UC const *first, UC const *last, T &value) noexcept {
++  return from_chars_caller<T>::call(first, last, value,
++                                    parse_options_t<UC>(Fmt));
++}
++#endif
++
+ template <typename T, typename UC, typename>
+ FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
+ from_chars(UC const *first, UC const *last, T &value,
+            chars_format fmt /*= chars_format::general*/) noexcept {
++#ifdef __clang__
++  if (fmt == chars_format::general) {
++    return from_chars_fixed_format<T, UC, chars_format::general>(first, last,
++                                                                 value);
++  }
++#endif
+   return from_chars_caller<T>::call(first, last, value,
+                                     parse_options_t<UC>(fmt));
+ }
+@@ -428,15 +448,19 @@ from_chars_float_advanced(UC const *first, UC const *last, T &value,
+   if fastfloat_unlikely (am.power2 < 0) {
+     return parse_number_slow_path<T, UC>(first, last, value, options, bjf);
+   }
+-#ifdef __clang__
+-#pragma clang diagnostic pop
+-#endif
+   to_float(pns.negative, am, value);
+-  // Test for over/underflow.
+-  if ((pns.mantissa != 0 && am.mantissa == 0 && am.power2 == 0) ||
+-      am.power2 == binary_format<T>::infinite_power()) {
++  // Test for over/underflow. Marked unlikely so that clang keeps it as a
++  // branch instead of folding it into a chain of conditional moves that
++  // every conversion pays for.
++  if fastfloat_clang_unlikely ((pns.mantissa != 0 && am.mantissa == 0 &&
++                                am.power2 == 0) ||
++                               am.power2 ==
++                                   binary_format<T>::infinite_power()) {
+     answer.ec = std::errc::result_out_of_range;
+   }
++#ifdef __clang__
++#pragma clang diagnostic pop
++#endif
+   return answer;
+ }
+ 

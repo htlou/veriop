@@ -1,0 +1,1742 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/70d2a45/linux/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/70d2a45/linux/old.ll
+
+----------------------------------------
+define i32 @target_u32(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = ctlz i32 noundef %#1, 1
+  %#range_0_%#15 = !range i32 %#15, i32 0, i32 32
+  %#16 = xor i32 %#range_0_%#15, 31
+  %#17 = ctpop i32 noundef %#1
+  %#range_1_%#17 = !range i32 %#17, i32 1, i32 33
+  %#18 = icmp samesign ult i32 %#range_1_%#17, 2
+  br i1 %#18, label %#4, label %#5
+
+#4:
+  %#19 = trunc nsw nuw i32 %#16 to i8
+  br label %#9
+
+#5:
+  %#20 = shl nuw i32 1, %#16
+  %#range_2_noundef %#1 = !range i32 noundef %#1, i32 1, i32 0
+  %#21 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#range_2_noundef %#1, i32 0, i32 %#20) nofree nothrow memory(none)
+  %#22 = extractvalue {i32, i32} %#21, 0
+  %#23 = extractvalue {i32, i32} %#21, 1
+  %#24 = sub i32 noundef %#1, %#23
+  %#25 = icmp ult i32 %#24, %#20
+  br i1 %#25, label %#6, label %#7
+
+#6:
+  %#26 = trunc nsw nuw i32 %#16 to i8
+  br label %#8
+
+#7:
+  %#27 = shl i32 %#22, 1
+  %#28 = shl i32 %#23, 1
+  %#29 = icmp uge i32 %#28, noundef %#1
+  %#30 = icmp slt i32 %#23, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i32
+  %#33 = or disjoint i32 %#27, %#32
+  %#34 = trunc nsw nuw i32 %#16 to i8
+  %#35 = or disjoint i8 %#34, 64
+  br label %#8
+
+#8:
+  %#36 = phi i32 [ %#33, %#7 ], [ %#22, %#6 ]
+  %#37 = phi i8 [ %#35, %#7 ], [ %#26, %#6 ]
+  %#38 = add i32 %#36, 1
+  %#39 = icmp eq i32 %#38, 0
+  br i1 %#39, label %#9, label %#10
+
+#9:
+  %#40 = phi i8 [ %#19, %#4 ], [ %#37, %#8 ]
+  %#41 = zext nneg i8 %#40 to i32
+  %#42 = lshr i32 noundef %#0, %#41
+  br label %#13
+
+#10:
+  %#43 = zext i32 %#38 to i64
+  %#44 = zext i32 noundef %#0 to i64
+  %#45 = mul nuw i64 %#43, %#44
+  %#46 = lshr i64 %#45, 32
+  %#47 = trunc nuw i64 %#46 to i32
+  %#48 = zext nneg i8 %#37 to i32
+  %#49 = icmp samesign ult i8 %#37, 64
+  br i1 %#49, label %#11, label %#12
+
+#11:
+  %#50 = lshr i32 %#47, %#48
+  br label %#13
+
+#12:
+  %#51 = sub i32 noundef %#0, %#47
+  %#52 = lshr i32 %#51, 1
+  %#53 = add i32 %#52, %#47
+  %#54 = and i32 %#48, 31
+  %#55 = lshr i32 %#53, %#54
+  br label %#13
+
+#13:
+  %#56 = phi i32 [ 0, %#2 ], [ %#42, %#9 ], [ %#55, %#12 ], [ %#50, %#11 ]
+  ret i32 %#56
+}
+=>
+define i32 @target_u32(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = ctlz i32 noundef %#1, 1
+  %#range_0_%#15 = !range i32 %#15, i32 0, i32 32
+  %#16 = xor i32 %#range_0_%#15, 31
+  %#17 = ctpop i32 noundef %#1
+  %#range_1_%#17 = !range i32 %#17, i32 1, i32 33
+  %#18 = icmp samesign ult i32 %#range_1_%#17, 2
+  br i1 %#18, label %#4, label %#5
+
+#4:
+  %#19 = trunc nsw nuw i32 %#16 to i8
+  br label %#9
+
+#5:
+  %#20 = shl nuw i32 1, %#16
+  %#range_2_noundef %#1 = !range i32 noundef %#1, i32 1, i32 0
+  %#21 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#range_2_noundef %#1, i32 0, i32 %#20) nofree nothrow memory(none)
+  %#22 = extractvalue {i32, i32} %#21, 0
+  %#23 = extractvalue {i32, i32} %#21, 1
+  %#24 = sub i32 noundef %#1, %#23
+  %#25 = icmp ult i32 %#24, %#20
+  br i1 %#25, label %#6, label %#7
+
+#6:
+  %#26 = trunc nsw nuw i32 %#16 to i8
+  br label %#8
+
+#7:
+  %#27 = shl i32 %#22, 1
+  %#28 = shl i32 %#23, 1
+  %#29 = icmp uge i32 %#28, noundef %#1
+  %#30 = icmp slt i32 %#23, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i32
+  %#33 = or disjoint i32 %#27, %#32
+  %#34 = trunc nsw nuw i32 %#16 to i8
+  %#35 = or disjoint i8 %#34, 64
+  br label %#8
+
+#8:
+  %#36 = phi i32 [ %#33, %#7 ], [ %#22, %#6 ]
+  %#37 = phi i8 [ %#35, %#7 ], [ %#26, %#6 ]
+  %#38 = add i32 %#36, 1
+  %#39 = icmp eq i32 %#38, 0
+  br i1 %#39, label %#9, label %#10
+
+#9:
+  %#40 = phi i8 [ %#19, %#4 ], [ %#37, %#8 ]
+  %#41 = zext nneg i8 %#40 to i32
+  %#42 = lshr i32 noundef %#0, %#41
+  br label %#13
+
+#10:
+  %#43 = zext i32 %#38 to i64
+  %#44 = zext i32 noundef %#0 to i64
+  %#45 = mul nuw i64 %#43, %#44
+  %#46 = lshr i64 %#45, 32
+  %#47 = trunc nuw i64 %#46 to i32
+  %#48 = zext nneg i8 %#37 to i32
+  %#49 = icmp samesign ult i8 %#37, 64
+  br i1 %#49, label %#11, label %#12
+
+#11:
+  %#50 = lshr i32 %#47, %#48
+  br label %#13
+
+#12:
+  %#51 = sub i32 noundef %#0, %#47
+  %#52 = lshr i32 %#51, 1
+  %#53 = add i32 %#52, %#47
+  %#54 = and i32 %#48, 31
+  %#55 = lshr i32 %#53, %#54
+  br label %#13
+
+#13:
+  %#56 = phi i32 [ 0, %#2 ], [ %#42, %#9 ], [ %#55, %#12 ], [ %#50, %#11 ]
+  ret i32 %#56
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i32 noundef %#1, 0
+  %#16 = abs i32 noundef %#1, 0
+  %#17 = ctlz i32 %#16, 1
+  %#range_0_%#17 = !range i32 %#17, i32 0, i32 32
+  %#18 = xor i32 %#range_0_%#17, 31
+  %#19 = ctpop i32 %#16
+  %#range_1_%#19 = !range i32 %#19, i32 1, i32 33
+  %#20 = icmp samesign ult i32 %#range_1_%#19, 2
+  br i1 %#20, label %#4, label %#5
+
+#4:
+  %#21 = lshr i32 noundef %#1, 24
+  %#22 = and i32 %#21, 128
+  %#23 = or disjoint i32 %#18, %#22
+  %#24 = trunc nuw i32 %#23 to i8
+  %#25 = and i8 %#24, 31
+  br label %#9
+
+#5:
+  %#26 = sub nsw i32 30, %#range_0_%#17
+  %#27 = shl nsw nuw i32 1, %#26
+  %#28 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#16, i32 0, i32 %#27) nofree nothrow memory(none)
+  %#29 = extractvalue {i32, i32} %#28, 0
+  %#30 = extractvalue {i32, i32} %#28, 1
+  %#31 = sub i32 %#16, %#30
+  %#32 = lshr i32 %#31, %#18
+  %#33 = icmp eq i32 %#32, 0
+  br i1 %#33, label %#6, label %#7
+
+#6:
+  %#34 = trunc nsw i32 %#26 to i8
+  br label %#8
+
+#7:
+  %#35 = shl i32 %#29, 1
+  %#36 = shl i32 %#30, 1
+  %#37 = icmp uge i32 %#36, %#16
+  %#38 = icmp slt i32 %#30, 0
+  %#39 = or i1 %#38, %#37
+  %#40 = zext i1 %#39 to i32
+  %#41 = or disjoint i32 %#35, %#40
+  %#42 = trunc nsw nuw i32 %#18 to i8
+  %#43 = or disjoint i8 %#42, 64
+  br label %#8
+
+#8:
+  %#44 = phi i32 [ %#41, %#7 ], [ %#29, %#6 ]
+  %#45 = phi i8 [ %#43, %#7 ], [ %#34, %#6 ]
+  %#46 = add i32 %#44, 1
+  %#47 = or i8 %#45, 128
+  %#48 = xor i32 %#44, 4294967295
+  %#49 = select i1 %#15, i8 %#47, i8 %#45
+  %#50 = select i1 %#15, i32 %#48, i32 %#46
+  %#51 = and i8 %#49, 31
+  %#52 = icmp eq i32 %#50, 0
+  br i1 %#52, label %#9, label %#10
+
+#9:
+  %#53 = phi i8 [ %#25, %#4 ], [ %#51, %#8 ]
+  %#54 = phi i8 [ %#24, %#4 ], [ %#49, %#8 ]
+  %#55 = ashr i8 %#54, 7
+  %#56 = sext i8 %#55 to i32
+  %#57 = zext nneg i8 %#53 to i32
+  %#58 = shl nsw i32 4294967295, %#57
+  %#59 = xor i32 %#58, 4294967295
+  %#60 = icmp slt i32 noundef %#0, 0
+  %#61 = select i1 %#60, i32 %#59, i32 0
+  %#62 = add i32 %#61, noundef %#0
+  %#63 = ashr i32 %#62, %#57
+  %#64 = xor i32 %#63, %#56
+  %#65 = sub i32 %#64, %#56
+  br label %#13
+
+#10:
+  %#66 = sext i32 %#50 to i64
+  %#67 = sext i32 noundef %#0 to i64
+  %#68 = mul nsw i64 %#66, %#67
+  %#69 = lshr i64 %#68, 32
+  %#70 = trunc nuw i64 %#69 to i32
+  %#71 = and i8 %#49, 64
+  %#72 = icmp eq i8 %#71, 0
+  br i1 %#72, label %#12, label %#11
+
+#11:
+  %#73 = ashr i8 %#49, 7
+  %#74 = sext i8 %#73 to i32
+  %#75 = xor i32 noundef %#0, %#74
+  %#76 = sub i32 %#75, %#74
+  %#77 = add i32 %#76, %#70
+  br label %#12
+
+#12:
+  %#78 = phi i32 [ %#77, %#11 ], [ %#70, %#10 ]
+  %#79 = zext nneg i8 %#51 to i32
+  %#80 = ashr i32 %#78, %#79
+  %#81 = lshr i32 %#80, 31
+  %#82 = add nsw i32 %#81, %#80
+  br label %#13
+
+#13:
+  %#83 = phi i32 [ 0, %#2 ], [ %#82, %#12 ], [ %#65, %#9 ]
+  ret i32 %#83
+}
+=>
+define i32 @target_s32(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i32 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i32 noundef %#1, 0
+  %#16 = abs i32 noundef %#1, 0
+  %#17 = ctlz i32 %#16, 1
+  %#range_0_%#17 = !range i32 %#17, i32 0, i32 32
+  %#18 = xor i32 %#range_0_%#17, 31
+  %#19 = ctpop i32 %#16
+  %#range_1_%#19 = !range i32 %#19, i32 1, i32 33
+  %#20 = icmp samesign ult i32 %#range_1_%#19, 2
+  br i1 %#20, label %#4, label %#5
+
+#4:
+  %#21 = lshr i32 noundef %#1, 24
+  %#22 = and i32 %#21, 128
+  %#23 = or disjoint i32 %#18, %#22
+  %#24 = trunc nuw i32 %#23 to i8
+  %#25 = and i8 %#24, 31
+  br label %#9
+
+#5:
+  %#26 = sub nsw i32 30, %#range_0_%#17
+  %#27 = shl nsw nuw i32 1, %#26
+  %#28 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#16, i32 0, i32 %#27) nofree nothrow memory(none)
+  %#29 = extractvalue {i32, i32} %#28, 0
+  %#30 = extractvalue {i32, i32} %#28, 1
+  %#31 = sub i32 %#16, %#30
+  %#32 = lshr i32 %#31, %#18
+  %#33 = icmp eq i32 %#32, 0
+  br i1 %#33, label %#6, label %#7
+
+#6:
+  %#34 = trunc nsw i32 %#26 to i8
+  br label %#8
+
+#7:
+  %#35 = shl i32 %#29, 1
+  %#36 = shl i32 %#30, 1
+  %#37 = icmp uge i32 %#36, %#16
+  %#38 = icmp slt i32 %#30, 0
+  %#39 = or i1 %#38, %#37
+  %#40 = zext i1 %#39 to i32
+  %#41 = or disjoint i32 %#35, %#40
+  %#42 = trunc nsw nuw i32 %#18 to i8
+  %#43 = or disjoint i8 %#42, 64
+  br label %#8
+
+#8:
+  %#44 = phi i32 [ %#41, %#7 ], [ %#29, %#6 ]
+  %#45 = phi i8 [ %#43, %#7 ], [ %#34, %#6 ]
+  %#46 = add i32 %#44, 1
+  %#47 = or i8 %#45, 128
+  %#48 = xor i32 %#44, 4294967295
+  %#49 = select i1 %#15, i8 %#47, i8 %#45
+  %#50 = select i1 %#15, i32 %#48, i32 %#46
+  %#51 = and i8 %#49, 31
+  %#52 = icmp eq i32 %#50, 0
+  br i1 %#52, label %#9, label %#10
+
+#9:
+  %#53 = phi i8 [ %#25, %#4 ], [ %#51, %#8 ]
+  %#54 = phi i8 [ %#24, %#4 ], [ %#49, %#8 ]
+  %#55 = ashr i8 %#54, 7
+  %#56 = sext i8 %#55 to i32
+  %#57 = zext nneg i8 %#53 to i32
+  %#58 = shl nsw i32 4294967295, %#57
+  %#59 = xor i32 %#58, 4294967295
+  %#60 = icmp slt i32 noundef %#0, 0
+  %#61 = select i1 %#60, i32 %#59, i32 0
+  %#62 = add i32 %#61, noundef %#0
+  %#63 = ashr i32 %#62, %#57
+  %#64 = xor i32 %#63, %#56
+  %#65 = sub i32 %#64, %#56
+  br label %#13
+
+#10:
+  %#66 = sext i32 %#50 to i64
+  %#67 = sext i32 noundef %#0 to i64
+  %#68 = mul nsw i64 %#66, %#67
+  %#69 = lshr i64 %#68, 32
+  %#70 = trunc nuw i64 %#69 to i32
+  %#71 = and i8 %#49, 64
+  %#72 = icmp eq i8 %#71, 0
+  br i1 %#72, label %#12, label %#11
+
+#11:
+  %#73 = ashr i8 %#49, 7
+  %#74 = sext i8 %#73 to i32
+  %#75 = xor i32 noundef %#0, %#74
+  %#76 = sub i32 %#75, %#74
+  %#77 = add i32 %#76, %#70
+  br label %#12
+
+#12:
+  %#78 = phi i32 [ %#77, %#11 ], [ %#70, %#10 ]
+  %#79 = zext nneg i8 %#51 to i32
+  %#80 = ashr i32 %#78, %#79
+  %#81 = lshr i32 %#80, 31
+  %#82 = add nsw i32 %#81, %#80
+  br label %#13
+
+#13:
+  %#83 = phi i32 [ 0, %#2 ], [ %#82, %#12 ], [ %#65, %#9 ]
+  ret i32 %#83
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_u64(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i64 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = ctlz i64 noundef %#1, 1
+  %#range_0_%#15 = !range i64 %#15, i64 0, i64 65
+  %#16 = trunc nsw nuw i64 %#range_0_%#15 to i32
+  %#17 = xor i32 %#16, 63
+  %#18 = ctpop i64 noundef %#1
+  %#range_1_%#18 = !range i64 %#18, i64 1, i64 65
+  %#19 = icmp samesign ult i64 %#range_1_%#18, 2
+  br i1 %#19, label %#4, label %#5
+
+#4:
+  %#20 = trunc nsw nuw i32 %#17 to i8
+  br label %#9
+
+#5:
+  %#21 = zext nneg i32 %#17 to i64
+  %#22 = shl nuw i64 1, %#21
+  %#range_2_noundef %#1 = !range i64 noundef %#1, i64 1, i64 0
+  %#23 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#range_2_noundef %#1, i64 0, i64 %#22) nofree nothrow memory(none)
+  %#24 = extractvalue {i64, i64} %#23, 0
+  %#25 = extractvalue {i64, i64} %#23, 1
+  %#26 = sub i64 noundef %#1, %#25
+  %#27 = icmp ult i64 %#26, %#22
+  br i1 %#27, label %#6, label %#7
+
+#6:
+  %#28 = trunc nsw nuw i32 %#17 to i8
+  br label %#8
+
+#7:
+  %#29 = shl i64 %#24, 1
+  %#30 = shl i64 %#25, 1
+  %#31 = icmp uge i64 %#30, noundef %#1
+  %#32 = icmp slt i64 %#25, 0
+  %#33 = or i1 %#32, %#31
+  %#34 = zext i1 %#33 to i64
+  %#35 = or disjoint i64 %#29, %#34
+  %#36 = trunc nsw nuw i32 %#17 to i8
+  %#37 = or disjoint i8 %#36, 64
+  br label %#8
+
+#8:
+  %#38 = phi i8 [ %#37, %#7 ], [ %#28, %#6 ]
+  %#39 = phi i64 [ %#35, %#7 ], [ %#24, %#6 ]
+  %#40 = add i64 %#39, 1
+  %#41 = icmp eq i64 %#40, 0
+  br i1 %#41, label %#9, label %#10
+
+#9:
+  %#42 = phi i8 [ %#20, %#4 ], [ %#38, %#8 ]
+  %#43 = zext nneg i8 %#42 to i64
+  %#44 = lshr i64 noundef %#0, %#43
+  br label %#13
+
+#10:
+  %#45 = zext i64 %#40 to i128
+  %#46 = zext i64 noundef %#0 to i128
+  %#47 = mul nuw i128 %#45, %#46
+  %#48 = lshr i128 %#47, 64
+  %#49 = trunc nuw i128 %#48 to i64
+  %#50 = icmp samesign ult i8 %#38, 64
+  br i1 %#50, label %#11, label %#12
+
+#11:
+  %#51 = zext nneg i8 %#38 to i64
+  %#52 = lshr i64 %#49, %#51
+  br label %#13
+
+#12:
+  %#53 = sub i64 noundef %#0, %#49
+  %#54 = lshr i64 %#53, 1
+  %#55 = add i64 %#54, %#49
+  %#56 = and i8 %#38, 63
+  %#57 = zext nneg i8 %#56 to i64
+  %#58 = lshr i64 %#55, %#57
+  br label %#13
+
+#13:
+  %#59 = phi i64 [ 0, %#2 ], [ %#44, %#9 ], [ %#58, %#12 ], [ %#52, %#11 ]
+  ret i64 %#59
+}
+=>
+define i64 @target_u64(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i64 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = ctlz i64 noundef %#1, 1
+  %#range_0_%#15 = !range i64 %#15, i64 0, i64 65
+  %#16 = trunc nsw nuw i64 %#range_0_%#15 to i32
+  %#17 = xor i32 %#16, 63
+  %#18 = ctpop i64 noundef %#1
+  %#range_1_%#18 = !range i64 %#18, i64 1, i64 65
+  %#19 = icmp samesign ult i64 %#range_1_%#18, 2
+  br i1 %#19, label %#4, label %#5
+
+#4:
+  %#20 = trunc nsw nuw i32 %#17 to i8
+  br label %#9
+
+#5:
+  %#21 = zext nneg i32 %#17 to i64
+  %#22 = shl nuw i64 1, %#21
+  %#range_2_noundef %#1 = !range i64 noundef %#1, i64 1, i64 0
+  %#23 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#range_2_noundef %#1, i64 0, i64 %#22) nofree nothrow memory(none)
+  %#24 = extractvalue {i64, i64} %#23, 0
+  %#25 = extractvalue {i64, i64} %#23, 1
+  %#26 = sub i64 noundef %#1, %#25
+  %#27 = icmp ult i64 %#26, %#22
+  br i1 %#27, label %#6, label %#7
+
+#6:
+  %#28 = trunc nsw nuw i32 %#17 to i8
+  br label %#8
+
+#7:
+  %#29 = shl i64 %#24, 1
+  %#30 = shl i64 %#25, 1
+  %#31 = icmp uge i64 %#30, noundef %#1
+  %#32 = icmp slt i64 %#25, 0
+  %#33 = or i1 %#32, %#31
+  %#34 = zext i1 %#33 to i64
+  %#35 = or disjoint i64 %#29, %#34
+  %#36 = trunc nsw nuw i32 %#17 to i8
+  %#37 = or disjoint i8 %#36, 64
+  br label %#8
+
+#8:
+  %#38 = phi i8 [ %#37, %#7 ], [ %#28, %#6 ]
+  %#39 = phi i64 [ %#35, %#7 ], [ %#24, %#6 ]
+  %#40 = add i64 %#39, 1
+  %#41 = icmp eq i64 %#40, 0
+  br i1 %#41, label %#9, label %#10
+
+#9:
+  %#42 = phi i8 [ %#20, %#4 ], [ %#38, %#8 ]
+  %#43 = zext nneg i8 %#42 to i64
+  %#44 = lshr i64 noundef %#0, %#43
+  br label %#13
+
+#10:
+  %#45 = zext i64 %#40 to i128
+  %#46 = zext i64 noundef %#0 to i128
+  %#47 = mul nuw i128 %#45, %#46
+  %#48 = lshr i128 %#47, 64
+  %#49 = trunc nuw i128 %#48 to i64
+  %#50 = icmp samesign ult i8 %#38, 64
+  br i1 %#50, label %#11, label %#12
+
+#11:
+  %#51 = zext nneg i8 %#38 to i64
+  %#52 = lshr i64 %#49, %#51
+  br label %#13
+
+#12:
+  %#53 = sub i64 noundef %#0, %#49
+  %#54 = lshr i64 %#53, 1
+  %#55 = add i64 %#54, %#49
+  %#56 = and i8 %#38, 63
+  %#57 = zext nneg i8 %#56 to i64
+  %#58 = lshr i64 %#55, %#57
+  br label %#13
+
+#13:
+  %#59 = phi i64 [ 0, %#2 ], [ %#44, %#9 ], [ %#58, %#12 ], [ %#52, %#11 ]
+  ret i64 %#59
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i64 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i64 noundef %#1, 0
+  %#16 = abs i64 noundef %#1, 0
+  %#17 = ctlz i64 %#16, 1
+  %#range_0_%#17 = !range i64 %#17, i64 0, i64 65
+  %#18 = trunc nsw nuw i64 %#range_0_%#17 to i32
+  %#19 = xor i32 %#18, 63
+  %#20 = ctpop i64 %#16
+  %#range_1_%#20 = !range i64 %#20, i64 1, i64 65
+  %#21 = icmp samesign ult i64 %#range_1_%#20, 2
+  br i1 %#21, label %#4, label %#5
+
+#4:
+  %#22 = lshr i64 noundef %#1, 56
+  %#23 = trunc nsw nuw i64 %#22 to i32
+  %#24 = and i32 %#23, 128
+  %#25 = or disjoint i32 %#19, %#24
+  %#26 = trunc nuw i32 %#25 to i8
+  %#27 = and i8 %#26, 63
+  br label %#9
+
+#5:
+  %#28 = sub nsw i32 62, %#18
+  %#29 = zext nneg i32 %#28 to i64
+  %#30 = shl nuw i64 1, %#29
+  %#31 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#16, i64 0, i64 %#30) nofree nothrow memory(none)
+  %#32 = extractvalue {i64, i64} %#31, 0
+  %#33 = extractvalue {i64, i64} %#31, 1
+  %#34 = sub i64 %#16, %#33
+  %#35 = zext nneg i32 %#19 to i64
+  %#36 = lshr i64 %#34, %#35
+  %#37 = icmp eq i64 %#36, 0
+  br i1 %#37, label %#6, label %#7
+
+#6:
+  %#38 = trunc nsw i32 %#28 to i8
+  br label %#8
+
+#7:
+  %#39 = shl i64 %#32, 1
+  %#40 = shl i64 %#33, 1
+  %#41 = icmp uge i64 %#40, %#16
+  %#42 = icmp slt i64 %#33, 0
+  %#43 = or i1 %#42, %#41
+  %#44 = zext i1 %#43 to i64
+  %#45 = or disjoint i64 %#39, %#44
+  %#46 = trunc nsw nuw i32 %#19 to i8
+  %#47 = or disjoint i8 %#46, 64
+  br label %#8
+
+#8:
+  %#48 = phi i64 [ %#45, %#7 ], [ %#32, %#6 ]
+  %#49 = phi i8 [ %#47, %#7 ], [ %#38, %#6 ]
+  %#50 = add i64 %#48, 1
+  %#51 = or i8 %#49, 128
+  %#52 = xor i64 %#48, -1
+  %#53 = select i1 %#15, i8 %#51, i8 %#49
+  %#54 = select i1 %#15, i64 %#52, i64 %#50
+  %#55 = and i8 %#53, 63
+  %#56 = icmp eq i64 %#54, 0
+  br i1 %#56, label %#9, label %#10
+
+#9:
+  %#57 = phi i8 [ %#27, %#4 ], [ %#55, %#8 ]
+  %#58 = phi i8 [ %#26, %#4 ], [ %#53, %#8 ]
+  %#59 = zext nneg i8 %#57 to i64
+  %#60 = shl nsw i64 -1, %#59
+  %#61 = xor i64 %#60, -1
+  %#62 = icmp slt i64 noundef %#0, 0
+  %#63 = select i1 %#62, i64 %#61, i64 0
+  %#64 = add i64 %#63, noundef %#0
+  %#65 = ashr i64 %#64, %#59
+  %#66 = ashr i8 %#58, 7
+  %#67 = sext i8 %#66 to i64
+  %#68 = xor i64 %#65, %#67
+  %#69 = sub nsw i64 %#68, %#67
+  br label %#13
+
+#10:
+  %#70 = sext i64 %#54 to i128
+  %#71 = sext i64 noundef %#0 to i128
+  %#72 = mul nsw i128 %#70, %#71
+  %#73 = lshr i128 %#72, 64
+  %#74 = trunc nuw i128 %#73 to i64
+  %#75 = and i8 %#53, 64
+  %#76 = icmp eq i8 %#75, 0
+  br i1 %#76, label %#12, label %#11
+
+#11:
+  %#77 = ashr i8 %#53, 7
+  %#78 = sext i8 %#77 to i64
+  %#79 = xor i64 noundef %#0, %#78
+  %#80 = sub i64 %#79, %#78
+  %#81 = add i64 %#80, %#74
+  br label %#12
+
+#12:
+  %#82 = phi i64 [ %#81, %#11 ], [ %#74, %#10 ]
+  %#83 = zext nneg i8 %#55 to i64
+  %#84 = ashr i64 %#82, %#83
+  %#85 = lshr i64 %#84, 63
+  %#86 = add nsw i64 %#85, %#84
+  br label %#13
+
+#13:
+  %#87 = phi i64 [ 0, %#2 ], [ %#86, %#12 ], [ %#69, %#9 ]
+  ret i64 %#87
+}
+=>
+define i64 @target_s64(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#14 = icmp eq i64 noundef %#1, 0
+  br i1 %#14, label %#13, label %#3
+
+#3:
+  %#15 = icmp slt i64 noundef %#1, 0
+  %#16 = abs i64 noundef %#1, 0
+  %#17 = ctlz i64 %#16, 1
+  %#range_0_%#17 = !range i64 %#17, i64 0, i64 65
+  %#18 = trunc nsw nuw i64 %#range_0_%#17 to i32
+  %#19 = xor i32 %#18, 63
+  %#20 = ctpop i64 %#16
+  %#range_1_%#20 = !range i64 %#20, i64 1, i64 65
+  %#21 = icmp samesign ult i64 %#range_1_%#20, 2
+  br i1 %#21, label %#4, label %#5
+
+#4:
+  %#22 = lshr i64 noundef %#1, 56
+  %#23 = trunc nsw nuw i64 %#22 to i32
+  %#24 = and i32 %#23, 128
+  %#25 = or disjoint i32 %#19, %#24
+  %#26 = trunc nuw i32 %#25 to i8
+  %#27 = and i8 %#26, 63
+  br label %#9
+
+#5:
+  %#28 = sub nsw i32 62, %#18
+  %#29 = zext nneg i32 %#28 to i64
+  %#30 = shl nuw i64 1, %#29
+  %#31 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#16, i64 0, i64 %#30) nofree nothrow memory(none)
+  %#32 = extractvalue {i64, i64} %#31, 0
+  %#33 = extractvalue {i64, i64} %#31, 1
+  %#34 = sub i64 %#16, %#33
+  %#35 = zext nneg i32 %#19 to i64
+  %#36 = lshr i64 %#34, %#35
+  %#37 = icmp eq i64 %#36, 0
+  br i1 %#37, label %#6, label %#7
+
+#6:
+  %#38 = trunc nsw i32 %#28 to i8
+  br label %#8
+
+#7:
+  %#39 = shl i64 %#32, 1
+  %#40 = shl i64 %#33, 1
+  %#41 = icmp uge i64 %#40, %#16
+  %#42 = icmp slt i64 %#33, 0
+  %#43 = or i1 %#42, %#41
+  %#44 = zext i1 %#43 to i64
+  %#45 = or disjoint i64 %#39, %#44
+  %#46 = trunc nsw nuw i32 %#19 to i8
+  %#47 = or disjoint i8 %#46, 64
+  br label %#8
+
+#8:
+  %#48 = phi i64 [ %#45, %#7 ], [ %#32, %#6 ]
+  %#49 = phi i8 [ %#47, %#7 ], [ %#38, %#6 ]
+  %#50 = add i64 %#48, 1
+  %#51 = or i8 %#49, 128
+  %#52 = xor i64 %#48, -1
+  %#53 = select i1 %#15, i8 %#51, i8 %#49
+  %#54 = select i1 %#15, i64 %#52, i64 %#50
+  %#55 = and i8 %#53, 63
+  %#56 = icmp eq i64 %#54, 0
+  br i1 %#56, label %#9, label %#10
+
+#9:
+  %#57 = phi i8 [ %#27, %#4 ], [ %#55, %#8 ]
+  %#58 = phi i8 [ %#26, %#4 ], [ %#53, %#8 ]
+  %#59 = zext nneg i8 %#57 to i64
+  %#60 = shl nsw i64 -1, %#59
+  %#61 = xor i64 %#60, -1
+  %#62 = icmp slt i64 noundef %#0, 0
+  %#63 = select i1 %#62, i64 %#61, i64 0
+  %#64 = add i64 %#63, noundef %#0
+  %#65 = ashr i64 %#64, %#59
+  %#66 = ashr i8 %#58, 7
+  %#67 = sext i8 %#66 to i64
+  %#68 = xor i64 %#65, %#67
+  %#69 = sub nsw i64 %#68, %#67
+  br label %#13
+
+#10:
+  %#70 = sext i64 %#54 to i128
+  %#71 = sext i64 noundef %#0 to i128
+  %#72 = mul nsw i128 %#70, %#71
+  %#73 = lshr i128 %#72, 64
+  %#74 = trunc nuw i128 %#73 to i64
+  %#75 = and i8 %#53, 64
+  %#76 = icmp eq i8 %#75, 0
+  br i1 %#76, label %#12, label %#11
+
+#11:
+  %#77 = ashr i8 %#53, 7
+  %#78 = sext i8 %#77 to i64
+  %#79 = xor i64 noundef %#0, %#78
+  %#80 = sub i64 %#79, %#78
+  %#81 = add i64 %#80, %#74
+  br label %#12
+
+#12:
+  %#82 = phi i64 [ %#81, %#11 ], [ %#74, %#10 ]
+  %#83 = zext nneg i8 %#55 to i64
+  %#84 = ashr i64 %#82, %#83
+  %#85 = lshr i64 %#84, 63
+  %#86 = add nsw i64 %#85, %#84
+  br label %#13
+
+#13:
+  %#87 = phi i64 [ 0, %#2 ], [ %#86, %#12 ], [ %#69, %#9 ]
+  ret i64 %#87
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_u32_bf(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp ult i32 noundef %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = ctlz i32 noundef %#1, 1
+  %#range_0_%#9 = !range i32 %#9, i32 0, i32 32
+  %#10 = ctpop i32 noundef %#1
+  %#range_1_%#10 = !range i32 %#10, i32 1, i32 33
+  %#11 = icmp samesign ult i32 %#range_1_%#10, 2
+  br i1 %#11, label %#4, label %#5
+
+#4:
+  %#12 = sub nsw nuw i32 30, %#range_0_%#9
+  br label %#6
+
+#5:
+  %#13 = xor i32 %#range_0_%#9, 31
+  %#14 = shl nuw i32 1, %#13
+  %#range_2_noundef %#1 = !range i32 noundef %#1, i32 2, i32 0
+  %#15 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#range_2_noundef %#1, i32 0, i32 %#14) nofree nothrow memory(none)
+  %#16 = extractvalue {i32, i32} %#15, 0
+  %#17 = extractvalue {i32, i32} %#15, 1
+  %#18 = shl i32 %#16, 1
+  %#19 = shl i32 %#17, 1
+  %#20 = icmp uge i32 %#19, noundef %#1
+  %#21 = icmp slt i32 %#17, 0
+  %#22 = or i1 %#21, %#20
+  %#23 = zext i1 %#22 to i32
+  %#24 = or disjoint i32 %#18, 1
+  %#25 = add i32 %#24, %#23
+  %#26 = zext i32 %#25 to i64
+  br label %#6
+
+#6:
+  %#27 = phi i64 [ 0, %#4 ], [ %#26, %#5 ]
+  %#28 = phi i32 [ %#12, %#4 ], [ %#13, %#5 ]
+  %#29 = zext i32 noundef %#0 to i64
+  %#30 = mul nuw i64 %#27, %#29
+  %#31 = lshr i64 %#30, 32
+  %#32 = trunc nuw i64 %#31 to i32
+  %#33 = sub i32 noundef %#0, %#32
+  %#34 = lshr i32 %#33, 1
+  %#35 = add i32 %#34, %#32
+  %#36 = lshr i32 %#35, %#28
+  br label %#7
+
+#7:
+  %#37 = phi i32 [ %#36, %#6 ], [ 0, %#2 ]
+  ret i32 %#37
+}
+=>
+define i32 @target_u32_bf(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp ult i32 noundef %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = ctlz i32 noundef %#1, 1
+  %#range_0_%#9 = !range i32 %#9, i32 0, i32 32
+  %#10 = ctpop i32 noundef %#1
+  %#range_1_%#10 = !range i32 %#10, i32 1, i32 33
+  %#11 = icmp samesign ult i32 %#range_1_%#10, 2
+  br i1 %#11, label %#4, label %#5
+
+#4:
+  %#12 = sub nsw nuw i32 30, %#range_0_%#9
+  br label %#6
+
+#5:
+  %#13 = xor i32 %#range_0_%#9, 31
+  %#14 = shl nuw i32 1, %#13
+  %#range_2_noundef %#1 = !range i32 noundef %#1, i32 2, i32 0
+  %#15 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#range_2_noundef %#1, i32 0, i32 %#14) nofree nothrow memory(none)
+  %#16 = extractvalue {i32, i32} %#15, 0
+  %#17 = extractvalue {i32, i32} %#15, 1
+  %#18 = shl i32 %#16, 1
+  %#19 = shl i32 %#17, 1
+  %#20 = icmp uge i32 %#19, noundef %#1
+  %#21 = icmp slt i32 %#17, 0
+  %#22 = or i1 %#21, %#20
+  %#23 = zext i1 %#22 to i32
+  %#24 = or disjoint i32 %#18, 1
+  %#25 = add i32 %#24, %#23
+  %#26 = zext i32 %#25 to i64
+  br label %#6
+
+#6:
+  %#27 = phi i64 [ 0, %#4 ], [ %#26, %#5 ]
+  %#28 = phi i32 [ %#12, %#4 ], [ %#13, %#5 ]
+  %#29 = zext i32 noundef %#0 to i64
+  %#30 = mul nuw i64 %#27, %#29
+  %#31 = lshr i64 %#30, 32
+  %#32 = trunc nuw i64 %#31 to i32
+  %#33 = sub i32 noundef %#0, %#32
+  %#34 = lshr i32 %#33, 1
+  %#35 = add i32 %#34, %#32
+  %#36 = lshr i32 %#35, %#28
+  br label %#7
+
+#7:
+  %#37 = phi i32 [ %#36, %#6 ], [ 0, %#2 ]
+  ret i32 %#37
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_u64_bf(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp ult i64 noundef %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = ctlz i64 noundef %#1, 1
+  %#range_0_%#9 = !range i64 %#9, i64 0, i64 65
+  %#10 = ctpop i64 noundef %#1
+  %#range_1_%#10 = !range i64 %#10, i64 1, i64 65
+  %#11 = icmp samesign ult i64 %#range_1_%#10, 2
+  br i1 %#11, label %#4, label %#5
+
+#4:
+  %#12 = sub nsw nuw i64 62, %#range_0_%#9
+  br label %#6
+
+#5:
+  %#13 = trunc nsw nuw i64 %#range_0_%#9 to i32
+  %#14 = xor i32 %#13, 63
+  %#15 = zext nneg i32 %#14 to i64
+  %#16 = shl nuw i64 1, %#15
+  %#range_2_noundef %#1 = !range i64 noundef %#1, i64 2, i64 0
+  %#17 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#range_2_noundef %#1, i64 0, i64 %#16) nofree nothrow memory(none)
+  %#18 = extractvalue {i64, i64} %#17, 0
+  %#19 = extractvalue {i64, i64} %#17, 1
+  %#20 = shl i64 %#18, 1
+  %#21 = shl i64 %#19, 1
+  %#22 = icmp uge i64 %#21, noundef %#1
+  %#23 = icmp slt i64 %#19, 0
+  %#24 = or i1 %#23, %#22
+  %#25 = zext i1 %#24 to i64
+  %#26 = zext nneg i32 %#14 to i64
+  %#27 = or disjoint i64 %#20, 1
+  %#28 = add i64 %#27, %#25
+  br label %#6
+
+#6:
+  %#29 = phi i64 [ 0, %#4 ], [ %#28, %#5 ]
+  %#30 = phi i64 [ %#12, %#4 ], [ %#26, %#5 ]
+  %#31 = zext i64 %#29 to i128
+  %#32 = zext i64 noundef %#0 to i128
+  %#33 = mul nuw i128 %#31, %#32
+  %#34 = lshr i128 %#33, 64
+  %#35 = trunc nuw i128 %#34 to i64
+  %#36 = sub i64 noundef %#0, %#35
+  %#37 = lshr i64 %#36, 1
+  %#38 = add i64 %#37, %#35
+  %#39 = lshr i64 %#38, %#30
+  br label %#7
+
+#7:
+  %#40 = phi i64 [ %#39, %#6 ], [ 0, %#2 ]
+  ret i64 %#40
+}
+=>
+define i64 @target_u64_bf(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp ult i64 noundef %#1, 2
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = ctlz i64 noundef %#1, 1
+  %#range_0_%#9 = !range i64 %#9, i64 0, i64 65
+  %#10 = ctpop i64 noundef %#1
+  %#range_1_%#10 = !range i64 %#10, i64 1, i64 65
+  %#11 = icmp samesign ult i64 %#range_1_%#10, 2
+  br i1 %#11, label %#4, label %#5
+
+#4:
+  %#12 = sub nsw nuw i64 62, %#range_0_%#9
+  br label %#6
+
+#5:
+  %#13 = trunc nsw nuw i64 %#range_0_%#9 to i32
+  %#14 = xor i32 %#13, 63
+  %#15 = zext nneg i32 %#14 to i64
+  %#16 = shl nuw i64 1, %#15
+  %#range_2_noundef %#1 = !range i64 noundef %#1, i64 2, i64 0
+  %#17 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#range_2_noundef %#1, i64 0, i64 %#16) nofree nothrow memory(none)
+  %#18 = extractvalue {i64, i64} %#17, 0
+  %#19 = extractvalue {i64, i64} %#17, 1
+  %#20 = shl i64 %#18, 1
+  %#21 = shl i64 %#19, 1
+  %#22 = icmp uge i64 %#21, noundef %#1
+  %#23 = icmp slt i64 %#19, 0
+  %#24 = or i1 %#23, %#22
+  %#25 = zext i1 %#24 to i64
+  %#26 = zext nneg i32 %#14 to i64
+  %#27 = or disjoint i64 %#20, 1
+  %#28 = add i64 %#27, %#25
+  br label %#6
+
+#6:
+  %#29 = phi i64 [ 0, %#4 ], [ %#28, %#5 ]
+  %#30 = phi i64 [ %#12, %#4 ], [ %#26, %#5 ]
+  %#31 = zext i64 %#29 to i128
+  %#32 = zext i64 noundef %#0 to i128
+  %#33 = mul nuw i128 %#31, %#32
+  %#34 = lshr i128 %#33, 64
+  %#35 = trunc nuw i128 %#34 to i64
+  %#36 = sub i64 noundef %#0, %#35
+  %#37 = lshr i64 %#36, 1
+  %#38 = add i64 %#37, %#35
+  %#39 = lshr i64 %#38, %#30
+  br label %#7
+
+#7:
+  %#40 = phi i64 [ %#39, %#6 ], [ 0, %#2 ]
+  ret i64 %#40
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_bf(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp eq i32 noundef %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i32 noundef %#1, 0
+  %#10 = ctlz i32 %#9, 1
+  %#range_0_%#10 = !range i32 %#10, i32 0, i32 32
+  %#11 = xor i32 %#range_0_%#10, 31
+  %#12 = ctpop i32 %#9
+  %#range_1_%#12 = !range i32 %#12, i32 1, i32 33
+  %#13 = icmp samesign ult i32 %#range_1_%#12, 2
+  br i1 %#13, label %#4, label %#5
+
+#4:
+  %#14 = lshr i32 noundef %#1, 24
+  %#15 = and i32 %#14, 128
+  %#16 = or disjoint i32 %#11, %#15
+  %#17 = trunc nuw i32 %#16 to i8
+  br label %#6
+
+#5:
+  %#18 = icmp slt i32 noundef %#1, 0
+  %#19 = sub nsw i32 30, %#range_0_%#10
+  %#20 = shl nsw nuw i32 1, %#19
+  %#21 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#9, i32 0, i32 %#20) nofree nothrow memory(none)
+  %#22 = extractvalue {i32, i32} %#21, 0
+  %#23 = extractvalue {i32, i32} %#21, 1
+  %#24 = shl i32 %#22, 1
+  %#25 = shl i32 %#23, 1
+  %#26 = icmp uge i32 %#25, %#9
+  %#27 = icmp slt i32 %#23, 0
+  %#28 = or i1 %#27, %#26
+  %#29 = zext i1 %#28 to i32
+  %#30 = trunc nsw nuw i32 %#11 to i8
+  %#31 = or disjoint i32 %#24, 1
+  %#32 = add i32 %#31, %#29
+  %#33 = select i1 %#18, i8 192, i8 64
+  %#34 = or disjoint i8 %#33, %#30
+  br label %#6
+
+#6:
+  %#35 = phi i32 [ 0, %#4 ], [ %#32, %#5 ]
+  %#36 = phi i8 [ %#17, %#4 ], [ %#34, %#5 ]
+  %#37 = and i8 %#36, 31
+  %#38 = ashr i8 %#36, 7
+  %#39 = sext i8 %#38 to i32
+  %#40 = sext i32 %#35 to i64
+  %#41 = sext i32 noundef %#0 to i64
+  %#42 = mul nsw i64 %#40, %#41
+  %#43 = lshr i64 %#42, 32
+  %#44 = trunc nuw i64 %#43 to i32
+  %#45 = add nsw i32 noundef %#0, %#44
+  %#46 = icmp eq i32 %#35, 0
+  %#47 = sext i1 %#46 to i32
+  %#48 = zext nneg i8 %#37 to i32
+  %#49 = shl nuw i32 1, %#48
+  %#50 = add i32 %#49, %#47
+  %#51 = icmp slt i32 %#45, 0
+  %#52 = select i1 %#51, i32 %#50, i32 0
+  %#53 = add i32 %#52, %#45
+  %#54 = ashr i32 %#53, %#48
+  %#55 = xor i32 %#54, %#39
+  %#56 = sub nsw i32 %#55, %#39
+  br label %#7
+
+#7:
+  %#57 = phi i32 [ %#56, %#6 ], [ 0, %#2 ]
+  ret i32 %#57
+}
+=>
+define i32 @target_s32_bf(i32 noundef %#0, i32 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp eq i32 noundef %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i32 noundef %#1, 0
+  %#10 = ctlz i32 %#9, 1
+  %#range_0_%#10 = !range i32 %#10, i32 0, i32 32
+  %#11 = xor i32 %#range_0_%#10, 31
+  %#12 = ctpop i32 %#9
+  %#range_1_%#12 = !range i32 %#12, i32 1, i32 33
+  %#13 = icmp samesign ult i32 %#range_1_%#12, 2
+  br i1 %#13, label %#4, label %#5
+
+#4:
+  %#14 = lshr i32 noundef %#1, 24
+  %#15 = and i32 %#14, 128
+  %#16 = or disjoint i32 %#11, %#15
+  %#17 = trunc nuw i32 %#16 to i8
+  br label %#6
+
+#5:
+  %#18 = icmp slt i32 noundef %#1, 0
+  %#19 = sub nsw i32 30, %#range_0_%#10
+  %#20 = shl nsw nuw i32 1, %#19
+  %#21 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#9, i32 0, i32 %#20) nofree nothrow memory(none)
+  %#22 = extractvalue {i32, i32} %#21, 0
+  %#23 = extractvalue {i32, i32} %#21, 1
+  %#24 = shl i32 %#22, 1
+  %#25 = shl i32 %#23, 1
+  %#26 = icmp uge i32 %#25, %#9
+  %#27 = icmp slt i32 %#23, 0
+  %#28 = or i1 %#27, %#26
+  %#29 = zext i1 %#28 to i32
+  %#30 = trunc nsw nuw i32 %#11 to i8
+  %#31 = or disjoint i32 %#24, 1
+  %#32 = add i32 %#31, %#29
+  %#33 = select i1 %#18, i8 192, i8 64
+  %#34 = or disjoint i8 %#33, %#30
+  br label %#6
+
+#6:
+  %#35 = phi i32 [ 0, %#4 ], [ %#32, %#5 ]
+  %#36 = phi i8 [ %#17, %#4 ], [ %#34, %#5 ]
+  %#37 = and i8 %#36, 31
+  %#38 = ashr i8 %#36, 7
+  %#39 = sext i8 %#38 to i32
+  %#40 = sext i32 %#35 to i64
+  %#41 = sext i32 noundef %#0 to i64
+  %#42 = mul nsw i64 %#40, %#41
+  %#43 = lshr i64 %#42, 32
+  %#44 = trunc nuw i64 %#43 to i32
+  %#45 = add nsw i32 noundef %#0, %#44
+  %#46 = icmp eq i32 %#35, 0
+  %#47 = sext i1 %#46 to i32
+  %#48 = zext nneg i8 %#37 to i32
+  %#49 = shl nuw i32 1, %#48
+  %#50 = add i32 %#49, %#47
+  %#51 = icmp slt i32 %#45, 0
+  %#52 = select i1 %#51, i32 %#50, i32 0
+  %#53 = add i32 %#52, %#45
+  %#54 = ashr i32 %#53, %#48
+  %#55 = xor i32 %#54, %#39
+  %#56 = sub nsw i32 %#55, %#39
+  br label %#7
+
+#7:
+  %#57 = phi i32 [ %#56, %#6 ], [ 0, %#2 ]
+  ret i32 %#57
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_bf(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp eq i64 noundef %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i64 noundef %#1, 0
+  %#10 = ctlz i64 %#9, 1
+  %#range_0_%#10 = !range i64 %#10, i64 0, i64 65
+  %#11 = trunc nsw nuw i64 %#range_0_%#10 to i32
+  %#12 = xor i32 %#11, 63
+  %#13 = ctpop i64 %#9
+  %#range_1_%#13 = !range i64 %#13, i64 1, i64 65
+  %#14 = icmp samesign ult i64 %#range_1_%#13, 2
+  br i1 %#14, label %#4, label %#5
+
+#4:
+  %#15 = lshr i64 noundef %#1, 56
+  %#16 = trunc nsw nuw i64 %#15 to i32
+  %#17 = and i32 %#16, 128
+  %#18 = or disjoint i32 %#12, %#17
+  %#19 = trunc nuw i32 %#18 to i8
+  br label %#6
+
+#5:
+  %#20 = icmp slt i64 noundef %#1, 0
+  %#21 = sub nsw i64 62, %#range_0_%#10
+  %#22 = and i64 %#21, 4294967295
+  %#23 = shl nuw i64 1, %#22
+  %#24 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#9, i64 0, i64 %#23) nofree nothrow memory(none)
+  %#25 = extractvalue {i64, i64} %#24, 0
+  %#26 = extractvalue {i64, i64} %#24, 1
+  %#27 = shl i64 %#25, 1
+  %#28 = shl i64 %#26, 1
+  %#29 = icmp uge i64 %#28, %#9
+  %#30 = icmp slt i64 %#26, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i64
+  %#33 = trunc nsw nuw i32 %#12 to i8
+  %#34 = or disjoint i64 %#27, 1
+  %#35 = add i64 %#34, %#32
+  %#36 = select i1 %#20, i8 192, i8 64
+  %#37 = or disjoint i8 %#36, %#33
+  br label %#6
+
+#6:
+  %#38 = phi i64 [ 0, %#4 ], [ %#35, %#5 ]
+  %#39 = phi i8 [ %#19, %#4 ], [ %#37, %#5 ]
+  %#40 = and i8 %#39, 63
+  %#41 = ashr i8 %#39, 7
+  %#42 = sext i8 %#41 to i64
+  %#43 = sext i64 %#38 to i128
+  %#44 = sext i64 noundef %#0 to i128
+  %#45 = mul nsw i128 %#43, %#44
+  %#46 = lshr i128 %#45, 64
+  %#47 = trunc nuw i128 %#46 to i64
+  %#48 = add nsw i64 noundef %#0, %#47
+  %#49 = icmp eq i64 %#38, 0
+  %#50 = sext i1 %#49 to i64
+  %#51 = zext nneg i8 %#40 to i64
+  %#52 = shl nuw i64 1, %#51
+  %#53 = add i64 %#52, %#50
+  %#54 = icmp slt i64 %#48, 0
+  %#55 = select i1 %#54, i64 %#53, i64 0
+  %#56 = add i64 %#55, %#48
+  %#57 = ashr i64 %#56, %#51
+  %#58 = xor i64 %#57, %#42
+  %#59 = sub nsw i64 %#58, %#42
+  br label %#7
+
+#7:
+  %#60 = phi i64 [ %#59, %#6 ], [ 0, %#2 ]
+  ret i64 %#60
+}
+=>
+define i64 @target_s64_bf(i64 noundef %#0, i64 noundef %#1) nofree memory(none) {
+#2:
+  %#8 = icmp eq i64 noundef %#1, 0
+  br i1 %#8, label %#7, label %#3
+
+#3:
+  %#9 = abs i64 noundef %#1, 0
+  %#10 = ctlz i64 %#9, 1
+  %#range_0_%#10 = !range i64 %#10, i64 0, i64 65
+  %#11 = trunc nsw nuw i64 %#range_0_%#10 to i32
+  %#12 = xor i32 %#11, 63
+  %#13 = ctpop i64 %#9
+  %#range_1_%#13 = !range i64 %#13, i64 1, i64 65
+  %#14 = icmp samesign ult i64 %#range_1_%#13, 2
+  br i1 %#14, label %#4, label %#5
+
+#4:
+  %#15 = lshr i64 noundef %#1, 56
+  %#16 = trunc nsw nuw i64 %#15 to i32
+  %#17 = and i32 %#16, 128
+  %#18 = or disjoint i32 %#12, %#17
+  %#19 = trunc nuw i32 %#18 to i8
+  br label %#6
+
+#5:
+  %#20 = icmp slt i64 noundef %#1, 0
+  %#21 = sub nsw i64 62, %#range_0_%#10
+  %#22 = and i64 %#21, 4294967295
+  %#23 = shl nuw i64 1, %#22
+  %#24 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#9, i64 0, i64 %#23) nofree nothrow memory(none)
+  %#25 = extractvalue {i64, i64} %#24, 0
+  %#26 = extractvalue {i64, i64} %#24, 1
+  %#27 = shl i64 %#25, 1
+  %#28 = shl i64 %#26, 1
+  %#29 = icmp uge i64 %#28, %#9
+  %#30 = icmp slt i64 %#26, 0
+  %#31 = or i1 %#30, %#29
+  %#32 = zext i1 %#31 to i64
+  %#33 = trunc nsw nuw i32 %#12 to i8
+  %#34 = or disjoint i64 %#27, 1
+  %#35 = add i64 %#34, %#32
+  %#36 = select i1 %#20, i8 192, i8 64
+  %#37 = or disjoint i8 %#36, %#33
+  br label %#6
+
+#6:
+  %#38 = phi i64 [ 0, %#4 ], [ %#35, %#5 ]
+  %#39 = phi i8 [ %#19, %#4 ], [ %#37, %#5 ]
+  %#40 = and i8 %#39, 63
+  %#41 = ashr i8 %#39, 7
+  %#42 = sext i8 %#41 to i64
+  %#43 = sext i64 %#38 to i128
+  %#44 = sext i64 noundef %#0 to i128
+  %#45 = mul nsw i128 %#43, %#44
+  %#46 = lshr i128 %#45, 64
+  %#47 = trunc nuw i128 %#46 to i64
+  %#48 = add nsw i64 noundef %#0, %#47
+  %#49 = icmp eq i64 %#38, 0
+  %#50 = sext i1 %#49 to i64
+  %#51 = zext nneg i8 %#40 to i64
+  %#52 = shl nuw i64 1, %#51
+  %#53 = add i64 %#52, %#50
+  %#54 = icmp slt i64 %#48, 0
+  %#55 = select i1 %#54, i64 %#53, i64 0
+  %#56 = add i64 %#55, %#48
+  %#57 = ashr i64 %#56, %#51
+  %#58 = xor i64 %#57, %#42
+  %#59 = sub nsw i64 %#58, %#42
+  br label %#7
+
+#7:
+  %#60 = phi i64 [ %#59, %#6 ], [ 0, %#2 ]
+  ret i64 %#60
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_u32_recover(i32 noundef %#0) nofree memory(none) {
+#1:
+  %#13 = icmp eq i32 noundef %#0, 0
+  br i1 %#13, label %#12, label %#2
+
+#2:
+  %#14 = ctlz i32 noundef %#0, 1
+  %#range_0_%#14 = !range i32 %#14, i32 0, i32 32
+  %#15 = xor i32 %#range_0_%#14, 31
+  %#16 = ctpop i32 noundef %#0
+  %#range_1_%#16 = !range i32 %#16, i32 1, i32 33
+  %#17 = icmp samesign ult i32 %#range_1_%#16, 2
+  br i1 %#17, label %#3, label %#4
+
+#3:
+  %#18 = trunc nsw nuw i32 %#15 to i8
+  br label %#8
+
+#4:
+  %#19 = shl nuw i32 1, %#15
+  %#range_2_noundef %#0 = !range i32 noundef %#0, i32 1, i32 0
+  %#20 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#range_2_noundef %#0, i32 0, i32 %#19) nofree nothrow memory(none)
+  %#21 = extractvalue {i32, i32} %#20, 0
+  %#22 = extractvalue {i32, i32} %#20, 1
+  %#23 = sub i32 noundef %#0, %#22
+  %#24 = icmp ult i32 %#23, %#19
+  br i1 %#24, label %#5, label %#6
+
+#5:
+  %#25 = trunc nsw nuw i32 %#15 to i8
+  br label %#7
+
+#6:
+  %#26 = shl i32 %#21, 1
+  %#27 = shl i32 %#22, 1
+  %#28 = icmp uge i32 %#27, noundef %#0
+  %#29 = icmp slt i32 %#22, 0
+  %#30 = or i1 %#29, %#28
+  %#31 = zext i1 %#30 to i32
+  %#32 = or disjoint i32 %#26, %#31
+  %#33 = trunc nsw nuw i32 %#15 to i8
+  %#34 = or disjoint i8 %#33, 64
+  br label %#7
+
+#7:
+  %#35 = phi i32 [ %#32, %#6 ], [ %#21, %#5 ]
+  %#36 = phi i8 [ %#34, %#6 ], [ %#25, %#5 ]
+  %#37 = add i32 %#35, 1
+  %#38 = and i8 %#36, 31
+  %#39 = icmp eq i32 %#37, 0
+  br i1 %#39, label %#8, label %#9
+
+#8:
+  %#40 = phi i8 [ %#18, %#3 ], [ %#38, %#7 ]
+  %#41 = zext nneg i8 %#40 to i32
+  %#42 = shl nuw i32 1, %#41
+  br label %#12
+
+#9:
+  %#43 = and i8 %#36, 64
+  %#44 = icmp eq i8 %#43, 0
+  br i1 %#44, label %#10, label %#11
+
+#10:
+  %#45 = zext nneg i8 %#38 to i32
+  %#46 = shl nuw i32 1, %#45
+  %#47 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#37, i32 0, i32 %#46) nofree nothrow memory(none)
+  %#48 = extractvalue {i32, i32} %#47, 0
+  %#49 = add i32 %#48, 1
+  br label %#12
+
+#11:
+  %#50 = or disjoint i8 %#38, 32
+  %#51 = zext nneg i8 %#50 to i64
+  %#52 = shl nuw i64 1, %#51
+  %#53 = zext i32 %#37 to i64
+  %#54 = or disjoint i64 %#53, 4294967296
+  %#55 = udiv i64 %#52, %#54
+  %#56 = trunc nuw i64 %#55 to i32
+  %#57 = urem i64 %#52, %#54
+  %#58 = shl i32 %#56, 1
+  %#59 = shl nsw nuw i64 %#57, 1
+  %#60 = icmp samesign uge i64 %#59, %#54
+  %#61 = zext i1 %#60 to i32
+  %#62 = or disjoint i32 %#58, 1
+  %#63 = add i32 %#62, %#61
+  br label %#12
+
+#12:
+  %#64 = phi i32 [ 0, %#1 ], [ %#63, %#11 ], [ %#49, %#10 ], [ %#42, %#8 ]
+  ret i32 %#64
+}
+=>
+define i32 @target_u32_recover(i32 noundef %#0) nofree memory(none) {
+#1:
+  %#13 = icmp eq i32 noundef %#0, 0
+  br i1 %#13, label %#12, label %#2
+
+#2:
+  %#14 = ctlz i32 noundef %#0, 1
+  %#range_0_%#14 = !range i32 %#14, i32 0, i32 32
+  %#15 = xor i32 %#range_0_%#14, 31
+  %#16 = ctpop i32 noundef %#0
+  %#range_1_%#16 = !range i32 %#16, i32 1, i32 33
+  %#17 = icmp samesign ult i32 %#range_1_%#16, 2
+  br i1 %#17, label %#3, label %#4
+
+#3:
+  %#18 = trunc nsw nuw i32 %#15 to i8
+  br label %#8
+
+#4:
+  %#19 = shl nuw i32 1, %#15
+  %#range_2_noundef %#0 = !range i32 noundef %#0, i32 1, i32 0
+  %#20 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#range_2_noundef %#0, i32 0, i32 %#19) nofree nothrow memory(none)
+  %#21 = extractvalue {i32, i32} %#20, 0
+  %#22 = extractvalue {i32, i32} %#20, 1
+  %#23 = sub i32 noundef %#0, %#22
+  %#24 = icmp ult i32 %#23, %#19
+  br i1 %#24, label %#5, label %#6
+
+#5:
+  %#25 = trunc nsw nuw i32 %#15 to i8
+  br label %#7
+
+#6:
+  %#26 = shl i32 %#21, 1
+  %#27 = shl i32 %#22, 1
+  %#28 = icmp uge i32 %#27, noundef %#0
+  %#29 = icmp slt i32 %#22, 0
+  %#30 = or i1 %#29, %#28
+  %#31 = zext i1 %#30 to i32
+  %#32 = or disjoint i32 %#26, %#31
+  %#33 = trunc nsw nuw i32 %#15 to i8
+  %#34 = or disjoint i8 %#33, 64
+  br label %#7
+
+#7:
+  %#35 = phi i32 [ %#32, %#6 ], [ %#21, %#5 ]
+  %#36 = phi i8 [ %#34, %#6 ], [ %#25, %#5 ]
+  %#37 = add i32 %#35, 1
+  %#38 = and i8 %#36, 31
+  %#39 = icmp eq i32 %#37, 0
+  br i1 %#39, label %#8, label %#9
+
+#8:
+  %#40 = phi i8 [ %#18, %#3 ], [ %#38, %#7 ]
+  %#41 = zext nneg i8 %#40 to i32
+  %#42 = shl nuw i32 1, %#41
+  br label %#12
+
+#9:
+  %#43 = and i8 %#36, 64
+  %#44 = icmp eq i8 %#43, 0
+  br i1 %#44, label %#10, label %#11
+
+#10:
+  %#45 = zext nneg i8 %#38 to i32
+  %#46 = shl nuw i32 1, %#45
+  %#47 = tail call {i32, i32} asm divl $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i32 %#37, i32 0, i32 %#46) nofree nothrow memory(none)
+  %#48 = extractvalue {i32, i32} %#47, 0
+  %#49 = add i32 %#48, 1
+  br label %#12
+
+#11:
+  %#50 = or disjoint i8 %#38, 32
+  %#51 = zext nneg i8 %#50 to i64
+  %#52 = shl nuw i64 1, %#51
+  %#53 = zext i32 %#37 to i64
+  %#54 = or disjoint i64 %#53, 4294967296
+  %#55 = udiv i64 %#52, %#54
+  %#56 = trunc nuw i64 %#55 to i32
+  %#57 = urem i64 %#52, %#54
+  %#58 = shl i32 %#56, 1
+  %#59 = shl nsw nuw i64 %#57, 1
+  %#60 = icmp samesign uge i64 %#59, %#54
+  %#61 = zext i1 %#60 to i32
+  %#62 = or disjoint i32 %#58, 1
+  %#63 = add i32 %#62, %#61
+  br label %#12
+
+#12:
+  %#64 = phi i32 [ 0, %#1 ], [ %#63, %#11 ], [ %#49, %#10 ], [ %#42, %#8 ]
+  ret i32 %#64
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i64 @target_u64_recover(i64 noundef %#0) nofree memory(none) {
+#1:
+  %#15 = icmp eq i64 noundef %#0, 0
+  br i1 %#15, label %#14, label %#2
+
+#2:
+  %#16 = ctlz i64 noundef %#0, 1
+  %#range_0_%#16 = !range i64 %#16, i64 0, i64 65
+  %#17 = trunc nsw nuw i64 %#range_0_%#16 to i32
+  %#18 = xor i32 %#17, 63
+  %#19 = ctpop i64 noundef %#0
+  %#range_1_%#19 = !range i64 %#19, i64 1, i64 65
+  %#20 = icmp samesign ult i64 %#range_1_%#19, 2
+  br i1 %#20, label %#3, label %#4
+
+#3:
+  %#21 = trunc nsw nuw i32 %#18 to i8
+  br label %#8
+
+#4:
+  %#22 = zext nneg i32 %#18 to i64
+  %#23 = shl nuw i64 1, %#22
+  %#range_2_noundef %#0 = !range i64 noundef %#0, i64 1, i64 0
+  %#24 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#range_2_noundef %#0, i64 0, i64 %#23) nofree nothrow memory(none)
+  %#25 = extractvalue {i64, i64} %#24, 0
+  %#26 = extractvalue {i64, i64} %#24, 1
+  %#27 = sub i64 noundef %#0, %#26
+  %#28 = icmp ult i64 %#27, %#23
+  br i1 %#28, label %#5, label %#6
+
+#5:
+  %#29 = trunc nsw nuw i32 %#18 to i8
+  br label %#7
+
+#6:
+  %#30 = shl i64 %#25, 1
+  %#31 = shl i64 %#26, 1
+  %#32 = icmp uge i64 %#31, noundef %#0
+  %#33 = icmp slt i64 %#26, 0
+  %#34 = or i1 %#33, %#32
+  %#35 = zext i1 %#34 to i64
+  %#36 = or disjoint i64 %#30, %#35
+  %#37 = trunc nsw nuw i32 %#18 to i8
+  %#38 = or disjoint i8 %#37, 64
+  br label %#7
+
+#7:
+  %#39 = phi i8 [ %#38, %#6 ], [ %#29, %#5 ]
+  %#40 = phi i64 [ %#36, %#6 ], [ %#25, %#5 ]
+  %#41 = add i64 %#40, 1
+  %#42 = and i8 %#39, 63
+  %#43 = icmp eq i64 %#41, 0
+  br i1 %#43, label %#8, label %#9
+
+#8:
+  %#44 = phi i8 [ %#21, %#3 ], [ %#42, %#7 ]
+  %#45 = zext nneg i8 %#44 to i64
+  %#46 = shl nuw i64 1, %#45
+  br label %#14
+
+#9:
+  %#47 = and i8 %#39, 64
+  %#48 = icmp eq i8 %#47, 0
+  %#49 = zext nneg i8 %#42 to i64
+  %#50 = shl nuw i64 1, %#49
+  br i1 %#48, label %#10, label %#11
+
+#10:
+  %#51 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#41, i64 0, i64 %#50) nofree nothrow memory(none)
+  %#52 = extractvalue {i64, i64} %#51, 0
+  %#53 = add i64 %#52, 1
+  br label %#14
+
+#11:
+  %#54 = zext i64 %#50 to i128
+  %#55 = shl nuw i128 %#54, 64
+  %#56 = zext i64 %#41 to i128
+  %#57 = or disjoint i128 %#56, 18446744073709551616
+  %#58 = udiv i128 %#55, %#57
+  %#59 = trunc nuw i128 %#58 to i64
+  %#60 = mul nuw i128 %#58, %#57
+  %#61 = sub i128 %#55, %#60
+  %#62 = trunc i128 %#61 to i64
+  %#63 = lshr i128 %#61, 64
+  %#64 = trunc nuw i128 %#63 to i64
+  %#65 = fshl i64 %#64, i64 %#62, i64 1
+  %#66 = icmp ugt i64 %#65, 1
+  br i1 %#66, label %#13, label %#12
+
+#12:
+  %#67 = shl i64 %#62, 1
+  %#68 = icmp eq i64 %#65, 1
+  %#69 = icmp uge i64 %#67, %#41
+  %#70 = select i1 %#68, i1 %#69, i1 0
+  %#71 = zext i1 %#70 to i64
+  br label %#13
+
+#13:
+  %#72 = phi i64 [ 1, %#11 ], [ %#71, %#12 ]
+  %#73 = shl i64 %#59, 1
+  %#74 = or disjoint i64 %#73, 1
+  %#75 = add i64 %#74, %#72
+  br label %#14
+
+#14:
+  %#76 = phi i64 [ 0, %#1 ], [ %#75, %#13 ], [ %#53, %#10 ], [ %#46, %#8 ]
+  ret i64 %#76
+}
+=>
+define i64 @target_u64_recover(i64 noundef %#0) nofree memory(none) {
+#1:
+  %#15 = icmp eq i64 noundef %#0, 0
+  br i1 %#15, label %#14, label %#2
+
+#2:
+  %#16 = ctlz i64 noundef %#0, 1
+  %#range_0_%#16 = !range i64 %#16, i64 0, i64 65
+  %#17 = trunc nsw nuw i64 %#range_0_%#16 to i32
+  %#18 = xor i32 %#17, 63
+  %#19 = ctpop i64 noundef %#0
+  %#range_1_%#19 = !range i64 %#19, i64 1, i64 65
+  %#20 = icmp samesign ult i64 %#range_1_%#19, 2
+  br i1 %#20, label %#3, label %#4
+
+#3:
+  %#21 = trunc nsw nuw i32 %#18 to i8
+  br label %#8
+
+#4:
+  %#22 = zext nneg i32 %#18 to i64
+  %#23 = shl nuw i64 1, %#22
+  %#range_2_noundef %#0 = !range i64 noundef %#0, i64 1, i64 0
+  %#24 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#range_2_noundef %#0, i64 0, i64 %#23) nofree nothrow memory(none)
+  %#25 = extractvalue {i64, i64} %#24, 0
+  %#26 = extractvalue {i64, i64} %#24, 1
+  %#27 = sub i64 noundef %#0, %#26
+  %#28 = icmp ult i64 %#27, %#23
+  br i1 %#28, label %#5, label %#6
+
+#5:
+  %#29 = trunc nsw nuw i32 %#18 to i8
+  br label %#7
+
+#6:
+  %#30 = shl i64 %#25, 1
+  %#31 = shl i64 %#26, 1
+  %#32 = icmp uge i64 %#31, noundef %#0
+  %#33 = icmp slt i64 %#26, 0
+  %#34 = or i1 %#33, %#32
+  %#35 = zext i1 %#34 to i64
+  %#36 = or disjoint i64 %#30, %#35
+  %#37 = trunc nsw nuw i32 %#18 to i8
+  %#38 = or disjoint i8 %#37, 64
+  br label %#7
+
+#7:
+  %#39 = phi i8 [ %#38, %#6 ], [ %#29, %#5 ]
+  %#40 = phi i64 [ %#36, %#6 ], [ %#25, %#5 ]
+  %#41 = add i64 %#40, 1
+  %#42 = and i8 %#39, 63
+  %#43 = icmp eq i64 %#41, 0
+  br i1 %#43, label %#8, label %#9
+
+#8:
+  %#44 = phi i8 [ %#21, %#3 ], [ %#42, %#7 ]
+  %#45 = zext nneg i8 %#44 to i64
+  %#46 = shl nuw i64 1, %#45
+  br label %#14
+
+#9:
+  %#47 = and i8 %#39, 64
+  %#48 = icmp eq i8 %#47, 0
+  %#49 = zext nneg i8 %#42 to i64
+  %#50 = shl nuw i64 1, %#49
+  br i1 %#48, label %#10, label %#11
+
+#10:
+  %#51 = tail call {i64, i64} asm divq $2, ={ax},={dx},r,{ax},{dx},~{dirflag},~{fpsr},~{flags}(i64 %#41, i64 0, i64 %#50) nofree nothrow memory(none)
+  %#52 = extractvalue {i64, i64} %#51, 0
+  %#53 = add i64 %#52, 1
+  br label %#14
+
+#11:
+  %#54 = zext i64 %#50 to i128
+  %#55 = shl nuw i128 %#54, 64
+  %#56 = zext i64 %#41 to i128
+  %#57 = or disjoint i128 %#56, 18446744073709551616
+  %#58 = udiv i128 %#55, %#57
+  %#59 = trunc nuw i128 %#58 to i64
+  %#60 = mul nuw i128 %#58, %#57
+  %#61 = sub i128 %#55, %#60
+  %#62 = trunc i128 %#61 to i64
+  %#63 = lshr i128 %#61, 64
+  %#64 = trunc nuw i128 %#63 to i64
+  %#65 = fshl i64 %#64, i64 %#62, i64 1
+  %#66 = icmp ugt i64 %#65, 1
+  br i1 %#66, label %#13, label %#12
+
+#12:
+  %#67 = shl i64 %#62, 1
+  %#68 = icmp eq i64 %#65, 1
+  %#69 = icmp uge i64 %#67, %#41
+  %#70 = select i1 %#68, i1 %#69, i1 0
+  %#71 = zext i1 %#70 to i64
+  br label %#13
+
+#13:
+  %#72 = phi i64 [ 1, %#11 ], [ %#71, %#12 ]
+  %#73 = shl i64 %#59, 1
+  %#74 = or disjoint i64 %#73, 1
+  %#75 = add i64 %#74, %#72
+  br label %#14
+
+#14:
+  %#76 = phi i64 [ 0, %#1 ], [ %#75, %#13 ], [ %#53, %#10 ], [ %#46, %#8 ]
+  ret i64 %#76
+}
+ERROR: Timeout
+
+Summary:
+  8 correct transformations
+  0 incorrect transformations
+  2 failed-to-prove transformations
+  0 Alive2 errors

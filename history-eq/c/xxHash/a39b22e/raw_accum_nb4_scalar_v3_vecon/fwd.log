@@ -1,0 +1,251 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/a39b22e/raw_accum_nb4_scalar_v3_vecon/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/a39b22e/raw_accum_nb4_scalar_v3_vecon/new.ll
+
+----------------------------------------
+define void @target_accum(ptr noundef %#0, ptr nowrite noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: readwrite) {
+#4:
+  %#12 = icmp ugt i64 noundef %#3, 4
+  br i1 %#12, label %#11, label %#5
+
+#5:
+  %#13 = load <4 x i64>, ptr noundef %#0, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#15 = load <4 x i64>, ptr %#14, align 8
+  %#16 = icmp eq i64 noundef %#3, 0
+  br i1 %#16, label %#10, label %#6
+
+#6:
+  %#17 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 32
+  %#18 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#19 = load <4 x i64>, ptr nowrite noundef %#1, align 1
+  %#20 = load <4 x i64>, ptr nowrite noundef %#2, align 8
+  %#21 = xor <4 x i64> %#20, %#19
+  %#22 = and <4 x i64> %#21, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#23 = lshr <4 x i64> %#21, { 32, 32, 32, 32 }
+  %#24 = mul nuw <4 x i64> %#22, %#23
+  %#25 = add <4 x i64> %#19, %#13
+  %#26 = add <4 x i64> %#25, %#24
+  %#27 = load <4 x i64>, ptr %#17, align 1
+  %#28 = load <4 x i64>, ptr %#18, align 8
+  %#29 = xor <4 x i64> %#28, %#27
+  %#30 = and <4 x i64> %#29, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#31 = lshr <4 x i64> %#29, { 32, 32, 32, 32 }
+  %#32 = mul nuw <4 x i64> %#30, %#31
+  %#33 = add <4 x i64> %#27, %#15
+  %#34 = add <4 x i64> %#33, %#32
+  %#35 = icmp eq i64 noundef %#3, 1
+  br i1 %#35, label %#10, label %#7
+
+#7:
+  %#36 = load <2 x i64>, ptr %#18, align 8
+  %#37 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 64
+  %#38 = load <4 x i64>, ptr %#37, align 1
+  %#39 = shufflevector <2 x i64> %#36, <2 x i64> poison, 0, 1, 4294967295, 4294967295
+  %#40 = shufflevector <4 x i64> %#20, <4 x i64> %#39, 1, 2, 3, 4
+  %#41 = xor <4 x i64> %#38, %#40
+  %#42 = and <4 x i64> %#41, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#43 = lshr <4 x i64> %#41, { 32, 32, 32, 32 }
+  %#44 = mul nuw <4 x i64> %#42, %#43
+  %#45 = add <4 x i64> %#38, %#26
+  %#46 = add <4 x i64> %#45, %#44
+  %#47 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 96
+  %#48 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 64
+  %#49 = load i64, ptr %#48, align 8
+  %#50 = load <4 x i64>, ptr %#47, align 1
+  %#51 = shufflevector <4 x i64> %#28, <4 x i64> poison, 1, 2, 3, 4294967295
+  %#52 = insertelement <4 x i64> %#51, i64 %#49, i64 3
+  %#53 = xor <4 x i64> %#50, %#52
+  %#54 = and <4 x i64> %#53, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#55 = lshr <4 x i64> %#53, { 32, 32, 32, 32 }
+  %#56 = mul nuw <4 x i64> %#54, %#55
+  %#57 = add <4 x i64> %#50, %#34
+  %#58 = add <4 x i64> %#57, %#56
+  %#59 = icmp eq i64 noundef %#3, 2
+  br i1 %#59, label %#10, label %#8
+
+#8:
+  %#60 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 128
+  %#61 = load <4 x i64>, ptr %#60, align 1
+  %#62 = shufflevector <4 x i64> %#40, <4 x i64> %#39, 1, 2, 3, 5
+  %#63 = xor <4 x i64> %#61, %#62
+  %#64 = and <4 x i64> %#63, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#65 = lshr <4 x i64> %#63, { 32, 32, 32, 32 }
+  %#66 = mul nuw <4 x i64> %#64, %#65
+  %#67 = add <4 x i64> %#61, %#46
+  %#68 = add <4 x i64> %#67, %#66
+  %#69 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 160
+  %#70 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 72
+  %#71 = load i64, ptr %#70, align 8
+  %#72 = load <4 x i64>, ptr %#69, align 1
+  %#73 = shufflevector <4 x i64> %#52, <4 x i64> poison, 1, 2, 3, 4294967295
+  %#74 = insertelement <4 x i64> %#73, i64 %#71, i64 3
+  %#75 = xor <4 x i64> %#72, %#74
+  %#76 = and <4 x i64> %#75, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#77 = lshr <4 x i64> %#75, { 32, 32, 32, 32 }
+  %#78 = mul nuw <4 x i64> %#76, %#77
+  %#79 = add <4 x i64> %#72, %#58
+  %#80 = add <4 x i64> %#79, %#78
+  %#81 = icmp eq i64 noundef %#3, 3
+  br i1 %#81, label %#10, label %#9
+
+#9:
+  %#82 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 192
+  %#83 = load <4 x i64>, ptr %#82, align 1
+  %#84 = shufflevector <4 x i64> %#62, <4 x i64> %#28, 1, 2, 3, 6
+  %#85 = xor <4 x i64> %#83, %#84
+  %#86 = and <4 x i64> %#85, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#87 = lshr <4 x i64> %#85, { 32, 32, 32, 32 }
+  %#88 = mul nuw <4 x i64> %#86, %#87
+  %#89 = add <4 x i64> %#83, %#68
+  %#90 = add <4 x i64> %#89, %#88
+  %#91 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 224
+  %#92 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 80
+  %#93 = load i64, ptr %#92, align 8
+  %#94 = load <4 x i64>, ptr %#91, align 1
+  %#95 = shufflevector <4 x i64> %#74, <4 x i64> poison, 1, 2, 3, 4294967295
+  %#96 = insertelement <4 x i64> %#95, i64 %#93, i64 3
+  %#97 = xor <4 x i64> %#94, %#96
+  %#98 = and <4 x i64> %#97, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#99 = lshr <4 x i64> %#97, { 32, 32, 32, 32 }
+  %#100 = mul nuw <4 x i64> %#98, %#99
+  %#101 = add <4 x i64> %#94, %#80
+  %#102 = add <4 x i64> %#101, %#100
+  br label %#10
+
+#10:
+  %#103 = phi <4 x i64> [ %#13, %#5 ], [ %#26, %#6 ], [ %#46, %#7 ], [ %#68, %#8 ], [ %#90, %#9 ]
+  %#104 = phi <4 x i64> [ %#15, %#5 ], [ %#34, %#6 ], [ %#58, %#7 ], [ %#80, %#8 ], [ %#102, %#9 ]
+  store <4 x i64> %#103, ptr noundef %#0, align 8
+  store <4 x i64> %#104, ptr %#14, align 8
+  br label %#11
+
+#11:
+  ret void
+}
+=>
+define void @target_accum(ptr noundef %#0, ptr nowrite noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: readwrite) {
+#4:
+  %#12 = icmp ugt i64 noundef %#3, 4
+  br i1 %#12, label %#11, label %#5
+
+#5:
+  %#13 = load <4 x i64>, ptr noundef %#0, align 8
+  %#14 = gep inbounds nuw ptr noundef %#0, 1 x i64 32
+  %#15 = load <4 x i64>, ptr %#14, align 8
+  %#16 = icmp eq i64 noundef %#3, 0
+  br i1 %#16, label %#10, label %#6
+
+#6:
+  %#17 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 32
+  %#18 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 32
+  %#19 = load <4 x i64>, ptr nowrite noundef %#1, align 1
+  %#20 = load <4 x i64>, ptr nowrite noundef %#2, align 8
+  %#21 = xor <4 x i64> %#20, %#19
+  %#22 = and <4 x i64> %#21, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#23 = lshr <4 x i64> %#21, { 32, 32, 32, 32 }
+  %#24 = mul nuw <4 x i64> %#22, %#23
+  %#25 = add <4 x i64> %#19, %#13
+  %#26 = add <4 x i64> %#25, %#24
+  %#27 = load <4 x i64>, ptr %#17, align 1
+  %#28 = load <4 x i64>, ptr %#18, align 8
+  %#29 = xor <4 x i64> %#28, %#27
+  %#30 = and <4 x i64> %#29, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#31 = lshr <4 x i64> %#29, { 32, 32, 32, 32 }
+  %#32 = mul nuw <4 x i64> %#30, %#31
+  %#33 = add <4 x i64> %#27, %#15
+  %#34 = add <4 x i64> %#33, %#32
+  %#35 = icmp eq i64 noundef %#3, 1
+  br i1 %#35, label %#10, label %#7
+
+#7:
+  %#36 = load <2 x i64>, ptr %#18, align 8
+  %#37 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 64
+  %#38 = load <4 x i64>, ptr %#37, align 1
+  %#39 = shufflevector <2 x i64> %#36, <2 x i64> poison, 0, 1, 4294967295, 4294967295
+  %#40 = shufflevector <4 x i64> %#20, <4 x i64> %#39, 1, 2, 3, 4
+  %#41 = xor <4 x i64> %#38, %#40
+  %#42 = and <4 x i64> %#41, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#43 = lshr <4 x i64> %#41, { 32, 32, 32, 32 }
+  %#44 = mul nuw <4 x i64> %#42, %#43
+  %#45 = add <4 x i64> %#38, %#26
+  %#46 = add <4 x i64> %#45, %#44
+  %#47 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 96
+  %#48 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 64
+  %#49 = load i64, ptr %#48, align 8
+  %#50 = load <4 x i64>, ptr %#47, align 1
+  %#51 = shufflevector <4 x i64> %#28, <4 x i64> poison, 1, 2, 3, 4294967295
+  %#52 = insertelement <4 x i64> %#51, i64 %#49, i64 3
+  %#53 = xor <4 x i64> %#50, %#52
+  %#54 = and <4 x i64> %#53, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#55 = lshr <4 x i64> %#53, { 32, 32, 32, 32 }
+  %#56 = mul nuw <4 x i64> %#54, %#55
+  %#57 = add <4 x i64> %#50, %#34
+  %#58 = add <4 x i64> %#57, %#56
+  %#59 = icmp eq i64 noundef %#3, 2
+  br i1 %#59, label %#10, label %#8
+
+#8:
+  %#60 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 128
+  %#61 = load <4 x i64>, ptr %#60, align 1
+  %#62 = shufflevector <4 x i64> %#40, <4 x i64> %#39, 1, 2, 3, 5
+  %#63 = xor <4 x i64> %#61, %#62
+  %#64 = and <4 x i64> %#63, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#65 = lshr <4 x i64> %#63, { 32, 32, 32, 32 }
+  %#66 = mul nuw <4 x i64> %#64, %#65
+  %#67 = add <4 x i64> %#61, %#46
+  %#68 = add <4 x i64> %#67, %#66
+  %#69 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 160
+  %#70 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 72
+  %#71 = load i64, ptr %#70, align 8
+  %#72 = load <4 x i64>, ptr %#69, align 1
+  %#73 = shufflevector <4 x i64> %#52, <4 x i64> poison, 1, 2, 3, 4294967295
+  %#74 = insertelement <4 x i64> %#73, i64 %#71, i64 3
+  %#75 = xor <4 x i64> %#72, %#74
+  %#76 = and <4 x i64> %#75, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#77 = lshr <4 x i64> %#75, { 32, 32, 32, 32 }
+  %#78 = mul nuw <4 x i64> %#76, %#77
+  %#79 = add <4 x i64> %#72, %#58
+  %#80 = add <4 x i64> %#79, %#78
+  %#81 = icmp eq i64 noundef %#3, 3
+  br i1 %#81, label %#10, label %#9
+
+#9:
+  %#82 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 192
+  %#83 = load <4 x i64>, ptr %#82, align 1
+  %#84 = shufflevector <4 x i64> %#62, <4 x i64> %#28, 1, 2, 3, 6
+  %#85 = xor <4 x i64> %#83, %#84
+  %#86 = and <4 x i64> %#85, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#87 = lshr <4 x i64> %#85, { 32, 32, 32, 32 }
+  %#88 = mul nuw <4 x i64> %#86, %#87
+  %#89 = add <4 x i64> %#83, %#68
+  %#90 = add <4 x i64> %#89, %#88
+  %#91 = gep inbounds nuw ptr nowrite noundef %#1, 1 x i64 224
+  %#92 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 80
+  %#93 = load i64, ptr %#92, align 8
+  %#94 = load <4 x i64>, ptr %#91, align 1
+  %#95 = shufflevector <4 x i64> %#74, <4 x i64> poison, 1, 2, 3, 4294967295
+  %#96 = insertelement <4 x i64> %#95, i64 %#93, i64 3
+  %#97 = xor <4 x i64> %#94, %#96
+  %#98 = and <4 x i64> %#97, { 4294967295, 4294967295, 4294967295, 4294967295 }
+  %#99 = lshr <4 x i64> %#97, { 32, 32, 32, 32 }
+  %#100 = mul nuw <4 x i64> %#98, %#99
+  %#101 = add <4 x i64> %#94, %#80
+  %#102 = add <4 x i64> %#101, %#100
+  br label %#10
+
+#10:
+  %#103 = phi <4 x i64> [ %#13, %#5 ], [ %#26, %#6 ], [ %#46, %#7 ], [ %#68, %#8 ], [ %#90, %#9 ]
+  %#104 = phi <4 x i64> [ %#15, %#5 ], [ %#34, %#6 ], [ %#58, %#7 ], [ %#80, %#8 ], [ %#102, %#9 ]
+  store <4 x i64> %#103, ptr noundef %#0, align 8
+  store <4 x i64> %#104, ptr %#14, align 8
+  br label %#11
+
+#11:
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

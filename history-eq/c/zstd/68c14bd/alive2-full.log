@@ -1,0 +1,457 @@
+
+----------------------------------------
+declare i64 @HUF_readStats(noundef ptr, noundef i64, noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef i64)
+
+define i64 @HUF_readCTable(ptr noundef %#0, ptr noundef %#1, ptr noundef %#2, i64 noundef %#3, ptr noundef %#4) {
+#5:
+  %#25 = alloca i64 256, align 16, dead
+  %#26 = alloca i64 64, align 16, dead
+  %#27 = alloca i64 4, align 4, dead
+  %#28 = alloca i64 4, align 4, dead
+  %#29 = alloca i64 28, align 16, dead
+  %#30 = alloca i64 28, align 16, dead
+  start_lifetime ptr %#25
+  start_lifetime ptr %#26
+  start_lifetime ptr %#27
+  store i32 0, ptr %#27, align 4
+  start_lifetime ptr %#28
+  store i32 0, ptr %#28, align 4
+  %#31 = call i64 @HUF_readStats(nonnull noundef ptr %#25, noundef i64 256, nonnull noundef ptr %#26, nonnull noundef ptr %#28, nonnull noundef ptr %#27, noundef ptr noundef %#2, noundef i64 noundef %#3)
+  %#32 = icmp ult i64 %#31, -119
+  br i1 %#32, label %#6, label %#24
+
+#6:
+  %#33 = load i32, ptr %#27, align 4
+  %#34 = icmp ugt i32 %#33, 12
+  br i1 %#34, label %#24, label %#7
+
+#7:
+  %#35 = load i32, ptr %#28, align 4
+  %#36 = load i32, ptr noundef %#1, align 4
+  %#37 = add i32 %#36, 1
+  %#38 = icmp ugt i32 %#35, %#37
+  br i1 %#38, label %#24, label %#8
+
+#8:
+  %#39 = icmp eq i32 %#33, 0
+  br i1 %#39, label %#11, label %#9
+
+#9:
+  %#40 = add nsw nuw i32 %#33, 1
+  %#41 = zext nneg i32 %#40 to i64
+  br label %#10
+
+#10:
+  %#42 = phi i64 [ 1, %#9 ], [ %#50, %#10 ]
+  %#43 = phi i32 [ 0, %#9 ], [ %#49, %#10 ]
+  %#44 = gep inbounds nuw ptr %#26, 64 x i64 0, 4 x i64 %#42
+  %#45 = load i32, ptr %#44, align 4
+  %#46 = trunc i64 %#42 to i32
+  %#47 = add i32 %#46, 4294967295
+  %#48 = shl i32 %#45, %#47
+  %#49 = add i32 %#48, %#43
+  store i32 %#43, ptr %#44, align 4
+  %#50 = add nsw nuw i64 %#42, 1
+  %#51 = icmp eq i64 %#50, %#41
+  br i1 %#51, label %#11, label %#10
+
+#11:
+  store i32 0, ptr noundef %#4, align 4
+  %#52 = icmp eq i32 %#35, 0
+  br i1 %#52, label %#14, label %#12
+
+#12:
+  %#53 = trunc nuw i32 %#33 to i8
+  %#54 = add nsw nuw i8 %#53, 1
+  %#55 = zext i32 %#35 to i64
+  br label %#13
+
+#13:
+  %#56 = phi i64 [ 0, %#12 ], [ %#66, %#13 ]
+  %#57 = gep inbounds nuw ptr %#25, 256 x i64 0, 1 x i64 %#56
+  %#58 = load i8, ptr %#57, align 1
+  %#59 = icmp eq i8 %#58, 0
+  %#60 = zext i1 %#59 to i32
+  %#61 = load i32, ptr noundef %#4, align 4
+  %#62 = or i32 %#61, %#60
+  store i32 %#62, ptr noundef %#4, align 4
+  %#63 = sub i8 %#54, %#58
+  %#64 = select i1 %#59, i8 0, i8 %#63
+  %#65 = gep inbounds nuw ptr noundef %#0, 4 x i64 %#56, 1 x i64 2
+  store i8 %#64, ptr %#65, align 2
+  %#66 = add nsw nuw i64 %#56, 1
+  %#67 = icmp eq i64 %#66, %#55
+  br i1 %#67, label %#14, label %#13
+
+#14:
+  start_lifetime ptr %#29
+  memset ptr %#29 align 16, i8 0, i64 28
+  start_lifetime ptr %#30
+  memset ptr %#30 align 16, i8 0, i64 28
+  %#68 = icmp eq i32 %#35, 0
+  br i1 %#68, label %#17, label %#15
+
+#15:
+  %#69 = zext i32 %#35 to i64
+  br label %#16
+
+#16:
+  %#70 = phi i64 [ 0, %#15 ], [ %#77, %#16 ]
+  %#71 = gep inbounds nuw ptr noundef %#0, 4 x i64 %#70, 1 x i64 2
+  %#72 = load i8, ptr %#71, align 2
+  %#73 = zext i8 %#72 to i64
+  %#74 = gep inbounds nuw ptr %#29, 28 x i64 0, 2 x i64 %#73
+  %#75 = load i16, ptr %#74, align 2
+  %#76 = add i16 %#75, 1
+  store i16 %#76, ptr %#74, align 2
+  %#77 = add nsw nuw i64 %#70, 1
+  %#78 = icmp eq i64 %#77, %#69
+  br i1 %#78, label %#17, label %#16
+
+#17:
+  %#79 = add nsw nuw i32 %#33, 1
+  %#80 = zext nneg i32 %#79 to i64
+  %#81 = gep inbounds nuw ptr %#30, 28 x i64 0, 2 x i64 %#80
+  store i16 0, ptr %#81, align 2
+  %#82 = icmp eq i32 %#33, 0
+  br i1 %#82, label %#20, label %#18
+
+#18:
+  %#83 = zext nneg i32 %#33 to i64
+  br label %#19
+
+#19:
+  %#84 = phi i64 [ %#83, %#18 ], [ %#94, %#19 ]
+  %#85 = phi i32 [ %#33, %#18 ], [ %#92, %#19 ]
+  %#86 = phi i16 [ 0, %#18 ], [ %#91, %#19 ]
+  %#87 = gep inbounds nuw ptr %#30, 28 x i64 0, 2 x i64 %#84
+  store i16 %#86, ptr %#87, align 2
+  %#88 = gep inbounds nuw ptr %#29, 28 x i64 0, 2 x i64 %#84
+  %#89 = load i16, ptr %#88, align 2
+  %#90 = add i16 %#89, %#86
+  %#91 = lshr i16 %#90, 1
+  %#92 = add i32 %#85, 4294967295
+  %#93 = icmp eq i32 %#92, 0
+  %#94 = add nsw i64 %#84, -1
+  br i1 %#93, label %#20, label %#19
+
+#20:
+  %#95 = icmp eq i32 %#35, 0
+  br i1 %#95, label %#23, label %#21
+
+#21:
+  %#96 = zext i32 %#35 to i64
+  br label %#22
+
+#22:
+  %#97 = phi i64 [ 0, %#21 ], [ %#105, %#22 ]
+  %#98 = gep inbounds nuw ptr noundef %#0, 4 x i64 %#97
+  %#99 = gep inbounds nuw ptr %#98, 1 x i64 2
+  %#100 = load i8, ptr %#99, align 2
+  %#101 = zext i8 %#100 to i64
+  %#102 = gep inbounds nuw ptr %#30, 28 x i64 0, 2 x i64 %#101
+  %#103 = load i16, ptr %#102, align 2
+  %#104 = add i16 %#103, 1
+  store i16 %#104, ptr %#102, align 2
+  store i16 %#103, ptr %#98, align 2
+  %#105 = add nsw nuw i64 %#97, 1
+  %#106 = icmp eq i64 %#105, %#96
+  br i1 %#106, label %#23, label %#22
+
+#23:
+  end_lifetime ptr %#30
+  end_lifetime ptr %#29
+  %#107 = add i32 %#35, 4294967295
+  store i32 %#107, ptr noundef %#1, align 4
+  br label %#24
+
+#24:
+  %#108 = phi i64 [ %#31, %#23 ], [ %#31, %#5 ], [ -44, %#6 ], [ -48, %#7 ]
+  end_lifetime ptr %#28
+  end_lifetime ptr %#27
+  end_lifetime ptr %#26
+  end_lifetime ptr %#25
+  ret i64 %#108
+}
+=>
+declare i64 @HUF_readStats(noundef ptr, noundef i64, noundef ptr, noundef ptr, noundef ptr, noundef ptr, noundef i64)
+
+define i64 @HUF_readCTable(ptr noundef %#0, ptr noundef %#1, ptr noundef %#2, i64 noundef %#3, ptr noread noundef %#4) {
+#5:
+  %#25 = alloca i64 256, align 16, dead
+  %#26 = alloca i64 64, align 16, dead
+  %#27 = alloca i64 4, align 4, dead
+  %#28 = alloca i64 4, align 4, dead
+  %#29 = alloca i64 28, align 16, dead
+  %#30 = alloca i64 28, align 16, dead
+  start_lifetime ptr %#25
+  start_lifetime ptr %#26
+  start_lifetime ptr %#27
+  store i32 0, ptr %#27, align 4
+  start_lifetime ptr %#28
+  store i32 0, ptr %#28, align 4
+  %#31 = call i64 @HUF_readStats(nonnull noundef ptr %#25, noundef i64 256, nonnull noundef ptr %#26, nonnull noundef ptr %#28, nonnull noundef ptr %#27, noundef ptr noundef %#2, noundef i64 noundef %#3)
+  %#32 = icmp ult i64 %#31, -119
+  br i1 %#32, label %#6, label %#24
+
+#6:
+  %#33 = load i32, ptr %#26, align 16
+  %#34 = icmp ne i32 %#33, 0
+  %#35 = zext i1 %#34 to i32
+  store i32 %#35, ptr noread noundef %#4, align 4
+  %#36 = load i32, ptr %#27, align 4
+  %#37 = icmp ugt i32 %#36, 12
+  br i1 %#37, label %#24, label %#7
+
+#7:
+  %#38 = load i32, ptr %#28, align 4
+  %#39 = load i32, ptr noundef %#1, align 4
+  %#40 = add i32 %#39, 1
+  %#41 = icmp ugt i32 %#38, %#40
+  br i1 %#41, label %#24, label %#8
+
+#8:
+  %#42 = icmp eq i32 %#36, 0
+  br i1 %#42, label %#11, label %#9
+
+#9:
+  %#43 = add nsw nuw i32 %#36, 1
+  %#44 = zext nneg i32 %#43 to i64
+  br label %#10
+
+#10:
+  %#45 = phi i64 [ 1, %#9 ], [ %#53, %#10 ]
+  %#46 = phi i32 [ 0, %#9 ], [ %#52, %#10 ]
+  %#47 = gep inbounds nuw ptr %#26, 64 x i64 0, 4 x i64 %#45
+  %#48 = load i32, ptr %#47, align 4
+  %#49 = trunc i64 %#45 to i32
+  %#50 = add i32 %#49, 4294967295
+  %#51 = shl i32 %#48, %#50
+  %#52 = add i32 %#51, %#46
+  store i32 %#46, ptr %#47, align 4
+  %#53 = add nsw nuw i64 %#45, 1
+  %#54 = icmp eq i64 %#53, %#44
+  br i1 %#54, label %#11, label %#10
+
+#11:
+  %#55 = icmp eq i32 %#38, 0
+  br i1 %#55, label %#14, label %#12
+
+#12:
+  %#56 = trunc nuw i32 %#36 to i8
+  %#57 = add nsw nuw i8 %#56, 1
+  %#58 = zext i32 %#38 to i64
+  br label %#13
+
+#13:
+  %#59 = phi i64 [ 0, %#12 ], [ %#66, %#13 ]
+  %#60 = gep inbounds nuw ptr %#25, 256 x i64 0, 1 x i64 %#59
+  %#61 = load i8, ptr %#60, align 1
+  %#62 = sub i8 %#57, %#61
+  %#63 = icmp eq i8 %#61, 0
+  %#64 = select i1 %#63, i8 0, i8 %#62
+  %#65 = gep inbounds nuw ptr noundef %#0, 4 x i64 %#59, 1 x i64 2
+  store i8 %#64, ptr %#65, align 2
+  %#66 = add nsw nuw i64 %#59, 1
+  %#67 = icmp eq i64 %#66, %#58
+  br i1 %#67, label %#14, label %#13
+
+#14:
+  start_lifetime ptr %#29
+  memset ptr %#29 align 16, i8 0, i64 28
+  start_lifetime ptr %#30
+  memset ptr %#30 align 16, i8 0, i64 28
+  %#68 = icmp eq i32 %#38, 0
+  br i1 %#68, label %#17, label %#15
+
+#15:
+  %#69 = zext i32 %#38 to i64
+  br label %#16
+
+#16:
+  %#70 = phi i64 [ 0, %#15 ], [ %#77, %#16 ]
+  %#71 = gep inbounds nuw ptr noundef %#0, 4 x i64 %#70, 1 x i64 2
+  %#72 = load i8, ptr %#71, align 2
+  %#73 = zext i8 %#72 to i64
+  %#74 = gep inbounds nuw ptr %#29, 28 x i64 0, 2 x i64 %#73
+  %#75 = load i16, ptr %#74, align 2
+  %#76 = add i16 %#75, 1
+  store i16 %#76, ptr %#74, align 2
+  %#77 = add nsw nuw i64 %#70, 1
+  %#78 = icmp eq i64 %#77, %#69
+  br i1 %#78, label %#17, label %#16
+
+#17:
+  %#79 = add nsw nuw i32 %#36, 1
+  %#80 = zext nneg i32 %#79 to i64
+  %#81 = gep inbounds nuw ptr %#30, 28 x i64 0, 2 x i64 %#80
+  store i16 0, ptr %#81, align 2
+  %#82 = icmp eq i32 %#36, 0
+  br i1 %#82, label %#20, label %#18
+
+#18:
+  %#83 = zext nneg i32 %#36 to i64
+  br label %#19
+
+#19:
+  %#84 = phi i64 [ %#83, %#18 ], [ %#94, %#19 ]
+  %#85 = phi i32 [ %#36, %#18 ], [ %#92, %#19 ]
+  %#86 = phi i16 [ 0, %#18 ], [ %#91, %#19 ]
+  %#87 = gep inbounds nuw ptr %#30, 28 x i64 0, 2 x i64 %#84
+  store i16 %#86, ptr %#87, align 2
+  %#88 = gep inbounds nuw ptr %#29, 28 x i64 0, 2 x i64 %#84
+  %#89 = load i16, ptr %#88, align 2
+  %#90 = add i16 %#89, %#86
+  %#91 = lshr i16 %#90, 1
+  %#92 = add i32 %#85, 4294967295
+  %#93 = icmp eq i32 %#92, 0
+  %#94 = add nsw i64 %#84, -1
+  br i1 %#93, label %#20, label %#19
+
+#20:
+  %#95 = icmp eq i32 %#38, 0
+  br i1 %#95, label %#23, label %#21
+
+#21:
+  %#96 = zext i32 %#38 to i64
+  br label %#22
+
+#22:
+  %#97 = phi i64 [ 0, %#21 ], [ %#105, %#22 ]
+  %#98 = gep inbounds nuw ptr noundef %#0, 4 x i64 %#97
+  %#99 = gep inbounds nuw ptr %#98, 1 x i64 2
+  %#100 = load i8, ptr %#99, align 2
+  %#101 = zext i8 %#100 to i64
+  %#102 = gep inbounds nuw ptr %#30, 28 x i64 0, 2 x i64 %#101
+  %#103 = load i16, ptr %#102, align 2
+  %#104 = add i16 %#103, 1
+  store i16 %#104, ptr %#102, align 2
+  store i16 %#103, ptr %#98, align 2
+  %#105 = add nsw nuw i64 %#97, 1
+  %#106 = icmp eq i64 %#105, %#96
+  br i1 %#106, label %#23, label %#22
+
+#23:
+  end_lifetime ptr %#30
+  end_lifetime ptr %#29
+  %#107 = add i32 %#38, 4294967295
+  store i32 %#107, ptr noundef %#1, align 4
+  br label %#24
+
+#24:
+  %#108 = phi i64 [ %#31, %#23 ], [ %#31, %#5 ], [ -44, %#6 ], [ -48, %#7 ]
+  end_lifetime ptr %#28
+  end_lifetime ptr %#27
+  end_lifetime ptr %#26
+  end_lifetime ptr %#25
+  ret i64 %#108
+}
+Transformation doesn't verify!
+
+ERROR: Source is more defined than target
+
+Example:
+ptr noundef %#0 = null
+ptr noundef %#1 = pointer(non-local, block_id=2, offset=0) / Address=#x0000000000000008
+ptr noundef %#2 = null
+i64 noundef %#3 = #x0000000000000003 (3)
+ptr noundef %#4 = pointer(non-local, block_id=2, offset=0) / Address=#x0000000000000008
+
+Source:
+ptr %#25 = pointer(local, block_id=0, offset=0) / Address=#x80000000000000e0
+ptr %#26 = pointer(local, block_id=1, offset=0) / Address=#x80000000000000a0
+ptr %#27 = pointer(local, block_id=2, offset=0) / Address=#x8000000000000028
+ptr %#28 = pointer(local, block_id=3, offset=0) / Address=#x800000000000002c
+ptr %#29 = pointer(local, block_id=4, offset=0) / Address=#x8000000000000000
+ptr %#30 = pointer(local, block_id=5, offset=0) / Address=#x8000000000000080
+i64 %#31 = #x0000000000000000 (0)
+i1 %#32 = #x1 (1)
+  >> Jump to %#6
+i32 %#33 = #x00000000 (0)
+i1 %#34 = #x0 (0)
+  >> Jump to %#7
+i32 %#35 = #x00000000 (0)
+i32 %#36 = #x00000000 (0)
+i32 %#37 = #x00000001 (1)
+i1 %#38 = #x0 (0)
+  >> Jump to %#8
+i1 %#39 = #x1 (1)
+  >> Jump to %#11
+i1 %#52 = #x1 (1)
+  >> Jump to %#14
+i1 %#68 = #x1 (1)
+  >> Jump to %#17
+i32 %#79 = #x00000001 (1)
+i64 %#80 = #x0000000000000001 (1)
+ptr %#81 = pointer(local, block_id=5, offset=2) / Address=#x8000000000000082
+i1 %#82 = #x1 (1)
+  >> Jump to %#20
+i1 %#95 = #x1 (1)
+  >> Jump to %#23
+i32 %#107 = #xffffffff (4294967295, -1)
+  >> Jump to %#24
+i64 %#108 = #x0000000000000000 (0)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 0	align: 1	alloc type: 0	alive: true	address: 12
+Block 2 >	size: 4	align: 1	alloc type: 0	alive: true	address: 8
+Contents:
+0: #x00
+1: #x00
+2: #x00
+3: #x00
+*: poison
+
+Block 3 >	size: 0	align: 1	alloc type: 0	alive: true	address: 8
+Block 4 >	size: 0	align: 1	alloc type: 0	alive: true	address: 4
+Block 5 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+
+LOCAL BLOCKS:
+Block 8 >	size: 256	align: 16	alloc type: 1	alive: false	address: 9223372036854776032
+Block 9 >	size: 64	align: 16	alloc type: 1	alive: false	address: 9223372036854775968
+Block 10 >	size: 4	align: 4	alloc type: 1	alive: false	address: 9223372036854775848
+Block 11 >	size: 4	align: 4	alloc type: 1	alive: false	address: 9223372036854775852
+Block 12 >	size: 32	align: 16	alloc type: 1	alive: false	address: 9223372036854775808
+Block 13 >	size: 32	align: 16	alloc type: 1	alive: false	address: 9223372036854775936
+
+Target:
+ptr %#25 = pointer(local, block_id=0, offset=0) / Address=#x8000000000000000
+ptr %#26 = pointer(local, block_id=1, offset=0) / Address=#x8000000000000800
+ptr %#27 = pointer(local, block_id=2, offset=0) / Address=#x8000000000000200
+ptr %#28 = pointer(local, block_id=3, offset=0) / Address=#x8000000000000100
+ptr %#29 = pointer(local, block_id=4, offset=0) / Address=#x8000000000000c00
+ptr %#30 = pointer(local, block_id=5, offset=0) / Address=#x8000000000000210
+i64 %#31 = #x0000000000000000 (0)
+i1 %#32 = #x1 (1)
+  >> Jump to %#6
+i32 %#33 = poison
+i1 %#34 = poison
+i32 %#35 = poison
+i32 %#36 = #x00000000 (0)
+i1 %#37 = #x0 (0)
+  >> Jump to %#7
+i32 %#38 = #x00000000 (0)
+i32 %#39 = poison
+i32 %#40 = poison
+i1 %#41 = poison
+UB triggered on br
+
+TARGET MEMORY STATE
+===================
+LOCAL BLOCKS:
+Block 8 >	size: 256	align: 16	alloc type: 1	alive: false	address: 9223372036854775808
+Block 9 >	size: 64	align: 16	alloc type: 1	alive: false	address: 9223372036854777856
+Block 10 >	size: 4	align: 4	alloc type: 1	alive: false	address: 9223372036854776320
+Block 11 >	size: 4	align: 4	alloc type: 1	alive: false	address: 9223372036854776064
+Block 12 >	size: 32	align: 16	alloc type: 1	alive: false	address: 9223372036854778880
+Block 13 >	size: 32	align: 16	alloc type: 1	alive: false	address: 9223372036854776336
+
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

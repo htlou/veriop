@@ -1,0 +1,5 @@
+# llama.cpp `077c94d0`: fused CUDA top-K MoE
+
+The exact historical parent `aa3ee0eb` executes a graph sequence; child `077c94d0` adds one CUDA kernel that fuses softmax, top-K/argsort, get-rows, and optional normalization. The [production diff](../source-screening/077c94d0.source.diff) shows the fusion dispatcher and `ggml_cuda_topk_moe_ops`: the old reference is a **five-op** graph without normalization or a **nine-op** graph with normalization, while the new path calls one `topk_moe_cuda` kernel.
+
+[Volta's documented comparison interface](../../../../cuda/repos/volta/README.md) accepts one reference PTX kernel and one optimized PTX kernel, checking the output footprint of each CTA-0 run. It has no argument for the old multi-kernel graph composition, intermediate buffers, or the graph dispatcher. Therefore the historical old/new transformation cannot be submitted to this Volta interface as a faithful pair. **Fixed-sample verdict: `UNSUPPORTED` by the selected Volta checker.** No equivalence, inequality, Kuiper proof, or official historical benchmark delta is established for this commit.

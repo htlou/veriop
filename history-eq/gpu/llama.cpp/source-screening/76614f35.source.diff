@@ -1,0 +1,172 @@
+diff --git a/ggml/src/ggml-aarch64.c b/ggml/src/ggml-aarch64.c
+index af53dea17..d7a608997 100644
+--- a/ggml/src/ggml-aarch64.c
++++ b/ggml/src/ggml-aarch64.c
+@@ -384,8 +384,8 @@ void ggml_gemv_q4_0_4x4_q8_0(int n, float * restrict s, size_t bs, const void *
+     UNUSED(blocklen);
+ 
+ #if defined(__ARM_FEATURE_SVE)
+-    if (svcntw() == 8) {
+-        GGML_ASSERT(!(ggml_cpu_has_sve() && (svcntw() == 8)) &&
++    if (ggml_sve_cnt_b == QK8_0) {
++        GGML_ASSERT(!(ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) &&
+                     "__ARM_FEATURE_SVE defined, use the Q4_0_8_8 quantization format for optimal performance");
+     }
+ #endif
+@@ -496,8 +496,8 @@ void ggml_gemv_q4_0_4x8_q8_0(int n, float * restrict s, size_t bs, const void *
+     UNUSED(blocklen);
+ 
+ #if defined(__ARM_FEATURE_SVE)
+-    if (svcntw() == 8) {
+-        GGML_ASSERT(!(ggml_cpu_has_sve() && (svcntw() == 8)) &&
++    if (ggml_sve_cnt_b == QK8_0) {
++        GGML_ASSERT(!(ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) &&
+                     "__ARM_FEATURE_SVE defined, use the Q4_0_8_8 quantization format for optimal performance");
+     }
+ #endif
+@@ -614,7 +614,7 @@ void ggml_gemv_q4_0_8x8_q8_0(int n, float * restrict s, size_t bs, const void *
+     UNUSED(blocklen);
+ 
+ #if defined(__ARM_FEATURE_SVE) && ! ((defined(_MSC_VER)) && ! defined(__clang__))
+-    if (svcntw() == 8) {
++    if (ggml_sve_cnt_b == QK8_0) {
+         const void * b_ptr = vx;
+         const void * a_ptr = vy;
+         float * res_ptr = s;
+@@ -680,12 +680,12 @@ void ggml_gemv_q4_0_8x8_q8_0(int n, float * restrict s, size_t bs, const void *
+         return;
+     }
+     else if (ggml_cpu_has_neon() && ggml_cpu_has_matmul_int8()) {
+-        GGML_ASSERT((ggml_cpu_has_sve() && (svcntw() == 8)) &&
++        GGML_ASSERT((ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) &&
+                     "__ARM_FEATURE_SVE for vector size of 256-bits not defined, use the Q4_0_4_8 quantization format for optimal "
+                     "performance");
+     }
+     else if (ggml_cpu_has_neon()) {
+-        GGML_ASSERT(((ggml_cpu_has_sve() && (svcntw() == 8)) || ggml_cpu_has_matmul_int8()) &&
++        GGML_ASSERT(((ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) || ggml_cpu_has_matmul_int8()) &&
+                     "__ARM_FEATURE_SVE for vector size of 256-bits and __ARM_FEATURE_MATMUL_INT8 not defined, use the Q4_0_4_4 "
+                     "quantization format for optimal performance");
+     }
+@@ -745,8 +745,8 @@ void ggml_gemm_q4_0_4x4_q8_0(int n, float * restrict s, size_t bs, const void *
+     UNUSED(blocklen);
+ 
+ #if defined(__ARM_FEATURE_SVE) && defined(__ARM_FEATURE_MATMUL_INT8)
+-    if (svcntw() == 8) {
+-        GGML_ASSERT(!(ggml_cpu_has_sve() && (svcntw() == 8)) &&
++    if (ggml_sve_cnt_b == QK8_0) {
++        GGML_ASSERT(!(ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) &&
+                     "__ARM_FEATURE_SVE defined, use the Q4_0_8_8 quantization format for optimal performance");
+     }
+ #endif
+@@ -1266,8 +1266,8 @@ void ggml_gemm_q4_0_4x8_q8_0(int n, float * restrict s, size_t bs, const void *
+     UNUSED(blocklen);
+ 
+ #if defined(__ARM_FEATURE_SVE) && defined(__ARM_FEATURE_MATMUL_INT8)
+-    if (svcntw() == 8) {
+-        GGML_ASSERT(!(ggml_cpu_has_sve() && (svcntw() == 8)) &&
++    if (ggml_sve_cnt_b == QK8_0) {
++        GGML_ASSERT(!(ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) &&
+                     "__ARM_FEATURE_SVE defined, use the Q4_0_8_8 quantization format for optimal performance");
+     }
+ #endif
+@@ -1728,7 +1728,7 @@ void ggml_gemm_q4_0_8x8_q8_0(int n, float * restrict s, size_t bs, const void *
+     UNUSED(blocklen);
+ 
+ #if defined(__ARM_FEATURE_SVE) && defined(__ARM_FEATURE_MATMUL_INT8) && ! ((defined(_MSC_VER)) && ! defined(__clang__))
+-    if (svcntw() == 8) {
++    if (ggml_sve_cnt_b == QK8_0) {
+         const void * b_ptr = vx;
+         const void * a_ptr = vy;
+         float * res_ptr = s;
+@@ -2139,12 +2139,12 @@ void ggml_gemm_q4_0_8x8_q8_0(int n, float * restrict s, size_t bs, const void *
+         return;
+     }
+     else if (ggml_cpu_has_neon() && ggml_cpu_has_matmul_int8()) {
+-        GGML_ASSERT((ggml_cpu_has_sve() && (svcntw() == 8)) &&
++        GGML_ASSERT((ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) &&
+                     "__ARM_FEATURE_SVE for vector size of 256-bits not defined, use the Q4_0_4_8 quantization format for optimal "
+                     "performance");
+     }
+     else if (ggml_cpu_has_neon()) {
+-        GGML_ASSERT(((ggml_cpu_has_sve() && (svcntw() == 8)) || ggml_cpu_has_matmul_int8()) &&
++        GGML_ASSERT(((ggml_cpu_has_sve() && (ggml_sve_cnt_b == QK8_0)) || ggml_cpu_has_matmul_int8()) &&
+                     "__ARM_FEATURE_SVE for vector size of 256-bits and __ARM_FEATURE_MATMUL_INT8 not defined, use the Q4_0_4_4 "
+                     "quantization format for optimal performance");
+     }
+diff --git a/ggml/src/ggml-impl.h b/ggml/src/ggml-impl.h
+index 3daee4926..190af0810 100644
+--- a/ggml/src/ggml-impl.h
++++ b/ggml/src/ggml-impl.h
+@@ -143,6 +143,7 @@ extern "C" {
+ 
+ #if defined(__ARM_FEATURE_SVE)
+ #include <arm_sve.h>
++#include <sys/prctl.h>
+ #endif
+ 
+ // 16-bit float
+diff --git a/ggml/src/ggml-quants.c b/ggml/src/ggml-quants.c
+index 16aaf523f..d5b91c2db 100644
+--- a/ggml/src/ggml-quants.c
++++ b/ggml/src/ggml-quants.c
+@@ -3818,7 +3818,7 @@ void ggml_vec_dot_q4_0_q8_0(int n, float * restrict s, size_t bs, const void * r
+     float sumf = 0;
+ 
+ #if defined(__ARM_FEATURE_SVE)
+-    if (svcntb() == QK8_0) {
++    if (ggml_sve_cnt_b == QK8_0) {
+         const svbool_t ptrueh = svptrue_pat_b8(SV_VL16);
+         const svbool_t ptruel = svnot_b_z(svptrue_b8(), ptrueh);
+ 
+@@ -5303,7 +5303,7 @@ void ggml_vec_dot_q8_0_q8_0(int n, float * restrict s, size_t bs, const void * r
+     float sumf = 0;
+ 
+ #if defined(__ARM_FEATURE_SVE)
+-    if (svcntb() == QK8_0) {
++    if (ggml_sve_cnt_b == QK8_0) {
+         svfloat32_t sumv0 = svdup_n_f32(0.0f);
+         svfloat32_t sumv1 = svdup_n_f32(0.0f);
+ 
+diff --git a/ggml/src/ggml-quants.h b/ggml/src/ggml-quants.h
+index 88b1f3269..525d5ee30 100644
+--- a/ggml/src/ggml-quants.h
++++ b/ggml/src/ggml-quants.h
+@@ -127,6 +127,10 @@ void iq2xs_free_impl(enum ggml_type type);
+ void iq3xs_init_impl(int grid_size);
+ void iq3xs_free_impl(int grid_size);
+ 
++#if defined(__ARM_FEATURE_SVE)
++extern int ggml_sve_cnt_b;
++#endif
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/ggml/src/ggml.c b/ggml/src/ggml.c
+index be672f6ef..42f4a34b8 100644
+--- a/ggml/src/ggml.c
++++ b/ggml/src/ggml.c
+@@ -37,6 +37,9 @@
+ #include <unistd.h>
+ #endif
+ 
++#if defined(__ARM_FEATURE_SVE)
++int ggml_sve_cnt_b = 0;
++#endif
+ #if defined(__ARM_FEATURE_SVE) || defined(__ARM_FEATURE_MATMUL_INT8)
+ #undef GGML_USE_LLAMAFILE
+ #endif
+@@ -3558,6 +3561,12 @@ struct ggml_context * ggml_init(struct ggml_init_params params) {
+ 
+     GGML_ASSERT_ALIGNED(ctx->mem_buffer);
+ 
++#if defined(__ARM_FEATURE_SVE)
++    if (!ggml_sve_cnt_b) {
++        ggml_sve_cnt_b = PR_SVE_VL_LEN_MASK & prctl(PR_SVE_GET_VL);
++    }
++#endif
++
+     GGML_PRINT_DEBUG("%s: context initialized\n", __func__);
+ 
+     ggml_critical_section_end();

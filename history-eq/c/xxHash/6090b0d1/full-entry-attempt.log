@@ -1,0 +1,72 @@
+
+----------------------------------------
+declare void @setDispatch()
+declare i32 @XXH3_update(noundef ptr, noundef ptr, noundef i64, noundef i32, noundef ptr, noundef ptr)
+
+@g_coreFunc = global 16 bytes, align 8
+
+define i32 @XXH3_128bits_update_dispatch(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2) {
+#3:
+  %#6 = alloca i64 8, align 8
+  %#7 = alloca i64 8, align 8
+  %#8 = alloca i64 8, align 8
+  store ptr noundef %#0, ptr %#6, align 8
+  store ptr noundef %#1, ptr %#7, align 8
+  store i64 noundef %#2, ptr %#8, align 8
+  %#9 = load ptr, ptr @g_coreFunc, align 8
+  %#10 = icmp eq ptr %#9, null
+  br i1 %#10, label %#4, label %#5
+
+#4:
+  call void @setDispatch()
+  br label %#5
+
+#5:
+  %#11 = load ptr, ptr %#6, align 8
+  %#12 = load ptr, ptr %#7, align 8
+  %#13 = load i64, ptr %#8, align 8
+  %#14 = load ptr, ptr @g_coreFunc, align 8
+  %__constexpr_0 = gep inbounds nuw ptr @g_coreFunc, 16 x i32 0, 1 x i64 8
+  %#15 = load ptr, ptr %__constexpr_0, align 8
+  %#16 = call i32 @XXH3_update(noundef ptr %#11, noundef ptr %#12, noundef i64 %#13, noundef i32 1, noundef ptr %#14, noundef ptr %#15)
+  ret i32 %#16
+}
+=>
+declare void @setDispatch()
+
+@g_dispatch128 = global 32 bytes, align 8
+@g_coreFunc = global 16 bytes, align 8
+
+define i32 @XXH3_128bits_update_dispatch(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2) {
+#3:
+  %#6 = alloca i64 8, align 8
+  %#7 = alloca i64 8, align 8
+  %#8 = alloca i64 8, align 8
+  store ptr noundef %#0, ptr %#6, align 8
+  store ptr noundef %#1, ptr %#7, align 8
+  store i64 noundef %#2, ptr %#8, align 8
+  %__constexpr_0 = gep inbounds nuw ptr @g_dispatch128, 32 x i32 0, 1 x i64 24
+  %#9 = load ptr, ptr %__constexpr_0, align 8
+  %#10 = icmp eq ptr %#9, null
+  br i1 %#10, label %#4, label %#5
+
+#4:
+  call void @setDispatch()
+  br label %#5
+
+#5:
+  %__constexpr_1 = gep inbounds nuw ptr @g_dispatch128, 32 x i32 0, 1 x i64 24
+  %#11 = load ptr, ptr %__constexpr_1, align 8
+  %#12 = load ptr, ptr %#6, align 8
+  %#13 = load ptr, ptr %#7, align 8
+  %#14 = load i64, ptr %#8, align 8
+  %#15 = call i32 %#11(noundef ptr %#12, noundef ptr %#13, noundef i64 %#14)
+  ret i32 %#15
+}
+ERROR: Unsupported interprocedural transformation: non-constant global variable @g_dispatch128 is introduced in target
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

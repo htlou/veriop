@@ -1,0 +1,40 @@
+{
+  "commit": "7788a1f",
+  "date": "2016-04-09",
+  "subject": "Remove shift masks in branchfree vector paths",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit removes an instruction from SSE2 unsigned branchfree vector division paths.",
+  "change_summary": "Uses the stored shift field directly in 32/64-bit branchfree SSE2 vector division.",
+  "units": [
+    {
+      "name": "public generated unsigned-32/64 branchfree SSE2 vector division",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "d >= 2",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/7788a1f/sse2_u4",
+      "evidence": "Both generated-divider SSE2 API targets pass bidirectional Alive2 with unroll 4."
+    },
+    {
+      "name": "raw unsigned-32/64 branchfree SSE2 vector division with arbitrary divider fields",
+      "level": "raw",
+      "verdict": "NOT_EQUIV",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": "ub-domain-change",
+      "artifact_dir": "c/libdivide/7788a1f/sse2_u4",
+      "evidence": "Both raw targets have bidirectional value-mismatch counterexamples for fabricated more fields."
+    }
+  ],
+  "commit_verdict": "EQUIV_BOUNDED",
+  "raw_verdict": "NOT_EQUIV",
+  "coverage": "full",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The branchfree generator already masks the shift in the preceding commit; raw structs with out-of-contract more values need not agree. Only the two changed SSE2 paths appear in this commit's diff."
+}

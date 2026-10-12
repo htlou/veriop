@@ -1,0 +1,13 @@
+; For every Java int x, the two changed radix digit formulas agree in both passes.
+(set-logic QF_BV)
+(declare-fun x () (_ BitVec 32))
+(define-fun old16 () (_ BitVec 32)
+  (bvlshr (bvand x #x00ff0000) (_ bv16 32)))
+(define-fun new16 () (_ BitVec 32)
+  (bvand (bvlshr x (_ bv16 32)) #x000000ff))
+(define-fun old24 () (_ BitVec 32)
+  (bvlshr (bvand x #xff000000) (_ bv24 32)))
+(define-fun new24 () (_ BitVec 32)
+  (bvand (bvlshr x (_ bv24 32)) #x000000ff))
+(assert (or (not (= old16 new16)) (not (= old24 new24))))
+(check-sat)

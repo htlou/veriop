@@ -1,0 +1,44 @@
+  @Override
+  public Container ior(RunContainer x) {
+    if (isFull()) {
+      return this;
+    }
+
+    final int nbrruns = this.nbrruns;
+    final int xnbrruns = x.nbrruns;
+    final int offset = Math.max(nbrruns, xnbrruns);
+
+    // Push all values length to the end of the array (resize array if needed)
+    copyToOffset(offset);
+    // Aggregate and store the result at the beginning of the array
+    this.nbrruns = 0;
+    int rlepos = 0;
+    int xrlepos = 0;
+
+    // Add values length (smaller first)
+    while ((rlepos < nbrruns) && (xrlepos < xnbrruns)) {
+      final char value = this.getValue(offset + rlepos);
+      final char xvalue = x.getValue(xrlepos);
+      final char length = this.getLength(offset + rlepos);
+      final char xlength = x.getLength(xrlepos);
+
+      if (value - xvalue <= 0) {
+        this.smartAppend(value, length);
+        ++rlepos;
+      } else {
+        this.smartAppend(xvalue, xlength);
+        ++xrlepos;
+      }
+    }
+
+    while (rlepos < nbrruns) {
+      this.smartAppend(this.getValue(offset + rlepos), this.getLength(offset + rlepos));
+      ++rlepos;
+    }
+
+    while (xrlepos < xnbrruns) {
+      this.smartAppend(x.getValue(xrlepos), x.getLength(xrlepos));
+      ++xrlepos;
+    }
+    return this.toBitmapIfNeeded();
+  }

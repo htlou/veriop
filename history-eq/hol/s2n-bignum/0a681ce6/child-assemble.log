@@ -1,0 +1,5 @@
+make: Entering directory '/tmp/veriop-s2n-0a681ce6/arm'
+cat curve25519/bignum_sqr_p25519.S | clang -E -I../include  -xassembler-with-cpp - | tr ';' '\n' | grep -v -E '^\s+.quad\s+0x[0-9a-f]+$' | clang -target aarch64-none-elf -c -x assembler -march=armv8-a+crypto -o curve25519/bignum_sqr_p25519.o -
+llvm-objdump-14 -d curve25519/bignum_sqr_p25519.o | ( ( ! grep --ignore-case -E 'w18|[^0]x18' ) || ( rm curve25519/bignum_sqr_p25519.o ; exit 1 ) )
+cat curve25519/bignum_sqr_p25519.S | clang -E -I../include  -xassembler-with-cpp - | tr ';' '\n' | clang -target aarch64-none-elf -c -x assembler -march=armv8-a+crypto -o curve25519/bignum_sqr_p25519.o -
+make: Leaving directory '/tmp/veriop-s2n-0a681ce6/arm'

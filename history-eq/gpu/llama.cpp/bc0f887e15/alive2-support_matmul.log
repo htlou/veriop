@@ -1,0 +1,54 @@
+
+----------------------------------------
+define i1 @support_matmul(i32 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  switch i32 noundef %#0, label %#4 [
+    i32 1, label %#3
+    i32 2, label %#3
+    i32 3, label %#3
+    i32 4, label %#5
+  ]
+
+#3:
+  %#6 = icmp sgt i64 noundef %#1, 33
+  br label %#5
+
+#4:
+  br label %#5
+
+#5:
+  %#7 = phi i1 [ 0, %#4 ], [ %#6, %#3 ], [ 1, %#2 ]
+  ret i1 %#7
+}
+=>
+define i1 @support_matmul(i32 noundef %#0, i64 noundef %#1) nofree noundef willreturn zeroext memory(none) {
+#2:
+  %#3 = add i32 noundef %#0, 4294967295
+  %#4 = icmp ult i32 %#3, 4
+  ret i1 %#4
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000001 (1)
+i64 noundef %#1 = #x0000000000000000 (0)
+
+Source:
+  >> Jump to %#3
+i1 %#6 = #x0 (0)
+  >> Jump to %#5
+i1 %#7 = #x0 (0)
+
+Target:
+i32 %#3 = #x00000000 (0)
+i1 %#4 = #x1 (1)
+Source value: #x0 (0)
+Target value: #x1 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,52 @@
+{
+ "commit": "e7c94ef",
+ "date": "2024-11-29",
+ "subject": "Add LoongArch SX SIMD extenstion implementation",
+ "selected_by": "keyword",
+ "perf_evidence": "Adds an LSX (128-bit SIMD) implementation of the XXH3 long-input kernels for LoongArch64, auto-selected when __loongarch_sx is defined (default for clang loongarch64); SIMD = speed.",
+ "change_summary": "New XXH_VECTOR=XXH_LSX with XXH3_accumulate_512_lsx / XXH3_scrambleAcc_lsx (vmulwev.d.wu for 32x32->64 products, vshuf4i.w lane swap, scramble multiply emulated by two vmulwev + shift + add); initCustomSecret stays scalar; XXH_ACC_ALIGN 64.",
+ "units": [
+  {
+   "name": "XXH3_accumulate_512 + XXH3_scrambleAcc scalar -> LSX, loongarch64 -mlsx, as compiled",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/e7c94ef/r_lsx",
+   "evidence": "failed-to-prove: 'Unknown libcall: @llvm.loongarch.lsx.vmulwev.d.wu / vld / vxor.v / vshuf4i.w / ...' (approximated)"
+  },
+  {
+   "name": "XXH3_accumulate_512 scalar -> LSX, LSX intrinsics modeled + O2-normalized",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/e7c94ef/r_lsx_model_O2",
+   "evidence": "fwd+bwd correct (modeled but not normalized: Timeout at 60 s and 600 s, r_lsx_model_long, r_lsx_model_opt)"
+  },
+  {
+   "name": "XXH3_scrambleAcc scalar -> LSX, LSX intrinsics modeled (+O2)",
+   "level": "raw",
+   "verdict": "UNKNOWN",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/e7c94ef/r_lsx_model_O2",
+   "evidence": "Timeout (600 s) both directions in r_lsx_model_long, r_lsx_model_opt and r_lsx_model_O2: needs the 64-bit multiplier identity (x&0xffffffff)*P + (x>>32)*(P<<32) == x*P"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "non-x86-target-intrinsics",
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). clang enables LSX by default for loongarch64 (__loongarch_sx defined without -mlsx), so the default loongarch64 build changes (ident_la64_default/: target_xxh3_128_seed differs). Flags: --target loongarch64-linux-gnu, cflags '-O3 -fno-strict-aliasing -fno-vectorize -fno-slp-vectorize -w -nostdlibinc -isystem _work2020/cross_sysinc -mlsx|-mlasx' + '-DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000'; wrapper wrap_simd.c uses the library dispatch macros with value-arg inputs in local arrays. Plain Alive2 cannot conclude: LSX/LASX builtins stay as llvm.loongarch.{lsx,lasx}.* calls and are approximated as unknown libcalls ('Couldn't prove the correctness ... Alive2 approximated the semantics'). Secondary analysis: la_model.py replaces each intrinsic by generic IR with its ISA semantics (vld=unaligned load, vxor/vadd/vmul.d lane-wise, vsrli/vslli shifts, vmulwev.d.wu = zext(even 32-bit lanes) products, vreplgr2vr = splat, vshuf4i.w = per-128-bit-lane word shuffle), identically on both sides; *_O2 dirs additionally re-normalize both sides with opt default<O2> (no vectorizers) and strip nocapture. Result modulo that model: accumulate_512 EQUIV to scalar; scrambleAcc UNKNOWN (SMT timeout). target_initsecret (scalar both sides) EQUIV as control; target_api_len1024 'source program doesn't reach a return instruction' (loops, not unrolled) - not pursued. Commit verdict UNSUPPORTED per METHOD aggregation because the code as compiled is not analyzable by Alive2."
+}

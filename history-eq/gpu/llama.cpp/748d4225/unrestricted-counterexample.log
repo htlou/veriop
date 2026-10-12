@@ -1,0 +1,52 @@
+
+----------------------------------------
+define i32 @target_unrestricted(i32 noundef %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {
+#2:
+  %#3 = bitcast i32 noundef %#0 to <4 x i8>
+  %#4 = bitcast i32 noundef %#1 to <4 x i8>
+  %#5 = ssub_sat <4 x i8> %#3, %#4
+  %#6 = bitcast <4 x i8> %#5 to i32
+  ret i32 %#6
+}
+=>
+define i32 @target_unrestricted(i32 noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = or i32 noundef %#0, 2155905152
+  %#4 = and i32 noundef %#1, 2139062143
+  %#5 = sub nuw i32 %#3, %#4
+  %#6 = xor i32 noundef %#1, noundef %#0
+  %#7 = and i32 %#6, 2155905152
+  %#8 = xor i32 %#7, %#5
+  %#9 = xor i32 %#8, 2155905152
+  ret i32 %#9
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000000 (0)
+i32 noundef %#1 = #x00000080 (128)
+
+Source:
+<4 x i8> %#3 = < #x00 (0), #x00 (0), #x00 (0), #x00 (0) >
+<4 x i8> %#4 = < #x80 (128, -128), #x00 (0), #x00 (0), #x00 (0) >
+<4 x i8> %#5 = < #x7f (127), #x00 (0), #x00 (0), #x00 (0) >
+i32 %#6 = #x0000007f (127)
+
+Target:
+i32 %#3 = #x80808080 (2155905152, -2139062144)
+i32 %#4 = #x00000000 (0)
+i32 %#5 = #x80808080 (2155905152, -2139062144)
+i32 %#6 = #x00000080 (128)
+i32 %#7 = #x00000080 (128)
+i32 %#8 = #x80808000 (2155905024, -2139062272)
+i32 %#9 = #x00000080 (128)
+Source value: #x0000007f (127)
+Target value: #x00000080 (128)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

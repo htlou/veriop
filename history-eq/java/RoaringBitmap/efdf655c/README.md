@@ -1,0 +1,7 @@
+# RoaringBitmap `efdf655c`: empty ART iterator
+
+**Fixed-sample verdict: `NOT_EQUIV` for the existing public `LeafNodeIterator.next()` method.** With a valid empty `Art`, `hasNext()` returns `false` on both historical versions. Calling `next()` then returns `null` in the parent and throws `NoSuchElementException` in the child. This is an observable Java result/exception difference, even though the child behavior conforms to the `Iterator` contract.
+
+[`run.py`](run.py) checks the complete archived production diff against the pinned Git objects, copies the exact parent and child `LeafNodeIterator.java` blobs ([parent](parent/LeafNodeIterator.java), [child](child/LeafNodeIterator.java)), and checks that both historical `Art` constructors create an empty root and `isEmpty()` reads that root. It compiles each **unaltered historical iterator class** against the same minimal supporting classes, whose `Art` models that empty-root state. The [same witness](Witness.java) yields the different results recorded in [witness.json](witness.json). Reproduce from the project root with `python3 history-eq/java/RoaringBitmap/efdf655c/run.py`.
+
+This is a concrete execution counterexample, **not a KeY proof**. It establishes inequality for this valid public method call, not the behavior of all iterator states or other changes in the commit. No official historical before/after performance score was measured.

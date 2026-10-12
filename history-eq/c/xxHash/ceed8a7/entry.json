@@ -1,0 +1,76 @@
+{
+  "commit": "ceed8a7",
+  "date": "2020-05-27",
+  "subject": "simplified XXH_PREFETCH_DIST logic (#375)",
+  "selected_by": "manual-scan",
+  "perf_evidence": "The diff changes the compiler/ISA-specific prefetch distance used in XXH3's stripe loop, including Clang AVX2 and GCC AVX512 paths.",
+  "change_summary": "Replace separate AVX512 64/128-bit prefetch distances with one configurable XXH_PREFETCH_DIST. Clang uses 320, GCC AVX512 uses 512, other GCC paths use 384.",
+  "units": [
+    {
+      "name": "XXH3_accumulate, one stripe, Clang AVX2, 64/128-bit widths",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/ceed8a7/raw_clang_avx2",
+      "evidence": "target_acc64/target_acc128 forward and backward correct; old/new IR differs in prefetch address."
+    },
+    {
+      "name": "XXH3_accumulate, one stripe, GCC preprocessor branch AVX512, 64/128-bit widths",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/ceed8a7/raw_gccview_avx512",
+      "evidence": "target_acc64/target_acc128 forward and backward correct with -U__clang__ selecting the GCC branch."
+    },
+    {
+      "name": "Clang AVX512 unchanged-path control",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/ceed8a7/raw_clang_avx512",
+      "evidence": "Compiled old/new modules are byte-identical after normalization; both target functions forward and backward correct."
+    },
+    {
+      "name": "XXH3_64bits/XXH3_128bits, 256 bytes, Clang AVX2",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/ceed8a7/api_clang_avx2",
+      "evidence": "Public targets forward/backward correct in result.json; both noinline hashLong default-secret callees separately forward/backward correct in helpers_fwd.log/helpers_bwd.log."
+    },
+    {
+      "name": "XXH3_64bits/XXH3_128bits, 256 bytes, GCC preprocessor branch AVX512",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/ceed8a7/api_gccview_avx512",
+      "evidence": "Public targets and their noinline hashLong default-secret callees separately pass Alive2 in both directions at 256 bytes."
+    }
+  ],
+  "commit_verdict": "EQUIV_BOUNDED",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The two changed compiled paths are checked at 256 bytes. -U__clang__ selects the GCC preprocessor branch but Clang still generates the IR; actual GCC code generation is outside this proof. Public targets call noinline helpers; the separate helper logs prove those actual computation bodies. Other input lengths remain unchecked."
+}

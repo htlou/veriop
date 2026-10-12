@@ -1,0 +1,218 @@
+
+----------------------------------------
+define i32 @XXH32_update(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2) nofree noundef memory(argmem: readwrite) {
+#3:
+  %#15 = gep inbounds nuw ptr noundef %#1, 1 x i64 noundef %#2
+  %#16 = trunc i64 noundef %#2 to i32
+  %#17 = load i32, ptr noundef %#0, align 4
+  %#18 = add i32 %#17, %#16
+  store i32 %#18, ptr noundef %#0, align 4
+  %#19 = icmp ugt i64 noundef %#2, 15
+  %#20 = icmp ugt i32 %#18, 15
+  %#21 = or i1 %#19, %#20
+  %#22 = zext i1 %#21 to i32
+  %#23 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#24 = load i32, ptr %#23, align 4
+  %#25 = or i32 %#24, %#22
+  store i32 %#25, ptr %#23, align 4
+  %#26 = gep inbounds nuw ptr noundef %#0, 1 x i64 40
+  %#27 = load i32, ptr %#26, align 4
+  %#28 = zext i32 %#27 to i64
+  %#29 = add i64 noundef %#2, %#28
+  %#30 = icmp ult i64 %#29, 16
+  br i1 %#30, label %#12, label %#4
+
+#4:
+  %#31 = icmp eq i32 %#27, 0
+  br i1 %#31, label %#6, label %#5
+
+#5:
+  %#32 = gep inbounds nuw ptr noundef %#0, 1 x i64 24
+  %#33 = gep inbounds nuw ptr %#32, 1 x i64 %#28
+  %#34 = sub i32 16, %#27
+  %#35 = zext i32 %#34 to i64
+  tail memcpy ptr %#33 align 1, ptr noundef %#1 align 1, i64 %#35
+  %#36 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#37 = load <4 x i32>, ptr %#36, align 4
+  %#38 = load <4 x i32>, ptr %#32, align 1
+  %#39 = mul <4 x i32> %#38, { 2246822519, 2246822519, 2246822519, 2246822519 }
+  %#40 = add <4 x i32> %#39, %#37
+  %#41 = fshl <4 x i32> %#40, <4 x i32> %#40, <4 x i32> { 13, 13, 13, 13 }
+  %#42 = mul <4 x i32> %#41, { 2654435761, 2654435761, 2654435761, 2654435761 }
+  store <4 x i32> %#42, ptr %#36, align 4
+  %#43 = load i32, ptr %#26, align 4
+  %#44 = sub i32 16, %#43
+  %#45 = zext i32 %#44 to i64
+  %#46 = gep inbounds nuw ptr noundef %#1, 1 x i64 %#45
+  store i32 0, ptr %#26, align 4
+  br label %#6
+
+#6:
+  %#47 = phi ptr [ %#46, %#5 ], [ noundef %#1, %#4 ]
+  %#48 = gep inbounds ptr %#15, 1 x i64 -16
+  %#49 = icmp ugt ptr %#47, %#48
+  br i1 %#49, label %#10, label %#7
+
+#7:
+  %#50 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#51 = load <4 x i32>, ptr %#50, align 4
+  br label %#8
+
+#8:
+  %#52 = phi ptr [ %#47, %#7 ], [ %#59, %#8 ]
+  %#53 = phi <4 x i32> [ %#51, %#7 ], [ %#58, %#8 ]
+  %#54 = load <4 x i32>, ptr %#52, align 1
+  %#55 = mul <4 x i32> %#54, { 2246822519, 2246822519, 2246822519, 2246822519 }
+  %#56 = add <4 x i32> %#55, %#53
+  %#57 = fshl <4 x i32> %#56, <4 x i32> %#56, <4 x i32> { 13, 13, 13, 13 }
+  %#58 = mul <4 x i32> %#57, { 2654435761, 2654435761, 2654435761, 2654435761 }
+  %#59 = gep inbounds nuw ptr %#52, 1 x i64 16
+  %#60 = icmp ugt ptr %#59, %#48, offsetonly
+  br i1 %#60, label %#9, label %#8
+
+#9:
+  store <4 x i32> %#58, ptr %#50, align 4
+  br label %#10
+
+#10:
+  %#61 = phi ptr [ %#59, %#9 ], [ %#47, %#6 ]
+  %#62 = icmp ult ptr %#61, %#15
+  br i1 %#62, label %#11, label %#14
+
+#11:
+  %#63 = gep inbounds nuw ptr noundef %#0, 1 x i64 24
+  %#64 = ptrtoint ptr %#15 to i64
+  %#65 = ptrtoint ptr %#61 to i64
+  %#66 = sub i64 %#64, %#65
+  tail memcpy ptr %#63 align 1, ptr %#61 align 1, i64 %#66
+  %#67 = trunc i64 %#66 to i32
+  br label %#13
+
+#12:
+  %#68 = gep inbounds nuw ptr noundef %#0, 1 x i64 24
+  %#69 = gep inbounds nuw ptr %#68, 1 x i64 %#28
+  tail memcpy ptr %#69 align 1, ptr noundef %#1 align 1, i64 noundef %#2
+  %#70 = load i32, ptr %#26, align 4
+  %#71 = add i32 %#70, %#16
+  br label %#13
+
+#13:
+  %#72 = phi i32 [ %#71, %#12 ], [ %#67, %#11 ]
+  store i32 %#72, ptr %#26, align 4
+  br label %#14
+
+#14:
+  ret i32 0
+}
+=>
+define i32 @XXH32_update(ptr noundef %#0, ptr noundef %#1, i64 noundef %#2) nofree noundef memory(argmem: readwrite) {
+#3:
+  %#15 = gep inbounds nuw ptr noundef %#1, 1 x i64 noundef %#2
+  %#16 = trunc i64 noundef %#2 to i32
+  %#17 = load i32, ptr noundef %#0, align 4
+  %#18 = add i32 %#17, %#16
+  store i32 %#18, ptr noundef %#0, align 4
+  %#19 = icmp ugt i64 noundef %#2, 15
+  %#20 = icmp ugt i32 %#18, 15
+  %#21 = or i1 %#19, %#20
+  %#22 = zext i1 %#21 to i32
+  %#23 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#24 = load i32, ptr %#23, align 4
+  %#25 = or i32 %#24, %#22
+  store i32 %#25, ptr %#23, align 4
+  %#26 = gep inbounds nuw ptr noundef %#0, 1 x i64 40
+  %#27 = load i32, ptr %#26, align 4
+  %#28 = zext i32 %#27 to i64
+  %#29 = add i64 noundef %#2, %#28
+  %#30 = icmp ult i64 %#29, 16
+  br i1 %#30, label %#12, label %#4
+
+#4:
+  %#31 = icmp eq i32 %#27, 0
+  br i1 %#31, label %#6, label %#5
+
+#5:
+  %#32 = gep inbounds nuw ptr noundef %#0, 1 x i64 24
+  %#33 = gep inbounds nuw ptr %#32, 1 x i64 %#28
+  %#34 = sub i32 16, %#27
+  %#35 = zext i32 %#34 to i64
+  tail memcpy ptr %#33 align 1, ptr noundef %#1 align 1, i64 %#35
+  %#36 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#37 = load <4 x i32>, ptr %#36, align 4
+  %#38 = load <4 x i32>, ptr %#32, align 1
+  %#39 = mul <4 x i32> %#38, { 2246822519, 2246822519, 2246822519, 2246822519 }
+  %#40 = add <4 x i32> %#39, %#37
+  %#41 = fshl <4 x i32> %#40, <4 x i32> %#40, <4 x i32> { 13, 13, 13, 13 }
+  %#42 = mul <4 x i32> %#41, { 2654435761, 2654435761, 2654435761, 2654435761 }
+  store <4 x i32> %#42, ptr %#36, align 4
+  %#43 = load i32, ptr %#26, align 4
+  %#44 = sub i32 16, %#43
+  %#45 = zext i32 %#44 to i64
+  %#46 = gep inbounds nuw ptr noundef %#1, 1 x i64 %#45
+  store i32 0, ptr %#26, align 4
+  br label %#6
+
+#6:
+  %#47 = phi ptr [ %#46, %#5 ], [ noundef %#1, %#4 ]
+  %#48 = gep inbounds ptr %#15, 1 x i64 -16
+  %#49 = icmp ugt ptr %#47, %#48
+  br i1 %#49, label %#10, label %#7
+
+#7:
+  %#50 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#51 = load <4 x i32>, ptr %#50, align 4
+  br label %#8
+
+#8:
+  %#52 = phi ptr [ %#47, %#7 ], [ %#59, %#8 ]
+  %#53 = phi <4 x i32> [ %#51, %#7 ], [ %#58, %#8 ]
+  %#54 = load <4 x i32>, ptr %#52, align 1
+  %#55 = mul <4 x i32> %#54, { 2246822519, 2246822519, 2246822519, 2246822519 }
+  %#56 = add <4 x i32> %#55, %#53
+  %#57 = fshl <4 x i32> %#56, <4 x i32> %#56, <4 x i32> { 13, 13, 13, 13 }
+  %#58 = mul <4 x i32> %#57, { 2654435761, 2654435761, 2654435761, 2654435761 }
+  %#59 = gep inbounds nuw ptr %#52, 1 x i64 16
+  %#60 = icmp ugt ptr %#59, %#48, offsetonly
+  br i1 %#60, label %#9, label %#8
+
+#9:
+  store <4 x i32> %#58, ptr %#50, align 4
+  br label %#10
+
+#10:
+  %#61 = phi ptr [ %#59, %#9 ], [ %#47, %#6 ]
+  %#62 = icmp ult ptr %#61, %#15
+  br i1 %#62, label %#11, label %#14
+
+#11:
+  %#63 = gep inbounds nuw ptr noundef %#0, 1 x i64 24
+  %#64 = ptrtoint ptr %#15 to i64
+  %#65 = ptrtoint ptr %#61 to i64
+  %#66 = sub i64 %#64, %#65
+  tail memcpy ptr %#63 align 1, ptr %#61 align 1, i64 %#66
+  %#67 = trunc i64 %#66 to i32
+  br label %#13
+
+#12:
+  %#68 = gep inbounds nuw ptr noundef %#0, 1 x i64 24
+  %#69 = gep inbounds nuw ptr %#68, 1 x i64 %#28
+  tail memcpy ptr %#69 align 1, ptr noundef %#1 align 1, i64 noundef %#2
+  %#70 = load i32, ptr %#26, align 4
+  %#71 = add i32 %#70, %#16
+  br label %#13
+
+#13:
+  %#72 = phi i32 [ %#67, %#11 ], [ %#71, %#12 ]
+  store i32 %#72, ptr %#26, align 4
+  br label %#14
+
+#14:
+  ret i32 0
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

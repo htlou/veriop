@@ -1,0 +1,44 @@
+  |- forall z x y a b pc.
+         nonoverlapping (word pc,734) (z,8 * 12) /\
+         (y = z \/ nonoverlapping (y,8 * 6) (z,8 * 12)) /\
+         nonoverlapping (x,8 * 6) (z,8 * 12)
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_6_12_mc /\
+                  read RIP s = word (pc + 6) /\
+                  C_ARGUMENTS [z; x; y] s /\
+                  bignum_from_memory (x,6) s = a /\
+                  bignum_from_memory (y,6) s = b)
+             (\s.
+                  read RIP s = word (pc + 727) /\
+                  bignum_from_memory (z,12) s = a * b)
+             (MAYCHANGE
+              [RIP; RAX; RBP; RBX; RCX; RDX; R8; R9; R10; R11; R12; R13] ,,
+              MAYCHANGE [memory :> bytes (z,8 * 12)] ,,
+              MAYCHANGE SOME_FLAGS)
+
+  |- forall z x y a b pc stackpointer returnaddress.
+         nonoverlapping (word_sub stackpointer (word 32),40) (z,8 * 12) /\
+         ALL (nonoverlapping (word_sub stackpointer (word 32),32))
+         [word pc,734; x,8 * 6; y,8 * 6] /\
+         nonoverlapping (word pc,734) (z,8 * 12) /\
+         (y = z \/ nonoverlapping (y,8 * 6) (z,8 * 12)) /\
+         nonoverlapping (x,8 * 6) (z,8 * 12)
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_mul_6_12_mc /\
+                  read RIP s = word pc /\
+                  read RSP s = stackpointer /\
+                  read (memory :> bytes64 stackpointer) s = returnaddress /\
+                  C_ARGUMENTS [z; x; y] s /\
+                  bignum_from_memory (x,6) s = a /\
+                  bignum_from_memory (y,6) s = b)
+             (\s.
+                  read RIP s = returnaddress /\
+                  read RSP s = word_add stackpointer (word 8) /\
+                  bignum_from_memory (z,12) s = a * b)
+             (MAYCHANGE [RIP; RSP; RAX; RCX; RDX; R8; R9; R10; R11] ,,
+              MAYCHANGE
+              [memory :> bytes (z,8 * 12);
+               memory :> bytes (word_sub stackpointer (word 32),32)] ,,
+              MAYCHANGE SOME_FLAGS)

@@ -1,0 +1,24 @@
+{
+  "repo": "fast_float",
+  "commit": "38613a39f9eb3763a68fe56f8acf22474ed9c5ed",
+  "parent": "6ede03878977d0a3469d3fc239168333dcf8a3f2",
+  "selected_from": "history-eq/results/pinned-samples.json",
+  "performance_intent": "Commit title explicitly fixes a performance decrease for UC=char by splitting the eight-digit scan paths",
+  "commit_verdict": "VERIFIED_INEQUAL_UNRESTRICTED_PUBLIC_CHAR16",
+  "checked_scope": "Eight-char16 SIMD scan with arbitrary code units and accumulator; fixed ten-code-unit parse_number_string and public from_chars<double,char16_t> witness",
+  "checker": "Alive2 for changed scan and parser; historical GCC 11 native binaries for public API",
+  "compiler": "Clang 20.1.8 -std=c++20 -O2 -msse2 for Alive2 IR; GCC 11.4.0 -std=c++20 -O2 -msse2 for public runtime witness",
+  "clang_intrinsic_alias": "Clang 20 lacks GCC's _mm_cvtsi128_si64x spelling; both IR revisions map it to _mm_cvtsi128_si64, whose local compiler headers implement the same low-64-bit extraction",
+  "old_ir_sha256": "f8e0d4c338a4d85e815f552972589c52f9451cb0312791ac92eb27d63dac08e9",
+  "new_ir_sha256": "80aee2884514dde0434f7d69a9e77efe8a75aece5dee061d798e1d4e8f66748f",
+  "result": {
+    "scan_old_to_new": "3 correct, 1 incorrect (char16 accumulator)",
+    "scan_new_to_old": "3 correct, 1 incorrect (char16 accumulator)",
+    "parser_old_to_new": "1 incorrect: old mantissa 127263718, new 241393937",
+    "parser_new_to_old": "1 incorrect: new mantissa 241393937, old 127263718",
+    "public_native": "Both accept and consume 10 char16_t units; old output bits 3ff45cb8cdbc60ef, new 40034fbf71c56a2d",
+    "public_alive2": "unsupported: rounds_to_nearest emits a volatile floating-point load that installed Alive2 cannot translate"
+  },
+  "witness_code_units": [48, 46, 33802, 49196, 49156, 33025, 33024, 40960, 40960, 40997],
+  "limitations": "Counterexample has non-ASCII char16_t units. It establishes unrestricted API difference, not a difference for valid decimal-digit strings. No official before/after benchmark score was measured."
+}

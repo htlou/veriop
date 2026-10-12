@@ -1,0 +1,568 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify r1/old.ll r1/new.ll
+
+----------------------------------------
+define i64 @target_xxh3_64_seed_4to8(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: read) {
+#3:
+  %#6 = add i64 noundef %#1, -9
+  %#7 = icmp ult i64 %#6, -5
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = load i32, ptr nowrite noundef %#0, align 1
+  %#9 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#10 = gep inbounds ptr %#9, 1 x i64 -4
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = lshr i64 noundef %#2, 32
+  %#13 = trunc nuw i64 %#12 to i32
+  %#14 = add i32 %#13, 963444408
+  %#15 = xor i32 %#8, %#14
+  %#16 = trunc i64 noundef %#2 to i32
+  %#17 = sub i32 3192628259, %#16
+  %#18 = xor i32 %#11, %#17
+  %#19 = zext i32 %#15 to i64
+  %#20 = zext i32 %#18 to i64
+  %#21 = mul nuw i64 %#20, %#19
+  %#22 = zext i32 %#8 to i64
+  %#23 = bswap i64 %#22
+  assume_welldefined i64 %#23
+  %#24 = bswap i32 %#11
+  %#25 = zext i32 %#24 to i64
+  %#26 = shl nsw nuw i64 %#25, 31
+  %#27 = or disjoint i64 %#23, noundef %#1
+  %#28 = add i64 %#27, %#21
+  %#29 = add i64 %#28, %#26
+  %#30 = lshr i64 %#29, 59
+  %#31 = lshr i64 %#29, 37
+  %#32 = xor i64 %#30, %#31
+  %#33 = xor i64 %#32, %#29
+  %#34 = mul i64 %#33, 1609587791953885689
+  %#35 = lshr i64 %#34, 32
+  %#36 = xor i64 %#35, %#34
+  br label %#5
+
+#5:
+  %#37 = phi i64 [ %#36, %#4 ], [ 0, %#3 ]
+  ret i64 %#37
+}
+=>
+define i64 @target_xxh3_64_seed_4to8(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: read) {
+#3:
+  %#6 = add i64 noundef %#1, -9
+  %#7 = icmp ult i64 %#6, -5
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = load i32, ptr nowrite noundef %#0, align 1
+  %#9 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#10 = gep inbounds ptr %#9, 1 x i64 -4
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = lshr i64 noundef %#2, 32
+  %#13 = trunc nuw i64 %#12 to i32
+  %#14 = add i32 %#13, 963444408
+  %#15 = xor i32 %#8, %#14
+  %#16 = trunc i64 noundef %#2 to i32
+  %#17 = sub i32 3192628259, %#16
+  %#18 = xor i32 %#11, %#17
+  %#19 = zext i32 %#15 to i64
+  %#20 = zext i32 %#18 to i64
+  %#21 = mul nuw i64 %#20, %#19
+  %#22 = zext i32 %#8 to i64
+  %#23 = bswap i64 %#22
+  assume_welldefined i64 %#23
+  %#24 = fshl i32 %#11, i32 %#11, i32 23
+  %#25 = zext i32 %#24 to i64
+  %#26 = shl nuw i64 %#25, 32
+  %#27 = or disjoint i64 %#23, noundef %#1
+  %#28 = add i64 %#27, %#21
+  %#29 = add i64 %#28, %#26
+  %#30 = lshr i64 %#29, 59
+  %#31 = lshr i64 %#29, 37
+  %#32 = xor i64 %#30, %#31
+  %#33 = xor i64 %#32, %#29
+  %#34 = mul i64 %#33, 1609587791953885689
+  %#35 = lshr i64 %#34, 32
+  %#36 = xor i64 %#35, %#34
+  br label %#5
+
+#5:
+  %#37 = phi i64 [ %#36, %#4 ], [ 0, %#3 ]
+  ret i64 %#37
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x0000000000000009
+i64 noundef %#1 = #x0000000000000007 (7)
+i64 noundef %#2 = #x0000000000000000 (0)
+
+Source:
+i64 %#6 = #xfffffffffffffffe (18446744073709551614, -2)
+i1 %#7 = #x0 (0)
+  >> Jump to %#4
+i32 %#8 = #x4b743f9c (1265909660)
+ptr %#9 = pointer(non-local, block_id=1, offset=9, attrs=3) / Address=#x0000000000000010
+ptr %#10 = pointer(non-local, block_id=1, offset=5, attrs=3) / Address=#x000000000000000c
+i32 %#11 = #xc808ac4b (3356011595, -938955701)
+i64 %#12 = #x0000000000000000 (0)
+i32 %#13 = #x00000000 (0)
+i32 %#14 = #x396cfeb8 (963444408)
+i32 %#15 = #x7218c124 (1914224932)
+i32 %#16 = #x00000000 (0)
+i32 %#17 = #xbe4ba423 (3192628259, -1102339037)
+i32 %#18 = #x76430868 (1984104552)
+i64 %#19 = #x000000007218c124 (1914224932)
+i64 %#20 = #x0000000076430868 (1984104552)
+i64 %#21 = #x34b54940448396a0 (3798022401133090464)
+i64 %#22 = #x000000004b743f9c (1265909660)
+i64 %#23 = #x9c3f744b00000000 (11258845458920898560, -7187898614788653056)
+i32 %#24 = #x4bac08c8 (1269565640)
+i64 %#25 = #x000000004bac08c8 (1269565640)
+i64 %#26 = #x25d6046400000000 (2726371451962654720)
+i64 %#27 = #x9c3f744b00000007 (11258845458920898567, -7187898614788653049)
+i64 %#28 = #xd0f4bd8b448396a7 (15056867860053989031, -3389876213655562585)
+i64 %#29 = #xf6cac1ef448396a7 (17783239312016643751, -663504761692907865)
+i64 %#30 = #x000000000000001e (30)
+i64 %#31 = #x0000000007b6560f (129390095)
+i64 %#32 = #x0000000007b65611 (129390097)
+i64 %#33 = #xf6cac1ef4335c0b6 (17783239311994765494, -663504761714786122)
+i64 %#34 = #x49e2b70f82787706 (5324018986746672902)
+i64 %#35 = #x0000000049e2b70f (1239594767)
+i64 %#36 = #x49e2b70fcb9ac009 (5324018987973656585)
+  >> Jump to %#5
+i64 %#37 = #x49e2b70fcb9ac009 (5324018987973656585)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 9	align: 1	alloc type: 0	alive: true	address: 7
+Contents:
+8: #xc8
+2: #x9c
+4: #x74
+6: #xac
+5: #x4b
+3: #x3f
+7: #x08
+*: poison
+
+
+Target:
+i64 %#6 = #xfffffffffffffffe (18446744073709551614, -2)
+i1 %#7 = #x0 (0)
+  >> Jump to %#4
+i32 %#8 = #x4b743f9c (1265909660)
+ptr %#9 = pointer(non-local, block_id=1, offset=9, attrs=3) / Address=#x0000000000000010
+ptr %#10 = pointer(non-local, block_id=1, offset=5, attrs=3) / Address=#x000000000000000c
+i32 %#11 = #xc808ac4b (3356011595, -938955701)
+i64 %#12 = #x0000000000000000 (0)
+i32 %#13 = #x00000000 (0)
+i32 %#14 = #x396cfeb8 (963444408)
+i32 %#15 = #x7218c124 (1914224932)
+i32 %#16 = #x00000000 (0)
+i32 %#17 = #xbe4ba423 (3192628259, -1102339037)
+i32 %#18 = #x76430868 (1984104552)
+i64 %#19 = #x000000007218c124 (1914224932)
+i64 %#20 = #x0000000076430868 (1984104552)
+i64 %#21 = #x34b54940448396a0 (3798022401133090464)
+i64 %#22 = #x000000004b743f9c (1265909660)
+i64 %#23 = #x9c3f744b00000000 (11258845458920898560, -7187898614788653056)
+i32 %#24 = #x25e40456 (635700310)
+i64 %#25 = #x0000000025e40456 (635700310)
+i64 %#26 = #x25e4045600000000 (2730312041507061760)
+i64 %#27 = #x9c3f744b00000007 (11258845458920898567, -7187898614788653049)
+i64 %#28 = #xd0f4bd8b448396a7 (15056867860053989031, -3389876213655562585)
+i64 %#29 = #xf6d8c1e1448396a7 (17787179901561050791, -659564172148500825)
+i64 %#30 = #x000000000000001e (30)
+i64 %#31 = #x0000000007b6c60f (129418767)
+i64 %#32 = #x0000000007b6c611 (129418769)
+i64 %#33 = #xf6d8c1e1433550b6 (17787179901539143862, -659564172170407754)
+i64 %#34 = #x812856393d1b8706 (9306783433799468806, -9139960639910082810)
+i64 %#35 = #x0000000081285639 (2166904377)
+i64 %#36 = #x81285639bc33d13f (9306783435931767103, -9139960637777784513)
+  >> Jump to %#5
+i64 %#37 = #x81285639bc33d13f (9306783435931767103, -9139960637777784513)
+Source value: #x49e2b70fcb9ac009 (5324018987973656585)
+Target value: #x81285639bc33d13f (9306783435931767103, -9139960637777784513)
+
+
+----------------------------------------
+define i64 @target_xxh3_64_4to8(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#5 = add i64 noundef %#1, -9
+  %#6 = icmp ult i64 %#5, -5
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#9 = gep inbounds ptr %#8, 1 x i64 -4
+  %#10 = load i32, ptr %#9, align 1
+  %#11 = xor i32 %#7, 963444408
+  %#12 = xor i32 %#10, 3192628259
+  %#13 = zext i32 %#11 to i64
+  %#14 = zext i32 %#12 to i64
+  %#15 = mul nuw i64 %#14, %#13
+  %#16 = zext i32 %#7 to i64
+  %#17 = bswap i64 %#16
+  assume_welldefined i64 %#17
+  %#18 = bswap i32 %#10
+  %#19 = zext i32 %#18 to i64
+  %#20 = shl nsw nuw i64 %#19, 31
+  %#21 = or disjoint i64 %#17, noundef %#1
+  %#22 = add i64 %#21, %#15
+  %#23 = add i64 %#22, %#20
+  %#24 = lshr i64 %#23, 59
+  %#25 = lshr i64 %#23, 37
+  %#26 = xor i64 %#24, %#25
+  %#27 = xor i64 %#26, %#23
+  %#28 = mul i64 %#27, 1609587791953885689
+  %#29 = lshr i64 %#28, 32
+  %#30 = xor i64 %#29, %#28
+  br label %#4
+
+#4:
+  %#31 = phi i64 [ %#30, %#3 ], [ 0, %#2 ]
+  ret i64 %#31
+}
+=>
+define i64 @target_xxh3_64_4to8(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#5 = add i64 noundef %#1, -9
+  %#6 = icmp ult i64 %#5, -5
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#9 = gep inbounds ptr %#8, 1 x i64 -4
+  %#10 = load i32, ptr %#9, align 1
+  %#11 = xor i32 %#7, 963444408
+  %#12 = xor i32 %#10, 3192628259
+  %#13 = zext i32 %#11 to i64
+  %#14 = zext i32 %#12 to i64
+  %#15 = mul nuw i64 %#14, %#13
+  %#16 = zext i32 %#7 to i64
+  %#17 = bswap i64 %#16
+  assume_welldefined i64 %#17
+  %#18 = fshl i32 %#10, i32 %#10, i32 23
+  %#19 = zext i32 %#18 to i64
+  %#20 = shl nuw i64 %#19, 32
+  %#21 = or disjoint i64 %#17, noundef %#1
+  %#22 = add i64 %#21, %#15
+  %#23 = add i64 %#22, %#20
+  %#24 = lshr i64 %#23, 59
+  %#25 = lshr i64 %#23, 37
+  %#26 = xor i64 %#24, %#25
+  %#27 = xor i64 %#26, %#23
+  %#28 = mul i64 %#27, 1609587791953885689
+  %#29 = lshr i64 %#28, 32
+  %#30 = xor i64 %#29, %#28
+  br label %#4
+
+#4:
+  %#31 = phi i64 [ %#30, %#3 ], [ 0, %#2 ]
+  ret i64 %#31
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i64 noundef %#1 = #x0000000000000004 (4)
+
+Source:
+i64 %#5 = #xfffffffffffffffb (18446744073709551611, -5)
+i1 %#6 = #x0 (0)
+  >> Jump to %#3
+i32 %#7 = #xc01987bb (3222898619, -1072068677)
+ptr %#8 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x0000000000000005
+ptr %#9 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i32 %#10 = #xc01987bb (3222898619, -1072068677)
+i32 %#11 = #xf9757903 (4185225475, -109741821)
+i32 %#12 = #x7e522398 (2119312280)
+i64 %#13 = #x00000000f9757903 (4185225475)
+i64 %#14 = #x000000007e522398 (2119312280)
+i64 %#15 = #x7b17dbdf6a4142c8 (8869799743736333000)
+i64 %#16 = #x00000000c01987bb (3222898619)
+i64 %#17 = #xbb8719c000000000 (13512797519372877824, -4933946554336673792)
+i32 %#18 = #xbb8719c0 (3146193344, -1148773952)
+i64 %#19 = #x00000000bb8719c0 (3146193344)
+i64 %#20 = #x5dc38ce000000000 (6756398759686438912)
+i64 %#21 = #xbb8719c000000004 (13512797519372877828, -4933946554336673788)
+i64 %#22 = #x369ef59f6a4142cc (3935853189399659212)
+i64 %#23 = #x9462827f6a4142cc (10692251949086098124, -7754492124623453492)
+i64 %#24 = #x0000000000000012 (18)
+i64 %#25 = #x0000000004a31413 (77796371)
+i64 %#26 = #x0000000004a31401 (77796353)
+i64 %#27 = #x9462827f6ee256cd (10692251949163763405, -7754492124545788211)
+i64 %#28 = #x394d52ac01385265 (4129047332076933733)
+i64 %#29 = #x00000000394d52ac (961368748)
+i64 %#30 = #x394d52ac387500c9 (4129047333003657417)
+  >> Jump to %#4
+i64 %#31 = #x394d52ac387500c9 (4129047333003657417)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 13	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+1: #x87
+2: #x19
+0: #xbb
+3: #xc0
+*: poison
+
+
+Target:
+i64 %#5 = #xfffffffffffffffb (18446744073709551611, -5)
+i1 %#6 = #x0 (0)
+  >> Jump to %#3
+i32 %#7 = #xc01987bb (3222898619, -1072068677)
+ptr %#8 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x0000000000000005
+ptr %#9 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000001
+i32 %#10 = #xc01987bb (3222898619, -1072068677)
+i32 %#11 = #xf9757903 (4185225475, -109741821)
+i32 %#12 = #x7e522398 (2119312280)
+i64 %#13 = #x00000000f9757903 (4185225475)
+i64 %#14 = #x000000007e522398 (2119312280)
+i64 %#15 = #x7b17dbdf6a4142c8 (8869799743736333000)
+i64 %#16 = #x00000000c01987bb (3222898619)
+i64 %#17 = #xbb8719c000000000 (13512797519372877824, -4933946554336673792)
+i32 %#18 = #xdde00cc3 (3722448067, -572519229)
+i64 %#19 = #x00000000dde00cc3 (3722448067)
+i64 %#20 = #xdde00cc300000000 (15987792708823416832, -2458951364886134784)
+i64 %#21 = #xbb8719c000000004 (13512797519372877828, -4933946554336673788)
+i64 %#22 = #x369ef59f6a4142cc (3935853189399659212)
+i64 %#23 = #x147f02626a4142cc (1476901824513524428)
+i64 %#24 = #x0000000000000002 (2)
+i64 %#25 = #x0000000000a3f813 (10745875)
+i64 %#26 = #x0000000000a3f811 (10745873)
+i64 %#27 = #x147f02626ae2badd (1476901824524106461)
+i64 %#28 = #xc09f7e76ac5535f5 (13879951624741664245, -4566792448967887371)
+i64 %#29 = #x00000000c09f7e76 (3231678070)
+i64 %#30 = #xc09f7e766cca4b83 (13879951623675595651, -4566792450033955965)
+  >> Jump to %#4
+i64 %#31 = #xc09f7e766cca4b83 (13879951623675595651, -4566792450033955965)
+Source value: #x394d52ac387500c9 (4129047333003657417)
+Target value: #xc09f7e766cca4b83 (13879951623675595651, -4566792450033955965)
+
+
+----------------------------------------
+define i64 @target_raw_len_4to8_64b(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read) {
+#4:
+  %#7 = add i64 noundef %#1, -9
+  %#8 = icmp ult i64 %#7, -5
+  br i1 %#8, label %#6, label %#5
+
+#5:
+  %#9 = load i32, ptr nowrite noundef %#0, align 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#11 = gep inbounds ptr %#10, 1 x i64 -4
+  %#12 = load i32, ptr %#11, align 1
+  %#13 = lshr i64 noundef %#3, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = load i32, ptr nowrite noundef %#2, align 1
+  %#16 = add i32 %#15, %#14
+  %#17 = xor i32 %#16, %#9
+  %#18 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 4
+  %#19 = load i32, ptr %#18, align 1
+  %#20 = trunc i64 noundef %#3 to i32
+  %#21 = sub i32 %#19, %#20
+  %#22 = xor i32 %#21, %#12
+  %#23 = zext i32 %#17 to i64
+  %#24 = zext i32 %#22 to i64
+  %#25 = mul nuw i64 %#24, %#23
+  %#26 = zext i32 %#9 to i64
+  %#27 = bswap i64 %#26
+  assume_welldefined i64 %#27
+  %#28 = bswap i32 %#12
+  %#29 = zext i32 %#28 to i64
+  %#30 = shl nsw nuw i64 %#29, 31
+  %#31 = or disjoint i64 %#27, noundef %#1
+  %#32 = add i64 %#31, %#30
+  %#33 = add i64 %#32, %#25
+  %#34 = lshr i64 %#33, 59
+  %#35 = lshr i64 %#33, 37
+  %#36 = xor i64 %#35, %#34
+  %#37 = xor i64 %#36, %#33
+  %#38 = mul i64 %#37, 1609587791953885689
+  %#39 = lshr i64 %#38, 32
+  %#40 = xor i64 %#39, %#38
+  br label %#6
+
+#6:
+  %#41 = phi i64 [ %#40, %#5 ], [ 0, %#4 ]
+  ret i64 %#41
+}
+=>
+define i64 @target_raw_len_4to8_64b(ptr nowrite noundef %#0, i64 noundef %#1, ptr nowrite noundef %#2, i64 noundef %#3) nofree willreturn memory(argmem: read) {
+#4:
+  %#7 = add i64 noundef %#1, -9
+  %#8 = icmp ult i64 %#7, -5
+  br i1 %#8, label %#6, label %#5
+
+#5:
+  %#9 = load i32, ptr nowrite noundef %#0, align 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#11 = gep inbounds ptr %#10, 1 x i64 -4
+  %#12 = load i32, ptr %#11, align 1
+  %#13 = lshr i64 noundef %#3, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = load i32, ptr nowrite noundef %#2, align 1
+  %#16 = add i32 %#15, %#14
+  %#17 = xor i32 %#16, %#9
+  %#18 = gep inbounds nuw ptr nowrite noundef %#2, 1 x i64 4
+  %#19 = load i32, ptr %#18, align 1
+  %#20 = trunc i64 noundef %#3 to i32
+  %#21 = sub i32 %#19, %#20
+  %#22 = xor i32 %#21, %#12
+  %#23 = zext i32 %#17 to i64
+  %#24 = zext i32 %#22 to i64
+  %#25 = mul nuw i64 %#24, %#23
+  %#26 = zext i32 %#9 to i64
+  %#27 = bswap i64 %#26
+  assume_welldefined i64 %#27
+  %#28 = fshl i32 %#12, i32 %#12, i32 23
+  %#29 = zext i32 %#28 to i64
+  %#30 = shl nuw i64 %#29, 32
+  %#31 = or disjoint i64 %#27, noundef %#1
+  %#32 = add i64 %#31, %#30
+  %#33 = add i64 %#32, %#25
+  %#34 = lshr i64 %#33, 59
+  %#35 = lshr i64 %#33, 37
+  %#36 = xor i64 %#35, %#34
+  %#37 = xor i64 %#36, %#33
+  %#38 = mul i64 %#37, 1609587791953885689
+  %#39 = lshr i64 %#38, 32
+  %#40 = xor i64 %#39, %#38
+  br label %#6
+
+#6:
+  %#41 = phi i64 [ %#40, %#5 ], [ 0, %#4 ]
+  ret i64 %#41
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x0000000000000009
+i64 noundef %#1 = #x0000000000000008 (8)
+ptr nowrite noundef %#2 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x0000000000000008
+i64 noundef %#3 = #x0000000000000000 (0)
+
+Source:
+i64 %#7 = #xffffffffffffffff (18446744073709551615, -1)
+i1 %#8 = #x0 (0)
+  >> Jump to %#5
+i32 %#9 = #x6411ed36 (1678896438)
+ptr %#10 = pointer(non-local, block_id=1, offset=9, attrs=3) / Address=#x0000000000000011
+ptr %#11 = pointer(non-local, block_id=1, offset=5, attrs=3) / Address=#x000000000000000d
+i32 %#12 = #x3f197123 (1058631971)
+i64 %#13 = #x0000000000000000 (0)
+i32 %#14 = #x00000000 (0)
+i32 %#15 = #x11ed36e1 (300758753)
+i32 %#16 = #x11ed36e1 (300758753)
+i32 %#17 = #x75fcdbd7 (1979505623)
+ptr %#18 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x000000000000000c
+i32 %#19 = #x19712364 (426845028)
+i32 %#20 = #x00000000 (0)
+i32 %#21 = #x19712364 (426845028)
+i32 %#22 = #x26685247 (644371015)
+i64 %#23 = #x0000000075fcdbd7 (1979505623)
+i64 %#24 = #x0000000026685247 (644371015)
+i64 %#25 = #x11b39d46f0e3d6a1 (1275536047490717345)
+i64 %#26 = #x000000006411ed36 (1678896438)
+i64 %#27 = #x36ed116400000000 (3957838768722935808)
+i32 %#28 = #x2371193f (594614591)
+i64 %#29 = #x000000002371193f (594614591)
+i64 %#30 = #x11b88c9f80000000 (1276925111034707968)
+i64 %#31 = #x36ed116400000008 (3957838768722935816)
+i64 %#32 = #x48a59e0380000008 (5234763879757643784)
+i64 %#33 = #x5a593b4a70e3d6a9 (6510299927248361129)
+i64 %#34 = #x000000000000000b (11)
+i64 %#35 = #x0000000002d2c9da (47368666)
+i64 %#36 = #x0000000002d2c9d1 (47368657)
+i64 %#37 = #x5a593b4a72311f78 (6510299927270203256)
+i64 %#38 = #x1115d0541c6f53b8 (1231119132828586936)
+i64 %#39 = #x000000001115d054 (286642260)
+i64 %#40 = #x1115d0540d7a83ec (1231119132577661932)
+  >> Jump to %#6
+i64 %#41 = #x1115d0540d7a83ec (1231119132577661932)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 9	align: 4	alloc type: 0	alive: true	address: 8
+Contents:
+1: #x36
+6: #x71
+0: #xe1
+3: #x11
+5: #x23
+7: #x19
+2: #xed
+8: #x3f
+4: #x64
+*: poison
+
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 8
+Contents:
+3: #x00
+2: #x00
+4: #x00
+*: poison
+
+
+Target:
+i64 %#7 = #xffffffffffffffff (18446744073709551615, -1)
+i1 %#8 = #x0 (0)
+  >> Jump to %#5
+i32 %#9 = #x6411ed36 (1678896438)
+ptr %#10 = pointer(non-local, block_id=1, offset=9, attrs=3) / Address=#x0000000000000011
+ptr %#11 = pointer(non-local, block_id=1, offset=5, attrs=3) / Address=#x000000000000000d
+i32 %#12 = #x3f197123 (1058631971)
+i64 %#13 = #x0000000000000000 (0)
+i32 %#14 = #x00000000 (0)
+i32 %#15 = #x11ed36e1 (300758753)
+i32 %#16 = #x11ed36e1 (300758753)
+i32 %#17 = #x75fcdbd7 (1979505623)
+ptr %#18 = pointer(non-local, block_id=1, offset=4, attrs=3) / Address=#x000000000000000c
+i32 %#19 = #x19712364 (426845028)
+i32 %#20 = #x00000000 (0)
+i32 %#21 = #x19712364 (426845028)
+i32 %#22 = #x26685247 (644371015)
+i64 %#23 = #x0000000075fcdbd7 (1979505623)
+i64 %#24 = #x0000000026685247 (644371015)
+i64 %#25 = #x11b39d46f0e3d6a1 (1275536047490717345)
+i64 %#26 = #x000000006411ed36 (1678896438)
+i64 %#27 = #x36ed116400000000 (3957838768722935808)
+i32 %#28 = #x919f8cb8 (2443152568, -1851814728)
+i64 %#29 = #x00000000919f8cb8 (2443152568)
+i64 %#30 = #x919f8cb800000000 (10493260378698416128, -7953483695011135488)
+i64 %#31 = #x36ed116400000008 (3957838768722935816)
+i64 %#32 = #xc88c9e1c00000008 (14451099147421351944, -3995644926288199672)
+i64 %#33 = #xda403b62f0e3d6a9 (15726635194912069289, -2720108878797482327)
+i64 %#34 = #x000000000000001b (27)
+i64 %#35 = #x0000000006d201db (114426331)
+i64 %#36 = #x0000000006d201c0 (114426304)
+i64 %#37 = #xda403b62f631d769 (15726635195001067369, -2720108878708484247)
+i64 %#38 = #x5ded72c01ada2621 (6768191984417515041)
+i64 %#39 = #x000000005ded72c0 (1575842496)
+i64 %#40 = #x5ded72c0473754e1 (6768191985161819361)
+  >> Jump to %#6
+i64 %#41 = #x5ded72c0473754e1 (6768191985161819361)
+Source value: #x1115d0540d7a83ec (1231119132577661932)
+Target value: #x5ded72c0473754e1 (6768191985161819361)
+
+Summary:
+  0 correct transformations
+  3 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

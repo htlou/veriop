@@ -1,0 +1,113 @@
+
+----------------------------------------
+define void @target(ptr noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  %#3 = ptrtoint ptr noundef %#0 to i64
+  %#4 = and i64 %#3, 3
+  %#5 = icmp eq i64 %#4, 0
+  assume i1 %#5
+  tail memcpy ptr noread noundef %#1 align 1, ptr noundef %#0 align 4, i64 16
+  %#6 = gep inbounds ptr noundef %#0, 1 x i64 24
+  %#7 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#7 align 1, ptr %#6 align 4, i64 16
+  %#8 = gep inbounds ptr noundef %#0, 1 x i64 48
+  %#9 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#9 align 1, ptr %#8 align 4, i64 16
+  %#10 = gep inbounds ptr noundef %#0, 1 x i64 80
+  %#11 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#11 align 1, ptr %#10 align 4, i64 16
+  %#12 = gep inbounds ptr noundef %#0, 1 x i64 104
+  %#13 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#13 align 1, ptr %#12 align 4, i64 16
+  %#14 = gep inbounds ptr noundef %#0, 1 x i64 128
+  %#15 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#15 align 1, ptr %#14 align 4, i64 16
+  ret void
+}
+=>
+define void @target(ptr noundef %#0, ptr noread noundef %#1) nofree {
+#2:
+  %#3 = ptrtoint ptr noundef %#0 to i64
+  %#4 = and i64 %#3, 3
+  %#5 = icmp eq i64 %#4, 0
+  assume i1 %#5
+  tail memcpy ptr noread noundef %#1 align 1, ptr noundef %#0 align 4, i64 15
+  %#6 = gep inbounds ptr noundef %#0, 1 x i64 24
+  %#7 = gep inbounds ptr noread noundef %#1, 1 x i64 16
+  tail memcpy ptr %#7 align 1, ptr %#6 align 4, i64 16
+  %#8 = gep inbounds ptr noundef %#0, 1 x i64 48
+  %#9 = gep inbounds ptr noread noundef %#1, 1 x i64 32
+  tail memcpy ptr %#9 align 1, ptr %#8 align 4, i64 16
+  %#10 = gep inbounds ptr noundef %#0, 1 x i64 80
+  %#11 = gep inbounds ptr noread noundef %#1, 1 x i64 48
+  tail memcpy ptr %#11 align 1, ptr %#10 align 4, i64 16
+  %#12 = gep inbounds ptr noundef %#0, 1 x i64 104
+  %#13 = gep inbounds ptr noread noundef %#1, 1 x i64 64
+  tail memcpy ptr %#13 align 1, ptr %#12 align 4, i64 16
+  %#14 = gep inbounds ptr noundef %#0, 1 x i64 128
+  %#15 = gep inbounds ptr noread noundef %#1, 1 x i64 80
+  tail memcpy ptr %#15 align 1, ptr %#14 align 4, i64 16
+  ret void
+}
+Transformation doesn't verify!
+
+ERROR: Mismatch in memory
+
+Example:
+ptr noundef %#0 = pointer(non-local, block_id=1, offset=1) / Address=#x0000000000000004
+ptr noread noundef %#1 = pointer(non-local, block_id=1, offset=66, attrs=1) / Address=#x0000000000000045
+
+Source:
+i64 %#3 = #x0000000000000004 (4)
+i64 %#4 = #x0000000000000000 (0)
+i1 %#5 = #x1 (1)
+ptr %#6 = pointer(non-local, block_id=1, offset=25) / Address=#x000000000000001c
+ptr %#7 = pointer(non-local, block_id=1, offset=82, attrs=1) / Address=#x0000000000000055
+ptr %#8 = pointer(non-local, block_id=1, offset=49) / Address=#x0000000000000034
+ptr %#9 = pointer(non-local, block_id=1, offset=98, attrs=1) / Address=#x0000000000000065
+ptr %#10 = pointer(non-local, block_id=1, offset=81) / Address=#x0000000000000054
+ptr %#11 = pointer(non-local, block_id=1, offset=114, attrs=1) / Address=#x0000000000000075
+ptr %#12 = pointer(non-local, block_id=1, offset=105) / Address=#x000000000000006c
+ptr %#13 = pointer(non-local, block_id=1, offset=130, attrs=1) / Address=#x0000000000000085
+ptr %#14 = pointer(non-local, block_id=1, offset=129) / Address=#x0000000000000084
+ptr %#15 = pointer(non-local, block_id=1, offset=146, attrs=1) / Address=#x0000000000000095
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 192	align: 1	alloc type: 0	alive: true	address: 3
+Contents:
+16: #x00
+*: poison
+
+Block 2 >	size: 0	align: 1	alloc type: 0	alive: true	address: 1
+Contents:
+16: #x00
+*: poison
+
+
+Target:
+i64 %#3 = #x0000000000000004 (4)
+i64 %#4 = #x0000000000000000 (0)
+i1 %#5 = #x1 (1)
+ptr %#6 = pointer(non-local, block_id=1, offset=25) / Address=#x000000000000001c
+ptr %#7 = pointer(non-local, block_id=1, offset=82, attrs=1) / Address=#x0000000000000055
+ptr %#8 = pointer(non-local, block_id=1, offset=49) / Address=#x0000000000000034
+ptr %#9 = pointer(non-local, block_id=1, offset=98, attrs=1) / Address=#x0000000000000065
+ptr %#10 = pointer(non-local, block_id=1, offset=81) / Address=#x0000000000000054
+ptr %#11 = pointer(non-local, block_id=1, offset=114, attrs=1) / Address=#x0000000000000075
+ptr %#12 = pointer(non-local, block_id=1, offset=105) / Address=#x000000000000006c
+ptr %#13 = pointer(non-local, block_id=1, offset=130, attrs=1) / Address=#x0000000000000085
+ptr %#14 = pointer(non-local, block_id=1, offset=129) / Address=#x0000000000000084
+ptr %#15 = pointer(non-local, block_id=1, offset=146, attrs=1) / Address=#x0000000000000095
+
+Mismatch in pointer(non-local, block_id=1, offset=156)
+Source value: #x00
+Target value: poison
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

@@ -1,0 +1,98 @@
+buildlist() {
+   12:	EBP = EDI; 
+   11:	if (EBP <s 0) goto 10 else goto 9
+   10:	EAX = 0L; goto 1
+    9:	EDI = 16L; 
+    8:	call "malloc"; EBX = EAX; 
+    7:	
+    6:	int32[EBX + 0] = EBP; 
+    5:	EDI = EBP + -1 (int); 
+    4:	call "buildlist"; 
+    3:	int64[EBX + 8] = EAX; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+reverselist() {
+   14:	EBP = EDI; 
+   13:	EBX = 0L; 
+   12:	if (EBP !=lu 0) goto 11 else goto 2
+   11:	EDI = 16L; 
+   10:	call "malloc"; 
+    9:	
+    8:	ECX = int32[EBP + 0]; 
+    7:	int32[EAX + 0] = ECX; 
+    6:	int64[EAX + 8] = EBX; 
+    5:	EBX = EAX; 
+    4:	EBP = int64[EBP + 8]; 
+    3:	goto 12
+    2:	EAX = EBX; 
+    1:	return
+}
+
+reverse_inplace() {
+    9:	
+    8:	EAX = 0L; 
+    7:	if (EDI !=lu 0) goto 6 else goto 2
+    6:	ECX = int64[EDI + 8]; 
+    5:	int64[EDI + 8] = EAX; 
+    4:	EAX = EDI; 
+    3:	EDI = ECX; goto 7
+    2:	
+    1:	return
+}
+
+checklist() {
+   12:	
+   11:	ECX = 0; 
+   10:	if (ECX <=s EDI) goto 9 else goto 2
+    9:	if (ESI ==lu 0) goto 8 else goto 7
+    8:	EAX = 0; goto 1
+    7:	EDX = int32[ESI + 0]; 
+    6:	if (EDX !=s ECX) goto 5 else goto 4
+    5:	EAX = 0; goto 1
+    4:	ESI = int64[ESI + 8]; 
+    3:	ECX = ECX + 1 (int); goto 10
+    2:	EAX = ESI ==lu 0; 
+    1:	return
+}
+
+main() {
+   36:	EBP = ESI; R12 = EDI; 
+   35:	if (R12 >=s 2) goto 34 else goto 31
+   34:	EDI = int64[EBP + 8]; 
+   33:	call "atoi"; 
+   32:	EBX = EAX; goto 30
+   31:	EBX = 1000; 
+   30:	if (R12 >=s 3) goto 29 else goto 26
+   29:	EDI = int64[EBP + 8]; 
+   28:	call "atoi"; R12 = EAX; 
+   27:	goto 25
+   26:	R12 = 20000; 
+   25:	EDI = EBX; call "buildlist"; 
+   24:	EBP = EAX; 
+   23:	EDI = EBP; call "reverselist"; 
+   22:	ESI = EAX; EDI = EBX; call "checklist"; 
+   21:	if (EAX !=u 0) goto 17 else goto 20
+   20:	EDI = __stringlit_1 + 0 (long); 
+   19:	call "printf"; 
+   18:	EAX = 2; goto 1
+   17:	EDI = __stringlit_2 + 0 (long); 
+   16:	call "printf"; 
+   15:	R13 = 0; 
+   14:	EAX = R12 * 2 + 1 (int); 
+   13:	if (R13 <s EAX) goto 12 else goto 9
+   12:	EDI = EBP; call "reverse_inplace"; EBP = EAX; 
+   11:	
+   10:	R13 = R13 + 1 (int); goto 14
+    9:	ESI = EBP; EDI = EBX; call "checklist"; 
+    8:	if (EAX !=u 0) goto 4 else goto 7
+    7:	EDI = __stringlit_1 + 0 (long); 
+    6:	call "printf"; 
+    5:	EAX = 2; goto 1
+    4:	EDI = __stringlit_2 + 0 (long); 
+    3:	call "printf"; 
+    2:	EAX = 0; 
+    1:	return
+}
+

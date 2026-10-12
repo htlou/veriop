@@ -1,0 +1,64 @@
+{
+ "commit": "51184e2",
+ "date": "2021-11-23",
+ "subject": "[NEON] Enable XXH_NEON for MSVC ARM/ARM64",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Enables the NEON SIMD path (previously GCC/clang only, 'msvc support maybe later') for MSVC on ARM64/ARMv7VE; SIMD = speed for XXH3 long inputs.",
+ "change_summary": "XXH_VECTOR auto-selection: NEON now also chosen for _M_ARM64/_M_ARM_ARMV7VE (little-endian via _WIN32) without __GNUC__; vzip asm hack excluded for _M_ARM64; whitespace in scrambleAcc_neon.",
+ "units": [
+  {
+   "name": "XXH3_accumulate_512 + XXH3_scrambleAcc, scalar -> NEON, aarch64-pc-windows-msvc, as compiled",
+   "level": "raw",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "non-x86-target-intrinsics",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/51184e2/r_msvc_arm64",
+   "evidence": "both targets failed-to-prove: 'Alive2 approximated the semantics ... Unknown libcall: @llvm.aarch64.neon.umull.v2i64' (NEON side only, no counterpart in scalar)"
+  },
+  {
+   "name": "XXH3_accumulate_512 scalar -> NEON, aarch64 msvc, umull modeled",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/51184e2/r_msvc_arm64_umullmodel",
+   "evidence": "fwd+bwd correct with llvm.aarch64.neon.umull.v2i64 / llvm.arm.neon.vmullu.v2i64 replaced on both sides by their exact semantics mul nuw(zext a, zext b) (umull_model.py)"
+  },
+  {
+   "name": "XXH3_scrambleAcc scalar -> NEON, aarch64 msvc, umull modeled + O2-normalized",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/51184e2/r_msvc_arm64_umullmodel_O2",
+   "evidence": "fwd+bwd correct after identical opt default<O2> normalization (un-normalized: Timeout at 600 s, r_msvc_arm64_umullmodel)"
+  },
+  {
+   "name": "XXH3_accumulate_512 / XXH3_scrambleAcc scalar -> NEON, thumbv7-pc-windows-msvc, vmullu modeled",
+   "level": "raw",
+   "verdict": "EQUIV",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/51184e2/r_msvc_armv7_umullmodel_O2",
+   "evidence": "acc512 fwd+bwd correct (r_msvc_armv7_umullmodel); scramble correct after O2 normalization (r_msvc_armv7_umullmodel_O2), Timeout without; as compiled: failed-to-prove, unknown libcall llvm.arm.neon.vmullu (r_msvc_armv7)"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "UNSUPPORTED",
+ "coverage": "partial",
+ "unsupported_reason": "non-x86-target-intrinsics",
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). aarch64-linux-gnu (GCC-style clang) target IR identical too (ident_aarch64_linux/): NEON was already selected there. MSVC emulated with clang --target aarch64-pc-windows-msvc / thumbv7-pc-windows-msvc -fms-extensions -fms-compatibility (_MSC_VER=1933, _M_ARM64 or _M_ARM=7, no __GNUC__, __ARM_NEON defined): old falls back to scalar (needed __GNUC__), new selects NEON. Header shims in 51184e2/msvc_sysinc: setjmp.h/stdlib.h for clang's intrin.h, and intrin.h which additionally includes arm_neon.h on ARM - emulating MSVC's intrin.h (at this commit xxhash.h includes arm_neon.h only under __GNUC__ and relies on <intrin.h> for MSVC; clang's own intrin.h does not provide NEON, so without the shim the new side does not compile). clang does not define _M_ARM_ARMV7VE, but new still picks NEON on thumbv7 because clang also defines __ARM_NEON. Wrapper wrap_simd.c: library dispatch macros XXH3_accumulate_512/XXH3_scrambleAcc with value-arg inputs copied into local arrays. Plain Alive2 cannot conclude (target intrinsic), hence commit verdict UNSUPPORTED by METHOD aggregation; modulo the stated UMULL/VMULL.U32 semantics (and, for scrambleAcc, an identical LLVM O2 re-normalization of both sides) all checked kernels are EQUIV to the scalar code on both ARM64 and ARMv7. Raw per-stripe only; no API-level run."
+}

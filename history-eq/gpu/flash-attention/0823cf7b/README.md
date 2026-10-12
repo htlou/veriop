@@ -1,0 +1,9 @@
+# FlashAttention `0823cf7b`: paged TMA argument rewrite
+
+**Fixed-sample verdict: `EQUIV_PARTIAL`.** This commit changes three Hopper headers. The [source audit](check_source.py) verifies their archived production diff against the exact parent/child Git objects and locks the modeled `copy_paged_sm90_tma_cutlass35.hpp` 3D and 4D branches ([run](source-check.log)).
+
+For the **3D nonpaged branch**, the parent delegates to `SM90_TMA_LOAD_3D::copy` when `PagedCopyArgs.block_table == nullptr`; the child delegates unconditionally after changing the argument to a pointer. The [old](old.c) and [new](new.c) C models map a nonnull parent argument with a null block table to the child branch, preserving the same six TMA call arguments. They treat that TMA operation as the same external function. [`run_alive.py`](run_alive.py) compiles both models with Clang 20, removes only TBAA metadata from both IR files, and runs Alive2 in both directions. Both 3D checks are `correct` ([result](result.json), [forward log](alive-3d-forward.log), [backward log](alive-3d-backward.log)).
+
+The models also include the 4D paged/nonpaged coordinate calculation and the child `with()` mapping from a null block table to a null pointer. Both 4D Alive2 directions **timed out** at the recorded 10-second solver limit ([forward](alive-4d-forward.log), [backward](alive-4d-backward.log)); no 4D equivalence or counterexample follows. The model abstracts the TMA instruction and does not cover the second changed header, mainloop wiring, pointer lifetimes, the whole kernel, or performance. A full historical GPU specialization was not built on this host because the NVIDIA driver is unavailable. No official historical before/after benchmark score was measured.
+
+Reproduce from the project root with `python3 history-eq/gpu/flash-attention/0823cf7b/run_alive.py`.

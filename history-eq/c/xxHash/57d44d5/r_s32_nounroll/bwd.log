@@ -1,0 +1,4224 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/57d44d5/r_s32/new.ll c/xxHash/57d44d5/r_s32/old.ll
+
+----------------------------------------
+define i32 @target_s32_0_0(ptr noread nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i32 noundef %#1, 374761393
+  %#4 = lshr i32 %#3, 15
+  %#5 = xor i32 %#4, %#3
+  %#6 = mul i32 %#5, 2246822519
+  %#7 = lshr i32 %#6, 13
+  %#8 = xor i32 %#7, %#6
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = lshr i32 %#9, 16
+  %#11 = xor i32 %#10, %#9
+  ret i32 %#11
+}
+=>
+define i32 @target_s32_0_0(ptr noread nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {
+#2:
+  %#3 = add i32 noundef %#1, 374761393
+  %#4 = lshr i32 %#3, 15
+  %#5 = xor i32 %#4, %#3
+  %#6 = mul i32 %#5, 2246822519
+  %#7 = lshr i32 %#6, 13
+  %#8 = xor i32 %#7, %#6
+  %#9 = mul i32 %#8, 3266489917
+  %#10 = lshr i32 %#9, 16
+  %#11 = xor i32 %#10, %#9
+  ret i32 %#11
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_1_0(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i8, ptr nowrite noundef %#0, align 1
+  %#8 = zext i8 %#7 to i32
+  %#9 = mul i32 %#8, 374761393
+  %#10 = add i32 noundef %#1, 374761394
+  %#11 = add i32 %#9, %#10
+  %#12 = fshl i32 %#11, i32 %#11, i32 11
+  %#13 = mul i32 %#12, 2654435761
+  br label %#5
+
+#4:
+  %#14 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#15 = phi i32 [ %#14, %#4 ], [ %#13, %#3 ]
+  %#16 = lshr i32 %#15, 15
+  %#17 = xor i32 %#16, %#15
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = lshr i32 %#18, 13
+  %#20 = xor i32 %#19, %#18
+  %#21 = mul i32 %#20, 3266489917
+  %#22 = lshr i32 %#21, 16
+  %#23 = xor i32 %#22, %#21
+  ret i32 %#23
+}
+=>
+define i32 @target_s32_1_0(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i8, ptr nowrite noundef %#0, align 1
+  %#8 = zext i8 %#7 to i32
+  %#9 = mul i32 %#8, 374761393
+  %#10 = add i32 noundef %#1, 374761394
+  %#11 = add i32 %#9, %#10
+  %#12 = fshl i32 %#11, i32 %#11, i32 11
+  %#13 = mul i32 %#12, 2654435761
+  br label %#5
+
+#4:
+  %#14 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#15 = phi i32 [ %#13, %#3 ], [ %#14, %#4 ]
+  %#16 = lshr i32 %#15, 15
+  %#17 = xor i32 %#16, %#15
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = lshr i32 %#18, 13
+  %#20 = xor i32 %#19, %#18
+  %#21 = mul i32 %#20, 3266489917
+  %#22 = lshr i32 %#21, 16
+  %#23 = xor i32 %#22, %#21
+  ret i32 %#23
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_7_8(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#13 = alloca i64 48, align 4, dead
+  start_lifetime ptr %#13
+  %#14 = add i32 noundef %#1, 606290984
+  %#15 = add i32 noundef %#1, 2246822519
+  %#16 = add i32 noundef %#1, 1640531535
+  %#17 = gep inbounds nuw ptr %#13, 1 x i64 8
+  store i32 %#14, ptr %#17, align 4
+  %#18 = gep inbounds nuw ptr %#13, 1 x i64 12
+  store i32 %#15, ptr %#18, align 4
+  %#19 = gep inbounds nuw ptr %#13, 1 x i64 16
+  store i32 noundef %#1, ptr %#19, align 4
+  %#20 = gep inbounds nuw ptr %#13, 1 x i64 20
+  store i32 %#16, ptr %#20, align 4
+  %#21 = gep inbounds nuw ptr %#13, 1 x i64 24
+  memset ptr %#21 align 4, i8 0, i64 16
+  %#22 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#22, label %#4, label %#3
+
+#3:
+  memcpy ptr %#21 align 4, ptr nowrite noundef %#0 align 1, i64 7
+  br label %#4
+
+#4:
+  %#23 = phi i32 [ 0, %#2 ], [ 7, %#3 ]
+  %#24 = or disjoint i32 %#23, 8
+  store i32 %#24, ptr %#13, align 4
+  %#25 = gep inbounds nuw ptr %#13, 1 x i64 4
+  store i32 0, ptr %#25, align 4
+  %#26 = gep inbounds nuw ptr %#13, 1 x i64 40
+  %#27 = zext nneg i32 %#23 to i64
+  %#28 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 7
+  %#29 = gep inbounds nuw ptr %#21, 1 x i64 %#27
+  %#30 = load i64, ptr %#28, align 1
+  store i64 %#30, ptr %#29, align 1
+  %#31 = or disjoint i32 %#23, 8
+  store i32 %#31, ptr %#26, align 4
+  %#32 = zext nneg i32 %#31 to i64
+  %#33 = add i32 noundef %#1, 374761393
+  %#34 = add i32 %#24, %#33
+  %#35 = load i32, ptr %#21, align 4
+  %#36 = mul i32 %#35, 3266489917
+  %#37 = add i32 %#36, %#34
+  %#38 = gep inbounds nuw ptr %#13, 1 x i64 28
+  %#39 = fshl i32 %#37, i32 %#37, i32 17
+  %#40 = mul i32 %#39, 668265263
+  %#41 = add nsw i64 %#32, -4
+  %#42 = icmp samesign ugt i64 %#41, 3
+  br i1 %#42, label %#5, label %#7
+
+#5:
+  %#43 = load i32, ptr %#38, align 4
+  %#44 = mul i32 %#43, 3266489917
+  %#45 = add i32 %#44, %#40
+  %#46 = gep inbounds nuw ptr %#13, 1 x i64 32
+  %#47 = fshl i32 %#45, i32 %#45, i32 17
+  %#48 = mul i32 %#47, 668265263
+  %#49 = zext nneg i32 %#23 to i64
+  br i1 %#22, label %#7, label %#6
+
+#6:
+  %#50 = load i32, ptr %#46, align 4
+  %#51 = mul i32 %#50, 3266489917
+  %#52 = add i32 %#51, %#48
+  %#53 = gep inbounds nuw ptr %#13, 1 x i64 36
+  %#54 = fshl i32 %#52, i32 %#52, i32 17
+  %#55 = mul i32 %#54, 668265263
+  %#56 = add nsw i64 %#32, -12
+  br label %#7
+
+#7:
+  %#57 = phi ptr [ %#38, %#4 ], [ %#46, %#5 ], [ %#53, %#6 ]
+  %#58 = phi i32 [ %#40, %#4 ], [ %#48, %#5 ], [ %#55, %#6 ]
+  %#59 = phi i64 [ %#41, %#4 ], [ %#49, %#5 ], [ %#56, %#6 ]
+  %#60 = icmp eq i64 %#59, 0
+  br i1 %#60, label %#12, label %#8
+
+#8:
+  %#61 = and i64 %#59, 7
+  %#62 = icmp eq i64 %#61, 0
+  br i1 %#62, label %#10, label %#9
+
+#9:
+  %#63 = phi i32 [ %#73, %#9 ], [ %#58, %#8 ]
+  %#64 = phi i64 [ %#74, %#9 ], [ %#59, %#8 ]
+  %#65 = phi ptr [ %#67, %#9 ], [ %#57, %#8 ]
+  %#66 = phi i64 [ %#75, %#9 ], [ 0, %#8 ]
+  %#67 = gep inbounds nuw ptr %#65, 1 x i64 1
+  %#68 = load i8, ptr %#65, align 1
+  %#69 = zext i8 %#68 to i32
+  %#70 = mul i32 %#69, 374761393
+  %#71 = add i32 %#70, %#63
+  %#72 = fshl i32 %#71, i32 %#71, i32 11
+  %#73 = mul i32 %#72, 2654435761
+  %#74 = add nsw i64 %#64, -1
+  %#75 = add i64 %#66, 1
+  %#76 = icmp eq i64 %#75, %#61
+  br i1 %#76, label %#10, label %#9
+
+#10:
+  %#77 = phi i32 [ poison, %#8 ], [ %#73, %#9 ]
+  %#78 = phi i32 [ %#58, %#8 ], [ %#73, %#9 ]
+  %#79 = phi i64 [ %#59, %#8 ], [ %#74, %#9 ]
+  %#80 = phi ptr [ %#57, %#8 ], [ %#67, %#9 ]
+  %#81 = icmp ult i64 %#59, 8
+  br i1 %#81, label %#12, label %#11
+
+#11:
+  %#82 = phi i32 [ %#140, %#11 ], [ %#78, %#10 ]
+  %#83 = phi i64 [ %#141, %#11 ], [ %#79, %#10 ]
+  %#84 = phi ptr [ %#134, %#11 ], [ %#80, %#10 ]
+  %#85 = gep inbounds nuw ptr %#84, 1 x i64 1
+  %#86 = load i8, ptr %#84, align 1
+  %#87 = zext i8 %#86 to i32
+  %#88 = mul i32 %#87, 374761393
+  %#89 = add i32 %#88, %#82
+  %#90 = fshl i32 %#89, i32 %#89, i32 11
+  %#91 = mul i32 %#90, 2654435761
+  %#92 = gep inbounds nuw ptr %#84, 1 x i64 2
+  %#93 = load i8, ptr %#85, align 1
+  %#94 = zext i8 %#93 to i32
+  %#95 = mul i32 %#94, 374761393
+  %#96 = add i32 %#95, %#91
+  %#97 = fshl i32 %#96, i32 %#96, i32 11
+  %#98 = mul i32 %#97, 2654435761
+  %#99 = gep inbounds nuw ptr %#84, 1 x i64 3
+  %#100 = load i8, ptr %#92, align 1
+  %#101 = zext i8 %#100 to i32
+  %#102 = mul i32 %#101, 374761393
+  %#103 = add i32 %#102, %#98
+  %#104 = fshl i32 %#103, i32 %#103, i32 11
+  %#105 = mul i32 %#104, 2654435761
+  %#106 = gep inbounds nuw ptr %#84, 1 x i64 4
+  %#107 = load i8, ptr %#99, align 1
+  %#108 = zext i8 %#107 to i32
+  %#109 = mul i32 %#108, 374761393
+  %#110 = add i32 %#109, %#105
+  %#111 = fshl i32 %#110, i32 %#110, i32 11
+  %#112 = mul i32 %#111, 2654435761
+  %#113 = gep inbounds nuw ptr %#84, 1 x i64 5
+  %#114 = load i8, ptr %#106, align 1
+  %#115 = zext i8 %#114 to i32
+  %#116 = mul i32 %#115, 374761393
+  %#117 = add i32 %#116, %#112
+  %#118 = fshl i32 %#117, i32 %#117, i32 11
+  %#119 = mul i32 %#118, 2654435761
+  %#120 = gep inbounds nuw ptr %#84, 1 x i64 6
+  %#121 = load i8, ptr %#113, align 1
+  %#122 = zext i8 %#121 to i32
+  %#123 = mul i32 %#122, 374761393
+  %#124 = add i32 %#123, %#119
+  %#125 = fshl i32 %#124, i32 %#124, i32 11
+  %#126 = mul i32 %#125, 2654435761
+  %#127 = gep inbounds nuw ptr %#84, 1 x i64 7
+  %#128 = load i8, ptr %#120, align 1
+  %#129 = zext i8 %#128 to i32
+  %#130 = mul i32 %#129, 374761393
+  %#131 = add i32 %#130, %#126
+  %#132 = fshl i32 %#131, i32 %#131, i32 11
+  %#133 = mul i32 %#132, 2654435761
+  %#134 = gep inbounds nuw ptr %#84, 1 x i64 8
+  %#135 = load i8, ptr %#127, align 1
+  %#136 = zext i8 %#135 to i32
+  %#137 = mul i32 %#136, 374761393
+  %#138 = add i32 %#137, %#133
+  %#139 = fshl i32 %#138, i32 %#138, i32 11
+  %#140 = mul i32 %#139, 2654435761
+  %#141 = add nsw i64 %#83, -8
+  %#142 = icmp eq i64 %#141, 0
+  br i1 %#142, label %#12, label %#11
+
+#12:
+  %#143 = phi i32 [ %#58, %#7 ], [ %#77, %#10 ], [ %#140, %#11 ]
+  %#144 = lshr i32 %#143, 15
+  %#145 = xor i32 %#144, %#143
+  %#146 = mul i32 %#145, 2246822519
+  %#147 = lshr i32 %#146, 13
+  %#148 = xor i32 %#147, %#146
+  %#149 = mul i32 %#148, 3266489917
+  %#150 = lshr i32 %#149, 16
+  %#151 = xor i32 %#150, %#149
+  end_lifetime ptr %#13
+  ret i32 %#151
+}
+=>
+define i32 @target_s32_7_8(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = alloca i64 15, align 8, dead
+  start_lifetime ptr %#6
+  memset ptr %#6 align 8, i8 0, i64 15
+  %#7 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#7, label %#4, label %#3
+
+#3:
+  memcpy ptr %#6 align 8, ptr nowrite noundef %#0 align 1, i64 7
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 7
+  %#9 = load i64, ptr %#8, align 1
+  %#10 = gep inbounds nuw ptr %#6, 1 x i64 7
+  store i64 %#9, ptr %#10, align 1
+  %#11 = add i32 noundef %#1, 374761408
+  %#12 = load i32, ptr %#6, align 8
+  %#13 = mul i32 %#12, 3266489917
+  %#14 = add i32 %#13, %#11
+  %#15 = fshl i32 %#14, i32 %#14, i32 17
+  %#16 = mul i32 %#15, 668265263
+  %#17 = gep inbounds nuw ptr %#6, 1 x i64 13
+  %#18 = load i8, ptr %#17, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = gep inbounds nuw ptr %#6, 1 x i64 12
+  %#22 = load i8, ptr %#21, align 4
+  %#23 = zext i8 %#22 to i32
+  %#24 = mul i32 %#23, 374761393
+  %#25 = gep inbounds nuw ptr %#6, 1 x i64 8
+  %#26 = load i32, ptr %#25, align 8
+  %#27 = mul i32 %#26, 3266489917
+  %#28 = gep inbounds nuw ptr %#6, 1 x i64 4
+  %#29 = load i32, ptr %#28, align 4
+  %#30 = mul i32 %#29, 3266489917
+  %#31 = add i32 %#30, %#16
+  %#32 = fshl i32 %#31, i32 %#31, i32 17
+  %#33 = mul i32 %#32, 668265263
+  %#34 = add i32 %#27, %#33
+  %#35 = fshl i32 %#34, i32 %#34, i32 17
+  %#36 = mul i32 %#35, 668265263
+  %#37 = add i32 %#24, %#36
+  %#38 = fshl i32 %#37, i32 %#37, i32 11
+  %#39 = mul i32 %#38, 2654435761
+  %#40 = add i32 %#20, %#39
+  %#41 = fshl i32 %#40, i32 %#40, i32 11
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = gep inbounds nuw ptr %#6, 1 x i64 14
+  %#44 = load i8, ptr %#43, align 2
+  %#45 = zext i8 %#44 to i32
+  %#46 = mul i32 %#45, 374761393
+  %#47 = add i32 %#46, %#42
+  %#48 = fshl i32 %#47, i32 %#47, i32 11
+  %#49 = mul i32 %#48, 2654435761
+  br label %#5
+
+#4:
+  %#50 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 7
+  %#51 = load i64, ptr %#50, align 1
+  store i64 %#51, ptr %#6, align 8
+  %#52 = add i32 noundef %#1, 374761401
+  %#53 = load i32, ptr %#6, align 8
+  %#54 = mul i32 %#53, 3266489917
+  %#55 = add i32 %#54, %#52
+  %#56 = fshl i32 %#55, i32 %#55, i32 17
+  %#57 = mul i32 %#56, 668265263
+  %#58 = gep inbounds nuw ptr %#6, 1 x i64 4
+  %#59 = load i32, ptr %#58, align 4
+  %#60 = mul i32 %#59, 3266489917
+  %#61 = add i32 %#60, %#57
+  %#62 = fshl i32 %#61, i32 %#61, i32 17
+  %#63 = mul i32 %#62, 668265263
+  br label %#5
+
+#5:
+  %#64 = phi i32 [ %#63, %#4 ], [ %#49, %#3 ]
+  %#65 = lshr i32 %#64, 15
+  %#66 = xor i32 %#65, %#64
+  %#67 = mul i32 %#66, 2246822519
+  %#68 = lshr i32 %#67, 13
+  %#69 = xor i32 %#68, %#67
+  %#70 = mul i32 %#69, 3266489917
+  %#71 = lshr i32 %#70, 16
+  %#72 = xor i32 %#71, %#70
+  end_lifetime ptr %#6
+  ret i32 %#72
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_5_10(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#12 = alloca i64 48, align 4, dead
+  start_lifetime ptr %#12
+  %#13 = add i32 noundef %#1, 606290984
+  %#14 = add i32 noundef %#1, 2246822519
+  %#15 = add i32 noundef %#1, 1640531535
+  %#16 = gep inbounds nuw ptr %#12, 1 x i64 8
+  store i32 %#13, ptr %#16, align 4
+  %#17 = gep inbounds nuw ptr %#12, 1 x i64 12
+  store i32 %#14, ptr %#17, align 4
+  %#18 = gep inbounds nuw ptr %#12, 1 x i64 16
+  store i32 noundef %#1, ptr %#18, align 4
+  %#19 = gep inbounds nuw ptr %#12, 1 x i64 20
+  store i32 %#15, ptr %#19, align 4
+  %#20 = gep inbounds nuw ptr %#12, 1 x i64 24
+  memset ptr %#20 align 4, i8 0, i64 16
+  %#21 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#21, label %#4, label %#3
+
+#3:
+  memcpy ptr %#20 align 4, ptr nowrite noundef %#0 align 1, i64 5
+  br label %#4
+
+#4:
+  %#22 = phi i32 [ 0, %#2 ], [ 5, %#3 ]
+  %#23 = or disjoint i32 %#22, 10
+  store i32 %#23, ptr %#12, align 4
+  %#24 = gep inbounds nuw ptr %#12, 1 x i64 4
+  store i32 0, ptr %#24, align 4
+  %#25 = gep inbounds nuw ptr %#12, 1 x i64 40
+  %#26 = zext nneg i32 %#22 to i64
+  %#27 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#28 = gep inbounds nuw ptr %#20, 1 x i64 %#26
+  memcpy ptr %#28 align 1, ptr %#27 align 1, i64 10
+  %#29 = or disjoint i32 %#22, 10
+  store i32 %#29, ptr %#25, align 4
+  %#30 = zext nneg i32 %#29 to i64
+  %#31 = add i32 noundef %#1, 374761393
+  %#32 = add i32 %#23, %#31
+  %#33 = load i32, ptr %#20, align 4
+  %#34 = mul i32 %#33, 3266489917
+  %#35 = add i32 %#34, %#32
+  %#36 = gep inbounds nuw ptr %#12, 1 x i64 28
+  %#37 = fshl i32 %#35, i32 %#35, i32 17
+  %#38 = mul i32 %#37, 668265263
+  %#39 = add nsw i64 %#30, -4
+  %#40 = icmp samesign ugt i64 %#39, 3
+  br i1 %#40, label %#5, label %#7
+
+#5:
+  %#41 = load i32, ptr %#36, align 4
+  %#42 = mul i32 %#41, 3266489917
+  %#43 = add i32 %#42, %#38
+  %#44 = gep inbounds nuw ptr %#12, 1 x i64 32
+  %#45 = fshl i32 %#43, i32 %#43, i32 17
+  %#46 = mul i32 %#45, 668265263
+  %#47 = add nsw i64 %#30, -8
+  %#48 = icmp samesign ugt i64 %#47, 3
+  br i1 %#48, label %#6, label %#7
+
+#6:
+  %#49 = load i32, ptr %#44, align 4
+  %#50 = mul i32 %#49, 3266489917
+  %#51 = add i32 %#50, %#46
+  %#52 = gep inbounds nuw ptr %#12, 1 x i64 36
+  %#53 = fshl i32 %#51, i32 %#51, i32 17
+  %#54 = mul i32 %#53, 668265263
+  %#55 = add nsw i64 %#30, -12
+  br label %#7
+
+#7:
+  %#56 = phi ptr [ %#36, %#4 ], [ %#44, %#5 ], [ %#52, %#6 ]
+  %#57 = phi i32 [ %#38, %#4 ], [ %#46, %#5 ], [ %#54, %#6 ]
+  %#58 = phi i64 [ %#39, %#4 ], [ %#47, %#5 ], [ %#55, %#6 ]
+  %#59 = add nsw i64 %#58, -1
+  %#60 = and i64 %#58, 7
+  %#61 = icmp eq i64 %#60, 0
+  br i1 %#61, label %#9, label %#8
+
+#8:
+  %#62 = phi i32 [ %#72, %#8 ], [ %#57, %#7 ]
+  %#63 = phi i64 [ %#73, %#8 ], [ %#58, %#7 ]
+  %#64 = phi ptr [ %#66, %#8 ], [ %#56, %#7 ]
+  %#65 = phi i64 [ %#74, %#8 ], [ 0, %#7 ]
+  %#66 = gep inbounds nuw ptr %#64, 1 x i64 1
+  %#67 = load i8, ptr %#64, align 1
+  %#68 = zext i8 %#67 to i32
+  %#69 = mul i32 %#68, 374761393
+  %#70 = add i32 %#69, %#62
+  %#71 = fshl i32 %#70, i32 %#70, i32 11
+  %#72 = mul i32 %#71, 2654435761
+  %#73 = add nsw i64 %#63, -1
+  %#74 = add i64 %#65, 1
+  %#75 = icmp eq i64 %#74, %#60
+  br i1 %#75, label %#9, label %#8
+
+#9:
+  %#76 = phi i32 [ poison, %#7 ], [ %#72, %#8 ]
+  %#77 = phi i32 [ %#57, %#7 ], [ %#72, %#8 ]
+  %#78 = phi i64 [ %#58, %#7 ], [ %#73, %#8 ]
+  %#79 = phi ptr [ %#56, %#7 ], [ %#66, %#8 ]
+  %#80 = icmp ult i64 %#59, 7
+  br i1 %#80, label %#11, label %#10
+
+#10:
+  %#81 = phi i32 [ %#139, %#10 ], [ %#77, %#9 ]
+  %#82 = phi i64 [ %#140, %#10 ], [ %#78, %#9 ]
+  %#83 = phi ptr [ %#133, %#10 ], [ %#79, %#9 ]
+  %#84 = gep inbounds nuw ptr %#83, 1 x i64 1
+  %#85 = load i8, ptr %#83, align 1
+  %#86 = zext i8 %#85 to i32
+  %#87 = mul i32 %#86, 374761393
+  %#88 = add i32 %#87, %#81
+  %#89 = fshl i32 %#88, i32 %#88, i32 11
+  %#90 = mul i32 %#89, 2654435761
+  %#91 = gep inbounds nuw ptr %#83, 1 x i64 2
+  %#92 = load i8, ptr %#84, align 1
+  %#93 = zext i8 %#92 to i32
+  %#94 = mul i32 %#93, 374761393
+  %#95 = add i32 %#94, %#90
+  %#96 = fshl i32 %#95, i32 %#95, i32 11
+  %#97 = mul i32 %#96, 2654435761
+  %#98 = gep inbounds nuw ptr %#83, 1 x i64 3
+  %#99 = load i8, ptr %#91, align 1
+  %#100 = zext i8 %#99 to i32
+  %#101 = mul i32 %#100, 374761393
+  %#102 = add i32 %#101, %#97
+  %#103 = fshl i32 %#102, i32 %#102, i32 11
+  %#104 = mul i32 %#103, 2654435761
+  %#105 = gep inbounds nuw ptr %#83, 1 x i64 4
+  %#106 = load i8, ptr %#98, align 1
+  %#107 = zext i8 %#106 to i32
+  %#108 = mul i32 %#107, 374761393
+  %#109 = add i32 %#108, %#104
+  %#110 = fshl i32 %#109, i32 %#109, i32 11
+  %#111 = mul i32 %#110, 2654435761
+  %#112 = gep inbounds nuw ptr %#83, 1 x i64 5
+  %#113 = load i8, ptr %#105, align 1
+  %#114 = zext i8 %#113 to i32
+  %#115 = mul i32 %#114, 374761393
+  %#116 = add i32 %#115, %#111
+  %#117 = fshl i32 %#116, i32 %#116, i32 11
+  %#118 = mul i32 %#117, 2654435761
+  %#119 = gep inbounds nuw ptr %#83, 1 x i64 6
+  %#120 = load i8, ptr %#112, align 1
+  %#121 = zext i8 %#120 to i32
+  %#122 = mul i32 %#121, 374761393
+  %#123 = add i32 %#122, %#118
+  %#124 = fshl i32 %#123, i32 %#123, i32 11
+  %#125 = mul i32 %#124, 2654435761
+  %#126 = gep inbounds nuw ptr %#83, 1 x i64 7
+  %#127 = load i8, ptr %#119, align 1
+  %#128 = zext i8 %#127 to i32
+  %#129 = mul i32 %#128, 374761393
+  %#130 = add i32 %#129, %#125
+  %#131 = fshl i32 %#130, i32 %#130, i32 11
+  %#132 = mul i32 %#131, 2654435761
+  %#133 = gep inbounds nuw ptr %#83, 1 x i64 8
+  %#134 = load i8, ptr %#126, align 1
+  %#135 = zext i8 %#134 to i32
+  %#136 = mul i32 %#135, 374761393
+  %#137 = add i32 %#136, %#132
+  %#138 = fshl i32 %#137, i32 %#137, i32 11
+  %#139 = mul i32 %#138, 2654435761
+  %#140 = add nsw i64 %#82, -8
+  %#141 = icmp eq i64 %#140, 0
+  br i1 %#141, label %#11, label %#10
+
+#11:
+  %#142 = phi i32 [ %#76, %#9 ], [ %#139, %#10 ]
+  %#143 = lshr i32 %#142, 15
+  %#144 = xor i32 %#143, %#142
+  %#145 = mul i32 %#144, 2246822519
+  %#146 = lshr i32 %#145, 13
+  %#147 = xor i32 %#146, %#145
+  %#148 = mul i32 %#147, 3266489917
+  %#149 = lshr i32 %#148, 16
+  %#150 = xor i32 %#149, %#148
+  end_lifetime ptr %#12
+  ret i32 %#150
+}
+=>
+define i32 @target_s32_5_10(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#9 = load i8, ptr %#8, align 1
+  %#10 = zext i8 %#9 to i32
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#12 = load i24, ptr %#11, align 1
+  %#13 = zext i24 %#12 to i32
+  %#14 = shl nuw i32 %#13, 8
+  %#15 = or disjoint i32 %#14, %#10
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#19 = load i8, ptr %#18, align 1
+  %#20 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#21 = load i8, ptr %#20, align 1
+  %#22 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 14
+  %#23 = load i8, ptr %#22, align 1
+  %#24 = add i32 noundef %#1, 374761408
+  %#25 = mul i32 %#7, 3266489917
+  %#26 = add i32 %#25, %#24
+  %#27 = fshl i32 %#26, i32 %#26, i32 17
+  %#28 = mul i32 %#27, 668265263
+  %#29 = zext i8 %#21 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = zext i8 %#19 to i32
+  %#32 = mul i32 %#31, 374761393
+  %#33 = mul i32 %#17, 3266489917
+  %#34 = mul i32 %#15, 3266489917
+  %#35 = add i32 %#34, %#28
+  %#36 = fshl i32 %#35, i32 %#35, i32 17
+  %#37 = mul i32 %#36, 668265263
+  %#38 = add i32 %#33, %#37
+  %#39 = fshl i32 %#38, i32 %#38, i32 17
+  %#40 = mul i32 %#39, 668265263
+  %#41 = add i32 %#32, %#40
+  %#42 = fshl i32 %#41, i32 %#41, i32 11
+  %#43 = mul i32 %#42, 2654435761
+  %#44 = add i32 %#30, %#43
+  %#45 = fshl i32 %#44, i32 %#44, i32 11
+  %#46 = mul i32 %#45, 2654435761
+  %#47 = zext i8 %#23 to i32
+  %#48 = mul i32 %#47, 374761393
+  %#49 = add i32 %#48, %#46
+  %#50 = fshl i32 %#49, i32 %#49, i32 11
+  br label %#5
+
+#4:
+  %#51 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 5
+  %#52 = load i32, ptr %#51, align 1
+  %#53 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 9
+  %#54 = load i32, ptr %#53, align 1
+  %#55 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 13
+  %#56 = load i8, ptr %#55, align 1
+  %#57 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 14
+  %#58 = load i8, ptr %#57, align 1
+  %#59 = add i32 noundef %#1, 374761403
+  %#60 = mul i32 %#52, 3266489917
+  %#61 = add i32 %#60, %#59
+  %#62 = fshl i32 %#61, i32 %#61, i32 17
+  %#63 = mul i32 %#62, 668265263
+  %#64 = mul i32 %#54, 3266489917
+  %#65 = add i32 %#64, %#63
+  %#66 = fshl i32 %#65, i32 %#65, i32 17
+  %#67 = mul i32 %#66, 668265263
+  %#68 = zext i8 %#56 to i32
+  %#69 = mul i32 %#68, 374761393
+  %#70 = add i32 %#67, %#69
+  %#71 = fshl i32 %#70, i32 %#70, i32 11
+  %#72 = mul i32 %#71, 2654435761
+  %#73 = zext i8 %#58 to i32
+  %#74 = mul i32 %#73, 374761393
+  %#75 = add i32 %#72, %#74
+  %#76 = fshl i32 %#75, i32 %#75, i32 11
+  br label %#5
+
+#5:
+  %#77 = phi i32 [ %#76, %#4 ], [ %#50, %#3 ]
+  %#78 = mul i32 %#77, 2654435761
+  %#79 = lshr i32 %#78, 15
+  %#80 = xor i32 %#79, %#78
+  %#81 = mul i32 %#80, 2246822519
+  %#82 = lshr i32 %#81, 13
+  %#83 = xor i32 %#82, %#81
+  %#84 = mul i32 %#83, 3266489917
+  %#85 = lshr i32 %#84, 16
+  %#86 = xor i32 %#85, %#84
+  ret i32 %#86
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+
+----------------------------------------
+define i32 @target_s32_15_0(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#8 = load i24, ptr %#7, align 1
+  %#9 = zext i24 %#8 to i32
+  %#10 = add i32 noundef %#1, 374761408
+  %#11 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#12 = load i32, ptr %#11, align 1
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#14 = load i32, ptr %#13, align 1
+  %#15 = load i32, ptr nowrite noundef %#0, align 1
+  %#16 = mul i32 %#15, 3266489917
+  %#17 = add i32 %#16, %#10
+  %#18 = fshl i32 %#17, i32 %#17, i32 17
+  %#19 = mul i32 %#18, 668265263
+  %#20 = mul i32 %#14, 3266489917
+  %#21 = add i32 %#20, %#19
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  %#24 = mul i32 %#12, 3266489917
+  %#25 = add i32 %#24, %#23
+  %#26 = fshl i32 %#25, i32 %#25, i32 17
+  %#27 = mul i32 %#26, 668265263
+  %#28 = and i24 %#8, 255
+  %#29 = zext nneg i24 %#28 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = add i32 %#30, %#27
+  %#32 = fshl i32 %#31, i32 %#31, i32 11
+  %#33 = mul i32 %#32, 2654435761
+  %#34 = lshr i32 %#9, 8
+  %#35 = and i32 %#34, 255
+  %#36 = mul i32 %#35, 374761393
+  %#37 = add i32 %#36, %#33
+  %#38 = fshl i32 %#37, i32 %#37, i32 11
+  %#39 = mul i32 %#38, 2654435761
+  %#40 = lshr i32 %#9, 16
+  %#41 = mul i32 %#40, 374761393
+  %#42 = add i32 %#41, %#39
+  %#43 = fshl i32 %#42, i32 %#42, i32 11
+  %#44 = mul i32 %#43, 2654435761
+  br label %#5
+
+#4:
+  %#45 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#46 = phi i32 [ %#45, %#4 ], [ %#44, %#3 ]
+  %#47 = lshr i32 %#46, 15
+  %#48 = xor i32 %#47, %#46
+  %#49 = mul i32 %#48, 2246822519
+  %#50 = lshr i32 %#49, 13
+  %#51 = xor i32 %#50, %#49
+  %#52 = mul i32 %#51, 3266489917
+  %#53 = lshr i32 %#52, 16
+  %#54 = xor i32 %#53, %#52
+  ret i32 %#54
+}
+=>
+define i32 @target_s32_15_0(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#9 = load i32, ptr %#8, align 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#13 = load i24, ptr %#12, align 1
+  %#14 = zext i24 %#13 to i32
+  %#15 = add i32 noundef %#1, 374761408
+  %#16 = mul i32 %#7, 3266489917
+  %#17 = add i32 %#16, %#15
+  %#18 = fshl i32 %#17, i32 %#17, i32 17
+  %#19 = mul i32 %#18, 668265263
+  %#20 = mul i32 %#9, 3266489917
+  %#21 = add i32 %#20, %#19
+  %#22 = fshl i32 %#21, i32 %#21, i32 17
+  %#23 = mul i32 %#22, 668265263
+  %#24 = mul i32 %#11, 3266489917
+  %#25 = add i32 %#24, %#23
+  %#26 = fshl i32 %#25, i32 %#25, i32 17
+  %#27 = mul i32 %#26, 668265263
+  %#28 = and i24 %#13, 255
+  %#29 = zext nneg i24 %#28 to i32
+  %#30 = mul i32 %#29, 374761393
+  %#31 = add i32 %#30, %#27
+  %#32 = fshl i32 %#31, i32 %#31, i32 11
+  %#33 = mul i32 %#32, 2654435761
+  %#34 = zext i24 %#13 to i32
+  %#35 = lshr i32 %#34, 8
+  %#36 = and i32 %#35, 255
+  %#37 = mul i32 %#36, 374761393
+  %#38 = add i32 %#37, %#33
+  %#39 = fshl i32 %#38, i32 %#38, i32 11
+  %#40 = mul i32 %#39, 2654435761
+  %#41 = lshr i32 %#14, 16
+  %#42 = mul i32 %#41, 374761393
+  %#43 = add i32 %#42, %#40
+  %#44 = fshl i32 %#43, i32 %#43, i32 11
+  %#45 = mul i32 %#44, 2654435761
+  br label %#5
+
+#4:
+  %#46 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#47 = phi i32 [ %#46, %#4 ], [ %#45, %#3 ]
+  %#48 = lshr i32 %#47, 15
+  %#49 = xor i32 %#48, %#47
+  %#50 = mul i32 %#49, 2246822519
+  %#51 = lshr i32 %#50, 13
+  %#52 = xor i32 %#51, %#50
+  %#53 = mul i32 %#52, 3266489917
+  %#54 = lshr i32 %#53, 16
+  %#55 = xor i32 %#54, %#53
+  ret i32 %#55
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_10_10(ptr noundef %#0, i32 noundef %#1) {
+#2:
+  %#18 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#18
+  %#19 = add i32 noundef %#1, 606290984
+  %#20 = add i32 noundef %#1, 2246822519
+  %#21 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#18, align 8
+  %#22 = gep inbounds nuw ptr %#18, 1 x i64 8
+  store i32 %#19, ptr %#22, align 8
+  %#23 = gep inbounds nuw ptr %#18, 1 x i64 12
+  store i32 %#20, ptr %#23, align 4
+  %#24 = gep inbounds nuw ptr %#18, 1 x i64 16
+  store i32 noundef %#1, ptr %#24, align 8
+  %#25 = gep inbounds nuw ptr %#18, 1 x i64 20
+  store i32 %#21, ptr %#25, align 4
+  %#26 = gep inbounds nuw ptr %#18, 1 x i64 24
+  memset ptr %#26 align 8, i8 0, i64 20
+  %#27 = icmp eq ptr noundef %#0, null
+  br i1 %#27, label %#6, label %#3
+
+#3:
+  %#28 = gep inbounds nuw ptr %#18, 1 x i64 40
+  memcpy ptr %#26 align 8, ptr noundef %#0 align 1, i64 10
+  store i32 10, ptr %#28, align 8
+  %#29 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  store i32 20, ptr %#18, align 8
+  %#30 = gep inbounds nuw ptr %#18, 1 x i64 4
+  store i32 1, ptr %#30, align 4
+  %#31 = gep inbounds nuw ptr %#18, 1 x i64 40
+  %#32 = gep inbounds nuw ptr %#18, 1 x i64 34
+  memcpy ptr %#32 align 2, ptr %#29 align 1, i64 6
+  %#33 = load i32, ptr %#26, align 8
+  %#34 = mul i32 %#33, 2246822519
+  %#35 = add i32 %#34, %#19
+  %#36 = fshl i32 %#35, i32 %#35, i32 13
+  %#37 = mul i32 %#36, 2654435761
+  %#38 = freeze i32 %#37
+  store i32 %#38, ptr %#22, align 8
+  %#39 = gep inbounds nuw ptr %#18, 1 x i64 28
+  %#40 = load i32, ptr %#39, align 4
+  %#41 = mul i32 %#40, 2246822519
+  %#42 = add i32 %#41, %#20
+  %#43 = fshl i32 %#42, i32 %#42, i32 13
+  %#44 = mul i32 %#43, 2654435761
+  %#45 = freeze i32 %#44
+  store i32 %#45, ptr %#23, align 4
+  %#46 = gep inbounds nuw ptr %#18, 1 x i64 32
+  %#47 = load i32, ptr %#46, align 8
+  %#48 = mul i32 %#47, 2246822519
+  %#49 = add i32 %#48, noundef %#1
+  %#50 = fshl i32 %#49, i32 %#49, i32 13
+  %#51 = mul i32 %#50, 2654435761
+  %#52 = freeze i32 %#51
+  store i32 %#52, ptr %#24, align 8
+  %#53 = gep inbounds nuw ptr %#18, 1 x i64 36
+  %#54 = load i32, ptr %#53, align 4
+  %#55 = mul i32 %#54, 2246822519
+  %#56 = add i32 %#55, %#21
+  %#57 = fshl i32 %#56, i32 %#56, i32 13
+  %#58 = mul i32 %#57, 2654435761
+  %#59 = freeze i32 %#58
+  store i32 %#59, ptr %#25, align 4
+  %#60 = load i32, ptr %#31, align 8
+  %#61 = sub i32 16, %#60
+  store i32 0, ptr %#31, align 8
+  %#62 = icmp ult i32 %#61, 10
+  br i1 %#62, label %#4, label %#5
+
+#4:
+  %#63 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#64 = zext nneg i32 %#61 to i64
+  %#65 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#64
+  %#66 = gep inbounds nuw ptr %#65, 1 x i64 10
+  %#67 = ptrtoint ptr %#63 to i64
+  %#68 = ptrtoint ptr %#66 to i64
+  %#69 = sub i64 %#67, %#68
+  memcpy ptr %#26 align 8, ptr %#66 align 1, i64 %#69
+  %#70 = trunc i64 %#69 to i32
+  store i32 %#70, ptr %#31, align 8
+  %#71 = and i32 %#70, 15
+  br label %#5
+
+#5:
+  %#72 = phi i32 [ %#71, %#4 ], [ 0, %#3 ]
+  %#73 = fshl i32 %#38, i32 %#38, i32 1
+  %#74 = fshl i32 %#45, i32 %#45, i32 7
+  %#75 = add i32 %#74, %#73
+  %#76 = fshl i32 %#52, i32 %#52, i32 12
+  %#77 = add i32 %#75, %#76
+  %#78 = fshl i32 %#59, i32 %#59, i32 18
+  %#79 = add i32 %#77, %#78
+  br label %#7
+
+#6:
+  %#80 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  store i32 10, ptr %#18, align 8
+  %#81 = gep inbounds nuw ptr %#18, 1 x i64 4
+  store i32 0, ptr %#81, align 4
+  %#82 = gep inbounds nuw ptr %#18, 1 x i64 40
+  memcpy ptr %#26 align 8, ptr %#80 align 1, i64 10
+  %#83 = load i32, ptr %#82, align 8
+  %#84 = add i32 %#83, 10
+  store i32 %#84, ptr %#82, align 8
+  %#85 = and i32 %#84, 15
+  %#86 = add i32 noundef %#1, 374761393
+  br label %#7
+
+#7:
+  %#87 = phi i32 [ %#72, %#5 ], [ %#85, %#6 ]
+  %#88 = phi i32 [ 20, %#5 ], [ 10, %#6 ]
+  %#89 = phi i32 [ %#79, %#5 ], [ %#86, %#6 ]
+  %#90 = add i32 %#88, %#89
+  %#91 = zext i32 %#87 to i64
+  %#92 = icmp samesign ugt i32 %#87, 3
+  br i1 %#92, label %#8, label %#12
+
+#8:
+  %#93 = add nsw i64 %#91, -4
+  %#94 = lshr i64 %#93, 2
+  %#95 = add nsw nuw i64 %#94, 1
+  %#96 = and i64 %#95, 7
+  %#97 = and i64 %#93, 28
+  %#98 = icmp eq i64 %#97, 28
+  br i1 %#98, label %#10, label %#9
+
+#9:
+  %#99 = phi i32 [ %#108, %#9 ], [ %#90, %#8 ]
+  %#100 = phi i64 [ %#109, %#9 ], [ %#91, %#8 ]
+  %#101 = phi ptr [ %#106, %#9 ], [ %#26, %#8 ]
+  %#102 = phi i64 [ %#110, %#9 ], [ 0, %#8 ]
+  %#103 = load i32, ptr %#101, align 4
+  %#104 = mul i32 %#103, 3266489917
+  %#105 = add i32 %#104, %#99
+  %#106 = gep inbounds nuw ptr %#101, 1 x i64 4
+  %#107 = fshl i32 %#105, i32 %#105, i32 17
+  %#108 = mul i32 %#107, 668265263
+  %#109 = add nsw i64 %#100, -4
+  %#110 = add i64 %#102, 1
+  %#111 = icmp eq i64 %#110, %#96
+  br i1 %#111, label %#10, label %#9
+
+#10:
+  %#112 = phi i32 [ %#90, %#8 ], [ %#108, %#9 ]
+  %#113 = phi i64 [ %#91, %#8 ], [ %#109, %#9 ]
+  %#114 = phi ptr [ %#26, %#8 ], [ %#106, %#9 ]
+  %#115 = phi ptr [ poison, %#8 ], [ %#106, %#9 ]
+  %#116 = phi i32 [ poison, %#8 ], [ %#108, %#9 ]
+  %#117 = phi i64 [ poison, %#8 ], [ %#109, %#9 ]
+  %#118 = icmp ult i64 %#93, 28
+  br i1 %#118, label %#12, label %#11
+
+#11:
+  %#119 = phi i32 [ %#169, %#11 ], [ %#112, %#10 ]
+  %#120 = phi i64 [ %#170, %#11 ], [ %#113, %#10 ]
+  %#121 = phi ptr [ %#167, %#11 ], [ %#114, %#10 ]
+  %#122 = load i32, ptr %#121, align 4
+  %#123 = mul i32 %#122, 3266489917
+  %#124 = add i32 %#123, %#119
+  %#125 = gep inbounds nuw ptr %#121, 1 x i64 4
+  %#126 = fshl i32 %#124, i32 %#124, i32 17
+  %#127 = mul i32 %#126, 668265263
+  %#128 = load i32, ptr %#125, align 4
+  %#129 = mul i32 %#128, 3266489917
+  %#130 = add i32 %#129, %#127
+  %#131 = gep inbounds nuw ptr %#121, 1 x i64 8
+  %#132 = fshl i32 %#130, i32 %#130, i32 17
+  %#133 = mul i32 %#132, 668265263
+  %#134 = load i32, ptr %#131, align 4
+  %#135 = mul i32 %#134, 3266489917
+  %#136 = add i32 %#135, %#133
+  %#137 = gep inbounds nuw ptr %#121, 1 x i64 12
+  %#138 = fshl i32 %#136, i32 %#136, i32 17
+  %#139 = mul i32 %#138, 668265263
+  %#140 = load i32, ptr %#137, align 4
+  %#141 = mul i32 %#140, 3266489917
+  %#142 = add i32 %#141, %#139
+  %#143 = gep inbounds nuw ptr %#121, 1 x i64 16
+  %#144 = fshl i32 %#142, i32 %#142, i32 17
+  %#145 = mul i32 %#144, 668265263
+  %#146 = load i32, ptr %#143, align 4
+  %#147 = mul i32 %#146, 3266489917
+  %#148 = add i32 %#147, %#145
+  %#149 = gep inbounds nuw ptr %#121, 1 x i64 20
+  %#150 = fshl i32 %#148, i32 %#148, i32 17
+  %#151 = mul i32 %#150, 668265263
+  %#152 = load i32, ptr %#149, align 4
+  %#153 = mul i32 %#152, 3266489917
+  %#154 = add i32 %#153, %#151
+  %#155 = gep inbounds nuw ptr %#121, 1 x i64 24
+  %#156 = fshl i32 %#154, i32 %#154, i32 17
+  %#157 = mul i32 %#156, 668265263
+  %#158 = load i32, ptr %#155, align 4
+  %#159 = mul i32 %#158, 3266489917
+  %#160 = add i32 %#159, %#157
+  %#161 = gep inbounds nuw ptr %#121, 1 x i64 28
+  %#162 = fshl i32 %#160, i32 %#160, i32 17
+  %#163 = mul i32 %#162, 668265263
+  %#164 = load i32, ptr %#161, align 4
+  %#165 = mul i32 %#164, 3266489917
+  %#166 = add i32 %#165, %#163
+  %#167 = gep inbounds nuw ptr %#121, 1 x i64 32
+  %#168 = fshl i32 %#166, i32 %#166, i32 17
+  %#169 = mul i32 %#168, 668265263
+  %#170 = add nsw i64 %#120, -32
+  %#171 = icmp ugt i64 %#170, 3
+  br i1 %#171, label %#11, label %#12
+
+#12:
+  %#172 = phi ptr [ %#26, %#7 ], [ %#115, %#10 ], [ %#167, %#11 ]
+  %#173 = phi i64 [ %#91, %#7 ], [ %#117, %#10 ], [ %#170, %#11 ]
+  %#174 = phi i32 [ %#90, %#7 ], [ %#116, %#10 ], [ %#169, %#11 ]
+  %#175 = icmp eq i64 %#173, 0
+  br i1 %#175, label %#17, label %#13
+
+#13:
+  %#176 = and i64 %#173, 7
+  %#177 = icmp eq i64 %#176, 0
+  br i1 %#177, label %#15, label %#14
+
+#14:
+  %#178 = phi i32 [ %#188, %#14 ], [ %#174, %#13 ]
+  %#179 = phi i64 [ %#189, %#14 ], [ %#173, %#13 ]
+  %#180 = phi ptr [ %#182, %#14 ], [ %#172, %#13 ]
+  %#181 = phi i64 [ %#190, %#14 ], [ 0, %#13 ]
+  %#182 = gep inbounds nuw ptr %#180, 1 x i64 1
+  %#183 = load i8, ptr %#180, align 1
+  %#184 = zext i8 %#183 to i32
+  %#185 = mul i32 %#184, 374761393
+  %#186 = add i32 %#185, %#178
+  %#187 = fshl i32 %#186, i32 %#186, i32 11
+  %#188 = mul i32 %#187, 2654435761
+  %#189 = add nsw i64 %#179, -1
+  %#190 = add i64 %#181, 1
+  %#191 = icmp eq i64 %#190, %#176
+  br i1 %#191, label %#15, label %#14
+
+#15:
+  %#192 = phi i32 [ poison, %#13 ], [ %#188, %#14 ]
+  %#193 = phi i32 [ %#174, %#13 ], [ %#188, %#14 ]
+  %#194 = phi i64 [ %#173, %#13 ], [ %#189, %#14 ]
+  %#195 = phi ptr [ %#172, %#13 ], [ %#182, %#14 ]
+  %#196 = icmp ult i64 %#173, 8
+  br i1 %#196, label %#17, label %#16
+
+#16:
+  %#197 = phi i32 [ %#255, %#16 ], [ %#193, %#15 ]
+  %#198 = phi i64 [ %#256, %#16 ], [ %#194, %#15 ]
+  %#199 = phi ptr [ %#249, %#16 ], [ %#195, %#15 ]
+  %#200 = gep inbounds nuw ptr %#199, 1 x i64 1
+  %#201 = load i8, ptr %#199, align 1
+  %#202 = zext i8 %#201 to i32
+  %#203 = mul i32 %#202, 374761393
+  %#204 = add i32 %#203, %#197
+  %#205 = fshl i32 %#204, i32 %#204, i32 11
+  %#206 = mul i32 %#205, 2654435761
+  %#207 = gep inbounds nuw ptr %#199, 1 x i64 2
+  %#208 = load i8, ptr %#200, align 1
+  %#209 = zext i8 %#208 to i32
+  %#210 = mul i32 %#209, 374761393
+  %#211 = add i32 %#210, %#206
+  %#212 = fshl i32 %#211, i32 %#211, i32 11
+  %#213 = mul i32 %#212, 2654435761
+  %#214 = gep inbounds nuw ptr %#199, 1 x i64 3
+  %#215 = load i8, ptr %#207, align 1
+  %#216 = zext i8 %#215 to i32
+  %#217 = mul i32 %#216, 374761393
+  %#218 = add i32 %#217, %#213
+  %#219 = fshl i32 %#218, i32 %#218, i32 11
+  %#220 = mul i32 %#219, 2654435761
+  %#221 = gep inbounds nuw ptr %#199, 1 x i64 4
+  %#222 = load i8, ptr %#214, align 1
+  %#223 = zext i8 %#222 to i32
+  %#224 = mul i32 %#223, 374761393
+  %#225 = add i32 %#224, %#220
+  %#226 = fshl i32 %#225, i32 %#225, i32 11
+  %#227 = mul i32 %#226, 2654435761
+  %#228 = gep inbounds nuw ptr %#199, 1 x i64 5
+  %#229 = load i8, ptr %#221, align 1
+  %#230 = zext i8 %#229 to i32
+  %#231 = mul i32 %#230, 374761393
+  %#232 = add i32 %#231, %#227
+  %#233 = fshl i32 %#232, i32 %#232, i32 11
+  %#234 = mul i32 %#233, 2654435761
+  %#235 = gep inbounds nuw ptr %#199, 1 x i64 6
+  %#236 = load i8, ptr %#228, align 1
+  %#237 = zext i8 %#236 to i32
+  %#238 = mul i32 %#237, 374761393
+  %#239 = add i32 %#238, %#234
+  %#240 = fshl i32 %#239, i32 %#239, i32 11
+  %#241 = mul i32 %#240, 2654435761
+  %#242 = gep inbounds nuw ptr %#199, 1 x i64 7
+  %#243 = load i8, ptr %#235, align 1
+  %#244 = zext i8 %#243 to i32
+  %#245 = mul i32 %#244, 374761393
+  %#246 = add i32 %#245, %#241
+  %#247 = fshl i32 %#246, i32 %#246, i32 11
+  %#248 = mul i32 %#247, 2654435761
+  %#249 = gep inbounds nuw ptr %#199, 1 x i64 8
+  %#250 = load i8, ptr %#242, align 1
+  %#251 = zext i8 %#250 to i32
+  %#252 = mul i32 %#251, 374761393
+  %#253 = add i32 %#252, %#248
+  %#254 = fshl i32 %#253, i32 %#253, i32 11
+  %#255 = mul i32 %#254, 2654435761
+  %#256 = add nsw i64 %#198, -8
+  %#257 = icmp eq i64 %#256, 0
+  br i1 %#257, label %#17, label %#16
+
+#17:
+  %#258 = phi i32 [ %#174, %#12 ], [ %#192, %#15 ], [ %#255, %#16 ]
+  %#259 = lshr i32 %#258, 15
+  %#260 = xor i32 %#259, %#258
+  %#261 = mul i32 %#260, 2246822519
+  %#262 = lshr i32 %#261, 13
+  %#263 = xor i32 %#262, %#261
+  %#264 = mul i32 %#263, 3266489917
+  %#265 = lshr i32 %#264, 16
+  %#266 = xor i32 %#265, %#264
+  end_lifetime ptr %#18
+  ret i32 %#266
+}
+=>
+define i32 @target_s32_10_10(ptr noundef %#0, i32 noundef %#1) {
+#2:
+  %#25 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#25
+  %#26 = add i32 noundef %#1, 606290984
+  %#27 = add i32 noundef %#1, 2246822519
+  %#28 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#25, align 8
+  %#29 = gep inbounds nuw ptr %#25, 1 x i64 8
+  store i32 %#26, ptr %#29, align 8
+  %#30 = gep inbounds nuw ptr %#25, 1 x i64 12
+  store i32 %#27, ptr %#30, align 4
+  %#31 = gep inbounds nuw ptr %#25, 1 x i64 16
+  store i32 noundef %#1, ptr %#31, align 8
+  %#32 = gep inbounds nuw ptr %#25, 1 x i64 20
+  store i32 %#28, ptr %#32, align 4
+  %#33 = gep inbounds nuw ptr %#25, 1 x i64 24
+  memset ptr %#33 align 8, i8 0, i64 20
+  %#34 = icmp eq ptr noundef %#0, null
+  br i1 %#34, label %#6, label %#3
+
+#3:
+  %#35 = gep inbounds nuw ptr %#25, 1 x i64 40
+  memcpy ptr %#33 align 8, ptr noundef %#0 align 1, i64 10
+  store i32 10, ptr %#35, align 8
+  %#36 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  store i32 20, ptr %#25, align 8
+  %#37 = gep inbounds nuw ptr %#25, 1 x i64 4
+  store i32 1, ptr %#37, align 4
+  %#38 = gep inbounds nuw ptr %#25, 1 x i64 40
+  %#39 = gep inbounds nuw ptr %#25, 1 x i64 34
+  memcpy ptr %#39 align 2, ptr %#36 align 1, i64 6
+  %#40 = load i32, ptr %#33, align 8
+  %#41 = mul i32 %#40, 2246822519
+  %#42 = add i32 %#41, %#26
+  %#43 = fshl i32 %#42, i32 %#42, i32 13
+  %#44 = mul i32 %#43, 2654435761
+  %#45 = freeze i32 %#44
+  store i32 %#45, ptr %#29, align 8
+  %#46 = gep inbounds nuw ptr %#25, 1 x i64 28
+  %#47 = load i32, ptr %#46, align 4
+  %#48 = mul i32 %#47, 2246822519
+  %#49 = add i32 %#48, %#27
+  %#50 = fshl i32 %#49, i32 %#49, i32 13
+  %#51 = mul i32 %#50, 2654435761
+  %#52 = freeze i32 %#51
+  store i32 %#52, ptr %#30, align 4
+  %#53 = gep inbounds nuw ptr %#25, 1 x i64 32
+  %#54 = load i32, ptr %#53, align 8
+  %#55 = mul i32 %#54, 2246822519
+  %#56 = add i32 %#55, noundef %#1
+  %#57 = fshl i32 %#56, i32 %#56, i32 13
+  %#58 = mul i32 %#57, 2654435761
+  %#59 = freeze i32 %#58
+  store i32 %#59, ptr %#31, align 8
+  %#60 = gep inbounds nuw ptr %#25, 1 x i64 36
+  %#61 = load i32, ptr %#60, align 4
+  %#62 = mul i32 %#61, 2246822519
+  %#63 = add i32 %#62, %#28
+  %#64 = fshl i32 %#63, i32 %#63, i32 13
+  %#65 = mul i32 %#64, 2654435761
+  %#66 = freeze i32 %#65
+  store i32 %#66, ptr %#32, align 4
+  %#67 = load i32, ptr %#38, align 8
+  %#68 = sub i32 16, %#67
+  store i32 0, ptr %#38, align 8
+  %#69 = icmp ult i32 %#68, 10
+  br i1 %#69, label %#4, label %#5
+
+#4:
+  %#70 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#71 = zext nneg i32 %#68 to i64
+  %#72 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#71
+  %#73 = gep inbounds nuw ptr %#72, 1 x i64 10
+  %#74 = ptrtoint ptr %#70 to i64
+  %#75 = ptrtoint ptr %#73 to i64
+  %#76 = sub i64 %#74, %#75
+  memcpy ptr %#33 align 8, ptr %#73 align 1, i64 %#76
+  %#77 = trunc i64 %#76 to i32
+  store i32 %#77, ptr %#38, align 8
+  %#78 = and i32 %#77, 15
+  br label %#5
+
+#5:
+  %#79 = phi i32 [ %#78, %#4 ], [ 0, %#3 ]
+  %#80 = fshl i32 %#45, i32 %#45, i32 1
+  %#81 = fshl i32 %#52, i32 %#52, i32 7
+  %#82 = add i32 %#81, %#80
+  %#83 = fshl i32 %#59, i32 %#59, i32 12
+  %#84 = add i32 %#82, %#83
+  %#85 = fshl i32 %#66, i32 %#66, i32 18
+  %#86 = add i32 %#84, %#85
+  br label %#7
+
+#6:
+  %#87 = gep inbounds nuw ptr noundef %#0, 1 x i64 10
+  store i32 10, ptr %#25, align 8
+  %#88 = gep inbounds nuw ptr %#25, 1 x i64 4
+  store i32 0, ptr %#88, align 4
+  %#89 = gep inbounds nuw ptr %#25, 1 x i64 40
+  memcpy ptr %#33 align 8, ptr %#87 align 1, i64 10
+  %#90 = load i32, ptr %#89, align 8
+  %#91 = add i32 %#90, 10
+  store i32 %#91, ptr %#89, align 8
+  %#92 = and i32 %#91, 15
+  %#93 = add i32 noundef %#1, 374761393
+  br label %#7
+
+#7:
+  %#94 = phi i32 [ %#79, %#5 ], [ %#92, %#6 ]
+  %#95 = phi i32 [ 20, %#5 ], [ 10, %#6 ]
+  %#96 = phi i32 [ %#86, %#5 ], [ %#93, %#6 ]
+  %#97 = add i32 %#95, %#96
+  switch i32 %#94, label %#20 [
+    i32 12, label %#17
+    i32 8, label %#18
+    i32 4, label %#19
+    i32 13, label %#14
+    i32 9, label %#15
+    i32 5, label %#16
+    i32 14, label %#11
+    i32 10, label %#12
+    i32 6, label %#13
+    i32 15, label %#8
+    i32 11, label %#9
+    i32 7, label %#10
+    i32 3, label %#21
+    i32 2, label %#22
+    i32 1, label %#23
+    i32 0, label %#24
+  ]
+
+#8:
+  %#98 = load i32, ptr %#33, align 8
+  %#99 = mul i32 %#98, 3266489917
+  %#100 = add i32 %#99, %#97
+  %#101 = gep inbounds nuw ptr %#25, 1 x i64 28
+  %#102 = fshl i32 %#100, i32 %#100, i32 17
+  %#103 = mul i32 %#102, 668265263
+  br label %#9
+
+#9:
+  %#104 = phi ptr [ %#33, %#7 ], [ %#101, %#8 ]
+  %#105 = phi i32 [ %#97, %#7 ], [ %#103, %#8 ]
+  %#106 = load i32, ptr %#104, align 4
+  %#107 = mul i32 %#106, 3266489917
+  %#108 = add i32 %#107, %#105
+  %#109 = gep inbounds nuw ptr %#104, 1 x i64 4
+  %#110 = fshl i32 %#108, i32 %#108, i32 17
+  %#111 = mul i32 %#110, 668265263
+  br label %#10
+
+#10:
+  %#112 = phi ptr [ %#33, %#7 ], [ %#109, %#9 ]
+  %#113 = phi i32 [ %#97, %#7 ], [ %#111, %#9 ]
+  %#114 = load i32, ptr %#112, align 4
+  %#115 = mul i32 %#114, 3266489917
+  %#116 = add i32 %#115, %#113
+  %#117 = gep inbounds nuw ptr %#112, 1 x i64 4
+  %#118 = fshl i32 %#116, i32 %#116, i32 17
+  %#119 = mul i32 %#118, 668265263
+  br label %#21
+
+#11:
+  %#120 = load i32, ptr %#33, align 8
+  %#121 = mul i32 %#120, 3266489917
+  %#122 = add i32 %#121, %#97
+  %#123 = gep inbounds nuw ptr %#25, 1 x i64 28
+  %#124 = fshl i32 %#122, i32 %#122, i32 17
+  %#125 = mul i32 %#124, 668265263
+  br label %#12
+
+#12:
+  %#126 = phi ptr [ %#33, %#7 ], [ %#123, %#11 ]
+  %#127 = phi i32 [ %#97, %#7 ], [ %#125, %#11 ]
+  %#128 = load i32, ptr %#126, align 4
+  %#129 = mul i32 %#128, 3266489917
+  %#130 = add i32 %#129, %#127
+  %#131 = gep inbounds nuw ptr %#126, 1 x i64 4
+  %#132 = fshl i32 %#130, i32 %#130, i32 17
+  %#133 = mul i32 %#132, 668265263
+  br label %#13
+
+#13:
+  %#134 = phi ptr [ %#33, %#7 ], [ %#131, %#12 ]
+  %#135 = phi i32 [ %#97, %#7 ], [ %#133, %#12 ]
+  %#136 = load i32, ptr %#134, align 4
+  %#137 = mul i32 %#136, 3266489917
+  %#138 = add i32 %#137, %#135
+  %#139 = gep inbounds nuw ptr %#134, 1 x i64 4
+  %#140 = fshl i32 %#138, i32 %#138, i32 17
+  %#141 = mul i32 %#140, 668265263
+  %#142 = gep inbounds nuw ptr %#134, 1 x i64 5
+  %#143 = load i8, ptr %#139, align 4
+  %#144 = zext i8 %#143 to i32
+  %#145 = mul i32 %#144, 374761393
+  %#146 = add i32 %#141, %#145
+  %#147 = fshl i32 %#146, i32 %#146, i32 11
+  %#148 = mul i32 %#147, 2654435761
+  %#149 = load i8, ptr %#142, align 1
+  %#150 = zext i8 %#149 to i32
+  %#151 = mul i32 %#150, 374761393
+  %#152 = add i32 %#148, %#151
+  %#153 = fshl i32 %#152, i32 %#152, i32 11
+  %#154 = mul i32 %#153, 2654435761
+  br label %#24
+
+#14:
+  %#155 = load i32, ptr %#33, align 8
+  %#156 = mul i32 %#155, 3266489917
+  %#157 = add i32 %#156, %#97
+  %#158 = gep inbounds nuw ptr %#25, 1 x i64 28
+  %#159 = fshl i32 %#157, i32 %#157, i32 17
+  %#160 = mul i32 %#159, 668265263
+  br label %#15
+
+#15:
+  %#161 = phi ptr [ %#33, %#7 ], [ %#158, %#14 ]
+  %#162 = phi i32 [ %#97, %#7 ], [ %#160, %#14 ]
+  %#163 = load i32, ptr %#161, align 4
+  %#164 = mul i32 %#163, 3266489917
+  %#165 = add i32 %#164, %#162
+  %#166 = gep inbounds nuw ptr %#161, 1 x i64 4
+  %#167 = fshl i32 %#165, i32 %#165, i32 17
+  %#168 = mul i32 %#167, 668265263
+  br label %#16
+
+#16:
+  %#169 = phi ptr [ %#33, %#7 ], [ %#166, %#15 ]
+  %#170 = phi i32 [ %#97, %#7 ], [ %#168, %#15 ]
+  %#171 = load i32, ptr %#169, align 4
+  %#172 = mul i32 %#171, 3266489917
+  %#173 = add i32 %#172, %#170
+  %#174 = gep inbounds nuw ptr %#169, 1 x i64 4
+  %#175 = fshl i32 %#173, i32 %#173, i32 17
+  %#176 = mul i32 %#175, 668265263
+  %#177 = load i8, ptr %#174, align 4
+  %#178 = zext i8 %#177 to i32
+  %#179 = mul i32 %#178, 374761393
+  %#180 = add i32 %#176, %#179
+  %#181 = fshl i32 %#180, i32 %#180, i32 11
+  %#182 = mul i32 %#181, 2654435761
+  br label %#24
+
+#17:
+  %#183 = load i32, ptr %#33, align 8
+  %#184 = mul i32 %#183, 3266489917
+  %#185 = add i32 %#184, %#97
+  %#186 = gep inbounds nuw ptr %#25, 1 x i64 28
+  %#187 = fshl i32 %#185, i32 %#185, i32 17
+  %#188 = mul i32 %#187, 668265263
+  br label %#18
+
+#18:
+  %#189 = phi ptr [ %#33, %#7 ], [ %#186, %#17 ]
+  %#190 = phi i32 [ %#97, %#7 ], [ %#188, %#17 ]
+  %#191 = load i32, ptr %#189, align 4
+  %#192 = mul i32 %#191, 3266489917
+  %#193 = add i32 %#192, %#190
+  %#194 = gep inbounds nuw ptr %#189, 1 x i64 4
+  %#195 = fshl i32 %#193, i32 %#193, i32 17
+  %#196 = mul i32 %#195, 668265263
+  br label %#19
+
+#19:
+  %#197 = phi ptr [ %#33, %#7 ], [ %#194, %#18 ]
+  %#198 = phi i32 [ %#97, %#7 ], [ %#196, %#18 ]
+  %#199 = load i32, ptr %#197, align 4
+  %#200 = mul i32 %#199, 3266489917
+  %#201 = add i32 %#200, %#198
+  %#202 = fshl i32 %#201, i32 %#201, i32 17
+  %#203 = mul i32 %#202, 668265263
+  br label %#24
+
+#20:
+  assume i1 0
+
+#21:
+  %#204 = phi ptr [ %#33, %#7 ], [ %#117, %#10 ]
+  %#205 = phi i32 [ %#97, %#7 ], [ %#119, %#10 ]
+  %#206 = gep inbounds nuw ptr %#204, 1 x i64 1
+  %#207 = load i8, ptr %#204, align 4
+  %#208 = zext i8 %#207 to i32
+  %#209 = mul i32 %#208, 374761393
+  %#210 = add i32 %#209, %#205
+  %#211 = fshl i32 %#210, i32 %#210, i32 11
+  %#212 = mul i32 %#211, 2654435761
+  br label %#22
+
+#22:
+  %#213 = phi ptr [ %#33, %#7 ], [ %#206, %#21 ]
+  %#214 = phi i32 [ %#97, %#7 ], [ %#212, %#21 ]
+  %#215 = gep inbounds nuw ptr %#213, 1 x i64 1
+  %#216 = load i8, ptr %#213, align 1
+  %#217 = zext i8 %#216 to i32
+  %#218 = mul i32 %#217, 374761393
+  %#219 = add i32 %#218, %#214
+  %#220 = fshl i32 %#219, i32 %#219, i32 11
+  %#221 = mul i32 %#220, 2654435761
+  br label %#23
+
+#23:
+  %#222 = phi ptr [ %#33, %#7 ], [ %#215, %#22 ]
+  %#223 = phi i32 [ %#97, %#7 ], [ %#221, %#22 ]
+  %#224 = load i8, ptr %#222, align 1
+  %#225 = zext i8 %#224 to i32
+  %#226 = mul i32 %#225, 374761393
+  %#227 = add i32 %#226, %#223
+  %#228 = fshl i32 %#227, i32 %#227, i32 11
+  %#229 = mul i32 %#228, 2654435761
+  br label %#24
+
+#24:
+  %#230 = phi i32 [ %#154, %#13 ], [ %#182, %#16 ], [ %#203, %#19 ], [ %#97, %#7 ], [ %#229, %#23 ]
+  %#231 = lshr i32 %#230, 15
+  %#232 = xor i32 %#231, %#230
+  %#233 = mul i32 %#232, 2246822519
+  %#234 = lshr i32 %#233, 13
+  %#235 = xor i32 %#234, %#233
+  %#236 = mul i32 %#235, 3266489917
+  %#237 = lshr i32 %#236, 16
+  %#238 = xor i32 %#237, %#236
+  end_lifetime ptr %#25
+  ret i32 %#238
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i32 @target_s32_3_20(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#19 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#19
+  %#20 = add i32 noundef %#1, 606290984
+  %#21 = add i32 noundef %#1, 2246822519
+  %#22 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#19, align 8
+  %#23 = gep inbounds nuw ptr %#19, 1 x i64 8
+  %#24 = gep inbounds nuw ptr %#19, 1 x i64 12
+  %#25 = gep inbounds nuw ptr %#19, 1 x i64 16
+  %#26 = gep inbounds nuw ptr %#19, 1 x i64 20
+  %#27 = gep inbounds nuw ptr %#19, 1 x i64 24
+  memset ptr %#27 align 8, i8 0, i64 20
+  %#28 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#28, label %#4, label %#3
+
+#3:
+  %#29 = gep inbounds nuw ptr %#19, 1 x i64 40
+  memcpy ptr %#27 align 8, ptr nowrite noundef %#0 align 1, i64 3
+  store i32 3, ptr %#29, align 8
+  store i32 23, ptr %#19, align 8
+  %#30 = gep inbounds nuw ptr %#19, 1 x i64 4
+  store i32 1, ptr %#30, align 4
+  %#31 = gep inbounds nuw ptr %#19, 1 x i64 40
+  %#32 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 3
+  %#33 = gep inbounds nuw ptr %#19, 1 x i64 27
+  memcpy ptr %#33 align 1, ptr %#32 align 1, i64 13
+  %#34 = load i32, ptr %#27, align 8
+  %#35 = mul i32 %#34, 2246822519
+  %#36 = add i32 %#35, %#20
+  %#37 = fshl i32 %#36, i32 %#36, i32 13
+  %#38 = mul i32 %#37, 2654435761
+  %#39 = freeze i32 %#38
+  store i32 %#39, ptr %#23, align 8
+  %#40 = gep inbounds nuw ptr %#19, 1 x i64 28
+  %#41 = load i32, ptr %#40, align 4
+  %#42 = mul i32 %#41, 2246822519
+  %#43 = add i32 %#42, %#21
+  %#44 = fshl i32 %#43, i32 %#43, i32 13
+  %#45 = mul i32 %#44, 2654435761
+  %#46 = freeze i32 %#45
+  store i32 %#46, ptr %#24, align 4
+  %#47 = gep inbounds nuw ptr %#19, 1 x i64 32
+  %#48 = load i32, ptr %#47, align 8
+  %#49 = mul i32 %#48, 2246822519
+  %#50 = add i32 %#49, noundef %#1
+  %#51 = fshl i32 %#50, i32 %#50, i32 13
+  %#52 = mul i32 %#51, 2654435761
+  %#53 = freeze i32 %#52
+  store i32 %#53, ptr %#25, align 8
+  %#54 = gep inbounds nuw ptr %#19, 1 x i64 36
+  %#55 = load i32, ptr %#54, align 4
+  %#56 = mul i32 %#55, 2246822519
+  %#57 = add i32 %#56, %#22
+  %#58 = fshl i32 %#57, i32 %#57, i32 13
+  %#59 = mul i32 %#58, 2654435761
+  %#60 = freeze i32 %#59
+  store i32 %#60, ptr %#26, align 4
+  %#61 = load i32, ptr %#31, align 8
+  %#62 = sub i32 16, %#61
+  %#63 = zext i32 %#62 to i64
+  %#64 = add nsw nuw i64 %#63, 3
+  store i32 0, ptr %#31, align 8
+  %#65 = icmp ugt i32 %#62, 4
+  br i1 %#65, label %#6, label %#5
+
+#4:
+  store i32 20, ptr %#19, align 8
+  %#66 = gep inbounds nuw ptr %#19, 1 x i64 4
+  store i32 1, ptr %#66, align 4
+  %#67 = gep inbounds nuw ptr %#19, 1 x i64 40
+  br label %#5
+
+#5:
+  %#68 = phi ptr [ %#31, %#3 ], [ %#67, %#4 ]
+  %#69 = phi i32 [ 23, %#3 ], [ 20, %#4 ]
+  %#70 = phi i32 [ %#60, %#3 ], [ %#22, %#4 ]
+  %#71 = phi i32 [ %#53, %#3 ], [ noundef %#1, %#4 ]
+  %#72 = phi i32 [ %#46, %#3 ], [ %#21, %#4 ]
+  %#73 = phi i32 [ %#39, %#3 ], [ %#20, %#4 ]
+  %#74 = phi i64 [ %#64, %#3 ], [ 3, %#4 ]
+  %#75 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#74
+  %#76 = load i32, ptr %#75, align 1
+  %#77 = mul i32 %#76, 2246822519
+  %#78 = add i32 %#77, %#73
+  %#79 = fshl i32 %#78, i32 %#78, i32 13
+  %#80 = mul i32 %#79, 2654435761
+  %#81 = freeze i32 %#80
+  %#82 = gep inbounds nuw ptr %#75, 1 x i64 4
+  %#83 = load i32, ptr %#82, align 1
+  %#84 = mul i32 %#83, 2246822519
+  %#85 = add i32 %#84, %#72
+  %#86 = fshl i32 %#85, i32 %#85, i32 13
+  %#87 = mul i32 %#86, 2654435761
+  %#88 = freeze i32 %#87
+  %#89 = gep inbounds nuw ptr %#75, 1 x i64 8
+  %#90 = load i32, ptr %#89, align 1
+  %#91 = mul i32 %#90, 2246822519
+  %#92 = add i32 %#91, %#71
+  %#93 = fshl i32 %#92, i32 %#92, i32 13
+  %#94 = mul i32 %#93, 2654435761
+  %#95 = freeze i32 %#94
+  %#96 = gep inbounds nuw ptr %#75, 1 x i64 12
+  %#97 = load i32, ptr %#96, align 1
+  %#98 = mul i32 %#97, 2246822519
+  %#99 = add i32 %#98, %#70
+  %#100 = fshl i32 %#99, i32 %#99, i32 13
+  %#101 = mul i32 %#100, 2654435761
+  %#102 = freeze i32 %#101
+  %#103 = add nsw nuw i64 %#74, 16
+  store i32 %#81, ptr %#23, align 8
+  store i32 %#88, ptr %#24, align 4
+  store i32 %#95, ptr %#25, align 8
+  store i32 %#102, ptr %#26, align 4
+  br label %#6
+
+#6:
+  %#104 = phi ptr [ %#31, %#3 ], [ %#68, %#5 ]
+  %#105 = phi i32 [ 23, %#3 ], [ %#69, %#5 ]
+  %#106 = phi i32 [ %#60, %#3 ], [ %#102, %#5 ]
+  %#107 = phi i32 [ %#53, %#3 ], [ %#95, %#5 ]
+  %#108 = phi i32 [ %#46, %#3 ], [ %#88, %#5 ]
+  %#109 = phi i32 [ %#39, %#3 ], [ %#81, %#5 ]
+  %#110 = phi i64 [ %#64, %#3 ], [ %#103, %#5 ]
+  %#111 = icmp samesign ult i64 %#110, 23
+  br i1 %#111, label %#7, label %#8
+
+#7:
+  %#112 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#110
+  %#113 = sub nsw nuw i64 23, %#110
+  memcpy ptr %#27 align 8, ptr %#112 align 1, i64 %#113
+  %#114 = trunc nsw nuw i64 %#113 to i32
+  store i32 %#114, ptr %#104, align 8
+  %#115 = and i32 %#114, 15
+  br label %#8
+
+#8:
+  %#116 = phi i32 [ 0, %#6 ], [ %#115, %#7 ]
+  %#117 = fshl i32 %#108, i32 %#108, i32 7
+  %#118 = fshl i32 %#109, i32 %#109, i32 1
+  %#119 = add i32 %#117, %#118
+  %#120 = fshl i32 %#107, i32 %#107, i32 12
+  %#121 = add i32 %#119, %#120
+  %#122 = fshl i32 %#106, i32 %#106, i32 18
+  %#123 = add i32 %#121, %#122
+  %#124 = add i32 %#105, %#123
+  %#125 = zext nneg i32 %#116 to i64
+  %#126 = icmp samesign ugt i32 %#116, 3
+  br i1 %#126, label %#9, label %#13
+
+#9:
+  %#127 = add nsw i64 %#125, -4
+  %#128 = lshr i64 %#127, 2
+  %#129 = add nsw nuw i64 %#128, 1
+  %#130 = and i64 %#129, 7
+  %#131 = and i64 %#127, 28
+  %#132 = icmp eq i64 %#131, 28
+  br i1 %#132, label %#11, label %#10
+
+#10:
+  %#133 = phi i32 [ %#142, %#10 ], [ %#124, %#9 ]
+  %#134 = phi i64 [ %#143, %#10 ], [ %#125, %#9 ]
+  %#135 = phi ptr [ %#140, %#10 ], [ %#27, %#9 ]
+  %#136 = phi i64 [ %#144, %#10 ], [ 0, %#9 ]
+  %#137 = load i32, ptr %#135, align 4
+  %#138 = mul i32 %#137, 3266489917
+  %#139 = add i32 %#138, %#133
+  %#140 = gep inbounds nuw ptr %#135, 1 x i64 4
+  %#141 = fshl i32 %#139, i32 %#139, i32 17
+  %#142 = mul i32 %#141, 668265263
+  %#143 = add nsw i64 %#134, -4
+  %#144 = add i64 %#136, 1
+  %#145 = icmp eq i64 %#144, %#130
+  br i1 %#145, label %#11, label %#10
+
+#11:
+  %#146 = phi i32 [ %#124, %#9 ], [ %#142, %#10 ]
+  %#147 = phi i64 [ %#125, %#9 ], [ %#143, %#10 ]
+  %#148 = phi ptr [ %#27, %#9 ], [ %#140, %#10 ]
+  %#149 = phi ptr [ poison, %#9 ], [ %#140, %#10 ]
+  %#150 = phi i32 [ poison, %#9 ], [ %#142, %#10 ]
+  %#151 = phi i64 [ poison, %#9 ], [ %#143, %#10 ]
+  %#152 = icmp ult i64 %#127, 28
+  br i1 %#152, label %#13, label %#12
+
+#12:
+  %#153 = phi i32 [ %#203, %#12 ], [ %#146, %#11 ]
+  %#154 = phi i64 [ %#204, %#12 ], [ %#147, %#11 ]
+  %#155 = phi ptr [ %#201, %#12 ], [ %#148, %#11 ]
+  %#156 = load i32, ptr %#155, align 4
+  %#157 = mul i32 %#156, 3266489917
+  %#158 = add i32 %#157, %#153
+  %#159 = gep inbounds nuw ptr %#155, 1 x i64 4
+  %#160 = fshl i32 %#158, i32 %#158, i32 17
+  %#161 = mul i32 %#160, 668265263
+  %#162 = load i32, ptr %#159, align 4
+  %#163 = mul i32 %#162, 3266489917
+  %#164 = add i32 %#163, %#161
+  %#165 = gep inbounds nuw ptr %#155, 1 x i64 8
+  %#166 = fshl i32 %#164, i32 %#164, i32 17
+  %#167 = mul i32 %#166, 668265263
+  %#168 = load i32, ptr %#165, align 4
+  %#169 = mul i32 %#168, 3266489917
+  %#170 = add i32 %#169, %#167
+  %#171 = gep inbounds nuw ptr %#155, 1 x i64 12
+  %#172 = fshl i32 %#170, i32 %#170, i32 17
+  %#173 = mul i32 %#172, 668265263
+  %#174 = load i32, ptr %#171, align 4
+  %#175 = mul i32 %#174, 3266489917
+  %#176 = add i32 %#175, %#173
+  %#177 = gep inbounds nuw ptr %#155, 1 x i64 16
+  %#178 = fshl i32 %#176, i32 %#176, i32 17
+  %#179 = mul i32 %#178, 668265263
+  %#180 = load i32, ptr %#177, align 4
+  %#181 = mul i32 %#180, 3266489917
+  %#182 = add i32 %#181, %#179
+  %#183 = gep inbounds nuw ptr %#155, 1 x i64 20
+  %#184 = fshl i32 %#182, i32 %#182, i32 17
+  %#185 = mul i32 %#184, 668265263
+  %#186 = load i32, ptr %#183, align 4
+  %#187 = mul i32 %#186, 3266489917
+  %#188 = add i32 %#187, %#185
+  %#189 = gep inbounds nuw ptr %#155, 1 x i64 24
+  %#190 = fshl i32 %#188, i32 %#188, i32 17
+  %#191 = mul i32 %#190, 668265263
+  %#192 = load i32, ptr %#189, align 4
+  %#193 = mul i32 %#192, 3266489917
+  %#194 = add i32 %#193, %#191
+  %#195 = gep inbounds nuw ptr %#155, 1 x i64 28
+  %#196 = fshl i32 %#194, i32 %#194, i32 17
+  %#197 = mul i32 %#196, 668265263
+  %#198 = load i32, ptr %#195, align 4
+  %#199 = mul i32 %#198, 3266489917
+  %#200 = add i32 %#199, %#197
+  %#201 = gep inbounds nuw ptr %#155, 1 x i64 32
+  %#202 = fshl i32 %#200, i32 %#200, i32 17
+  %#203 = mul i32 %#202, 668265263
+  %#204 = add nsw i64 %#154, -32
+  %#205 = icmp ugt i64 %#204, 3
+  br i1 %#205, label %#12, label %#13
+
+#13:
+  %#206 = phi ptr [ %#27, %#8 ], [ %#149, %#11 ], [ %#201, %#12 ]
+  %#207 = phi i64 [ %#125, %#8 ], [ %#151, %#11 ], [ %#204, %#12 ]
+  %#208 = phi i32 [ %#124, %#8 ], [ %#150, %#11 ], [ %#203, %#12 ]
+  %#209 = icmp eq i64 %#207, 0
+  br i1 %#209, label %#18, label %#14
+
+#14:
+  %#210 = and i64 %#207, 7
+  %#211 = icmp eq i64 %#210, 0
+  br i1 %#211, label %#16, label %#15
+
+#15:
+  %#212 = phi i32 [ %#222, %#15 ], [ %#208, %#14 ]
+  %#213 = phi i64 [ %#223, %#15 ], [ %#207, %#14 ]
+  %#214 = phi ptr [ %#216, %#15 ], [ %#206, %#14 ]
+  %#215 = phi i64 [ %#224, %#15 ], [ 0, %#14 ]
+  %#216 = gep inbounds nuw ptr %#214, 1 x i64 1
+  %#217 = load i8, ptr %#214, align 1
+  %#218 = zext i8 %#217 to i32
+  %#219 = mul i32 %#218, 374761393
+  %#220 = add i32 %#219, %#212
+  %#221 = fshl i32 %#220, i32 %#220, i32 11
+  %#222 = mul i32 %#221, 2654435761
+  %#223 = add nsw i64 %#213, -1
+  %#224 = add i64 %#215, 1
+  %#225 = icmp eq i64 %#224, %#210
+  br i1 %#225, label %#16, label %#15
+
+#16:
+  %#226 = phi i32 [ poison, %#14 ], [ %#222, %#15 ]
+  %#227 = phi i32 [ %#208, %#14 ], [ %#222, %#15 ]
+  %#228 = phi i64 [ %#207, %#14 ], [ %#223, %#15 ]
+  %#229 = phi ptr [ %#206, %#14 ], [ %#216, %#15 ]
+  %#230 = icmp ult i64 %#207, 8
+  br i1 %#230, label %#18, label %#17
+
+#17:
+  %#231 = phi i32 [ %#289, %#17 ], [ %#227, %#16 ]
+  %#232 = phi i64 [ %#290, %#17 ], [ %#228, %#16 ]
+  %#233 = phi ptr [ %#283, %#17 ], [ %#229, %#16 ]
+  %#234 = gep inbounds nuw ptr %#233, 1 x i64 1
+  %#235 = load i8, ptr %#233, align 1
+  %#236 = zext i8 %#235 to i32
+  %#237 = mul i32 %#236, 374761393
+  %#238 = add i32 %#237, %#231
+  %#239 = fshl i32 %#238, i32 %#238, i32 11
+  %#240 = mul i32 %#239, 2654435761
+  %#241 = gep inbounds nuw ptr %#233, 1 x i64 2
+  %#242 = load i8, ptr %#234, align 1
+  %#243 = zext i8 %#242 to i32
+  %#244 = mul i32 %#243, 374761393
+  %#245 = add i32 %#244, %#240
+  %#246 = fshl i32 %#245, i32 %#245, i32 11
+  %#247 = mul i32 %#246, 2654435761
+  %#248 = gep inbounds nuw ptr %#233, 1 x i64 3
+  %#249 = load i8, ptr %#241, align 1
+  %#250 = zext i8 %#249 to i32
+  %#251 = mul i32 %#250, 374761393
+  %#252 = add i32 %#251, %#247
+  %#253 = fshl i32 %#252, i32 %#252, i32 11
+  %#254 = mul i32 %#253, 2654435761
+  %#255 = gep inbounds nuw ptr %#233, 1 x i64 4
+  %#256 = load i8, ptr %#248, align 1
+  %#257 = zext i8 %#256 to i32
+  %#258 = mul i32 %#257, 374761393
+  %#259 = add i32 %#258, %#254
+  %#260 = fshl i32 %#259, i32 %#259, i32 11
+  %#261 = mul i32 %#260, 2654435761
+  %#262 = gep inbounds nuw ptr %#233, 1 x i64 5
+  %#263 = load i8, ptr %#255, align 1
+  %#264 = zext i8 %#263 to i32
+  %#265 = mul i32 %#264, 374761393
+  %#266 = add i32 %#265, %#261
+  %#267 = fshl i32 %#266, i32 %#266, i32 11
+  %#268 = mul i32 %#267, 2654435761
+  %#269 = gep inbounds nuw ptr %#233, 1 x i64 6
+  %#270 = load i8, ptr %#262, align 1
+  %#271 = zext i8 %#270 to i32
+  %#272 = mul i32 %#271, 374761393
+  %#273 = add i32 %#272, %#268
+  %#274 = fshl i32 %#273, i32 %#273, i32 11
+  %#275 = mul i32 %#274, 2654435761
+  %#276 = gep inbounds nuw ptr %#233, 1 x i64 7
+  %#277 = load i8, ptr %#269, align 1
+  %#278 = zext i8 %#277 to i32
+  %#279 = mul i32 %#278, 374761393
+  %#280 = add i32 %#279, %#275
+  %#281 = fshl i32 %#280, i32 %#280, i32 11
+  %#282 = mul i32 %#281, 2654435761
+  %#283 = gep inbounds nuw ptr %#233, 1 x i64 8
+  %#284 = load i8, ptr %#276, align 1
+  %#285 = zext i8 %#284 to i32
+  %#286 = mul i32 %#285, 374761393
+  %#287 = add i32 %#286, %#282
+  %#288 = fshl i32 %#287, i32 %#287, i32 11
+  %#289 = mul i32 %#288, 2654435761
+  %#290 = add nsw i64 %#232, -8
+  %#291 = icmp eq i64 %#290, 0
+  br i1 %#291, label %#18, label %#17
+
+#18:
+  %#292 = phi i32 [ %#208, %#13 ], [ %#226, %#16 ], [ %#289, %#17 ]
+  %#293 = lshr i32 %#292, 15
+  %#294 = xor i32 %#293, %#292
+  %#295 = mul i32 %#294, 2246822519
+  %#296 = lshr i32 %#295, 13
+  %#297 = xor i32 %#296, %#295
+  %#298 = mul i32 %#297, 3266489917
+  %#299 = lshr i32 %#298, 16
+  %#300 = xor i32 %#299, %#298
+  end_lifetime ptr %#19
+  ret i32 %#300
+}
+=>
+define i32 @target_s32_3_20(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#26 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#26
+  %#27 = add i32 noundef %#1, 606290984
+  %#28 = add i32 noundef %#1, 2246822519
+  %#29 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#26, align 8
+  %#30 = gep inbounds nuw ptr %#26, 1 x i64 8
+  %#31 = gep inbounds nuw ptr %#26, 1 x i64 12
+  %#32 = gep inbounds nuw ptr %#26, 1 x i64 16
+  %#33 = gep inbounds nuw ptr %#26, 1 x i64 20
+  %#34 = gep inbounds nuw ptr %#26, 1 x i64 24
+  memset ptr %#34 align 8, i8 0, i64 20
+  %#35 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#35, label %#4, label %#3
+
+#3:
+  %#36 = gep inbounds nuw ptr %#26, 1 x i64 40
+  memcpy ptr %#34 align 8, ptr nowrite noundef %#0 align 1, i64 3
+  store i32 3, ptr %#36, align 8
+  store i32 23, ptr %#26, align 8
+  %#37 = gep inbounds nuw ptr %#26, 1 x i64 4
+  store i32 1, ptr %#37, align 4
+  %#38 = gep inbounds nuw ptr %#26, 1 x i64 40
+  %#39 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 3
+  %#40 = gep inbounds nuw ptr %#26, 1 x i64 27
+  memcpy ptr %#40 align 1, ptr %#39 align 1, i64 13
+  %#41 = load i32, ptr %#34, align 8
+  %#42 = mul i32 %#41, 2246822519
+  %#43 = add i32 %#42, %#27
+  %#44 = fshl i32 %#43, i32 %#43, i32 13
+  %#45 = mul i32 %#44, 2654435761
+  %#46 = freeze i32 %#45
+  store i32 %#46, ptr %#30, align 8
+  %#47 = gep inbounds nuw ptr %#26, 1 x i64 28
+  %#48 = load i32, ptr %#47, align 4
+  %#49 = mul i32 %#48, 2246822519
+  %#50 = add i32 %#49, %#28
+  %#51 = fshl i32 %#50, i32 %#50, i32 13
+  %#52 = mul i32 %#51, 2654435761
+  %#53 = freeze i32 %#52
+  store i32 %#53, ptr %#31, align 4
+  %#54 = gep inbounds nuw ptr %#26, 1 x i64 32
+  %#55 = load i32, ptr %#54, align 8
+  %#56 = mul i32 %#55, 2246822519
+  %#57 = add i32 %#56, noundef %#1
+  %#58 = fshl i32 %#57, i32 %#57, i32 13
+  %#59 = mul i32 %#58, 2654435761
+  %#60 = freeze i32 %#59
+  store i32 %#60, ptr %#32, align 8
+  %#61 = gep inbounds nuw ptr %#26, 1 x i64 36
+  %#62 = load i32, ptr %#61, align 4
+  %#63 = mul i32 %#62, 2246822519
+  %#64 = add i32 %#63, %#29
+  %#65 = fshl i32 %#64, i32 %#64, i32 13
+  %#66 = mul i32 %#65, 2654435761
+  %#67 = freeze i32 %#66
+  store i32 %#67, ptr %#33, align 4
+  %#68 = load i32, ptr %#38, align 8
+  %#69 = sub i32 16, %#68
+  %#70 = zext i32 %#69 to i64
+  %#71 = add nsw nuw i64 %#70, 3
+  store i32 0, ptr %#38, align 8
+  %#72 = icmp ugt i32 %#69, 4
+  br i1 %#72, label %#6, label %#5
+
+#4:
+  store i32 20, ptr %#26, align 8
+  %#73 = gep inbounds nuw ptr %#26, 1 x i64 4
+  store i32 1, ptr %#73, align 4
+  %#74 = gep inbounds nuw ptr %#26, 1 x i64 40
+  br label %#5
+
+#5:
+  %#75 = phi ptr [ %#38, %#3 ], [ %#74, %#4 ]
+  %#76 = phi i32 [ 23, %#3 ], [ 20, %#4 ]
+  %#77 = phi i32 [ %#67, %#3 ], [ %#29, %#4 ]
+  %#78 = phi i32 [ %#60, %#3 ], [ noundef %#1, %#4 ]
+  %#79 = phi i32 [ %#53, %#3 ], [ %#28, %#4 ]
+  %#80 = phi i32 [ %#46, %#3 ], [ %#27, %#4 ]
+  %#81 = phi i64 [ %#71, %#3 ], [ 3, %#4 ]
+  %#82 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#81
+  %#83 = load i32, ptr %#82, align 1
+  %#84 = mul i32 %#83, 2246822519
+  %#85 = add i32 %#84, %#80
+  %#86 = fshl i32 %#85, i32 %#85, i32 13
+  %#87 = mul i32 %#86, 2654435761
+  %#88 = freeze i32 %#87
+  %#89 = gep inbounds nuw ptr %#82, 1 x i64 4
+  %#90 = load i32, ptr %#89, align 1
+  %#91 = mul i32 %#90, 2246822519
+  %#92 = add i32 %#91, %#79
+  %#93 = fshl i32 %#92, i32 %#92, i32 13
+  %#94 = mul i32 %#93, 2654435761
+  %#95 = freeze i32 %#94
+  %#96 = gep inbounds nuw ptr %#82, 1 x i64 8
+  %#97 = load i32, ptr %#96, align 1
+  %#98 = mul i32 %#97, 2246822519
+  %#99 = add i32 %#98, %#78
+  %#100 = fshl i32 %#99, i32 %#99, i32 13
+  %#101 = mul i32 %#100, 2654435761
+  %#102 = freeze i32 %#101
+  %#103 = gep inbounds nuw ptr %#82, 1 x i64 12
+  %#104 = load i32, ptr %#103, align 1
+  %#105 = mul i32 %#104, 2246822519
+  %#106 = add i32 %#105, %#77
+  %#107 = fshl i32 %#106, i32 %#106, i32 13
+  %#108 = mul i32 %#107, 2654435761
+  %#109 = freeze i32 %#108
+  %#110 = add nsw nuw i64 %#81, 16
+  store i32 %#88, ptr %#30, align 8
+  store i32 %#95, ptr %#31, align 4
+  store i32 %#102, ptr %#32, align 8
+  store i32 %#109, ptr %#33, align 4
+  br label %#6
+
+#6:
+  %#111 = phi ptr [ %#38, %#3 ], [ %#75, %#5 ]
+  %#112 = phi i32 [ 23, %#3 ], [ %#76, %#5 ]
+  %#113 = phi i32 [ %#67, %#3 ], [ %#109, %#5 ]
+  %#114 = phi i32 [ %#60, %#3 ], [ %#102, %#5 ]
+  %#115 = phi i32 [ %#53, %#3 ], [ %#95, %#5 ]
+  %#116 = phi i32 [ %#46, %#3 ], [ %#88, %#5 ]
+  %#117 = phi i64 [ %#71, %#3 ], [ %#110, %#5 ]
+  %#118 = icmp samesign ult i64 %#117, 23
+  br i1 %#118, label %#7, label %#24
+
+#7:
+  %#119 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#117
+  %#120 = sub nsw nuw i64 23, %#117
+  memcpy ptr %#34 align 8, ptr %#119 align 1, i64 %#120
+  %#121 = trunc nsw nuw i64 %#120 to i32
+  store i32 %#121, ptr %#111, align 8
+  %#122 = and i32 %#121, 15
+  %#123 = fshl i32 %#115, i32 %#115, i32 7
+  %#124 = fshl i32 %#116, i32 %#116, i32 1
+  %#125 = add i32 %#123, %#124
+  %#126 = fshl i32 %#114, i32 %#114, i32 12
+  %#127 = add i32 %#125, %#126
+  %#128 = fshl i32 %#113, i32 %#113, i32 18
+  %#129 = add i32 %#127, %#128
+  %#130 = add i32 %#112, %#129
+  switch i32 %#122, label %#20 [
+    i32 12, label %#17
+    i32 8, label %#18
+    i32 4, label %#19
+    i32 13, label %#14
+    i32 9, label %#15
+    i32 5, label %#16
+    i32 14, label %#11
+    i32 10, label %#12
+    i32 6, label %#13
+    i32 15, label %#8
+    i32 11, label %#9
+    i32 7, label %#10
+    i32 3, label %#21
+    i32 2, label %#22
+    i32 1, label %#23
+    i32 0, label %#25
+  ]
+
+#8:
+  %#131 = load i32, ptr %#34, align 8
+  %#132 = mul i32 %#131, 3266489917
+  %#133 = add i32 %#132, %#130
+  %#134 = gep inbounds nuw ptr %#26, 1 x i64 28
+  %#135 = fshl i32 %#133, i32 %#133, i32 17
+  %#136 = mul i32 %#135, 668265263
+  br label %#9
+
+#9:
+  %#137 = phi ptr [ %#34, %#7 ], [ %#134, %#8 ]
+  %#138 = phi i32 [ %#130, %#7 ], [ %#136, %#8 ]
+  %#139 = load i32, ptr %#137, align 4
+  %#140 = mul i32 %#139, 3266489917
+  %#141 = add i32 %#140, %#138
+  %#142 = gep inbounds nuw ptr %#137, 1 x i64 4
+  %#143 = fshl i32 %#141, i32 %#141, i32 17
+  %#144 = mul i32 %#143, 668265263
+  br label %#10
+
+#10:
+  %#145 = phi ptr [ %#34, %#7 ], [ %#142, %#9 ]
+  %#146 = phi i32 [ %#130, %#7 ], [ %#144, %#9 ]
+  %#147 = load i32, ptr %#145, align 4
+  %#148 = mul i32 %#147, 3266489917
+  %#149 = add i32 %#148, %#146
+  %#150 = gep inbounds nuw ptr %#145, 1 x i64 4
+  %#151 = fshl i32 %#149, i32 %#149, i32 17
+  %#152 = mul i32 %#151, 668265263
+  br label %#21
+
+#11:
+  %#153 = load i32, ptr %#34, align 8
+  %#154 = mul i32 %#153, 3266489917
+  %#155 = add i32 %#154, %#130
+  %#156 = gep inbounds nuw ptr %#26, 1 x i64 28
+  %#157 = fshl i32 %#155, i32 %#155, i32 17
+  %#158 = mul i32 %#157, 668265263
+  br label %#12
+
+#12:
+  %#159 = phi ptr [ %#34, %#7 ], [ %#156, %#11 ]
+  %#160 = phi i32 [ %#130, %#7 ], [ %#158, %#11 ]
+  %#161 = load i32, ptr %#159, align 4
+  %#162 = mul i32 %#161, 3266489917
+  %#163 = add i32 %#162, %#160
+  %#164 = gep inbounds nuw ptr %#159, 1 x i64 4
+  %#165 = fshl i32 %#163, i32 %#163, i32 17
+  %#166 = mul i32 %#165, 668265263
+  br label %#13
+
+#13:
+  %#167 = phi ptr [ %#34, %#7 ], [ %#164, %#12 ]
+  %#168 = phi i32 [ %#130, %#7 ], [ %#166, %#12 ]
+  %#169 = load i32, ptr %#167, align 4
+  %#170 = mul i32 %#169, 3266489917
+  %#171 = add i32 %#170, %#168
+  %#172 = gep inbounds nuw ptr %#167, 1 x i64 4
+  %#173 = fshl i32 %#171, i32 %#171, i32 17
+  %#174 = mul i32 %#173, 668265263
+  %#175 = gep inbounds nuw ptr %#167, 1 x i64 5
+  %#176 = load i8, ptr %#172, align 4
+  %#177 = zext i8 %#176 to i32
+  %#178 = mul i32 %#177, 374761393
+  %#179 = add i32 %#174, %#178
+  %#180 = fshl i32 %#179, i32 %#179, i32 11
+  %#181 = mul i32 %#180, 2654435761
+  %#182 = load i8, ptr %#175, align 1
+  %#183 = zext i8 %#182 to i32
+  %#184 = mul i32 %#183, 374761393
+  %#185 = add i32 %#181, %#184
+  %#186 = fshl i32 %#185, i32 %#185, i32 11
+  %#187 = mul i32 %#186, 2654435761
+  br label %#25
+
+#14:
+  %#188 = load i32, ptr %#34, align 8
+  %#189 = mul i32 %#188, 3266489917
+  %#190 = add i32 %#189, %#130
+  %#191 = gep inbounds nuw ptr %#26, 1 x i64 28
+  %#192 = fshl i32 %#190, i32 %#190, i32 17
+  %#193 = mul i32 %#192, 668265263
+  br label %#15
+
+#15:
+  %#194 = phi ptr [ %#34, %#7 ], [ %#191, %#14 ]
+  %#195 = phi i32 [ %#130, %#7 ], [ %#193, %#14 ]
+  %#196 = load i32, ptr %#194, align 4
+  %#197 = mul i32 %#196, 3266489917
+  %#198 = add i32 %#197, %#195
+  %#199 = gep inbounds nuw ptr %#194, 1 x i64 4
+  %#200 = fshl i32 %#198, i32 %#198, i32 17
+  %#201 = mul i32 %#200, 668265263
+  br label %#16
+
+#16:
+  %#202 = phi ptr [ %#34, %#7 ], [ %#199, %#15 ]
+  %#203 = phi i32 [ %#130, %#7 ], [ %#201, %#15 ]
+  %#204 = load i32, ptr %#202, align 4
+  %#205 = mul i32 %#204, 3266489917
+  %#206 = add i32 %#205, %#203
+  %#207 = gep inbounds nuw ptr %#202, 1 x i64 4
+  %#208 = fshl i32 %#206, i32 %#206, i32 17
+  %#209 = mul i32 %#208, 668265263
+  %#210 = load i8, ptr %#207, align 4
+  %#211 = zext i8 %#210 to i32
+  %#212 = mul i32 %#211, 374761393
+  %#213 = add i32 %#209, %#212
+  %#214 = fshl i32 %#213, i32 %#213, i32 11
+  %#215 = mul i32 %#214, 2654435761
+  br label %#25
+
+#17:
+  %#216 = load i32, ptr %#34, align 8
+  %#217 = mul i32 %#216, 3266489917
+  %#218 = add i32 %#217, %#130
+  %#219 = gep inbounds nuw ptr %#26, 1 x i64 28
+  %#220 = fshl i32 %#218, i32 %#218, i32 17
+  %#221 = mul i32 %#220, 668265263
+  br label %#18
+
+#18:
+  %#222 = phi ptr [ %#34, %#7 ], [ %#219, %#17 ]
+  %#223 = phi i32 [ %#130, %#7 ], [ %#221, %#17 ]
+  %#224 = load i32, ptr %#222, align 4
+  %#225 = mul i32 %#224, 3266489917
+  %#226 = add i32 %#225, %#223
+  %#227 = gep inbounds nuw ptr %#222, 1 x i64 4
+  %#228 = fshl i32 %#226, i32 %#226, i32 17
+  %#229 = mul i32 %#228, 668265263
+  br label %#19
+
+#19:
+  %#230 = phi ptr [ %#34, %#7 ], [ %#227, %#18 ]
+  %#231 = phi i32 [ %#130, %#7 ], [ %#229, %#18 ]
+  %#232 = load i32, ptr %#230, align 4
+  %#233 = mul i32 %#232, 3266489917
+  %#234 = add i32 %#233, %#231
+  %#235 = fshl i32 %#234, i32 %#234, i32 17
+  %#236 = mul i32 %#235, 668265263
+  br label %#25
+
+#20:
+  assume i1 0
+
+#21:
+  %#237 = phi ptr [ %#34, %#7 ], [ %#150, %#10 ]
+  %#238 = phi i32 [ %#130, %#7 ], [ %#152, %#10 ]
+  %#239 = gep inbounds nuw ptr %#237, 1 x i64 1
+  %#240 = load i8, ptr %#237, align 4
+  %#241 = zext i8 %#240 to i32
+  %#242 = mul i32 %#241, 374761393
+  %#243 = add i32 %#242, %#238
+  %#244 = fshl i32 %#243, i32 %#243, i32 11
+  %#245 = mul i32 %#244, 2654435761
+  br label %#22
+
+#22:
+  %#246 = phi ptr [ %#34, %#7 ], [ %#239, %#21 ]
+  %#247 = phi i32 [ %#130, %#7 ], [ %#245, %#21 ]
+  %#248 = gep inbounds nuw ptr %#246, 1 x i64 1
+  %#249 = load i8, ptr %#246, align 1
+  %#250 = zext i8 %#249 to i32
+  %#251 = mul i32 %#250, 374761393
+  %#252 = add i32 %#251, %#247
+  %#253 = fshl i32 %#252, i32 %#252, i32 11
+  %#254 = mul i32 %#253, 2654435761
+  br label %#23
+
+#23:
+  %#255 = phi ptr [ %#34, %#7 ], [ %#248, %#22 ]
+  %#256 = phi i32 [ %#130, %#7 ], [ %#254, %#22 ]
+  %#257 = load i8, ptr %#255, align 1
+  %#258 = zext i8 %#257 to i32
+  %#259 = mul i32 %#258, 374761393
+  %#260 = add i32 %#259, %#256
+  %#261 = fshl i32 %#260, i32 %#260, i32 11
+  %#262 = mul i32 %#261, 2654435761
+  br label %#25
+
+#24:
+  %#263 = fshl i32 %#115, i32 %#115, i32 7
+  %#264 = fshl i32 %#116, i32 %#116, i32 1
+  %#265 = add i32 %#263, %#264
+  %#266 = fshl i32 %#114, i32 %#114, i32 12
+  %#267 = add i32 %#265, %#266
+  %#268 = fshl i32 %#113, i32 %#113, i32 18
+  %#269 = add i32 %#267, %#268
+  %#270 = add i32 %#112, %#269
+  br label %#25
+
+#25:
+  %#271 = phi i32 [ %#187, %#13 ], [ %#215, %#16 ], [ %#236, %#19 ], [ %#130, %#7 ], [ %#262, %#23 ], [ %#270, %#24 ]
+  %#272 = lshr i32 %#271, 15
+  %#273 = xor i32 %#272, %#271
+  %#274 = mul i32 %#273, 2246822519
+  %#275 = lshr i32 %#274, 13
+  %#276 = xor i32 %#275, %#274
+  %#277 = mul i32 %#276, 3266489917
+  %#278 = lshr i32 %#277, 16
+  %#279 = xor i32 %#278, %#277
+  end_lifetime ptr %#26
+  ret i32 %#279
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_16_0(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = add i32 noundef %#1, 1640531535
+  %#8 = add i32 noundef %#1, 2246822519
+  %#9 = add i32 noundef %#1, 606290984
+  %#10 = load i32, ptr nowrite noundef %#0, align 1
+  %#11 = mul i32 %#10, 2246822519
+  %#12 = add i32 %#11, %#9
+  %#13 = fshl i32 %#12, i32 %#12, i32 13
+  %#14 = mul i32 %#13, 2654435761
+  %#15 = freeze i32 %#14
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = add i32 %#18, %#8
+  %#20 = fshl i32 %#19, i32 %#19, i32 13
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = freeze i32 %#21
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#24 = load i32, ptr %#23, align 1
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = add i32 %#25, noundef %#1
+  %#27 = fshl i32 %#26, i32 %#26, i32 13
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = freeze i32 %#28
+  %#30 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#31 = load i32, ptr %#30, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#7
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = fshl i32 %#15, i32 %#15, i32 1
+  %#38 = fshl i32 %#22, i32 %#22, i32 7
+  %#39 = add i32 %#38, %#37
+  %#40 = fshl i32 %#29, i32 %#29, i32 12
+  %#41 = add i32 %#39, %#40
+  %#42 = fshl i32 %#36, i32 %#36, i32 18
+  %#43 = add i32 %#41, %#42
+  br label %#5
+
+#4:
+  %#44 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#45 = phi i32 [ 16, %#3 ], [ 0, %#4 ]
+  %#46 = phi i32 [ %#43, %#3 ], [ %#44, %#4 ]
+  %#47 = add i32 %#45, %#46
+  %#48 = lshr i32 %#47, 15
+  %#49 = xor i32 %#48, %#47
+  %#50 = mul i32 %#49, 2246822519
+  %#51 = lshr i32 %#50, 13
+  %#52 = xor i32 %#51, %#50
+  %#53 = mul i32 %#52, 3266489917
+  %#54 = lshr i32 %#53, 16
+  %#55 = xor i32 %#54, %#53
+  ret i32 %#55
+}
+=>
+define i32 @target_s32_16_0(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = add i32 noundef %#1, 1640531535
+  %#8 = add i32 noundef %#1, 2246822519
+  %#9 = add i32 noundef %#1, 606290984
+  %#10 = load i32, ptr nowrite noundef %#0, align 1
+  %#11 = mul i32 %#10, 2246822519
+  %#12 = add i32 %#11, %#9
+  %#13 = fshl i32 %#12, i32 %#12, i32 13
+  %#14 = mul i32 %#13, 2654435761
+  %#15 = freeze i32 %#14
+  %#16 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#17 = load i32, ptr %#16, align 1
+  %#18 = mul i32 %#17, 2246822519
+  %#19 = add i32 %#18, %#8
+  %#20 = fshl i32 %#19, i32 %#19, i32 13
+  %#21 = mul i32 %#20, 2654435761
+  %#22 = freeze i32 %#21
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#24 = load i32, ptr %#23, align 1
+  %#25 = mul i32 %#24, 2246822519
+  %#26 = add i32 %#25, noundef %#1
+  %#27 = fshl i32 %#26, i32 %#26, i32 13
+  %#28 = mul i32 %#27, 2654435761
+  %#29 = freeze i32 %#28
+  %#30 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#31 = load i32, ptr %#30, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#7
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = fshl i32 %#15, i32 %#15, i32 1
+  %#38 = fshl i32 %#22, i32 %#22, i32 7
+  %#39 = add i32 %#38, %#37
+  %#40 = fshl i32 %#29, i32 %#29, i32 12
+  %#41 = add i32 %#39, %#40
+  %#42 = fshl i32 %#36, i32 %#36, i32 18
+  %#43 = add i32 %#41, %#42
+  br label %#5
+
+#4:
+  %#44 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#45 = phi i32 [ 16, %#3 ], [ 0, %#4 ]
+  %#46 = phi i32 [ %#43, %#3 ], [ %#44, %#4 ]
+  %#47 = add i32 %#45, %#46
+  %#48 = lshr i32 %#47, 15
+  %#49 = xor i32 %#48, %#47
+  %#50 = mul i32 %#49, 2246822519
+  %#51 = lshr i32 %#50, 13
+  %#52 = xor i32 %#51, %#50
+  %#53 = mul i32 %#52, 3266489917
+  %#54 = lshr i32 %#53, 16
+  %#55 = xor i32 %#54, %#53
+  ret i32 %#55
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i32 @target_s32_20_13(ptr noundef %#0, i32 noundef %#1) {
+#2:
+  %#20 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#20
+  %#21 = add i32 noundef %#1, 606290984
+  %#22 = add i32 noundef %#1, 2246822519
+  %#23 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#20, align 8
+  %#24 = gep inbounds nuw ptr %#20, 1 x i64 8
+  store i32 %#21, ptr %#24, align 8
+  %#25 = gep inbounds nuw ptr %#20, 1 x i64 12
+  store i32 %#22, ptr %#25, align 4
+  %#26 = gep inbounds nuw ptr %#20, 1 x i64 16
+  store i32 noundef %#1, ptr %#26, align 8
+  %#27 = gep inbounds nuw ptr %#20, 1 x i64 20
+  store i32 %#23, ptr %#27, align 4
+  %#28 = gep inbounds nuw ptr %#20, 1 x i64 24
+  memset ptr %#28 align 8, i8 0, i64 20
+  %#29 = icmp ne ptr noundef %#0, null
+  br i1 %#29, label %#3, label %#6
+
+#3:
+  %#30 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#31 = load i32, ptr noundef %#0, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#21
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  store i32 %#36, ptr %#24, align 8
+  %#37 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#38 = load i32, ptr %#37, align 1
+  %#39 = mul i32 %#38, 2246822519
+  %#40 = add i32 %#39, %#22
+  %#41 = fshl i32 %#40, i32 %#40, i32 13
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = freeze i32 %#42
+  store i32 %#43, ptr %#25, align 4
+  %#44 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#45 = load i32, ptr %#44, align 1
+  %#46 = mul i32 %#45, 2246822519
+  %#47 = add i32 %#46, noundef %#1
+  %#48 = fshl i32 %#47, i32 %#47, i32 13
+  %#49 = mul i32 %#48, 2654435761
+  %#50 = freeze i32 %#49
+  store i32 %#50, ptr %#26, align 8
+  %#51 = gep inbounds nuw ptr noundef %#0, 1 x i64 12
+  %#52 = load i32, ptr %#51, align 1
+  %#53 = mul i32 %#52, 2246822519
+  %#54 = add i32 %#53, %#23
+  %#55 = fshl i32 %#54, i32 %#54, i32 13
+  %#56 = mul i32 %#55, 2654435761
+  %#57 = freeze i32 %#56
+  store i32 %#57, ptr %#27, align 4
+  %#58 = gep ptr noundef %#0, 1 x i64 16
+  %#59 = icmp ult ptr %#58, %#30
+  br i1 %#59, label %#4, label %#6
+
+#4:
+  %#60 = gep inbounds nuw ptr %#20, 1 x i64 40
+  %#61 = load i32, ptr %#58, align 1
+  store i32 %#61, ptr %#28, align 8
+  store i32 4, ptr %#60, align 8
+  %#62 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  store i32 33, ptr %#20, align 8
+  %#63 = gep inbounds nuw ptr %#20, 1 x i64 4
+  store i32 1, ptr %#63, align 4
+  %#64 = gep inbounds nuw ptr %#20, 1 x i64 40
+  %#65 = gep inbounds nuw ptr %#20, 1 x i64 28
+  memcpy ptr %#65 align 4, ptr %#62 align 1, i64 12
+  %#66 = load i32, ptr %#28, align 8
+  %#67 = mul i32 %#66, 2246822519
+  %#68 = add i32 %#67, %#36
+  %#69 = fshl i32 %#68, i32 %#68, i32 13
+  %#70 = mul i32 %#69, 2654435761
+  %#71 = freeze i32 %#70
+  store i32 %#71, ptr %#24, align 8
+  %#72 = gep inbounds nuw ptr %#20, 1 x i64 28
+  %#73 = load i32, ptr %#72, align 4
+  %#74 = mul i32 %#73, 2246822519
+  %#75 = add i32 %#74, %#43
+  %#76 = fshl i32 %#75, i32 %#75, i32 13
+  %#77 = mul i32 %#76, 2654435761
+  %#78 = freeze i32 %#77
+  store i32 %#78, ptr %#25, align 4
+  %#79 = gep inbounds nuw ptr %#20, 1 x i64 32
+  %#80 = load i32, ptr %#79, align 8
+  %#81 = mul i32 %#80, 2246822519
+  %#82 = add i32 %#81, %#50
+  %#83 = fshl i32 %#82, i32 %#82, i32 13
+  %#84 = mul i32 %#83, 2654435761
+  %#85 = freeze i32 %#84
+  store i32 %#85, ptr %#26, align 8
+  %#86 = gep inbounds nuw ptr %#20, 1 x i64 36
+  %#87 = load i32, ptr %#86, align 4
+  %#88 = mul i32 %#87, 2246822519
+  %#89 = add i32 %#88, %#57
+  %#90 = fshl i32 %#89, i32 %#89, i32 13
+  %#91 = mul i32 %#90, 2654435761
+  %#92 = freeze i32 %#91
+  store i32 %#92, ptr %#27, align 4
+  %#93 = load i32, ptr %#64, align 8
+  %#94 = sub i32 16, %#93
+  store i32 0, ptr %#64, align 8
+  %#95 = icmp ult i32 %#94, 13
+  br i1 %#95, label %#5, label %#8
+
+#5:
+  %#96 = gep inbounds nuw ptr noundef %#0, 1 x i64 33
+  %#97 = zext nneg i32 %#94 to i64
+  %#98 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#97
+  %#99 = gep inbounds nuw ptr %#98, 1 x i64 20
+  %#100 = ptrtoint ptr %#96 to i64
+  %#101 = ptrtoint ptr %#99 to i64
+  %#102 = sub i64 %#100, %#101
+  memcpy ptr %#28 align 8, ptr %#99 align 1, i64 %#102
+  %#103 = trunc i64 %#102 to i32
+  store i32 %#103, ptr %#64, align 8
+  %#104 = and i32 %#103, 15
+  br label %#8
+
+#6:
+  %#105 = phi i32 [ %#57, %#3 ], [ %#23, %#2 ]
+  %#106 = phi i32 [ %#50, %#3 ], [ noundef %#1, %#2 ]
+  %#107 = phi i32 [ %#43, %#3 ], [ %#22, %#2 ]
+  %#108 = phi i32 [ %#36, %#3 ], [ %#21, %#2 ]
+  %#109 = phi i32 [ 1, %#3 ], [ 0, %#2 ]
+  %#110 = phi i32 [ 33, %#3 ], [ 13, %#2 ]
+  %#111 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  store i32 %#110, ptr %#20, align 8
+  %#112 = zext i1 %#29 to i32
+  %#113 = gep inbounds nuw ptr %#20, 1 x i64 4
+  %#114 = or i32 %#109, %#112
+  store i32 %#114, ptr %#113, align 4
+  %#115 = gep inbounds nuw ptr %#20, 1 x i64 40
+  memcpy ptr %#28 align 8, ptr %#111 align 1, i64 13
+  %#116 = load i32, ptr %#115, align 8
+  %#117 = add i32 %#116, 13
+  store i32 %#117, ptr %#115, align 8
+  %#118 = and i32 %#117, 15
+  %#119 = icmp eq i32 %#114, 0
+  br i1 %#119, label %#7, label %#8
+
+#7:
+  %#120 = add i32 %#106, 374761393
+  br label %#9
+
+#8:
+  %#121 = phi i32 [ %#108, %#6 ], [ %#71, %#5 ], [ %#71, %#4 ]
+  %#122 = phi i32 [ %#107, %#6 ], [ %#78, %#5 ], [ %#78, %#4 ]
+  %#123 = phi i32 [ %#106, %#6 ], [ %#85, %#5 ], [ %#85, %#4 ]
+  %#124 = phi i32 [ %#105, %#6 ], [ %#92, %#5 ], [ %#92, %#4 ]
+  %#125 = phi i32 [ %#118, %#6 ], [ %#104, %#5 ], [ 0, %#4 ]
+  %#126 = phi i32 [ %#110, %#6 ], [ 33, %#5 ], [ 33, %#4 ]
+  %#127 = fshl i32 %#121, i32 %#121, i32 1
+  %#128 = fshl i32 %#122, i32 %#122, i32 7
+  %#129 = add i32 %#128, %#127
+  %#130 = fshl i32 %#123, i32 %#123, i32 12
+  %#131 = add i32 %#129, %#130
+  %#132 = fshl i32 %#124, i32 %#124, i32 18
+  %#133 = add i32 %#131, %#132
+  br label %#9
+
+#9:
+  %#134 = phi i32 [ %#125, %#8 ], [ %#118, %#7 ]
+  %#135 = phi i32 [ %#126, %#8 ], [ %#110, %#7 ]
+  %#136 = phi i32 [ %#133, %#8 ], [ %#120, %#7 ]
+  %#137 = add i32 %#135, %#136
+  %#138 = zext i32 %#134 to i64
+  %#139 = icmp samesign ugt i32 %#134, 3
+  br i1 %#139, label %#10, label %#14
+
+#10:
+  %#140 = add nsw i64 %#138, -4
+  %#141 = lshr i64 %#140, 2
+  %#142 = add nsw nuw i64 %#141, 1
+  %#143 = and i64 %#142, 7
+  %#144 = and i64 %#140, 28
+  %#145 = icmp eq i64 %#144, 28
+  br i1 %#145, label %#12, label %#11
+
+#11:
+  %#146 = phi i32 [ %#155, %#11 ], [ %#137, %#10 ]
+  %#147 = phi i64 [ %#156, %#11 ], [ %#138, %#10 ]
+  %#148 = phi ptr [ %#153, %#11 ], [ %#28, %#10 ]
+  %#149 = phi i64 [ %#157, %#11 ], [ 0, %#10 ]
+  %#150 = load i32, ptr %#148, align 4
+  %#151 = mul i32 %#150, 3266489917
+  %#152 = add i32 %#151, %#146
+  %#153 = gep inbounds nuw ptr %#148, 1 x i64 4
+  %#154 = fshl i32 %#152, i32 %#152, i32 17
+  %#155 = mul i32 %#154, 668265263
+  %#156 = add nsw i64 %#147, -4
+  %#157 = add i64 %#149, 1
+  %#158 = icmp eq i64 %#157, %#143
+  br i1 %#158, label %#12, label %#11
+
+#12:
+  %#159 = phi i32 [ %#137, %#10 ], [ %#155, %#11 ]
+  %#160 = phi i64 [ %#138, %#10 ], [ %#156, %#11 ]
+  %#161 = phi ptr [ %#28, %#10 ], [ %#153, %#11 ]
+  %#162 = phi ptr [ poison, %#10 ], [ %#153, %#11 ]
+  %#163 = phi i32 [ poison, %#10 ], [ %#155, %#11 ]
+  %#164 = phi i64 [ poison, %#10 ], [ %#156, %#11 ]
+  %#165 = icmp ult i64 %#140, 28
+  br i1 %#165, label %#14, label %#13
+
+#13:
+  %#166 = phi i32 [ %#216, %#13 ], [ %#159, %#12 ]
+  %#167 = phi i64 [ %#217, %#13 ], [ %#160, %#12 ]
+  %#168 = phi ptr [ %#214, %#13 ], [ %#161, %#12 ]
+  %#169 = load i32, ptr %#168, align 4
+  %#170 = mul i32 %#169, 3266489917
+  %#171 = add i32 %#170, %#166
+  %#172 = gep inbounds nuw ptr %#168, 1 x i64 4
+  %#173 = fshl i32 %#171, i32 %#171, i32 17
+  %#174 = mul i32 %#173, 668265263
+  %#175 = load i32, ptr %#172, align 4
+  %#176 = mul i32 %#175, 3266489917
+  %#177 = add i32 %#176, %#174
+  %#178 = gep inbounds nuw ptr %#168, 1 x i64 8
+  %#179 = fshl i32 %#177, i32 %#177, i32 17
+  %#180 = mul i32 %#179, 668265263
+  %#181 = load i32, ptr %#178, align 4
+  %#182 = mul i32 %#181, 3266489917
+  %#183 = add i32 %#182, %#180
+  %#184 = gep inbounds nuw ptr %#168, 1 x i64 12
+  %#185 = fshl i32 %#183, i32 %#183, i32 17
+  %#186 = mul i32 %#185, 668265263
+  %#187 = load i32, ptr %#184, align 4
+  %#188 = mul i32 %#187, 3266489917
+  %#189 = add i32 %#188, %#186
+  %#190 = gep inbounds nuw ptr %#168, 1 x i64 16
+  %#191 = fshl i32 %#189, i32 %#189, i32 17
+  %#192 = mul i32 %#191, 668265263
+  %#193 = load i32, ptr %#190, align 4
+  %#194 = mul i32 %#193, 3266489917
+  %#195 = add i32 %#194, %#192
+  %#196 = gep inbounds nuw ptr %#168, 1 x i64 20
+  %#197 = fshl i32 %#195, i32 %#195, i32 17
+  %#198 = mul i32 %#197, 668265263
+  %#199 = load i32, ptr %#196, align 4
+  %#200 = mul i32 %#199, 3266489917
+  %#201 = add i32 %#200, %#198
+  %#202 = gep inbounds nuw ptr %#168, 1 x i64 24
+  %#203 = fshl i32 %#201, i32 %#201, i32 17
+  %#204 = mul i32 %#203, 668265263
+  %#205 = load i32, ptr %#202, align 4
+  %#206 = mul i32 %#205, 3266489917
+  %#207 = add i32 %#206, %#204
+  %#208 = gep inbounds nuw ptr %#168, 1 x i64 28
+  %#209 = fshl i32 %#207, i32 %#207, i32 17
+  %#210 = mul i32 %#209, 668265263
+  %#211 = load i32, ptr %#208, align 4
+  %#212 = mul i32 %#211, 3266489917
+  %#213 = add i32 %#212, %#210
+  %#214 = gep inbounds nuw ptr %#168, 1 x i64 32
+  %#215 = fshl i32 %#213, i32 %#213, i32 17
+  %#216 = mul i32 %#215, 668265263
+  %#217 = add nsw i64 %#167, -32
+  %#218 = icmp ugt i64 %#217, 3
+  br i1 %#218, label %#13, label %#14
+
+#14:
+  %#219 = phi ptr [ %#28, %#9 ], [ %#162, %#12 ], [ %#214, %#13 ]
+  %#220 = phi i64 [ %#138, %#9 ], [ %#164, %#12 ], [ %#217, %#13 ]
+  %#221 = phi i32 [ %#137, %#9 ], [ %#163, %#12 ], [ %#216, %#13 ]
+  %#222 = icmp eq i64 %#220, 0
+  br i1 %#222, label %#19, label %#15
+
+#15:
+  %#223 = and i64 %#220, 7
+  %#224 = icmp eq i64 %#223, 0
+  br i1 %#224, label %#17, label %#16
+
+#16:
+  %#225 = phi i32 [ %#235, %#16 ], [ %#221, %#15 ]
+  %#226 = phi i64 [ %#236, %#16 ], [ %#220, %#15 ]
+  %#227 = phi ptr [ %#229, %#16 ], [ %#219, %#15 ]
+  %#228 = phi i64 [ %#237, %#16 ], [ 0, %#15 ]
+  %#229 = gep inbounds nuw ptr %#227, 1 x i64 1
+  %#230 = load i8, ptr %#227, align 1
+  %#231 = zext i8 %#230 to i32
+  %#232 = mul i32 %#231, 374761393
+  %#233 = add i32 %#232, %#225
+  %#234 = fshl i32 %#233, i32 %#233, i32 11
+  %#235 = mul i32 %#234, 2654435761
+  %#236 = add nsw i64 %#226, -1
+  %#237 = add i64 %#228, 1
+  %#238 = icmp eq i64 %#237, %#223
+  br i1 %#238, label %#17, label %#16
+
+#17:
+  %#239 = phi i32 [ poison, %#15 ], [ %#235, %#16 ]
+  %#240 = phi i32 [ %#221, %#15 ], [ %#235, %#16 ]
+  %#241 = phi i64 [ %#220, %#15 ], [ %#236, %#16 ]
+  %#242 = phi ptr [ %#219, %#15 ], [ %#229, %#16 ]
+  %#243 = icmp ult i64 %#220, 8
+  br i1 %#243, label %#19, label %#18
+
+#18:
+  %#244 = phi i32 [ %#302, %#18 ], [ %#240, %#17 ]
+  %#245 = phi i64 [ %#303, %#18 ], [ %#241, %#17 ]
+  %#246 = phi ptr [ %#296, %#18 ], [ %#242, %#17 ]
+  %#247 = gep inbounds nuw ptr %#246, 1 x i64 1
+  %#248 = load i8, ptr %#246, align 1
+  %#249 = zext i8 %#248 to i32
+  %#250 = mul i32 %#249, 374761393
+  %#251 = add i32 %#250, %#244
+  %#252 = fshl i32 %#251, i32 %#251, i32 11
+  %#253 = mul i32 %#252, 2654435761
+  %#254 = gep inbounds nuw ptr %#246, 1 x i64 2
+  %#255 = load i8, ptr %#247, align 1
+  %#256 = zext i8 %#255 to i32
+  %#257 = mul i32 %#256, 374761393
+  %#258 = add i32 %#257, %#253
+  %#259 = fshl i32 %#258, i32 %#258, i32 11
+  %#260 = mul i32 %#259, 2654435761
+  %#261 = gep inbounds nuw ptr %#246, 1 x i64 3
+  %#262 = load i8, ptr %#254, align 1
+  %#263 = zext i8 %#262 to i32
+  %#264 = mul i32 %#263, 374761393
+  %#265 = add i32 %#264, %#260
+  %#266 = fshl i32 %#265, i32 %#265, i32 11
+  %#267 = mul i32 %#266, 2654435761
+  %#268 = gep inbounds nuw ptr %#246, 1 x i64 4
+  %#269 = load i8, ptr %#261, align 1
+  %#270 = zext i8 %#269 to i32
+  %#271 = mul i32 %#270, 374761393
+  %#272 = add i32 %#271, %#267
+  %#273 = fshl i32 %#272, i32 %#272, i32 11
+  %#274 = mul i32 %#273, 2654435761
+  %#275 = gep inbounds nuw ptr %#246, 1 x i64 5
+  %#276 = load i8, ptr %#268, align 1
+  %#277 = zext i8 %#276 to i32
+  %#278 = mul i32 %#277, 374761393
+  %#279 = add i32 %#278, %#274
+  %#280 = fshl i32 %#279, i32 %#279, i32 11
+  %#281 = mul i32 %#280, 2654435761
+  %#282 = gep inbounds nuw ptr %#246, 1 x i64 6
+  %#283 = load i8, ptr %#275, align 1
+  %#284 = zext i8 %#283 to i32
+  %#285 = mul i32 %#284, 374761393
+  %#286 = add i32 %#285, %#281
+  %#287 = fshl i32 %#286, i32 %#286, i32 11
+  %#288 = mul i32 %#287, 2654435761
+  %#289 = gep inbounds nuw ptr %#246, 1 x i64 7
+  %#290 = load i8, ptr %#282, align 1
+  %#291 = zext i8 %#290 to i32
+  %#292 = mul i32 %#291, 374761393
+  %#293 = add i32 %#292, %#288
+  %#294 = fshl i32 %#293, i32 %#293, i32 11
+  %#295 = mul i32 %#294, 2654435761
+  %#296 = gep inbounds nuw ptr %#246, 1 x i64 8
+  %#297 = load i8, ptr %#289, align 1
+  %#298 = zext i8 %#297 to i32
+  %#299 = mul i32 %#298, 374761393
+  %#300 = add i32 %#299, %#295
+  %#301 = fshl i32 %#300, i32 %#300, i32 11
+  %#302 = mul i32 %#301, 2654435761
+  %#303 = add nsw i64 %#245, -8
+  %#304 = icmp eq i64 %#303, 0
+  br i1 %#304, label %#19, label %#18
+
+#19:
+  %#305 = phi i32 [ %#221, %#14 ], [ %#239, %#17 ], [ %#302, %#18 ]
+  %#306 = lshr i32 %#305, 15
+  %#307 = xor i32 %#306, %#305
+  %#308 = mul i32 %#307, 2246822519
+  %#309 = lshr i32 %#308, 13
+  %#310 = xor i32 %#309, %#308
+  %#311 = mul i32 %#310, 3266489917
+  %#312 = lshr i32 %#311, 16
+  %#313 = xor i32 %#312, %#311
+  end_lifetime ptr %#20
+  ret i32 %#313
+}
+=>
+define i32 @target_s32_20_13(ptr noundef %#0, i32 noundef %#1) {
+#2:
+  %#27 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#27
+  %#28 = add i32 noundef %#1, 606290984
+  %#29 = add i32 noundef %#1, 2246822519
+  %#30 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#27, align 8
+  %#31 = gep inbounds nuw ptr %#27, 1 x i64 8
+  store i32 %#28, ptr %#31, align 8
+  %#32 = gep inbounds nuw ptr %#27, 1 x i64 12
+  store i32 %#29, ptr %#32, align 4
+  %#33 = gep inbounds nuw ptr %#27, 1 x i64 16
+  store i32 noundef %#1, ptr %#33, align 8
+  %#34 = gep inbounds nuw ptr %#27, 1 x i64 20
+  store i32 %#30, ptr %#34, align 4
+  %#35 = gep inbounds nuw ptr %#27, 1 x i64 24
+  memset ptr %#35 align 8, i8 0, i64 20
+  %#36 = icmp ne ptr noundef %#0, null
+  br i1 %#36, label %#3, label %#6
+
+#3:
+  %#37 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  %#38 = load i32, ptr noundef %#0, align 1
+  %#39 = mul i32 %#38, 2246822519
+  %#40 = add i32 %#39, %#28
+  %#41 = fshl i32 %#40, i32 %#40, i32 13
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = freeze i32 %#42
+  store i32 %#43, ptr %#31, align 8
+  %#44 = gep inbounds nuw ptr noundef %#0, 1 x i64 4
+  %#45 = load i32, ptr %#44, align 1
+  %#46 = mul i32 %#45, 2246822519
+  %#47 = add i32 %#46, %#29
+  %#48 = fshl i32 %#47, i32 %#47, i32 13
+  %#49 = mul i32 %#48, 2654435761
+  %#50 = freeze i32 %#49
+  store i32 %#50, ptr %#32, align 4
+  %#51 = gep inbounds nuw ptr noundef %#0, 1 x i64 8
+  %#52 = load i32, ptr %#51, align 1
+  %#53 = mul i32 %#52, 2246822519
+  %#54 = add i32 %#53, noundef %#1
+  %#55 = fshl i32 %#54, i32 %#54, i32 13
+  %#56 = mul i32 %#55, 2654435761
+  %#57 = freeze i32 %#56
+  store i32 %#57, ptr %#33, align 8
+  %#58 = gep inbounds nuw ptr noundef %#0, 1 x i64 12
+  %#59 = load i32, ptr %#58, align 1
+  %#60 = mul i32 %#59, 2246822519
+  %#61 = add i32 %#60, %#30
+  %#62 = fshl i32 %#61, i32 %#61, i32 13
+  %#63 = mul i32 %#62, 2654435761
+  %#64 = freeze i32 %#63
+  store i32 %#64, ptr %#34, align 4
+  %#65 = gep ptr noundef %#0, 1 x i64 16
+  %#66 = icmp ult ptr %#65, %#37
+  br i1 %#66, label %#4, label %#6
+
+#4:
+  %#67 = gep inbounds nuw ptr %#27, 1 x i64 40
+  %#68 = load i32, ptr %#65, align 1
+  store i32 %#68, ptr %#35, align 8
+  store i32 4, ptr %#67, align 8
+  %#69 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  store i32 33, ptr %#27, align 8
+  %#70 = gep inbounds nuw ptr %#27, 1 x i64 4
+  store i32 1, ptr %#70, align 4
+  %#71 = gep inbounds nuw ptr %#27, 1 x i64 40
+  %#72 = gep inbounds nuw ptr %#27, 1 x i64 28
+  memcpy ptr %#72 align 4, ptr %#69 align 1, i64 12
+  %#73 = load i32, ptr %#35, align 8
+  %#74 = mul i32 %#73, 2246822519
+  %#75 = add i32 %#74, %#43
+  %#76 = fshl i32 %#75, i32 %#75, i32 13
+  %#77 = mul i32 %#76, 2654435761
+  %#78 = freeze i32 %#77
+  store i32 %#78, ptr %#31, align 8
+  %#79 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#80 = load i32, ptr %#79, align 4
+  %#81 = mul i32 %#80, 2246822519
+  %#82 = add i32 %#81, %#50
+  %#83 = fshl i32 %#82, i32 %#82, i32 13
+  %#84 = mul i32 %#83, 2654435761
+  %#85 = freeze i32 %#84
+  store i32 %#85, ptr %#32, align 4
+  %#86 = gep inbounds nuw ptr %#27, 1 x i64 32
+  %#87 = load i32, ptr %#86, align 8
+  %#88 = mul i32 %#87, 2246822519
+  %#89 = add i32 %#88, %#57
+  %#90 = fshl i32 %#89, i32 %#89, i32 13
+  %#91 = mul i32 %#90, 2654435761
+  %#92 = freeze i32 %#91
+  store i32 %#92, ptr %#33, align 8
+  %#93 = gep inbounds nuw ptr %#27, 1 x i64 36
+  %#94 = load i32, ptr %#93, align 4
+  %#95 = mul i32 %#94, 2246822519
+  %#96 = add i32 %#95, %#64
+  %#97 = fshl i32 %#96, i32 %#96, i32 13
+  %#98 = mul i32 %#97, 2654435761
+  %#99 = freeze i32 %#98
+  store i32 %#99, ptr %#34, align 4
+  %#100 = load i32, ptr %#71, align 8
+  %#101 = sub i32 16, %#100
+  store i32 0, ptr %#71, align 8
+  %#102 = icmp ult i32 %#101, 13
+  br i1 %#102, label %#5, label %#8
+
+#5:
+  %#103 = gep inbounds nuw ptr noundef %#0, 1 x i64 33
+  %#104 = zext nneg i32 %#101 to i64
+  %#105 = gep inbounds nuw ptr noundef %#0, 1 x i64 %#104
+  %#106 = gep inbounds nuw ptr %#105, 1 x i64 20
+  %#107 = ptrtoint ptr %#103 to i64
+  %#108 = ptrtoint ptr %#106 to i64
+  %#109 = sub i64 %#107, %#108
+  memcpy ptr %#35 align 8, ptr %#106 align 1, i64 %#109
+  %#110 = trunc i64 %#109 to i32
+  store i32 %#110, ptr %#71, align 8
+  %#111 = and i32 %#110, 15
+  br label %#8
+
+#6:
+  %#112 = phi i32 [ %#64, %#3 ], [ %#30, %#2 ]
+  %#113 = phi i32 [ %#57, %#3 ], [ noundef %#1, %#2 ]
+  %#114 = phi i32 [ %#50, %#3 ], [ %#29, %#2 ]
+  %#115 = phi i32 [ %#43, %#3 ], [ %#28, %#2 ]
+  %#116 = phi i32 [ 1, %#3 ], [ 0, %#2 ]
+  %#117 = phi i32 [ 33, %#3 ], [ 13, %#2 ]
+  %#118 = gep inbounds nuw ptr noundef %#0, 1 x i64 20
+  store i32 %#117, ptr %#27, align 8
+  %#119 = zext i1 %#36 to i32
+  %#120 = gep inbounds nuw ptr %#27, 1 x i64 4
+  %#121 = or i32 %#116, %#119
+  store i32 %#121, ptr %#120, align 4
+  %#122 = gep inbounds nuw ptr %#27, 1 x i64 40
+  memcpy ptr %#35 align 8, ptr %#118 align 1, i64 13
+  %#123 = load i32, ptr %#122, align 8
+  %#124 = add i32 %#123, 13
+  store i32 %#124, ptr %#122, align 8
+  %#125 = and i32 %#124, 15
+  %#126 = icmp eq i32 %#121, 0
+  br i1 %#126, label %#7, label %#8
+
+#7:
+  %#127 = add i32 %#113, 374761393
+  br label %#9
+
+#8:
+  %#128 = phi i32 [ %#115, %#6 ], [ %#78, %#5 ], [ %#78, %#4 ]
+  %#129 = phi i32 [ %#114, %#6 ], [ %#85, %#5 ], [ %#85, %#4 ]
+  %#130 = phi i32 [ %#113, %#6 ], [ %#92, %#5 ], [ %#92, %#4 ]
+  %#131 = phi i32 [ %#112, %#6 ], [ %#99, %#5 ], [ %#99, %#4 ]
+  %#132 = phi i32 [ %#125, %#6 ], [ %#111, %#5 ], [ 0, %#4 ]
+  %#133 = phi i32 [ %#117, %#6 ], [ 33, %#5 ], [ 33, %#4 ]
+  %#134 = fshl i32 %#128, i32 %#128, i32 1
+  %#135 = fshl i32 %#129, i32 %#129, i32 7
+  %#136 = add i32 %#135, %#134
+  %#137 = fshl i32 %#130, i32 %#130, i32 12
+  %#138 = add i32 %#136, %#137
+  %#139 = fshl i32 %#131, i32 %#131, i32 18
+  %#140 = add i32 %#138, %#139
+  br label %#9
+
+#9:
+  %#141 = phi i32 [ %#132, %#8 ], [ %#125, %#7 ]
+  %#142 = phi i32 [ %#133, %#8 ], [ %#117, %#7 ]
+  %#143 = phi i32 [ %#140, %#8 ], [ %#127, %#7 ]
+  %#144 = add i32 %#142, %#143
+  switch i32 %#141, label %#22 [
+    i32 12, label %#19
+    i32 8, label %#20
+    i32 4, label %#21
+    i32 13, label %#16
+    i32 9, label %#17
+    i32 5, label %#18
+    i32 14, label %#13
+    i32 10, label %#14
+    i32 6, label %#15
+    i32 15, label %#10
+    i32 11, label %#11
+    i32 7, label %#12
+    i32 3, label %#23
+    i32 2, label %#24
+    i32 1, label %#25
+    i32 0, label %#26
+  ]
+
+#10:
+  %#145 = load i32, ptr %#35, align 8
+  %#146 = mul i32 %#145, 3266489917
+  %#147 = add i32 %#146, %#144
+  %#148 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#149 = fshl i32 %#147, i32 %#147, i32 17
+  %#150 = mul i32 %#149, 668265263
+  br label %#11
+
+#11:
+  %#151 = phi ptr [ %#35, %#9 ], [ %#148, %#10 ]
+  %#152 = phi i32 [ %#144, %#9 ], [ %#150, %#10 ]
+  %#153 = load i32, ptr %#151, align 4
+  %#154 = mul i32 %#153, 3266489917
+  %#155 = add i32 %#154, %#152
+  %#156 = gep inbounds nuw ptr %#151, 1 x i64 4
+  %#157 = fshl i32 %#155, i32 %#155, i32 17
+  %#158 = mul i32 %#157, 668265263
+  br label %#12
+
+#12:
+  %#159 = phi ptr [ %#35, %#9 ], [ %#156, %#11 ]
+  %#160 = phi i32 [ %#144, %#9 ], [ %#158, %#11 ]
+  %#161 = load i32, ptr %#159, align 4
+  %#162 = mul i32 %#161, 3266489917
+  %#163 = add i32 %#162, %#160
+  %#164 = gep inbounds nuw ptr %#159, 1 x i64 4
+  %#165 = fshl i32 %#163, i32 %#163, i32 17
+  %#166 = mul i32 %#165, 668265263
+  br label %#23
+
+#13:
+  %#167 = load i32, ptr %#35, align 8
+  %#168 = mul i32 %#167, 3266489917
+  %#169 = add i32 %#168, %#144
+  %#170 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#171 = fshl i32 %#169, i32 %#169, i32 17
+  %#172 = mul i32 %#171, 668265263
+  br label %#14
+
+#14:
+  %#173 = phi ptr [ %#35, %#9 ], [ %#170, %#13 ]
+  %#174 = phi i32 [ %#144, %#9 ], [ %#172, %#13 ]
+  %#175 = load i32, ptr %#173, align 4
+  %#176 = mul i32 %#175, 3266489917
+  %#177 = add i32 %#176, %#174
+  %#178 = gep inbounds nuw ptr %#173, 1 x i64 4
+  %#179 = fshl i32 %#177, i32 %#177, i32 17
+  %#180 = mul i32 %#179, 668265263
+  br label %#15
+
+#15:
+  %#181 = phi ptr [ %#35, %#9 ], [ %#178, %#14 ]
+  %#182 = phi i32 [ %#144, %#9 ], [ %#180, %#14 ]
+  %#183 = load i32, ptr %#181, align 4
+  %#184 = mul i32 %#183, 3266489917
+  %#185 = add i32 %#184, %#182
+  %#186 = gep inbounds nuw ptr %#181, 1 x i64 4
+  %#187 = fshl i32 %#185, i32 %#185, i32 17
+  %#188 = mul i32 %#187, 668265263
+  %#189 = gep inbounds nuw ptr %#181, 1 x i64 5
+  %#190 = load i8, ptr %#186, align 4
+  %#191 = zext i8 %#190 to i32
+  %#192 = mul i32 %#191, 374761393
+  %#193 = add i32 %#188, %#192
+  %#194 = fshl i32 %#193, i32 %#193, i32 11
+  %#195 = mul i32 %#194, 2654435761
+  %#196 = load i8, ptr %#189, align 1
+  %#197 = zext i8 %#196 to i32
+  %#198 = mul i32 %#197, 374761393
+  %#199 = add i32 %#195, %#198
+  %#200 = fshl i32 %#199, i32 %#199, i32 11
+  %#201 = mul i32 %#200, 2654435761
+  br label %#26
+
+#16:
+  %#202 = load i32, ptr %#35, align 8
+  %#203 = mul i32 %#202, 3266489917
+  %#204 = add i32 %#203, %#144
+  %#205 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#206 = fshl i32 %#204, i32 %#204, i32 17
+  %#207 = mul i32 %#206, 668265263
+  br label %#17
+
+#17:
+  %#208 = phi ptr [ %#35, %#9 ], [ %#205, %#16 ]
+  %#209 = phi i32 [ %#144, %#9 ], [ %#207, %#16 ]
+  %#210 = load i32, ptr %#208, align 4
+  %#211 = mul i32 %#210, 3266489917
+  %#212 = add i32 %#211, %#209
+  %#213 = gep inbounds nuw ptr %#208, 1 x i64 4
+  %#214 = fshl i32 %#212, i32 %#212, i32 17
+  %#215 = mul i32 %#214, 668265263
+  br label %#18
+
+#18:
+  %#216 = phi ptr [ %#35, %#9 ], [ %#213, %#17 ]
+  %#217 = phi i32 [ %#144, %#9 ], [ %#215, %#17 ]
+  %#218 = load i32, ptr %#216, align 4
+  %#219 = mul i32 %#218, 3266489917
+  %#220 = add i32 %#219, %#217
+  %#221 = gep inbounds nuw ptr %#216, 1 x i64 4
+  %#222 = fshl i32 %#220, i32 %#220, i32 17
+  %#223 = mul i32 %#222, 668265263
+  %#224 = load i8, ptr %#221, align 4
+  %#225 = zext i8 %#224 to i32
+  %#226 = mul i32 %#225, 374761393
+  %#227 = add i32 %#223, %#226
+  %#228 = fshl i32 %#227, i32 %#227, i32 11
+  %#229 = mul i32 %#228, 2654435761
+  br label %#26
+
+#19:
+  %#230 = load i32, ptr %#35, align 8
+  %#231 = mul i32 %#230, 3266489917
+  %#232 = add i32 %#231, %#144
+  %#233 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#234 = fshl i32 %#232, i32 %#232, i32 17
+  %#235 = mul i32 %#234, 668265263
+  br label %#20
+
+#20:
+  %#236 = phi ptr [ %#35, %#9 ], [ %#233, %#19 ]
+  %#237 = phi i32 [ %#144, %#9 ], [ %#235, %#19 ]
+  %#238 = load i32, ptr %#236, align 4
+  %#239 = mul i32 %#238, 3266489917
+  %#240 = add i32 %#239, %#237
+  %#241 = gep inbounds nuw ptr %#236, 1 x i64 4
+  %#242 = fshl i32 %#240, i32 %#240, i32 17
+  %#243 = mul i32 %#242, 668265263
+  br label %#21
+
+#21:
+  %#244 = phi ptr [ %#35, %#9 ], [ %#241, %#20 ]
+  %#245 = phi i32 [ %#144, %#9 ], [ %#243, %#20 ]
+  %#246 = load i32, ptr %#244, align 4
+  %#247 = mul i32 %#246, 3266489917
+  %#248 = add i32 %#247, %#245
+  %#249 = fshl i32 %#248, i32 %#248, i32 17
+  %#250 = mul i32 %#249, 668265263
+  br label %#26
+
+#22:
+  assume i1 0
+
+#23:
+  %#251 = phi ptr [ %#35, %#9 ], [ %#164, %#12 ]
+  %#252 = phi i32 [ %#144, %#9 ], [ %#166, %#12 ]
+  %#253 = gep inbounds nuw ptr %#251, 1 x i64 1
+  %#254 = load i8, ptr %#251, align 4
+  %#255 = zext i8 %#254 to i32
+  %#256 = mul i32 %#255, 374761393
+  %#257 = add i32 %#256, %#252
+  %#258 = fshl i32 %#257, i32 %#257, i32 11
+  %#259 = mul i32 %#258, 2654435761
+  br label %#24
+
+#24:
+  %#260 = phi ptr [ %#35, %#9 ], [ %#253, %#23 ]
+  %#261 = phi i32 [ %#144, %#9 ], [ %#259, %#23 ]
+  %#262 = gep inbounds nuw ptr %#260, 1 x i64 1
+  %#263 = load i8, ptr %#260, align 1
+  %#264 = zext i8 %#263 to i32
+  %#265 = mul i32 %#264, 374761393
+  %#266 = add i32 %#265, %#261
+  %#267 = fshl i32 %#266, i32 %#266, i32 11
+  %#268 = mul i32 %#267, 2654435761
+  br label %#25
+
+#25:
+  %#269 = phi ptr [ %#35, %#9 ], [ %#262, %#24 ]
+  %#270 = phi i32 [ %#144, %#9 ], [ %#268, %#24 ]
+  %#271 = load i8, ptr %#269, align 1
+  %#272 = zext i8 %#271 to i32
+  %#273 = mul i32 %#272, 374761393
+  %#274 = add i32 %#273, %#270
+  %#275 = fshl i32 %#274, i32 %#274, i32 11
+  %#276 = mul i32 %#275, 2654435761
+  br label %#26
+
+#26:
+  %#277 = phi i32 [ %#201, %#15 ], [ %#229, %#18 ], [ %#250, %#21 ], [ %#144, %#9 ], [ %#276, %#25 ]
+  %#278 = lshr i32 %#277, 15
+  %#279 = xor i32 %#278, %#277
+  %#280 = mul i32 %#279, 2246822519
+  %#281 = lshr i32 %#280, 13
+  %#282 = xor i32 %#281, %#280
+  %#283 = mul i32 %#282, 3266489917
+  %#284 = lshr i32 %#283, 16
+  %#285 = xor i32 %#284, %#283
+  end_lifetime ptr %#27
+  ret i32 %#285
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i32 @target_s32_31_0(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#14 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#14
+  store i64 4294967327, ptr %#14, align 8
+  %#15 = gep inbounds nuw ptr %#14, 1 x i64 24
+  memset ptr %#15 align 8, i8 0, i64 20
+  %#16 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#16, label %#12, label %#3
+
+#3:
+  %#17 = gep inbounds nuw ptr %#14, 1 x i64 20
+  %#18 = gep inbounds nuw ptr %#14, 1 x i64 16
+  %#19 = gep inbounds nuw ptr %#14, 1 x i64 12
+  %#20 = gep inbounds nuw ptr %#14, 1 x i64 8
+  %#21 = add i32 noundef %#1, 1640531535
+  %#22 = add i32 noundef %#1, 2246822519
+  %#23 = add i32 noundef %#1, 606290984
+  %#24 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 31
+  %#25 = load i32, ptr nowrite noundef %#0, align 1
+  %#26 = mul i32 %#25, 2246822519
+  %#27 = add i32 %#26, %#23
+  %#28 = fshl i32 %#27, i32 %#27, i32 13
+  %#29 = mul i32 %#28, 2654435761
+  %#30 = freeze i32 %#29
+  store i32 %#30, ptr %#20, align 8
+  %#31 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#32 = load i32, ptr %#31, align 1
+  %#33 = mul i32 %#32, 2246822519
+  %#34 = add i32 %#33, %#22
+  %#35 = fshl i32 %#34, i32 %#34, i32 13
+  %#36 = mul i32 %#35, 2654435761
+  %#37 = freeze i32 %#36
+  store i32 %#37, ptr %#19, align 4
+  %#38 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#39 = load i32, ptr %#38, align 1
+  %#40 = mul i32 %#39, 2246822519
+  %#41 = add i32 %#40, noundef %#1
+  %#42 = fshl i32 %#41, i32 %#41, i32 13
+  %#43 = mul i32 %#42, 2654435761
+  %#44 = freeze i32 %#43
+  store i32 %#44, ptr %#18, align 8
+  %#45 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#46 = load i32, ptr %#45, align 1
+  %#47 = mul i32 %#46, 2246822519
+  %#48 = add i32 %#47, %#21
+  %#49 = fshl i32 %#48, i32 %#48, i32 13
+  %#50 = mul i32 %#49, 2654435761
+  %#51 = freeze i32 %#50
+  store i32 %#51, ptr %#17, align 4
+  %#52 = gep ptr nowrite noundef %#0, 1 x i64 16
+  %#53 = icmp ult ptr %#52, %#24
+  br i1 %#53, label %#4, label %#5
+
+#4:
+  %#54 = gep inbounds nuw ptr %#14, 1 x i64 40
+  memcpy ptr %#15 align 8, ptr %#52 align 1, i64 15
+  store i32 15, ptr %#54, align 8
+  br label %#5
+
+#5:
+  %#55 = phi i64 [ 15, %#4 ], [ 0, %#3 ]
+  %#56 = fshl i32 %#30, i32 %#30, i32 1
+  %#57 = fshl i32 %#37, i32 %#37, i32 7
+  %#58 = add i32 %#57, %#56
+  %#59 = fshl i32 %#44, i32 %#44, i32 12
+  %#60 = add i32 %#58, %#59
+  %#61 = fshl i32 %#51, i32 %#51, i32 18
+  %#62 = add i32 %#60, %#61
+  %#63 = add i32 %#62, 31
+  br i1 %#53, label %#6, label %#7
+
+#6:
+  %#64 = phi i32 [ %#72, %#6 ], [ %#63, %#5 ]
+  %#65 = phi i64 [ %#73, %#6 ], [ %#55, %#5 ]
+  %#66 = phi ptr [ %#70, %#6 ], [ %#15, %#5 ]
+  %#67 = load i32, ptr %#66, align 4
+  %#68 = mul i32 %#67, 3266489917
+  %#69 = add i32 %#68, %#64
+  %#70 = gep inbounds nuw ptr %#66, 1 x i64 4
+  %#71 = fshl i32 %#69, i32 %#69, i32 17
+  %#72 = mul i32 %#71, 668265263
+  %#73 = add nsw i64 %#65, -4
+  %#74 = icmp ugt i64 %#73, 3
+  br i1 %#74, label %#6, label %#7
+
+#7:
+  %#75 = phi ptr [ %#15, %#5 ], [ %#70, %#6 ]
+  %#76 = phi i64 [ %#55, %#5 ], [ %#73, %#6 ]
+  %#77 = phi i32 [ %#63, %#5 ], [ %#72, %#6 ]
+  %#78 = icmp eq i64 %#76, 0
+  br i1 %#78, label %#13, label %#8
+
+#8:
+  %#79 = and i64 %#76, 7
+  %#80 = icmp eq i64 %#79, 0
+  br i1 %#80, label %#10, label %#9
+
+#9:
+  %#81 = phi i32 [ %#91, %#9 ], [ %#77, %#8 ]
+  %#82 = phi i64 [ %#92, %#9 ], [ %#76, %#8 ]
+  %#83 = phi ptr [ %#85, %#9 ], [ %#75, %#8 ]
+  %#84 = phi i64 [ %#93, %#9 ], [ 0, %#8 ]
+  %#85 = gep inbounds nuw ptr %#83, 1 x i64 1
+  %#86 = load i8, ptr %#83, align 1
+  %#87 = zext i8 %#86 to i32
+  %#88 = mul i32 %#87, 374761393
+  %#89 = add i32 %#88, %#81
+  %#90 = fshl i32 %#89, i32 %#89, i32 11
+  %#91 = mul i32 %#90, 2654435761
+  %#92 = add nsw i64 %#82, -1
+  %#93 = add i64 %#84, 1
+  %#94 = icmp eq i64 %#93, %#79
+  br i1 %#94, label %#10, label %#9
+
+#10:
+  %#95 = phi i32 [ poison, %#8 ], [ %#91, %#9 ]
+  %#96 = phi i32 [ %#77, %#8 ], [ %#91, %#9 ]
+  %#97 = phi i64 [ %#76, %#8 ], [ %#92, %#9 ]
+  %#98 = phi ptr [ %#75, %#8 ], [ %#85, %#9 ]
+  %#99 = icmp ult i64 %#76, 8
+  br i1 %#99, label %#13, label %#11
+
+#11:
+  %#100 = phi i32 [ %#158, %#11 ], [ %#96, %#10 ]
+  %#101 = phi i64 [ %#159, %#11 ], [ %#97, %#10 ]
+  %#102 = phi ptr [ %#152, %#11 ], [ %#98, %#10 ]
+  %#103 = gep inbounds nuw ptr %#102, 1 x i64 1
+  %#104 = load i8, ptr %#102, align 1
+  %#105 = zext i8 %#104 to i32
+  %#106 = mul i32 %#105, 374761393
+  %#107 = add i32 %#106, %#100
+  %#108 = fshl i32 %#107, i32 %#107, i32 11
+  %#109 = mul i32 %#108, 2654435761
+  %#110 = gep inbounds nuw ptr %#102, 1 x i64 2
+  %#111 = load i8, ptr %#103, align 1
+  %#112 = zext i8 %#111 to i32
+  %#113 = mul i32 %#112, 374761393
+  %#114 = add i32 %#113, %#109
+  %#115 = fshl i32 %#114, i32 %#114, i32 11
+  %#116 = mul i32 %#115, 2654435761
+  %#117 = gep inbounds nuw ptr %#102, 1 x i64 3
+  %#118 = load i8, ptr %#110, align 1
+  %#119 = zext i8 %#118 to i32
+  %#120 = mul i32 %#119, 374761393
+  %#121 = add i32 %#120, %#116
+  %#122 = fshl i32 %#121, i32 %#121, i32 11
+  %#123 = mul i32 %#122, 2654435761
+  %#124 = gep inbounds nuw ptr %#102, 1 x i64 4
+  %#125 = load i8, ptr %#117, align 1
+  %#126 = zext i8 %#125 to i32
+  %#127 = mul i32 %#126, 374761393
+  %#128 = add i32 %#127, %#123
+  %#129 = fshl i32 %#128, i32 %#128, i32 11
+  %#130 = mul i32 %#129, 2654435761
+  %#131 = gep inbounds nuw ptr %#102, 1 x i64 5
+  %#132 = load i8, ptr %#124, align 1
+  %#133 = zext i8 %#132 to i32
+  %#134 = mul i32 %#133, 374761393
+  %#135 = add i32 %#134, %#130
+  %#136 = fshl i32 %#135, i32 %#135, i32 11
+  %#137 = mul i32 %#136, 2654435761
+  %#138 = gep inbounds nuw ptr %#102, 1 x i64 6
+  %#139 = load i8, ptr %#131, align 1
+  %#140 = zext i8 %#139 to i32
+  %#141 = mul i32 %#140, 374761393
+  %#142 = add i32 %#141, %#137
+  %#143 = fshl i32 %#142, i32 %#142, i32 11
+  %#144 = mul i32 %#143, 2654435761
+  %#145 = gep inbounds nuw ptr %#102, 1 x i64 7
+  %#146 = load i8, ptr %#138, align 1
+  %#147 = zext i8 %#146 to i32
+  %#148 = mul i32 %#147, 374761393
+  %#149 = add i32 %#148, %#144
+  %#150 = fshl i32 %#149, i32 %#149, i32 11
+  %#151 = mul i32 %#150, 2654435761
+  %#152 = gep inbounds nuw ptr %#102, 1 x i64 8
+  %#153 = load i8, ptr %#145, align 1
+  %#154 = zext i8 %#153 to i32
+  %#155 = mul i32 %#154, 374761393
+  %#156 = add i32 %#155, %#151
+  %#157 = fshl i32 %#156, i32 %#156, i32 11
+  %#158 = mul i32 %#157, 2654435761
+  %#159 = add nsw i64 %#101, -8
+  %#160 = icmp eq i64 %#159, 0
+  br i1 %#160, label %#13, label %#11
+
+#12:
+  %#161 = add i32 noundef %#1, 374761393
+  br label %#13
+
+#13:
+  %#162 = phi i32 [ %#77, %#7 ], [ %#161, %#12 ], [ %#95, %#10 ], [ %#158, %#11 ]
+  %#163 = lshr i32 %#162, 15
+  %#164 = xor i32 %#163, %#162
+  %#165 = mul i32 %#164, 2246822519
+  %#166 = lshr i32 %#165, 13
+  %#167 = xor i32 %#166, %#165
+  %#168 = mul i32 %#167, 3266489917
+  %#169 = lshr i32 %#168, 16
+  %#170 = xor i32 %#169, %#168
+  end_lifetime ptr %#14
+  ret i32 %#170
+}
+=>
+define i32 @target_s32_31_0(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#8 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#8, label %#6, label %#3
+
+#3:
+  %#9 = add i32 noundef %#1, 1640531535
+  %#10 = add i32 noundef %#1, 2246822519
+  %#11 = add i32 noundef %#1, 606290984
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 31
+  %#13 = load i32, ptr nowrite noundef %#0, align 1
+  %#14 = mul i32 %#13, 2246822519
+  %#15 = add i32 %#14, %#11
+  %#16 = fshl i32 %#15, i32 %#15, i32 13
+  %#17 = mul i32 %#16, 2654435761
+  %#18 = freeze i32 %#17
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#20 = load i32, ptr %#19, align 1
+  %#21 = mul i32 %#20, 2246822519
+  %#22 = add i32 %#21, %#10
+  %#23 = fshl i32 %#22, i32 %#22, i32 13
+  %#24 = mul i32 %#23, 2654435761
+  %#25 = freeze i32 %#24
+  %#26 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#27 = load i32, ptr %#26, align 1
+  %#28 = mul i32 %#27, 2246822519
+  %#29 = add i32 %#28, noundef %#1
+  %#30 = fshl i32 %#29, i32 %#29, i32 13
+  %#31 = mul i32 %#30, 2654435761
+  %#32 = freeze i32 %#31
+  %#33 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#34 = load i32, ptr %#33, align 1
+  %#35 = mul i32 %#34, 2246822519
+  %#36 = add i32 %#35, %#9
+  %#37 = fshl i32 %#36, i32 %#36, i32 13
+  %#38 = mul i32 %#37, 2654435761
+  %#39 = freeze i32 %#38
+  %#40 = gep ptr nowrite noundef %#0, 1 x i64 16
+  %#41 = icmp ult ptr %#40, %#12
+  br i1 %#41, label %#4, label %#5
+
+#4:
+  %#42 = load i32, ptr %#40, align 1
+  %#43 = gep ptr nowrite noundef %#0, 1 x i64 20
+  %#44 = load i32, ptr %#43, align 1
+  %#45 = gep ptr nowrite noundef %#0, 1 x i64 24
+  %#46 = load i32, ptr %#45, align 1
+  %#47 = gep ptr nowrite noundef %#0, 1 x i64 28
+  %#48 = load i24, ptr %#47, align 1
+  %#49 = zext i24 %#48 to i32
+  %#50 = fshl i32 %#18, i32 %#18, i32 1
+  %#51 = fshl i32 %#25, i32 %#25, i32 7
+  %#52 = add i32 %#51, %#50
+  %#53 = fshl i32 %#32, i32 %#32, i32 12
+  %#54 = add i32 %#52, %#53
+  %#55 = fshl i32 %#39, i32 %#39, i32 18
+  %#56 = add i32 %#54, %#55
+  %#57 = add i32 %#56, 31
+  %#58 = mul i32 %#42, 3266489917
+  %#59 = add i32 %#58, %#57
+  %#60 = fshl i32 %#59, i32 %#59, i32 17
+  %#61 = mul i32 %#60, 668265263
+  %#62 = mul i32 %#44, 3266489917
+  %#63 = add i32 %#62, %#61
+  %#64 = fshl i32 %#63, i32 %#63, i32 17
+  %#65 = mul i32 %#64, 668265263
+  %#66 = mul i32 %#46, 3266489917
+  %#67 = add i32 %#66, %#65
+  %#68 = fshl i32 %#67, i32 %#67, i32 17
+  %#69 = mul i32 %#68, 668265263
+  %#70 = and i24 %#48, 255
+  %#71 = zext nneg i24 %#70 to i32
+  %#72 = mul i32 %#71, 374761393
+  %#73 = add i32 %#72, %#69
+  %#74 = fshl i32 %#73, i32 %#73, i32 11
+  %#75 = mul i32 %#74, 2654435761
+  %#76 = zext i24 %#48 to i32
+  %#77 = lshr i32 %#76, 8
+  %#78 = and i32 %#77, 255
+  %#79 = mul i32 %#78, 374761393
+  %#80 = add i32 %#79, %#75
+  %#81 = fshl i32 %#80, i32 %#80, i32 11
+  %#82 = mul i32 %#81, 2654435761
+  %#83 = lshr i32 %#49, 16
+  %#84 = mul i32 %#83, 374761393
+  %#85 = add i32 %#84, %#82
+  %#86 = fshl i32 %#85, i32 %#85, i32 11
+  %#87 = mul i32 %#86, 2654435761
+  br label %#7
+
+#5:
+  %#88 = fshl i32 %#18, i32 %#18, i32 1
+  %#89 = fshl i32 %#25, i32 %#25, i32 7
+  %#90 = add i32 %#89, %#88
+  %#91 = fshl i32 %#32, i32 %#32, i32 12
+  %#92 = add i32 %#90, %#91
+  %#93 = fshl i32 %#39, i32 %#39, i32 18
+  %#94 = add i32 %#92, %#93
+  %#95 = add i32 %#94, 31
+  br label %#7
+
+#6:
+  %#96 = add i32 noundef %#1, 374761393
+  br label %#7
+
+#7:
+  %#97 = phi i32 [ %#95, %#5 ], [ %#87, %#4 ], [ %#96, %#6 ]
+  %#98 = lshr i32 %#97, 15
+  %#99 = xor i32 %#98, %#97
+  %#100 = mul i32 %#99, 2246822519
+  %#101 = lshr i32 %#100, 13
+  %#102 = xor i32 %#101, %#100
+  %#103 = mul i32 %#102, 3266489917
+  %#104 = lshr i32 %#103, 16
+  %#105 = xor i32 %#104, %#103
+  ret i32 %#105
+}
+ERROR: Timeout
+
+
+----------------------------------------
+define i32 @target_s32_17_30(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#20 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#20
+  %#21 = add i32 noundef %#1, 606290984
+  %#22 = add i32 noundef %#1, 2246822519
+  %#23 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#20, align 8
+  %#24 = gep inbounds nuw ptr %#20, 1 x i64 8
+  %#25 = gep inbounds nuw ptr %#20, 1 x i64 12
+  %#26 = gep inbounds nuw ptr %#20, 1 x i64 16
+  %#27 = gep inbounds nuw ptr %#20, 1 x i64 20
+  %#28 = gep inbounds nuw ptr %#20, 1 x i64 24
+  memset ptr %#28 align 8, i8 0, i64 20
+  %#29 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#29, label %#5, label %#3
+
+#3:
+  %#30 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 17
+  %#31 = load i32, ptr nowrite noundef %#0, align 1
+  %#32 = mul i32 %#31, 2246822519
+  %#33 = add i32 %#32, %#21
+  %#34 = fshl i32 %#33, i32 %#33, i32 13
+  %#35 = mul i32 %#34, 2654435761
+  %#36 = freeze i32 %#35
+  %#37 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#38 = load i32, ptr %#37, align 1
+  %#39 = mul i32 %#38, 2246822519
+  %#40 = add i32 %#39, %#22
+  %#41 = fshl i32 %#40, i32 %#40, i32 13
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = freeze i32 %#42
+  %#44 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#45 = load i32, ptr %#44, align 1
+  %#46 = mul i32 %#45, 2246822519
+  %#47 = add i32 %#46, noundef %#1
+  %#48 = fshl i32 %#47, i32 %#47, i32 13
+  %#49 = mul i32 %#48, 2654435761
+  %#50 = freeze i32 %#49
+  %#51 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#52 = load i32, ptr %#51, align 1
+  %#53 = mul i32 %#52, 2246822519
+  %#54 = add i32 %#53, %#23
+  %#55 = fshl i32 %#54, i32 %#54, i32 13
+  %#56 = mul i32 %#55, 2654435761
+  %#57 = freeze i32 %#56
+  %#58 = gep ptr nowrite noundef %#0, 1 x i64 16
+  %#59 = icmp ult ptr %#58, %#30
+  br i1 %#59, label %#4, label %#5
+
+#4:
+  %#60 = gep inbounds nuw ptr %#20, 1 x i64 40
+  %#61 = load i8, ptr %#58, align 1
+  store i8 %#61, ptr %#28, align 8
+  store i32 1, ptr %#60, align 8
+  store i32 47, ptr %#20, align 8
+  %#62 = gep inbounds nuw ptr %#20, 1 x i64 4
+  store i32 1, ptr %#62, align 4
+  %#63 = gep inbounds nuw ptr %#20, 1 x i64 40
+  %#64 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 17
+  %#65 = gep inbounds nuw ptr %#20, 1 x i64 25
+  memcpy ptr %#65 align 1, ptr %#64 align 1, i64 15
+  %#66 = load i32, ptr %#28, align 8
+  %#67 = mul i32 %#66, 2246822519
+  %#68 = add i32 %#67, %#36
+  %#69 = fshl i32 %#68, i32 %#68, i32 13
+  %#70 = mul i32 %#69, 2654435761
+  %#71 = freeze i32 %#70
+  store i32 %#71, ptr %#24, align 8
+  %#72 = gep inbounds nuw ptr %#20, 1 x i64 28
+  %#73 = load i32, ptr %#72, align 4
+  %#74 = mul i32 %#73, 2246822519
+  %#75 = add i32 %#74, %#43
+  %#76 = fshl i32 %#75, i32 %#75, i32 13
+  %#77 = mul i32 %#76, 2654435761
+  %#78 = freeze i32 %#77
+  store i32 %#78, ptr %#25, align 4
+  %#79 = gep inbounds nuw ptr %#20, 1 x i64 32
+  %#80 = load i32, ptr %#79, align 8
+  %#81 = mul i32 %#80, 2246822519
+  %#82 = add i32 %#81, %#50
+  %#83 = fshl i32 %#82, i32 %#82, i32 13
+  %#84 = mul i32 %#83, 2654435761
+  %#85 = freeze i32 %#84
+  store i32 %#85, ptr %#26, align 8
+  %#86 = gep inbounds nuw ptr %#20, 1 x i64 36
+  %#87 = load i32, ptr %#86, align 4
+  %#88 = mul i32 %#87, 2246822519
+  %#89 = add i32 %#88, %#57
+  %#90 = fshl i32 %#89, i32 %#89, i32 13
+  %#91 = mul i32 %#90, 2654435761
+  %#92 = freeze i32 %#91
+  store i32 %#92, ptr %#27, align 4
+  %#93 = load i32, ptr %#63, align 8
+  %#94 = sub i32 16, %#93
+  %#95 = zext i32 %#94 to i64
+  %#96 = add nsw nuw i64 %#95, 17
+  store i32 0, ptr %#63, align 8
+  %#97 = icmp ugt i32 %#94, 14
+  br i1 %#97, label %#7, label %#6
+
+#5:
+  %#98 = phi i32 [ %#57, %#3 ], [ %#23, %#2 ]
+  %#99 = phi i32 [ %#50, %#3 ], [ noundef %#1, %#2 ]
+  %#100 = phi i32 [ %#43, %#3 ], [ %#22, %#2 ]
+  %#101 = phi i32 [ %#36, %#3 ], [ %#21, %#2 ]
+  %#102 = phi i32 [ 47, %#3 ], [ 30, %#2 ]
+  store i32 %#102, ptr %#20, align 8
+  %#103 = gep inbounds nuw ptr %#20, 1 x i64 4
+  store i32 1, ptr %#103, align 4
+  %#104 = gep inbounds nuw ptr %#20, 1 x i64 40
+  br label %#6
+
+#6:
+  %#105 = phi ptr [ %#63, %#4 ], [ %#104, %#5 ]
+  %#106 = phi i32 [ 47, %#4 ], [ %#102, %#5 ]
+  %#107 = phi i32 [ %#92, %#4 ], [ %#98, %#5 ]
+  %#108 = phi i32 [ %#85, %#4 ], [ %#99, %#5 ]
+  %#109 = phi i32 [ %#78, %#4 ], [ %#100, %#5 ]
+  %#110 = phi i32 [ %#71, %#4 ], [ %#101, %#5 ]
+  %#111 = phi i64 [ %#96, %#4 ], [ 17, %#5 ]
+  %#112 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#111
+  %#113 = load i32, ptr %#112, align 1
+  %#114 = mul i32 %#113, 2246822519
+  %#115 = add i32 %#114, %#110
+  %#116 = fshl i32 %#115, i32 %#115, i32 13
+  %#117 = mul i32 %#116, 2654435761
+  %#118 = freeze i32 %#117
+  %#119 = gep inbounds nuw ptr %#112, 1 x i64 4
+  %#120 = load i32, ptr %#119, align 1
+  %#121 = mul i32 %#120, 2246822519
+  %#122 = add i32 %#121, %#109
+  %#123 = fshl i32 %#122, i32 %#122, i32 13
+  %#124 = mul i32 %#123, 2654435761
+  %#125 = freeze i32 %#124
+  %#126 = gep inbounds nuw ptr %#112, 1 x i64 8
+  %#127 = load i32, ptr %#126, align 1
+  %#128 = mul i32 %#127, 2246822519
+  %#129 = add i32 %#128, %#108
+  %#130 = fshl i32 %#129, i32 %#129, i32 13
+  %#131 = mul i32 %#130, 2654435761
+  %#132 = freeze i32 %#131
+  %#133 = gep inbounds nuw ptr %#112, 1 x i64 12
+  %#134 = load i32, ptr %#133, align 1
+  %#135 = mul i32 %#134, 2246822519
+  %#136 = add i32 %#135, %#107
+  %#137 = fshl i32 %#136, i32 %#136, i32 13
+  %#138 = mul i32 %#137, 2654435761
+  %#139 = freeze i32 %#138
+  %#140 = add nsw nuw i64 %#111, 16
+  store i32 %#118, ptr %#24, align 8
+  store i32 %#125, ptr %#25, align 4
+  store i32 %#132, ptr %#26, align 8
+  store i32 %#139, ptr %#27, align 4
+  br label %#7
+
+#7:
+  %#141 = phi ptr [ %#63, %#4 ], [ %#105, %#6 ]
+  %#142 = phi i32 [ 47, %#4 ], [ %#106, %#6 ]
+  %#143 = phi i32 [ %#92, %#4 ], [ %#139, %#6 ]
+  %#144 = phi i32 [ %#85, %#4 ], [ %#132, %#6 ]
+  %#145 = phi i32 [ %#78, %#4 ], [ %#125, %#6 ]
+  %#146 = phi i32 [ %#71, %#4 ], [ %#118, %#6 ]
+  %#147 = phi i64 [ %#96, %#4 ], [ %#140, %#6 ]
+  %#148 = icmp samesign ult i64 %#147, 47
+  br i1 %#148, label %#8, label %#9
+
+#8:
+  %#149 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#147
+  %#150 = sub nsw nuw i64 47, %#147
+  memcpy ptr %#28 align 8, ptr %#149 align 1, i64 %#150
+  %#151 = trunc nsw nuw i64 %#150 to i32
+  store i32 %#151, ptr %#141, align 8
+  %#152 = and i32 %#151, 15
+  br label %#9
+
+#9:
+  %#153 = phi i32 [ 0, %#7 ], [ %#152, %#8 ]
+  %#154 = fshl i32 %#145, i32 %#145, i32 7
+  %#155 = fshl i32 %#146, i32 %#146, i32 1
+  %#156 = add i32 %#154, %#155
+  %#157 = fshl i32 %#144, i32 %#144, i32 12
+  %#158 = add i32 %#156, %#157
+  %#159 = fshl i32 %#143, i32 %#143, i32 18
+  %#160 = add i32 %#158, %#159
+  %#161 = add i32 %#142, %#160
+  %#162 = zext nneg i32 %#153 to i64
+  %#163 = icmp samesign ugt i32 %#153, 3
+  br i1 %#163, label %#10, label %#14
+
+#10:
+  %#164 = add nsw i64 %#162, -4
+  %#165 = lshr i64 %#164, 2
+  %#166 = add nsw nuw i64 %#165, 1
+  %#167 = and i64 %#166, 7
+  %#168 = and i64 %#164, 28
+  %#169 = icmp eq i64 %#168, 28
+  br i1 %#169, label %#12, label %#11
+
+#11:
+  %#170 = phi i32 [ %#179, %#11 ], [ %#161, %#10 ]
+  %#171 = phi i64 [ %#180, %#11 ], [ %#162, %#10 ]
+  %#172 = phi ptr [ %#177, %#11 ], [ %#28, %#10 ]
+  %#173 = phi i64 [ %#181, %#11 ], [ 0, %#10 ]
+  %#174 = load i32, ptr %#172, align 4
+  %#175 = mul i32 %#174, 3266489917
+  %#176 = add i32 %#175, %#170
+  %#177 = gep inbounds nuw ptr %#172, 1 x i64 4
+  %#178 = fshl i32 %#176, i32 %#176, i32 17
+  %#179 = mul i32 %#178, 668265263
+  %#180 = add nsw i64 %#171, -4
+  %#181 = add i64 %#173, 1
+  %#182 = icmp eq i64 %#181, %#167
+  br i1 %#182, label %#12, label %#11
+
+#12:
+  %#183 = phi i32 [ %#161, %#10 ], [ %#179, %#11 ]
+  %#184 = phi i64 [ %#162, %#10 ], [ %#180, %#11 ]
+  %#185 = phi ptr [ %#28, %#10 ], [ %#177, %#11 ]
+  %#186 = phi ptr [ poison, %#10 ], [ %#177, %#11 ]
+  %#187 = phi i32 [ poison, %#10 ], [ %#179, %#11 ]
+  %#188 = phi i64 [ poison, %#10 ], [ %#180, %#11 ]
+  %#189 = icmp ult i64 %#164, 28
+  br i1 %#189, label %#14, label %#13
+
+#13:
+  %#190 = phi i32 [ %#240, %#13 ], [ %#183, %#12 ]
+  %#191 = phi i64 [ %#241, %#13 ], [ %#184, %#12 ]
+  %#192 = phi ptr [ %#238, %#13 ], [ %#185, %#12 ]
+  %#193 = load i32, ptr %#192, align 4
+  %#194 = mul i32 %#193, 3266489917
+  %#195 = add i32 %#194, %#190
+  %#196 = gep inbounds nuw ptr %#192, 1 x i64 4
+  %#197 = fshl i32 %#195, i32 %#195, i32 17
+  %#198 = mul i32 %#197, 668265263
+  %#199 = load i32, ptr %#196, align 4
+  %#200 = mul i32 %#199, 3266489917
+  %#201 = add i32 %#200, %#198
+  %#202 = gep inbounds nuw ptr %#192, 1 x i64 8
+  %#203 = fshl i32 %#201, i32 %#201, i32 17
+  %#204 = mul i32 %#203, 668265263
+  %#205 = load i32, ptr %#202, align 4
+  %#206 = mul i32 %#205, 3266489917
+  %#207 = add i32 %#206, %#204
+  %#208 = gep inbounds nuw ptr %#192, 1 x i64 12
+  %#209 = fshl i32 %#207, i32 %#207, i32 17
+  %#210 = mul i32 %#209, 668265263
+  %#211 = load i32, ptr %#208, align 4
+  %#212 = mul i32 %#211, 3266489917
+  %#213 = add i32 %#212, %#210
+  %#214 = gep inbounds nuw ptr %#192, 1 x i64 16
+  %#215 = fshl i32 %#213, i32 %#213, i32 17
+  %#216 = mul i32 %#215, 668265263
+  %#217 = load i32, ptr %#214, align 4
+  %#218 = mul i32 %#217, 3266489917
+  %#219 = add i32 %#218, %#216
+  %#220 = gep inbounds nuw ptr %#192, 1 x i64 20
+  %#221 = fshl i32 %#219, i32 %#219, i32 17
+  %#222 = mul i32 %#221, 668265263
+  %#223 = load i32, ptr %#220, align 4
+  %#224 = mul i32 %#223, 3266489917
+  %#225 = add i32 %#224, %#222
+  %#226 = gep inbounds nuw ptr %#192, 1 x i64 24
+  %#227 = fshl i32 %#225, i32 %#225, i32 17
+  %#228 = mul i32 %#227, 668265263
+  %#229 = load i32, ptr %#226, align 4
+  %#230 = mul i32 %#229, 3266489917
+  %#231 = add i32 %#230, %#228
+  %#232 = gep inbounds nuw ptr %#192, 1 x i64 28
+  %#233 = fshl i32 %#231, i32 %#231, i32 17
+  %#234 = mul i32 %#233, 668265263
+  %#235 = load i32, ptr %#232, align 4
+  %#236 = mul i32 %#235, 3266489917
+  %#237 = add i32 %#236, %#234
+  %#238 = gep inbounds nuw ptr %#192, 1 x i64 32
+  %#239 = fshl i32 %#237, i32 %#237, i32 17
+  %#240 = mul i32 %#239, 668265263
+  %#241 = add nsw i64 %#191, -32
+  %#242 = icmp ugt i64 %#241, 3
+  br i1 %#242, label %#13, label %#14
+
+#14:
+  %#243 = phi ptr [ %#28, %#9 ], [ %#186, %#12 ], [ %#238, %#13 ]
+  %#244 = phi i64 [ %#162, %#9 ], [ %#188, %#12 ], [ %#241, %#13 ]
+  %#245 = phi i32 [ %#161, %#9 ], [ %#187, %#12 ], [ %#240, %#13 ]
+  %#246 = icmp eq i64 %#244, 0
+  br i1 %#246, label %#19, label %#15
+
+#15:
+  %#247 = and i64 %#244, 7
+  %#248 = icmp eq i64 %#247, 0
+  br i1 %#248, label %#17, label %#16
+
+#16:
+  %#249 = phi i32 [ %#259, %#16 ], [ %#245, %#15 ]
+  %#250 = phi i64 [ %#260, %#16 ], [ %#244, %#15 ]
+  %#251 = phi ptr [ %#253, %#16 ], [ %#243, %#15 ]
+  %#252 = phi i64 [ %#261, %#16 ], [ 0, %#15 ]
+  %#253 = gep inbounds nuw ptr %#251, 1 x i64 1
+  %#254 = load i8, ptr %#251, align 1
+  %#255 = zext i8 %#254 to i32
+  %#256 = mul i32 %#255, 374761393
+  %#257 = add i32 %#256, %#249
+  %#258 = fshl i32 %#257, i32 %#257, i32 11
+  %#259 = mul i32 %#258, 2654435761
+  %#260 = add nsw i64 %#250, -1
+  %#261 = add i64 %#252, 1
+  %#262 = icmp eq i64 %#261, %#247
+  br i1 %#262, label %#17, label %#16
+
+#17:
+  %#263 = phi i32 [ poison, %#15 ], [ %#259, %#16 ]
+  %#264 = phi i32 [ %#245, %#15 ], [ %#259, %#16 ]
+  %#265 = phi i64 [ %#244, %#15 ], [ %#260, %#16 ]
+  %#266 = phi ptr [ %#243, %#15 ], [ %#253, %#16 ]
+  %#267 = icmp ult i64 %#244, 8
+  br i1 %#267, label %#19, label %#18
+
+#18:
+  %#268 = phi i32 [ %#326, %#18 ], [ %#264, %#17 ]
+  %#269 = phi i64 [ %#327, %#18 ], [ %#265, %#17 ]
+  %#270 = phi ptr [ %#320, %#18 ], [ %#266, %#17 ]
+  %#271 = gep inbounds nuw ptr %#270, 1 x i64 1
+  %#272 = load i8, ptr %#270, align 1
+  %#273 = zext i8 %#272 to i32
+  %#274 = mul i32 %#273, 374761393
+  %#275 = add i32 %#274, %#268
+  %#276 = fshl i32 %#275, i32 %#275, i32 11
+  %#277 = mul i32 %#276, 2654435761
+  %#278 = gep inbounds nuw ptr %#270, 1 x i64 2
+  %#279 = load i8, ptr %#271, align 1
+  %#280 = zext i8 %#279 to i32
+  %#281 = mul i32 %#280, 374761393
+  %#282 = add i32 %#281, %#277
+  %#283 = fshl i32 %#282, i32 %#282, i32 11
+  %#284 = mul i32 %#283, 2654435761
+  %#285 = gep inbounds nuw ptr %#270, 1 x i64 3
+  %#286 = load i8, ptr %#278, align 1
+  %#287 = zext i8 %#286 to i32
+  %#288 = mul i32 %#287, 374761393
+  %#289 = add i32 %#288, %#284
+  %#290 = fshl i32 %#289, i32 %#289, i32 11
+  %#291 = mul i32 %#290, 2654435761
+  %#292 = gep inbounds nuw ptr %#270, 1 x i64 4
+  %#293 = load i8, ptr %#285, align 1
+  %#294 = zext i8 %#293 to i32
+  %#295 = mul i32 %#294, 374761393
+  %#296 = add i32 %#295, %#291
+  %#297 = fshl i32 %#296, i32 %#296, i32 11
+  %#298 = mul i32 %#297, 2654435761
+  %#299 = gep inbounds nuw ptr %#270, 1 x i64 5
+  %#300 = load i8, ptr %#292, align 1
+  %#301 = zext i8 %#300 to i32
+  %#302 = mul i32 %#301, 374761393
+  %#303 = add i32 %#302, %#298
+  %#304 = fshl i32 %#303, i32 %#303, i32 11
+  %#305 = mul i32 %#304, 2654435761
+  %#306 = gep inbounds nuw ptr %#270, 1 x i64 6
+  %#307 = load i8, ptr %#299, align 1
+  %#308 = zext i8 %#307 to i32
+  %#309 = mul i32 %#308, 374761393
+  %#310 = add i32 %#309, %#305
+  %#311 = fshl i32 %#310, i32 %#310, i32 11
+  %#312 = mul i32 %#311, 2654435761
+  %#313 = gep inbounds nuw ptr %#270, 1 x i64 7
+  %#314 = load i8, ptr %#306, align 1
+  %#315 = zext i8 %#314 to i32
+  %#316 = mul i32 %#315, 374761393
+  %#317 = add i32 %#316, %#312
+  %#318 = fshl i32 %#317, i32 %#317, i32 11
+  %#319 = mul i32 %#318, 2654435761
+  %#320 = gep inbounds nuw ptr %#270, 1 x i64 8
+  %#321 = load i8, ptr %#313, align 1
+  %#322 = zext i8 %#321 to i32
+  %#323 = mul i32 %#322, 374761393
+  %#324 = add i32 %#323, %#319
+  %#325 = fshl i32 %#324, i32 %#324, i32 11
+  %#326 = mul i32 %#325, 2654435761
+  %#327 = add nsw i64 %#269, -8
+  %#328 = icmp eq i64 %#327, 0
+  br i1 %#328, label %#19, label %#18
+
+#19:
+  %#329 = phi i32 [ %#245, %#14 ], [ %#263, %#17 ], [ %#326, %#18 ]
+  %#330 = lshr i32 %#329, 15
+  %#331 = xor i32 %#330, %#329
+  %#332 = mul i32 %#331, 2246822519
+  %#333 = lshr i32 %#332, 13
+  %#334 = xor i32 %#333, %#332
+  %#335 = mul i32 %#334, 3266489917
+  %#336 = lshr i32 %#335, 16
+  %#337 = xor i32 %#336, %#335
+  end_lifetime ptr %#20
+  ret i32 %#337
+}
+=>
+define i32 @target_s32_17_30(ptr nowrite noundef %#0, i32 noundef %#1) {
+#2:
+  %#27 = alloca i64 48, align 8, dead
+  start_lifetime ptr %#27
+  %#28 = add i32 noundef %#1, 606290984
+  %#29 = add i32 noundef %#1, 2246822519
+  %#30 = add i32 noundef %#1, 1640531535
+  store i64 0, ptr %#27, align 8
+  %#31 = gep inbounds nuw ptr %#27, 1 x i64 8
+  %#32 = gep inbounds nuw ptr %#27, 1 x i64 12
+  %#33 = gep inbounds nuw ptr %#27, 1 x i64 16
+  %#34 = gep inbounds nuw ptr %#27, 1 x i64 20
+  %#35 = gep inbounds nuw ptr %#27, 1 x i64 24
+  memset ptr %#35 align 8, i8 0, i64 20
+  %#36 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#36, label %#5, label %#3
+
+#3:
+  %#37 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 17
+  %#38 = load i32, ptr nowrite noundef %#0, align 1
+  %#39 = mul i32 %#38, 2246822519
+  %#40 = add i32 %#39, %#28
+  %#41 = fshl i32 %#40, i32 %#40, i32 13
+  %#42 = mul i32 %#41, 2654435761
+  %#43 = freeze i32 %#42
+  %#44 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#45 = load i32, ptr %#44, align 1
+  %#46 = mul i32 %#45, 2246822519
+  %#47 = add i32 %#46, %#29
+  %#48 = fshl i32 %#47, i32 %#47, i32 13
+  %#49 = mul i32 %#48, 2654435761
+  %#50 = freeze i32 %#49
+  %#51 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#52 = load i32, ptr %#51, align 1
+  %#53 = mul i32 %#52, 2246822519
+  %#54 = add i32 %#53, noundef %#1
+  %#55 = fshl i32 %#54, i32 %#54, i32 13
+  %#56 = mul i32 %#55, 2654435761
+  %#57 = freeze i32 %#56
+  %#58 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#59 = load i32, ptr %#58, align 1
+  %#60 = mul i32 %#59, 2246822519
+  %#61 = add i32 %#60, %#30
+  %#62 = fshl i32 %#61, i32 %#61, i32 13
+  %#63 = mul i32 %#62, 2654435761
+  %#64 = freeze i32 %#63
+  %#65 = gep ptr nowrite noundef %#0, 1 x i64 16
+  %#66 = icmp ult ptr %#65, %#37
+  br i1 %#66, label %#4, label %#5
+
+#4:
+  %#67 = gep inbounds nuw ptr %#27, 1 x i64 40
+  %#68 = load i8, ptr %#65, align 1
+  store i8 %#68, ptr %#35, align 8
+  store i32 1, ptr %#67, align 8
+  store i32 47, ptr %#27, align 8
+  %#69 = gep inbounds nuw ptr %#27, 1 x i64 4
+  store i32 1, ptr %#69, align 4
+  %#70 = gep inbounds nuw ptr %#27, 1 x i64 40
+  %#71 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 17
+  %#72 = gep inbounds nuw ptr %#27, 1 x i64 25
+  memcpy ptr %#72 align 1, ptr %#71 align 1, i64 15
+  %#73 = load i32, ptr %#35, align 8
+  %#74 = mul i32 %#73, 2246822519
+  %#75 = add i32 %#74, %#43
+  %#76 = fshl i32 %#75, i32 %#75, i32 13
+  %#77 = mul i32 %#76, 2654435761
+  %#78 = freeze i32 %#77
+  store i32 %#78, ptr %#31, align 8
+  %#79 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#80 = load i32, ptr %#79, align 4
+  %#81 = mul i32 %#80, 2246822519
+  %#82 = add i32 %#81, %#50
+  %#83 = fshl i32 %#82, i32 %#82, i32 13
+  %#84 = mul i32 %#83, 2654435761
+  %#85 = freeze i32 %#84
+  store i32 %#85, ptr %#32, align 4
+  %#86 = gep inbounds nuw ptr %#27, 1 x i64 32
+  %#87 = load i32, ptr %#86, align 8
+  %#88 = mul i32 %#87, 2246822519
+  %#89 = add i32 %#88, %#57
+  %#90 = fshl i32 %#89, i32 %#89, i32 13
+  %#91 = mul i32 %#90, 2654435761
+  %#92 = freeze i32 %#91
+  store i32 %#92, ptr %#33, align 8
+  %#93 = gep inbounds nuw ptr %#27, 1 x i64 36
+  %#94 = load i32, ptr %#93, align 4
+  %#95 = mul i32 %#94, 2246822519
+  %#96 = add i32 %#95, %#64
+  %#97 = fshl i32 %#96, i32 %#96, i32 13
+  %#98 = mul i32 %#97, 2654435761
+  %#99 = freeze i32 %#98
+  store i32 %#99, ptr %#34, align 4
+  %#100 = load i32, ptr %#70, align 8
+  %#101 = sub i32 16, %#100
+  %#102 = zext i32 %#101 to i64
+  %#103 = add nsw nuw i64 %#102, 17
+  store i32 0, ptr %#70, align 8
+  %#104 = icmp ugt i32 %#101, 14
+  br i1 %#104, label %#7, label %#6
+
+#5:
+  %#105 = phi i32 [ %#64, %#3 ], [ %#30, %#2 ]
+  %#106 = phi i32 [ %#57, %#3 ], [ noundef %#1, %#2 ]
+  %#107 = phi i32 [ %#50, %#3 ], [ %#29, %#2 ]
+  %#108 = phi i32 [ %#43, %#3 ], [ %#28, %#2 ]
+  %#109 = phi i32 [ 47, %#3 ], [ 30, %#2 ]
+  store i32 %#109, ptr %#27, align 8
+  %#110 = gep inbounds nuw ptr %#27, 1 x i64 4
+  store i32 1, ptr %#110, align 4
+  %#111 = gep inbounds nuw ptr %#27, 1 x i64 40
+  br label %#6
+
+#6:
+  %#112 = phi ptr [ %#70, %#4 ], [ %#111, %#5 ]
+  %#113 = phi i32 [ 47, %#4 ], [ %#109, %#5 ]
+  %#114 = phi i32 [ %#99, %#4 ], [ %#105, %#5 ]
+  %#115 = phi i32 [ %#92, %#4 ], [ %#106, %#5 ]
+  %#116 = phi i32 [ %#85, %#4 ], [ %#107, %#5 ]
+  %#117 = phi i32 [ %#78, %#4 ], [ %#108, %#5 ]
+  %#118 = phi i64 [ %#103, %#4 ], [ 17, %#5 ]
+  %#119 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#118
+  %#120 = load i32, ptr %#119, align 1
+  %#121 = mul i32 %#120, 2246822519
+  %#122 = add i32 %#121, %#117
+  %#123 = fshl i32 %#122, i32 %#122, i32 13
+  %#124 = mul i32 %#123, 2654435761
+  %#125 = freeze i32 %#124
+  %#126 = gep inbounds nuw ptr %#119, 1 x i64 4
+  %#127 = load i32, ptr %#126, align 1
+  %#128 = mul i32 %#127, 2246822519
+  %#129 = add i32 %#128, %#116
+  %#130 = fshl i32 %#129, i32 %#129, i32 13
+  %#131 = mul i32 %#130, 2654435761
+  %#132 = freeze i32 %#131
+  %#133 = gep inbounds nuw ptr %#119, 1 x i64 8
+  %#134 = load i32, ptr %#133, align 1
+  %#135 = mul i32 %#134, 2246822519
+  %#136 = add i32 %#135, %#115
+  %#137 = fshl i32 %#136, i32 %#136, i32 13
+  %#138 = mul i32 %#137, 2654435761
+  %#139 = freeze i32 %#138
+  %#140 = gep inbounds nuw ptr %#119, 1 x i64 12
+  %#141 = load i32, ptr %#140, align 1
+  %#142 = mul i32 %#141, 2246822519
+  %#143 = add i32 %#142, %#114
+  %#144 = fshl i32 %#143, i32 %#143, i32 13
+  %#145 = mul i32 %#144, 2654435761
+  %#146 = freeze i32 %#145
+  %#147 = add nsw nuw i64 %#118, 16
+  store i32 %#125, ptr %#31, align 8
+  store i32 %#132, ptr %#32, align 4
+  store i32 %#139, ptr %#33, align 8
+  store i32 %#146, ptr %#34, align 4
+  br label %#7
+
+#7:
+  %#148 = phi ptr [ %#70, %#4 ], [ %#112, %#6 ]
+  %#149 = phi i32 [ 47, %#4 ], [ %#113, %#6 ]
+  %#150 = phi i32 [ %#99, %#4 ], [ %#146, %#6 ]
+  %#151 = phi i32 [ %#92, %#4 ], [ %#139, %#6 ]
+  %#152 = phi i32 [ %#85, %#4 ], [ %#132, %#6 ]
+  %#153 = phi i32 [ %#78, %#4 ], [ %#125, %#6 ]
+  %#154 = phi i64 [ %#103, %#4 ], [ %#147, %#6 ]
+  %#155 = icmp samesign ult i64 %#154, 47
+  br i1 %#155, label %#8, label %#25
+
+#8:
+  %#156 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#154
+  %#157 = sub nsw nuw i64 47, %#154
+  memcpy ptr %#35 align 8, ptr %#156 align 1, i64 %#157
+  %#158 = trunc nsw nuw i64 %#157 to i32
+  store i32 %#158, ptr %#148, align 8
+  %#159 = and i32 %#158, 15
+  %#160 = fshl i32 %#152, i32 %#152, i32 7
+  %#161 = fshl i32 %#153, i32 %#153, i32 1
+  %#162 = add i32 %#160, %#161
+  %#163 = fshl i32 %#151, i32 %#151, i32 12
+  %#164 = add i32 %#162, %#163
+  %#165 = fshl i32 %#150, i32 %#150, i32 18
+  %#166 = add i32 %#164, %#165
+  %#167 = add i32 %#149, %#166
+  switch i32 %#159, label %#21 [
+    i32 12, label %#18
+    i32 8, label %#19
+    i32 4, label %#20
+    i32 13, label %#15
+    i32 9, label %#16
+    i32 5, label %#17
+    i32 14, label %#12
+    i32 10, label %#13
+    i32 6, label %#14
+    i32 15, label %#9
+    i32 11, label %#10
+    i32 7, label %#11
+    i32 3, label %#22
+    i32 2, label %#23
+    i32 1, label %#24
+    i32 0, label %#26
+  ]
+
+#9:
+  %#168 = load i32, ptr %#35, align 8
+  %#169 = mul i32 %#168, 3266489917
+  %#170 = add i32 %#169, %#167
+  %#171 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#172 = fshl i32 %#170, i32 %#170, i32 17
+  %#173 = mul i32 %#172, 668265263
+  br label %#10
+
+#10:
+  %#174 = phi ptr [ %#35, %#8 ], [ %#171, %#9 ]
+  %#175 = phi i32 [ %#167, %#8 ], [ %#173, %#9 ]
+  %#176 = load i32, ptr %#174, align 4
+  %#177 = mul i32 %#176, 3266489917
+  %#178 = add i32 %#177, %#175
+  %#179 = gep inbounds nuw ptr %#174, 1 x i64 4
+  %#180 = fshl i32 %#178, i32 %#178, i32 17
+  %#181 = mul i32 %#180, 668265263
+  br label %#11
+
+#11:
+  %#182 = phi ptr [ %#35, %#8 ], [ %#179, %#10 ]
+  %#183 = phi i32 [ %#167, %#8 ], [ %#181, %#10 ]
+  %#184 = load i32, ptr %#182, align 4
+  %#185 = mul i32 %#184, 3266489917
+  %#186 = add i32 %#185, %#183
+  %#187 = gep inbounds nuw ptr %#182, 1 x i64 4
+  %#188 = fshl i32 %#186, i32 %#186, i32 17
+  %#189 = mul i32 %#188, 668265263
+  br label %#22
+
+#12:
+  %#190 = load i32, ptr %#35, align 8
+  %#191 = mul i32 %#190, 3266489917
+  %#192 = add i32 %#191, %#167
+  %#193 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#194 = fshl i32 %#192, i32 %#192, i32 17
+  %#195 = mul i32 %#194, 668265263
+  br label %#13
+
+#13:
+  %#196 = phi ptr [ %#35, %#8 ], [ %#193, %#12 ]
+  %#197 = phi i32 [ %#167, %#8 ], [ %#195, %#12 ]
+  %#198 = load i32, ptr %#196, align 4
+  %#199 = mul i32 %#198, 3266489917
+  %#200 = add i32 %#199, %#197
+  %#201 = gep inbounds nuw ptr %#196, 1 x i64 4
+  %#202 = fshl i32 %#200, i32 %#200, i32 17
+  %#203 = mul i32 %#202, 668265263
+  br label %#14
+
+#14:
+  %#204 = phi ptr [ %#35, %#8 ], [ %#201, %#13 ]
+  %#205 = phi i32 [ %#167, %#8 ], [ %#203, %#13 ]
+  %#206 = load i32, ptr %#204, align 4
+  %#207 = mul i32 %#206, 3266489917
+  %#208 = add i32 %#207, %#205
+  %#209 = gep inbounds nuw ptr %#204, 1 x i64 4
+  %#210 = fshl i32 %#208, i32 %#208, i32 17
+  %#211 = mul i32 %#210, 668265263
+  %#212 = gep inbounds nuw ptr %#204, 1 x i64 5
+  %#213 = load i8, ptr %#209, align 4
+  %#214 = zext i8 %#213 to i32
+  %#215 = mul i32 %#214, 374761393
+  %#216 = add i32 %#211, %#215
+  %#217 = fshl i32 %#216, i32 %#216, i32 11
+  %#218 = mul i32 %#217, 2654435761
+  %#219 = load i8, ptr %#212, align 1
+  %#220 = zext i8 %#219 to i32
+  %#221 = mul i32 %#220, 374761393
+  %#222 = add i32 %#218, %#221
+  %#223 = fshl i32 %#222, i32 %#222, i32 11
+  %#224 = mul i32 %#223, 2654435761
+  br label %#26
+
+#15:
+  %#225 = load i32, ptr %#35, align 8
+  %#226 = mul i32 %#225, 3266489917
+  %#227 = add i32 %#226, %#167
+  %#228 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#229 = fshl i32 %#227, i32 %#227, i32 17
+  %#230 = mul i32 %#229, 668265263
+  br label %#16
+
+#16:
+  %#231 = phi ptr [ %#35, %#8 ], [ %#228, %#15 ]
+  %#232 = phi i32 [ %#167, %#8 ], [ %#230, %#15 ]
+  %#233 = load i32, ptr %#231, align 4
+  %#234 = mul i32 %#233, 3266489917
+  %#235 = add i32 %#234, %#232
+  %#236 = gep inbounds nuw ptr %#231, 1 x i64 4
+  %#237 = fshl i32 %#235, i32 %#235, i32 17
+  %#238 = mul i32 %#237, 668265263
+  br label %#17
+
+#17:
+  %#239 = phi ptr [ %#35, %#8 ], [ %#236, %#16 ]
+  %#240 = phi i32 [ %#167, %#8 ], [ %#238, %#16 ]
+  %#241 = load i32, ptr %#239, align 4
+  %#242 = mul i32 %#241, 3266489917
+  %#243 = add i32 %#242, %#240
+  %#244 = gep inbounds nuw ptr %#239, 1 x i64 4
+  %#245 = fshl i32 %#243, i32 %#243, i32 17
+  %#246 = mul i32 %#245, 668265263
+  %#247 = load i8, ptr %#244, align 4
+  %#248 = zext i8 %#247 to i32
+  %#249 = mul i32 %#248, 374761393
+  %#250 = add i32 %#246, %#249
+  %#251 = fshl i32 %#250, i32 %#250, i32 11
+  %#252 = mul i32 %#251, 2654435761
+  br label %#26
+
+#18:
+  %#253 = load i32, ptr %#35, align 8
+  %#254 = mul i32 %#253, 3266489917
+  %#255 = add i32 %#254, %#167
+  %#256 = gep inbounds nuw ptr %#27, 1 x i64 28
+  %#257 = fshl i32 %#255, i32 %#255, i32 17
+  %#258 = mul i32 %#257, 668265263
+  br label %#19
+
+#19:
+  %#259 = phi ptr [ %#35, %#8 ], [ %#256, %#18 ]
+  %#260 = phi i32 [ %#167, %#8 ], [ %#258, %#18 ]
+  %#261 = load i32, ptr %#259, align 4
+  %#262 = mul i32 %#261, 3266489917
+  %#263 = add i32 %#262, %#260
+  %#264 = gep inbounds nuw ptr %#259, 1 x i64 4
+  %#265 = fshl i32 %#263, i32 %#263, i32 17
+  %#266 = mul i32 %#265, 668265263
+  br label %#20
+
+#20:
+  %#267 = phi ptr [ %#35, %#8 ], [ %#264, %#19 ]
+  %#268 = phi i32 [ %#167, %#8 ], [ %#266, %#19 ]
+  %#269 = load i32, ptr %#267, align 4
+  %#270 = mul i32 %#269, 3266489917
+  %#271 = add i32 %#270, %#268
+  %#272 = fshl i32 %#271, i32 %#271, i32 17
+  %#273 = mul i32 %#272, 668265263
+  br label %#26
+
+#21:
+  assume i1 0
+
+#22:
+  %#274 = phi ptr [ %#35, %#8 ], [ %#187, %#11 ]
+  %#275 = phi i32 [ %#167, %#8 ], [ %#189, %#11 ]
+  %#276 = gep inbounds nuw ptr %#274, 1 x i64 1
+  %#277 = load i8, ptr %#274, align 4
+  %#278 = zext i8 %#277 to i32
+  %#279 = mul i32 %#278, 374761393
+  %#280 = add i32 %#279, %#275
+  %#281 = fshl i32 %#280, i32 %#280, i32 11
+  %#282 = mul i32 %#281, 2654435761
+  br label %#23
+
+#23:
+  %#283 = phi ptr [ %#35, %#8 ], [ %#276, %#22 ]
+  %#284 = phi i32 [ %#167, %#8 ], [ %#282, %#22 ]
+  %#285 = gep inbounds nuw ptr %#283, 1 x i64 1
+  %#286 = load i8, ptr %#283, align 1
+  %#287 = zext i8 %#286 to i32
+  %#288 = mul i32 %#287, 374761393
+  %#289 = add i32 %#288, %#284
+  %#290 = fshl i32 %#289, i32 %#289, i32 11
+  %#291 = mul i32 %#290, 2654435761
+  br label %#24
+
+#24:
+  %#292 = phi ptr [ %#35, %#8 ], [ %#285, %#23 ]
+  %#293 = phi i32 [ %#167, %#8 ], [ %#291, %#23 ]
+  %#294 = load i8, ptr %#292, align 1
+  %#295 = zext i8 %#294 to i32
+  %#296 = mul i32 %#295, 374761393
+  %#297 = add i32 %#296, %#293
+  %#298 = fshl i32 %#297, i32 %#297, i32 11
+  %#299 = mul i32 %#298, 2654435761
+  br label %#26
+
+#25:
+  %#300 = fshl i32 %#152, i32 %#152, i32 7
+  %#301 = fshl i32 %#153, i32 %#153, i32 1
+  %#302 = add i32 %#300, %#301
+  %#303 = fshl i32 %#151, i32 %#151, i32 12
+  %#304 = add i32 %#302, %#303
+  %#305 = fshl i32 %#150, i32 %#150, i32 18
+  %#306 = add i32 %#304, %#305
+  %#307 = add i32 %#149, %#306
+  br label %#26
+
+#26:
+  %#308 = phi i32 [ %#224, %#14 ], [ %#252, %#17 ], [ %#273, %#20 ], [ %#167, %#8 ], [ %#299, %#24 ], [ %#307, %#25 ]
+  %#309 = lshr i32 %#308, 15
+  %#310 = xor i32 %#309, %#308
+  %#311 = mul i32 %#310, 2246822519
+  %#312 = lshr i32 %#311, 13
+  %#313 = xor i32 %#312, %#311
+  %#314 = mul i32 %#313, 3266489917
+  %#315 = lshr i32 %#314, 16
+  %#316 = xor i32 %#315, %#314
+  end_lifetime ptr %#27
+  ret i32 %#316
+}
+
+****************************************
+WARNING: Source function is always UB.
+It can be refined by any target function.
+Please make sure this is what you wanted.
+****************************************
+
+ERROR: The source program doesn't reach a return instruction.
+Consider increasing the unroll factor if it has loops
+
+Summary:
+  5 correct transformations
+  0 incorrect transformations
+  6 failed-to-prove transformations
+  0 Alive2 errors

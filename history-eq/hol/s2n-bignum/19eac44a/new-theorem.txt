@@ -1,0 +1,26 @@
+val BIGNUM_KSQR_32_64_SUBROUTINE_CORRECT : thm =
+  |- forall z x t a pc stackpointer returnaddress.
+         ALL (nonoverlapping (word_sub stackpointer (word 56),64))
+         [z,8 * 64; t,8 * 72] /\
+         ALL (nonoverlapping (word_sub stackpointer (word 56),56))
+         [word pc,5804; x,8 * 32] /\
+         nonoverlapping (z,8 * 64) (t,8 * 72) /\
+         ALLPAIRS nonoverlapping [z,8 * 64; t,8 * 72]
+         [word pc,5804; x,8 * 32]
+         ==> ensures x86
+             (\s.
+                  bytes_loaded s (word pc) bignum_ksqr_32_64_mc /\
+                  read RIP s = word pc /\
+                  read RSP s = stackpointer /\
+                  read (memory :> bytes64 stackpointer) s = returnaddress /\
+                  C_ARGUMENTS [z; x; t] s /\
+                  bignum_from_memory (x,32) s = a)
+             (\s.
+                  read RIP s = returnaddress /\
+                  read RSP s = word_add stackpointer (word 8) /\
+                  bignum_from_memory (z,64) s = a EXP 2)
+             (MAYCHANGE [RIP; RSP; RSI; RDI; RAX; RCX; RDX; R8; R9; R10; R11] ,,
+              MAYCHANGE
+              [memory :> bytes (z,8 * 64); memory :> bytes (t,8 * 72);
+               memory :> bytes (word_sub stackpointer (word 56),56)] ,,
+              MAYCHANGE SOME_FLAGS)

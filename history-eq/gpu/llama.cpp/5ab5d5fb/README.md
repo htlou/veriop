@@ -1,0 +1,12 @@
+# llama.cpp `5ab5d5fb`: AArch64 Q6_K × Q8_K 2×2 dot batching
+
+**Verdict: `UNKNOWN`; Alive2 timed out on the intended four-output relation.** The commit changes `ggml_vec_dot_q6_K_q8_K` so an AArch64 i8mm caller can request two rows/columns in one call. [reproduce.py](reproduce.py) extracts the exact [old](old-body.c) and [new](new-body.c) historical function bodies. Its comparison calls the old function four times with valid `nrc=1` inputs to fill a 2×2 output, and calls the new function once with `nrc=2`, `n=256`, and block-size byte strides. The wrapper maps outputs as `(x0,y0)`, `(x1,y0)`, `(x0,y1)`, `(x1,y1)` on both sides.
+
+Both sides compile with Clang 20 for `aarch64-linux-gnu -march=armv8.6-a+i8mm` without SVE, selecting the historical old NEON path and new i8mm path. The standalone harness uses ABI-matched historical Q6/Q8 block layouts and an IEEE-half conversion model in place of shared headers/runtime support. The exact body remains unchanged; the wrapper only fixes one valid 2×2 workload and forces inlining so Alive2 sees both computations. LLVM's `noalias` attributes and alias metadata are removed from the [normalized old](old-normalized.ll) and [new](new-normalized.ll) modules to fit Alive2's input model; both modules pass LLVM verification. This weakens alias assumptions and does not create a proof.
+
+[Alive2's run](alive2.log) reports `ERROR: Timeout`, one failed-to-prove transformation, zero correct transformations, and zero incorrect transformations. It supplies neither output equality nor a valid counterexample. The historical source and header hashes are in [manifest.json](manifest.json). There is no official before/after benchmark score for this historical pair in the workspace; Kuiper and Volta were not used.
+
+As a finite counterexample search, [emulate_aarch64.py](emulate_aarch64.py) compiles the same source-checked historical bodies for AArch64 i8mm and runs them under QEMU. Its [harness](emulator_harness.c) compares all four output bits for a two-block (`n=512`) 2×2 dot product on 256 deterministic quantized inputs, with each Q8 `bsums` derived from its `qs`. The [run log](emulator.log) reports `256 trials: equal bits`. This is execution evidence only; it does not discharge Alive2's symbolic obligation or change the `UNKNOWN` verdict.
+
+Run `python3 -B history-eq/gpu/llama.cpp/5ab5d5fb/reproduce.py` from the project root to regenerate and retry the check.
+Run `python3 -B history-eq/gpu/llama.cpp/5ab5d5fb/emulate_aarch64.py` to repeat the finite AArch64 check.

@@ -1,0 +1,141 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=60000 --always-verify c/xxHash/2765879/r_client/old.ll c/xxHash/2765879/r_client/new.ll
+
+----------------------------------------
+declare i64 @XXH64(noundef ptr, noundef i64, noundef i64) nofree willreturn memory(read)
+declare void @ext()
+
+define i64 @target_client_oneshot(i64 noundef %#0) {
+#1:
+  %#2 = alloca i64 32, align 16, dead
+  start_lifetime ptr %#2
+  store i64 noundef %#0, ptr %#2, align 16
+  %#3 = gep inbounds nuw ptr %#2, 1 x i64 8
+  store i64 noundef %#0, ptr %#3, align 8
+  %#4 = gep inbounds nuw ptr %#2, 1 x i64 16
+  store i64 noundef %#0, ptr %#4, align 16
+  %#5 = gep inbounds nuw ptr %#2, 1 x i64 24
+  store i64 noundef %#0, ptr %#5, align 8
+  %#6 = call i64 @XXH64(nonnull noundef ptr %#2, noundef i64 32, noundef i64 0) nofree willreturn memory(read)
+  tail call void @ext()
+  %#7 = add i64 noundef %#0, %#6
+  end_lifetime ptr %#2
+  ret i64 %#7
+}
+=>
+declare i64 @XXH64(noundef ptr, noundef i64, noundef i64) nofree willreturn memory(read)
+declare void @ext()
+
+define i64 @target_client_oneshot(i64 noundef %#0) {
+#1:
+  %#2 = alloca i64 32, align 16, dead
+  start_lifetime ptr %#2
+  store i64 noundef %#0, ptr %#2, align 16
+  %#3 = gep inbounds nuw ptr %#2, 1 x i64 8
+  store i64 noundef %#0, ptr %#3, align 8
+  %#4 = gep inbounds nuw ptr %#2, 1 x i64 16
+  store i64 noundef %#0, ptr %#4, align 16
+  %#5 = gep inbounds nuw ptr %#2, 1 x i64 24
+  store i64 noundef %#0, ptr %#5, align 8
+  %#6 = call i64 @XXH64(nonnull noundef ptr %#2, noundef i64 32, noundef i64 0) nofree willreturn memory(read)
+  tail call void @ext()
+  %#7 = add i64 %#6, noundef %#0
+  end_lifetime ptr %#2
+  ret i64 %#7
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare i32 @XXH64_update(noundef ptr, noundef ptr, noundef i64)
+declare void @ext()
+
+define i64 @target_client_update(ptr noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 32, align 16, dead
+  start_lifetime ptr %#3
+  store i64 noundef %#1, ptr %#3, align 16
+  %#4 = gep inbounds nuw ptr %#3, 1 x i64 8
+  store i64 noundef %#1, ptr %#4, align 8
+  %#5 = gep inbounds nuw ptr %#3, 1 x i64 16
+  store i64 noundef %#1, ptr %#5, align 16
+  %#6 = gep inbounds nuw ptr %#3, 1 x i64 24
+  store i64 noundef %#1, ptr %#6, align 8
+  %#7 = call i32 @XXH64_update(noundef ptr noundef %#0, nonnull noundef ptr %#3, noundef i64 32)
+  call void @ext()
+  %#8 = load i64, ptr %#4, align 8
+  end_lifetime ptr %#3
+  ret i64 %#8
+}
+=>
+declare i32 @XXH64_update(noundef ptr, noundef ptr, noundef i64)
+declare void @ext()
+
+define i64 @target_client_update(ptr noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 32, align 16, dead
+  start_lifetime ptr %#3
+  store i64 noundef %#1, ptr %#3, align 16
+  %#4 = gep inbounds nuw ptr %#3, 1 x i64 8
+  store i64 noundef %#1, ptr %#4, align 8
+  %#5 = gep inbounds nuw ptr %#3, 1 x i64 16
+  store i64 noundef %#1, ptr %#5, align 16
+  %#6 = gep inbounds nuw ptr %#3, 1 x i64 24
+  store i64 noundef %#1, ptr %#6, align 8
+  %#7 = call i32 @XXH64_update(noundef ptr noundef %#0, nonnull noundef ptr %#3, noundef i64 32)
+  tail call void @ext()
+  %#8 = load i64, ptr %#4, align 8
+  end_lifetime ptr %#3
+  ret i64 %#8
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+declare i32 @XXH3_64bits_update(noundef ptr, noundef ptr, noundef i64)
+declare void @ext()
+
+define i32 @target_client_xxh3_update(ptr noundef %#0, i32 noundef %#1) {
+#2:
+  %#3 = alloca i64 16, align 16, dead
+  start_lifetime ptr %#3
+  store i32 noundef %#1, ptr %#3, align 16
+  %#4 = gep inbounds nuw ptr %#3, 1 x i64 4
+  store i32 noundef %#1, ptr %#4, align 4
+  %#5 = gep inbounds nuw ptr %#3, 1 x i64 8
+  store i32 noundef %#1, ptr %#5, align 8
+  %#6 = gep inbounds nuw ptr %#3, 1 x i64 12
+  store i32 noundef %#1, ptr %#6, align 4
+  %#7 = call i32 @XXH3_64bits_update(noundef ptr noundef %#0, nonnull noundef ptr %#3, noundef i64 16)
+  call void @ext()
+  %#8 = load i32, ptr %#5, align 8
+  end_lifetime ptr %#3
+  ret i32 %#8
+}
+=>
+declare i32 @XXH3_64bits_update(noundef ptr, noundef ptr, noundef i64)
+declare void @ext()
+
+define i32 @target_client_xxh3_update(ptr noundef %#0, i32 noundef %#1) {
+#2:
+  %#3 = alloca i64 16, align 16, dead
+  start_lifetime ptr %#3
+  store i32 noundef %#1, ptr %#3, align 16
+  %#4 = gep inbounds nuw ptr %#3, 1 x i64 4
+  store i32 noundef %#1, ptr %#4, align 4
+  %#5 = gep inbounds nuw ptr %#3, 1 x i64 8
+  store i32 noundef %#1, ptr %#5, align 8
+  %#6 = gep inbounds nuw ptr %#3, 1 x i64 12
+  store i32 noundef %#1, ptr %#6, align 4
+  %#7 = call i32 @XXH3_64bits_update(noundef ptr noundef %#0, nonnull noundef ptr %#3, noundef i64 16)
+  tail call void @ext()
+  %#8 = load i32, ptr %#5, align 8
+  end_lifetime ptr %#3
+  ret i32 %#8
+}
+Transformation seems to be correct!
+
+Summary:
+  3 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

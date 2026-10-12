@@ -1,0 +1,105 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=300000 --always-verify r_api_canon/new.ll r_api_canon/old.ll
+
+----------------------------------------
+define i32 @target_api_xxh32_fromCanonical_ptr(ptr nowrite noundef %#0) nofree noundef willreturn memory(argmem: read) {
+#1:
+  %#2 = load i32, ptr nowrite noundef %#0, align 1
+  %#3 = bswap i32 %#2
+  assume_welldefined i32 %#3
+  ret i32 %#3
+}
+=>
+define i32 @target_api_xxh32_fromCanonical_ptr(ptr nowrite noundef %#0) nofree noundef willreturn memory(argmem: read) {
+#1:
+  %#2 = load i32, ptr nowrite noundef %#0, align 1
+  %#3 = bswap i32 %#2
+  assume_welldefined i32 %#3
+  ret i32 %#3
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_api_xxh64_fromCanonical_ptr(ptr nowrite noundef %#0) nofree noundef willreturn memory(argmem: read) {
+#1:
+  %#2 = load i64, ptr nowrite noundef %#0, align 1
+  %#3 = bswap i64 %#2
+  assume_welldefined i64 %#3
+  ret i64 %#3
+}
+=>
+define i64 @target_api_xxh64_fromCanonical_ptr(ptr nowrite noundef %#0) nofree noundef willreturn memory(argmem: read) {
+#1:
+  %#2 = load i64, ptr nowrite noundef %#0, align 1
+  %#3 = bswap i64 %#2
+  assume_welldefined i64 %#3
+  ret i64 %#3
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_api_xxh32_fromCanonical_val(i32 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i32 noundef %#0
+  assume_welldefined i32 %#2
+  ret i32 %#2
+}
+=>
+define i32 @target_api_xxh32_fromCanonical_val(i32 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i32 noundef %#0
+  assume_welldefined i32 %#2
+  ret i32 %#2
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_api_xxh64_fromCanonical_val(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i64 noundef %#0
+  assume_welldefined i64 %#2
+  ret i64 %#2
+}
+=>
+define i64 @target_api_xxh64_fromCanonical_val(i64 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = bswap i64 noundef %#0
+  assume_welldefined i64 %#2
+  ret i64 %#2
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define void @target_api_xxh128_fromCanonical_val(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = bswap i64 noundef %#0
+  assume_welldefined i64 %#4
+  %#5 = bswap i64 noundef %#1
+  assume_welldefined i64 %#5
+  store i64 %#5, ptr noread noundef initializes((0, 16)) %#2, align 8
+  %#6 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i64 8
+  store i64 %#4, ptr %#6, align 8
+  ret void
+}
+=>
+define void @target_api_xxh128_fromCanonical_val(i64 noundef %#0, i64 noundef %#1, ptr noread noundef initializes((0, 16)) %#2) nofree willreturn memory(argmem: write) {
+#3:
+  %#4 = bswap i64 noundef %#0
+  assume_welldefined i64 %#4
+  %#5 = bswap i64 noundef %#1
+  assume_welldefined i64 %#5
+  store i64 %#5, ptr noread noundef initializes((0, 16)) %#2, align 8
+  %#6 = gep inbounds nuw ptr noread noundef initializes((0, 16)) %#2, 1 x i64 8
+  store i64 %#4, ptr %#6, align 8
+  ret void
+}
+Transformation seems to be correct!
+
+Summary:
+  5 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

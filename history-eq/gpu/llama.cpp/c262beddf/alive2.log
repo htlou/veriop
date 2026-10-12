@@ -1,0 +1,80 @@
+
+----------------------------------------
+define i32 @gate(i64 noundef %#0, i64 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn memory(none) {
+#4:
+  %#7 = and i64 noundef %#0, 63
+  %#8 = icmp eq i64 %#7, 0
+  br i1 %#8, label %#5, label %#6
+
+#5:
+  %#9 = icmp eq i32 noundef %#2, 0
+  %#10 = icmp slt i64 noundef %#0, 129
+  %#11 = or i1 %#10, %#9
+  br label %#6
+
+#6:
+  %#12 = phi i1 [ 0, %#4 ], [ %#11, %#5 ]
+  %#13 = icmp eq i64 noundef %#1, 1
+  %#14 = and i1 %#13, %#12
+  %#15 = icmp eq i32 noundef %#3, 0
+  %#16 = and i1 %#15, %#14
+  %#17 = zext i1 %#16 to i32
+  %#range_0_%#17 = !range i32 %#17, i32 0, i32 2
+  ret i32 %#range_0_%#17
+}
+=>
+define i32 @gate(i64 noundef %#0, i64 noundef %#1, i32 noundef %#2, i32 noundef %#3) nofree willreturn memory(none) {
+#4:
+  %#5 = and i64 noundef %#0, 63
+  %#6 = icmp eq i64 %#5, 0
+  %#7 = icmp eq i64 noundef %#1, 1
+  %#8 = and i1 %#7, %#6
+  %#9 = icmp eq i32 noundef %#3, 0
+  %#10 = and i1 %#8, %#9
+  %#11 = zext i1 %#10 to i32
+  %#range_0_%#11 = !range i32 %#11, i32 0, i32 2
+  ret i32 %#range_0_%#11
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i64 noundef %#0 = #x00000000000000c0 (192)
+i64 noundef %#1 = #x0000000000000001 (1)
+i32 noundef %#2 = #x00000001 (1)
+i32 noundef %#3 = #x00000000 (0)
+
+Source:
+i64 %#7 = #x0000000000000000 (0)
+i1 %#8 = #x1 (1)
+  >> Jump to %#5
+i1 %#9 = #x0 (0)
+i1 %#10 = #x0 (0)
+i1 %#11 = #x0 (0)
+  >> Jump to %#6
+i1 %#12 = #x0 (0)
+i1 %#13 = #x1 (1)
+i1 %#14 = #x0 (0)
+i1 %#15 = #x1 (1)
+i1 %#16 = #x0 (0)
+i32 %#17 = #x00000000 (0)
+i32 %#range_0_%#17 = #x00000000 (0)
+
+Target:
+i64 %#5 = #x0000000000000000 (0)
+i1 %#6 = #x1 (1)
+i1 %#7 = #x1 (1)
+i1 %#8 = #x1 (1)
+i1 %#9 = #x1 (1)
+i1 %#10 = #x1 (1)
+i32 %#11 = #x00000001 (1)
+i32 %#range_0_%#11 = #x00000001 (1)
+Source value: #x00000000 (0)
+Target value: #x00000001 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

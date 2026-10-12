@@ -1,0 +1,107 @@
+rand_beebs() {
+   10:	
+    9:	EAX = int64[seed + 0]; 
+    8:	EAX = EAX *l 1103515245; 
+    7:	EAX = EAX + 12345 (long); 
+    6:	EAX = EAX &l 2147483647; 
+    5:	int64[seed + 0] = EAX; 
+    4:	
+    3:	EAX = EAX >>ls 16; 
+    2:	EAX = lowlong(EAX); 
+    1:	return
+}
+
+srand_beebs() {
+    4:	
+    3:	EAX = long32unsigned(EDI); 
+    2:	int64[seed + 0] = EAX; 
+    1:	return
+}
+
+init_heap_beebs() {
+    8:	
+    7:	int64[heap_ptr + 0] = EDI; 
+    6:	
+    5:	EAX = EDI + ESI + 0 (long); 
+    4:	int64[heap_end + 0] = EAX; 
+    3:	EAX = 0L; 
+    2:	int64[heap_requested + 0] = EAX; 
+    1:	return
+}
+
+check_heap_beebs() {
+    6:	
+    5:	EAX = int64[heap_requested + 0]; 
+    4:	ECX = EDI + EAX + 0 (long); 
+    3:	EDX = int64[heap_end + 0]; 
+    2:	EAX = ECX <=lu EDX; 
+    1:	return
+}
+
+malloc_beebs() {
+   18:	
+   17:	EAX = int64[heap_ptr + 0]; 
+   16:	ECX = int64[heap_requested + 0]; 
+   15:	ESI = ECX + EDI + 0 (long); 
+   14:	int64[heap_requested + 0] = ESI; 
+   13:	
+   12:	ECX = EAX + EDI + 0 (long); 
+   11:	EDX = int64[heap_end + 0]; 
+   10:	if (ECX >lu EDX) goto 3 else goto 9
+    9:	
+    8:	if (EDI ==lu 0) goto 2 else goto 7
+    7:	
+    6:	
+    5:	int64[heap_ptr + 0] = ECX; 
+    4:	goto 1
+    3:	
+    2:	EAX = 0L; 
+    1:	return
+}
+
+calloc_beebs() {
+   10:	R12 = ESI; EBP = EDI; 
+    9:	EDI = EBP; EDI = EDI *l R12; 
+    8:	call "malloc_beebs"; EBX = EAX; 
+    7:	
+    6:	if (EBX !=lu 0) goto 5 else goto 2
+    5:	ESI = 0; 
+    4:	EDX = EBP; EDX = EDX *l R12; 
+    3:	EDI = EBX; call "memset"; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+realloc_beebs() {
+   25:	
+   24:	EAX = int64[heap_ptr + 0]; 
+   23:	R8 = int64[heap_requested + 0]; 
+   22:	R8 = R8 + ESI + 0 (long); 
+   21:	int64[heap_requested + 0] = R8; 
+   20:	
+   19:	ECX = EAX + ESI + 0 (long); 
+   18:	R9 = int64[heap_end + 0]; 
+   17:	if (ECX >lu R9) goto 3 else goto 16
+   16:	
+   15:	if (ESI ==lu 0) goto 2 else goto 14
+   14:	
+   13:	
+   12:	int64[heap_ptr + 0] = ECX; 
+   11:	if (EDI !=lu 0) goto 10 else goto 4
+   10:	R8 = 0L; 
+    9:	if (R8 <lu ESI) goto 8 else goto 4
+    8:	ECX = int8s[EDI + R8 + 0]; 
+    7:	
+    6:	int8s[EAX + R8 + 0] = ECX; 
+    5:	R8 = R8 + 1 (long); goto 9
+    4:	goto 1
+    3:	
+    2:	EAX = 0L; 
+    1:	return
+}
+
+free_beebs() {
+    2:	
+    1:	return
+}
+

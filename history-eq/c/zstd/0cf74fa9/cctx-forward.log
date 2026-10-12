@@ -1,0 +1,59 @@
+
+----------------------------------------
+define i64 @target_cctx_request(i32 noundef %#0) nofree willreturn memory(globals: write, inaccessiblemem: write, errno: write, other: write) {
+#1:
+  %#2 = icmp ne i32 noundef %#0, 0
+  assume i1 %#2
+  %#3 = icmp ult i32 noundef %#0, 129
+  assume i1 %#3
+  %#4 = shl nsw nuw i32 noundef %#0, 3
+  %#5 = add nsw nuw i32 %#4, 16
+  %#6 = zext nneg i32 %#5 to i64
+  %#range_0_%#6 = !range i64 %#6, i64 24, i64 1041
+  ret i64 %#range_0_%#6
+}
+=>
+define i64 @target_cctx_request(i32 noundef %#0) nofree willreturn memory(globals: write, inaccessiblemem: write, errno: write, other: write) {
+#1:
+  %#2 = icmp ne i32 noundef %#0, 0
+  assume i1 %#2
+  %#3 = icmp ult i32 noundef %#0, 129
+  assume i1 %#3
+  %#4 = add nsw i32 noundef %#0, 4294967295
+  %#5 = zext nneg i32 %#4 to i64
+  %#6 = shl nsw nuw i64 %#5, 3
+  %#7 = add nsw nuw i64 %#6, 16
+  %#range_0_%#7 = !range i64 %#7, i64 16, i64 1033
+  ret i64 %#range_0_%#7
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #x00000005 (5)
+
+Source:
+i1 %#2 = #x1 (1)
+i1 %#3 = #x1 (1)
+i32 %#4 = #x00000028 (40)
+i32 %#5 = #x00000038 (56)
+i64 %#6 = #x0000000000000038 (56)
+i64 %#range_0_%#6 = #x0000000000000038 (56)
+
+Target:
+i1 %#2 = #x1 (1)
+i1 %#3 = #x1 (1)
+i32 %#4 = #x00000004 (4)
+i64 %#5 = #x0000000000000004 (4)
+i64 %#6 = #x0000000000000020 (32)
+i64 %#7 = #x0000000000000030 (48)
+i64 %#range_0_%#7 = #x0000000000000030 (48)
+Source value: #x0000000000000038 (56)
+Target value: #x0000000000000030 (48)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

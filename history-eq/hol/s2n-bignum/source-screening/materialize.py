@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Archive assembly/proof diffs for locally available s2n-bignum samples."""
+
+import os
+from pathlib import Path
+import subprocess
+
+here = Path(__file__).resolve().parent
+repo = here.parents[3] / "benchmarks/repos/s2n-bignum"
+commits = (
+    "0a681ce66", "19eac44af", "7420a7173", "91d4a8033",
+    "9f9dd0002", "d1ef8cfa0", "d830e3c5b", "f218286ce",
+)
+
+
+def git(*args):
+    return subprocess.check_output(
+        ["git", "-C", str(repo), *args],
+        env={**os.environ, "GIT_NO_LAZY_FETCH": "1"},
+    )
+
+
+for short in commits:
+    commit = git("rev-parse", short).decode().strip()
+    parent = git("rev-parse", commit + "^").decode().strip()
+    paths = git("diff-tree", "--no-commit-id", "--name-only", "-r", commit).decode().splitlines()
+    selected = [
+        path for path in paths
+        if path.endswith((".S", ".ml")) and not path.startswith(("benchmarks/", "tests/"))
+    ]
+    assert selected, commit
+    diff = git("diff", parent, commit, "--", *selected)
+    assert diff, commit
+    (here / f"{short[:8]}.source.diff").write_bytes(diff)
+    (here / f"{short[:8]}.paths.txt").write_text("\n".join(selected) + "\n")
+    print(f"{short[:8]}: {len(selected)} files, {len(diff)} diff bytes")

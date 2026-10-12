@@ -1,0 +1,115 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=900000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/681ea2a/api_armv5_len3_nw/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/681ea2a/api_armv5_len3_nw/old.ll
+
+----------------------------------------
+define i32 @target_xxh32(ptr noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i32 4294967292 to ptr
+  %#9 = icmp ugt ptr noundef %#0, %__constexpr_0
+  br i1 %#9, label %#8, label %#3
+
+#3:
+  %#10 = ptrtoint ptr noundef %#0 to i32
+  %#11 = and i32 %#10, 3
+  %#12 = icmp eq i32 %#11, 0
+  br i1 %#12, label %#4, label %#5
+
+#4:
+  %#13 = add i32 noundef %#1, 374761396
+  br label %#6
+
+#5:
+  %#14 = gep ptr noundef %#0, 1 x i32 3
+  %#15 = add i32 noundef %#1, 374761396
+  %#16 = icmp ult ptr noundef %#0, %#14
+  br i1 %#16, label %#6, label %#7
+
+#6:
+  %#17 = phi i32 [ %#13, %#4 ], [ %#15, %#5 ]
+  %#18 = load i8, ptr noundef %#0, align 1
+  %#19 = zext i8 %#18 to i32
+  %#20 = mul i32 %#19, 374761393
+  %#21 = add i32 %#20, %#17
+  %#22 = fshl i32 %#21, i32 %#21, i32 11
+  %#23 = mul i32 %#22, 2654435761
+  %#24 = gep inbounds nuw ptr noundef %#0, 1 x i32 1
+  %#25 = load i8, ptr %#24, align 1
+  %#26 = zext i8 %#25 to i32
+  %#27 = mul i32 %#26, 374761393
+  %#28 = add i32 %#27, %#23
+  %#29 = fshl i32 %#28, i32 %#28, i32 11
+  %#30 = mul i32 %#29, 2654435761
+  %#31 = gep inbounds nuw ptr noundef %#0, 1 x i32 2
+  %#32 = load i8, ptr %#31, align 1
+  %#33 = zext i8 %#32 to i32
+  %#34 = mul i32 %#33, 374761393
+  %#35 = add i32 %#34, %#30
+  %#36 = fshl i32 %#35, i32 %#35, i32 11
+  %#37 = mul i32 %#36, 2654435761
+  br label %#7
+
+#7:
+  %#38 = phi i32 [ %#15, %#5 ], [ %#37, %#6 ]
+  %#39 = lshr i32 %#38, 15
+  %#40 = xor i32 %#39, %#38
+  %#41 = mul i32 %#40, 2246822519
+  %#42 = lshr i32 %#41, 13
+  %#43 = xor i32 %#42, %#41
+  %#44 = mul i32 %#43, 3266489917
+  %#45 = lshr i32 %#44, 16
+  %#46 = xor i32 %#45, %#44
+  br label %#8
+
+#8:
+  %#47 = phi i32 [ %#46, %#7 ], [ 0, %#2 ]
+  ret i32 %#47
+}
+=>
+define i32 @target_xxh32(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %__constexpr_0 = int2ptr i32 4294967292 to ptr
+  %#5 = icmp ugt ptr nowrite noundef %#0, %__constexpr_0
+  br i1 %#5, label %#4, label %#3
+
+#3:
+  %#6 = add i32 noundef %#1, 374761396
+  %#7 = load i8, ptr nowrite noundef %#0, align 1
+  %#8 = zext i8 %#7 to i32
+  %#9 = mul i32 %#8, 374761393
+  %#10 = add i32 %#9, %#6
+  %#11 = fshl i32 %#10, i32 %#10, i32 11
+  %#12 = mul i32 %#11, 2654435761
+  %#13 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 1
+  %#14 = load i8, ptr %#13, align 1
+  %#15 = zext i8 %#14 to i32
+  %#16 = mul i32 %#15, 374761393
+  %#17 = add i32 %#16, %#12
+  %#18 = fshl i32 %#17, i32 %#17, i32 11
+  %#19 = mul i32 %#18, 2654435761
+  %#20 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i32 2
+  %#21 = load i8, ptr %#20, align 1
+  %#22 = zext i8 %#21 to i32
+  %#23 = mul i32 %#22, 374761393
+  %#24 = add i32 %#23, %#19
+  %#25 = fshl i32 %#24, i32 %#24, i32 11
+  %#26 = mul i32 %#25, 2654435761
+  %#27 = lshr i32 %#26, 15
+  %#28 = xor i32 %#27, %#26
+  %#29 = mul i32 %#28, 2246822519
+  %#30 = lshr i32 %#29, 13
+  %#31 = xor i32 %#30, %#29
+  %#32 = mul i32 %#31, 3266489917
+  %#33 = lshr i32 %#32, 16
+  %#34 = xor i32 %#33, %#32
+  br label %#4
+
+#4:
+  %#35 = phi i32 [ %#34, %#3 ], [ 0, %#2 ]
+  ret i32 %#35
+}
+ERROR: Timeout
+
+Summary:
+  0 correct transformations
+  0 incorrect transformations
+  1 failed-to-prove transformations
+  0 Alive2 errors

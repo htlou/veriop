@@ -1,0 +1,7 @@
+# xxHash `d2df04e`: complete C++17 module
+
+**Scoped verdict: `EQUIV`.** The historical commit changes only `xxhash.c`, adding C++ to the `FORCE_INLINE` macro condition. [`verify.py`](verify.py) checks the archived parent/child C and unchanged header against their Git blob IDs, then compiles each complete `xxhash.c` as C++17 with Clang 20, `-O2 -march=x86-64-v3 -fno-strict-aliasing`, and default macros.
+
+The [parent LLVM module](old.ll) and [child module](new.ll) each define 19 exported functions. Every definition except `XXH32_update`, `XXH32_digest`, `XXH64_update`, and `XXH64_digest` is byte-identical; all remaining module text is identical after those four definitions are isolated. For each of the four, Alive2 verifies the complete function in both directions, including output-memory effects: **8 correct transformations, zero incorrect, zero failed, zero errors** across the [saved logs](result.json). The checker copies remove `nocapture` from both sides because this Alive2 build rejects it; that admits a broader pointer domain and does not create an equivalence assumption. The exact IR files and hashes are recorded in the result.
+
+Run `python3 -B history-eq/c/xxHash/d2df04e/full-module/verify.py` from the project root. The result covers the compiled C++17 module under this build configuration; other compilers, architectures, external macro overrides, ABI details, and performance remain unchecked. No official historical benchmark score is claimed.

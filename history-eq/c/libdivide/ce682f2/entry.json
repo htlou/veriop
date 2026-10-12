@@ -1,0 +1,40 @@
+{
+  "commit": "ce682f2",
+  "date": "2016-08-04",
+  "subject": "Use __mulh(), __umulh() intrinsics for MSVC x64",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit selects native MSVC x64 high-multiply intrinsics in the division helpers.",
+  "change_summary": "Adds MSVC x64 high-multiply intrinsics, but the committed header has an unterminated preprocessor conditional.",
+  "units": [
+    {
+      "name": "committed MSVC x64 signed and unsigned high-multiply paths",
+      "level": "api",
+      "verdict": "UNSUPPORTED",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": "other",
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/ce682f2/msvc",
+      "evidence": "Clang targeting x86_64-pc-windows-msvc rejects the actual new header: unterminated conditional at libdivide.h:322. No valid new LLVM IR exists for Alive2."
+    },
+    {
+      "name": "repaired-header MSVC model, high multiplies and generated division",
+      "level": "precond",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 4,
+      "precondition": "One-character #if-to-#elif repair in candidate header; d != 0 for generated division",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/libdivide/ce682f2/msvc_fixed",
+      "evidence": "With that explicit repair, four high-multiply/API targets pass bidirectional Alive2 with unroll 4. This is conditional evidence, not proof of the committed source."
+    }
+  ],
+  "commit_verdict": "UNSUPPORTED",
+  "raw_verdict": "UNSUPPORTED",
+  "coverage": "partial",
+  "unsupported_reason": "other",
+  "not_equiv_kind": null,
+  "notes": "new_fixed/libdivide.h differs from new/libdivide.h by exactly changing the erroneous #if HAS_INT128_T to #elif HAS_INT128_T. The repaired run must not be promoted to a verdict about the original commit."
+}

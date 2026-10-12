@@ -1,0 +1,47 @@
+
+----------------------------------------
+define i32 @target(i32 noundef %#0) nofree noundef willreturn memory(none) {
+#1:
+  %#2 = udiv i32 noundef %#0, 3
+  %#range_0_%#2 = !range i32 %#2, i32 0, i32 1431655766
+  ret i32 %#range_0_%#2
+}
+=>
+define i32 @target(i32 noundef %#0) nofree willreturn memory(none) {
+#1:
+  %#2 = zext i32 noundef %#0 to i64
+  %#3 = mul nsw nuw i64 %#2, 1431655766
+  %#4 = lshr i64 %#3, 32
+  %#5 = trunc nsw nuw i64 %#4 to i32
+  %#6 = add i32 noundef %#0, %#5
+  %#7 = lshr i32 %#6, 2
+  %#range_0_%#7 = !range i32 %#7, i32 0, i32 1073741824
+  ret i32 %#range_0_%#7
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef %#0 = #xf012db89 (4027767689, -267199607)
+
+Source:
+i32 %#2 = #x5006492d (1342589229)
+i32 %#range_0_%#2 = #x5006492d (1342589229)
+
+Target:
+i64 %#2 = #x00000000f012db89 (4027767689)
+i64 %#3 = #x5006492e4ab73d06 (5766376836065344774)
+i64 %#4 = #x000000005006492e (1342589230)
+i32 %#5 = #x5006492e (1342589230)
+i32 %#6 = #x401924b7 (1075389623)
+i32 %#7 = #x1006492d (268847405)
+i32 %#range_0_%#7 = #x1006492d (268847405)
+Source value: #x5006492d (1342589229)
+Target value: #x1006492d (268847405)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

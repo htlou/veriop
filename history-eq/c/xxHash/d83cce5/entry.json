@@ -1,0 +1,28 @@
+{
+ "commit": "d83cce5",
+ "date": "2020-09-30",
+ "subject": "fix prefetching for x86 32-bit target on MSVC",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Prefetching is a pure performance feature; the misspelled macro _M_I86 meant MSVC x86-32 builds silently compiled XXH_PREFETCH to a no-op. The fix (_M_IX86) enables _mm_prefetch there.",
+ "change_summary": "XXH_PREFETCH: condition 'defined(_MSC_VER) && (defined(_M_X64) || defined(_M_I86))' -> '... || defined(_M_IX86))', so 32-bit MSVC uses _mm_prefetch(ptr, _MM_HINT_T0) in XXH3's long-input accumulate loop.",
+ "units": [
+  {
+   "name": "XXH3_64bits / XXH3_64bits_withSeed at len 256 (hashLong accumulate with XXH_PREFETCH), i686-pc-windows-msvc emulated with clang -fms-extensions -fms-compatibility -msse2",
+   "level": "api",
+   "verdict": "EQUIV_BOUNDED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/d83cce5/r_msvc_i686_sse2_fix",
+   "evidence": "fwd+bwd correct for both targets; old has no prefetch, new has 3/6 llvm.prefetch calls, which Alive2 treats as having no semantic effect"
+  }
+ ],
+ "commit_verdict": "EQUIV_BOUNDED",
+ "raw_verdict": "EQUIV_BOUNDED",
+ "coverage": "partial",
+ "unsupported_reason": null,
+ "not_equiv_kind": null,
+ "notes": "x86-64 IR unchanged under clang: all one-shot APIs (symbolic len) with -march=x86-64-v3 and default SSE2 give identical modules except !srcloc line metadata (x86_ident_v3/, x86_ident_sse2/). x86_64-pc-windows-msvc (_M_X64, unaffected) target IR identical too (ident_x86_64_msvc/). clang for i686-pc-windows-msvc defines _MSC_VER=1933 and _M_IX86=600 and no __GNUC__, so old = disabled prefetch, new = _mm_prefetch -> llvm.prefetch. -msse2 emulates MSVC's default /arch:SSE2 (_M_IX86_FP=2, also selects XXH_SSE2); without it clang rejects the new code ('_mm_prefetch' needs target feature, compile_i686_msvc_nosse2/) - a clang-cl emulation artifact, real MSVC accepts _mm_prefetch on /arch:IA32. Header shims for the msvc target (d83cce5/msvc_sysinc: setjmp.h, malloc.h, stdlib.h with _byteswap_*) so clang's intrin.h/mm_malloc.h can be included. The runner's asm->freeze rewrite produced invalid 'freeze ptr nonnull %x' (attribute copied); fixed by sed in r_msvc_i686_sse2_fix (README.txt), then alive-tv --smt-to=600000 per function. Fixed length 256 only (EQUIV_BOUNDED); coverage partial because the perf effect (cache prefetch) is outside IR semantics by design - the check only shows the prefetch adds no observable behaviour."
+}

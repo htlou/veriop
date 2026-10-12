@@ -1,0 +1,65 @@
+{
+  "commit": "eaffecc777c9be148e41a6f852154dc11881c374",
+  "source_blobs": {
+    "old": "fbbb66ec6a9ca8cd709e359c653e8c391ac84586",
+    "new": "108269076a17ade7cad1c6e663211b8ccb17624c"
+  },
+  "scope": "three direct memory-helper calls in default Clang 20 -O1 x86-64 translation units",
+  "o0_calls": {
+    "old": {
+      "target_copy": [
+        "%10 = call ptr @XXH_memcpy(ptr noundef %7, ptr noundef %8, i64 noundef %9)"
+      ],
+      "target_set": [
+        "%10 = call ptr @XXH_memset(ptr noundef %7, i32 noundef %8, i64 noundef %9)"
+      ],
+      "target_compare": [
+        "%10 = call i32 @XXH_memcmp(ptr noundef %7, ptr noundef %8, i64 noundef %9)"
+      ]
+    },
+    "new": {
+      "target_copy": [
+        "call void @llvm.memcpy.p0.p0.i64(ptr align 1 %7, ptr align 1 %8, i64 %9, i1 false)"
+      ],
+      "target_set": [
+        "call void @llvm.memset.p0.i64(ptr align 1 %7, i8 %9, i64 %10, i1 false)"
+      ],
+      "target_compare": [
+        "%10 = call i32 @memcmp(ptr noundef %7, ptr noundef %8, i64 noundef %9) #13"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "function": "target_copy",
+      "direction": "old-to-new",
+      "output": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    },
+    {
+      "function": "target_copy",
+      "direction": "new-to-old",
+      "output": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    },
+    {
+      "function": "target_set",
+      "direction": "old-to-new",
+      "output": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    },
+    {
+      "function": "target_set",
+      "direction": "new-to-old",
+      "output": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    },
+    {
+      "function": "target_compare",
+      "direction": "old-to-new",
+      "output": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    },
+    {
+      "function": "target_compare",
+      "direction": "new-to-old",
+      "output": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    }
+  ],
+  "verdict": "EQUIV_PARTIAL"
+}

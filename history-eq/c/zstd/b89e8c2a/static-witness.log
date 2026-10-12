@@ -1,0 +1,37 @@
+
+----------------------------------------
+define i32 @target_heap_bmi2_argument(i32 noundef returned %#0) nofree willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp ult i32 noundef returned %#0, 2
+  assume i1 %#2
+  %#range_0_noundef returned %#0 = !range i32 noundef returned %#0, i32 0, i32 2
+  ret i32 %#range_0_noundef returned %#0
+}
+=>
+define i32 @target_heap_bmi2_argument(i32 noundef %#0) nofree noundef willreturn memory(inaccessiblemem: write) {
+#1:
+  %#2 = icmp ult i32 noundef %#0, 2
+  assume i1 %#2
+  ret i32 0
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i32 noundef returned %#0 = #x00000001 (1)
+
+Source:
+i1 %#2 = #x1 (1)
+i32 %#range_0_noundef returned %#0 = #x00000001 (1)
+
+Target:
+i1 %#2 = #x1 (1)
+Source value: #x00000001 (1)
+Target value: #x00000000 (0)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

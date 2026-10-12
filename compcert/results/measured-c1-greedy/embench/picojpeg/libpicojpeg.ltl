@@ -1,0 +1,3143 @@
+getChar() {
+   50:	
+   49:	EAX = int8u[gInBufLeft + 0]; 
+   48:	if (EAX ==u 0) goto 47 else goto 13
+   47:	
+   46:	EAX = 4; 
+   45:	int8u[gInBufOfs + 0] = EAX; 
+   44:	EAX = 0; 
+   43:	int8u[gInBufLeft + 0] = EAX; 
+   42:	R10 = int64[g_pNeedBytesCallback + 0]; 
+   41:	
+   40:	
+   39:	
+   38:	EDI = gInBuf + 4 (long); 
+   37:	
+   36:	
+   35:	
+   34:	ESI = 252; 
+   33:	EDX = gInBufLeft + 0 (long); 
+   32:	ECX = int64[g_pCallback_data + 0]; 
+   31:	call R10; 
+   30:	EDX = int8unsigned(EAX); 
+   29:	
+   28:	if (EDX !=u 0) goto 27 else goto 25
+   27:	
+   26:	int8u[gCallbackStatus + 0] = EDX; 
+   25:	
+   24:	EAX = int8u[gInBufLeft + 0]; 
+   23:	if (EAX ==u 0) goto 22 else goto 13
+   22:	ECX = int8u[gTemFlag + 0]; 
+   21:	ECX = not(ECX); 
+   20:	ECX = int8unsigned(ECX); 
+   19:	int8u[gTemFlag + 0] = ECX; 
+   18:	EAX = 255; 
+   17:	R8 = 217; 
+   16:	
+   15:	EAX = ECX !=u 0 ?int EAX : R8; 
+   14:	goto 1
+   13:	EAX = int8u[gInBufLeft + 0]; 
+   12:	ESI = EAX + -1 (int); 
+   11:	
+   10:	int8u[gInBufLeft + 0] = ESI; 
+    9:	ECX = int8u[gInBufOfs + 0]; 
+    8:	EDI = ECX + 1 (int); 
+    7:	
+    6:	int8u[gInBufOfs + 0] = EDI; 
+    5:	EAX = gInBuf + 0 (long); 
+    4:	R9 = long32signed(ECX); 
+    3:	EAX = int8u[EAX + R9 + 0]; 
+    2:	
+    1:	return
+}
+
+stuffChar() {
+   15:	
+   14:	EDX = int8u[gInBufOfs + 0]; 
+   13:	R8 = EDX + -1 (int); 
+   12:	EAX = int8unsigned(R8); 
+   11:	int8u[gInBufOfs + 0] = EAX; 
+   10:	ESI = gInBuf + 0 (long); 
+    9:	
+    8:	R8 = long32signed(EAX); 
+    7:	
+    6:	int8u[ESI + R8 + 0] = EDI; 
+    5:	EAX = int8u[gInBufLeft + 0]; 
+    4:	ECX = EAX + 1 (int); 
+    3:	
+    2:	int8u[gInBufLeft + 0] = ECX; 
+    1:	return
+}
+
+getOctet() {
+   18:	EBP = EDI; 
+   17:	call "getChar"; 
+   16:	EBX = int8unsigned(EAX); 
+   15:	
+   14:	if (EBP !=u 0) goto 12 else goto 13
+   13:	goto 2
+   12:	
+   11:	if (EBX ==s 255) goto 10 else goto 2
+   10:	call "getChar"; 
+    9:	EDI = int8unsigned(EAX); 
+    8:	
+    7:	if (EDI !=u 0) goto 6 else goto 2
+    6:	
+    5:	call "stuffChar"; 
+    4:	EDI = 255; 
+    3:	call "stuffChar"; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+getBits() {
+   71:	EBP = ESI; R13 = EDI; 
+   70:	R12 = R13; 
+   69:	EBX = int16u[gBitBuf + 0]; 
+   68:	
+   67:	if (R13 >s 8) goto 66 else goto 40
+   66:	ESI = R13 + -8 (int); 
+   65:	R13 = int8unsigned(ESI); 
+   64:	EAX = EBX; 
+   63:	ECX = int8u[gBitsLeft + 0]; 
+   62:	EAX = EAX << ECX; 
+   61:	
+   60:	int16u[gBitBuf + 0] = EAX; 
+   59:	
+   58:	EDI = EBP; call "getOctet"; 
+   57:	R10 = int8unsigned(EAX); 
+   56:	EDX = int16u[gBitBuf + 0]; 
+   55:	EDX = EDX | R10; 
+   54:	
+   53:	
+   52:	
+   51:	ECX = 8; 
+   50:	R11 = int8u[gBitsLeft + 0]; 
+   49:	ECX = ECX - R11; 
+   48:	EDX = EDX << ECX; 
+   47:	R8 = int16unsigned(EDX); 
+   46:	int16u[gBitBuf + 0] = R8; 
+   45:	EBX = EBX & 65280; 
+   44:	
+   43:	R8 = R8 >>s 8; 
+   42:	EBX = EBX | R8; 
+   41:	EBX = int16unsigned(EBX); 
+   40:	ECX = int8u[gBitsLeft + 0]; 
+   39:	if (ECX <s R13) goto 38 else goto 14
+   38:	EDI = int16u[gBitBuf + 0]; 
+   37:	
+   36:	EDI = EDI << ECX; 
+   35:	
+   34:	int16u[gBitBuf + 0] = EDI; 
+   33:	
+   32:	EDI = EBP; call "getOctet"; 
+   31:	EAX = int8unsigned(EAX); 
+   30:	R9 = int16u[gBitBuf + 0]; 
+   29:	R9 = R9 | EAX; 
+   28:	
+   27:	
+   26:	
+   25:	EDX = int8u[gBitsLeft + 0]; 
+   24:	ECX = R13; ECX = ECX - EDX; 
+   23:	R9 = R9 << ECX; 
+   22:	
+   21:	int16u[gBitBuf + 0] = R9; 
+   20:	EDX = 8; 
+   19:	
+   18:	
+   17:	EDX = EDX - ECX; 
+   16:	
+   15:	int8u[gBitsLeft + 0] = EDX; goto 5
+   14:	
+   13:	ECX = ECX - R13; 
+   12:	
+   11:	
+   10:	int8u[gBitsLeft + 0] = ECX; 
+    9:	ESI = int16u[gBitBuf + 0]; 
+    8:	ECX = R13; ESI = ESI << ECX; 
+    7:	
+    6:	int16u[gBitBuf + 0] = ESI; 
+    5:	ECX = 16; 
+    4:	ECX = ECX - R12; 
+    3:	EBX = EBX >>s ECX; 
+    2:	EAX = int16unsigned(EBX); 
+    1:	return
+}
+
+getBits1() {
+    7:	
+    6:	
+    5:	ESI = 0; 
+    4:	call "getBits"; 
+    3:	EAX = int16unsigned(EAX); 
+    2:	
+    1:	return
+}
+
+getBits2() {
+    7:	
+    6:	
+    5:	ESI = 1; 
+    4:	call "getBits"; 
+    3:	EAX = int16unsigned(EAX); 
+    2:	
+    1:	return
+}
+
+getBit() {
+   28:	
+   27:	R11 = 0; 
+   26:	EBX = 1; 
+   25:	EDI = int16u[gBitBuf + 0]; 
+   24:	EBX = EDI & 0x8000 != 0 ?int EBX : R11; 
+   23:	R9 = int8u[gBitsLeft + 0]; 
+   22:	if (R9 ==u 0) goto 21 else goto 10
+   21:	EDI = 1; 
+   20:	call "getOctet"; 
+   19:	ECX = int8unsigned(EAX); 
+   18:	EAX = int16u[gBitBuf + 0]; 
+   17:	EAX = EAX | ECX; 
+   16:	
+   15:	int16u[gBitBuf + 0] = EAX; 
+   14:	EAX = int8u[gBitsLeft + 0]; 
+   13:	ESI = EAX + 8 (int); 
+   12:	
+   11:	int8u[gBitsLeft + 0] = ESI; 
+   10:	R10 = int8u[gBitsLeft + 0]; 
+    9:	ECX = R10 + -1 (int); 
+    8:	
+    7:	int8u[gBitsLeft + 0] = ECX; 
+    6:	R8 = int16u[gBitBuf + 0]; 
+    5:	EDX = R8 * 2 + 0 (int); 
+    4:	
+    3:	int16u[gBitBuf + 0] = EDX; 
+    2:	EAX = EBX; 
+    1:	return
+}
+
+huffExtend() {
+   57:	
+   56:	ECX = ESI; 
+   55:	
+   54:	
+   53:	
+   52:	if (ECX <u 16) goto 51 else goto 34
+   51:	jumptable (ECX)
+		case 0: goto 50
+		case 1: goto 49
+		case 2: goto 48
+		case 3: goto 47
+		case 4: goto 46
+		case 5: goto 45
+		case 6: goto 44
+		case 7: goto 43
+		case 8: goto 42
+		case 9: goto 41
+		case 10: goto 40
+		case 11: goto 39
+		case 12: goto 38
+		case 13: goto 37
+		case 14: goto 36
+		case 15: goto 35
+   50:	EAX = 0; goto 33
+   49:	EAX = 1; goto 33
+   48:	EAX = 2; goto 33
+   47:	EAX = 4; goto 33
+   46:	EAX = 8; goto 33
+   45:	EAX = 16; goto 33
+   44:	EAX = 32; goto 33
+   43:	EAX = 64; goto 33
+   42:	EAX = 128; goto 33
+   41:	EAX = 256; goto 33
+   40:	EAX = 512; goto 33
+   39:	EAX = 1024; goto 33
+   38:	EAX = 2048; goto 33
+   37:	EAX = 4096; goto 33
+   36:	EAX = 8192; goto 33
+   35:	EAX = 16384; goto 33
+   34:	EAX = 0; 
+   33:	
+   32:	
+   31:	if (EDI <s EAX) goto 30 else goto 3
+   30:	
+   29:	
+   28:	
+   27:	
+   26:	if (ESI <u 16) goto 25 else goto 8
+   25:	jumptable (ESI)
+		case 0: goto 24
+		case 1: goto 23
+		case 2: goto 22
+		case 3: goto 21
+		case 4: goto 20
+		case 5: goto 19
+		case 6: goto 18
+		case 7: goto 17
+		case 8: goto 16
+		case 9: goto 15
+		case 10: goto 14
+		case 11: goto 13
+		case 12: goto 12
+		case 13: goto 11
+		case 14: goto 10
+		case 15: goto 9
+   24:	EDX = 0; goto 7
+   23:	EDX = -1; goto 7
+   22:	EDX = -3; goto 7
+   21:	EDX = -7; goto 7
+   20:	EDX = -15; goto 7
+   19:	EDX = -31; goto 7
+   18:	EDX = -63; goto 7
+   17:	EDX = -127; goto 7
+   16:	EDX = -255; goto 7
+   15:	EDX = -511; goto 7
+   14:	EDX = -1023; goto 7
+   13:	EDX = -2047; goto 7
+   12:	EDX = -4095; goto 7
+   11:	EDX = -8191; goto 7
+   10:	EDX = -16383; goto 7
+    9:	EDX = -32767; goto 7
+    8:	EDX = 0; 
+    7:	
+    6:	
+    5:	
+    4:	EDI = EDI + EDX + 0 (int); goto 2
+    3:	
+    2:	EAX = int16signed(EDI); 
+    1:	return
+}
+
+huffDecode() {
+   35:	R13 = ESI; EBP = EDI; 
+   34:	R12 = 0; 
+   33:	call "getBit"; 
+   32:	EBX = int8unsigned(EAX); 
+   31:	
+   30:	ECX = long32signed(R12); 
+   29:	EAX = int16u[EBP + ECX * 2 + 32]; 
+   28:	
+   27:	if (EBX <=s EAX) goto 25 else goto 26
+   26:	goto 23
+   25:	
+   24:	if (EAX !=s 65535) goto 13 else goto 23
+   23:	ECX = R12 + 1 (int); 
+   22:	R12 = int8unsigned(ECX); 
+   21:	R11 = EBX * 2 + 0 (int); 
+   20:	EBX = int16unsigned(R11); 
+   19:	call "getBit"; 
+   18:	EDI = int8unsigned(EAX); 
+   17:	EBX = EBX | EDI; 
+   16:	
+   15:	if (R12 ==s 16) goto 14 else goto 30
+   14:	EAX = 0; goto 1
+   13:	
+   12:	ESI = int8u[EBP + ECX + 64]; 
+   11:	
+   10:	
+    9:	R8 = int16u[EBP + ECX * 2 + 0]; 
+    8:	EBX = EBX - R8; 
+    7:	R9 = ESI + EBX + 0 (int); 
+    6:	EDX = int8unsigned(R9); 
+    5:	
+    4:	EAX = long32signed(EDX); 
+    3:	EAX = int8u[R13 + EAX + 0]; 
+    2:	
+    1:	return
+}
+
+processMarkers() {
+  334:	R12 = EDI; 
+  333:	
+  332:	
+  331:	
+  330:	
+  329:	
+  328:	EDI = 8; 
+  327:	call "getBits1"; 
+  326:	
+  325:	ESI = int8unsigned(EAX); 
+  324:	
+  323:	if (ESI !=s 255) goto 322 else goto 321
+  322:	goto 330
+  321:	
+  320:	EDI = 8; 
+  319:	call "getBits1"; 
+  318:	
+  317:	ECX = int8unsigned(EAX); 
+  316:	
+  315:	if (ECX ==s 255) goto 314 else goto 313
+  314:	goto 320
+  313:	if (ECX ==s 0) goto 312 else goto 310
+  312:	
+  311:	goto 330
+  310:	
+  309:	
+  308:	
+  307:	
+  306:	
+  305:	if (ECX <u 206) goto 304 else goto 137
+  304:	if (ECX <u 198) goto 303 else goto 145
+  303:	if (ECX <u 194) goto 302 else goto 299
+  302:	if (ECX ==s 1) goto 126 else goto 301
+  301:	if (ECX ==s 192) goto 123 else goto 300
+  300:	if (ECX ==s 193) goto 123 else goto 104
+  299:	if (ECX <u 196) goto 298 else goto 297
+  298:	goto 123
+  297:	if (ECX ==s 196) goto 296 else goto 123
+  296:	
+  295:	EDI = 16; 
+  294:	call "getBits1"; 
+  293:	EDI = int16unsigned(EAX); 
+  292:	
+  291:	if (EDI <s 2) goto 290 else goto 289
+  290:	goto 146
+  289:	R8 = EDI + -2 (int); 
+  288:	EBP = int16unsigned(R8); 
+  287:	if (EBP !=u 0) goto 286 else goto 147
+  286:	EDI = 8; 
+  285:	call "getBits1"; 
+  284:	
+  283:	
+  282:	
+  281:	ESI = EAX; ESI = ESI & 15; 
+  280:	if (ESI >s 1) goto 149 else goto 279
+  279:	R8 = EAX; R8 = R8 & 240; 
+  278:	
+  277:	if (R8 >s 16) goto 148 else goto 276
+  276:	R11 = EAX; R11 = R11 >>s 3; 
+  275:	R11 = R11 & 2; 
+  274:	EAX = EAX & 1; 
+  273:	R11 = R11 + EAX + 0 (int); 
+  272:	R13 = int8unsigned(R11); 
+  271:	
+  270:	R11 = R13; 
+  269:	
+  268:	if (R11 <u 2) goto 267 else goto 264
+  267:	if (R11 ==s 0) goto 266 else goto 265
+  266:	ECX = gHuffTab0 + 0 (long); goto 259
+  265:	ECX = gHuffTab1 + 0 (long); goto 259
+  264:	if (R11 ==s 2) goto 260 else goto 263
+  263:	if (R11 ==s 3) goto 262 else goto 261
+  262:	ECX = gHuffTab3 + 0 (long); goto 259
+  261:	ECX = 0L; goto 259
+  260:	ECX = gHuffTab2 + 0 (long); 
+  259:	
+  258:	local(0,long) = ECX; 
+  257:	
+  256:	ESI = R13; 
+  255:	
+  254:	if (ESI <u 2) goto 253 else goto 250
+  253:	if (ESI ==s 0) goto 252 else goto 251
+  252:	EAX = gHuffVal0 + 0 (long); goto 245
+  251:	EAX = gHuffVal1 + 0 (long); goto 245
+  250:	if (ESI ==s 2) goto 246 else goto 249
+  249:	if (ESI ==s 3) goto 248 else goto 247
+  248:	EAX = gHuffVal3 + 0 (long); goto 245
+  247:	EAX = 0L; goto 245
+  246:	EAX = gHuffVal2 + 0 (long); 
+  245:	
+  244:	R15 = EAX; 
+  243:	R10 = int8u[gValidHuffTables + 0]; 
+  242:	EDX = 1; 
+  241:	ECX = R13; EDX = EDX << ECX; 
+  240:	R10 = R10 | EDX; 
+  239:	
+  238:	int8u[gValidHuffTables + 0] = R10; 
+  237:	EBX = 0; 
+  236:	R14 = 0; 
+  235:	EDI = 8; 
+  234:	call "getBits1"; 
+  233:	
+  232:	R9 = int8unsigned(EAX); 
+  231:	
+  230:	EDI = stack(0) (long); 
+  229:	R10 = long32signed(R14); 
+  228:	
+  227:	int8u[EDI + R10 + 0] = R9; 
+  226:	EDX = EBX + R9 + 0 (int); 
+  225:	EBX = int16unsigned(EDX); 
+  224:	
+  223:	R11 = R14 + 1 (int); 
+  222:	R14 = int8unsigned(R11); 
+  221:	if (R14 <=s 15) goto 235 else goto 220
+  220:	
+  219:	
+  218:	ECX = 12; 
+  217:	R10 = 255; 
+  216:	ECX = R13 <s 2 ?int ECX : R10; 
+  215:	
+  214:	
+  213:	
+  212:	if (EBX >s ECX) goto 211 else goto 210
+  211:	goto 146
+  210:	R13 = 0; 
+  209:	if (R13 <s EBX) goto 208 else goto 199
+  208:	EDI = 8; 
+  207:	call "getBits1"; 
+  206:	
+  205:	EDX = long32signed(R13); 
+  204:	
+  203:	
+  202:	int8u[R15 + EDX + 0] = EAX; 
+  201:	R9 = R13 + 1 (int); 
+  200:	R13 = int8unsigned(R9); goto 209
+  199:	EAX = EBX + 17 (int); 
+  198:	EAX = int16unsigned(EAX); 
+  197:	if (EBP <s EAX) goto 196 else goto 195
+  196:	goto 146
+  195:	EBP = EBP - EAX; 
+  194:	EBP = int16unsigned(EBP); 
+  193:	
+  192:	
+  191:	EDX = local(0,long); 
+  190:	R10 = stack(0) (long); 
+  189:	R11 = 0; 
+  188:	EDI = 0; 
+  187:	ECX = 0; 
+  186:	R9 = long32signed(R11); 
+  185:	ESI = int8u[R10 + R9 + 0]; 
+  184:	
+  183:	if (ESI ==u 0) goto 166 else goto 182
+  182:	
+  181:	
+  180:	int16u[EDX + R9 * 2 + 0] = ECX; 
+  179:	
+  178:	EAX = ECX + ESI + -1 (int); 
+  177:	
+  176:	int16u[EDX + R9 * 2 + 32] = EAX; 
+  175:	
+  174:	
+  173:	int8u[EDX + R9 + 64] = EDI; 
+  172:	EDI = EDI + ESI + 0 (int); 
+  171:	
+  170:	
+  169:	ECX = ECX + ESI + 0 (int); 
+  168:	
+  167:	goto 157
+  166:	
+  165:	R8 = 0; 
+  164:	int16u[EDX + R9 * 2 + 0] = R8; 
+  163:	
+  162:	EAX = 65535; 
+  161:	int16u[EDX + R9 * 2 + 32] = EAX; 
+  160:	
+  159:	ESI = 0; 
+  158:	int8u[EDX + R9 + 64] = ESI; 
+  157:	ECX = ECX * 2 + 0 (int); 
+  156:	
+  155:	R11 = R11 + 1 (int); 
+  154:	R11 = int8unsigned(R11); 
+  153:	if (R11 >s 15) goto 151 else goto 152
+  152:	goto 186
+  151:	
+  150:	goto 287
+  149:	
+  148:	goto 146
+  147:	
+  146:	goto 331
+  145:	if (ECX <u 202) goto 144 else goto 141
+  144:	if (ECX <u 200) goto 143 else goto 142
+  143:	goto 123
+  142:	if (ECX ==s 200) goto 126 else goto 123
+  141:	if (ECX <u 204) goto 140 else goto 139
+  140:	goto 123
+  139:	if (ECX ==s 204) goto 138 else goto 123
+  138:	EAX = 17; goto 120
+  137:	if (ECX <u 213) goto 136 else goto 130
+  136:	if (ECX <u 209) goto 135 else goto 133
+  135:	if (ECX ==s 206) goto 123 else goto 134
+  134:	if (ECX ==s 207) goto 123 else goto 126
+  133:	if (ECX <u 211) goto 132 else goto 131
+  132:	goto 126
+  131:	goto 126
+  130:	if (ECX <u 217) goto 129 else goto 125
+  129:	if (ECX <u 215) goto 128 else goto 127
+  128:	goto 126
+  127:	if (ECX ==s 215) goto 126 else goto 123
+  126:	EAX = 18; goto 120
+  125:	if (ECX <u 219) goto 124 else goto 119
+  124:	
+  123:	
+  122:	int8u[R12 + 0] = ECX; 
+  121:	EAX = 0; 
+  120:	return
+  119:	if (ECX ==s 219) goto 88 else goto 118
+  118:	if (ECX ==s 221) goto 117 else goto 104
+  117:	
+  116:	EDI = 16; 
+  115:	call "getBits1"; 
+  114:	EAX = int16unsigned(EAX); 
+  113:	if (EAX !=s 4) goto 112 else goto 111
+  112:	goto 105
+  111:	EDI = 16; 
+  110:	call "getBits1"; 
+  109:	
+  108:	
+  107:	int16u[gRestartInterval + 0] = EAX; 
+  106:	
+  105:	goto 331
+  104:	
+  103:	EDI = 16; 
+  102:	call "getBits1"; 
+  101:	R8 = int16unsigned(EAX); 
+  100:	
+   99:	if (R8 <s 2) goto 98 else goto 97
+   98:	goto 89
+   97:	EDI = R8 + -2 (int); 
+   96:	EBX = int16unsigned(EDI); 
+   95:	if (EBX !=u 0) goto 94 else goto 90
+   94:	EDI = 8; 
+   93:	call "getBits1"; 
+   92:	ECX = EBX + -1 (int); 
+   91:	EBX = int16unsigned(ECX); goto 95
+   90:	
+   89:	goto 331
+   88:	
+   87:	EDI = 16; 
+   86:	call "getBits1"; 
+   85:	EAX = int16unsigned(EAX); 
+   84:	
+   83:	if (EAX <s 2) goto 82 else goto 81
+   82:	goto 1
+   81:	ECX = EAX + -2 (int); 
+   80:	EBX = int16unsigned(ECX); 
+   79:	if (EBX !=u 0) goto 78 else goto 2
+   78:	EDI = 8; 
+   77:	call "getBits1"; 
+   76:	
+   75:	ESI = int8unsigned(EAX); 
+   74:	EBP = ESI; 
+   73:	EDX = EBP; EDX = EDX >>s 4; 
+   72:	R13 = int8unsigned(EDX); 
+   71:	EBP = EBP & 15; 
+   70:	if (EBP >s 1) goto 69 else goto 68
+   69:	goto 1
+   68:	EDX = 2; 
+   67:	R10 = 1; 
+   66:	EDX = ESI & 0xf != 0 ?int EDX : R10; 
+   65:	EDI = int8u[gValidQuantTables + 0]; 
+   64:	EDI = EDI | EDX; 
+   63:	
+   62:	int8u[gValidQuantTables + 0] = EDI; 
+   61:	R14 = 0; 
+   60:	EDI = 8; 
+   59:	call "getBits1"; 
+   58:	R15 = EAX; 
+   57:	
+   56:	if (R13 !=u 0) goto 55 else goto 49
+   55:	EDI = 8; 
+   54:	call "getBits1"; 
+   53:	
+   52:	R15 = R15 << 8; 
+   51:	R15 = R15 + EAX + 0 (int); 
+   50:	
+   49:	if (EBP !=u 0) goto 43 else goto 48
+   48:	ECX = gQuant0 + 0 (long); 
+   47:	EDX = long32signed(R14); 
+   46:	
+   45:	
+   44:	int16s[ECX + EDX * 2 + 0] = R15; goto 38
+   43:	ECX = gQuant1 + 0 (long); 
+   42:	R11 = long32signed(R14); 
+   41:	
+   40:	
+   39:	int16s[ECX + R11 * 2 + 0] = R15; 
+   38:	ESI = R14 + 1 (int); 
+   37:	R14 = int8unsigned(ESI); 
+   36:	if (R14 <s 64) goto 60 else goto 35
+   35:	R8 = gQuant1 + 0 (long); 
+   34:	ESI = gQuant0 + 0 (long); 
+   33:	R8 = EBP !=u 0 ?long R8 : ESI; 
+   32:	
+   31:	R11 = 0; 
+   30:	R9 = long32signed(R11); 
+   29:	R10 = int16s[R8 + R9 * 2 + 0]; 
+   28:	EDI = long32signed(R10); 
+   27:	R10 = gWinogradQuant + 0 (long); 
+   26:	
+   25:	R10 = int8u[R10 + R9 + 0]; 
+   24:	R10 = long32unsigned(R10); 
+   23:	EDI = EDI *l R10; 
+   22:	
+   21:	R10 = EDI + 4 (long); 
+   20:	R10 = R10 >>ls 3; 
+   19:	R10 = lowlong(R10); 
+   18:	
+   17:	
+   16:	int16s[R8 + R9 * 2 + 0] = R10; 
+   15:	R9 = R11 + 1 (int); 
+   14:	R11 = int8unsigned(R9); 
+   13:	if (R11 <s 64) goto 30 else goto 12
+   12:	
+   11:	EDX = 65; 
+   10:	
+    9:	R11 = 129; 
+    8:	R11 = R13 !=u 0 ?int R11 : EDX; 
+    7:	if (EBX <s R11) goto 6 else goto 5
+    6:	goto 1
+    5:	EBX = EBX - R11; 
+    4:	EBX = int16unsigned(EBX); 
+    3:	goto 79
+    2:	
+    1:	goto 331
+}
+
+imul_b1_b3() {
+    9:	
+    8:	ECX = long32signed(EDI); 
+    7:	ECX = ECX *l 362; 
+    6:	EAX = ECX + 128 (long); 
+    5:	EAX = EAX >>ls 8; 
+    4:	EAX = lowlong(EAX); 
+    3:	EAX = int16signed(EAX); 
+    2:	
+    1:	return
+}
+
+imul_b2() {
+    9:	
+    8:	ECX = long32signed(EDI); 
+    7:	ECX = ECX *l 669; 
+    6:	EAX = ECX + 128 (long); 
+    5:	EAX = EAX >>ls 8; 
+    4:	EAX = lowlong(EAX); 
+    3:	EAX = int16signed(EAX); 
+    2:	
+    1:	return
+}
+
+imul_b4() {
+    9:	
+    8:	ECX = long32signed(EDI); 
+    7:	ECX = ECX *l 277; 
+    6:	EAX = ECX + 128 (long); 
+    5:	EAX = EAX >>ls 8; 
+    4:	EAX = lowlong(EAX); 
+    3:	EAX = int16signed(EAX); 
+    2:	
+    1:	return
+}
+
+imul_b5() {
+    9:	
+    8:	ECX = long32signed(EDI); 
+    7:	ECX = ECX *l 196; 
+    6:	EAX = ECX + 128 (long); 
+    5:	EAX = EAX >>ls 8; 
+    4:	EAX = lowlong(EAX); 
+    3:	EAX = int16signed(EAX); 
+    2:	
+    1:	return
+}
+
+clamp() {
+   10:	
+    9:	EAX = int16unsigned(EDI); 
+    8:	if (EAX >u 255) goto 7 else goto 3
+    7:	if (EDI <s 0) goto 4 else goto 6
+    6:	if (EDI >s 255) goto 5 else goto 3
+    5:	EAX = 255; goto 1
+    4:	EAX = 0; goto 1
+    3:	EAX = int8unsigned(EDI); 
+    2:	
+    1:	return
+}
+
+addAndClamp() {
+   12:	
+   11:	EAX = EDI + ESI + 0 (int); 
+   10:	EDX = int16signed(EAX); 
+    9:	ECX = int16unsigned(EDX); 
+    8:	if (ECX >u 255) goto 7 else goto 3
+    7:	if (EDX <s 0) goto 4 else goto 6
+    6:	if (EDX >s 255) goto 5 else goto 3
+    5:	EAX = 255; goto 1
+    4:	EAX = 0; goto 1
+    3:	EAX = int8unsigned(EDX); 
+    2:	
+    1:	return
+}
+
+subAndClamp() {
+   12:	
+   11:	EDI = EDI - ESI; 
+   10:	EDX = int16signed(EDI); 
+    9:	ECX = int16unsigned(EDX); 
+    8:	if (ECX >u 255) goto 7 else goto 3
+    7:	if (EDX <s 0) goto 4 else goto 6
+    6:	if (EDX >s 255) goto 5 else goto 3
+    5:	EAX = 255; goto 1
+    4:	EAX = 0; goto 1
+    3:	EAX = int8unsigned(EDX); 
+    2:	
+    1:	return
+}
+
+upsampleCb() {
+   93:	
+   92:	ECX = gCoeffBuf + 0 (long); 
+   91:	R10 = long32signed(EDI); 
+   90:	EBP = ECX + R10 * 2 + 0 (long); 
+   89:	R8 = gMCUBufG + 0 (long); 
+   88:	EDI = long32signed(ESI); 
+   87:	R12 = R8 + EDI + 0 (long); 
+   86:	R8 = gMCUBufB + 0 (long); 
+   85:	
+   84:	R13 = R8 + EDI + 0 (long); 
+   83:	R14 = 0; 
+   82:	R15 = 0; 
+   81:	ESI = EBP; 
+   80:	EBP = ESI + 2 (long); 
+   79:	EAX = int16s[ESI + 0]; 
+   78:	EBX = int8unsigned(EAX); 
+   77:	
+   76:	ECX = EBX; ECX = ECX * 88; 
+   75:	ECX = ECX >>u 8; 
+   74:	ESI = ECX + -44 (int); 
+   73:	EAX = int16signed(ESI); local(0,int) = EAX; 
+   72:	EDI = int8u[R12 + 0]; 
+   71:	
+   70:	ESI = local(0,int); 
+   69:	call "subAndClamp"; 
+   68:	
+   67:	
+   66:	int8u[R12 + 0] = EAX; 
+   65:	EDI = int8u[R12 + 1]; 
+   64:	
+   63:	
+   62:	ESI = local(0,int); call "subAndClamp"; 
+   61:	
+   60:	
+   59:	int8u[R12 + 1] = EAX; 
+   58:	EDI = int8u[R12 + 8]; 
+   57:	
+   56:	ESI = local(0,int); 
+   55:	call "subAndClamp"; 
+   54:	
+   53:	
+   52:	int8u[R12 + 8] = EAX; 
+   51:	EDI = int8u[R12 + 9]; 
+   50:	
+   49:	
+   48:	ESI = local(0,int); call "subAndClamp"; 
+   47:	
+   46:	
+   45:	int8u[R12 + 9] = EAX; 
+   44:	EDX = EBX; EDX = EDX * 198; 
+   43:	EDX = EDX >>u 8; 
+   42:	EDX = EBX + EDX + -227 (int); 
+   41:	EBX = int16signed(EDX); 
+   40:	EDI = int8u[R13 + 0]; 
+   39:	
+   38:	ESI = EBX; 
+   37:	call "addAndClamp"; 
+   36:	
+   35:	
+   34:	int8u[R13 + 0] = EAX; 
+   33:	EDI = int8u[R13 + 1]; 
+   32:	
+   31:	
+   30:	ESI = EBX; call "addAndClamp"; 
+   29:	
+   28:	
+   27:	int8u[R13 + 1] = EAX; 
+   26:	EDI = int8u[R13 + 8]; 
+   25:	
+   24:	ESI = EBX; 
+   23:	call "addAndClamp"; 
+   22:	
+   21:	
+   20:	int8u[R13 + 8] = EAX; 
+   19:	EDI = int8u[R13 + 9]; 
+   18:	
+   17:	
+   16:	ESI = EBX; call "addAndClamp"; 
+   15:	
+   14:	
+   13:	int8u[R13 + 9] = EAX; 
+   12:	R12 = R12 + 2 (long); 
+   11:	R13 = R13 + 2 (long); 
+   10:	ECX = R15 + 1 (int); 
+    9:	R15 = int8unsigned(ECX); 
+    8:	if (R15 <s 4) goto 81 else goto 7
+    7:	EBP = EBP + 8 (long); 
+    6:	R12 = R12 + 8 (long); 
+    5:	R13 = R13 + 8 (long); 
+    4:	ESI = R14 + 1 (int); 
+    3:	R14 = int8unsigned(ESI); 
+    2:	if (R14 <s 4) goto 82 else goto 1
+    1:	return
+}
+
+upsampleCbH() {
+   63:	
+   62:	R10 = gCoeffBuf + 0 (long); 
+   61:	R9 = long32signed(EDI); 
+   60:	EBP = R10 + R9 * 2 + 0 (long); 
+   59:	R8 = gMCUBufG + 0 (long); 
+   58:	EDI = long32signed(ESI); 
+   57:	R12 = R8 + EDI + 0 (long); 
+   56:	R11 = gMCUBufB + 0 (long); 
+   55:	
+   54:	R13 = R11 + EDI + 0 (long); 
+   53:	R15 = 0; 
+   52:	R14 = 0; 
+   51:	ESI = EBP; 
+   50:	EBP = ESI + 2 (long); 
+   49:	ECX = int16s[ESI + 0]; 
+   48:	EBX = int8unsigned(ECX); 
+   47:	
+   46:	EDX = EBX; EDX = EDX * 88; 
+   45:	EDX = EDX >>u 8; 
+   44:	R10 = EDX + -44 (int); 
+   43:	EAX = int16signed(R10); local(0,int) = EAX; 
+   42:	EDI = int8u[R12 + 0]; 
+   41:	
+   40:	ESI = local(0,int); 
+   39:	call "subAndClamp"; 
+   38:	
+   37:	
+   36:	int8u[R12 + 0] = EAX; 
+   35:	EDI = int8u[R12 + 1]; 
+   34:	
+   33:	
+   32:	ESI = local(0,int); call "subAndClamp"; 
+   31:	
+   30:	
+   29:	int8u[R12 + 1] = EAX; 
+   28:	ECX = EBX; ECX = ECX * 198; 
+   27:	ECX = ECX >>u 8; 
+   26:	EAX = EBX + ECX + -227 (int); 
+   25:	EBX = int16signed(EAX); 
+   24:	EDI = int8u[R13 + 0]; 
+   23:	
+   22:	ESI = EBX; 
+   21:	call "addAndClamp"; 
+   20:	
+   19:	
+   18:	int8u[R13 + 0] = EAX; 
+   17:	EDI = int8u[R13 + 1]; 
+   16:	
+   15:	
+   14:	ESI = EBX; call "addAndClamp"; 
+   13:	
+   12:	
+   11:	int8u[R13 + 1] = EAX; 
+   10:	R12 = R12 + 2 (long); 
+    9:	R13 = R13 + 2 (long); 
+    8:	R9 = R14 + 1 (int); 
+    7:	R14 = int8unsigned(R9); 
+    6:	if (R14 <s 4) goto 51 else goto 5
+    5:	EBP = EBP + 8 (long); 
+    4:	EAX = R15 + 1 (int); 
+    3:	R15 = int8unsigned(EAX); 
+    2:	if (R15 <s 8) goto 52 else goto 1
+    1:	return
+}
+
+upsampleCbV() {
+   64:	
+   63:	R11 = gCoeffBuf + 0 (long); 
+   62:	EDI = long32signed(EDI); 
+   61:	R15 = R11 + EDI * 2 + 0 (long); 
+   60:	EDX = gMCUBufG + 0 (long); 
+   59:	ECX = long32signed(ESI); 
+   58:	R13 = EDX + ECX + 0 (long); 
+   57:	R8 = gMCUBufB + 0 (long); 
+   56:	
+   55:	R14 = R8 + ECX + 0 (long); 
+   54:	R12 = 0; 
+   53:	EBP = 0; 
+   52:	EDX = R15; 
+   51:	R15 = EDX + 2 (long); 
+   50:	R11 = int16s[EDX + 0]; 
+   49:	EBX = int8unsigned(R11); 
+   48:	
+   47:	EDI = EBX; EDI = EDI * 88; 
+   46:	EDI = EDI >>u 8; 
+   45:	R9 = EDI + -44 (int); 
+   44:	EAX = int16signed(R9); local(0,int) = EAX; 
+   43:	EDI = int8u[R13 + 0]; 
+   42:	
+   41:	
+   40:	ESI = local(0,int); call "subAndClamp"; 
+   39:	
+   38:	
+   37:	int8u[R13 + 0] = EAX; 
+   36:	EDI = int8u[R13 + 8]; 
+   35:	
+   34:	ESI = local(0,int); 
+   33:	call "subAndClamp"; 
+   32:	
+   31:	
+   30:	int8u[R13 + 8] = EAX; 
+   29:	ESI = EBX; ESI = ESI * 198; 
+   28:	ESI = ESI >>u 8; 
+   27:	EAX = EBX + ESI + -227 (int); 
+   26:	EBX = int16signed(EAX); 
+   25:	EDI = int8u[R14 + 0]; 
+   24:	
+   23:	
+   22:	ESI = EBX; call "addAndClamp"; 
+   21:	
+   20:	
+   19:	int8u[R14 + 0] = EAX; 
+   18:	EDI = int8u[R14 + 8]; 
+   17:	
+   16:	ESI = EBX; 
+   15:	call "addAndClamp"; 
+   14:	
+   13:	
+   12:	int8u[R14 + 8] = EAX; 
+   11:	R13 = R13 + 1 (long); 
+   10:	R14 = R14 + 1 (long); 
+    9:	R10 = EBP + 1 (int); 
+    8:	EBP = int8unsigned(R10); 
+    7:	if (EBP <s 8) goto 52 else goto 6
+    6:	R13 = R13 + 8 (long); 
+    5:	R14 = R14 + 8 (long); 
+    4:	R10 = R12 + 1 (int); 
+    3:	R12 = int8unsigned(R10); 
+    2:	if (R12 <s 4) goto 53 else goto 1
+    1:	return
+}
+
+upsampleCr() {
+   93:	
+   92:	EAX = gCoeffBuf + 0 (long); 
+   91:	R9 = long32signed(EDI); 
+   90:	EBP = EAX + R9 * 2 + 0 (long); 
+   89:	EDI = gMCUBufR + 0 (long); 
+   88:	ESI = long32signed(ESI); 
+   87:	R12 = EDI + ESI + 0 (long); 
+   86:	EDI = gMCUBufG + 0 (long); 
+   85:	
+   84:	R13 = EDI + ESI + 0 (long); 
+   83:	R14 = 0; 
+   82:	R15 = 0; 
+   81:	EDX = EBP; 
+   80:	EBP = EDX + 2 (long); 
+   79:	R11 = int16s[EDX + 0]; 
+   78:	EBX = int8unsigned(R11); 
+   77:	
+   76:	ECX = EBX; ECX = ECX * 103; 
+   75:	ECX = ECX >>u 8; 
+   74:	EDX = EBX + ECX + -179 (int); 
+   73:	EAX = int16signed(EDX); local(0,int) = EAX; 
+   72:	EDI = int8u[R12 + 0]; 
+   71:	
+   70:	ESI = local(0,int); 
+   69:	call "addAndClamp"; 
+   68:	
+   67:	
+   66:	int8u[R12 + 0] = EAX; 
+   65:	EDI = int8u[R12 + 1]; 
+   64:	
+   63:	
+   62:	ESI = local(0,int); call "addAndClamp"; 
+   61:	
+   60:	
+   59:	int8u[R12 + 1] = EAX; 
+   58:	EDI = int8u[R12 + 8]; 
+   57:	
+   56:	ESI = local(0,int); 
+   55:	call "addAndClamp"; 
+   54:	
+   53:	
+   52:	int8u[R12 + 8] = EAX; 
+   51:	EDI = int8u[R12 + 9]; 
+   50:	
+   49:	
+   48:	ESI = local(0,int); call "addAndClamp"; 
+   47:	
+   46:	
+   45:	int8u[R12 + 9] = EAX; 
+   44:	EBX = EBX * 183; 
+   43:	EBX = EBX >>u 8; 
+   42:	ECX = EBX + -91 (int); 
+   41:	EBX = int16signed(ECX); 
+   40:	EDI = int8u[R13 + 0]; 
+   39:	
+   38:	ESI = EBX; 
+   37:	call "subAndClamp"; 
+   36:	
+   35:	
+   34:	int8u[R13 + 0] = EAX; 
+   33:	EDI = int8u[R13 + 1]; 
+   32:	
+   31:	
+   30:	ESI = EBX; call "subAndClamp"; 
+   29:	
+   28:	
+   27:	int8u[R13 + 1] = EAX; 
+   26:	EDI = int8u[R13 + 8]; 
+   25:	
+   24:	ESI = EBX; 
+   23:	call "subAndClamp"; 
+   22:	
+   21:	
+   20:	int8u[R13 + 8] = EAX; 
+   19:	EDI = int8u[R13 + 9]; 
+   18:	
+   17:	
+   16:	ESI = EBX; call "subAndClamp"; 
+   15:	
+   14:	
+   13:	int8u[R13 + 9] = EAX; 
+   12:	R12 = R12 + 2 (long); 
+   11:	R13 = R13 + 2 (long); 
+   10:	EAX = R15 + 1 (int); 
+    9:	R15 = int8unsigned(EAX); 
+    8:	if (R15 <s 4) goto 81 else goto 7
+    7:	EBP = EBP + 8 (long); 
+    6:	R12 = R12 + 8 (long); 
+    5:	R13 = R13 + 8 (long); 
+    4:	EDX = R14 + 1 (int); 
+    3:	R14 = int8unsigned(EDX); 
+    2:	if (R14 <s 4) goto 82 else goto 1
+    1:	return
+}
+
+upsampleCrH() {
+   63:	
+   62:	R9 = gCoeffBuf + 0 (long); 
+   61:	R8 = long32signed(EDI); 
+   60:	EBP = R9 + R8 * 2 + 0 (long); 
+   59:	EDI = gMCUBufR + 0 (long); 
+   58:	ESI = long32signed(ESI); 
+   57:	R12 = EDI + ESI + 0 (long); 
+   56:	R10 = gMCUBufG + 0 (long); 
+   55:	
+   54:	R13 = R10 + ESI + 0 (long); 
+   53:	R15 = 0; 
+   52:	R14 = 0; 
+   51:	EDX = EBP; 
+   50:	EBP = EDX + 2 (long); 
+   49:	EAX = int16s[EDX + 0]; 
+   48:	EBX = int8unsigned(EAX); 
+   47:	
+   46:	ECX = EBX; ECX = ECX * 103; 
+   45:	ECX = ECX >>u 8; 
+   44:	R9 = EBX + ECX + -179 (int); 
+   43:	EAX = int16signed(R9); local(0,int) = EAX; 
+   42:	EDI = int8u[R12 + 0]; 
+   41:	
+   40:	ESI = local(0,int); 
+   39:	call "addAndClamp"; 
+   38:	
+   37:	
+   36:	int8u[R12 + 0] = EAX; 
+   35:	EDI = int8u[R12 + 1]; 
+   34:	
+   33:	
+   32:	ESI = local(0,int); call "addAndClamp"; 
+   31:	
+   30:	
+   29:	int8u[R12 + 1] = EAX; 
+   28:	EBX = EBX * 183; 
+   27:	EBX = EBX >>u 8; 
+   26:	R11 = EBX + -91 (int); 
+   25:	EBX = int16signed(R11); 
+   24:	EDI = int8u[R13 + 0]; 
+   23:	
+   22:	ESI = EBX; 
+   21:	call "subAndClamp"; 
+   20:	
+   19:	
+   18:	int8u[R13 + 0] = EAX; 
+   17:	EDI = int8u[R13 + 1]; 
+   16:	
+   15:	
+   14:	ESI = EBX; call "subAndClamp"; 
+   13:	
+   12:	
+   11:	int8u[R13 + 1] = EAX; 
+   10:	R12 = R12 + 2 (long); 
+    9:	R13 = R13 + 2 (long); 
+    8:	R8 = R14 + 1 (int); 
+    7:	R14 = int8unsigned(R8); 
+    6:	if (R14 <s 4) goto 51 else goto 5
+    5:	EBP = EBP + 8 (long); 
+    4:	R11 = R15 + 1 (int); 
+    3:	R15 = int8unsigned(R11); 
+    2:	if (R15 <s 8) goto 52 else goto 1
+    1:	return
+}
+
+upsampleCrV() {
+   64:	
+   63:	R10 = gCoeffBuf + 0 (long); 
+   62:	EDI = long32signed(EDI); 
+   61:	R15 = R10 + EDI * 2 + 0 (long); 
+   60:	EDX = gMCUBufR + 0 (long); 
+   59:	ECX = long32signed(ESI); 
+   58:	R13 = EDX + ECX + 0 (long); 
+   57:	EDI = gMCUBufG + 0 (long); 
+   56:	
+   55:	R14 = EDI + ECX + 0 (long); 
+   54:	R12 = 0; 
+   53:	EBP = 0; 
+   52:	EDX = R15; 
+   51:	R15 = EDX + 2 (long); 
+   50:	R10 = int16s[EDX + 0]; 
+   49:	EBX = int8unsigned(R10); 
+   48:	
+   47:	ESI = EBX; ESI = ESI * 103; 
+   46:	ESI = ESI >>u 8; 
+   45:	R8 = EBX + ESI + -179 (int); 
+   44:	EAX = int16signed(R8); local(0,int) = EAX; 
+   43:	EDI = int8u[R13 + 0]; 
+   42:	
+   41:	
+   40:	ESI = local(0,int); call "addAndClamp"; 
+   39:	
+   38:	
+   37:	int8u[R13 + 0] = EAX; 
+   36:	EDI = int8u[R13 + 8]; 
+   35:	
+   34:	ESI = local(0,int); 
+   33:	call "addAndClamp"; 
+   32:	
+   31:	
+   30:	int8u[R13 + 8] = EAX; 
+   29:	EBX = EBX * 183; 
+   28:	EBX = EBX >>u 8; 
+   27:	R11 = EBX + -91 (int); 
+   26:	EBX = int16signed(R11); 
+   25:	EDI = int8u[R14 + 0]; 
+   24:	
+   23:	
+   22:	ESI = EBX; call "subAndClamp"; 
+   21:	
+   20:	
+   19:	int8u[R14 + 0] = EAX; 
+   18:	EDI = int8u[R14 + 8]; 
+   17:	
+   16:	ESI = EBX; 
+   15:	call "subAndClamp"; 
+   14:	
+   13:	
+   12:	int8u[R14 + 8] = EAX; 
+   11:	R13 = R13 + 1 (long); 
+   10:	R14 = R14 + 1 (long); 
+    9:	R9 = EBP + 1 (int); 
+    8:	EBP = int8unsigned(R9); 
+    7:	if (EBP <s 8) goto 52 else goto 6
+    6:	R13 = R13 + 8 (long); 
+    5:	R14 = R14 + 8 (long); 
+    4:	R9 = R12 + 1 (int); 
+    3:	R12 = int8unsigned(R9); 
+    2:	if (R12 <s 4) goto 53 else goto 1
+    1:	return
+}
+
+copyY() {
+   33:	
+   32:	EDX = gMCUBufR + 0 (long); 
+   31:	R9 = long32signed(EDI); 
+   30:	ECX = EDX + R9 + 0 (long); 
+   29:	ESI = gMCUBufG + 0 (long); 
+   28:	
+   27:	R8 = ESI + R9 + 0 (long); 
+   26:	EDI = gMCUBufB + 0 (long); 
+   25:	
+   24:	ESI = EDI + R9 + 0 (long); 
+   23:	R11 = gCoeffBuf + 0 (long); 
+   22:	EBX = 64; 
+   21:	EAX = R11; 
+   20:	R11 = EAX + 2 (long); 
+   19:	R10 = int16s[EAX + 0]; 
+   18:	
+   17:	
+   16:	EDX = ECX; 
+   15:	ECX = EDX + 1 (long); 
+   14:	
+   13:	int8u[EDX + 0] = R10; 
+   12:	R9 = R8; 
+   11:	R8 = R9 + 1 (long); 
+   10:	
+    9:	int8u[R9 + 0] = R10; 
+    8:	EDI = ESI; 
+    7:	ESI = EDI + 1 (long); 
+    6:	
+    5:	int8u[EDI + 0] = R10; 
+    4:	EDX = EBX + -1 (int); 
+    3:	EBX = int8unsigned(EDX); 
+    2:	if (EBX >s 0) goto 21 else goto 1
+    1:	return
+}
+
+pjpeg_decode_mcu() {
+ 1188:	
+ 1187:	EAX = int8u[gCallbackStatus + 0]; 
+ 1186:	if (EAX !=u 0) goto 1185 else goto 1183
+ 1185:	
+ 1184:	goto 1
+ 1183:	EAX = int16u[gNumMCUSRemaining + 0]; 
+ 1182:	if (EAX ==u 0) goto 1181 else goto 1180
+ 1181:	EAX = 1; goto 1
+ 1180:	
+ 1179:	EAX = int16u[gRestartInterval + 0]; 
+ 1178:	if (EAX !=u 0) goto 1177 else goto 1120
+ 1177:	EAX = int16u[gRestartsLeft + 0]; 
+ 1176:	if (EAX ==s 0) goto 1175 else goto 1124
+ 1175:	
+ 1174:	EBX = 0; 
+ 1173:	EBP = 1536; 
+ 1172:	call "getChar"; 
+ 1171:	R8 = int8unsigned(EAX); 
+ 1170:	if (R8 ==s 255) goto 1166 else goto 1169
+ 1169:	ESI = EBP + -1 (int); 
+ 1168:	EBP = int16unsigned(ESI); 
+ 1167:	if (EBP >s 0) goto 1172 else goto 1166
+ 1166:	if (EBP ==s 0) goto 1165 else goto 1164
+ 1165:	EAX = 29; goto 1129
+ 1164:	
+ 1163:	if (EBP >s 0) goto 1162 else goto 1155
+ 1162:	call "getChar"; 
+ 1161:	EBX = int8unsigned(EAX); 
+ 1160:	
+ 1159:	
+ 1158:	if (EBX !=s 255) goto 1155 else goto 1157
+ 1157:	R11 = EBP + -1 (int); 
+ 1156:	EBP = int16unsigned(R11); goto 1163
+ 1155:	if (EBP ==s 0) goto 1154 else goto 1153
+ 1154:	EAX = 29; goto 1129
+ 1153:	R10 = int16u[gNextRestartNum + 0]; 
+ 1152:	R11 = R10 + 208 (int); 
+ 1151:	if (EBX !=s R11) goto 1150 else goto 1149
+ 1150:	EAX = 29; goto 1129
+ 1149:	EAX = 0; 
+ 1148:	int16s[gLastDC + 0] = EAX; 
+ 1147:	EDI = 0; 
+ 1146:	int16s[gLastDC + 2] = EDI; 
+ 1145:	ECX = 0; 
+ 1144:	int16s[gLastDC + 4] = ECX; 
+ 1143:	R11 = int16u[gRestartInterval + 0]; 
+ 1142:	
+ 1141:	int16u[gRestartsLeft + 0] = R11; 
+ 1140:	
+ 1139:	R8 = R10 + 1 (int); 
+ 1138:	R8 = R8 & 7; 
+ 1137:	int16u[gNextRestartNum + 0] = R8; 
+ 1136:	EAX = 8; 
+ 1135:	int8u[gBitsLeft + 0] = EAX; 
+ 1134:	EDI = 8; 
+ 1133:	call "getBits2"; 
+ 1132:	EDI = 8; 
+ 1131:	call "getBits2"; 
+ 1130:	EAX = 0; 
+ 1129:	
+ 1128:	
+ 1127:	
+ 1126:	if (EAX !=u 0) goto 1125 else goto 1124
+ 1125:	goto 19
+ 1124:	EAX = int16u[gRestartsLeft + 0]; 
+ 1123:	ECX = EAX + -1 (int); 
+ 1122:	
+ 1121:	int16u[gRestartsLeft + 0] = ECX; 
+ 1120:	R10 = 0; local(4,int) = R10; 
+ 1119:	ECX = int8u[gMaxBlocksPerMCU + 0]; 
+ 1118:	R9 = local(4,int); if (R9 <s ECX) goto 1117 else goto 20
+ 1117:	EDX = gMCUOrg + 0 (long); 
+ 1116:	ESI = long32signed(R9); 
+ 1115:	EBP = int8u[EDX + ESI + 0]; 
+ 1114:	
+ 1113:	R9 = gCompQuant + 0 (long); 
+ 1112:	R8 = long32signed(EBP); 
+ 1111:	EDI = int8u[R9 + R8 + 0]; 
+ 1110:	
+ 1109:	EAX = gCompDCTab + 0 (long); 
+ 1108:	
+ 1107:	EDX = int8u[EAX + R8 + 0]; 
+ 1106:	
+ 1105:	EBX = gQuant1 + 0 (long); 
+ 1104:	R8 = gQuant0 + 0 (long); 
+ 1103:	EBX = EDI !=u 0 ?long EBX : R8; 
+ 1102:	
+ 1101:	EDI = gHuffTab1 + 0 (long); 
+ 1100:	R11 = gHuffTab0 + 0 (long); 
+ 1099:	EDI = EDX !=u 0 ?long EDI : R11; 
+ 1098:	ESI = gHuffVal1 + 0 (long); 
+ 1097:	R8 = gHuffVal0 + 0 (long); 
+ 1096:	ESI = EDX !=u 0 ?long ESI : R8; 
+ 1095:	call "huffDecode"; 
+ 1094:	R12 = int8unsigned(EAX); 
+ 1093:	
+ 1092:	EDI = 0; 
+ 1091:	R9 = R12; R9 = R9 & 15; 
+ 1090:	if (R12 & 0xf != 0) goto 1089 else goto 1085
+ 1089:	
+ 1088:	EDI = R9; call "getBits2"; 
+ 1087:	EDI = int16unsigned(EAX); 
+ 1086:	
+ 1085:	
+ 1084:	ESI = R12; 
+ 1083:	call "huffExtend"; 
+ 1082:	
+ 1081:	
+ 1080:	EDI = gLastDC + 0 (long); 
+ 1079:	ESI = long32signed(EBP); 
+ 1078:	ECX = int16s[EDI + ESI * 2 + 0]; 
+ 1077:	R9 = EAX + ECX + 0 (int); 
+ 1076:	
+ 1075:	EAX = gLastDC + 0 (long); 
+ 1074:	
+ 1073:	
+ 1072:	int16s[EAX + ESI * 2 + 0] = R9; 
+ 1071:	R10 = int16s[EBX + 0]; 
+ 1070:	R9 = R9 * R10; 
+ 1069:	
+ 1068:	int16s[gCoeffBuf + 0] = R9; 
+ 1067:	EDI = gCompACTab + 0 (long); 
+ 1066:	
+ 1065:	EBP = int8u[EDI + ESI + 0]; 
+ 1064:	
+ 1063:	ESI = int8u[gReduce + 0]; 
+ 1062:	if (ESI !=u 0) goto 466 else goto 1061
+ 1061:	R13 = 1; 
+ 1060:	EDI = gHuffTab3 + 0 (long); 
+ 1059:	R8 = gHuffTab2 + 0 (long); 
+ 1058:	EDI = EBP !=u 0 ?long EDI : R8; 
+ 1057:	ESI = gHuffVal3 + 0 (long); 
+ 1056:	ECX = gHuffVal2 + 0 (long); 
+ 1055:	ESI = EBP !=u 0 ?long ESI : ECX; 
+ 1054:	call "huffDecode"; 
+ 1053:	R12 = int8unsigned(EAX); 
+ 1052:	
+ 1051:	EDI = 0; 
+ 1050:	ECX = R12; ECX = ECX & 15; 
+ 1049:	if (R12 & 0xf != 0) goto 1048 else goto 1044
+ 1048:	EDI = ECX; 
+ 1047:	call "getBits2"; 
+ 1046:	EDI = int16unsigned(EAX); 
+ 1045:	
+ 1044:	ESI = R12; ESI = ESI >>s 4; 
+ 1043:	ECX = int16unsigned(ESI); 
+ 1042:	R12 = R12 & 15; 
+ 1041:	if (R12 !=u 0) goto 1040 else goto 1007
+ 1040:	if (ECX !=u 0) goto 1039 else goto 1022
+ 1039:	EDX = R13 + ECX + 0 (int); 
+ 1038:	if (EDX >s 63) goto 1037 else goto 1036
+ 1037:	EAX = 28; goto 19
+ 1036:	
+ 1035:	if (ECX !=u 0) goto 1034 else goto 1022
+ 1034:	R11 = R13; 
+ 1033:	R8 = R11 + 1 (int); 
+ 1032:	R13 = int8unsigned(R8); 
+ 1031:	R10 = gCoeffBuf + 0 (long); 
+ 1030:	EAX = ZAG + 0 (long); 
+ 1029:	R8 = long32signed(R11); 
+ 1028:	R11 = int8s[EAX + R8 + 0]; 
+ 1027:	R9 = long32signed(R11); 
+ 1026:	R8 = 0; 
+ 1025:	int16s[R10 + R9 * 2 + 0] = R8; 
+ 1024:	R11 = ECX + -1 (int); 
+ 1023:	ECX = int16unsigned(R11); goto 1035
+ 1022:	
+ 1021:	
+ 1020:	ESI = R12; call "huffExtend"; 
+ 1019:	
+ 1018:	
+ 1017:	R10 = gCoeffBuf + 0 (long); 
+ 1016:	R8 = ZAG + 0 (long); 
+ 1015:	R11 = long32signed(R13); 
+ 1014:	ECX = int8s[R8 + R11 + 0]; 
+ 1013:	ECX = long32signed(ECX); 
+ 1012:	
+ 1011:	R9 = int16s[EBX + R11 * 2 + 0]; 
+ 1010:	EAX = EAX * R9; 
+ 1009:	
+ 1008:	int16s[R10 + ECX * 2 + 0] = EAX; goto 987
+ 1007:	if (ECX ==s 15) goto 1006 else goto 984
+ 1006:	EAX = R13 + 16 (int); 
+ 1005:	if (EAX >s 64) goto 1004 else goto 1003
+ 1004:	EAX = 28; goto 19
+ 1003:	EDX = 16; 
+ 1002:	EDI = R13; 
+ 1001:	R10 = EDI + 1 (int); 
+ 1000:	R13 = int8unsigned(R10); 
+  999:	R11 = gCoeffBuf + 0 (long); 
+  998:	R8 = ZAG + 0 (long); 
+  997:	R9 = long32signed(EDI); 
+  996:	R10 = int8s[R8 + R9 + 0]; 
+  995:	R8 = long32signed(R10); 
+  994:	ESI = 0; 
+  993:	int16s[R11 + R8 * 2 + 0] = ESI; 
+  992:	ESI = EDX + -1 (int); 
+  991:	EDX = int16unsigned(ESI); 
+  990:	if (EDX >s 0) goto 1002 else goto 989
+  989:	R13 = R13 + -1 (int); 
+  988:	
+  987:	R9 = R13 + 1 (int); 
+  986:	R13 = int8unsigned(R9); 
+  985:	if (R13 <s 64) goto 1060 else goto 984
+  984:	
+  983:	if (R13 <s 64) goto 982 else goto 971
+  982:	R8 = R13; 
+  981:	ECX = R8 + 1 (int); 
+  980:	R13 = int8unsigned(ECX); 
+  979:	ESI = gCoeffBuf + 0 (long); 
+  978:	R9 = ZAG + 0 (long); 
+  977:	ECX = long32signed(R8); 
+  976:	EDX = int8s[R9 + ECX + 0]; 
+  975:	EDI = long32signed(EDX); 
+  974:	EAX = 0; 
+  973:	int16s[ESI + EDI * 2 + 0] = EAX; 
+  972:	goto 983
+  971:	EAX = local(4,int); 
+  970:	local(5,int) = EAX; 
+  969:	R12 = gCoeffBuf + 0 (long); 
+  968:	R10 = 0; local(2,int) = R10; 
+  967:	R8 = int16s[R12 + 2]; 
+  966:	EDX = int16s[R12 + 4]; 
+  965:	R11 = R8; R11 = R11 | EDX; 
+  964:	R10 = int16s[R12 + 6]; 
+  963:	R11 = R11 | R10; 
+  962:	EAX = int16s[R12 + 8]; 
+  961:	R11 = R11 | EAX; 
+  960:	R9 = int16s[R12 + 10]; 
+  959:	R11 = R11 | R9; 
+  958:	EAX = int16s[R12 + 12]; 
+  957:	R11 = R11 | EAX; 
+  956:	EDX = int16s[R12 + 14]; 
+  955:	R11 = R11 | EDX; 
+  954:	if (R11 ==s 0) goto 856 else goto 953
+  953:	
+  952:	
+  951:	
+  950:	
+  949:	R11 = R9; R11 = R11 - R10; 
+  948:	R15 = int16signed(R11); 
+  947:	R11 = R9 + R10 + 0 (int); 
+  946:	EBP = int16signed(R11); 
+  945:	
+  944:	
+  943:	
+  942:	
+  941:	R11 = R8 + EDX + 0 (int); 
+  940:	R14 = int16signed(R11); 
+  939:	R8 = R8 - EDX; 
+  938:	R13 = int16signed(R8); 
+  937:	ESI = R15; ESI = ESI - R13; 
+  936:	EDI = int16signed(ESI); 
+  935:	call "imul_b5"; 
+  934:	EBX = int16signed(EAX); 
+  933:	
+  932:	EDI = R13; 
+  931:	call "imul_b4"; 
+  930:	EAX = int16signed(EAX); 
+  929:	EAX = EAX - EBX; 
+  928:	R13 = int16signed(EAX); 
+  927:	
+  926:	EDI = R15; call "imul_b2"; 
+  925:	EAX = int16signed(EAX); 
+  924:	EBX = EBX - EAX; 
+  923:	
+  922:	R9 = R14; R9 = R9 - EBP; 
+  921:	EDI = int16signed(R9); 
+  920:	R10 = R14 + EBP + 0 (int); 
+  919:	R9 = int16signed(R10); local(1,int) = R9; 
+  918:	R13 = R13 - R9; 
+  917:	EBP = int16signed(R13); 
+  916:	
+  915:	call "imul_b1_b3"; 
+  914:	ECX = int16signed(EAX); 
+  913:	ECX = ECX - EBP; 
+  912:	R13 = int16signed(ECX); 
+  911:	R8 = R13 + EBX + 0 (int); 
+  910:	R8 = int16signed(R8); local(0,int) = R8; 
+  909:	EAX = int16s[R12 + 0]; 
+  908:	
+  907:	ECX = int16s[R12 + 8]; 
+  906:	
+  905:	EDI = EAX + ECX + 0 (int); 
+  904:	R15 = int16signed(EDI); 
+  903:	EAX = EAX - ECX; 
+  902:	R14 = int16signed(EAX); 
+  901:	R11 = int16s[R12 + 4]; 
+  900:	
+  899:	R10 = int16s[R12 + 12]; 
+  898:	
+  897:	EAX = R11; EAX = EAX - R10; 
+  896:	EDI = int16signed(EAX); 
+  895:	ECX = R11 + R10 + 0 (int); 
+  894:	EBX = int16signed(ECX); 
+  893:	
+  892:	call "imul_b1_b3"; 
+  891:	R11 = int16signed(EAX); 
+  890:	R11 = R11 - EBX; 
+  889:	R9 = int16signed(R11); 
+  888:	R10 = R15 + EBX + 0 (int); 
+  887:	EDX = int16signed(R10); 
+  886:	R15 = R15 - EBX; 
+  885:	R10 = int16signed(R15); 
+  884:	ESI = R14 + R9 + 0 (int); 
+  883:	R11 = int16signed(ESI); 
+  882:	R14 = R14 - R9; 
+  881:	ECX = int16signed(R14); 
+  880:	EDI = local(1,int); EDI = EDX + EDI + 0 (int); 
+  879:	
+  878:	int16s[R12 + 0] = EDI; 
+  877:	ESI = R11 + EBP + 0 (int); 
+  876:	
+  875:	int16s[R12 + 2] = ESI; 
+  874:	EDI = ECX + R13 + 0 (int); 
+  873:	
+  872:	int16s[R12 + 4] = EDI; 
+  871:	ESI = local(0,int); EDI = R10; EDI = EDI - ESI; 
+  870:	
+  869:	int16s[R12 + 6] = EDI; 
+  868:	EAX = local(0,int); ESI = R10 + EAX + 0 (int); 
+  867:	
+  866:	int16s[R12 + 8] = ESI; 
+  865:	ECX = ECX - R13; 
+  864:	
+  863:	int16s[R12 + 10] = ECX; 
+  862:	R11 = R11 - EBP; 
+  861:	
+  860:	int16s[R12 + 12] = R11; 
+  859:	ESI = local(1,int); EDX = EDX - ESI; 
+  858:	
+  857:	int16s[R12 + 14] = EDX; goto 840
+  856:	EDX = int16s[R12 + 0]; 
+  855:	
+  854:	
+  853:	int16s[R12 + 2] = EDX; 
+  852:	
+  851:	int16s[R12 + 4] = EDX; 
+  850:	
+  849:	int16s[R12 + 6] = EDX; 
+  848:	
+  847:	int16s[R12 + 8] = EDX; 
+  846:	
+  845:	int16s[R12 + 10] = EDX; 
+  844:	
+  843:	int16s[R12 + 12] = EDX; 
+  842:	
+  841:	int16s[R12 + 14] = EDX; 
+  840:	R12 = R12 + 16 (long); 
+  839:	R9 = local(2,int); R8 = R9 + 1 (int); 
+  838:	R8 = int8unsigned(R8); local(2,int) = R8; 
+  837:	if (R8 <s 8) goto 967 else goto 836
+  836:	
+  835:	
+  834:	R15 = gCoeffBuf + 0 (long); 
+  833:	ECX = 0; local(3,int) = ECX; 
+  832:	EDX = int16s[R15 + 16]; 
+  831:	R10 = int16s[R15 + 32]; 
+  830:	EDI = EDX; EDI = EDI | R10; 
+  829:	ESI = int16s[R15 + 48]; 
+  828:	EDI = EDI | ESI; 
+  827:	R8 = int16s[R15 + 64]; 
+  826:	EDI = EDI | R8; 
+  825:	R8 = int16s[R15 + 80]; 
+  824:	EDI = EDI | R8; 
+  823:	ECX = int16s[R15 + 96]; 
+  822:	EDI = EDI | ECX; 
+  821:	R11 = int16s[R15 + 112]; 
+  820:	EDI = EDI | R11; 
+  819:	if (EDI ==s 0) goto 677 else goto 818
+  818:	
+  817:	
+  816:	
+  815:	
+  814:	ECX = R8; ECX = ECX - ESI; 
+  813:	R14 = int16signed(ECX); 
+  812:	ECX = R8 + ESI + 0 (int); 
+  811:	EBP = int16signed(ECX); 
+  810:	
+  809:	
+  808:	
+  807:	
+  806:	R9 = EDX + R11 + 0 (int); 
+  805:	R13 = int16signed(R9); 
+  804:	EDX = EDX - R11; 
+  803:	R12 = int16signed(EDX); 
+  802:	EAX = R14; EAX = EAX - R12; 
+  801:	EDI = int16signed(EAX); 
+  800:	call "imul_b5"; 
+  799:	EBX = int16signed(EAX); 
+  798:	
+  797:	
+  796:	EDI = R12; call "imul_b4"; 
+  795:	R8 = int16signed(EAX); 
+  794:	R8 = R8 - EBX; 
+  793:	R12 = int16signed(R8); 
+  792:	EDI = R14; 
+  791:	call "imul_b2"; 
+  790:	EAX = int16signed(EAX); 
+  789:	EBX = EBX - EAX; 
+  788:	
+  787:	EDI = R13; EDI = EDI - EBP; 
+  786:	EDI = int16signed(EDI); 
+  785:	R8 = R13 + EBP + 0 (int); 
+  784:	R8 = int16signed(R8); local(2,int) = R8; 
+  783:	R12 = R12 - R8; 
+  782:	EDX = int16signed(R12); local(0,int) = EDX; 
+  781:	
+  780:	call "imul_b1_b3"; 
+  779:	EAX = int16signed(EAX); 
+  778:	R8 = local(0,int); EAX = EAX - R8; 
+  777:	R14 = int16signed(EAX); 
+  776:	R10 = R14 + EBX + 0 (int); 
+  775:	ECX = int16signed(R10); local(1,int) = ECX; 
+  774:	R8 = int16s[R15 + 0]; 
+  773:	
+  772:	EAX = int16s[R15 + 64]; 
+  771:	
+  770:	R11 = R8 + EAX + 0 (int); 
+  769:	EBP = int16signed(R11); 
+  768:	R8 = R8 - EAX; 
+  767:	R12 = int16signed(R8); 
+  766:	EAX = int16s[R15 + 32]; 
+  765:	
+  764:	EDX = int16s[R15 + 96]; 
+  763:	
+  762:	ECX = EAX; ECX = ECX - EDX; 
+  761:	EDI = int16signed(ECX); 
+  760:	R8 = EAX + EDX + 0 (int); 
+  759:	EBX = int16signed(R8); 
+  758:	
+  757:	call "imul_b1_b3"; 
+  756:	R9 = int16signed(EAX); 
+  755:	R9 = R9 - EBX; 
+  754:	R10 = int16signed(R9); 
+  753:	EDX = EBP + EBX + 0 (int); 
+  752:	R13 = int16signed(EDX); 
+  751:	EBP = EBP - EBX; 
+  750:	EBX = int16signed(EBP); 
+  749:	ECX = R12 + R10 + 0 (int); 
+  748:	EBP = int16signed(ECX); 
+  747:	R12 = R12 - R10; 
+  746:	R12 = int16signed(R12); 
+  745:	R10 = local(2,int); EAX = R13 + R10 + 64 (int); 
+  744:	EAX = EAX >>u 7; 
+  743:	EAX = EAX + 128 (int); 
+  742:	EDI = int16signed(EAX); 
+  741:	call "clamp"; 
+  740:	ESI = int8unsigned(EAX); 
+  739:	
+  738:	int16s[R15 + 0] = ESI; 
+  737:	R11 = local(0,int); ECX = EBP + R11 + 64 (int); 
+  736:	ECX = ECX >>u 7; 
+  735:	ESI = ECX + 128 (int); 
+  734:	EDI = int16signed(ESI); 
+  733:	call "clamp"; 
+  732:	R11 = int8unsigned(EAX); 
+  731:	
+  730:	int16s[R15 + 16] = R11; 
+  729:	EDX = R12 + R14 + 64 (int); 
+  728:	EDX = EDX >>u 7; 
+  727:	EDX = EDX + 128 (int); 
+  726:	EDI = int16signed(EDX); 
+  725:	call "clamp"; 
+  724:	R8 = int8unsigned(EAX); 
+  723:	
+  722:	int16s[R15 + 32] = R8; 
+  721:	R11 = local(1,int); EDX = EBX; EDX = EDX - R11; 
+  720:	ESI = EDX + 64 (int); 
+  719:	ESI = ESI >>u 7; 
+  718:	R10 = ESI + 128 (int); 
+  717:	EDI = int16signed(R10); 
+  716:	call "clamp"; 
+  715:	ESI = int8unsigned(EAX); 
+  714:	
+  713:	int16s[R15 + 48] = ESI; 
+  712:	EDX = local(1,int); ECX = EBX + EDX + 64 (int); 
+  711:	ECX = ECX >>u 7; 
+  710:	R11 = ECX + 128 (int); 
+  709:	EDI = int16signed(R11); 
+  708:	call "clamp"; 
+  707:	R11 = int8unsigned(EAX); 
+  706:	
+  705:	int16s[R15 + 64] = R11; 
+  704:	R12 = R12 - R14; 
+  703:	R9 = R12 + 64 (int); 
+  702:	R9 = R9 >>u 7; 
+  701:	R10 = R9 + 128 (int); 
+  700:	EDI = int16signed(R10); 
+  699:	call "clamp"; 
+  698:	R8 = int8unsigned(EAX); 
+  697:	
+  696:	int16s[R15 + 80] = R8; 
+  695:	EDI = local(0,int); EBP = EBP - EDI; 
+  694:	R9 = EBP + 64 (int); 
+  693:	R9 = R9 >>u 7; 
+  692:	EAX = R9 + 128 (int); 
+  691:	EDI = int16signed(EAX); 
+  690:	call "clamp"; 
+  689:	EDI = int8unsigned(EAX); 
+  688:	
+  687:	int16s[R15 + 96] = EDI; 
+  686:	ESI = local(2,int); R13 = R13 - ESI; 
+  685:	ECX = R13 + 64 (int); 
+  684:	ECX = ECX >>u 7; 
+  683:	EDX = ECX + 128 (int); 
+  682:	EDI = int16signed(EDX); 
+  681:	call "clamp"; 
+  680:	EDX = int8unsigned(EAX); 
+  679:	
+  678:	int16s[R15 + 112] = EDX; goto 653
+  677:	R8 = int16s[R15 + 0]; 
+  676:	ECX = R8 + 64 (int); 
+  675:	ECX = ECX >>u 7; 
+  674:	EDI = ECX + 128 (int); 
+  673:	EDI = int16signed(EDI); 
+  672:	call "clamp"; 
+  671:	EDI = int8unsigned(EAX); 
+  670:	
+  669:	
+  668:	int16s[R15 + 0] = EDI; 
+  667:	
+  666:	int16s[R15 + 16] = EDI; 
+  665:	
+  664:	int16s[R15 + 32] = EDI; 
+  663:	
+  662:	int16s[R15 + 48] = EDI; 
+  661:	
+  660:	int16s[R15 + 64] = EDI; 
+  659:	
+  658:	int16s[R15 + 80] = EDI; 
+  657:	
+  656:	int16s[R15 + 96] = EDI; 
+  655:	
+  654:	int16s[R15 + 112] = EDI; 
+  653:	R15 = R15 + 2 (long); 
+  652:	EAX = local(3,int); R9 = EAX + 1 (int); 
+  651:	R11 = int8unsigned(R9); local(3,int) = R11; 
+  650:	if (R11 <s 8) goto 832 else goto 649
+  649:	
+  648:	ESI = int32[gScanType + 0]; 
+  647:	if (ESI <u 2) goto 646 else goto 551
+  646:	if (ESI ==s 0) goto 645 else goto 643
+  645:	EDI = 0; 
+  644:	call "copyY"; goto 22
+  643:	EDX = local(5,int); 
+  642:	if (EDX ==s 0) goto 553 else goto 641
+  641:	if (EDX ==s 1) goto 596 else goto 640
+  640:	if (EDX ==s 2) goto 639 else goto 473
+  639:	
+  638:	
+  637:	
+  636:	
+  635:	R12 = gMCUBufR + 0 (long); 
+  634:	
+  633:	
+  632:	EBP = gMCUBufG + 0 (long); 
+  631:	R14 = gCoeffBuf + 0 (long); 
+  630:	R13 = 64; 
+  629:	R11 = R14; 
+  628:	R14 = R11 + 2 (long); 
+  627:	R11 = int16s[R11 + 0]; 
+  626:	EBX = int8unsigned(R11); 
+  625:	
+  624:	R9 = EBX; R9 = R9 * 103; 
+  623:	R9 = R9 >>u 8; 
+  622:	R9 = EBX + R9 + -179 (int); 
+  621:	ESI = int16signed(R9); 
+  620:	EDI = int8u[R12 + 0]; 
+  619:	
+  618:	
+  617:	call "addAndClamp"; 
+  616:	
+  615:	
+  614:	int8u[R12 + 0] = EAX; 
+  613:	R12 = R12 + 1 (long); 
+  612:	EBX = EBX * 183; 
+  611:	EBX = EBX >>u 8; 
+  610:	R11 = EBX + -91 (int); 
+  609:	ESI = int16signed(R11); 
+  608:	EDI = int8u[EBP + 0]; 
+  607:	
+  606:	
+  605:	call "subAndClamp"; 
+  604:	
+  603:	
+  602:	int8u[EBP + 0] = EAX; 
+  601:	EBP = EBP + 1 (long); 
+  600:	EAX = R13 + -1 (int); 
+  599:	R13 = int8unsigned(EAX); 
+  598:	if (R13 >s 0) goto 629 else goto 597
+  597:	goto 22
+  596:	
+  595:	
+  594:	
+  593:	
+  592:	R13 = gMCUBufG + 0 (long); 
+  591:	
+  590:	
+  589:	R14 = gMCUBufB + 0 (long); 
+  588:	R12 = gCoeffBuf + 0 (long); 
+  587:	EBP = 64; 
+  586:	EDX = R12; 
+  585:	R12 = EDX + 2 (long); 
+  584:	ECX = int16s[EDX + 0]; 
+  583:	EBX = int8unsigned(ECX); 
+  582:	
+  581:	EAX = EBX; EAX = EAX * 88; 
+  580:	EAX = EAX >>u 8; 
+  579:	R8 = EAX + -44 (int); 
+  578:	ESI = int16signed(R8); 
+  577:	EDI = int8u[R13 + 0]; 
+  576:	
+  575:	
+  574:	call "subAndClamp"; 
+  573:	
+  572:	
+  571:	int8u[R13 + 0] = EAX; 
+  570:	R13 = R13 + 1 (long); 
+  569:	ESI = EBX; ESI = ESI * 198; 
+  568:	ESI = ESI >>u 8; 
+  567:	R9 = EBX + ESI + -227 (int); 
+  566:	ESI = int16signed(R9); 
+  565:	EDI = int8u[R14 + 0]; 
+  564:	
+  563:	
+  562:	call "addAndClamp"; 
+  561:	
+  560:	
+  559:	int8u[R14 + 0] = EAX; 
+  558:	R14 = R14 + 1 (long); 
+  557:	R9 = EBP + -1 (int); 
+  556:	EBP = int8unsigned(R9); 
+  555:	if (EBP >s 0) goto 586 else goto 554
+  554:	goto 22
+  553:	EDI = 0; 
+  552:	call "copyY"; goto 22
+  551:	if (ESI ==s 2) goto 488 else goto 550
+  550:	if (ESI ==s 3) goto 509 else goto 549
+  549:	if (ESI ==s 4) goto 548 else goto 473
+  548:	ECX = local(5,int); 
+  547:	if (ECX <u 3) goto 546 else goto 538
+  546:	if (ECX ==s 0) goto 540 else goto 545
+  545:	if (ECX ==s 1) goto 544 else goto 542
+  544:	EDI = 64; 
+  543:	call "copyY"; goto 22
+  542:	EDI = 128; 
+  541:	call "copyY"; goto 22
+  540:	EDI = 0; 
+  539:	call "copyY"; goto 22
+  538:	if (ECX ==s 3) goto 511 else goto 537
+  537:	if (ECX ==s 4) goto 523 else goto 536
+  536:	if (ECX ==s 5) goto 535 else goto 473
+  535:	EDI = 0; 
+  534:	ESI = 0; 
+  533:	call "upsampleCr"; 
+  532:	EDI = 4; 
+  531:	ESI = 64; 
+  530:	call "upsampleCr"; 
+  529:	EDI = 32; 
+  528:	ESI = 128; 
+  527:	call "upsampleCr"; 
+  526:	EDI = 36; 
+  525:	ESI = 192; 
+  524:	call "upsampleCr"; goto 22
+  523:	EDI = 0; 
+  522:	ESI = 0; 
+  521:	call "upsampleCb"; 
+  520:	EDI = 4; 
+  519:	ESI = 64; 
+  518:	call "upsampleCb"; 
+  517:	EDI = 32; 
+  516:	ESI = 128; 
+  515:	call "upsampleCb"; 
+  514:	EDI = 36; 
+  513:	ESI = 192; 
+  512:	call "upsampleCb"; goto 22
+  511:	EDI = 192; 
+  510:	call "copyY"; goto 22
+  509:	EAX = local(5,int); 
+  508:	if (EAX <u 2) goto 507 else goto 502
+  507:	if (EAX ==s 0) goto 506 else goto 504
+  506:	EDI = 0; 
+  505:	call "copyY"; goto 22
+  504:	EDI = 128; 
+  503:	call "copyY"; goto 22
+  502:	if (EAX ==s 2) goto 494 else goto 501
+  501:	if (EAX ==s 3) goto 500 else goto 473
+  500:	EDI = 0; 
+  499:	ESI = 0; 
+  498:	call "upsampleCrV"; 
+  497:	EDI = 32; 
+  496:	ESI = 128; 
+  495:	call "upsampleCrV"; goto 22
+  494:	EDI = 0; 
+  493:	ESI = 0; 
+  492:	call "upsampleCbV"; 
+  491:	EDI = 32; 
+  490:	ESI = 128; 
+  489:	call "upsampleCbV"; goto 22
+  488:	ESI = local(5,int); 
+  487:	if (ESI <u 2) goto 486 else goto 481
+  486:	if (ESI ==s 0) goto 485 else goto 483
+  485:	EDI = 0; 
+  484:	call "copyY"; goto 22
+  483:	EDI = 64; 
+  482:	call "copyY"; goto 22
+  481:	if (ESI ==s 2) goto 472 else goto 480
+  480:	if (ESI ==s 3) goto 479 else goto 473
+  479:	EDI = 0; 
+  478:	ESI = 0; 
+  477:	call "upsampleCrH"; 
+  476:	EDI = 4; 
+  475:	ESI = 64; 
+  474:	call "upsampleCrH"; goto 22
+  473:	goto 22
+  472:	EDI = 0; 
+  471:	ESI = 0; 
+  470:	call "upsampleCbH"; 
+  469:	EDI = 4; 
+  468:	ESI = 64; 
+  467:	call "upsampleCbH"; goto 22
+  466:	R12 = 1; 
+  465:	EDI = gHuffTab3 + 0 (long); 
+  464:	ESI = gHuffTab2 + 0 (long); 
+  463:	EDI = EBP !=u 0 ?long EDI : ESI; 
+  462:	ESI = gHuffVal3 + 0 (long); 
+  461:	R8 = gHuffVal2 + 0 (long); 
+  460:	ESI = EBP !=u 0 ?long ESI : R8; 
+  459:	call "huffDecode"; 
+  458:	EBX = int8unsigned(EAX); 
+  457:	
+  456:	EDI = EBX; EDI = EDI & 15; 
+  455:	if (EBX & 0xf != 0) goto 454 else goto 452
+  454:	
+  453:	call "getBits2"; 
+  452:	ECX = EBX; ECX = ECX >>s 4; 
+  451:	EAX = int16unsigned(ECX); 
+  450:	EBX = EBX & 15; 
+  449:	if (EBX !=u 0) goto 448 else goto 441
+  448:	if (EAX !=u 0) goto 447 else goto 435
+  447:	R12 = R12 + EAX + 0 (int); 
+  446:	if (R12 >s 63) goto 445 else goto 444
+  445:	EAX = 28; goto 19
+  444:	
+  443:	
+  442:	goto 435
+  441:	if (EAX ==s 15) goto 440 else goto 432
+  440:	R11 = R12 + 16 (int); 
+  439:	if (R11 >s 64) goto 438 else goto 437
+  438:	EAX = 28; goto 19
+  437:	R12 = R12 + 15 (int); 
+  436:	
+  435:	EDX = R12 + 1 (int); 
+  434:	R12 = int8unsigned(EDX); 
+  433:	if (R12 <s 64) goto 465 else goto 432
+  432:	EBP = local(4,int); 
+  431:	
+  430:	ESI = int16s[gCoeffBuf + 0]; 
+  429:	EDX = ESI + 64 (int); 
+  428:	EDX = EDX >>u 7; 
+  427:	EDI = EDX + 128 (int); 
+  426:	EDI = int16signed(EDI); 
+  425:	call "clamp"; 
+  424:	EBX = int8unsigned(EAX); 
+  423:	
+  422:	ESI = int32[gScanType + 0]; 
+  421:	if (ESI <u 2) goto 420 else goto 363
+  420:	if (ESI ==s 0) goto 419 else goto 417
+  419:	
+  418:	int8u[gMCUBufR + 0] = EBX; goto 23
+  417:	
+  416:	if (EBP ==s 0) goto 369 else goto 415
+  415:	if (EBP ==s 1) goto 391 else goto 414
+  414:	if (EBP ==s 2) goto 413 else goto 23
+  413:	EDI = EBX; EDI = EDI * 103; 
+  412:	EDI = EDI >>u 8; 
+  411:	EDX = EBX + EDI + -179 (int); 
+  410:	ESI = int16signed(EDX); 
+  409:	EDI = int8u[gMCUBufR + 0]; 
+  408:	
+  407:	
+  406:	call "addAndClamp"; 
+  405:	
+  404:	
+  403:	int8u[gMCUBufR + 0] = EAX; 
+  402:	EBX = EBX * 183; 
+  401:	EBX = EBX >>u 8; 
+  400:	R9 = EBX + -91 (int); 
+  399:	ESI = int16signed(R9); 
+  398:	EDI = int8u[gMCUBufG + 0]; 
+  397:	
+  396:	
+  395:	call "subAndClamp"; 
+  394:	
+  393:	
+  392:	int8u[gMCUBufG + 0] = EAX; goto 23
+  391:	EDX = EBX; EDX = EDX * 88; 
+  390:	EDX = EDX >>u 8; 
+  389:	R11 = EDX + -44 (int); 
+  388:	ESI = int16signed(R11); 
+  387:	EDI = int8u[gMCUBufG + 0]; 
+  386:	
+  385:	
+  384:	call "subAndClamp"; 
+  383:	
+  382:	
+  381:	int8u[gMCUBufG + 0] = EAX; 
+  380:	R8 = EBX; R8 = R8 * 198; 
+  379:	R8 = R8 >>u 8; 
+  378:	EDX = EBX + R8 + -227 (int); 
+  377:	ESI = int16signed(EDX); 
+  376:	EDI = int8u[gMCUBufB + 0]; 
+  375:	
+  374:	
+  373:	call "addAndClamp"; 
+  372:	
+  371:	
+  370:	int8u[gMCUBufB + 0] = EAX; goto 23
+  369:	
+  368:	int8u[gMCUBufR + 0] = EBX; 
+  367:	
+  366:	int8u[gMCUBufG + 0] = EBX; 
+  365:	
+  364:	int8u[gMCUBufB + 0] = EBX; goto 23
+  363:	if (ESI ==s 2) goto 112 else goto 362
+  362:	if (ESI ==s 3) goto 201 else goto 361
+  361:	if (ESI ==s 4) goto 360 else goto 23
+  360:	
+  359:	if (EBP <u 3) goto 358 else goto 338
+  358:	if (EBP ==s 0) goto 344 else goto 357
+  357:	if (EBP ==s 1) goto 356 else goto 350
+  356:	
+  355:	int8u[gMCUBufR + 64] = EBX; 
+  354:	
+  353:	int8u[gMCUBufG + 64] = EBX; 
+  352:	
+  351:	int8u[gMCUBufB + 64] = EBX; goto 23
+  350:	
+  349:	int8u[gMCUBufR + 128] = EBX; 
+  348:	
+  347:	int8u[gMCUBufG + 128] = EBX; 
+  346:	
+  345:	int8u[gMCUBufB + 128] = EBX; goto 23
+  344:	
+  343:	int8u[gMCUBufR + 0] = EBX; 
+  342:	
+  341:	int8u[gMCUBufG + 0] = EBX; 
+  340:	
+  339:	int8u[gMCUBufB + 0] = EBX; goto 23
+  338:	if (EBP ==s 3) goto 207 else goto 337
+  337:	if (EBP ==s 4) goto 271 else goto 336
+  336:	if (EBP ==s 5) goto 335 else goto 23
+  335:	EAX = EBX; EAX = EAX * 103; 
+  334:	EAX = EAX >>u 8; 
+  333:	EAX = EBX + EAX + -179 (int); 
+  332:	EBP = int16signed(EAX); 
+  331:	EDI = int8u[gMCUBufR + 0]; 
+  330:	
+  329:	
+  328:	ESI = EBP; call "addAndClamp"; 
+  327:	
+  326:	
+  325:	int8u[gMCUBufR + 0] = EAX; 
+  324:	EDI = int8u[gMCUBufR + 64]; 
+  323:	
+  322:	ESI = EBP; 
+  321:	call "addAndClamp"; 
+  320:	
+  319:	
+  318:	int8u[gMCUBufR + 64] = EAX; 
+  317:	EDI = int8u[gMCUBufR + 128]; 
+  316:	
+  315:	
+  314:	ESI = EBP; call "addAndClamp"; 
+  313:	
+  312:	
+  311:	int8u[gMCUBufR + 128] = EAX; 
+  310:	EDI = int8u[gMCUBufR + 192]; 
+  309:	
+  308:	ESI = EBP; 
+  307:	call "addAndClamp"; 
+  306:	
+  305:	
+  304:	int8u[gMCUBufR + 192] = EAX; 
+  303:	EBX = EBX * 183; 
+  302:	EBX = EBX >>u 8; 
+  301:	ESI = EBX + -91 (int); 
+  300:	EBX = int16signed(ESI); 
+  299:	EDI = int8u[gMCUBufG + 0]; 
+  298:	
+  297:	
+  296:	ESI = EBX; call "subAndClamp"; 
+  295:	
+  294:	
+  293:	int8u[gMCUBufG + 0] = EAX; 
+  292:	EDI = int8u[gMCUBufG + 64]; 
+  291:	
+  290:	ESI = EBX; 
+  289:	call "subAndClamp"; 
+  288:	
+  287:	
+  286:	int8u[gMCUBufG + 64] = EAX; 
+  285:	EDI = int8u[gMCUBufG + 128]; 
+  284:	
+  283:	
+  282:	ESI = EBX; call "subAndClamp"; 
+  281:	
+  280:	
+  279:	int8u[gMCUBufG + 128] = EAX; 
+  278:	EDI = int8u[gMCUBufG + 192]; 
+  277:	
+  276:	ESI = EBX; 
+  275:	call "subAndClamp"; 
+  274:	
+  273:	
+  272:	int8u[gMCUBufG + 192] = EAX; goto 23
+  271:	R11 = EBX; R11 = R11 * 88; 
+  270:	R11 = R11 >>u 8; 
+  269:	EAX = R11 + -44 (int); 
+  268:	EBP = int16signed(EAX); 
+  267:	EDI = int8u[gMCUBufG + 0]; 
+  266:	
+  265:	
+  264:	ESI = EBP; call "subAndClamp"; 
+  263:	
+  262:	
+  261:	int8u[gMCUBufG + 0] = EAX; 
+  260:	EDI = int8u[gMCUBufG + 64]; 
+  259:	
+  258:	ESI = EBP; 
+  257:	call "subAndClamp"; 
+  256:	
+  255:	
+  254:	int8u[gMCUBufG + 64] = EAX; 
+  253:	EDI = int8u[gMCUBufG + 128]; 
+  252:	
+  251:	
+  250:	ESI = EBP; call "subAndClamp"; 
+  249:	
+  248:	
+  247:	int8u[gMCUBufG + 128] = EAX; 
+  246:	EDI = int8u[gMCUBufG + 192]; 
+  245:	
+  244:	ESI = EBP; 
+  243:	call "subAndClamp"; 
+  242:	
+  241:	
+  240:	int8u[gMCUBufG + 192] = EAX; 
+  239:	ESI = EBX; ESI = ESI * 198; 
+  238:	ESI = ESI >>u 8; 
+  237:	R11 = EBX + ESI + -227 (int); 
+  236:	EBX = int16signed(R11); 
+  235:	EDI = int8u[gMCUBufB + 0]; 
+  234:	
+  233:	
+  232:	ESI = EBX; call "addAndClamp"; 
+  231:	
+  230:	
+  229:	int8u[gMCUBufB + 0] = EAX; 
+  228:	EDI = int8u[gMCUBufB + 64]; 
+  227:	
+  226:	ESI = EBX; 
+  225:	call "addAndClamp"; 
+  224:	
+  223:	
+  222:	int8u[gMCUBufB + 64] = EAX; 
+  221:	EDI = int8u[gMCUBufB + 128]; 
+  220:	
+  219:	
+  218:	ESI = EBX; call "addAndClamp"; 
+  217:	
+  216:	
+  215:	int8u[gMCUBufB + 128] = EAX; 
+  214:	EDI = int8u[gMCUBufB + 192]; 
+  213:	
+  212:	ESI = EBX; 
+  211:	call "addAndClamp"; 
+  210:	
+  209:	
+  208:	int8u[gMCUBufB + 192] = EAX; goto 23
+  207:	
+  206:	int8u[gMCUBufR + 192] = EBX; 
+  205:	
+  204:	int8u[gMCUBufG + 192] = EBX; 
+  203:	
+  202:	int8u[gMCUBufB + 192] = EBX; goto 23
+  201:	
+  200:	if (EBP <u 2) goto 199 else goto 186
+  199:	if (EBP ==s 0) goto 198 else goto 192
+  198:	
+  197:	int8u[gMCUBufR + 0] = EBX; 
+  196:	
+  195:	int8u[gMCUBufG + 0] = EBX; 
+  194:	
+  193:	int8u[gMCUBufB + 0] = EBX; goto 23
+  192:	
+  191:	int8u[gMCUBufR + 128] = EBX; 
+  190:	
+  189:	int8u[gMCUBufG + 128] = EBX; 
+  188:	
+  187:	int8u[gMCUBufB + 128] = EBX; goto 23
+  186:	if (EBP ==s 2) goto 148 else goto 185
+  185:	if (EBP ==s 3) goto 184 else goto 23
+  184:	R8 = EBX; R8 = R8 * 103; 
+  183:	R8 = R8 >>u 8; 
+  182:	EAX = EBX + R8 + -179 (int); 
+  181:	EBP = int16signed(EAX); 
+  180:	EDI = int8u[gMCUBufR + 0]; 
+  179:	
+  178:	ESI = EBP; 
+  177:	call "addAndClamp"; 
+  176:	
+  175:	
+  174:	int8u[gMCUBufR + 0] = EAX; 
+  173:	EDI = int8u[gMCUBufR + 128]; 
+  172:	
+  171:	
+  170:	ESI = EBP; call "addAndClamp"; 
+  169:	
+  168:	
+  167:	int8u[gMCUBufR + 128] = EAX; 
+  166:	EBX = EBX * 183; 
+  165:	EBX = EBX >>u 8; 
+  164:	R8 = EBX + -91 (int); 
+  163:	EBX = int16signed(R8); 
+  162:	EDI = int8u[gMCUBufG + 0]; 
+  161:	
+  160:	ESI = EBX; 
+  159:	call "subAndClamp"; 
+  158:	
+  157:	
+  156:	int8u[gMCUBufG + 0] = EAX; 
+  155:	EDI = int8u[gMCUBufG + 128]; 
+  154:	
+  153:	
+  152:	ESI = EBX; call "subAndClamp"; 
+  151:	
+  150:	
+  149:	int8u[gMCUBufG + 128] = EAX; goto 23
+  148:	EDI = EBX; EDI = EDI * 88; 
+  147:	EDI = EDI >>u 8; 
+  146:	EDI = EDI + -44 (int); 
+  145:	EBP = int16signed(EDI); 
+  144:	EDI = int8u[gMCUBufG + 0]; 
+  143:	
+  142:	ESI = EBP; 
+  141:	call "subAndClamp"; 
+  140:	
+  139:	
+  138:	int8u[gMCUBufG + 0] = EAX; 
+  137:	EDI = int8u[gMCUBufG + 128]; 
+  136:	
+  135:	
+  134:	ESI = EBP; call "subAndClamp"; 
+  133:	
+  132:	
+  131:	int8u[gMCUBufG + 128] = EAX; 
+  130:	R9 = EBX; R9 = R9 * 198; 
+  129:	R9 = R9 >>u 8; 
+  128:	R11 = EBX + R9 + -227 (int); 
+  127:	EBX = int16signed(R11); 
+  126:	EDI = int8u[gMCUBufB + 0]; 
+  125:	
+  124:	ESI = EBX; 
+  123:	call "addAndClamp"; 
+  122:	
+  121:	
+  120:	int8u[gMCUBufB + 0] = EAX; 
+  119:	EDI = int8u[gMCUBufB + 128]; 
+  118:	
+  117:	
+  116:	ESI = EBX; call "addAndClamp"; 
+  115:	
+  114:	
+  113:	int8u[gMCUBufB + 128] = EAX; goto 23
+  112:	
+  111:	if (EBP <u 2) goto 110 else goto 97
+  110:	if (EBP ==s 0) goto 109 else goto 103
+  109:	
+  108:	int8u[gMCUBufR + 0] = EBX; 
+  107:	
+  106:	int8u[gMCUBufG + 0] = EBX; 
+  105:	
+  104:	int8u[gMCUBufB + 0] = EBX; goto 23
+  103:	
+  102:	int8u[gMCUBufR + 64] = EBX; 
+  101:	
+  100:	int8u[gMCUBufG + 64] = EBX; 
+   99:	
+   98:	int8u[gMCUBufB + 64] = EBX; goto 23
+   97:	if (EBP ==s 2) goto 59 else goto 96
+   96:	if (EBP ==s 3) goto 95 else goto 23
+   95:	R8 = EBX; R8 = R8 * 103; 
+   94:	R8 = R8 >>u 8; 
+   93:	ECX = EBX + R8 + -179 (int); 
+   92:	EBP = int16signed(ECX); 
+   91:	EDI = int8u[gMCUBufR + 0]; 
+   90:	
+   89:	
+   88:	ESI = EBP; call "addAndClamp"; 
+   87:	
+   86:	
+   85:	int8u[gMCUBufR + 0] = EAX; 
+   84:	EDI = int8u[gMCUBufR + 64]; 
+   83:	
+   82:	ESI = EBP; 
+   81:	call "addAndClamp"; 
+   80:	
+   79:	
+   78:	int8u[gMCUBufR + 64] = EAX; 
+   77:	EBX = EBX * 183; 
+   76:	EBX = EBX >>u 8; 
+   75:	EDX = EBX + -91 (int); 
+   74:	EBX = int16signed(EDX); 
+   73:	EDI = int8u[gMCUBufG + 0]; 
+   72:	
+   71:	
+   70:	ESI = EBX; call "subAndClamp"; 
+   69:	
+   68:	
+   67:	int8u[gMCUBufG + 0] = EAX; 
+   66:	EDI = int8u[gMCUBufG + 64]; 
+   65:	
+   64:	ESI = EBX; 
+   63:	call "subAndClamp"; 
+   62:	
+   61:	
+   60:	int8u[gMCUBufG + 64] = EAX; goto 23
+   59:	R10 = EBX; R10 = R10 * 88; 
+   58:	R10 = R10 >>u 8; 
+   57:	R9 = R10 + -44 (int); 
+   56:	EBP = int16signed(R9); 
+   55:	EDI = int8u[gMCUBufG + 0]; 
+   54:	
+   53:	
+   52:	ESI = EBP; call "subAndClamp"; 
+   51:	
+   50:	
+   49:	int8u[gMCUBufG + 0] = EAX; 
+   48:	EDI = int8u[gMCUBufG + 64]; 
+   47:	
+   46:	ESI = EBP; 
+   45:	call "subAndClamp"; 
+   44:	
+   43:	
+   42:	int8u[gMCUBufG + 64] = EAX; 
+   41:	R10 = EBX; R10 = R10 * 198; 
+   40:	R10 = R10 >>u 8; 
+   39:	R9 = EBX + R10 + -227 (int); 
+   38:	EBX = int16signed(R9); 
+   37:	EDI = int8u[gMCUBufB + 0]; 
+   36:	
+   35:	
+   34:	ESI = EBX; call "addAndClamp"; 
+   33:	
+   32:	
+   31:	int8u[gMCUBufB + 0] = EAX; 
+   30:	EDI = int8u[gMCUBufB + 64]; 
+   29:	
+   28:	ESI = EBX; 
+   27:	call "addAndClamp"; 
+   26:	
+   25:	
+   24:	int8u[gMCUBufB + 64] = EAX; 
+   23:	
+   22:	EDI = local(4,int); EAX = EDI + 1 (int); 
+   21:	ECX = int8unsigned(EAX); local(4,int) = ECX; goto 1119
+   20:	EAX = 0; 
+   19:	
+   18:	
+   17:	
+   16:	if (EAX !=u 0) goto 7 else goto 15
+   15:	R10 = int8u[gCallbackStatus + 0]; 
+   14:	
+   13:	if (R10 !=u 0) goto 6 else goto 12
+   12:	EAX = int16u[gNumMCUSRemaining + 0]; 
+   11:	R10 = EAX + -1 (int); 
+   10:	
+    9:	int16u[gNumMCUSRemaining + 0] = R10; 
+    8:	EAX = 0; goto 1
+    7:	
+    6:	R10 = int8u[gCallbackStatus + 0]; 
+    5:	if (R10 !=u 0) goto 4 else goto 3
+    4:	EAX = R10; goto 2
+    3:	
+    2:	
+    1:	return
+}
+
+pjpeg_decode_init() {
+  680:	EBX = EDI; 
+  679:	R9 = 0; 
+  678:	int32[EBX + 0] = R9; 
+  677:	R11 = 0; 
+  676:	int32[EBX + 4] = R11; 
+  675:	EAX = 0; 
+  674:	int32[EBX + 8] = EAX; 
+  673:	R8 = 0; 
+  672:	int32[EBX + 12] = R8; 
+  671:	R9 = 0; 
+  670:	int32[EBX + 16] = R9; 
+  669:	R11 = 0; 
+  668:	int32[EBX + 20] = R11; 
+  667:	EDI = 0; 
+  666:	int32[EBX + 24] = EDI; 
+  665:	R8 = 0; 
+  664:	int32[EBX + 28] = R8; 
+  663:	R11 = 0L; 
+  662:	int64[EBX + 32] = R11; 
+  661:	EDI = 0L; 
+  660:	int64[EBX + 40] = EDI; 
+  659:	EAX = 0L; 
+  658:	int64[EBX + 48] = EAX; 
+  657:	int64[g_pNeedBytesCallback + 0] = ESI; 
+  656:	int64[g_pCallback_data + 0] = EDX; 
+  655:	R11 = 0; 
+  654:	int8u[gCallbackStatus + 0] = R11; 
+  653:	
+  652:	int8u[gReduce + 0] = ECX; 
+  651:	
+  650:	R9 = 0; 
+  649:	int16u[gImageXSize + 0] = R9; 
+  648:	R8 = 0; 
+  647:	int16u[gImageYSize + 0] = R8; 
+  646:	R10 = 0; 
+  645:	int8u[gCompsInFrame + 0] = R10; 
+  644:	R8 = 0; 
+  643:	int16u[gRestartInterval + 0] = R8; 
+  642:	EDI = 0; 
+  641:	int8u[gCompsInScan + 0] = EDI; 
+  640:	R8 = 0; 
+  639:	int8u[gValidHuffTables + 0] = R8; 
+  638:	EDI = 0; 
+  637:	int8u[gValidQuantTables + 0] = EDI; 
+  636:	R8 = 0; 
+  635:	int8u[gTemFlag + 0] = R8; 
+  634:	R9 = 0; 
+  633:	int8u[gInBufOfs + 0] = R9; 
+  632:	EDX = 0; 
+  631:	int8u[gInBufLeft + 0] = EDX; 
+  630:	ESI = 0; 
+  629:	int16u[gBitBuf + 0] = ESI; 
+  628:	ECX = 8; 
+  627:	int8u[gBitsLeft + 0] = ECX; 
+  626:	EDI = 8; 
+  625:	call "getBits1"; 
+  624:	EDI = 8; 
+  623:	call "getBits1"; 
+  622:	
+  621:	
+  620:	
+  619:	
+  618:	EAX = int8u[gCallbackStatus + 0]; 
+  617:	
+  616:	if (EAX !=u 0) goto 615 else goto 610
+  615:	
+  614:	if (EAX !=u 0) goto 613 else goto 612
+  613:	goto 611
+  612:	EAX = 0; 
+  611:	goto 2
+  610:	
+  609:	
+  608:	EDI = 8; 
+  607:	call "getBits1"; 
+  606:	
+  605:	EBP = int8unsigned(EAX); 
+  604:	
+  603:	EDI = 8; 
+  602:	call "getBits1"; 
+  601:	
+  600:	EAX = int8unsigned(EAX); 
+  599:	
+  598:	if (EBP ==s 255) goto 596 else goto 597
+  597:	goto 593
+  596:	
+  595:	if (EAX ==s 216) goto 594 else goto 593
+  594:	ECX = 0; goto 571
+  593:	EBP = 4096; 
+  592:	ESI = EBP + -1 (int); 
+  591:	EBP = int16unsigned(ESI); 
+  590:	
+  589:	if (EBP ==s 0) goto 588 else goto 587
+  588:	ECX = 19; goto 571
+  587:	R12 = EAX; 
+  586:	EDI = 8; 
+  585:	call "getBits1"; 
+  584:	
+  583:	EAX = int8unsigned(EAX); 
+  582:	
+  581:	if (R12 ==s 255) goto 580 else goto 1
+  580:	if (EAX ==s 216) goto 577 else goto 579
+  579:	if (EAX ==s 217) goto 578 else goto 1
+  578:	ECX = 19; goto 571
+  577:	ECX = int16u[gBitBuf + 0]; 
+  576:	ECX = ECX >>s 8; 
+  575:	ECX = ECX & 255; 
+  574:	if (ECX !=s 255) goto 573 else goto 572
+  573:	ECX = 19; goto 571
+  572:	ECX = 0; 
+  571:	
+  570:	
+  569:	
+  568:	if (ECX !=u 0) goto 567 else goto 566
+  567:	goto 452
+  566:	EDI = stack(0) (long); 
+  565:	call "processMarkers"; 
+  564:	ECX = int8unsigned(EAX); 
+  563:	
+  562:	if (ECX !=u 0) goto 561 else goto 560
+  561:	goto 452
+  560:	EAX = int8u[stack(0)]; 
+  559:	if (EAX <u 194) goto 558 else goto 457
+  558:	if (EAX ==s 192) goto 556 else goto 557
+  557:	goto 454
+  556:	
+  555:	EDI = 16; 
+  554:	call "getBits1"; 
+  553:	EBP = int16unsigned(EAX); 
+  552:	
+  551:	EDI = 8; 
+  550:	call "getBits1"; 
+  549:	EDI = int16unsigned(EAX); 
+  548:	if (EDI !=s 8) goto 547 else goto 546
+  547:	ECX = 7; goto 463
+  546:	EDI = 16; 
+  545:	call "getBits1"; 
+  544:	R9 = int16unsigned(EAX); 
+  543:	
+  542:	int16u[gImageYSize + 0] = R9; 
+  541:	
+  540:	if (R9 ==u 0) goto 465 else goto 539
+  539:	
+  538:	
+  537:	if (R9 >s 16384) goto 464 else goto 536
+  536:	EDI = 16; 
+  535:	call "getBits1"; 
+  534:	ESI = int16unsigned(EAX); 
+  533:	
+  532:	int16u[gImageXSize + 0] = ESI; 
+  531:	
+  530:	if (ESI ==u 0) goto 467 else goto 529
+  529:	
+  528:	
+  527:	if (ESI >s 16384) goto 466 else goto 526
+  526:	EDI = 8; 
+  525:	call "getBits1"; 
+  524:	
+  523:	R10 = int8unsigned(EAX); 
+  522:	
+  521:	int8u[gCompsInFrame + 0] = R10; 
+  520:	
+  519:	if (R10 >s 3) goto 518 else goto 517
+  518:	ECX = 10; goto 463
+  517:	
+  516:	
+  515:	EDI = R10 + R10 + 0 (int); 
+  514:	
+  513:	EDX = EDI + R10 + 8 (int); 
+  512:	if (EBP !=s EDX) goto 511 else goto 510
+  511:	ECX = 11; goto 463
+  510:	EBP = 0; 
+  509:	R10 = int8u[gCompsInFrame + 0]; 
+  508:	if (EBP <s R10) goto 507 else goto 468
+  507:	EDI = 8; 
+  506:	call "getBits1"; 
+  505:	
+  504:	EDI = gCompIdent + 0 (long); 
+  503:	R10 = long32signed(EBP); 
+  502:	
+  501:	
+  500:	int8u[EDI + R10 + 0] = EAX; 
+  499:	EDI = 4; 
+  498:	call "getBits1"; 
+  497:	
+  496:	EDX = gCompHSamp + 0 (long); 
+  495:	R10 = long32signed(EBP); 
+  494:	
+  493:	
+  492:	int8u[EDX + R10 + 0] = EAX; 
+  491:	EDI = 4; 
+  490:	call "getBits1"; 
+  489:	
+  488:	R11 = gCompVSamp + 0 (long); 
+  487:	EDI = long32signed(EBP); 
+  486:	
+  485:	
+  484:	int8u[R11 + EDI + 0] = EAX; 
+  483:	EDI = 8; 
+  482:	call "getBits1"; 
+  481:	
+  480:	R8 = gCompQuant + 0 (long); 
+  479:	EDX = long32signed(EBP); 
+  478:	EDI = int8unsigned(EAX); 
+  477:	
+  476:	int8u[R8 + EDX + 0] = EDI; 
+  475:	
+  474:	
+  473:	
+  472:	if (EDI >s 1) goto 471 else goto 470
+  471:	ECX = 36; goto 463
+  470:	R9 = EBP + 1 (int); 
+  469:	EBP = int8unsigned(R9); goto 509
+  468:	ECX = 0; goto 463
+  467:	
+  466:	ECX = 9; goto 463
+  465:	
+  464:	ECX = 8; 
+  463:	
+  462:	
+  461:	
+  460:	if (ECX !=u 0) goto 459 else goto 458
+  459:	goto 452
+  458:	ECX = 0; goto 452
+  457:	if (EAX ==s 194) goto 453 else goto 456
+  456:	if (EAX ==s 201) goto 455 else goto 454
+  455:	ECX = 17; goto 452
+  454:	ECX = 20; goto 452
+  453:	ECX = 37; 
+  452:	
+  451:	
+  450:	
+  449:	if (ECX !=u 0) goto 8 else goto 448
+  448:	EDX = int8u[gCallbackStatus + 0]; 
+  447:	
+  446:	if (EDX !=u 0) goto 7 else goto 445
+  445:	
+  444:	R9 = int8u[gCompsInFrame + 0]; 
+  443:	if (R9 ==s 1) goto 333 else goto 442
+  442:	
+  441:	if (R9 ==s 3) goto 440 else goto 334
+  440:	ECX = int8u[gCompHSamp + 1]; 
+  439:	if (ECX !=s 1) goto 337 else goto 438
+  438:	ESI = int8u[gCompVSamp + 1]; 
+  437:	
+  436:	if (ESI !=s 1) goto 336 else goto 435
+  435:	R10 = int8u[gCompHSamp + 2]; 
+  434:	if (R10 !=s 1) goto 338 else goto 433
+  433:	R10 = int8u[gCompVSamp + 2]; 
+  432:	
+  431:	
+  430:	if (R10 !=s 1) goto 335 else goto 429
+  429:	ESI = int8u[gCompHSamp + 0]; 
+  428:	if (ESI ==s 1) goto 427 else goto 410
+  427:	EDX = int8u[gCompVSamp + 0]; 
+  426:	
+  425:	if (EDX ==s 1) goto 424 else goto 409
+  424:	ESI = 1; 
+  423:	int32[gScanType + 0] = ESI; 
+  422:	R9 = 3; 
+  421:	int8u[gMaxBlocksPerMCU + 0] = R9; 
+  420:	R8 = 0; 
+  419:	int8u[gMCUOrg + 0] = R8; 
+  418:	ESI = 1; 
+  417:	int8u[gMCUOrg + 1] = ESI; 
+  416:	ECX = 2; 
+  415:	int8u[gMCUOrg + 2] = ECX; 
+  414:	R10 = 8; 
+  413:	int8u[gMaxMCUXSize + 0] = R10; 
+  412:	R10 = 8; 
+  411:	int8u[gMaxMCUYSize + 0] = R10; goto 318
+  410:	
+  409:	EDX = int8u[gCompHSamp + 0]; 
+  408:	if (EDX ==s 1) goto 407 else goto 388
+  407:	R8 = int8u[gCompVSamp + 0]; 
+  406:	
+  405:	if (R8 ==s 2) goto 404 else goto 387
+  404:	R11 = 3; 
+  403:	int32[gScanType + 0] = R11; 
+  402:	R10 = 4; 
+  401:	int8u[gMaxBlocksPerMCU + 0] = R10; 
+  400:	R10 = 0; 
+  399:	int8u[gMCUOrg + 0] = R10; 
+  398:	R9 = 0; 
+  397:	int8u[gMCUOrg + 1] = R9; 
+  396:	R10 = 1; 
+  395:	int8u[gMCUOrg + 2] = R10; 
+  394:	EAX = 2; 
+  393:	int8u[gMCUOrg + 3] = EAX; 
+  392:	R11 = 8; 
+  391:	int8u[gMaxMCUXSize + 0] = R11; 
+  390:	EDX = 16; 
+  389:	int8u[gMaxMCUYSize + 0] = EDX; goto 318
+  388:	
+  387:	ECX = int8u[gCompHSamp + 0]; 
+  386:	if (ECX ==s 2) goto 385 else goto 366
+  385:	R8 = int8u[gCompVSamp + 0]; 
+  384:	
+  383:	if (R8 ==s 1) goto 382 else goto 365
+  382:	ECX = 2; 
+  381:	int32[gScanType + 0] = ECX; 
+  380:	EDX = 4; 
+  379:	int8u[gMaxBlocksPerMCU + 0] = EDX; 
+  378:	EDI = 0; 
+  377:	int8u[gMCUOrg + 0] = EDI; 
+  376:	EDX = 0; 
+  375:	int8u[gMCUOrg + 1] = EDX; 
+  374:	ECX = 1; 
+  373:	int8u[gMCUOrg + 2] = ECX; 
+  372:	EDX = 2; 
+  371:	int8u[gMCUOrg + 3] = EDX; 
+  370:	EDI = 16; 
+  369:	int8u[gMaxMCUXSize + 0] = EDI; 
+  368:	ECX = 8; 
+  367:	int8u[gMaxMCUYSize + 0] = ECX; goto 318
+  366:	
+  365:	R9 = int8u[gCompHSamp + 0]; 
+  364:	if (R9 ==s 2) goto 363 else goto 340
+  363:	R10 = int8u[gCompVSamp + 0]; 
+  362:	
+  361:	if (R10 ==s 2) goto 360 else goto 339
+  360:	R8 = 4; 
+  359:	int32[gScanType + 0] = R8; 
+  358:	EAX = 6; 
+  357:	int8u[gMaxBlocksPerMCU + 0] = EAX; 
+  356:	R8 = 0; 
+  355:	int8u[gMCUOrg + 0] = R8; 
+  354:	EDI = 0; 
+  353:	int8u[gMCUOrg + 1] = EDI; 
+  352:	ESI = 0; 
+  351:	int8u[gMCUOrg + 2] = ESI; 
+  350:	EDI = 0; 
+  349:	int8u[gMCUOrg + 3] = EDI; 
+  348:	EAX = 1; 
+  347:	int8u[gMCUOrg + 4] = EAX; 
+  346:	EDI = 2; 
+  345:	int8u[gMCUOrg + 5] = EDI; 
+  344:	R11 = 16; 
+  343:	int8u[gMaxMCUXSize + 0] = R11; 
+  342:	EAX = 16; 
+  341:	int8u[gMaxMCUYSize + 0] = EAX; goto 318
+  340:	
+  339:	EDX = 27; goto 290
+  338:	goto 335
+  337:	
+  336:	
+  335:	EDX = 27; goto 290
+  334:	EDX = 26; goto 290
+  333:	R10 = int8u[gCompHSamp + 0]; 
+  332:	if (R10 !=s 1) goto 292 else goto 331
+  331:	EAX = int8u[gCompVSamp + 0]; 
+  330:	
+  329:	if (EAX !=s 1) goto 291 else goto 328
+  328:	EAX = 0; 
+  327:	int32[gScanType + 0] = EAX; 
+  326:	R11 = 1; 
+  325:	int8u[gMaxBlocksPerMCU + 0] = R11; 
+  324:	ECX = 0; 
+  323:	int8u[gMCUOrg + 0] = ECX; 
+  322:	R9 = 8; 
+  321:	int8u[gMaxMCUXSize + 0] = R9; 
+  320:	EDI = 8; 
+  319:	int8u[gMaxMCUYSize + 0] = EDI; 
+  318:	ECX = 3; 
+  317:	R9 = 4; 
+  316:	R8 = int8u[gMaxMCUXSize + 0]; 
+  315:	ECX = R8 ==s 8 ?int ECX : R9; 
+  314:	EAX = int16u[gImageXSize + 0]; 
+  313:	
+  312:	R11 = EAX + R8 + -1 (int); 
+  311:	R11 = R11 >>s ECX; 
+  310:	
+  309:	int16u[gMaxMCUSPerRow + 0] = R11; 
+  308:	ECX = 3; 
+  307:	EDI = 4; 
+  306:	EDX = int8u[gMaxMCUYSize + 0]; 
+  305:	ECX = EDX ==s 8 ?int ECX : EDI; 
+  304:	EAX = int16u[gImageYSize + 0]; 
+  303:	
+  302:	EDI = EAX + EDX + -1 (int); 
+  301:	EDI = EDI >>s ECX; 
+  300:	
+  299:	int16u[gMaxMCUSPerCol + 0] = EDI; 
+  298:	
+  297:	
+  296:	R11 = R11 * EDI; 
+  295:	
+  294:	int16u[gNumMCUSRemaining + 0] = R11; 
+  293:	EDX = 0; goto 290
+  292:	
+  291:	EDX = 27; 
+  290:	
+  289:	
+  288:	
+  287:	if (EDX !=u 0) goto 14 else goto 286
+  286:	EAX = int8u[gCallbackStatus + 0]; 
+  285:	
+  284:	if (EAX !=u 0) goto 13 else goto 283
+  283:	
+  282:	
+  281:	
+  280:	ECX = 0; 
+  279:	int8u[stack(0)] = ECX; 
+  278:	EDI = stack(1) (long); 
+  277:	call "processMarkers"; 
+  276:	ESI = int8unsigned(EAX); 
+  275:	
+  274:	if (ESI !=u 0) goto 273 else goto 272
+  273:	goto 157
+  272:	R10 = int8u[stack(1)]; 
+  271:	if (R10 ==s 217) goto 270 else goto 267
+  270:	R11 = 1; 
+  269:	int8u[stack(0)] = R11; 
+  268:	ESI = 0; goto 157
+  267:	
+  266:	if (R10 !=s 218) goto 265 else goto 264
+  265:	ESI = 18; goto 157
+  264:	
+  263:	EDI = 16; 
+  262:	call "getBits1"; 
+  261:	
+  260:	EBP = EAX; 
+  259:	EDI = 8; 
+  258:	call "getBits1"; 
+  257:	
+  256:	EDX = int8unsigned(EAX); 
+  255:	
+  254:	int8u[gCompsInScan + 0] = EDX; 
+  253:	R11 = EBP + -3 (int); 
+  252:	EBP = int16unsigned(R11); 
+  251:	
+  250:	
+  249:	R8 = EDX + EDX + 3 (int); 
+  248:	if (EBP !=s R8) goto 163 else goto 247
+  247:	
+  246:	
+  245:	if (EDX <s 1) goto 162 else goto 244
+  244:	
+  243:	
+  242:	if (EDX >s 3) goto 161 else goto 241
+  241:	R12 = 0; 
+  240:	EAX = int8u[gCompsInScan + 0]; 
+  239:	if (R12 <s EAX) goto 238 else goto 199
+  238:	EDI = 8; 
+  237:	call "getBits1"; 
+  236:	
+  235:	R13 = int8unsigned(EAX); 
+  234:	
+  233:	EDI = 8; 
+  232:	call "getBits1"; R8 = EAX; 
+  231:	
+  230:	
+  229:	
+  228:	EBP = EBP + -2 (int); 
+  227:	
+  226:	ECX = 0; 
+  225:	R9 = int8u[gCompsInFrame + 0]; 
+  224:	if (ECX <s R9) goto 223 else goto 217
+  223:	R11 = gCompIdent + 0 (long); 
+  222:	R9 = long32signed(ECX); 
+  221:	EAX = int8u[R11 + R9 + 0]; 
+  220:	if (R13 ==s EAX) goto 217 else goto 219
+  219:	EAX = ECX + 1 (int); 
+  218:	ECX = int8unsigned(EAX); goto 225
+  217:	R11 = int8u[gCompsInFrame + 0]; 
+  216:	if (ECX >=s R11) goto 215 else goto 214
+  215:	ESI = 15; goto 160
+  214:	R9 = gCompList + 0 (long); 
+  213:	ESI = long32signed(R12); 
+  212:	
+  211:	int8u[R9 + ESI + 0] = ECX; 
+  210:	EDX = gCompDCTab + 0 (long); 
+  209:	ESI = long32signed(ECX); 
+  208:	R9 = R8; R9 = R9 >>s 4; 
+  207:	R9 = R9 & 15; 
+  206:	int8u[EDX + ESI + 0] = R9; 
+  205:	R9 = gCompACTab + 0 (long); 
+  204:	
+  203:	R8 = R8 & 15; 
+  202:	int8u[R9 + ESI + 0] = R8; 
+  201:	EDX = R12 + 1 (int); 
+  200:	R12 = int8unsigned(EDX); goto 240
+  199:	EDI = 8; 
+  198:	call "getBits1"; 
+  197:	
+  196:	ECX = &spectral_start; 
+  195:	
+  194:	
+  193:	_ = volatile store int8u(ECX, EAX); 
+  192:	EDI = 8; 
+  191:	call "getBits1"; 
+  190:	
+  189:	R9 = &spectral_end; 
+  188:	
+  187:	
+  186:	_ = volatile store int8u(R9, EAX); 
+  185:	EDI = 4; 
+  184:	call "getBits1"; 
+  183:	
+  182:	R10 = &successive_high; 
+  181:	
+  180:	
+  179:	_ = volatile store int8u(R10, EAX); 
+  178:	EDI = 4; 
+  177:	call "getBits1"; 
+  176:	
+  175:	ESI = &successive_low; 
+  174:	
+  173:	
+  172:	_ = volatile store int8u(ESI, EAX); 
+  171:	ESI = EBP + -3 (int); 
+  170:	EBP = int16unsigned(ESI); 
+  169:	if (EBP !=u 0) goto 168 else goto 164
+  168:	EDI = 8; 
+  167:	call "getBits1"; 
+  166:	ESI = EBP + -1 (int); 
+  165:	EBP = int16unsigned(ESI); goto 169
+  164:	ESI = 0; goto 160
+  163:	
+  162:	
+  161:	ESI = 14; 
+  160:	
+  159:	
+  158:	
+  157:	
+  156:	
+  155:	
+  154:	if (ESI !=u 0) goto 153 else goto 152
+  153:	goto 50
+  152:	R10 = int8u[stack(0)]; 
+  151:	if (R10 !=u 0) goto 150 else goto 149
+  150:	ESI = 18; goto 50
+  149:	
+  148:	EDX = 0; 
+  147:	R11 = int8u[gCompsInScan + 0]; 
+  146:	if (EDX <s R11) goto 145 else goto 115
+  145:	ESI = gCompDCTab + 0 (long); 
+  144:	R10 = gCompList + 0 (long); 
+  143:	R9 = long32signed(EDX); 
+  142:	EDI = int8u[R10 + R9 + 0]; 
+  141:	R11 = long32signed(EDI); 
+  140:	ECX = int8u[ESI + R11 + 0]; 
+  139:	
+  138:	EAX = gCompACTab + 0 (long); 
+  137:	
+  136:	
+  135:	
+  134:	
+  133:	EAX = int8u[EAX + R11 + 0]; 
+  132:	ESI = EAX + 2 (int); 
+  131:	ESI = int8unsigned(ESI); 
+  130:	R10 = int8u[gValidHuffTables + 0]; 
+  129:	EAX = 1; 
+  128:	EAX = EAX << ECX; 
+  127:	EDI = R10; EDI = EDI & EAX; 
+  126:	if (EDI ==s 0) goto 117 else goto 125
+  125:	
+  124:	R11 = 1; 
+  123:	ECX = ESI; R11 = R11 << ECX; 
+  122:	R10 = R10 & R11; 
+  121:	
+  120:	if (R10 ==s 0) goto 116 else goto 119
+  119:	ESI = EDX + 1 (int); 
+  118:	EDX = int8unsigned(ESI); goto 147
+  117:	
+  116:	ESI = 24; goto 114
+  115:	ESI = 0; 
+  114:	
+  113:	
+  112:	
+  111:	if (ESI !=u 0) goto 110 else goto 109
+  110:	goto 50
+  109:	
+  108:	R8 = 0; 
+  107:	EAX = int8u[gCompsInScan + 0]; 
+  106:	if (R8 <s EAX) goto 105 else goto 89
+  105:	EDI = 2; 
+  104:	R11 = 1; 
+  103:	R9 = gCompQuant + 0 (long); 
+  102:	R10 = gCompList + 0 (long); 
+  101:	ECX = long32signed(R8); 
+  100:	R10 = int8u[R10 + ECX + 0]; 
+   99:	EDX = long32signed(R10); 
+   98:	ESI = int8u[R9 + EDX + 0]; 
+   97:	EDI = ESI !=u 0 ?int EDI : R11; 
+   96:	
+   95:	ECX = int8u[gValidQuantTables + 0]; 
+   94:	ECX = ECX & EDI; 
+   93:	if (ECX ==s 0) goto 92 else goto 91
+   92:	ESI = 23; goto 88
+   91:	EDI = R8 + 1 (int); 
+   90:	R8 = int8unsigned(EDI); goto 107
+   89:	ESI = 0; 
+   88:	
+   87:	
+   86:	
+   85:	if (ESI !=u 0) goto 84 else goto 83
+   84:	goto 50
+   83:	ESI = 0; 
+   82:	int16s[gLastDC + 0] = ESI; 
+   81:	EDX = 0; 
+   80:	int16s[gLastDC + 2] = EDX; 
+   79:	ECX = 0; 
+   78:	int16s[gLastDC + 4] = ECX; 
+   77:	R8 = int16u[gRestartInterval + 0]; 
+   76:	if (R8 !=u 0) goto 75 else goto 70
+   75:	
+   74:	
+   73:	int16u[gRestartsLeft + 0] = R8; 
+   72:	ESI = 0; 
+   71:	int16u[gNextRestartNum + 0] = ESI; 
+   70:	
+   69:	EDI = int8u[gBitsLeft + 0]; 
+   68:	if (EDI >s 0) goto 67 else goto 63
+   67:	EAX = int16u[gBitBuf + 0]; 
+   66:	EDI = int8unsigned(EAX); 
+   65:	
+   64:	call "stuffChar"; 
+   63:	EDX = int16u[gBitBuf + 0]; 
+   62:	EDX = EDX >>s 8; 
+   61:	EDI = int8unsigned(EDX); 
+   60:	
+   59:	call "stuffChar"; 
+   58:	R8 = 8; 
+   57:	int8u[gBitsLeft + 0] = R8; 
+   56:	EDI = 8; 
+   55:	call "getBits2"; 
+   54:	EDI = 8; 
+   53:	call "getBits2"; 
+   52:	
+   51:	ESI = 0; 
+   50:	
+   49:	
+   48:	
+   47:	if (ESI !=u 0) goto 20 else goto 46
+   46:	ECX = int8u[gCallbackStatus + 0]; 
+   45:	
+   44:	if (ECX !=u 0) goto 19 else goto 43
+   43:	EDI = int16u[gImageXSize + 0]; 
+   42:	int32[EBX + 0] = EDI; 
+   41:	EDX = int16u[gImageYSize + 0]; 
+   40:	int32[EBX + 4] = EDX; 
+   39:	ESI = int8u[gCompsInFrame + 0]; 
+   38:	int32[EBX + 8] = ESI; 
+   37:	R9 = int32[gScanType + 0]; 
+   36:	int32[EBX + 20] = R9; 
+   35:	R9 = int16u[gMaxMCUSPerRow + 0]; 
+   34:	int32[EBX + 12] = R9; 
+   33:	EDI = int16u[gMaxMCUSPerCol + 0]; 
+   32:	int32[EBX + 16] = EDI; 
+   31:	R11 = int8u[gMaxMCUXSize + 0]; 
+   30:	int32[EBX + 24] = R11; 
+   29:	R10 = int8u[gMaxMCUYSize + 0]; 
+   28:	int32[EBX + 28] = R10; 
+   27:	R10 = gMCUBufR + 0 (long); 
+   26:	int64[EBX + 32] = R10; 
+   25:	R9 = gMCUBufG + 0 (long); 
+   24:	int64[EBX + 40] = R9; 
+   23:	R11 = gMCUBufB + 0 (long); 
+   22:	int64[EBX + 48] = R11; 
+   21:	EAX = 0; goto 2
+   20:	
+   19:	EAX = int8u[gCallbackStatus + 0]; 
+   18:	if (EAX !=u 0) goto 17 else goto 16
+   17:	goto 15
+   16:	EAX = ESI; 
+   15:	goto 2
+   14:	
+   13:	EAX = int8u[gCallbackStatus + 0]; 
+   12:	if (EAX !=u 0) goto 11 else goto 10
+   11:	goto 9
+   10:	EAX = EDX; 
+    9:	goto 2
+    8:	
+    7:	EAX = int8u[gCallbackStatus + 0]; 
+    6:	if (EAX !=u 0) goto 5 else goto 4
+    5:	goto 3
+    4:	EAX = ECX; 
+    3:	
+    2:	return
+    1:	goto 592
+}
+

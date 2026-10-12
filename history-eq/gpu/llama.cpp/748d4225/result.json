@@ -1,0 +1,55 @@
+{
+  "commit": "748d4225b9016b17ce4bcfa69fdc2c39f473a965",
+  "verdict": "EQUIV_PARTIAL",
+  "checker_status": "checked",
+  "scope": "HIP helper arithmetic for all 14 saturating-to-wrapping replacements under source byte bounds; other code and full kernels unproved",
+  "source_blobs": {
+    "old/ggml/src/ggml-cuda/fattn-common.cuh": "6d1ce52dbc774d8ad274a931e55f79e3a436ab99",
+    "old/ggml/src/ggml-cuda/mmq-load-tiles.cuh": "e19f4f24d78b6bb2d80757cf90e82b5e3ef66748",
+    "old/ggml/src/ggml-cuda/vecdotq.cuh": "f2a6f2009c9ac907b6002667a49dcb6c2e75be56",
+    "old/ggml/src/ggml-cuda/vendors/hip.h": "da7e3da0b9cae37c4280955748c522ded7f05bfd",
+    "new/ggml/src/ggml-cuda/fattn-common.cuh": "a194918219fc1aa9e7fcb32d8b2bf9b5668dfefe",
+    "new/ggml/src/ggml-cuda/mmq-load-tiles.cuh": "d5654868bc0819b7d31cf7558a6eafb009f6c954",
+    "new/ggml/src/ggml-cuda/vecdotq.cuh": "f65fe530eb4f292fb6cffc4e1cb83cb6e1720629",
+    "new/ggml/src/ggml-cuda/vendors/hip.h": "da7e3da0b9cae37c4280955748c522ded7f05bfd"
+  },
+  "diff_sha256": "ba577fc843f34d47567dc6af2aa445214a917c34d97dc9983ac9d3e200f12673",
+  "changed_calls": 14,
+  "callsite_families": [
+    "q4",
+    "q5",
+    "q4",
+    "q4",
+    "q5",
+    "q5",
+    "q3",
+    "sc3_q6",
+    "sc3_q6",
+    "sc3_q6",
+    "sc3_q6",
+    "sc3_q6",
+    "q3_pair",
+    "sc3_q6"
+  ],
+  "ir_sha256": {
+    "old": "ffe18152e60430aa2408d96041762ffa51a8ec2ae50315bcbc8696ce5384b2f6",
+    "new": "42b61fdc9726a0fa51b870510830e5335671b552e0064c96fe08551c895b36b2"
+  },
+  "checks": {
+    "forward": {
+      "q4": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "q5": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "q3": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "sc3_q6": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "q3_pair": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    },
+    "backward": {
+      "q4": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "q5": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "q3": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "sc3_q6": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors",
+      "q3_pair": "Transformation seems to be correct!\n\nSummary:\n  1 correct transformations\n  0 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+    }
+  },
+  "unrestricted_counterexample": "----------------------------------------\ndefine i32 @target_unrestricted(i32 noundef %#0, i32 noundef %#1) nofree noundef willreturn memory(none) {\n#2:\n  %#3 = bitcast i32 noundef %#0 to <4 x i8>\n  %#4 = bitcast i32 noundef %#1 to <4 x i8>\n  %#5 = ssub_sat <4 x i8> %#3, %#4\n  %#6 = bitcast <4 x i8> %#5 to i32\n  ret i32 %#6\n}\n=>\ndefine i32 @target_unrestricted(i32 noundef %#0, i32 noundef %#1) nofree willreturn memory(none) {\n#2:\n  %#3 = or i32 noundef %#0, 2155905152\n  %#4 = and i32 noundef %#1, 2139062143\n  %#5 = sub nuw i32 %#3, %#4\n  %#6 = xor i32 noundef %#1, noundef %#0\n  %#7 = and i32 %#6, 2155905152\n  %#8 = xor i32 %#7, %#5\n  %#9 = xor i32 %#8, 2155905152\n  ret i32 %#9\n}\nTransformation doesn't verify!\n\nERROR: Value mismatch\n\nExample:\ni32 noundef %#0 = #x00000000 (0)\ni32 noundef %#1 = #x00000080 (128)\n\nSource:\n<4 x i8> %#3 = < #x00 (0), #x00 (0), #x00 (0), #x00 (0) >\n<4 x i8> %#4 = < #x80 (128, -128), #x00 (0), #x00 (0), #x00 (0) >\n<4 x i8> %#5 = < #x7f (127), #x00 (0), #x00 (0), #x00 (0) >\ni32 %#6 = #x0000007f (127)\n\nTarget:\ni32 %#3 = #x80808080 (2155905152, -2139062144)\ni32 %#4 = #x00000000 (0)\ni32 %#5 = #x80808080 (2155905152, -2139062144)\ni32 %#6 = #x00000080 (128)\ni32 %#7 = #x00000080 (128)\ni32 %#8 = #x80808000 (2155905024, -2139062272)\ni32 %#9 = #x00000080 (128)\nSource value: #x0000007f (127)\nTarget value: #x00000080 (128)\n\nSummary:\n  0 correct transformations\n  1 incorrect transformations\n  0 failed-to-prove transformations\n  0 Alive2 errors"
+}

@@ -1,0 +1,44 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=10000 --always-verify history-eq/gpu/llama.cpp/0e148a57/alive2/new.ll history-eq/gpu/llama.cpp/0e148a57/alive2/old.ll
+
+----------------------------------------
+define i1 @target_check_usm_system(i1 noundef zeroext %#0, i64 noundef %#1, i1 noundef zeroext %#2) nofree noundef willreturn zeroext memory(none) {
+#3:
+  %#4 = icmp ugt i64 noundef %#1, 4294967295
+  %#5 = and i1 noundef zeroext %#0, %#4
+  %#6 = and i1 noundef zeroext %#2, %#5
+  ret i1 %#6
+}
+=>
+define i1 @target_check_usm_system(i1 noundef zeroext %#0, i64 noundef %#1, i1 noundef zeroext %#2) nofree noundef willreturn zeroext memory(none) {
+#3:
+  %#4 = icmp ugt i64 noundef %#1, 1073741823
+  %#5 = and i1 noundef zeroext %#0, %#4
+  %#6 = and i1 noundef zeroext %#2, %#5
+  ret i1 %#6
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+i1 noundef zeroext %#0 = #x1 (1)
+i64 noundef %#1 = #x0000000080000000 (2147483648)
+i1 noundef zeroext %#2 = #x1 (1)
+
+Source:
+i1 %#4 = #x0 (0)
+i1 %#5 = #x0 (0)
+i1 %#6 = #x0 (0)
+
+Target:
+i1 %#4 = #x1 (1)
+i1 %#5 = #x1 (1)
+i1 %#6 = #x1 (1)
+Source value: #x0 (0)
+Target value: #x1 (1)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

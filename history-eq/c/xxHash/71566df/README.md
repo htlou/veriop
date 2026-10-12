@@ -1,0 +1,11 @@
+# xxHash `71566df`: custom-secret 128-bit output
+
+The [exact historical `xxh3.h` diff](source.diff) changes the long-input callback used by `XXH3_128bits_withSecret` from `XXH3_hashLong_128b_defaultSecret`, which ignores the caller's secret, to `XXH3_hashLong_128b_withSecret`. The [reproducer](reproduce.py) verifies the Git blob IDs of both historical `xxh3.h`, `xxhash.h`, and `xxhash.c` revisions, compiles complete parent and child libraries with the same Clang 20 flags, and calls the advanced public API with 300 logical data bytes in a 1024-byte backing array and valid 192-byte secrets (minimum documented size: 136 bytes). The extra backing space keeps the implementation's ahead-of-input prefetch addresses inside the allocation.
+
+The [native result](result.json) gives `a9b1c67db7853f503463f8e1612d6949` for **both** custom secrets before the commit. Afterward, the outputs are `af5b93a0c5604177275a31ac08a375a9` and `9c8319e773235f7e7dcf6c0dacf87cf9`. Thus the same valid call with secret A produces a different 128-bit hash before and after. GCC AddressSanitizer and UndefinedBehaviorSanitizer builds reproduce both outputs without diagnostics on this input.
+
+[Alive2](alive2.log) independently reports **one incorrect transformation, zero Alive2 errors** for the [old](old-target.ll) and [new](new-target.ll) LLVM IR. The reproducer compiles both exact historical headers at Clang 20 `-O3 -march=x86-64-v3`, using the library's `XXH_INLINE_ALL`, `XXH_NO_INLINE_HINTS`, and `XXH_NO_PREFETCH` build options. The compiler fully folds a fixed valid 300-byte call with secret A into each IR return value, and Alive2 reports those two 128-bit return values differ. This is an existential counterexample under that configuration; it is not a proof for arbitrary inputs. The native builds use default options and independently show the same difference.
+
+**Verdict: `NOT_EQUIV` for this public API call.** The prior Alive2 study checked a 300-byte 64-bit entry point and timed out; it did not cover this 128-bit custom-secret path. This witness does not compare the commit's `xxhsum.c` additions. No official before/after xxHash benchmark score was measured.
+
+Reproduce from the project root with `python3 -B history-eq/c/xxHash/71566df/reproduce.py`.

@@ -1,0 +1,123 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh32 --func=target_xxh32_stream --func=target_xxh32_symlen --func=target_oneshot --func=target_stream --func=target_symlen --src-unroll=8 --tgt-unroll=8 /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/3bb5bb6/api_stream32_len14/old.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/3bb5bb6/api_stream32_len14/new.ll
+
+----------------------------------------
+define i32 @target_stream(ptr nowrite noundef %#0, i32 noundef %#1) nofree memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#8 = load i16, ptr %#7, align 1
+  %#9 = add i32 noundef %#1, 374761407
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#13 = load i32, ptr %#12, align 1
+  %#14 = load i32, ptr nowrite noundef %#0, align 1
+  %#15 = mul i32 %#14, 3266489917
+  %#16 = add i32 %#15, %#9
+  %#17 = fshl i32 %#16, i32 %#16, i32 17
+  %#18 = mul i32 %#17, 668265263
+  %#19 = mul i32 %#13, 3266489917
+  %#20 = add i32 %#19, %#18
+  %#21 = fshl i32 %#20, i32 %#20, i32 17
+  %#22 = mul i32 %#21, 668265263
+  %#23 = mul i32 %#11, 3266489917
+  %#24 = add i32 %#23, %#22
+  %#25 = fshl i32 %#24, i32 %#24, i32 17
+  %#26 = mul i32 %#25, 668265263
+  %#27 = and i16 %#8, 255
+  %#28 = zext nneg i16 %#27 to i32
+  %#29 = mul i32 %#28, 374761393
+  %#30 = add i32 %#29, %#26
+  %#31 = fshl i32 %#30, i32 %#30, i32 11
+  %#32 = mul i32 %#31, 2654435761
+  %#33 = lshr i16 %#8, 8
+  %#34 = zext nneg i16 %#33 to i32
+  %#35 = mul i32 %#34, 374761393
+  %#36 = add i32 %#35, %#32
+  %#37 = fshl i32 %#36, i32 %#36, i32 11
+  %#38 = mul i32 %#37, 2654435761
+  br label %#5
+
+#4:
+  %#39 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#40 = phi i32 [ %#39, %#4 ], [ %#38, %#3 ]
+  %#41 = lshr i32 %#40, 15
+  %#42 = xor i32 %#41, %#40
+  %#43 = mul i32 %#42, 2246822519
+  %#44 = lshr i32 %#43, 13
+  %#45 = xor i32 %#44, %#43
+  %#46 = mul i32 %#45, 3266489917
+  %#47 = lshr i32 %#46, 16
+  %#48 = xor i32 %#47, %#46
+  ret i32 %#48
+}
+=>
+define i32 @target_stream(ptr nowrite noundef %#0, i32 noundef %#1) nofree willreturn memory(argmem: readwrite) {
+#2:
+  %#6 = icmp eq ptr nowrite noundef %#0, null
+  br i1 %#6, label %#4, label %#3
+
+#3:
+  %#7 = load i32, ptr nowrite noundef %#0, align 1
+  %#8 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 4
+  %#9 = load i32, ptr %#8, align 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#11 = load i32, ptr %#10, align 1
+  %#12 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 12
+  %#13 = load i16, ptr %#12, align 1
+  %#14 = add i32 noundef %#1, 374761407
+  %#15 = mul i32 %#7, 3266489917
+  %#16 = add i32 %#15, %#14
+  %#17 = fshl i32 %#16, i32 %#16, i32 17
+  %#18 = mul i32 %#17, 668265263
+  %#19 = mul i32 %#9, 3266489917
+  %#20 = add i32 %#19, %#18
+  %#21 = fshl i32 %#20, i32 %#20, i32 17
+  %#22 = mul i32 %#21, 668265263
+  %#23 = mul i32 %#11, 3266489917
+  %#24 = add i32 %#23, %#22
+  %#25 = fshl i32 %#24, i32 %#24, i32 17
+  %#26 = mul i32 %#25, 668265263
+  %#27 = and i16 %#13, 255
+  %#28 = zext nneg i16 %#27 to i32
+  %#29 = mul i32 %#28, 374761393
+  %#30 = add i32 %#26, %#29
+  %#31 = fshl i32 %#30, i32 %#30, i32 11
+  %#32 = mul i32 %#31, 2654435761
+  %#33 = lshr i16 %#13, 8
+  %#34 = zext nneg i16 %#33 to i32
+  %#35 = mul i32 %#34, 374761393
+  %#36 = add i32 %#32, %#35
+  %#37 = fshl i32 %#36, i32 %#36, i32 11
+  %#38 = mul i32 %#37, 2654435761
+  br label %#5
+
+#4:
+  %#39 = add i32 noundef %#1, 374761393
+  br label %#5
+
+#5:
+  %#40 = phi i32 [ %#38, %#3 ], [ %#39, %#4 ]
+  %#41 = lshr i32 %#40, 15
+  %#42 = xor i32 %#41, %#40
+  %#43 = mul i32 %#42, 2246822519
+  %#44 = lshr i32 %#43, 13
+  %#45 = xor i32 %#44, %#43
+  %#46 = mul i32 %#45, 3266489917
+  %#47 = lshr i32 %#46, 16
+  %#48 = xor i32 %#47, %#46
+  ret i32 %#48
+}
+Transformation seems to be correct!
+
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

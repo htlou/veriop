@@ -1,0 +1,7 @@
+# rust-base64 `a8a60f43` — public decode error difference
+
+**Verdict: `NOT_EQUIV` for the public `decode` error value on invalid Base64 input.** The commit changes `DecodeError::InvalidLength` from a unit variant to `InvalidLength(usize)` while rewriting the decode loop. Building both exact historical crates with Rust 1.99 and calling their public `decode("A")` yields `Err(InvalidLength)` before and `Err(InvalidLength(1))` after. `decode("AAAAA")` similarly returns the unit error before and length 5 after; input bytes `[65, 10]` (`A` followed by a newline) remain `Err(InvalidByte(1, 10))` on both sides. These are concrete observable error values under the ordinary public Rust API and Debug representation; a custom cross-version relation that deliberately discards the new length field would be a different specification. No conclusion is drawn about successful decoded bytes.
+
+Run `python3 -B history-eq/rust/rust-base64/a8a60f4/reproduce.py` from the project root. It archives each Git revision into a temporary directory, checks the exact `src/decode.rs` blob IDs, compiles both complete library sources, compiles the same [public API driver](reproduce.rs) against each, and asserts the outputs in [old.log](old.log) and [new.log](new.log). [result.json](result.json) records the revisions and tool version.
+
+Aeneas did not prove the rewritten full decode loop; this counterexample is from native Rust execution of the historical libraries. No official before/after benchmark score was measured.

@@ -9,8 +9,18 @@ c/          C/LLVM implementations, Alive2 checks, and benchmark results
 aeneas/     Rust implementations, Aeneas models, Lean proofs, and benchmarks
   SUBMISSION.md
   submission/   artifact audits and reproduction helpers
+benchmarks/ 25 pinned upstream targets: native benchmark gates and checker gates
+history-eq/ historical performance commits checked against each repo's checker
+cuda/       llama.cpp RMSNorm candidates checked with Volta (PTX)
+compcert/   CompCert layout (C1) and CFG-cloning (C2) experiments
+docs/       project proposal
+volta-logs/ Volta parse logs
 readme.md   this index
 ```
+
+Upstream clones, worktrees, toolchains, build outputs, Lean build artifacts, LLBC files and
+files over 5 MiB are not included; `benchmarks/targets.tsv` and each directory's pins
+record how to re-fetch them.
 
 | Target | Measured result | Verification |
 |---|---|---|

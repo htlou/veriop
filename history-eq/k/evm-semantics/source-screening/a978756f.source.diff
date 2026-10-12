@@ -1,0 +1,288 @@
+diff --git a/include/kframework/evm.md b/include/kframework/evm.md
+index 79c078a3..b3653570 100644
+--- a/include/kframework/evm.md
++++ b/include/kframework/evm.md
+@@ -261,7 +261,8 @@ Control Flow
+ ```k
+     syntax KItem ::= "#halt" | "#end" StatusCode
+  // --------------------------------------------
+-    rule <k> #end SC => #halt ... </k>
++    rule [end]:
++         <k> #end SC => #halt ... </k>
+          <statusCode> _ => SC </statusCode>
+ 
+     rule <k> #halt ~> (_:Int    => .) ... </k>
+@@ -290,11 +291,14 @@ OpCode Execution
+ ```k
+     syntax KItem ::= "#execute"
+  // ---------------------------
+-    rule [halt]: <k> #halt ~> (#execute => .) ... </k>
+-    rule [step]: <k> (. => #next [ #lookupOpCode(PGM, PCOUNT, SCHED) ]) ~> #execute ... </k>
+-                 <program> PGM </program>
+-                 <pc> PCOUNT </pc>
+-                 <schedule> SCHED </schedule>
++    rule [halt]:
++         <k> #halt ~> (#execute => .) ... </k>
++
++    rule [step]:
++         <k> (. => #next [ #lookupOpCode(PGM, PCOUNT, SCHED) ]) ~> #execute ... </k>
++         <program> PGM </program>
++         <pc> PCOUNT </pc>
++         <schedule> SCHED </schedule>
+ ```
+ 
+ ### Single Step
+@@ -1398,14 +1402,16 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
+ 
+     syntax KItem ::= "#return" Int Int
+  // ----------------------------------
+-    rule <statusCode> _:ExceptionalStatusCode </statusCode>
++    rule [return.exception]:
++         <statusCode> _:ExceptionalStatusCode </statusCode>
+          <k> #halt ~> #return _ _
+           => #popCallStack ~> #popWorldState ~> 0 ~> #push
+          ...
+          </k>
+          <output> _ => .ByteArray </output>
+ 
+-    rule <statusCode> EVMC_REVERT </statusCode>
++    rule [return.revert]:
++         <statusCode> EVMC_REVERT </statusCode>
+          <k> #halt ~> #return RETSTART RETWIDTH
+           => #popCallStack ~> #popWorldState
+           ~> 0 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
+@@ -1414,7 +1420,8 @@ The various `CALL*` (and other inter-contract control flow) operations will be d
+          <output> OUT </output>
+          <gas> GAVAIL </gas>
+ 
+-    rule <statusCode> EVMC_SUCCESS </statusCode>
++    rule [return.success]:
++         <statusCode> EVMC_SUCCESS </statusCode>
+          <k> #halt ~> #return RETSTART RETWIDTH
+           => #popCallStack ~> #dropWorldState
+           ~> 1 ~> #push ~> #refund GAVAIL ~> #setLocalMem RETSTART RETWIDTH OUT
+@@ -1442,7 +1449,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
+ ```k
+     syntax CallOp ::= "CALL"
+  // ------------------------
+-    rule <k> CALL _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
++    rule [call]:
++         <k> CALL _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
+           => #checkCall ACCTFROM VALUE
+           ~> #call ACCTFROM ACCTTO ACCTTO VALUE VALUE #range(LM, ARGSTART, ARGWIDTH) false
+           ~> #return RETSTART RETWIDTH
+@@ -1453,7 +1461,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
+ 
+     syntax CallOp ::= "CALLCODE"
+  // ----------------------------
+-    rule <k> CALLCODE _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
++    rule [callcode]:
++         <k> CALLCODE _GCAP ACCTTO VALUE ARGSTART ARGWIDTH RETSTART RETWIDTH
+           => #checkCall ACCTFROM VALUE
+           ~> #call ACCTFROM ACCTFROM ACCTTO VALUE VALUE #range(LM, ARGSTART, ARGWIDTH) false
+           ~> #return RETSTART RETWIDTH
+@@ -1464,7 +1473,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
+ 
+     syntax CallSixOp ::= "DELEGATECALL"
+  // -----------------------------------
+-    rule <k> DELEGATECALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
++    rule [delegatecall]:
++         <k> DELEGATECALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
+           => #checkCall ACCTFROM 0
+           ~> #call ACCTAPPFROM ACCTFROM ACCTTO 0 VALUE #range(LM, ARGSTART, ARGWIDTH) false
+           ~> #return RETSTART RETWIDTH
+@@ -1477,7 +1487,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
+ 
+     syntax CallSixOp ::= "STATICCALL"
+  // ---------------------------------
+-    rule <k> STATICCALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
++    rule [staticcall]:
++         <k> STATICCALL _GCAP ACCTTO ARGSTART ARGWIDTH RETSTART RETWIDTH
+           => #checkCall ACCTFROM 0
+           ~> #call ACCTFROM ACCTTO ACCTTO 0 0 #range(LM, ARGSTART, ARGWIDTH) true
+           ~> #return RETSTART RETWIDTH
+@@ -1596,7 +1607,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
+ ```k
+     syntax TernStackOp ::= "CREATE"
+  // -------------------------------
+-    rule <k> CREATE VALUE MEMSTART MEMWIDTH
++    rule [create]:
++         <k> CREATE VALUE MEMSTART MEMWIDTH
+           => #accessAccounts #newAddr(ACCT, NONCE)
+           ~> #checkCall ACCT VALUE
+           ~> #create ACCT #newAddr(ACCT, NONCE) VALUE #range(LM, MEMSTART, MEMWIDTH)
+@@ -1617,7 +1629,8 @@ For each `CALL*` operation, we make a corresponding call to `#call` and a state-
+ ```k
+     syntax QuadStackOp ::= "CREATE2"
+  // --------------------------------
+-    rule <k> CREATE2 VALUE MEMSTART MEMWIDTH SALT
++    rule [create2]:
++         <k> CREATE2 VALUE MEMSTART MEMWIDTH SALT
+           => #accessAccounts #newAddr(ACCT, SALT, #range(LM, MEMSTART, MEMWIDTH))
+           ~> #checkCall ACCT VALUE
+           ~> #create ACCT #newAddr(ACCT, SALT, #range(LM, MEMSTART, MEMWIDTH)) VALUE #range(LM, MEMSTART, MEMWIDTH)
+diff --git a/include/kframework/infinite-gas.md b/include/kframework/infinite-gas.md
+index d8b10375..3f52c2b4 100644
+--- a/include/kframework/infinite-gas.md
++++ b/include/kframework/infinite-gas.md
+@@ -98,6 +98,18 @@ module INFINITE-GAS-COMMON
+     rule 0 <=Int Csstore(_, _, _, _)              => true [simplification]
+     rule         Csstore(_, _, _, _) <Int #gas(_) => true [simplification]
+ 
++    rule G <Int Csstore(SCHED, _, _, _) => false
++      requires Gsload       < SCHED > <=Int G
++       andBool Gsstoreset   < SCHED > <=Int G
++       andBool Gsstorereset < SCHED > <=Int G
++      [simplification]
++
++    rule Csstore(SCHED, _, _, _) <=Int G => true
++      requires Gsload       < SCHED > <=Int G
++       andBool Gsstoreset   < SCHED > <=Int G
++       andBool Gsstorereset < SCHED > <=Int G
++      [simplification]
++
+     rule 0 <=Int Cmem(_, N)              => true requires 0 <=Int N       [simplification]
+     rule         Cmem(_, N) <Int #gas(G) => true requires N  <Int #gas(G) [simplification]
+ 
+diff --git a/include/kframework/lemmas/int-simplification.k b/include/kframework/lemmas/int-simplification.k
+index 8fb2bd79..9f78b5cc 100644
+--- a/include/kframework/lemmas/int-simplification.k
++++ b/include/kframework/lemmas/int-simplification.k
+@@ -38,7 +38,7 @@ module INT-SIMPLIFICATION-HASKELL [symbolic, kore]
+     // associativity normalization
+ 
+     rule C1 +Int S2 => S2 +Int C1 [concrete(C1), symbolic(S2), simplification]
+-    
++
+     rule S1 +Int (S2 +Int I3) => (S1 +Int S2) +Int I3 [symbolic(S1, S2), simplification]
+     rule S1 +Int (S2 -Int I3) => (S1 +Int S2) -Int I3 [symbolic(S1, S2), simplification]
+     rule S1 -Int (S2 +Int I3) => (S1 -Int S2) -Int I3 [symbolic(S1, S2), simplification]
+@@ -64,6 +64,8 @@ module INT-SIMPLIFICATION-HASKELL [symbolic, kore]
+     rule I1 +Int C   <Int I2         => I1          <Int I2 -Int C  [concrete(C), simplification]
+     rule C1          <Int I2 +Int C3 => C1 -Int C3  <Int I2         [concrete(C1, C3), simplification]
+     rule C1         <=Int I2 +Int C3 => C1 -Int C3 <=Int I2         [concrete(C1, C3), simplification]
++    rule C1 -Int I2  <Int C3         => C1 -Int C3  <Int I2         [concrete(C1, C3), simplification]
++    rule C1         <=Int C2 -Int I3 => I3         <=Int C2 -Int C1 [concrete(C1, C2), simplification]
+ 
+ endmodule
+ 
+@@ -101,9 +103,9 @@ module INT-SIMPLIFICATION-COMMON
+     rule   (C +Int (A  -Int D)) +Int (B  -Int A) =>  C +Int (B  -Int D) [simplification]
+     rule (((A -Int  B) -Int C)  -Int  D) +Int B  => (A -Int  C) -Int D  [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // mul
+-  // ###########################################################################    
++  // ###########################################################################
+ 
+     rule 1 *Int A => A [simplification]
+     rule A *Int 1 => A [simplification]
+@@ -114,9 +116,9 @@ module INT-SIMPLIFICATION-COMMON
+ 
+     rule (E *Int A) +Int B +Int C +Int D +Int (F *Int A) => ((E +Int F) *Int A) +Int B +Int C +Int D [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // div
+-  // ###########################################################################    
++  // ###########################################################################
+ 
+     rule A /Int 1 => A  [simplification]
+ 
+@@ -129,7 +131,7 @@ module INT-SIMPLIFICATION-COMMON
+ 
+     rule (A *Int B) /Int C <=Int D => true requires 0 <=Int A andBool 0 <=Int B andBool 0 <Int C andBool A <=Int D andBool B <=Int C [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // inc-or
+   // ###########################################################################
+ 
+@@ -137,29 +139,29 @@ module INT-SIMPLIFICATION-COMMON
+     rule A |Int 0 => A [simplification]
+     rule A |Int A => A [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // bit-and
+-  // ###########################################################################    
++  // ###########################################################################
+ 
+     rule 0 &Int _ => 0 [simplification]
+     rule _ &Int 0 => 0 [simplification]
+     rule A &Int A => A [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // mod
+-  // ###########################################################################    
++  // ###########################################################################
+ 
+     rule A modInt B => A requires 0 <=Int A andBool A <Int B [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // max, min
+-  // ###########################################################################    
++  // ###########################################################################
+ 
+     rule minInt(A, B) => A requires A <=Int B [simplification]
+ 
+-  // ###########################################################################    
++  // ###########################################################################
+   // inequality
+-  // ###########################################################################    
++  // ###########################################################################
+ 
+     rule A +Int B <Int A => false requires 0 <=Int B [simplification]
+ 
+@@ -181,7 +183,6 @@ module INT-SIMPLIFICATION-COMMON
+     rule A  <Int minInt(B, C) => true requires A  <Int B andBool A  <Int C [simplification]
+     rule A <=Int minInt(B, C) => true requires A <=Int B andBool A <=Int C [simplification]
+ 
+-
+     rule A <=Int maxInt(B, C) => true requires A <=Int B orBool A <=Int C [simplification]
+ 
+ endmodule
+diff --git a/kevm-pyk/src/kevm_pyk/__main__.py b/kevm-pyk/src/kevm_pyk/__main__.py
+index b55bf852..896a3899 100644
+--- a/kevm-pyk/src/kevm_pyk/__main__.py
++++ b/kevm-pyk/src/kevm_pyk/__main__.py
+@@ -912,12 +912,12 @@ def _create_argument_parser() -> ArgumentParser:
+ 
+ 
+ def _loglevel(args: Namespace) -> int:
+-    if args.verbose or args.profile:
+-        return logging.INFO
+-
+     if args.debug:
+         return logging.DEBUG
+ 
++    if args.verbose or args.profile:
++        return logging.INFO
++
+     return logging.WARNING
+ 
+ 
+diff --git a/kevm-pyk/src/kevm_pyk/kevm.py b/kevm-pyk/src/kevm_pyk/kevm.py
+index b888be61..22aa7681 100644
+--- a/kevm-pyk/src/kevm_pyk/kevm.py
++++ b/kevm-pyk/src/kevm_pyk/kevm.py
+@@ -12,6 +12,7 @@ from pyk.kast.outer import KFlatModule
+ from pyk.ktool import KProve, KRun
+ from pyk.ktool.kompile import KompileBackend
+ from pyk.ktool.kprint import SymbolTable, paren
++from pyk.prelude.bytes import bytesToken
+ from pyk.prelude.kbool import notBool
+ from pyk.prelude.kint import intToken, ltInt
+ from pyk.prelude.ml import mlAnd, mlEqualsTrue
+@@ -471,7 +472,7 @@ class Foundry(KEVM):
+         return KEVM.account_cell(
+             Foundry.address_CHEATCODE(),  # Hardcoded for now
+             intToken(0),
+-            KToken('b"\\x00"', 'Bytes'),
++            bytesToken('\x00'),
+             store_var,
+             KApply('.Map'),
+             intToken(0),

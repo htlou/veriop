@@ -1,0 +1,166 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify --func=target_xxh3_64 --func=target_xxh128 --func=target_oneshot --func=target_stream --func=target_symlen --func=target_accum --func=target_fold64 --func=target_acc512 --func=target_scramble /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/7558f18/api64_sym1to3/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/xxHash/7558f18/api64_sym1to3/old.ll
+
+----------------------------------------
+define i64 @target_xxh3_64(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: read) {
+#3:
+  %#6 = add i64 noundef %#1, -4
+  %#7 = icmp ult i64 %#6, -3
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = load i8, ptr nowrite noundef %#0, align 1
+  %#9 = lshr i64 noundef %#1, 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#9
+  %#11 = load i8, ptr %#10, align 1
+  %#12 = gep ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#13 = gep ptr %#12, 1 x i64 -1
+  %#14 = load i8, ptr %#13, align 1
+  %#15 = zext i8 %#8 to i64
+  %#16 = zext i8 %#11 to i64
+  %#17 = shl nsw nuw i64 %#16, 8
+  %#18 = or disjoint i64 %#17, %#15
+  %#19 = zext i8 %#14 to i64
+  %#20 = shl nsw nuw i64 %#19, 2
+  %#21 = add i64 noundef %#2, 3103681593
+  %#22 = add i64 %#21, %#18
+  %#23 = and i64 %#22, 4294967295
+  %#24 = add nsw nuw i64 noundef %#1, 597969854
+  %#25 = add nsw nuw i64 %#24, %#20
+  %#26 = mul nsw nuw i64 %#23, %#25
+  %#27 = lshr i64 %#26, 29
+  %#28 = xor i64 %#27, %#26
+  %#29 = mul i64 %#28, 1609587929392839161
+  %#30 = lshr i64 %#29, 32
+  %#31 = xor i64 %#30, %#29
+  br label %#5
+
+#5:
+  %#32 = phi i64 [ %#31, %#4 ], [ 0, %#3 ]
+  ret i64 %#32
+}
+=>
+define i64 @target_xxh3_64(ptr nowrite noundef %#0, i64 noundef %#1, i64 noundef %#2) nofree willreturn memory(argmem: read) {
+#3:
+  %#6 = add i64 noundef %#1, -4
+  %#7 = icmp ult i64 %#6, -3
+  br i1 %#7, label %#5, label %#4
+
+#4:
+  %#8 = load i8, ptr nowrite noundef %#0, align 1
+  %#9 = lshr i64 noundef %#1, 1
+  %#10 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 %#9
+  %#11 = load i8, ptr %#10, align 1
+  %#12 = gep ptr nowrite noundef %#0, 1 x i64 noundef %#1
+  %#13 = gep ptr %#12, 1 x i64 -1
+  %#14 = load i8, ptr %#13, align 1
+  %#15 = zext i8 %#8 to i64
+  %#16 = zext i8 %#11 to i64
+  %#17 = shl nsw nuw i64 %#16, 8
+  %#18 = or disjoint i64 %#17, %#15
+  %#19 = zext i8 %#14 to i64
+  %#20 = shl nsw nuw i64 %#19, 2
+  %#21 = add i64 noundef %#2, 3103681593
+  %#22 = add i64 %#21, %#18
+  %#23 = add nsw nuw i64 noundef %#1, 597969854
+  %#24 = add nsw nuw i64 %#23, %#20
+  %#25 = mul i64 %#22, %#24
+  %#26 = lshr i64 %#25, 29
+  %#27 = xor i64 %#26, %#25
+  %#28 = mul i64 %#27, 1609587929392839161
+  %#29 = lshr i64 %#28, 32
+  %#30 = xor i64 %#29, %#28
+  br label %#5
+
+#5:
+  %#31 = phi i64 [ %#30, %#4 ], [ 0, %#3 ]
+  ret i64 %#31
+}
+Transformation doesn't verify!
+
+ERROR: Value mismatch
+
+Example:
+ptr nowrite noundef %#0 = pointer(non-local, block_id=1, offset=0, attrs=3) / Address=#x000000000000000c
+i64 noundef %#1 = #x0000000000000003 (3)
+i64 noundef %#2 = #x6e0a00000a50aab3 (7929150094112238259)
+
+Source:
+i64 %#6 = #xffffffffffffffff (18446744073709551615, -1)
+i1 %#7 = #x0 (0)
+  >> Jump to %#4
+i8 %#8 = #xc2 (194, -62)
+i64 %#9 = #x0000000000000001 (1)
+ptr %#10 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x000000000000000d
+i8 %#11 = #x11 (17)
+ptr %#12 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x000000000000000f
+ptr %#13 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x000000000000000e
+i8 %#14 = #x6c (108)
+i64 %#15 = #x00000000000000c2 (194)
+i64 %#16 = #x0000000000000011 (17)
+i64 %#17 = #x0000000000001100 (4352)
+i64 %#18 = #x00000000000011c2 (4546)
+i64 %#19 = #x000000000000006c (108)
+i64 %#20 = #x00000000000001b0 (432)
+i64 %#21 = #x6e0a0000c34f16ec (7929150097215919852)
+i64 %#22 = #x6e0a0000c34f28ae (7929150097215924398)
+i64 %#23 = #x00000000c34f28ae (3276744878)
+i64 %#24 = #x0000000023a44bc1 (597969857)
+i64 %#25 = #x0000000023a44d71 (597970289)
+i64 %#26 = #x1b312c5adea54ace (1959396081676929742)
+i64 %#27 = #x00000000d98962d6 (3649659606)
+i64 %#28 = #x1b312c5a072c2818 (1959396078061889560)
+i64 %#29 = #x0a48dcc8460e5758 (741084891429361496)
+i64 %#30 = #x000000000a48dcc8 (172547272)
+i64 %#31 = #x0a48dcc84c468b90 (741084891533708176)
+  >> Jump to %#5
+i64 %#32 = #x0a48dcc84c468b90 (741084891533708176)
+
+SOURCE MEMORY STATE
+===================
+NON-LOCAL BLOCKS:
+Block 0 >	size: 0	align: 1	alloc type: 0	alive: false	address: 0
+Block 1 >	size: 9	align: 2	alloc type: 0	alive: true	address: 12
+Contents:
+1: #x11
+0: #xc2
+2: #x6c
+*: poison
+
+
+Target:
+i64 %#6 = #xffffffffffffffff (18446744073709551615, -1)
+i1 %#7 = #x0 (0)
+  >> Jump to %#4
+i8 %#8 = #xc2 (194, -62)
+i64 %#9 = #x0000000000000001 (1)
+ptr %#10 = pointer(non-local, block_id=1, offset=1, attrs=3) / Address=#x000000000000000d
+i8 %#11 = #x11 (17)
+ptr %#12 = pointer(non-local, block_id=1, offset=3, attrs=3) / Address=#x000000000000000f
+ptr %#13 = pointer(non-local, block_id=1, offset=2, attrs=3) / Address=#x000000000000000e
+i8 %#14 = #x6c (108)
+i64 %#15 = #x00000000000000c2 (194)
+i64 %#16 = #x0000000000000011 (17)
+i64 %#17 = #x0000000000001100 (4352)
+i64 %#18 = #x00000000000011c2 (4546)
+i64 %#19 = #x000000000000006c (108)
+i64 %#20 = #x00000000000001b0 (432)
+i64 %#21 = #x6e0a0000c34f16ec (7929150097215919852)
+i64 %#22 = #x6e0a0000c34f28ae (7929150097215924398)
+i64 %#23 = #x0000000023a44bc1 (597969857)
+i64 %#24 = #x0000000023a44d71 (597970289)
+i64 %#25 = #xaf9b2c5adea54ace (12653756346821593806, -5792987726887957810)
+i64 %#26 = #x000000057cd962d6 (23569457878)
+i64 %#27 = #xaf9b2c5fa27c2818 (12653756367287101464, -5792987706422450152)
+i64 %#28 = #x88c546d526de5758 (9855361240864282456, -8591382832845269160)
+i64 %#29 = #x0000000088c546d5 (2294630101)
+i64 %#30 = #x88c546d5ae1b118d (9855361243133186445, -8591382830576365171)
+  >> Jump to %#5
+i64 %#31 = #x88c546d5ae1b118d (9855361243133186445, -8591382830576365171)
+Source value: #x0a48dcc84c468b90 (741084891533708176)
+Target value: #x88c546d5ae1b118d (9855361243133186445, -8591382830576365171)
+
+Summary:
+  0 correct transformations
+  1 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

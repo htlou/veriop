@@ -1,0 +1,302 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=20000 --always-verify c/xxHash/665424e/r_newapi/new.ll c/xxHash/665424e/r_newapi/old.ll
+
+----------------------------------------
+declare i64 @XXH3_hashLong_64b_withSecret(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read, inaccessiblemem: readwrite)
+
+define i64 @target_x_len256(ptr nowrite noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 192, align 32, dead
+  %#4 = alloca i64 192, align 64, dead
+  start_lifetime ptr %#4
+  start_lifetime ptr %#3
+  assume_welldefined i1 0
+  %#5 = sub i64 0, noundef %#1
+  %#6 = insertelement <4 x i64> poison, i64 noundef %#1, i64 0
+  %#7 = insertelement <4 x i64> %#6, i64 %#5, i64 1
+  %#8 = insertelement <4 x i64> %#7, i64 noundef %#1, i64 2
+  %#9 = insertelement <4 x i64> %#8, i64 %#5, i64 3
+  %#10 = freeze ptr %#3
+  %#11 = add <4 x i64> %#9, { -4734510112055689544, 2066345149520216444, -2623469361688619810, 2262974939099578482 }
+  store <4 x i64> %#11, ptr %#10, align 32
+  %#12 = add <4 x i64> %#9, { 8711581037947681227, 2410270004345854594, -8204357891075471176, 5487137525590930912 }
+  %#13 = gep inbounds nuw ptr %#10, 1 x i64 32
+  store <4 x i64> %#12, ptr %#13, align 32
+  %#14 = add <4 x i64> %#9, { -3818837453329782724, -6688317018830679928, 5690594596133299313, -2833645246901970632 }
+  %#15 = gep inbounds nuw ptr %#10, 1 x i64 64
+  store <4 x i64> %#14, ptr %#15, align 32
+  %#16 = add <4 x i64> %#9, { 4554437623014685352, 2111919702937427193, 3556072174620004746, 7238261902898274248 }
+  %#17 = gep inbounds nuw ptr %#10, 1 x i64 96
+  store <4 x i64> %#16, ptr %#17, align 32
+  %#18 = add <4 x i64> %#9, { -4329134394285701654, -1485321483350670907, 5321830579834785047, -7032137544937171245 }
+  %#19 = gep inbounds nuw ptr %#10, 1 x i64 128
+  store <4 x i64> %#18, ptr %#19, align 32
+  %#20 = add <4 x i64> %#9, { -242834301215959509, -3588858202114426737, 2883454493032893253, 9097354517224871855 }
+  %#21 = gep inbounds nuw ptr %#10, 1 x i64 160
+  store <4 x i64> %#20, ptr %#21, align 32
+  memcpy ptr %#4 align 64, ptr %#3 align 32, i64 192
+  end_lifetime ptr %#3
+  %#range_0_256 = !range i64 256, i64 64, i64 257, welldefined
+  %#22 = call i64 @XXH3_hashLong_64b_withSecret(nowrite noundef ptr nowrite noundef %#0, noundef i64 %#range_0_256, nonnull nowrite noundef ptr %#4, noundef i64 192) nofree memory(argmem: read, inaccessiblemem: readwrite)
+  end_lifetime ptr %#4
+  ret i64 %#22
+}
+=>
+declare i64 @XXH3_hashLong_64b_withSeed(nowrite noundef ptr, noundef i64, noundef i64)
+
+define i64 @target_x_len256(ptr nowrite noundef %#0, i64 noundef %#1) {
+#2:
+  %#range_0_256 = !range i64 256, i64 64, i64 257, welldefined
+  %#3 = tail call i64 @XXH3_hashLong_64b_withSeed(nowrite noundef ptr nowrite noundef %#0, noundef i64 %#range_0_256, noundef i64 noundef %#1)
+  ret i64 %#3
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @XXH3_hashLong_64b_withSecret
+
+
+
+----------------------------------------
+declare i64 @XXH3_len_129to240_64b(nowrite noundef ptr, noundef i64, nowrite noundef ptr, noundef i64) nofree memory(argmem: read)
+
+@XXH3_kSecret = constant 192 bytes, align 64
+
+define i64 @target_x_len200(ptr nowrite noundef %#0, i64 noundef %#1) {
+init:
+  br label %#2
+
+#2:
+  %#3 = alloca i64 192, align 32, dead
+  start_lifetime ptr %#3
+  assume_welldefined i1 0
+  %#4 = sub i64 0, noundef %#1
+  %#5 = insertelement <4 x i64> poison, i64 noundef %#1, i64 0
+  %#6 = insertelement <4 x i64> %#5, i64 %#4, i64 1
+  %#7 = insertelement <4 x i64> %#6, i64 noundef %#1, i64 2
+  %#8 = insertelement <4 x i64> %#7, i64 %#4, i64 3
+  %#9 = freeze ptr %#3
+  %#10 = add <4 x i64> %#8, { -4734510112055689544, 2066345149520216444, -2623469361688619810, 2262974939099578482 }
+  store <4 x i64> %#10, ptr %#9, align 32
+  %#11 = add <4 x i64> %#8, { 8711581037947681227, 2410270004345854594, -8204357891075471176, 5487137525590930912 }
+  %#12 = gep inbounds nuw ptr %#9, 1 x i64 32
+  store <4 x i64> %#11, ptr %#12, align 32
+  %#13 = add <4 x i64> %#8, { -3818837453329782724, -6688317018830679928, 5690594596133299313, -2833645246901970632 }
+  %#14 = gep inbounds nuw ptr %#9, 1 x i64 64
+  store <4 x i64> %#13, ptr %#14, align 32
+  %#15 = add <4 x i64> %#8, { 4554437623014685352, 2111919702937427193, 3556072174620004746, 7238261902898274248 }
+  %#16 = gep inbounds nuw ptr %#9, 1 x i64 96
+  store <4 x i64> %#15, ptr %#16, align 32
+  %#17 = add <4 x i64> %#8, { -4329134394285701654, -1485321483350670907, 5321830579834785047, -7032137544937171245 }
+  %#18 = gep inbounds nuw ptr %#9, 1 x i64 128
+  store <4 x i64> %#17, ptr %#18, align 32
+  %#19 = add <4 x i64> %#8, { -242834301215959509, -3588858202114426737, 2883454493032893253, 9097354517224871855 }
+  %#20 = gep inbounds nuw ptr %#9, 1 x i64 160
+  store <4 x i64> %#19, ptr %#20, align 32
+  end_lifetime ptr %#3
+  %#range_0_200 = !range i64 200, i64 129, i64 241, welldefined
+  %#range_1_%#range_0_200 = !range i64 %#range_0_200, i64 64, i64 257, welldefined
+  %#range_2_%#range_1_%#range_0_200 = !range i64 %#range_1_%#range_0_200, i64 129, i64 241, welldefined
+  %#21 = call i64 @XXH3_len_129to240_64b(nowrite noundef ptr nowrite noundef %#0, noundef i64 %#range_2_%#range_1_%#range_0_200, nonnull nowrite noundef ptr @XXH3_kSecret, noundef i64 noundef %#1) nofree memory(argmem: read)
+  ret i64 %#21
+}
+=>
+declare i64 @XXH3_len_129to240_64b(nowrite noundef ptr, noundef i64, noundef i64) nofree memory(argmem: read)
+
+@XXH3_kSecret = constant 192 bytes, align 64
+
+define i64 @target_x_len200(ptr nowrite noundef %#0, i64 noundef %#1) nofree memory(argmem: read) {
+init:
+  br label %#2
+
+#2:
+  %#range_0_200 = !range i64 200, i64 129, i64 241, welldefined
+  %#range_1_%#range_0_200 = !range i64 %#range_0_200, i64 64, i64 257, welldefined
+  %#range_2_%#range_1_%#range_0_200 = !range i64 %#range_1_%#range_0_200, i64 129, i64 241, welldefined
+  %#3 = tail call i64 @XXH3_len_129to240_64b(nowrite noundef ptr nowrite noundef %#0, noundef i64 %#range_2_%#range_1_%#range_0_200, noundef i64 noundef %#1) nofree memory(argmem: read)
+  ret i64 %#3
+}
+ERROR: Couldn't prove the correctness of the transformation
+Alive2 approximated the semantics of the programs and therefore we
+cannot conclude whether the bug found is valid or not.
+
+Approximations done:
+ - Unknown libcall: @XXH3_len_129to240_64b
+
+
+
+----------------------------------------
+define i64 @target_x_len64(ptr nowrite noundef %#0, i64 noundef %#1) {
+#2:
+  %#3 = alloca i64 192, align 32, dead
+  start_lifetime ptr %#3
+  assume_welldefined i1 0
+  %#4 = sub i64 0, noundef %#1
+  %#5 = insertelement <4 x i64> poison, i64 noundef %#1, i64 0
+  %#6 = insertelement <4 x i64> %#5, i64 %#4, i64 1
+  %#7 = insertelement <4 x i64> %#6, i64 noundef %#1, i64 2
+  %#8 = insertelement <4 x i64> %#7, i64 %#4, i64 3
+  %#9 = freeze ptr %#3
+  %#10 = add <4 x i64> %#8, { -4734510112055689544, 2066345149520216444, -2623469361688619810, 2262974939099578482 }
+  store <4 x i64> %#10, ptr %#9, align 32
+  %#11 = add <4 x i64> %#8, { 8711581037947681227, 2410270004345854594, -8204357891075471176, 5487137525590930912 }
+  %#12 = gep inbounds nuw ptr %#9, 1 x i64 32
+  store <4 x i64> %#11, ptr %#12, align 32
+  %#13 = add <4 x i64> %#8, { -3818837453329782724, -6688317018830679928, 5690594596133299313, -2833645246901970632 }
+  %#14 = gep inbounds nuw ptr %#9, 1 x i64 64
+  store <4 x i64> %#13, ptr %#14, align 32
+  %#15 = add <4 x i64> %#8, { 4554437623014685352, 2111919702937427193, 3556072174620004746, 7238261902898274248 }
+  %#16 = gep inbounds nuw ptr %#9, 1 x i64 96
+  store <4 x i64> %#15, ptr %#16, align 32
+  %#17 = add <4 x i64> %#8, { -4329134394285701654, -1485321483350670907, 5321830579834785047, -7032137544937171245 }
+  %#18 = gep inbounds nuw ptr %#9, 1 x i64 128
+  store <4 x i64> %#17, ptr %#18, align 32
+  %#19 = add <4 x i64> %#8, { -242834301215959509, -3588858202114426737, 2883454493032893253, 9097354517224871855 }
+  %#20 = gep inbounds nuw ptr %#9, 1 x i64 160
+  store <4 x i64> %#19, ptr %#20, align 32
+  end_lifetime ptr %#3
+  %#21 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#22 = load i64, ptr %#21, align 1
+  %#23 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#24 = load i64, ptr %#23, align 1
+  %#25 = add i64 noundef %#1, 8711581037947681227
+  %#26 = xor i64 %#22, %#25
+  %#27 = sub i64 2410270004345854594, noundef %#1
+  %#28 = xor i64 %#24, %#27
+  %#29 = zext i64 %#26 to i128
+  %#30 = zext i64 %#28 to i128
+  %#31 = mul nuw i128 %#30, %#29
+  %#32 = lshr i128 %#31, 64
+  %#33 = xor i128 %#32, %#31
+  %#34 = trunc i128 %#33 to i64
+  %#35 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 32
+  %#36 = load i64, ptr %#35, align 1
+  %#37 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 40
+  %#38 = load i64, ptr %#37, align 1
+  %#39 = add i64 noundef %#1, -8204357891075471176
+  %#40 = xor i64 %#36, %#39
+  %#41 = sub i64 5487137525590930912, noundef %#1
+  %#42 = xor i64 %#38, %#41
+  %#43 = zext i64 %#40 to i128
+  %#44 = zext i64 %#42 to i128
+  %#45 = mul nuw i128 %#44, %#43
+  %#46 = lshr i128 %#45, 64
+  %#47 = xor i128 %#46, %#45
+  %#48 = trunc i128 %#47 to i64
+  %#49 = add i64 %#34, -8224016703601598016
+  %#50 = add i64 %#49, %#48
+  %#51 = load i64, ptr nowrite noundef %#0, align 1
+  %#52 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#53 = load i64, ptr %#52, align 1
+  %#54 = add i64 noundef %#1, -4734510112055689544
+  %#55 = xor i64 %#51, %#54
+  %#56 = sub i64 2066345149520216444, noundef %#1
+  %#57 = xor i64 %#53, %#56
+  %#58 = zext i64 %#55 to i128
+  %#59 = zext i64 %#57 to i128
+  %#60 = mul nuw i128 %#59, %#58
+  %#61 = lshr i128 %#60, 64
+  %#62 = xor i128 %#61, %#60
+  %#63 = trunc i128 %#62 to i64
+  %#64 = add i64 %#50, %#63
+  %#65 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 48
+  %#66 = load i64, ptr %#65, align 1
+  %#67 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 56
+  %#68 = load i64, ptr %#67, align 1
+  %#69 = add i64 noundef %#1, -2623469361688619810
+  %#70 = xor i64 %#66, %#69
+  %#71 = sub i64 2262974939099578482, noundef %#1
+  %#72 = xor i64 %#68, %#71
+  %#73 = zext i64 %#70 to i128
+  %#74 = zext i64 %#72 to i128
+  %#75 = mul nuw i128 %#74, %#73
+  %#76 = lshr i128 %#75, 64
+  %#77 = xor i128 %#76, %#75
+  %#78 = trunc i128 %#77 to i64
+  %#79 = add i64 %#64, %#78
+  %#80 = lshr i64 %#79, 37
+  %#81 = xor i64 %#80, %#79
+  %#82 = mul i64 %#81, 1609587791953885689
+  %#83 = lshr i64 %#82, 32
+  %#84 = xor i64 %#83, %#82
+  ret i64 %#84
+}
+=>
+define i64 @target_x_len64(ptr nowrite noundef %#0, i64 noundef %#1) nofree willreturn memory(argmem: read) {
+#2:
+  %#3 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 16
+  %#4 = load i64, ptr %#3, align 1
+  %#5 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 24
+  %#6 = load i64, ptr %#5, align 1
+  %#7 = add i64 noundef %#1, 8711581037947681227
+  %#8 = xor i64 %#4, %#7
+  %#9 = sub i64 2410270004345854594, noundef %#1
+  %#10 = xor i64 %#6, %#9
+  %#11 = zext i64 %#8 to i128
+  %#12 = zext i64 %#10 to i128
+  %#13 = mul nuw i128 %#12, %#11
+  %#14 = lshr i128 %#13, 64
+  %#15 = xor i128 %#14, %#13
+  %#16 = trunc i128 %#15 to i64
+  %#17 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 32
+  %#18 = load i64, ptr %#17, align 1
+  %#19 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 40
+  %#20 = load i64, ptr %#19, align 1
+  %#21 = add i64 noundef %#1, -8204357891075471176
+  %#22 = xor i64 %#18, %#21
+  %#23 = sub i64 5487137525590930912, noundef %#1
+  %#24 = xor i64 %#20, %#23
+  %#25 = zext i64 %#22 to i128
+  %#26 = zext i64 %#24 to i128
+  %#27 = mul nuw i128 %#26, %#25
+  %#28 = lshr i128 %#27, 64
+  %#29 = xor i128 %#28, %#27
+  %#30 = trunc i128 %#29 to i64
+  %#31 = add i64 %#16, -8224016703601598016
+  %#32 = add i64 %#31, %#30
+  %#33 = load i64, ptr nowrite noundef %#0, align 1
+  %#34 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 8
+  %#35 = load i64, ptr %#34, align 1
+  %#36 = add i64 noundef %#1, -4734510112055689544
+  %#37 = xor i64 %#33, %#36
+  %#38 = sub i64 2066345149520216444, noundef %#1
+  %#39 = xor i64 %#35, %#38
+  %#40 = zext i64 %#37 to i128
+  %#41 = zext i64 %#39 to i128
+  %#42 = mul nuw i128 %#41, %#40
+  %#43 = lshr i128 %#42, 64
+  %#44 = xor i128 %#43, %#42
+  %#45 = trunc i128 %#44 to i64
+  %#46 = add i64 %#32, %#45
+  %#47 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 48
+  %#48 = load i64, ptr %#47, align 1
+  %#49 = gep inbounds nuw ptr nowrite noundef %#0, 1 x i64 56
+  %#50 = load i64, ptr %#49, align 1
+  %#51 = add i64 noundef %#1, -2623469361688619810
+  %#52 = xor i64 %#48, %#51
+  %#53 = sub i64 2262974939099578482, noundef %#1
+  %#54 = xor i64 %#50, %#53
+  %#55 = zext i64 %#52 to i128
+  %#56 = zext i64 %#54 to i128
+  %#57 = mul nuw i128 %#56, %#55
+  %#58 = lshr i128 %#57, 64
+  %#59 = xor i128 %#58, %#57
+  %#60 = trunc i128 %#59 to i64
+  %#61 = add i64 %#46, %#60
+  %#62 = lshr i64 %#61, 37
+  %#63 = xor i64 %#62, %#61
+  %#64 = mul i64 %#63, 1609587791953885689
+  %#65 = lshr i64 %#64, 32
+  %#66 = xor i64 %#65, %#64
+  ret i64 %#66
+}
+Transformation seems to be correct!
+
+ERROR: Unsupported attribute: noalias
+ERROR: Could not translate 'XXH3_len_129to240_64b' to Alive IR
+Summary:
+  1 correct transformations
+  0 incorrect transformations
+  2 failed-to-prove transformations
+  1 Alive2 errors

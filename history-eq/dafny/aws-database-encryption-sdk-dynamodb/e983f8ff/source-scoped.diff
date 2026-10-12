@@ -1,0 +1,350 @@
+diff --git a/DynamoDbEncryption/dafny/DynamoDbEncryption/src/DynamoToStruct.dfy b/DynamoDbEncryption/dafny/DynamoDbEncryption/src/DynamoToStruct.dfy
+index 9c29028..8d281ed 100644
+--- a/DynamoDbEncryption/dafny/DynamoDbEncryption/src/DynamoToStruct.dfy
++++ b/DynamoDbEncryption/dafny/DynamoDbEncryption/src/DynamoToStruct.dfy
+@@ -71,7 +71,7 @@ module DynamoToStruct {
+       && kv.1.content.Terminal.value == TopLevelAttributeToBytes(item[kv.0]).value
+ 
+   {
+-    var structuredMap := map kv <- item.Items | true :: kv.0 := AttrToStructured(kv.1);
++    var structuredMap := map k <- item :: k := AttrToStructured(item[k]);
+     MapKeysMatchItems(item);
+     MapError(SimplifyMapValue(structuredMap))
+   }
+@@ -101,11 +101,11 @@ module DynamoToStruct {
+       && kv.1 == StructuredToAttr(s[kv.0]).value
+   {
+     if forall k <- s.Keys :: IsValid_AttributeName(k) then
+-      var structuredData := map kv <- s.Items | true :: kv.0 := StructuredToAttr(kv.1);
++      var structuredData := map k <- s :: k := StructuredToAttr(s[k]);
+       MapKeysMatchItems(s);
+       MapError(SimplifyMapValue(structuredData))
+     else
+-      var badNames := set k <- s.Keys | !IsValid_AttributeName(k) :: k;
++      var badNames := set k <- s | !IsValid_AttributeName(k) :: k;
+       OneBadKey(s, badNames, IsValid_AttributeName);
+       var orderedAttrNames := SetToOrderedSequence(badNames, CharLess);
+       var attrNameList := Join(orderedAttrNames, ",");
+@@ -1081,11 +1081,11 @@ module DynamoToStruct {
+   }
+ 
+   function method FlattenValueMap<X,Y>(m : map<X, Result<Y,string>>): map<X,Y> {
+-    map kv <- m.Items | kv.1.Success? :: kv.0 := kv.1.value
++    map k <- m | m[k].Success? :: k := m[k].value
+   }
+ 
+   function method FlattenErrors<X,Y>(m : map<X, Result<Y,string>>): set<string> {
+-    set k <- m.Values | k.Failure? :: k.error
++    set k <- m | m[k].Failure? :: m[k].error
+   }
+ 
+   lemma OneBadResult<X,Y>(m : map<X, Result<Y,string>>)
+@@ -1128,7 +1128,7 @@ module DynamoToStruct {
+     ensures ret.Success? ==> |ret.value.Keys| == |m.Keys|
+     ensures ret.Success? ==> |ret.value| == |m|
+   {
+-    if forall v <- m.Values :: v.Success? then
++    if forall k <- m :: m[k].Success? then
+       var result := FlattenValueMap(m);
+       MapKeysMatchItems(m);
+       Success(result)
+diff --git a/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations.dfy b/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations.dfy
+index 76ae911..1c07da0 100644
+--- a/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations.dfy
++++ b/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations.dfy
+@@ -438,7 +438,7 @@ module AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations refines Abs
+                       ret.value.content.SchemaMap[k].content ==
+                       CSE.CryptoSchemaContent.Action(config.attributeActions[k]))
+   {
+-    var schema := map kv <- item.Items | true :: kv.0 := GetCryptoSchemaAction(config, kv.0);
++    var schema := map k <- item :: k := GetCryptoSchemaAction(config, k);
+     DynamoToStruct.MapKeysMatchItems(item);
+     DynamoToStruct.SimplifyMapValueSuccess(schema);
+     var actionMapRes := DynamoToStruct.SimplifyMapValue(schema);
+@@ -500,8 +500,8 @@ module AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations refines Abs
+   //# An item MUST be determined to be plaintext if it does not contain
+   //# attributes with the names "aws_dbe_head" and "aws_dbe_foot".
+   predicate method IsPlaintextItem(ddbItem: ComAmazonawsDynamodbTypes.AttributeMap) {
+-    && StructuredEncryptionUtil.HeaderField !in ddbItem.Keys
+-    && StructuredEncryptionUtil.FooterField !in ddbItem.Keys
++    && StructuredEncryptionUtil.HeaderField !in ddbItem
++    && StructuredEncryptionUtil.FooterField !in ddbItem
+   }
+ 
+   function method ConvertCryptoSchemaToAttributeActions(config: ValidConfig, schema: CSE.CryptoSchema)
+@@ -517,7 +517,7 @@ module AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations refines Abs
+             DynamoDbItemEncryptorException( message := "Recieved unexpected Crypto Schema: mismatch with signature scope"));
+     :- Need(forall k <- schema.content.SchemaMap :: ComAmazonawsDynamodbTypes.IsValid_AttributeName(k),
+             DynamoDbItemEncryptorException( message := "Recieved unexpected Crypto Schema: Invalid attribute names"));
+-    Success(map k <- schema.content.SchemaMap.Keys | true :: k := schema.content.SchemaMap[k].content.Action)
++    Success(map k <- schema.content.SchemaMap :: k := schema.content.SchemaMap[k].content.Action)
+   }
+ 
+   predicate EncryptItemEnsuresPublicly(input: EncryptItemInput, output: Result<EncryptItemOutput, Error>)
+@@ -651,8 +651,6 @@ module AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations refines Abs
+       return Success(passthroughOutput);
+     }
+ 
+-    assert {:split_here} true;
+-
+     var plaintextStructure :- DynamoToStruct.ItemToStructured(input.plaintextItem)
+     .MapFailure(e => Error.AwsCryptographyDbEncryptionSdkDynamoDb(e));
+     var context :- MakeEncryptionContext(config, plaintextStructure);
+diff --git a/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/Index.dfy b/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/Index.dfy
+index 0018c14..2e2bdd9 100644
+--- a/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/Index.dfy
++++ b/DynamoDbEncryption/dafny/DynamoDbItemEncryptor/src/Index.dfy
+@@ -16,6 +16,9 @@ module
+   import Operations = AwsCryptographyDbEncryptionSdkDynamoDbItemEncryptorOperations
+   import SE =  StructuredEncryptionUtil
+   import InternalLegacyConfig
++  import SortedSets
++  import DDB = ComAmazonawsDynamodbTypes
++
+ 
+   // There is no sensible default, so construct something simple but invalid at runtime.
+   function method DefaultDynamoDbItemEncryptorConfig(): DynamoDbItemEncryptorConfig
+@@ -90,37 +93,40 @@ module
+         message := "Sort key attribute action MUST be SIGN_ONLY"
+       ));
+ 
+-    var attributeActions' := config.attributeActions;
+-    while attributeActions'.Keys != {}
+-      invariant forall attribute <- (config.attributeActions - attributeActions'.Keys)
+-      :: Operations.ForwardCompatibleAttributeAction(
+-          attribute,
+-          config.attributeActions[attribute],
+-          config.allowedUnauthenticatedAttributes,
+-          config.allowedUnauthenticatedAttributePrefix)
+-      invariant forall attribute <- (config.attributeActions - attributeActions'.Keys)
+-      :: UnreservedPrefix(attribute)
++    var attributeNames : seq<DDB.AttributeName> := SortedSets.ComputeSetToOrderedSequence2(config.attributeActions.Keys, CharLess);
++    for i := 0 to |attributeNames|
++      invariant forall j | 0 <= j < i ::
++      && UnreservedPrefix(attributeNames[j])
++      && (Operations.ForwardCompatibleAttributeAction(
++               attributeNames[j],
++               config.attributeActions[attributeNames[j]],
++               config.allowedUnauthenticatedAttributes,
++               config.allowedUnauthenticatedAttributePrefix))
+     {
+-      var attribute :| attribute in attributeActions';
+-      var action := config.attributeActions[attribute];
++      var attributeName := attributeNames[i];
++      var action := config.attributeActions[attributeName];
+       if !(Operations.ForwardCompatibleAttributeAction(
+-          attribute,
++          attributeName,
+           action,
+           config.allowedUnauthenticatedAttributes,
+           config.allowedUnauthenticatedAttributePrefix
+         ))
+       {
+         return Failure(DynamoDbItemEncryptorException(
+-          message := Operations.ExplainNotForwardCompatible(attribute, action, config.allowedUnauthenticatedAttributes, config.allowedUnauthenticatedAttributePrefix)
++          message := Operations.ExplainNotForwardCompatible(attributeName, action, config.allowedUnauthenticatedAttributes, config.allowedUnauthenticatedAttributePrefix)
+         ));
+       }
+-      if !UnreservedPrefix(attribute) {
++      if !UnreservedPrefix(attributeName) {
+         return Failure(DynamoDbItemEncryptorException(
+-          message := "Attribute: " + attribute + " is reserved, and may not be configured."
++          message := "Attribute: " + attributeName + " is reserved, and may not be configured."
+         ));
+       }
+-      attributeActions' := attributeActions' - {attribute};
++      assert UnreservedPrefix(attributeName);
++      assert UnreservedPrefix(attributeNames[i]);
+     }
++    assert (forall attribute <- attributeNames :: UnreservedPrefix(attribute));
++    assert (forall attribute <- config.attributeActions.Keys :: UnreservedPrefix(attribute));
++    assert (forall attribute <- config.attributeActions.Keys :: !(ReservedPrefix <= attribute));
+ 
+     // Create the structured encryption client
+     var structuredEncryptionRes := StructuredEncryption.StructuredEncryption();
+diff --git a/DynamoDbEncryption/dafny/StructuredEncryption/src/AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations.dfy b/DynamoDbEncryption/dafny/StructuredEncryption/src/AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations.dfy
+index 0053762..7c065e0 100644
+--- a/DynamoDbEncryption/dafny/StructuredEncryption/src/AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations.dfy
++++ b/DynamoDbEncryption/dafny/StructuredEncryption/src/AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations.dfy
+@@ -285,7 +285,7 @@ module AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations refines Abst
+   {
+     reveal Maps.Injective();
+     Paths.SimpleCanonUnique(tableName);
+-    map k <- data.Keys | schema[k].content.Action != DO_NOTHING :: Paths.SimpleCanon(tableName, k) := k
++    map k <- data | schema[k].content.Action != DO_NOTHING :: Paths.SimpleCanon(tableName, k) := k
+   }
+ 
+   // construct the EncryptCanon
+@@ -323,7 +323,7 @@ module AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations refines Abst
+     var data_c := map k <- fieldMap :: k := data[fieldMap[k]];
+     var signedFields_c := SortedSets.ComputeSetToOrderedSequence2(data_c.Keys, ByteLess);
+     var encFields_c := FilterEncrypt(signedFields_c, fieldMap, schema);
+-    var trimmedSchema := map k <- fieldMap.Values :: k := schema[k];
++    var trimmedSchema := map k <- fieldMap :: fieldMap[k] := schema[fieldMap[k]];
+ 
+     assert |data_c| == |trimmedSchema| by {
+       assert data_c.Keys == fieldMap.Keys;
+@@ -379,7 +379,7 @@ module AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations refines Abst
+ 
+     reveal Maps.Injective();
+     Paths.SimpleCanonUnique(input.tableName);
+-    var fieldMap := map k <- input.data.Keys | input.authSchema[k].content.Action == SIGN ::
++    var fieldMap := map k <- input.data | input.authSchema[k].content.Action == SIGN ::
+       Paths.SimpleCanon(input.tableName, k) := k;
+     assert Maps.Injective(fieldMap);
+ 
+@@ -401,8 +401,8 @@ module AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations refines Abst
+     var encFields_c : seq<CanonicalPath> := FilterEncrypted(signedFields_c, input.legend);
+     :- Need(|encFields_c| < (UINT32_LIMIT / 3), E("Too many encrypted fields."));
+ 
+-    var actionMap := map v <- fieldMap.Values ::
+-      v := if Paths.SimpleCanon(input.tableName, v) in encFields_c then
++    var actionMap := map k <- fieldMap ::
++      fieldMap[k] := if Paths.SimpleCanon(input.tableName, fieldMap[k]) in encFields_c then
+         CryptoSchema(
+           content := CryptoSchemaContent.Action(ENCRYPT_AND_SIGN),
+           attributes := None
+@@ -543,7 +543,7 @@ module AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations refines Abst
+     :- Need(|canonData.encFields_c| < (UINT32_LIMIT / 3), E("Too many encrypted fields"));
+     var encryptedItems :- Crypt.Encrypt(config.primitives, alg, key, head, canonData.encFields_c, canonData.data_c);
+ 
+-    var result : map<string, StructuredData> := map k | k in plainRecord.Keys :: k :=
++    var result : map<string, StructuredData> := map k <- plainRecord | true :: k :=
+       var c := Paths.SimpleCanon(input.tableName, k);
+       if c in encryptedItems then
+         encryptedItems[c]
+@@ -839,7 +839,7 @@ module AwsCryptographyDbEncryptionSdkStructuredEncryptionOperations refines Abst
+                             canonData.signedFields_c, canonData.encFields_c, map[], canonData.data_c, headerSerialized);
+     var decryptedItems :- Crypt.Decrypt(config.primitives, postCMMAlg, key, head, canonData.encFields_c, canonData.data_c);
+ 
+-    var result : map<string, StructuredData> := map k | k in encRecord.Keys :: k :=
++    var result : map<string, StructuredData> := map k <- encRecord | true :: k :=
+       var c := Paths.SimpleCanon(input.tableName, k);
+       if c in decryptedItems then
+         decryptedItems[c]
+diff --git a/DynamoDbEncryption/dafny/StructuredEncryption/src/Crypt.dfy b/DynamoDbEncryption/dafny/StructuredEncryption/src/Crypt.dfy
+index 96b69df..418396b 100644
+--- a/DynamoDbEncryption/dafny/StructuredEncryption/src/Crypt.dfy
++++ b/DynamoDbEncryption/dafny/StructuredEncryption/src/Crypt.dfy
+@@ -13,6 +13,7 @@ module StructuredEncryptionCrypt {
+   import opened StandardLibrary.UInt
+   import opened AwsCryptographyDbEncryptionSdkStructuredEncryptionTypes
+   import opened StructuredEncryptionUtil
++  import opened DafnyLibraries
+ 
+   import CMP = AwsCryptographyMaterialProvidersTypes
+   import Prim = AwsCryptographyPrimitivesTypes
+@@ -23,7 +24,6 @@ module StructuredEncryptionCrypt {
+   import AesKdfCtr
+   import Seq
+ 
+-
+   function method FieldKey(HKDFOutput : Bytes, offset : uint32)
+     : (ret : Result<Bytes, Error>)
+     requires |HKDFOutput| == KeySize
+@@ -231,41 +231,44 @@ module StructuredEncryptionCrypt {
+     //# The calculated Field Root MUST have length equal to the
+     //# [algorithm suite's encryption key length](../../submodules/MaterialProviders/aws-encryption-sdk-specification/framework/algorithm-suites.md#algorithm-suites-encryption-settings).
+     assert |fieldRootKey| == AlgorithmSuites.GetEncryptKeyLength(alg) as int;
+-    var result := CryptList(mode, client, alg, fieldRootKey, 0, fieldNames, data, map[]);
++    var result := CryptList(mode, client, alg, fieldRootKey, fieldNames, data);
+     return result;
+   }
+ 
+   // Encrypt or Decrypt each entry in keys, putting results in output
+-  method {:tailrecursion} CryptList(
++  method CryptList(
+     mode : EncryptionSelector,
+     client: Primitives.AtomicPrimitivesClient,
+     alg : CMP.AlgorithmSuiteInfo,
+     fieldRootKey : Key,
+-    offset : uint32,
+     fieldNames : seq<CanonicalPath>,
+-    input : StructuredDataCanon,
+-    output : StructuredDataCanon
++    input : StructuredDataCanon
+   )
+     returns (ret : Result<StructuredDataCanon, Error>)
+     requires forall k <- fieldNames :: k in input
+-    requires (|fieldNames| + offset as nat) * 3 < UINT32_LIMIT
++    requires (|fieldNames| as nat) * 3 < UINT32_LIMIT
+     decreases |fieldNames|
+ 
+     modifies client.Modifies - {client.History} , client.History`AESEncrypt, client.History`AESDecrypt
+     requires client.ValidState()
+     ensures client.ValidState()
+   {
+-    if |fieldNames| == 0 {
+-      return Success(output);
++    // It is very inefficient to manually build Dafny maps in methods, so use
++    // a MutableMap to build the key value pairs then convert back to a Dafny map.
++    var mutMap : MutableMap<CanonicalPath, StructuredDataTerminalType> := new MutableMap();
++    for i := 0 to |fieldNames| {
++      var data;
++      var fieldName := fieldNames[i];
++      if mode == DoEncrypt {
++        data :- EncryptTerminal(client, alg, fieldRootKey, i as uint32, fieldName, input[fieldName].content.Terminal);
++      } else {
++        data :- DecryptTerminal(client, alg, fieldRootKey, i as uint32, fieldName, input[fieldName].content.Terminal);
++      }
++      mutMap.Put(fieldName, data);
+     }
+-    var data;
+-    if mode == DoEncrypt {
+-      data :- EncryptTerminal(client, alg, fieldRootKey, offset, fieldNames[0], input[fieldNames[0]].content.Terminal);
+-    } else {
+-      data :- DecryptTerminal(client, alg, fieldRootKey, offset, fieldNames[0], input[fieldNames[0]].content.Terminal);
+-    }
+-    var result := CryptList(mode, client, alg, fieldRootKey, offset+1, fieldNames[1..], input, output[fieldNames[0] := data]);
+-    return result;
++    var mutMapItems := mutMap.content(); // Have to initialize this separately, otherwise the map comprehension will do something very inefficient
++    var output : StructuredDataCanon := map k <- mutMapItems :: k := mutMap.Select(k);
++    return Success(output);
+   }
+ 
+   // Encrypt a single Terminal
+diff --git a/DynamoDbEncryption/dafny/StructuredEncryption/src/Header.dfy b/DynamoDbEncryption/dafny/StructuredEncryption/src/Header.dfy
+index 1e94fde..63f718f 100644
+--- a/DynamoDbEncryption/dafny/StructuredEncryption/src/Header.dfy
++++ b/DynamoDbEncryption/dafny/StructuredEncryption/src/Header.dfy
+@@ -338,9 +338,9 @@ module StructuredEncryptionHeader {
+   }
+ 
+   function method MyMap<X, Y, Z>(f: X -> Y, m: map<X, Z>): map<Y, Z>
+-    requires forall a, b | a in m.Keys && b in m.Keys :: a != b ==> f(a) != f(b)
++    requires forall a, b | a in m && b in m :: a != b ==> f(a) != f(b)
+   {
+-    map k | k in m.Keys :: f(k) := m[k]
++    map k | k in m :: f(k) := m[k]
+   }
+ 
+   // Create a Legend from the Schema
+diff --git a/DynamoDbEncryption/dafny/StructuredEncryption/src/Util.dfy b/DynamoDbEncryption/dafny/StructuredEncryption/src/Util.dfy
+index 26516a8..e3c7bfd 100644
+--- a/DynamoDbEncryption/dafny/StructuredEncryption/src/Util.dfy
++++ b/DynamoDbEncryption/dafny/StructuredEncryption/src/Util.dfy
+@@ -126,21 +126,21 @@ module StructuredEncryptionUtil {
+   function method CryptoSchemaMapIsFlat(data : CryptoSchemaMap) : (ret : bool)
+     ensures ret ==> (forall v <- data.Values :: v.content.Action?)
+   {
+-    forall v <- data.Values :: v.content.Action?
++    forall k <- data :: data[k].content.Action?
+   }
+ 
+   // Schema must contain only Actions
+   function method AuthSchemaIsFlat(data : AuthenticateSchemaMap) : (ret : bool)
+     ensures ret ==> (forall v <- data.Values :: v.content.Action?)
+   {
+-    forall v <- data.Values :: v.content.Action?
++    forall k <- data :: data[k].content.Action?
+   }
+ 
+   // Map must contain only Terminals
+   function method DataMapIsFlat(data : StructuredDataMap) : (ret : bool)
+     ensures ret ==> (forall v <- data.Values :: v.content.Terminal?)
+   {
+-    forall v <- data.Values :: v.content.Terminal?
++    forall k <- data :: data[k].content.Terminal?
+   }
+ 
+   // attribute is "authorized", a.k.a. included in the signature

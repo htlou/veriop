@@ -1,0 +1,40 @@
+{
+ "commit": "08aff8b",
+ "date": "2021-12-11",
+ "subject": "added __attribute__((pure))",
+ "selected_by": "manual-scan",
+ "perf_evidence": "Adds __attribute__((pure)) (XXH_PUREF) to hashing API declarations: a function attribute whose only purpose is to let compilers optimize calls (CSE/hoisting/dead-call elimination) - codegen intent; no message body.",
+ "change_summary": "Defines XXH_PUREF (__attribute__((pure)) on GNUC) and adds it to the declarations of XXH32, XXH32_digest, XXH32_hashFromCanonical, XXH64, XXH64_digest, XXH64_hashFromCanonical, XXH3_64bits*, XXH3_128bits*, XXH128 etc. No function body changes.",
+ "units": [
+  {
+   "name": "library implementation (XXH_INLINE_ALL; XXH32/XXH64/XXH3/XXH128 one-shot, XXH32 streaming, hashFromCanonical)",
+   "level": "api",
+   "verdict": "EQUIV",
+   "bounded": true,
+   "unroll": 8,
+   "precondition": null,
+   "unsupported_reason": null,
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/08aff8b/r_impl",
+   "evidence": "IR identical for all 7 targets after normalization; Alive2 EQUIV both directions (XXH32 len20 (value args), XXH32 stream 10+10 (value args), XXH64 len40, XXH3_64bits len20/200(withSeed), XXH3_128bits len20, XXH64_hashFromCanonical)"
+  },
+  {
+   "name": "separately compiled client calling the API twice (declarations only, library linked separately)",
+   "level": "api",
+   "verdict": "UNSUPPORTED",
+   "bounded": false,
+   "unroll": 0,
+   "precondition": null,
+   "unsupported_reason": "other",
+   "not_equiv_kind": null,
+   "artifact_dir": "c/xxHash/08aff8b/r_client",
+   "evidence": "client IR differs (new: x - x folded to 0 since calls are pure/willreturn). Alive2 fwd 'Source and target don't have the same return domain' with example 'Source: function did not return!' - the CE needs the opaque extern XXH32 to not terminate / be impure, which the real implementation never does; Alive2 cannot check that the declaration contract is justified by the (separately compiled) implementation"
+  }
+ ],
+ "commit_verdict": "UNSUPPORTED",
+ "raw_verdict": "EQUIV",
+ "coverage": "partial",
+ "unsupported_reason": "other",
+ "not_equiv_kind": null,
+ "notes": "The commit only adds a declaration-level contract. (1) Implementation level: compiled with XXH_INLINE_ALL (bodies visible) the IR is identical on both sides (clang already infers the attributes it needs from the bodies) -> EQUIV; XXH32 targets take inputs by value (U8ARGS) to avoid the SSE4.1-guard freeze/poison timeout; --unroll 8 only because streaming finalize loops exist (identical IR). (2) The perf effect exists only for separately compiled callers: there Alive2 treats the undefined extern function as arbitrary (may diverge, may have side effects), so the reported 'counterexample' (old client calls a non-returning XXH32) is not realizable with the real library; whether 'pure' is truthful is a cross-TU property Alive2 cannot check -> UNSUPPORTED(other) for that unit. Commit verdict follows METHOD aggregation (an UNSUPPORTED unit, no NOT_EQUIV) -> UNSUPPORTED; library semantics unchanged (IR identical). Flags: default x86-64-v3 recipe + -DXXH_NO_INLINE_HINTS=1 -mllvm -inline-threshold=100000 (impl); client compiled with the default flags (no implementation)."
+}

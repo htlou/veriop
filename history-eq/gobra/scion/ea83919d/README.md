@@ -1,0 +1,5 @@
+# SCION `ea83919d`: management API documentation bundle
+
+**Fixed-sample verdict: `UNSUPPORTED` by the selected Gobra checker for the whole change.** The [exact upstream commit](https://github.com/scionproto/scion/commit/ea83919d5698104d8dea82e42a3ed8d111b8f35e.patch) explicitly targets reduced build time and binary size. It adds a default-false Bazel flag and changes management API `embedsrcs` from the generated documentation bundle to `dummy.html` by default, while retaining an opt-in bundle. Go `//go:embed` declarations and `ResolveIndex` then consume the selected files.
+
+The optimization is the Bazel build graph and embedded asset choice across five management API packages. Gobra verifies annotated Go programs; its source-level verification does not model Bazel `select`, generated asset size, or build time. No historical old/new Gobra relation, binary-size measurement, or equivalent HTTP-output proof was run. This is a checker-scope classification, not a claim of equivalence, a counterexample, or measured speedup. The historical changed blobs are missing from the local Git store, although the upstream diff identifies the complete change.

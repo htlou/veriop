@@ -1,0 +1,40 @@
+{
+  "commit": "e616faf",
+  "date": "2020-03-03",
+  "subject": "Autovectorization in-source quickfixes",
+  "selected_by": "keyword",
+  "perf_evidence": "Commit explicitly adjusts source annotations and expressions to improve Clang/GCC autovectorization.",
+  "change_summary": "Changes XXH3 inlining, ARMv7 NEON mid-size handling and scalar long-multiply code generation.",
+  "units": [
+    {
+      "name": "public XXH3 64/128-bit fixed mid-size and long-input paths, x86 scalar and x86-64-v3",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/e616faf/r_api_x64scalar",
+      "evidence": "Six fixed-length public targets pass bidirectional Alive2 in scalar x86; the corresponding six x86-64-v3 targets also pass in r_api_v3."
+    },
+    {
+      "name": "public XXH3 64-bit 200/240-byte ARMv7 NEON paths",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 8,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/e616faf/r_arm_neon",
+      "evidence": "Three ARMv7 NEON public targets pass both directions with vectorization disabled; the same three pass with vectorization enabled in r_arm_neon_vec."
+    }
+  ],
+  "commit_verdict": "EQUIV_BOUNDED",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "The finite lengths sample changed mid-size and long paths, not every input length or compiler. The LLVM target bodies have no residual opaque XXH calls."
+}

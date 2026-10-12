@@ -1,0 +1,843 @@
+/srv/home/hantaolou/code/veriop/alive2/build/alive2/alive-tv --smt-to=600000 --always-verify /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/31f1e42/x86_64/new.ll /srv/home/hantaolou/code/veriop/history-eq/c/libdivide/31f1e42/x86_64/old.ll
+
+----------------------------------------
+define i16 @target_u16_do_raw(i16 noundef zeroext %#0, i16 noundef zeroext %#1, i8 noundef zeroext %#2) nofree willreturn zeroext memory(none) {
+#3:
+  %#9 = icmp eq i16 noundef zeroext %#1, 0
+  %#10 = zext i16 noundef zeroext %#0 to i32
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#11 = zext i16 noundef zeroext %#1 to i32
+  %#12 = mul nuw i32 %#11, %#10
+  %#13 = lshr i32 %#12, 16
+  %#14 = zext i8 noundef zeroext %#2 to i32
+  %#15 = and i32 %#14, 64
+  %#16 = icmp eq i32 %#15, 0
+  br i1 %#16, label %#5, label %#6
+
+#5:
+  %#17 = lshr i32 %#13, %#14
+  br label %#8
+
+#6:
+  %#18 = sub nsw i32 %#10, %#13
+  %#19 = lshr i32 %#18, 1
+  %#20 = add nuw i32 %#19, %#13
+  %#21 = and i32 %#20, 65535
+  %#22 = and i32 %#14, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext nneg i8 noundef zeroext %#2 to i32
+  %#25 = lshr i32 %#10, %#24
+  br label %#8
+
+#8:
+  %#26 = phi i32 [ %#25, %#7 ], [ %#23, %#6 ], [ %#17, %#5 ]
+  %#27 = trunc nuw i32 %#26 to i16
+  ret i16 %#27
+}
+=>
+define i16 @target_u16_do_raw(i16 noundef zeroext %#0, i16 noundef zeroext %#1, i8 noundef zeroext %#2) nofree willreturn zeroext memory(none) {
+#3:
+  %#9 = icmp eq i16 noundef zeroext %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i16 noundef zeroext %#1 to i32
+  %#11 = zext i16 noundef zeroext %#0 to i32
+  %#12 = mul nuw i32 %#10, %#11
+  %#13 = lshr i32 %#12, 16
+  %#14 = zext i8 noundef zeroext %#2 to i32
+  %#15 = and i32 %#14, 64
+  %#16 = icmp eq i32 %#15, 0
+  br i1 %#16, label %#5, label %#6
+
+#5:
+  %#17 = lshr i32 %#13, %#14
+  br label %#8
+
+#6:
+  %#18 = sub nsw i32 %#11, %#13
+  %#19 = lshr i32 %#18, 1
+  %#20 = add nuw i32 %#19, %#13
+  %#21 = and i32 %#20, 65535
+  %#22 = and i32 %#14, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext i16 noundef zeroext %#0 to i32
+  %#25 = zext nneg i8 noundef zeroext %#2 to i32
+  %#26 = lshr i32 %#24, %#25
+  br label %#8
+
+#8:
+  %#27 = phi i32 [ %#26, %#7 ], [ %#23, %#6 ], [ %#17, %#5 ]
+  %#28 = trunc nuw i32 %#27 to i16
+  ret i16 %#28
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_u32_do_raw(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i32 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i32 noundef %#0 to i64
+  %#11 = zext i32 noundef %#1 to i64
+  %#12 = mul nuw i64 %#11, %#10
+  %#13 = lshr i64 %#12, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = lshr i32 %#14, %#15
+  br label %#8
+
+#6:
+  %#19 = sub i32 noundef %#0, %#14
+  %#20 = lshr i32 %#19, 1
+  %#21 = add i32 %#20, %#14
+  %#22 = and i32 %#15, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext nneg i8 noundef zeroext %#2 to i32
+  %#25 = lshr i32 noundef %#0, %#24
+  br label %#8
+
+#8:
+  %#26 = phi i32 [ %#25, %#7 ], [ %#23, %#6 ], [ %#18, %#5 ]
+  ret i32 %#26
+}
+=>
+define i32 @target_u32_do_raw(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i32 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i32 noundef %#1 to i64
+  %#11 = zext i32 noundef %#0 to i64
+  %#12 = mul nuw i64 %#10, %#11
+  %#13 = lshr i64 %#12, 32
+  %#14 = trunc nuw i64 %#13 to i32
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = lshr i32 %#14, %#15
+  br label %#8
+
+#6:
+  %#19 = sub i32 noundef %#0, %#14
+  %#20 = lshr i32 %#19, 1
+  %#21 = add i32 %#20, %#14
+  %#22 = and i32 %#15, 31
+  %#23 = lshr i32 %#21, %#22
+  br label %#8
+
+#7:
+  %#24 = zext nneg i8 noundef zeroext %#2 to i32
+  %#25 = lshr i32 noundef %#0, %#24
+  br label %#8
+
+#8:
+  %#26 = phi i32 [ %#25, %#7 ], [ %#23, %#6 ], [ %#18, %#5 ]
+  ret i32 %#26
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_u64_do_raw(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i64 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i64 noundef %#0 to i128
+  %#11 = zext i64 noundef %#1 to i128
+  %#12 = mul nuw i128 %#11, %#10
+  %#13 = lshr i128 %#12, 64
+  %#14 = trunc nuw i128 %#13 to i64
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = zext nneg i8 noundef zeroext %#2 to i64
+  %#19 = lshr i64 %#14, %#18
+  br label %#8
+
+#6:
+  %#20 = sub i64 noundef %#0, %#14
+  %#21 = lshr i64 %#20, 1
+  %#22 = add i64 %#21, %#14
+  %#23 = and i32 %#15, 63
+  %#24 = zext nneg i32 %#23 to i64
+  %#25 = lshr i64 %#22, %#24
+  br label %#8
+
+#7:
+  %#26 = zext nneg i8 noundef zeroext %#2 to i64
+  %#27 = lshr i64 noundef %#0, %#26
+  br label %#8
+
+#8:
+  %#28 = phi i64 [ %#27, %#7 ], [ %#25, %#6 ], [ %#19, %#5 ]
+  ret i64 %#28
+}
+=>
+define i64 @target_u64_do_raw(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = icmp eq i64 noundef %#1, 0
+  br i1 %#9, label %#7, label %#4
+
+#4:
+  %#10 = zext i64 noundef %#1 to i128
+  %#11 = zext i64 noundef %#0 to i128
+  %#12 = mul nuw i128 %#10, %#11
+  %#13 = lshr i128 %#12, 64
+  %#14 = trunc nuw i128 %#13 to i64
+  %#15 = zext i8 noundef zeroext %#2 to i32
+  %#16 = and i32 %#15, 64
+  %#17 = icmp eq i32 %#16, 0
+  br i1 %#17, label %#5, label %#6
+
+#5:
+  %#18 = zext nneg i8 noundef zeroext %#2 to i64
+  %#19 = lshr i64 %#14, %#18
+  br label %#8
+
+#6:
+  %#20 = sub i64 noundef %#0, %#14
+  %#21 = lshr i64 %#20, 1
+  %#22 = add i64 %#21, %#14
+  %#23 = and i32 %#15, 63
+  %#24 = zext nneg i32 %#23 to i64
+  %#25 = lshr i64 %#22, %#24
+  br label %#8
+
+#7:
+  %#26 = zext nneg i8 noundef zeroext %#2 to i64
+  %#27 = lshr i64 noundef %#0, %#26
+  br label %#8
+
+#8:
+  %#28 = phi i64 [ %#27, %#7 ], [ %#25, %#6 ], [ %#19, %#5 ]
+  ret i64 %#28
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i16 @target_s16_do_raw(i16 noundef signext %#0, i16 noundef signext %#1, i8 noundef zeroext %#2) nofree willreturn signext memory(none) {
+#3:
+  %#9 = and i8 noundef zeroext %#2, 31
+  %#10 = icmp eq i16 noundef signext %#1, 0
+  br i1 %#10, label %#7, label %#4
+
+#4:
+  %#11 = sext i16 noundef signext %#0 to i32
+  %#12 = sext i16 noundef signext %#1 to i32
+  %#13 = mul nsw i32 %#12, %#11
+  %#14 = lshr i32 %#13, 16
+  %#15 = and i8 noundef zeroext %#2, 64
+  %#16 = icmp eq i8 %#15, 0
+  br i1 %#16, label %#6, label %#5
+
+#5:
+  %#17 = ashr i8 noundef zeroext %#2, 7
+  %#18 = zext i16 noundef signext %#0 to i32
+  %#19 = sext i8 %#17 to i32
+  %#20 = xor i32 %#19, %#18
+  %#21 = sub nsw i32 %#14, %#19
+  %#22 = add nsw i32 %#21, %#20
+  br label %#6
+
+#6:
+  %#23 = phi i32 [ %#22, %#5 ], [ %#14, %#4 ]
+  %#24 = zext nneg i8 %#9 to i32
+  %#25 = shl i32 %#23, 16
+  %#26 = ashr exact i32 %#25, 16
+  %#27 = ashr i32 %#26, %#24
+  %#28 = lshr i32 %#27, 31
+  %#29 = add nsw i32 %#28, %#27
+  br label %#8
+
+#7:
+  %#30 = zext nneg i8 %#9 to i32
+  %#31 = shl nsw i32 4294967295, %#30
+  %#32 = sext i16 noundef signext %#0 to i32
+  %#33 = lshr i32 %#32, 15
+  %#34 = xor i32 %#31, 4294967295
+  %#35 = and i32 %#33, %#34
+  %#36 = trunc i32 %#35 to i16
+  %#37 = add i16 noundef signext %#0, %#36
+  %#38 = sext i16 %#37 to i32
+  %#39 = ashr i32 %#38, %#30
+  %#40 = icmp slt i8 noundef zeroext %#2, 0
+  %#41 = select i1 %#40, i32 65535, i32 0
+  %#42 = xor i32 %#39, %#41
+  %#43 = sub nsw i32 %#42, %#41
+  br label %#8
+
+#8:
+  %#44 = phi i32 [ %#29, %#6 ], [ %#43, %#7 ]
+  %#45 = trunc i32 %#44 to i16
+  ret i16 %#45
+}
+=>
+define i16 @target_s16_do_raw(i16 noundef signext %#0, i16 noundef signext %#1, i8 noundef zeroext %#2) nofree willreturn signext memory(none) {
+#3:
+  %#9 = and i8 noundef zeroext %#2, 31
+  %#10 = icmp eq i16 noundef signext %#1, 0
+  br i1 %#10, label %#7, label %#4
+
+#4:
+  %#11 = sext i16 noundef signext %#1 to i32
+  %#12 = sext i16 noundef signext %#0 to i32
+  %#13 = mul nsw i32 %#11, %#12
+  %#14 = lshr i32 %#13, 16
+  %#15 = and i8 noundef zeroext %#2, 64
+  %#16 = icmp eq i8 %#15, 0
+  br i1 %#16, label %#6, label %#5
+
+#5:
+  %#17 = ashr i8 noundef zeroext %#2, 7
+  %#18 = zext i16 noundef signext %#0 to i32
+  %#19 = sext i8 %#17 to i32
+  %#20 = xor i32 %#19, %#18
+  %#21 = sub nsw i32 %#14, %#19
+  %#22 = add nsw i32 %#21, %#20
+  br label %#6
+
+#6:
+  %#23 = phi i32 [ %#22, %#5 ], [ %#14, %#4 ]
+  %#24 = zext nneg i8 %#9 to i32
+  %#25 = shl i32 %#23, 16
+  %#26 = ashr exact i32 %#25, 16
+  %#27 = ashr i32 %#26, %#24
+  %#28 = lshr i32 %#27, 31
+  %#29 = add nsw i32 %#28, %#27
+  br label %#8
+
+#7:
+  %#30 = zext nneg i8 %#9 to i32
+  %#31 = shl nsw i32 4294967295, %#30
+  %#32 = sext i16 noundef signext %#0 to i32
+  %#33 = lshr i32 %#32, 15
+  %#34 = xor i32 %#31, 4294967295
+  %#35 = and i32 %#33, %#34
+  %#36 = trunc i32 %#35 to i16
+  %#37 = add i16 noundef signext %#0, %#36
+  %#38 = sext i16 %#37 to i32
+  %#39 = ashr i32 %#38, %#30
+  %#40 = icmp slt i8 noundef zeroext %#2, 0
+  %#41 = select i1 %#40, i32 65535, i32 0
+  %#42 = xor i32 %#39, %#41
+  %#43 = sub nsw i32 %#42, %#41
+  br label %#8
+
+#8:
+  %#44 = phi i32 [ %#29, %#6 ], [ %#43, %#7 ]
+  %#45 = trunc i32 %#44 to i16
+  ret i16 %#45
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_do_raw(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = and i8 noundef zeroext %#2, 31
+  %#10 = icmp eq i32 noundef %#1, 0
+  br i1 %#10, label %#7, label %#4
+
+#4:
+  %#11 = sext i32 noundef %#0 to i64
+  %#12 = sext i32 noundef %#1 to i64
+  %#13 = mul nsw i64 %#12, %#11
+  %#14 = lshr i64 %#13, 32
+  %#15 = trunc nuw i64 %#14 to i32
+  %#16 = and i8 noundef zeroext %#2, 64
+  %#17 = icmp eq i8 %#16, 0
+  br i1 %#17, label %#6, label %#5
+
+#5:
+  %#18 = ashr i8 noundef zeroext %#2, 7
+  %#19 = sext i8 %#18 to i32
+  %#20 = xor i32 noundef %#0, %#19
+  %#21 = sub i32 %#20, %#19
+  %#22 = add i32 %#21, %#15
+  br label %#6
+
+#6:
+  %#23 = phi i32 [ %#22, %#5 ], [ %#15, %#4 ]
+  %#24 = zext nneg i8 %#9 to i32
+  %#25 = ashr i32 %#23, %#24
+  %#26 = lshr i32 %#25, 31
+  %#27 = add nsw i32 %#26, %#25
+  br label %#8
+
+#7:
+  %#28 = ashr i8 noundef zeroext %#2, 7
+  %#29 = sext i8 %#28 to i32
+  %#30 = zext nneg i8 %#9 to i32
+  %#31 = shl nsw i32 4294967295, %#30
+  %#32 = xor i32 %#31, 4294967295
+  %#33 = icmp slt i32 noundef %#0, 0
+  %#34 = select i1 %#33, i32 %#32, i32 0
+  %#35 = add i32 %#34, noundef %#0
+  %#36 = ashr i32 %#35, %#30
+  %#37 = xor i32 %#36, %#29
+  %#38 = sub i32 %#37, %#29
+  br label %#8
+
+#8:
+  %#39 = phi i32 [ %#27, %#6 ], [ %#38, %#7 ]
+  ret i32 %#39
+}
+=>
+define i32 @target_s32_do_raw(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = and i8 noundef zeroext %#2, 31
+  %#10 = icmp eq i32 noundef %#1, 0
+  br i1 %#10, label %#7, label %#4
+
+#4:
+  %#11 = sext i32 noundef %#1 to i64
+  %#12 = sext i32 noundef %#0 to i64
+  %#13 = mul nsw i64 %#11, %#12
+  %#14 = lshr i64 %#13, 32
+  %#15 = trunc nuw i64 %#14 to i32
+  %#16 = and i8 noundef zeroext %#2, 64
+  %#17 = icmp eq i8 %#16, 0
+  br i1 %#17, label %#6, label %#5
+
+#5:
+  %#18 = ashr i8 noundef zeroext %#2, 7
+  %#19 = sext i8 %#18 to i32
+  %#20 = xor i32 noundef %#0, %#19
+  %#21 = sub i32 %#20, %#19
+  %#22 = add i32 %#21, %#15
+  br label %#6
+
+#6:
+  %#23 = phi i32 [ %#22, %#5 ], [ %#15, %#4 ]
+  %#24 = zext nneg i8 %#9 to i32
+  %#25 = ashr i32 %#23, %#24
+  %#26 = lshr i32 %#25, 31
+  %#27 = add nsw i32 %#26, %#25
+  br label %#8
+
+#7:
+  %#28 = ashr i8 noundef zeroext %#2, 7
+  %#29 = sext i8 %#28 to i32
+  %#30 = zext nneg i8 %#9 to i32
+  %#31 = shl nsw i32 4294967295, %#30
+  %#32 = xor i32 %#31, 4294967295
+  %#33 = icmp slt i32 noundef %#0, 0
+  %#34 = select i1 %#33, i32 %#32, i32 0
+  %#35 = add i32 %#34, noundef %#0
+  %#36 = ashr i32 %#35, %#30
+  %#37 = xor i32 %#36, %#29
+  %#38 = sub i32 %#37, %#29
+  br label %#8
+
+#8:
+  %#39 = phi i32 [ %#27, %#6 ], [ %#38, %#7 ]
+  ret i32 %#39
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_do_raw(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = and i8 noundef zeroext %#2, 63
+  %#10 = icmp eq i64 noundef %#1, 0
+  br i1 %#10, label %#7, label %#4
+
+#4:
+  %#11 = sext i64 noundef %#0 to i128
+  %#12 = sext i64 noundef %#1 to i128
+  %#13 = mul nsw i128 %#12, %#11
+  %#14 = lshr i128 %#13, 64
+  %#15 = trunc nuw i128 %#14 to i64
+  %#16 = and i8 noundef zeroext %#2, 64
+  %#17 = icmp eq i8 %#16, 0
+  br i1 %#17, label %#6, label %#5
+
+#5:
+  %#18 = ashr i8 noundef zeroext %#2, 7
+  %#19 = sext i8 %#18 to i64
+  %#20 = xor i64 noundef %#0, %#19
+  %#21 = sub i64 %#20, %#19
+  %#22 = add i64 %#21, %#15
+  br label %#6
+
+#6:
+  %#23 = phi i64 [ %#22, %#5 ], [ %#15, %#4 ]
+  %#24 = zext nneg i8 %#9 to i64
+  %#25 = ashr i64 %#23, %#24
+  %#26 = lshr i64 %#25, 63
+  %#27 = add nsw i64 %#26, %#25
+  br label %#8
+
+#7:
+  %#28 = zext nneg i8 %#9 to i64
+  %#29 = shl nsw i64 -1, %#28
+  %#30 = xor i64 %#29, -1
+  %#31 = icmp slt i64 noundef %#0, 0
+  %#32 = select i1 %#31, i64 %#30, i64 0
+  %#33 = add i64 %#32, noundef %#0
+  %#34 = ashr i64 %#33, %#28
+  %#35 = ashr i8 noundef zeroext %#2, 7
+  %#36 = sext i8 %#35 to i64
+  %#37 = xor i64 %#34, %#36
+  %#38 = sub nsw i64 %#37, %#36
+  br label %#8
+
+#8:
+  %#39 = phi i64 [ %#27, %#6 ], [ %#38, %#7 ]
+  ret i64 %#39
+}
+=>
+define i64 @target_s64_do_raw(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#9 = and i8 noundef zeroext %#2, 63
+  %#10 = icmp eq i64 noundef %#1, 0
+  br i1 %#10, label %#7, label %#4
+
+#4:
+  %#11 = sext i64 noundef %#1 to i128
+  %#12 = sext i64 noundef %#0 to i128
+  %#13 = mul nsw i128 %#11, %#12
+  %#14 = lshr i128 %#13, 64
+  %#15 = trunc nuw i128 %#14 to i64
+  %#16 = and i8 noundef zeroext %#2, 64
+  %#17 = icmp eq i8 %#16, 0
+  br i1 %#17, label %#6, label %#5
+
+#5:
+  %#18 = ashr i8 noundef zeroext %#2, 7
+  %#19 = sext i8 %#18 to i64
+  %#20 = xor i64 noundef %#0, %#19
+  %#21 = sub i64 %#20, %#19
+  %#22 = add i64 %#21, %#15
+  br label %#6
+
+#6:
+  %#23 = phi i64 [ %#22, %#5 ], [ %#15, %#4 ]
+  %#24 = zext nneg i8 %#9 to i64
+  %#25 = ashr i64 %#23, %#24
+  %#26 = lshr i64 %#25, 63
+  %#27 = add nsw i64 %#26, %#25
+  br label %#8
+
+#7:
+  %#28 = zext nneg i8 %#9 to i64
+  %#29 = shl nsw i64 -1, %#28
+  %#30 = xor i64 %#29, -1
+  %#31 = icmp slt i64 noundef %#0, 0
+  %#32 = select i1 %#31, i64 %#30, i64 0
+  %#33 = add i64 %#32, noundef %#0
+  %#34 = ashr i64 %#33, %#28
+  %#35 = ashr i8 noundef zeroext %#2, 7
+  %#36 = sext i8 %#35 to i64
+  %#37 = xor i64 %#34, %#36
+  %#38 = sub nsw i64 %#37, %#36
+  br label %#8
+
+#8:
+  %#39 = phi i64 [ %#27, %#6 ], [ %#38, %#7 ]
+  ret i64 %#39
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i16 @target_u16_bf(i16 noundef zeroext %#0, i16 noundef zeroext %#1, i8 noundef zeroext %#2) nofree willreturn zeroext memory(none) {
+#3:
+  %#4 = zext i16 noundef zeroext %#0 to i32
+  %#5 = zext i16 noundef zeroext %#1 to i32
+  %#6 = mul nuw i32 %#5, %#4
+  %#7 = lshr i32 %#6, 16
+  %#8 = sub nsw i32 %#4, %#7
+  %#9 = lshr i32 %#8, 1
+  %#10 = add nuw i32 %#9, %#7
+  %#11 = and i32 %#10, 65535
+  %#12 = zext nneg i8 noundef zeroext %#2 to i32
+  %#13 = lshr i32 %#11, %#12
+  %#14 = trunc nuw i32 %#13 to i16
+  ret i16 %#14
+}
+=>
+define i16 @target_u16_bf(i16 noundef zeroext %#0, i16 noundef zeroext %#1, i8 noundef zeroext %#2) nofree willreturn zeroext memory(none) {
+#3:
+  %#4 = zext i16 noundef zeroext %#1 to i32
+  %#5 = zext i16 noundef zeroext %#0 to i32
+  %#6 = mul nuw i32 %#4, %#5
+  %#7 = lshr i32 %#6, 16
+  %#8 = sub nsw i32 %#5, %#7
+  %#9 = lshr i32 %#8, 1
+  %#10 = add nuw i32 %#9, %#7
+  %#11 = and i32 %#10, 65535
+  %#12 = zext nneg i8 noundef zeroext %#2 to i32
+  %#13 = lshr i32 %#11, %#12
+  %#14 = trunc nuw i32 %#13 to i16
+  ret i16 %#14
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_u32_bf(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = zext i32 noundef %#0 to i64
+  %#5 = zext i32 noundef %#1 to i64
+  %#6 = mul nuw i64 %#5, %#4
+  %#7 = lshr i64 %#6, 32
+  %#8 = trunc nuw i64 %#7 to i32
+  %#9 = sub i32 noundef %#0, %#8
+  %#10 = lshr i32 %#9, 1
+  %#11 = add i32 %#10, %#8
+  %#12 = zext nneg i8 noundef zeroext %#2 to i32
+  %#13 = lshr i32 %#11, %#12
+  ret i32 %#13
+}
+=>
+define i32 @target_u32_bf(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = zext i32 noundef %#1 to i64
+  %#5 = zext i32 noundef %#0 to i64
+  %#6 = mul nuw i64 %#4, %#5
+  %#7 = lshr i64 %#6, 32
+  %#8 = trunc nuw i64 %#7 to i32
+  %#9 = sub i32 noundef %#0, %#8
+  %#10 = lshr i32 %#9, 1
+  %#11 = add i32 %#10, %#8
+  %#12 = zext nneg i8 noundef zeroext %#2 to i32
+  %#13 = lshr i32 %#11, %#12
+  ret i32 %#13
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_u64_bf(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = zext i64 noundef %#0 to i128
+  %#5 = zext i64 noundef %#1 to i128
+  %#6 = mul nuw i128 %#5, %#4
+  %#7 = lshr i128 %#6, 64
+  %#8 = trunc nuw i128 %#7 to i64
+  %#9 = sub i64 noundef %#0, %#8
+  %#10 = lshr i64 %#9, 1
+  %#11 = add i64 %#10, %#8
+  %#12 = zext nneg i8 noundef zeroext %#2 to i64
+  %#13 = lshr i64 %#11, %#12
+  ret i64 %#13
+}
+=>
+define i64 @target_u64_bf(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = zext i64 noundef %#1 to i128
+  %#5 = zext i64 noundef %#0 to i128
+  %#6 = mul nuw i128 %#4, %#5
+  %#7 = lshr i128 %#6, 64
+  %#8 = trunc nuw i128 %#7 to i64
+  %#9 = sub i64 noundef %#0, %#8
+  %#10 = lshr i64 %#9, 1
+  %#11 = add i64 %#10, %#8
+  %#12 = zext nneg i8 noundef zeroext %#2 to i64
+  %#13 = lshr i64 %#11, %#12
+  ret i64 %#13
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i16 @target_s16_bf(i16 noundef signext %#0, i16 noundef signext %#1, i8 noundef zeroext %#2) nofree willreturn signext memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 31
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i16 noundef signext %#0 to i32
+  %#7 = sext i16 noundef signext %#1 to i32
+  %#8 = mul nsw i32 %#7, %#6
+  %#9 = lshr i32 %#8, 16
+  %#10 = trunc nuw i32 %#9 to i16
+  %#11 = add i16 noundef signext %#0, %#10
+  %#12 = icmp eq i16 noundef signext %#1, 0
+  %#13 = zext nneg i8 %#4 to i32
+  %#14 = shl nuw i32 1, %#13
+  %#15 = sext i1 %#12 to i32
+  %#16 = add i32 %#14, %#15
+  %#17 = trunc i32 %#16 to i16
+  %#18 = icmp slt i16 %#11, 0
+  %#19 = select i1 %#18, i16 %#17, i16 0
+  %#20 = add i16 %#19, %#11
+  %#21 = sext i16 %#20 to i32
+  %#22 = ashr i32 %#21, %#13
+  %#23 = sext i8 %#5 to i32
+  %#24 = xor i32 %#22, %#23
+  %#25 = sub nsw i32 %#24, %#23
+  %#26 = trunc i32 %#25 to i16
+  ret i16 %#26
+}
+=>
+define i16 @target_s16_bf(i16 noundef signext %#0, i16 noundef signext %#1, i8 noundef zeroext %#2) nofree willreturn signext memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 31
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i16 noundef signext %#1 to i32
+  %#7 = sext i16 noundef signext %#0 to i32
+  %#8 = mul nsw i32 %#6, %#7
+  %#9 = lshr i32 %#8, 16
+  %#10 = trunc nuw i32 %#9 to i16
+  %#11 = add i16 noundef signext %#0, %#10
+  %#12 = icmp eq i16 noundef signext %#1, 0
+  %#13 = zext nneg i8 %#4 to i32
+  %#14 = shl nuw i32 1, %#13
+  %#15 = sext i1 %#12 to i32
+  %#16 = add i32 %#14, %#15
+  %#17 = trunc i32 %#16 to i16
+  %#18 = icmp slt i16 %#11, 0
+  %#19 = select i1 %#18, i16 %#17, i16 0
+  %#20 = add i16 %#19, %#11
+  %#21 = sext i16 %#20 to i32
+  %#22 = ashr i32 %#21, %#13
+  %#23 = sext i8 %#5 to i32
+  %#24 = xor i32 %#22, %#23
+  %#25 = sub nsw i32 %#24, %#23
+  %#26 = trunc i32 %#25 to i16
+  ret i16 %#26
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i32 @target_s32_bf(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 31
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i32
+  %#7 = sext i32 noundef %#0 to i64
+  %#8 = sext i32 noundef %#1 to i64
+  %#9 = mul nsw i64 %#8, %#7
+  %#10 = lshr i64 %#9, 32
+  %#11 = trunc nuw i64 %#10 to i32
+  %#12 = add nsw i32 noundef %#0, %#11
+  %#13 = icmp eq i32 noundef %#1, 0
+  %#14 = sext i1 %#13 to i32
+  %#15 = zext nneg i8 %#4 to i32
+  %#16 = shl nuw i32 1, %#15
+  %#17 = add i32 %#16, %#14
+  %#18 = icmp slt i32 %#12, 0
+  %#19 = select i1 %#18, i32 %#17, i32 0
+  %#20 = add i32 %#19, %#12
+  %#21 = ashr i32 %#20, %#15
+  %#22 = xor i32 %#21, %#6
+  %#23 = sub nsw i32 %#22, %#6
+  ret i32 %#23
+}
+=>
+define i32 @target_s32_bf(i32 noundef %#0, i32 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 31
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i32
+  %#7 = sext i32 noundef %#1 to i64
+  %#8 = sext i32 noundef %#0 to i64
+  %#9 = mul nsw i64 %#7, %#8
+  %#10 = lshr i64 %#9, 32
+  %#11 = trunc nuw i64 %#10 to i32
+  %#12 = add nsw i32 noundef %#0, %#11
+  %#13 = icmp eq i32 noundef %#1, 0
+  %#14 = sext i1 %#13 to i32
+  %#15 = zext nneg i8 %#4 to i32
+  %#16 = shl nuw i32 1, %#15
+  %#17 = add i32 %#16, %#14
+  %#18 = icmp slt i32 %#12, 0
+  %#19 = select i1 %#18, i32 %#17, i32 0
+  %#20 = add i32 %#19, %#12
+  %#21 = ashr i32 %#20, %#15
+  %#22 = xor i32 %#21, %#6
+  %#23 = sub nsw i32 %#22, %#6
+  ret i32 %#23
+}
+Transformation seems to be correct!
+
+
+----------------------------------------
+define i64 @target_s64_bf(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 63
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i64
+  %#7 = sext i64 noundef %#0 to i128
+  %#8 = sext i64 noundef %#1 to i128
+  %#9 = mul nsw i128 %#8, %#7
+  %#10 = lshr i128 %#9, 64
+  %#11 = trunc nuw i128 %#10 to i64
+  %#12 = add nsw i64 noundef %#0, %#11
+  %#13 = icmp eq i64 noundef %#1, 0
+  %#14 = sext i1 %#13 to i64
+  %#15 = zext nneg i8 %#4 to i64
+  %#16 = shl nuw i64 1, %#15
+  %#17 = add i64 %#16, %#14
+  %#18 = icmp slt i64 %#12, 0
+  %#19 = select i1 %#18, i64 %#17, i64 0
+  %#20 = add i64 %#19, %#12
+  %#21 = ashr i64 %#20, %#15
+  %#22 = xor i64 %#21, %#6
+  %#23 = sub nsw i64 %#22, %#6
+  ret i64 %#23
+}
+=>
+define i64 @target_s64_bf(i64 noundef %#0, i64 noundef %#1, i8 noundef zeroext %#2) nofree willreturn memory(none) {
+#3:
+  %#4 = and i8 noundef zeroext %#2, 63
+  %#5 = ashr i8 noundef zeroext %#2, 7
+  %#6 = sext i8 %#5 to i64
+  %#7 = sext i64 noundef %#1 to i128
+  %#8 = sext i64 noundef %#0 to i128
+  %#9 = mul nsw i128 %#7, %#8
+  %#10 = lshr i128 %#9, 64
+  %#11 = trunc nuw i128 %#10 to i64
+  %#12 = add nsw i64 noundef %#0, %#11
+  %#13 = icmp eq i64 noundef %#1, 0
+  %#14 = sext i1 %#13 to i64
+  %#15 = zext nneg i8 %#4 to i64
+  %#16 = shl nuw i64 1, %#15
+  %#17 = add i64 %#16, %#14
+  %#18 = icmp slt i64 %#12, 0
+  %#19 = select i1 %#18, i64 %#17, i64 0
+  %#20 = add i64 %#19, %#12
+  %#21 = ashr i64 %#20, %#15
+  %#22 = xor i64 %#21, %#6
+  %#23 = sub nsw i64 %#22, %#6
+  ret i64 %#23
+}
+Transformation seems to be correct!
+
+Summary:
+  12 correct transformations
+  0 incorrect transformations
+  0 failed-to-prove transformations
+  0 Alive2 errors

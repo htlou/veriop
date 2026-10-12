@@ -1,0 +1,64 @@
+{
+  "commit": "4f43b71",
+  "date": "2025-06-19",
+  "subject": "small optimization when streaming small quantities",
+  "selected_by": "keyword",
+  "perf_evidence": "small streaming XXH3 update optimization",
+  "change_summary": "Moves small updates through a more direct buffer path.",
+  "units": [
+    {
+      "name": "Moves small updates through a more direct buffer path.",
+      "level": "api",
+      "verdict": "UNKNOWN",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4f43b71/r_api_st1_t2",
+      "evidence": "The stack-accumulator public API configuration remains unresolved: seeded 200+50 proves forward only and 128-bit 100+200 times out in both directions. See README.md for the exact proved subset."
+    },
+    {
+      "name": "Public XXH3 streaming with direct state accumulators, 128-bit 100+200-byte case",
+      "level": "api",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "initialized state and readable 300-byte input",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4f43b71/r_api_st0_t5",
+      "evidence": "Bidirectional Alive2 passes. The three other default-configuration public API targets also pass; see README.md."
+    },
+    {
+      "name": "Internal XXH3_update small-input path with symbolic length",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "harness guards on buffered size and nonoverlap",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4f43b71/r_raw_st1_t1",
+      "evidence": "Bidirectional Alive2 passes with symbolic length; direct-accumulator configuration also passes."
+    },
+    {
+      "name": "Internal XXH3_update large-input path with fixed 200-byte input",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": "harness guards on state geometry and nonoverlap",
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/4f43b71/r_raw_st1_t2",
+      "evidence": "Bidirectional Alive2 passes for the fixed 200-byte large path; direct-accumulator configuration also passes."
+    }
+  ],
+  "commit_verdict": "EQUIV_PARTIAL",
+  "raw_verdict": null,
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "Exact old/new xxhash.h Git blobs are checked in README.md. Partial equivalence covers the documented raw paths and public API targets only. The two stack-accumulator public API timeouts prevent a full-commit proof."
+}

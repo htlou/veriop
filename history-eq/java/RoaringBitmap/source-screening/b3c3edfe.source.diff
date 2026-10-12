@@ -1,0 +1,54 @@
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+index 83509362..016dbeeb 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/RoaringBitmap.java
+@@ -1889,6 +1889,22 @@ public class RoaringBitmap implements Cloneable, Serializable, Iterable<Integer>
+     return (int) getLongCardinality();
+   }
+ 
++  /**
++   * Returns true if the bitmap's cardinality exceeds the threshold.
++   * @param threshold threshold
++   * @return true if the cardinality exceeds the threshold.
++   */
++  public boolean cardinalityExceeds(long threshold) {
++    long size = 0;
++    for (int i = 0; i < this.highLowContainer.size(); i++) {
++      size += this.highLowContainer.getContainerAtIndex(i).getCardinality();
++      if (size > threshold) {
++        return true;
++      }
++    }
++    return false;
++  }
++
+   @Override
+   public void forEach(IntConsumer ic) {
+     for (int i = 0; i < this.highLowContainer.size(); i++) {
+diff --git a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
+index 4b47d6f3..e353fe1b 100644
+--- a/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
++++ b/RoaringBitmap/src/main/java/org/roaringbitmap/buffer/ImmutableRoaringBitmap.java
+@@ -1289,6 +1289,22 @@ public class ImmutableRoaringBitmap
+     return (int) getLongCardinality();
+   }
+ 
++  /**
++   * Returns true if the bitmap's cardinality exceeds the threshold.
++   * @param threshold threshold
++   * @return true if the cardinality exceeds the threshold.
++   */
++  public boolean cardinalityExceeds(long threshold) {
++    long size = 0;
++    for (int i = 0; i < this.highLowContainer.size(); i++) {
++      size += this.highLowContainer.getContainerAtIndex(i).getCardinality();
++      if (size > threshold) {
++        return true;
++      }
++    }
++    return false;
++  }
++
+   @Override
+   public void forEach(IntConsumer ic) {
+     for (int i = 0; i < this.highLowContainer.size(); i++) {

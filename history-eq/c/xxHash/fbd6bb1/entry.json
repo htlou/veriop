@@ -1,0 +1,64 @@
+{
+  "commit": "fbd6bb1",
+  "date": "2020-04-08",
+  "subject": "update avx512 prefetch distance for gcc and clang",
+  "selected_by": "manual-scan",
+  "perf_evidence": "The commit changes AVX512 prefetch distances separately for clang (64/128: 320/320) and GCC (640/512), from 496/384.",
+  "change_summary": "Only the address passed to XXH_PREFETCH in the AVX512 XXH3_accumulate stripe loop changes; the hash arithmetic and loads are unchanged.",
+  "units": [
+    {
+      "name": "XXH3_accumulate, one stripe, AVX512, 64/128-bit widths, clang branch",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/fbd6bb1/raw_prefetch_avx512",
+      "evidence": "target_acc64/target_acc128: Alive2 forward and backward correct; IR differs only in the prefetch address."
+    },
+    {
+      "name": "XXH3_accumulate, one stripe, AVX512, 64/128-bit widths, GCC preprocessor branch",
+      "level": "raw",
+      "verdict": "EQUIV",
+      "bounded": false,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/fbd6bb1/raw_prefetch_gccview",
+      "evidence": "target_acc64/target_acc128: Alive2 forward and backward correct with -U__clang__ selecting the GCC branch."
+    },
+    {
+      "name": "XXH3_64bits/XXH3_128bits, 256 bytes, AVX512, clang branch",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/fbd6bb1/api_prefetch_avx512",
+      "evidence": "Public target_api64/target_api128 bidirectional correct in result.json; their noinline XXH3_hashLong_{64b,128b}_defaultSecret callees separately bidirectional correct in helpers_fwd.log/helpers_bwd.log (2/2 each direction)."
+    },
+    {
+      "name": "XXH3_64bits/XXH3_128bits, 256 bytes, AVX512, GCC preprocessor branch",
+      "level": "api",
+      "verdict": "EQUIV_BOUNDED",
+      "bounded": true,
+      "unroll": 0,
+      "precondition": null,
+      "unsupported_reason": null,
+      "not_equiv_kind": null,
+      "artifact_dir": "c/xxHash/fbd6bb1/api_prefetch_gccview",
+      "evidence": "Public targets bidirectional correct in result.json; noinline callees separately bidirectional correct in helpers_fwd.log/helpers_bwd.log."
+    }
+  ],
+  "commit_verdict": "EQUIV_BOUNDED",
+  "raw_verdict": "EQUIV",
+  "coverage": "partial",
+  "unsupported_reason": null,
+  "not_equiv_kind": null,
+  "notes": "Proof scope is fixed 256-byte inputs and AVX512. The GCC branch is selected by -U__clang__ while still compiling with clang; actual GCC code generation is not checked. Public targets call noinline helpers, so the separate helper proofs are needed; public-target checks alone would be insufficient. Arbitrary lengths and other compiler/ISA configurations remain outside this proof."
+}
