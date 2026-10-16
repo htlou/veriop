@@ -1,0 +1,151 @@
+From 1e07a9f1fd43c3267132fda2a681d90697dbb676 Mon Sep 17 00:00:00 2001
+From: hantaolou <hantaolou@berkeley.edu>
+Date: Wed, 14 Oct 2026 16:59:25 -0700
+Subject: [PATCH] CUDA: unrolled fixed-size conv2d_dw kernel for 3x3 and 5x5
+ depthwise kernels
+
+Same thread->output mapping and accumulation order as conv2d_dw_kernel;
+compile-time kernel size with fully unrolled, bounds-predicated taps and
+cheaper unsigned index decomposition.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ ggml/src/ggml-cuda/conv2d-dw.cu | 110 ++++++++++++++++++++++++++++----
+ 1 file changed, 98 insertions(+), 12 deletions(-)
+
+diff --git a/ggml/src/ggml-cuda/conv2d-dw.cu b/ggml/src/ggml-cuda/conv2d-dw.cu
+index 6371d0a87..249b7cb7b 100644
+--- a/ggml/src/ggml-cuda/conv2d-dw.cu
++++ b/ggml/src/ggml-cuda/conv2d-dw.cu
+@@ -117,6 +117,96 @@ __global__ void conv2d_dw_kernel(const float * __restrict__ input, const T * __r
+     output[Layout::output_index(batch_idx, channel_idx, out_y_idx, out_x_idx, params)] = accumulator;
+ }
+ 
++// Same thread->output mapping and accumulation order as conv2d_dw_kernel, specialized for a compile-time kernel size:
++//  - the tap loops are fully unrolled, so all in-bounds taps are issued independently instead of one
++//    runtime-bounded iteration at a time; a tap contributes iff its input coordinate is inside the image,
++//    which is exactly the [min, max) range computed by calculate_kernel_bounds;
++//  - the flat output index is decomposed with three unsigned divisions instead of four signed div/mod chains
++//    (global_idx >= 0, and for both layouts the output offset is global_idx itself).
++template <typename T, bool cwhn, int KW, int KH>
++__global__ void conv2d_dw_kernel_fixed(const float * __restrict__ input, const T * __restrict__ kernel, float * __restrict__ output,
++                                       const int in_w, const int in_h, const int out_w, const int out_h,
++                                       const int kernel_w, const int kernel_h, const int stride_x, const int stride_y,
++                                       const int padding_x, const int padding_y, const int dilation_x, const int dilation_y,
++                                       const int channels, const int batches) {
++    const int global_idx     = blockIdx.x * blockDim.x + threadIdx.x;
++    const int total_elements = batches * channels * out_h * out_w;
++
++    GGML_UNUSED_VARS(kernel_w, kernel_h); // same signature as conv2d_dw_kernel; KW == kernel_w, KH == kernel_h
++
++    if (global_idx >= total_elements) {
++        return;
++    }
++
++    const unsigned int idx = global_idx;
++    int out_x_idx, out_y_idx, channel_idx;
++    const float * in_base; // input pointer at (n, c, 0, 0) for whcn, (n, 0, 0, c) for cwhn
++    int in_step_x, in_step_y; // element strides of x and y in the input
++    if constexpr (!cwhn) {
++        const unsigned int q1    = idx / (unsigned int) out_w;  // n*C*OH + c*OH + y
++        const unsigned int plane = q1 / (unsigned int) out_h;   // n*C + c
++        out_x_idx   = idx - q1 * out_w;
++        out_y_idx   = q1 - plane * out_h;
++        channel_idx = plane % (unsigned int) channels;
++        in_base     = input + (size_t) plane * (in_w * in_h);
++        in_step_x   = 1;
++        in_step_y   = in_w;
++    } else {
++        const unsigned int q1 = idx / (unsigned int) channels;  // n*OH*OW + y*OW + x
++        const unsigned int q2 = q1 / (unsigned int) out_w;      // n*OH + y
++        const unsigned int n  = q2 / (unsigned int) out_h;
++        channel_idx = idx - q1 * channels;
++        out_x_idx   = q1 - q2 * out_w;
++        out_y_idx   = q2 - n * out_h;
++        in_base     = input + (size_t) n * (channels * in_w * in_h) + channel_idx;
++        in_step_x   = channels;
++        in_step_y   = channels * in_w;
++    }
++
++    const int in_y0 = out_y_idx * stride_y - padding_y;
++    const int in_x0 = out_x_idx * stride_x - padding_x;
++
++    float accumulator = 0.0f;
++
++#pragma unroll
++    for (int kern_y = 0; kern_y < KH; ++kern_y) {
++        const int in_y_idx = in_y0 + kern_y * dilation_y;
++#pragma unroll
++        for (int kern_x = 0; kern_x < KW; ++kern_x) {
++            const int in_x_idx = in_x0 + kern_x * dilation_x;
++            if (in_y_idx >= 0 && in_y_idx < in_h && in_x_idx >= 0 && in_x_idx < in_w) {
++                const float input_val  = in_base[in_y_idx * in_step_y + in_x_idx * in_step_x];
++                const T     kernel_val = cwhn ? kernel[(kern_y * KW + kern_x) * channels + channel_idx]
++                                              : kernel[channel_idx * (KH * KW) + kern_y * KW + kern_x];
++
++                accumulator += input_val * ggml_cuda_cast<float>(kernel_val);
++            }
++        }
++    }
++
++    output[global_idx] = accumulator;
++}
++
++template <typename T, typename Layout>
++static void conv2d_dw_cuda(const float * x_d, const T * w_d, float * y_d, const int in_w, const int in_h, const int out_w,
++                           const int out_h, const int kernel_w, const int kernel_h, const int stride_x, const int stride_y,
++                           const int padding_x, const int padding_y, const int dilation_x, const int dilation_y,
++                           const int channels, const int batches, const int blocks, cudaStream_t st) {
++    if (kernel_w == 3 && kernel_h == 3) {
++        conv2d_dw_kernel_fixed<T, std::is_same_v<Layout, cwhn_layout>, 3, 3><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
++            x_d, w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y, padding_x, padding_y,
++            dilation_x, dilation_y, channels, batches);
++    } else if (kernel_w == 5 && kernel_h == 5) {
++        conv2d_dw_kernel_fixed<T, std::is_same_v<Layout, cwhn_layout>, 5, 5><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
++            x_d, w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y, padding_x, padding_y,
++            dilation_x, dilation_y, channels, batches);
++    } else {
++        conv2d_dw_kernel<T, Layout><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
++            x_d, w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y, padding_x, padding_y,
++            dilation_x, dilation_y, channels, batches);
++    }
++}
++
+ void ggml_cuda_op_conv2d_dw(ggml_backend_cuda_context & ctx, ggml_tensor * dst) {
+     const ggml_tensor * kernel = dst->src[0];
+     const ggml_tensor * input  = dst->src[1];
+@@ -151,23 +241,19 @@ void ggml_cuda_op_conv2d_dw(ggml_backend_cuda_context & ctx, ggml_tensor * dst)
+ 
+     if (ggml_is_contiguous(input)) {
+         if (kernel->type == GGML_TYPE_F16) {
+-            conv2d_dw_kernel<half, whcn_layout><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
+-                x_d, (const half *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y,
+-                padding_x, padding_y, dilation_x, dilation_y, channels, batches);
++            conv2d_dw_cuda<half, whcn_layout>(x_d, (const half *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x,
++                stride_y, padding_x, padding_y, dilation_x, dilation_y, channels, batches, blocks, st);
+         } else {
+-            conv2d_dw_kernel<float, whcn_layout><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
+-                x_d, (const float *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y,
+-                padding_x, padding_y, dilation_x, dilation_y, channels, batches);
++            conv2d_dw_cuda<float, whcn_layout>(x_d, (const float *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x,
++                stride_y, padding_x, padding_y, dilation_x, dilation_y, channels, batches, blocks, st);
+         }
+     } else if (ggml_is_contiguous_channels(input)) {
+         if (kernel->type == GGML_TYPE_F16) {
+-            conv2d_dw_kernel<half, cwhn_layout><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
+-                x_d, (const half *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y,
+-                padding_x, padding_y, dilation_x, dilation_y, channels, batches);
++            conv2d_dw_cuda<half, cwhn_layout>(x_d, (const half *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x,
++                stride_y, padding_x, padding_y, dilation_x, dilation_y, channels, batches, blocks, st);
+         } else {
+-            conv2d_dw_kernel<float, cwhn_layout><<<blocks, CUDA_CONV2D_DW_BLOCK_SIZE, 0, st>>>(
+-                x_d, (const float *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x, stride_y,
+-                padding_x, padding_y, dilation_x, dilation_y, channels, batches);
++            conv2d_dw_cuda<float, cwhn_layout>(x_d, (const float *) w_d, y_d, in_w, in_h, out_w, out_h, kernel_w, kernel_h, stride_x,
++                stride_y, padding_x, padding_y, dilation_x, dilation_y, channels, batches, blocks, st);
+         }
+     } else {
+         GGML_ABORT("Unsupported memory layout for conv_2d_dw");
+-- 
+2.34.1
+

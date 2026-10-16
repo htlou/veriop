@@ -1,0 +1,27 @@
+{
+  "edits": "Generate the KeY model for the BitmapContainer.select(int) equivalence proof.\n\nOLD = select(int) of upstream RoaringBitmap @7f2b0a58 (wt/base).\nNEW = select(int) of the 4-word block-skip variant `t4`\n      (explore-inv-free/select-variants/t4.BitmapContainer.java; the class measured in\n      jmh/explore-select-t4 is explore-inv-free/cls-t4, compiled from that file).\n\nThe method bodies are extracted verbatim from the real sources. The only edits are:\n  * rename select -> selectOld / selectNew (the @Override line is not part of the extract)\n  * Long.bitCount(            -> PopCount.bitCount(  (KeY's JavaRedux has no Long.bitCount; stub\n                                                       = uninterpreted pure function pc, see PopCount.java)\n  * Util.select(              -> USel.select(        (uninterpreted pure function us, see USel.java)\n  * bitmap.length & -4        -> Bits.andM4(bitmap.length)   (KeY has no rules for binaryAnd with a\n                                 symbolic operand; the stub's contract is checked exhaustively for all\n                                 2^31 non-negative ints by AndM4Check.java)\n  * NEW only: `} else if (j >= 0) {` -> `} else { if (j >= 0) {` plus one closing brace\n                                 (same Java statement; needed because KeY 3.0.0 drops loop specs\n                                 inside `else if`; javac bytecode identity checked by check_else_if.sh)\n  * JML loop invariants inserted (comments only) before each `for` loop\nEverything else of BitmapContainer.java must be byte-identical between OLD and NEW (asserted).\n",
+  "sources": {
+    "old": {
+      "path": "/srv/home/hantaolou/code/veriop/heldout/java-key/wt/base/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java",
+      "sha256": "19b2adf46784317e5578c49b3182d865add4d36fcda16f3668b87430131c2ec0"
+    },
+    "new": {
+      "path": "/srv/home/hantaolou/code/veriop/heldout/java-key/explore-inv-free/select-variants/t4.BitmapContainer.java",
+      "sha256": "e51e3ae5975fe9f30c770fd78f9a86adfaf35369fad11c47cd6c87a8bc2c104d"
+    }
+  },
+  "methods_sha256": {
+    "select_old": "3147fa7fd343c083d48ddeb84b8ca029d9d1ffc3c08a9a10e38c840f4a6fc5ad",
+    "select_new": "d9ba0026070493e92bcfeb4cf8c557e382e0379580ca2d0e8082c0d3638873de"
+  },
+  "only_select_differs": true,
+  "generated": {
+    "sel": "dc9fc1e3ff4ef1e2e312cf9ee91dbaf7cf709b4efb7ad67618feffeae097cadf",
+    "selnull": "6d44b25078d90ce318e02e046f2b496a9f780c853152bda604574a8b344ee233",
+    "selmut": "da2e6cc57369bc477e0480a2c78f7f38f5aa58f3ad5276dacd8d876ea193c145"
+  },
+  "mutant": {
+    "from": "        if (bits >= leftover) {\n          break;",
+    "to": "        if (bits > leftover) {\n          break;"
+  }
+}

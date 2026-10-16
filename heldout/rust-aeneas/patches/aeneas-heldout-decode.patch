@@ -1,0 +1,189 @@
+--- a/src/PrePasses.ml	2026-10-02 01:09:22.173809985 -0700
++++ b/src/PrePasses.ml	2026-10-14 17:38:32.485867529 -0700
+@@ -390,6 +390,138 @@
+     in
+     visitor#visit_crate None crate
+ 
++(** Remove the exits to outer loops ([break k] with [k] larger than the
++    loop depth of the statement), which [update_loops] and the symbolic
++    interpreter do not support, by duplicating continuations.
++
++    Charon produces such exits when a [?] inside a [for] loop is followed by a
++    second loop: the error epilogue is shared and placed after the first loop
++    [P], and the second loop [L] is placed inside the branch of [P] which
++    handles the end of the iteration:
++    {[
++      loop {                                 // P
++        match next(iter) {
++          None => {
++            ...;
++            loop { ... break 1; ... break 0; ... };   // L
++            K;
++            return
++          }
++          Some => { ...; break 0; ...; continue 0 }
++        }
++      };
++      E;
++      return
++    ]}
++    When the statements [K] following [L] and the statements [E] following
++    [P] are loop-free and end with a [return], every exit of [L] leads to the
++    end of the function. We then move the continuation of each exit inside
++    [L]:
++    - the normal exits of [L] become [K; break];
++    - the exits to [P] become [E; break];
++    - [K; return] after [L] is replaced by [return].
++    The [return] (now at depth one) and the remaining exits of [P] are then
++    handled by [update_loops] as usual. All the exits of [L] lead to states
++    where the function is about to return, as in [update_loops]. *)
++let lower_nested_loop_exits (_ : crate) (f : fun_decl) : fun_decl =
++  match f.body with
++  | StructuredBody body ->
++      let is_return (st : statement) = st.kind = Return in
++      let loop_free (sts : statement list) : bool =
++        let visitor =
++          object
++            inherit [_] iter_statement
++            method! visit_Loop _ _ = raise Found
++          end
++        in
++        try
++          List.iter (visitor#visit_statement ()) sts;
++          true
++        with Found -> false
++      in
++      (* Split a continuation into its statements before the final [return] *)
++      let returning_continuation (sts : statement list) : statement list option =
++        match List.rev sts with
++        | last :: rev_init when is_return last && loop_free sts ->
++            Some (List.rev rev_init)
++        | _ -> None
++      in
++      (* Check that a loop body only exits to itself or to its parent loop, and
++         only through [break] *)
++      let exits_ok (loop_body : block) : bool =
++        let ok = ref true in
++        let rec visit_block depth (b : block) = List.iter (visit_st depth) b.statements
++        and visit_st depth (st : statement) =
++          match st.kind with
++          | Break i -> if i > depth + 1 then ok := false
++          | Continue i -> if i > depth then ok := false
++          | Return -> ok := false
++          | Loop b -> visit_block (depth + 1) b
++          | Switch (_, branches) -> List.iter (visit_block depth) branches
++          | _ -> ()
++        in
++        visit_block 0 loop_body;
++        !ok
++      in
++      let has_outer_exit (loop_body : block) : bool =
++        let found = ref false in
++        let rec visit_block depth (b : block) = List.iter (visit_st depth) b.statements
++        and visit_st depth (st : statement) =
++          match st.kind with
++          | Break i | Continue i -> if i > depth then found := true
++          | Loop b -> visit_block (depth + 1) b
++          | Switch (_, branches) -> List.iter (visit_block depth) branches
++          | _ -> ()
++        in
++        visit_block 0 loop_body;
++        !found
++      in
++      (* Rewrite the exits of [L] *)
++      let rewrite_exits (k_stmts : statement list) (e_stmts : statement list)
++          (loop_body : block) : block =
++        let rec visit_block depth (b : block) : block =
++          { b with statements = List.concat_map (visit_st depth) b.statements }
++        and visit_st depth (st : statement) : statement list =
++          match st.kind with
++          | Break i when i = depth -> k_stmts @ [ st ]
++          | Break i when i = depth + 1 -> e_stmts @ [ { st with kind = Break depth } ]
++          | Loop b -> [ { st with kind = Loop (visit_block (depth + 1) b) } ]
++          | Switch (data, branches) ->
++              [ { st with kind = Switch (data, List.map (visit_block depth) branches) } ]
++          | _ -> [ st ]
++        in
++        visit_block 0 loop_body
++      in
++      (* [parent_cont]: the continuation of the innermost enclosing loop, if it
++         is loop-free and ends with a return *)
++      let rec visit_block (parent_cont : statement list option option) (b : block) : block =
++        let rec go (sts : statement list) : statement list =
++          match sts with
++          | [] -> []
++          | ({ kind = Loop loop_body; _ } as st) :: rest -> (
++              let own_cont = returning_continuation rest in
++              (* Process the nested loops first, knowing our continuation *)
++              let loop_body = visit_block (Some own_cont) loop_body in
++              let st = { st with kind = Loop loop_body } in
++              match (parent_cont, own_cont) with
++              | Some (Some e_stmts), Some k_stmts
++                when has_outer_exit loop_body && exits_ok loop_body ->
++                  let loop_body = rewrite_exits k_stmts e_stmts loop_body in
++                  let ret = List.nth rest (List.length rest - 1) in
++                  [ { st with kind = Loop loop_body }; ret ]
++              | _ -> st :: go rest)
++          | st :: rest -> visit_st parent_cont st :: go rest
++        in
++        { b with statements = go b.statements }
++      and visit_st parent_cont (st : statement) : statement =
++        match st.kind with
++        | Switch (data, branches) ->
++            { st with kind = Switch (data, List.map (visit_block parent_cont) branches) }
++        | _ -> st
++      in
++      { f with body = StructuredBody { body with body = visit_block None body.body } }
++  | _ -> f
++
+ exception FoundStatement of statement
+ 
+ (** Check that loops:
+@@ -2356,6 +2488,7 @@
+       ("fix_closure_signature_regions", fix_closure_signature_regions);
+       ("erase_body_regions", erase_body_regions);
+       ("remove_unreachable", remove_unreachable);
++      ("lower_nested_loop_exits", lower_nested_loop_exits);
+       ("update_loop", update_loops);
+       ("remove_useless_joins", remove_useless_joins);
+       ( "remove_shallow_borrows_storage_live_dead",
+--- a/src/interp/InterpMatchCtxs.ml	2026-10-01 22:01:10.127106266 -0700
++++ b/src/interp/InterpMatchCtxs.ml	2026-10-14 17:40:44.052083294 -0700
+@@ -579,6 +579,17 @@
+             let proj_ty = M.match_rtys ctx0 ctx1 proj0.proj_ty proj1.proj_ty in
+             M.match_aproj_loans match_rec ctx0 ctx1 v0.ty pm0 ploans0 v1.ty pm1
+               ploans1 ty proj_ty
++        | AEndedProjLoans e0, AEndedProjLoans e1
++          when e0.consumed = [] && e1.consumed = [] && e0.borrows = []
++               && e1.borrows = [] && pm0 = pm1 ->
++            (* Ended loan projectors which consumed nothing only carry meta
++               information (used for the synthesis): we keep the left one, as
++               is done for the ended ignored mutable borrows. *)
++            { v0 with ty }
++        | AEndedProjBorrows b0, AEndedProjBorrows b1
++          when b0.loans = [] && b1.loans = [] && pm0 = pm1 ->
++            { v0 with ty }
++        | AEmpty, AEmpty when pm0 = pm1 -> { v0 with ty }
+         | _ -> [%craise_recover] M.recover M.span "Unreachable"
+       end
+     | _ ->
+--- a/src/extract/ExtractBase.ml	2026-10-02 02:38:39.815406886 -0700
++++ b/src/extract/ExtractBase.ml	2026-10-14 17:57:01.537367297 -0700
+@@ -2133,6 +2133,17 @@
+        the backend allows such collisions *)
+     StringSet.mem s ctx.names_maps.names_map.names_set
+     || StringSet.mem s ctx.names_maps.strict_names_map.names_set
++    (* Lean resolves [x.f] as a field access when [x] is a local variable:
++       forbid local names which are the first component of a qualified
++       global name (for instance, a variable [engine] would shadow
++       [engine.Engine.decode_slice]). *)
++    || (backend () = Lean
++       &&
++       let prefix = s ^ "." in
++       let len = String.length prefix in
++       StringSet.exists
++         (fun n -> String.length n > len && String.sub n 0 len = prefix)
++         ctx.names_maps.names_map.names_set)
+   in
+   basename_to_unique_aux collision name_append_index name
+ 

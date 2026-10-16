@@ -1,0 +1,110 @@
+diff --git a/include/fast_float/ascii_number.h b/include/fast_float/ascii_number.h
+index 4d68eaa..845f5f7 100644
+--- a/include/fast_float/ascii_number.h
++++ b/include/fast_float/ascii_number.h
+@@ -625,6 +625,52 @@ parse_number_string(UC const *p, UC const *pend, parse_options_t<UC> options,
+                                                              store_spans);
+ }
+ 
++// Fast path for decimal uint16_t from char: at least eight readable bytes
++// and a first character in '1'..'9' (so no white space, sign or leading
++// zero can be present). Converts one to five digits with a single 8-byte
++// load and no branch on the digit count. Returns false, without touching
++// `value` or `answer`, whenever the general path must decide.
++fastfloat_really_inline bool
++try_parse_u16_digits8(char const *p, char const *pend, uint16_t &value,
++                      from_chars_result_t<char> &answer) noexcept {
++  if (pend - p < 8) {
++    return false;
++  }
++  uint64_t const chunk = read8_to_u64(p);
++  uint64_t const nondigit =
++      ((chunk + 0x4646464646464646) | (chunk - 0x3030303030303030)) &
++      0x8080808080808080;
++  uint32_t const lead = uint32_t(chunk & 0xFF) - uint32_t('1');
++  uint32_t const nd = nondigit ? uint32_t(countr_zero_64(nondigit) >> 3) : 8u;
++  if (lead > 8 || nd > 5) {
++    return false;
++  }
++  // Move the nd digits to the top bytes and pad the low bytes with '0'.
++  uint64_t const aligned =
++      (chunk << (64 - 8 * nd)) | (uint64_t(0x3030303030303030) >> (8 * nd));
++  uint32_t const v = parse_eight_digits_unrolled(aligned);
++#ifdef FF_BRANCH_PTR
++  // Branch on the (usually predictable) digit count so that the returned
++  // pointer does not depend on the loaded bytes.
++  if (nd == 5) {
++    answer.ptr = p + 5;
++  } else if (nd == 4) {
++    answer.ptr = p + 4;
++  } else {
++    answer.ptr = p + nd;
++  }
++#else
++  answer.ptr = p + nd;
++#endif
++  if (v > 65535) {
++    answer.ec = std::errc::result_out_of_range;
++  } else {
++    value = uint16_t(v);
++    answer.ec = std::errc();
++  }
++  return true;
++}
++
+ template <typename T, typename UC>
+ fastfloat_really_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
+ parse_int_string(UC const *p, UC const *pend, T &value,
+diff --git a/include/fast_float/float_common.h b/include/fast_float/float_common.h
+index bf61951..7b4d478 100644
+--- a/include/fast_float/float_common.h
++++ b/include/fast_float/float_common.h
+@@ -491,6 +491,26 @@ countr_zero_32(uint32_t input_num) {
+ #endif
+ }
+ 
++/* count trailing zeroes for nonzero 64-bit integers */
++fastfloat_really_inline FASTFLOAT_CONSTEXPR20 int
++countr_zero_64(uint64_t input_num) {
++  if (cpp20_and_in_constexpr()) {
++    int low = countr_zero_generic_32(uint32_t(input_num));
++    return low != 32 ? low
++                     : 32 + countr_zero_generic_32(uint32_t(input_num >> 32));
++  }
++#if defined(FASTFLOAT_VISUAL_STUDIO) && defined(_WIN64)
++  unsigned long trailing_zero = 0;
++  _BitScanForward64(&trailing_zero, input_num);
++  return static_cast<int>(trailing_zero);
++#elif defined(FASTFLOAT_VISUAL_STUDIO)
++  int low = countr_zero_32(uint32_t(input_num));
++  return low != 32 ? low : 32 + countr_zero_32(uint32_t(input_num >> 32));
++#else
++  return __builtin_ctzll(input_num);
++#endif
++}
++
+ // slow emulation routine for 32-bit
+ fastfloat_really_inline constexpr uint64_t emulu(uint32_t x, uint32_t y) {
+   return x * static_cast<uint64_t>(y);
+diff --git a/include/fast_float/parse_number.h b/include/fast_float/parse_number.h
+index f8409d0..b989f30 100644
+--- a/include/fast_float/parse_number.h
++++ b/include/fast_float/parse_number.h
+@@ -578,6 +578,17 @@ from_chars_int_advanced(UC const *first, UC const *last, T &value,
+   int const base = options.base;
+ 
+   from_chars_result_t<UC> answer;
++  FASTFLOAT_IF_CONSTEXPR17((std::is_same<T, std::uint16_t>::value &&
++                            std::is_same<UC, char>::value)) {
++    if (!cpp20_and_in_constexpr() && base == 10 &&
++        try_parse_u16_digits8(
++            reinterpret_cast<char const *>(first),
++            reinterpret_cast<char const *>(last),
++            reinterpret_cast<uint16_t &>(value),
++            reinterpret_cast<from_chars_result_t<char> &>(answer))) {
++      return answer;
++    }
++  }
+   if (uint64_t(fmt & chars_format::skip_white_space)) {
+     while ((first != last) && fast_float::is_space(*first)) {
+       first++;

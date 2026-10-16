@@ -1,0 +1,64 @@
+diff --git a/csrc/libtorch_stable/activation_kernels.cu b/csrc/libtorch_stable/activation_kernels.cu
+index a7ee87b..5a1bfa7 100644
+--- a/csrc/libtorch_stable/activation_kernels.cu
++++ b/csrc/libtorch_stable/activation_kernels.cu
+@@ -1348,10 +1348,35 @@ __global__ void activation_kernel(
+   }
+ }
+ 
++// Flat grid-stride variant of activation_kernel's 128-bit vector path: rows
++// are contiguous with d % VEC_SIZE == 0, so vector i of the flattened
++// [num_tokens, d] tensor is vector i % (d / VEC_SIZE) of token i / (d /
++// VEC_SIZE).
++template <typename scalar_t, scalar_t (*ACT_FN)(const scalar_t&)>
++__global__ void activation_flat_vec_kernel(
++    scalar_t* __restrict__ out,          // [..., d]
++    const scalar_t* __restrict__ input,  // [..., d]
++    const int64_t num_vecs) {
++  constexpr int VEC_SIZE = sizeof(int4) / sizeof(scalar_t);
++  const int4* in_vec = reinterpret_cast<const int4*>(input);
++  int4* out_vec = reinterpret_cast<int4*>(out);
++  for (int64_t i = static_cast<int64_t>(blockIdx.x) * blockDim.x + threadIdx.x;
++       i < num_vecs; i += static_cast<int64_t>(gridDim.x) * blockDim.x) {
++    int4 v = VLLM_LDG(&in_vec[i]);
++    auto* vp = reinterpret_cast<scalar_t*>(&v);
++#pragma unroll
++    for (int k = 0; k < VEC_SIZE; k++) {
++      vp[k] = ACT_FN(vp[k]);
++    }
++    out_vec[i] = v;
++  }
++}
++
+ }  // namespace vllm
+ 
+ // Launch element-wise activation kernel.
+-#define LAUNCH_ACTIVATION_KERNEL(KERNEL)                                       \
++#define LAUNCH_ACTIVATION_KERNEL(KERNEL) LAUNCH_ACTIVATION_KERNEL_IMPL(KERNEL, false)
++#define LAUNCH_ACTIVATION_KERNEL_IMPL(KERNEL, FLAT_FP32)                                       \
+   auto dtype = input.scalar_type();                                            \
+   int d = input.size(-1);                                                      \
+   int64_t num_tokens = input.numel() / input.size(-1);                         \
+@@ -1377,6 +1402,15 @@ __global__ void activation_kernel(
+             <<<grid, block, 0, stream>>>(out.mutable_data_ptr<scalar_t>(),     \
+                                          input.const_data_ptr<scalar_t>(), d); \
+       });                                                                      \
++    } else if (FLAT_FP32 && dtype == torch::headeronly::ScalarType::Float &&   \
++               num_tokens <= 256) {                                            \
++      const int64_t num_vecs = num_tokens * (d / vec_size);                    \
++      const int flat_blocks = static_cast<int>(std::min<int64_t>(              \
++          (num_vecs + 127) / 128, 8 * get_device_prop()->multiProcessorCount)); \
++      vllm::activation_flat_vec_kernel<float, KERNEL<float>>                   \
++          <<<flat_blocks, 128, 0, stream>>>(out.mutable_data_ptr<float>(),     \
++                                            input.const_data_ptr<float>(),     \
++                                            num_vecs);                         \
+     } else {                                                                   \
+       VLLM_STABLE_DISPATCH_FLOATING_TYPES(dtype, "activation_kernel", [&] {    \
+         vllm::activation_kernel<scalar_t, KERNEL<scalar_t>, true, false>       \
+@@ -1447,5 +1481,5 @@ void gelu_quick(torch::stable::Tensor& out,    // [..., d]
+ void relu_squared(torch::stable::Tensor& out,    // [..., d]
+                   torch::stable::Tensor& input)  // [..., d]
+ {
+-  LAUNCH_ACTIVATION_KERNEL(vllm::relu_squared_kernel);
++  LAUNCH_ACTIVATION_KERNEL_IMPL(vllm::relu_squared_kernel, true);
+ }

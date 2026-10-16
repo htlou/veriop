@@ -1,0 +1,58 @@
+diff --git a/src/engine/general_purpose/decode.rs b/src/engine/general_purpose/decode.rs
+index eb45cfc..e1612e2 100644
+--- a/src/engine/general_purpose/decode.rs
++++ b/src/engine/general_purpose/decode.rs
+@@ -33,7 +33,7 @@ impl DecodeEstimate for GeneralPurposeEstimate {
+ // inlined(always), a different slow. plain ol' inline makes the benchmarks happiest at the moment,
+ // but this is fragile and the best setting changes with only minor code modifications.
+ #[allow(clippy::too_many_arguments)]
+-#[inline]
++#[inline(always)]
+ pub(crate) fn decode_helper(
+     input: &[u8],
+     estimate: &GeneralPurposeEstimate,
+@@ -92,7 +92,7 @@ pub(crate) fn decode_helper(
+ /// Decode the complete non-terminal quads in `input[input_index_start..input_index_end]` (both
+ /// bounds multiples of 4), writing to `output` starting at `output_index_start`, which must equal
+ /// `input_index_start / 4 * 3`. Error offsets are reported in absolute input coordinates.
+-#[inline]
++#[inline(always)]
+ fn decode_complete_quads(
+     input: &[u8],
+     input_index_start: usize,
+diff --git a/src/engine/general_purpose/decode_suffix.rs b/src/engine/general_purpose/decode_suffix.rs
+index 81950df..2579114 100644
+--- a/src/engine/general_purpose/decode_suffix.rs
++++ b/src/engine/general_purpose/decode_suffix.rs
+@@ -10,6 +10,7 @@ use crate::{
+ /// Returns the decode metadata representing the total number of bytes decoded, including the ones
+ /// indicated as already written by `output_index`.
+ #[allow(clippy::too_many_arguments)]
++#[inline(always)]
+ pub(crate) fn decode_suffix(
+     input: &[u8],
+     input_index: usize,
+diff --git a/src/engine/general_purpose/mod.rs b/src/engine/general_purpose/mod.rs
+index 802d76b..88597ef 100644
+--- a/src/engine/general_purpose/mod.rs
++++ b/src/engine/general_purpose/mod.rs
+@@ -90,6 +90,7 @@ impl super::Engine for GeneralPurpose {
+         GeneralPurposeEstimate::new(input_len)
+     }
+ 
++    #[inline(always)]
+     fn internal_decode(
+         &self,
+         input: &[u8],
+diff --git a/src/engine/mod.rs b/src/engine/mod.rs
+index a7c2776..be5c18f 100644
+--- a/src/engine/mod.rs
++++ b/src/engine/mod.rs
+@@ -388,6 +388,7 @@ pub trait Engine: Send + Sync {
+         input: T,
+         output: &mut [u8],
+     ) -> Result<usize, DecodeSliceError> {
++        #[inline(always)]
+         fn inner<E>(
+             engine: &E,
+             input_bytes: &[u8],

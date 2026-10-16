@@ -1,0 +1,263 @@
+diff --git a/crates/volta_analysis/src/driver.rs b/crates/volta_analysis/src/driver.rs
+index d541cbc..7818d5d 100644
+--- a/crates/volta_analysis/src/driver.rs
++++ b/crates/volta_analysis/src/driver.rs
+@@ -13,7 +13,7 @@ use crate::logging::info;
+ use crate::lower_error::LowerError;
+ use crate::lowering::lower_function;
+ use crate::numeric;
+-use crate::symbolic::{ExprArena, ExprId};
++use crate::symbolic::{ExprArena, ExprId, ExprNode};
+ 
+ /// Errors from the end-to-end analysis of one kernel.
+ #[derive(Debug)]
+@@ -1011,3 +1011,74 @@ mod tests {
+         );
+     }
+ }
++
++
++// =========================================================================
++// Syntactic (structural) identity of paired output expressions
++// =========================================================================
++
++/// Whether expression `a` in `ra` and expression `b` in `rb` are the same
++/// term: same node kinds, same constants, same input elements (by array
++/// name and index), same children in the same order, recursively. No
++/// algebraic reasoning at all (no commutativity, no reassociation). Fresh
++/// machine symbols, `Discarded` and `Undefined` never match (conservative).
++pub fn exprs_syntactically_identical(ra: &ExprArena, a: ExprId, rb: &ExprArena, b: ExprId) -> bool {
++    let mut memo: std::collections::HashSet<(u32, u32)> = std::collections::HashSet::new();
++    let mut stack = vec![(a, b)];
++    while let Some((x, y)) = stack.pop() {
++        if !memo.insert((x.0, y.0)) {
++            continue;
++        }
++        let (nx, ny) = (ra.node(x), rb.node(y));
++        if std::mem::discriminant(nx) != std::mem::discriminant(ny) {
++            return false;
++        }
++        let atoms_equal = match (nx, ny) {
++            (ExprNode::IntConst(p), ExprNode::IntConst(q)) => p == q,
++            (ExprNode::RealConst(p), ExprNode::RealConst(q)) => p == q,
++            (ExprNode::BoolConst(p), ExprNode::BoolConst(q)) => p == q,
++            (ExprNode::ParamSymbol(p), ExprNode::ParamSymbol(q)) => ra.string(*p) == rb.string(*q),
++            (
++                ExprNode::InputElement { array: p, index: i },
++                ExprNode::InputElement { array: q, index: j },
++            ) => ra.string(*p) == rb.string(*q) && i == j,
++            (ExprNode::SymbolicRead { array: p, .. }, ExprNode::SymbolicRead { array: q, .. }) => {
++                ra.string(*p) == rb.string(*q)
++            }
++            (ExprNode::Symbol(_), _) | (ExprNode::Discarded, _) | (ExprNode::Undefined, _) => false,
++            _ => true, // operator nodes: compared through their children below
++        };
++        if !atoms_equal {
++            return false;
++        }
++        let (mut cx, mut cy) = (Vec::new(), Vec::new());
++        nx.for_each_child(|c| cx.push(c));
++        ny.for_each_child(|c| cy.push(c));
++        if cx.len() != cy.len() {
++            return false;
++        }
++        stack.extend(cx.into_iter().zip(cy));
++    }
++    true
++}
++
++/// Count of paired elements (over `arrays`, all elements) whose reference
++/// and optimized expressions are syntactically identical, and the total.
++pub fn count_syntactically_identical(
++    reference: &AnalysisOutput,
++    optimized: &AnalysisOutput,
++    arrays: &[String],
++) -> Result<(usize, usize), EquivCheckError> {
++    let paired = paired_elements(reference, optimized, arrays)?;
++    let mut same = 0;
++    let mut total = 0;
++    for (_, elems) in &paired {
++        for &(_, ea, eb) in elems {
++            total += 1;
++            if exprs_syntactically_identical(&reference.arena, ea, &optimized.arena, eb) {
++                same += 1;
++            }
++        }
++    }
++    Ok((same, total))
++}
+diff --git a/crates/volta_analysis/src/eval/config.rs b/crates/volta_analysis/src/eval/config.rs
+index 1e5739f..37b91aa 100644
+--- a/crates/volta_analysis/src/eval/config.rs
++++ b/crates/volta_analysis/src/eval/config.rs
+@@ -65,10 +65,13 @@ impl ArrayDef {
+ /// Full configuration for analyzing one kernel.
+ #[derive(Debug, Clone)]
+ pub struct AnalysisConfig {
+-    /// Threads per block; the CTA under analysis is block (0,0,0)
++    /// Threads per block; the CTA under analysis is block `cta_id`
+     pub block_dim: (u32, u32, u32),
+     /// Grid dimensions (only used for `%nctaid`)
+     pub grid_dim: (u32, u32, u32),
++    /// Index of the CTA under analysis (`%ctaid`). Default (0,0,0), the
++    /// paper's CTA-0 model; must lie inside `grid_dim`.
++    pub cta_id: (u32, u32, u32),
+     /// Parameter values in `ParamId` (declaration) order
+     pub params: Vec<ParamValue>,
+     /// Global-memory arrays
+@@ -86,6 +89,7 @@ impl AnalysisConfig {
+         Self {
+             block_dim,
+             grid_dim: (1, 1, 1),
++            cta_id: (0, 0, 0),
+             params: Vec::new(),
+             arrays: Vec::new(),
+             global_values: Vec::new(),
+@@ -122,6 +126,14 @@ impl AnalysisConfig {
+     /// program's reserved module-global window needs the program and is
+     /// checked in `Interpreter::new`.
+     pub fn validate(&self) -> Result<(), String> {
++        let (cx, cy, cz) = self.cta_id;
++        let (gx, gy, gz) = self.grid_dim;
++        if cx >= gx || cy >= gy || cz >= gz {
++            return Err(format!(
++                "CTA ({},{},{}) is outside the grid ({},{},{})",
++                cx, cy, cz, gx, gy, gz
++            ));
++        }
+         // Per-array checks first, so the pairwise pass below may safely
+         // form `base + size_bytes()` for every array.
+         for a in &self.arrays {
+diff --git a/crates/volta_analysis/src/eval/interp.rs b/crates/volta_analysis/src/eval/interp.rs
+index b2e695e..86c4833 100644
+--- a/crates/volta_analysis/src/eval/interp.rs
++++ b/crates/volta_analysis/src/eval/interp.rs
+@@ -1152,9 +1152,12 @@ impl<'p> Interpreter<'p> {
+             SpecialRegKind::NtidX => self.config.block_dim.0 as i64,
+             SpecialRegKind::NtidY => self.config.block_dim.1 as i64,
+             SpecialRegKind::NtidZ => self.config.block_dim.2 as i64,
+-            // The CTA under analysis is always block (0,0,0) (paper: CTAs
+-            // are checked pairwise at block 0).
+-            SpecialRegKind::CtaidX | SpecialRegKind::CtaidY | SpecialRegKind::CtaidZ => 0,
++            // The CTA under analysis: block (0,0,0) by default (paper: CTAs
++            // are checked pairwise at block 0); `AnalysisConfig::cta_id`
++            // selects another block of the grid.
++            SpecialRegKind::CtaidX => self.config.cta_id.0 as i64,
++            SpecialRegKind::CtaidY => self.config.cta_id.1 as i64,
++            SpecialRegKind::CtaidZ => self.config.cta_id.2 as i64,
+             SpecialRegKind::NctaidX => self.config.grid_dim.0 as i64,
+             SpecialRegKind::NctaidY => self.config.grid_dim.1 as i64,
+             SpecialRegKind::NctaidZ => self.config.grid_dim.2 as i64,
+diff --git a/crates/volta_cli/src/main.rs b/crates/volta_cli/src/main.rs
+index 904ce84..3385019 100644
+--- a/crates/volta_cli/src/main.rs
++++ b/crates/volta_cli/src/main.rs
+@@ -139,6 +139,11 @@ struct LaunchArgs {
+     /// Dynamic (extern) shared memory size in bytes
+     #[arg(long, default_value_t = 0)]
+     dyn_shared: u64,
++
++    /// Index of the CTA to analyze, e.g. "5" or "5,0,0" (sets %ctaid;
++    /// missing components are 0). Default: block (0,0,0).
++    #[arg(long, default_value = "0,0,0")]
++    cta: String,
+ }
+ 
+ #[derive(Args)]
+@@ -204,6 +209,12 @@ struct CompareArgs {
+     #[arg(long)]
+     verify_numeric: bool,
+ 
++    /// Also report how many paired output elements have syntactically
++    /// identical expressions (same operators, operand order and atoms; no
++    /// algebra). Printed as a `SYNTACTIC: k/n` line before the verdict.
++    #[arg(long)]
++    syntactic: bool,
++
+     /// Recycle the VC intern tables past this many interned terms (0 = never)
+     #[arg(long, default_value_t = DEFAULT_RECYCLE_TERMS)]
+     recycle_terms: usize,
+@@ -303,6 +314,20 @@ fn parse_dims(s: &str) -> Result<(u32, u32, u32), String> {
+     Ok((x, y, z))
+ }
+ 
++/// Parse a CTA index "x[,y[,z]]"; missing components are 0 (not 1 as for
++/// dimensions).
++fn parse_cta(s: &str) -> Result<(u32, u32, u32), String> {
++    let mut v = [0u32; 3];
++    let parts: Vec<&str> = s.split(',').collect();
++    if parts.len() > 3 {
++        return Err(format!("expected at most 3 components, got '{}'", s));
++    }
++    for (i, p) in parts.iter().enumerate() {
++        v[i] = p.trim().parse::<u32>().map_err(|e| e.to_string())?;
++    }
++    Ok((v[0], v[1], v[2]))
++}
++
+ fn parse_u64_value(s: &str) -> Result<u64, String> {
+     if let Some(hex) = s.strip_prefix("0x") {
+         u64::from_str_radix(hex, 16).map_err(|e| e.to_string())
+@@ -365,6 +390,7 @@ struct ConfigInput<'a> {
+     params: &'a [String],
+     globals: &'a [String],
+     dyn_shared: u64,
++    cta: &'a str,
+ }
+ 
+ impl<'a> ConfigInput<'a> {
+@@ -379,6 +405,7 @@ impl<'a> ConfigInput<'a> {
+             params: &launch.params,
+             globals: &launch.globals,
+             dyn_shared: launch.dyn_shared,
++            cta: &launch.cta,
+         }
+     }
+ }
+@@ -387,6 +414,7 @@ fn build_config(input: ConfigInput) -> Result<AnalysisConfig, String> {
+     let block_dim = parse_dims(input.block).map_err(|e| format!("invalid --block: {}", e))?;
+     let mut config = AnalysisConfig::new(block_dim);
+     config.grid_dim = parse_dims(input.grid).map_err(|e| format!("invalid --grid: {}", e))?;
++    config.cta_id = parse_cta(input.cta).map_err(|e| format!("invalid --cta: {}", e))?;
+     config.dynamic_shared_bytes = input.dyn_shared;
+     for a in input.arrays {
+         config
+@@ -696,6 +724,38 @@ fn cmd_compare(args: CompareArgs, log: &mut run_log::RunLog) -> ExitCode {
+                         report.check_time().as_secs_f64(),
+                         elems
+                     );
++                    if args.syntactic {
++                        match volta_analysis::driver::count_syntactically_identical(
++                            &reference,
++                            &optimized,
++                            check_arrays,
++                        ) {
++                            Ok((same, total)) => {
++                                println!("SYNTACTIC: {}/{} elements identical", same, total)
++                            }
++                            Err(e) => println!("SYNTACTIC: error: {}", e),
++                        }
++                        // Written footprint of the checked arrays (identical
++                        // for both kernels, else pairing above would fail):
++                        // count and min/max index, so per-CTA runs can be
++                        // shown to tile the output disjointly.
++                        for name in check_arrays {
++                            if let Some((_, elems)) = reference.outputs.iter().find(|(n, _)| n == name) {
++                                let lo = elems.iter().map(|e| e.0).min();
++                                let hi = elems.iter().map(|e| e.0).max();
++                                match (lo, hi) {
++                                    (Some(lo), Some(hi)) => println!(
++                                        "FOOTPRINT: {} n={} min={} max={}",
++                                        name,
++                                        elems.len(),
++                                        lo,
++                                        hi
++                                    ),
++                                    _ => println!("FOOTPRINT: {} n=0", name),
++                                }
++                            }
++                        }
++                    }
+                     if report.check_iters.len() > 1 {
+                         let per_iter: Vec<String> = report
+                             .check_iters

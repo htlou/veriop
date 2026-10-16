@@ -1,0 +1,76 @@
+diff --git a/csrc/libtorch_stable/activation_kernels.cu b/csrc/libtorch_stable/activation_kernels.cu
+index a7ee87b..9f64ac6 100644
+--- a/csrc/libtorch_stable/activation_kernels.cu
++++ b/csrc/libtorch_stable/activation_kernels.cu
+@@ -1348,10 +1348,51 @@ __global__ void activation_kernel(
+   }
+ }
+ 
++// activation_kernel's 128-bit vector path with the same launch shape (one CTA
++// per token, min(d / VEC_SIZE, 1024) threads), but each thread issues the
++// loads of all of its (up to MAX_ITEMS) vectors before computing and storing
++// any of them, instead of one load-compute-store round trip per vector.
++template <typename scalar_t, scalar_t (*ACT_FN)(const scalar_t&),
++          int MAX_ITEMS>
++__global__ void activation_vec_prefetch_kernel(
++    scalar_t* __restrict__ out,          // [..., d]
++    const scalar_t* __restrict__ input,  // [..., d]
++    const int d) {
++  const int64_t token_idx = blockIdx.x;
++  const scalar_t* in_ptr = input + token_idx * d;
++  scalar_t* out_ptr = out + token_idx * d;
++  constexpr int VEC_SIZE = sizeof(int4) / sizeof(scalar_t);
++  const int4* in_vec = reinterpret_cast<const int4*>(in_ptr);
++  int4* out_vec = reinterpret_cast<int4*>(out_ptr);
++  const int num_vecs = d / VEC_SIZE;
++
++  int4 v[MAX_ITEMS];
++#pragma unroll
++  for (int j = 0; j < MAX_ITEMS; j++) {
++    const int i = threadIdx.x + j * blockDim.x;
++    if (i < num_vecs) {
++      v[j] = VLLM_LDG(&in_vec[i]);
++    }
++  }
++#pragma unroll
++  for (int j = 0; j < MAX_ITEMS; j++) {
++    const int i = threadIdx.x + j * blockDim.x;
++    if (i < num_vecs) {
++      auto* vp = reinterpret_cast<scalar_t*>(&v[j]);
++#pragma unroll
++      for (int k = 0; k < VEC_SIZE; k++) {
++        vp[k] = ACT_FN(vp[k]);
++      }
++      out_vec[i] = v[j];
++    }
++  }
++}
++
+ }  // namespace vllm
+ 
+ // Launch element-wise activation kernel.
+-#define LAUNCH_ACTIVATION_KERNEL(KERNEL)                                       \
++#define LAUNCH_ACTIVATION_KERNEL(KERNEL) LAUNCH_ACTIVATION_KERNEL_IMPL(KERNEL, false)
++#define LAUNCH_ACTIVATION_KERNEL_IMPL(KERNEL, PREFETCH_FP32)                                       \
+   auto dtype = input.scalar_type();                                            \
+   int d = input.size(-1);                                                      \
+   int64_t num_tokens = input.numel() / input.size(-1);                         \
+@@ -1377,6 +1418,11 @@ __global__ void activation_kernel(
+             <<<grid, block, 0, stream>>>(out.mutable_data_ptr<scalar_t>(),     \
+                                          input.const_data_ptr<scalar_t>(), d); \
+       });                                                                      \
++    } else if (PREFETCH_FP32 && dtype == torch::headeronly::ScalarType::Float && \
++               d / vec_size > 1024 && d / vec_size <= 4 * 1024) {             \
++      vllm::activation_vec_prefetch_kernel<float, KERNEL<float>, 4>            \
++          <<<grid, block, 0, stream>>>(out.mutable_data_ptr<float>(),          \
++                                       input.const_data_ptr<float>(), d);      \
+     } else {                                                                   \
+       VLLM_STABLE_DISPATCH_FLOATING_TYPES(dtype, "activation_kernel", [&] {    \
+         vllm::activation_kernel<scalar_t, KERNEL<scalar_t>, true, false>       \
+@@ -1447,5 +1493,5 @@ void gelu_quick(torch::stable::Tensor& out,    // [..., d]
+ void relu_squared(torch::stable::Tensor& out,    // [..., d]
+                   torch::stable::Tensor& input)  // [..., d]
+ {
+-  LAUNCH_ACTIVATION_KERNEL(vllm::relu_squared_kernel);
++  LAUNCH_ACTIVATION_KERNEL_IMPL(vllm::relu_squared_kernel, true);
+ }

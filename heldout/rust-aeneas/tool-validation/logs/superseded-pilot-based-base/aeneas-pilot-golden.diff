@@ -1,0 +1,1642 @@
+diff --git a/tests/lean/AssertCfg.lean b/tests/lean/AssertCfg.lean
+index 373703b4..b9e6cf99 100644
+--- a/tests/lean/AssertCfg.lean
++++ b/tests/lean/AssertCfg.lean
+@@ -53,43 +53,43 @@ def assert_and (b0 : Bool) (b1 : Bool) : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 25:0-28:1
+     Visibility: public -/
+ def assert_not_or (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert (¬ b0)
+-  massert (¬ b1)
++  massert (! b0)
++  massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_not_and]:
+     Source: 'tests/src/assert-cfg.rs', lines 30:0-33:1
+     Visibility: public -/
+ def assert_not_and (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert ((¬ b0) || (¬ b1))
++  massert ((! b0) || (! b1))
+   f
+ 
+ /-- [assert_cfg::assert_not_b0_or_b1]:
+     Source: 'tests/src/assert-cfg.rs', lines 35:0-38:1
+     Visibility: public -/
+ def assert_not_b0_or_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert ((¬ b0) || b1)
++  massert ((! b0) || b1)
+   f
+ 
+ /-- [assert_cfg::assert_b0_or_not_b1]:
+     Source: 'tests/src/assert-cfg.rs', lines 40:0-43:1
+     Visibility: public -/
+ def assert_b0_or_not_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert (b0 || (¬ b1))
++  massert (b0 || (! b1))
+   f
+ 
+ /-- [assert_cfg::assert_not_b0_or_not_b1]:
+     Source: 'tests/src/assert-cfg.rs', lines 45:0-48:1
+     Visibility: public -/
+ def assert_not_b0_or_not_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert ((¬ b0) || (¬ b1))
++  massert ((! b0) || (! b1))
+   f
+ 
+ /-- [assert_cfg::assert_not_b0_and_b1]:
+     Source: 'tests/src/assert-cfg.rs', lines 50:0-53:1
+     Visibility: public -/
+ def assert_not_b0_and_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert (¬ b0)
++  massert (! b0)
+   massert b1
+   f
+ 
+@@ -98,26 +98,26 @@ def assert_not_b0_and_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+     Visibility: public -/
+ def assert_b0_and_not_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+   massert b0
+-  massert (¬ b1)
++  massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_not_b0_and_not_b1]:
+     Source: 'tests/src/assert-cfg.rs', lines 60:0-63:1
+     Visibility: public -/
+ def assert_not_b0_and_not_b1 (b0 : Bool) (b1 : Bool) : Result Unit := do
+-  massert (¬ b0)
+-  massert (¬ b1)
++  massert (! b0)
++  massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_or_call]:
+     Source: 'tests/src/assert-cfg.rs', lines 67:0-70:1
+     Visibility: public -/
+ def assert_or_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   if b
+   then ok ()
+   else do
+-       let b1 ← get_b1
++       let b1 : Bool ← get_b1
+        massert b1
+   f
+ 
+@@ -125,9 +125,9 @@ def assert_or_call : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 72:0-75:1
+     Visibility: public -/
+ def assert_and_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   massert b
+-  let b1 ← get_b1
++  let b1 : Bool ← get_b1
+   massert b1
+   f
+ 
+@@ -135,21 +135,21 @@ def assert_and_call : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 77:0-80:1
+     Visibility: public -/
+ def assert_not_or_call : Result Unit := do
+-  let b ← get_b0
+-  massert (¬ b)
+-  let b1 ← get_b1
+-  massert (¬ b1)
++  let b : Bool ← get_b0
++  massert (! b)
++  let b1 : Bool ← get_b1
++  massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_not_and_call]:
+     Source: 'tests/src/assert-cfg.rs', lines 82:0-85:1
+     Visibility: public -/
+ def assert_not_and_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   if b
+   then do
+-       let b1 ← get_b1
+-       massert (¬ b1)
++       let b1 : Bool ← get_b1
++       massert (! b1)
+   else ok ()
+   f
+ 
+@@ -157,10 +157,10 @@ def assert_not_and_call : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 87:0-90:1
+     Visibility: public -/
+ def assert_not_b0_or_b1_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   if b
+   then do
+-       let b1 ← get_b1
++       let b1 : Bool ← get_b1
+        massert b1
+   else ok ()
+   f
+@@ -169,23 +169,23 @@ def assert_not_b0_or_b1_call : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 92:0-95:1
+     Visibility: public -/
+ def assert_b0_or_not_b1_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   if b
+   then ok ()
+   else do
+-       let b1 ← get_b1
+-       massert (¬ b1)
++       let b1 : Bool ← get_b1
++       massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_not_b0_or_not_b1_call]:
+     Source: 'tests/src/assert-cfg.rs', lines 97:0-100:1
+     Visibility: public -/
+ def assert_not_b0_or_not_b1_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   if b
+   then do
+-       let b1 ← get_b1
+-       massert (¬ b1)
++       let b1 : Bool ← get_b1
++       massert (! b1)
+   else ok ()
+   f
+ 
+@@ -193,9 +193,9 @@ def assert_not_b0_or_not_b1_call : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 102:0-105:1
+     Visibility: public -/
+ def assert_not_b0_and_b1_call : Result Unit := do
+-  let b ← get_b0
+-  massert (¬ b)
+-  let b1 ← get_b1
++  let b : Bool ← get_b0
++  massert (! b)
++  let b1 : Bool ← get_b1
+   massert b1
+   f
+ 
+@@ -203,20 +203,20 @@ def assert_not_b0_and_b1_call : Result Unit := do
+     Source: 'tests/src/assert-cfg.rs', lines 107:0-110:1
+     Visibility: public -/
+ def assert_b0_and_not_b1_call : Result Unit := do
+-  let b ← get_b0
++  let b : Bool ← get_b0
+   massert b
+-  let b1 ← get_b1
+-  massert (¬ b1)
++  let b1 : Bool ← get_b1
++  massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_not_b0_and_not_b1_call]:
+     Source: 'tests/src/assert-cfg.rs', lines 112:0-115:1
+     Visibility: public -/
+ def assert_not_b0_and_not_b1_call : Result Unit := do
+-  let b ← get_b0
+-  massert (¬ b)
+-  let b1 ← get_b1
+-  massert (¬ b1)
++  let b : Bool ← get_b0
++  massert (! b)
++  let b1 : Bool ← get_b1
++  massert (! b1)
+   f
+ 
+ /-- [assert_cfg::assert_lt]:
+diff --git a/tests/lean/Avl/Types.lean b/tests/lean/Avl/Types.lean
+index 970d34c2..3246255a 100644
+--- a/tests/lean/Avl/Types.lean
++++ b/tests/lean/Avl/Types.lean
+@@ -32,7 +32,7 @@ inductive Ordering where
+     Source: 'src/avl.rs', lines 24:0-26:1
+     Visibility: public -/
+ structure Ord (Self : Type) where
+-  cmp : Self → Self → Result Ordering
++  cmp : Self → Self → Result _root_.avl.Ordering
+ 
+ /-- [avl::Node]
+     Source: 'src/avl.rs', lines 28:0-33:1 -/
+diff --git a/tests/lean/Bst/Types.lean b/tests/lean/Bst/Types.lean
+index 4ca443ce..feebdc96 100644
+--- a/tests/lean/Bst/Types.lean
++++ b/tests/lean/Bst/Types.lean
+@@ -31,7 +31,7 @@ inductive Ordering where
+ /-- Trait declaration: [bst::Ord]
+     Source: 'src/bst.rs', lines 11:0-13:1 -/
+ structure Ord (Self : Type) where
+-  cmp : Self → Self → Result Ordering
++  cmp : Self → Self → Result _root_.bst.Ordering
+ 
+ /-- [bst::Node]
+     Source: 'src/bst.rs', lines 15:0-19:1 -/
+diff --git a/tests/lean/ChunksExact.lean b/tests/lean/ChunksExact.lean
+index 1ee407d5..35794672 100644
+--- a/tests/lean/ChunksExact.lean
++++ b/tests/lean/ChunksExact.lean
+@@ -44,7 +44,7 @@ def test_chunks_exact_exact_fit : Result Unit := do
+   let i5 ← Slice.index_usize c2 2#usize
+   massert (i5 = 6#u32)
+   let (o2, it3) ← core.slice.iter.IteratorChunksExact.next it2
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it3
+   let i6 := Slice.len rem
+@@ -78,7 +78,7 @@ def test_chunks_exact_with_remainder : Result Unit := do
+   let i5 ← Slice.index_usize c2 2#usize
+   massert (i5 = 6#u32)
+   let (o2, it3) ← core.slice.iter.IteratorChunksExact.next it2
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it3
+   let i6 := Slice.len rem
+@@ -106,7 +106,7 @@ def test_chunks_exact_remainder_2 : Result Unit := do
+   let i2 ← Slice.index_usize c 2#usize
+   massert (i2 = 30#u32)
+   let (o1, it2) ← core.slice.iter.IteratorChunksExact.next it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it2
+   let i3 := Slice.len rem
+@@ -139,7 +139,7 @@ def test_chunks_exact_size_1 : Result Unit := do
+   let i2 ← Slice.index_usize c3 0#usize
+   massert (i2 = 30#u32)
+   let (o3, it4) ← core.slice.iter.IteratorChunksExact.next it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it4
+   let i3 := Slice.len rem
+@@ -155,7 +155,7 @@ def test_chunks_exact_empty : Result Unit := do
+   let s ← lift (Array.to_slice (Std.Array.empty Std.U32))
+   let it ← core.slice.Slice.chunks_exact s 3#usize
+   let (o, it1) ← core.slice.iter.IteratorChunksExact.next it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it1
+   let i := Slice.len rem
+@@ -171,7 +171,7 @@ def test_chunks_exact_chunk_larger_than_slice : Result Unit := do
+   let s ← lift (Array.to_slice (Array.make 2#usize [ 1#u32, 2#u32 ]))
+   let it ← core.slice.Slice.chunks_exact s 5#usize
+   let (o, it1) ← core.slice.iter.IteratorChunksExact.next it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it1
+   let i := Slice.len rem
+@@ -199,7 +199,7 @@ def test_chunks_exact_chunk_equals_slice : Result Unit := do
+   let i2 ← Slice.index_usize c 2#usize
+   massert (i2 = 3#u32)
+   let (o1, it2) ← core.slice.iter.IteratorChunksExact.next it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it2
+   let i3 := Slice.len rem
+@@ -229,7 +229,7 @@ def test_chunks_exact_2_odd : Result Unit := do
+   let i3 ← Slice.index_usize c2 1#usize
+   massert (i3 = 4#u32)
+   let (o2, it3) ← core.slice.iter.IteratorChunksExact.next it2
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it3
+   let i4 := Slice.len rem
+@@ -247,7 +247,7 @@ def test_chunks_exact_2_single_element : Result Unit := do
+   let s ← lift (Array.to_slice (Array.make 1#usize [ 42#u32 ]))
+   let it ← core.slice.Slice.chunks_exact s 2#usize
+   let (o, it1) ← core.slice.iter.IteratorChunksExact.next it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+   let rem ← core.slice.iter.ChunksExact.getRemainder it1
+   let i := Slice.len rem
+diff --git a/tests/lean/Derive.lean b/tests/lean/Derive.lean
+index b4d28b12..bf02c5d7 100644
+--- a/tests/lean/Derive.lean
++++ b/tests/lean/Derive.lean
+@@ -118,7 +118,8 @@ def CopyEnumOneVariant.Insts.CoreFmtDebug.fmt
+   := do
+   let ⟨ __self_0 ⟩ := self
+   let __self_01 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugBool) __self_0
+-  core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant") __self_01
++  core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++    "Variant" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::CopyEnumOneVariant}]
+     Source: 'tests/src/derive.rs', lines 3:37-3:42 -/
+@@ -201,10 +202,18 @@ def ScalarEnum.Insts.CoreFmtDebug.fmt
+   Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+   := do
+   match self with
+-  | ScalarEnum.Variant0 => core.fmt.Formatter.write_str f (toStr "Variant0")
+-  | ScalarEnum.Variant1 => core.fmt.Formatter.write_str f (toStr "Variant1")
+-  | ScalarEnum.Variant2 => core.fmt.Formatter.write_str f (toStr "Variant2")
+-  | ScalarEnum.Variant3 => core.fmt.Formatter.write_str f (toStr "Variant3")
++  | ScalarEnum.Variant0 =>
++    core.fmt.Formatter.write_str f (toStr
++      "Variant0" (by simp only [U32.max, U32.numBits]; decide))
++  | ScalarEnum.Variant1 =>
++    core.fmt.Formatter.write_str f (toStr
++      "Variant1" (by simp only [U32.max, U32.numBits]; decide))
++  | ScalarEnum.Variant2 =>
++    core.fmt.Formatter.write_str f (toStr
++      "Variant2" (by simp only [U32.max, U32.numBits]; decide))
++  | ScalarEnum.Variant3 =>
++    core.fmt.Formatter.write_str f (toStr
++      "Variant3" (by simp only [U32.max, U32.numBits]; decide))
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::ScalarEnum}]
+     Source: 'tests/src/derive.rs', lines 8:37-8:42 -/
+@@ -232,7 +241,7 @@ def CopyEnum.Insts.CoreCloneClone.clone
+   match self with
+   | CopyEnum.Variant0 => ok CopyEnum.Variant0
+   | CopyEnum.Variant1 __self_0 =>
+-    let b ← lift (core.clone.impls.CloneBool.clone __self_0)
++    let b : Bool ← lift (core.clone.impls.CloneBool.clone __self_0)
+     ok (CopyEnum.Variant1 b)
+   | CopyEnum.Variant2 __self_0 =>
+     let i ← lift (core.clone.impls.CloneU32.clone __self_0)
+@@ -343,17 +352,22 @@ def CopyEnum.Insts.CoreFmtDebug.fmt
+   Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+   := do
+   match self with
+-  | CopyEnum.Variant0 => core.fmt.Formatter.write_str f (toStr "Variant0")
++  | CopyEnum.Variant0 =>
++    core.fmt.Formatter.write_str f (toStr
++      "Variant0" (by simp only [U32.max, U32.numBits]; decide))
+   | CopyEnum.Variant1 __self_0 =>
+     let __self_01 :=
+       Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugBool) __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant1") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant1" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+   | CopyEnum.Variant2 __self_0 =>
+     let __self_01 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU32) __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant2") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant2" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+   | CopyEnum.Variant3 __self_0 =>
+     let __self_01 := Dyn.mk _ (core.fmt.DebugShared corefmtDebugInst) __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant3") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant3" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::CopyEnum<T>}]
+     Source: 'tests/src/derive.rs', lines 16:37-16:42 -/
+@@ -383,7 +397,7 @@ def Enum.Insts.CoreCloneClone.clone
+   match self with
+   | Enum.Variant0 => ok Enum.Variant0
+   | Enum.Variant1 __self_0 =>
+-    let b ← lift (core.clone.impls.CloneBool.clone __self_0)
++    let b : Bool ← lift (core.clone.impls.CloneBool.clone __self_0)
+     ok (Enum.Variant1 b)
+   | Enum.Variant2 __self_0 =>
+     let i ← lift (core.clone.impls.CloneU32.clone __self_0)
+@@ -498,22 +512,28 @@ def Enum.Insts.CoreFmtDebug.fmt
+   Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+   := do
+   match self with
+-  | Enum.Variant0 => core.fmt.Formatter.write_str f (toStr "Variant0")
++  | Enum.Variant0 =>
++    core.fmt.Formatter.write_str f (toStr
++      "Variant0" (by simp only [U32.max, U32.numBits]; decide))
+   | Enum.Variant1 __self_0 =>
+     let __self_01 :=
+       Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugBool) __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant1") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant1" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+   | Enum.Variant2 __self_0 =>
+     let __self_01 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU32) __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant2") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant2" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+   | Enum.Variant3 __self_0 =>
+     let __self_01 := Dyn.mk _ (core.fmt.DebugShared corefmtDebugInst) __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant3") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant3" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+   | Enum.Variant4 __self_0 =>
+     let __self_01 :=
+       Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec corefmtDebugInst))
+         __self_0
+-    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Variant4") __self_01
++    core.fmt.Formatter.debug_tuple_field1_finish f (toStr
++      "Variant4" (by simp only [U32.max, U32.numBits]; decide)) __self_01
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::Enum<T>}]
+     Source: 'tests/src/derive.rs', lines 24:31-24:36 -/
+@@ -578,7 +598,7 @@ def List.Insts.CoreCmpPartialEqList.eq
+       match other with
+       | List.Nil => ok true
+       | List.Cons __arg1_0 __arg1_1 =>
+-        let b ←
++        let b : Bool ←
+           core.cmp.impls.PartialEqShared.eq corecmpPartialEqInst __self_0
+             __arg1_0
+         if b
+@@ -634,7 +654,7 @@ def CopyStruct.Insts.CoreCloneClone.clone
+   Result (CopyStruct T)
+   := do
+   (BuiltinClone Unit).clone ()
+-  let b ← lift (core.clone.impls.CloneBool.clone self.f1)
++  let b : Bool ← lift (core.clone.impls.CloneBool.clone self.f1)
+   let i ← lift (core.clone.impls.CloneU32.clone self.f2)
+   let t ← corecloneCloneInst.clone self.f3
+   ok { f0 := (), f1 := b, f2 := i, f3 := t }
+@@ -671,7 +691,7 @@ def CopyStruct.Insts.CoreCmpPartialEqCopyStruct.eq
+   (self : CopyStruct T) (other : CopyStruct T) :
+   Result Bool
+   := do
+-  let b ← core.cmp.impls.PartialEqUnit.eq () ()
++  let b : Bool ← core.cmp.impls.PartialEqUnit.eq () ()
+   if b
+   then
+     if self.f1 = other.f1
+@@ -725,8 +745,12 @@ def CopyStruct.Insts.CoreFmtDebug.fmt
+   let dyn1 := Dyn.mk _ core.fmt.DebugBool self.f1
+   let dyn2 := Dyn.mk _ core.fmt.DebugU32 self.f2
+   let dyn3 := Dyn.mk _ (core.fmt.DebugShared corefmtDebugInst) self.f3
+-  core.fmt.Formatter.debug_struct_field4_finish f (toStr "CopyStruct") (toStr
+-    "f0") dyn (toStr "f1") dyn1 (toStr "f2") dyn2 (toStr "f3") dyn3
++  core.fmt.Formatter.debug_struct_field4_finish f (toStr
++    "CopyStruct" (by simp only [U32.max, U32.numBits]; decide)) (toStr
++    "f0" (by simp only [U32.max, U32.numBits]; decide)) dyn (toStr
++    "f1" (by simp only [U32.max, U32.numBits]; decide)) dyn1 (toStr
++    "f2" (by simp only [U32.max, U32.numBits]; decide)) dyn2 (toStr
++    "f3" (by simp only [U32.max, U32.numBits]; decide)) dyn3
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::CopyStruct<T>}]
+     Source: 'tests/src/derive.rs', lines 41:37-41:42 -/
+@@ -816,8 +840,9 @@ def Struct.Insts.CoreFmtDebug.fmt
+   := do
+   let dyn :=
+     Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec corefmtDebugInst)) self.f
+-  core.fmt.Formatter.debug_struct_field1_finish f (toStr "Struct") (toStr "f")
+-    dyn
++  core.fmt.Formatter.debug_struct_field1_finish f (toStr
++    "Struct" (by simp only [U32.max, U32.numBits]; decide)) (toStr
++    "f" (by simp only [U32.max, U32.numBits]; decide)) dyn
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::Struct<T>}]
+     Source: 'tests/src/derive.rs', lines 49:31-49:36 -/
+@@ -928,10 +953,15 @@ def Struct6Fields.Insts.CoreFmtDebug.fmt
+   let s ←
+     lift (Array.to_slice
+       (Array.make 6#usize [
+-        toStr "a", toStr "b", toStr "c", toStr "d", toStr "e", toStr "f"
++        toStr "a" (by simp only [U32.max, U32.numBits]; decide), toStr
++        "b" (by simp only [U32.max, U32.numBits]; decide), toStr
++        "c" (by simp only [U32.max, U32.numBits]; decide), toStr
++        "d" (by simp only [U32.max, U32.numBits]; decide), toStr
++        "e" (by simp only [U32.max, U32.numBits]; decide), toStr
++        "f" (by simp only [U32.max, U32.numBits]; decide)
+         ]))
+-  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Struct6Fields") s
+-    values
++  core.fmt.Formatter.debug_struct_fields_finish f (toStr
++    "Struct6Fields" (by simp only [U32.max, U32.numBits]; decide)) s values
+ 
+ /-- Trait implementation: [derive::{impl core::fmt::Debug for derive::Struct6Fields}]
+     Source: 'tests/src/derive.rs', lines 54:31-54:36 -/
+diff --git a/tests/lean/Into.lean b/tests/lean/Into.lean
+index 65d83fd2..70958871 100644
+--- a/tests/lean/Into.lean
++++ b/tests/lean/Into.lean
+@@ -30,6 +30,6 @@ def slice_to_array (s : Slice Std.U8) : Result (Array Std.U8 32#usize) := do
+ def slice_to_array1 (s : Slice Std.U8) : Result (Array Std.U8 32#usize) := do
+   let r ← core.array.TryFromSharedArraySlice.try_from 32#usize s
+   core.result.Result.expect core.fmt.DebugTryFromSliceError r (toStr
+-    "Expected a slice of length 32")
++    "Expected a slice of length 32" (by simp only [U32.max, U32.numBits]; decide))
+ 
+ end into
+diff --git a/tests/lean/Issue765HrtbConditionalNegate.lean b/tests/lean/Issue765HrtbConditionalNegate.lean
+index b70cb5ef..2c677c26 100644
+--- a/tests/lean/Issue765HrtbConditionalNegate.lean
++++ b/tests/lean/Issue765HrtbConditionalNegate.lean
+@@ -61,8 +61,10 @@ def Choice.Insts.CoreMarkerCopy : core.marker.Copy Choice := {
+     Visibility: public -/
+ structure ConditionallySelectable (Self : Type) where
+   coremarkerCopyInst : core.marker.Copy Self
+-  conditional_select : Self → Self → Choice → Result Self
+-  conditional_assign : Self → Self → Choice → Result Self
++  conditional_select : Self → Self →
++    _root_.issue_765_hrtb_conditional_negate.Choice → Result Self
++  conditional_assign : Self → Self →
++    _root_.issue_765_hrtb_conditional_negate.Choice → Result Self
+ 
+ /-- [issue_765_hrtb_conditional_negate::ConditionallySelectable::conditional_assign]:
+     Source: 'tests/src/issue-765-hrtb-conditional-negate.rs', lines 18:4-20:5
+@@ -146,7 +148,8 @@ axiom ext.ConditionallyNegatable.Blanket.conditional_negate
+     Source: 'tests/src/issue-765-hrtb-conditional-negate.rs', lines 66:4-68:5
+     Visibility: public -/
+ structure local.ConditionallyNegatable (Self : Type) where
+-  conditional_negate : Self → Choice → Result Self
++  conditional_negate : Self → _root_.issue_765_hrtb_conditional_negate.Choice
++    → Result Self
+ 
+ /-- [issue_765_hrtb_conditional_negate::local::{impl issue_765_hrtb_conditional_negate::local::ConditionallyNegatable for T}::conditional_negate]:
+     Source: 'tests/src/issue-765-hrtb-conditional-negate.rs', lines 75:8-78:9
+diff --git a/tests/lean/Issue789LoopCtxMatch.lean b/tests/lean/Issue789LoopCtxMatch.lean
+index 6537356e..3722ad29 100644
+--- a/tests/lean/Issue789LoopCtxMatch.lean
++++ b/tests/lean/Issue789LoopCtxMatch.lean
+@@ -54,7 +54,7 @@ def the_loop_loop.body
+   then let a := to_slice_mut_back s2
+        ok (done (i, a, next_in1, done1))
+   else
+-    let b ← core.slice.Slice.is_empty next_in1
++    let b : Bool ← core.slice.Slice.is_empty next_in1
+     if b
+     then let a := to_slice_mut_back s2
+          ok (done (i, a, next_in1, done1))
+diff --git a/tests/lean/IterAdapters.lean b/tests/lean/IterAdapters.lean
+index 4161e8f0..6d09c786 100644
+--- a/tests/lean/IterAdapters.lean
++++ b/tests/lean/IterAdapters.lean
+@@ -50,7 +50,7 @@ def test_enumerate_slice : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.enumerate.IteratorEnumerate.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_enumerate_slice] -/
+@@ -68,7 +68,7 @@ def test_enumerate_empty : Result Unit := do
+   let (o, _) ←
+     core.iter.adapters.enumerate.IteratorEnumerate.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_enumerate_empty] -/
+@@ -98,7 +98,7 @@ def test_take_2 : Result Unit := do
+   let (o2, _) ←
+     core.iter.adapters.take.IteratorTake.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it2
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_take_2] -/
+@@ -117,7 +117,7 @@ def test_take_0 : Result Unit := do
+   let (o, _) ←
+     core.iter.adapters.take.IteratorTake.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_take_0] -/
+@@ -150,7 +150,7 @@ def test_take_more_than_available : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.take.IteratorTake.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_take_more_than_available] -/
+@@ -393,7 +393,7 @@ def test_array_into_iter : Result Unit := do
+   let i2 ← core.option.Option.unwrap o2
+   massert (i2 = 30#u32)
+   let (o3, _) ← core.slice.iter.IteratorSliceIter.next it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_array_into_iter] -/
+@@ -419,7 +419,7 @@ def test_slice_into_iter : Result Unit := do
+   let i3 ← core.option.Option.unwrap o3
+   massert (i3 = 4#u32)
+   let (o4, _) ← core.slice.iter.IteratorSliceIter.next it4
+-  let b := core.option.Option.is_none o4
++  let b : Bool := core.option.Option.is_none o4
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_slice_into_iter] -/
+@@ -491,7 +491,7 @@ def test_enumerate_take : Result Unit := do
+     core.iter.adapters.take.IteratorTake.next
+       (core.iter.traits.iterator.IteratorEnumerate
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32)) it2
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_enumerate_take] -/
+@@ -514,12 +514,12 @@ def test_take_exhausted_then_next : Result Unit := do
+   let (o1, it2) ←
+     core.iter.adapters.take.IteratorTake.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+   let (o2, _) ←
+     core.iter.adapters.take.IteratorTake.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it2
+-  let b1 := core.option.Option.is_none o2
++  let b1 : Bool := core.option.Option.is_none o2
+   massert b1
+ 
+ /- Unit test for [iter_adapters::test_take_exhausted_then_next] -/
+@@ -535,7 +535,7 @@ def test_range_single_element : Result Unit := do
+   let i ← core.option.Option.unwrap o
+   massert (i = 0#u8)
+   let (o1, _) ← core.iter.range.IteratorRange.next core.iter.range.StepU8 it
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_single_element] -/
+@@ -551,7 +551,7 @@ def test_range_u8_near_max : Result Unit := do
+   let i ← core.option.Option.unwrap o
+   massert (i = 254#u8)
+   let (o1, _) ← core.iter.range.IteratorRange.next core.iter.range.StepU8 it
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_u8_near_max] -/
+@@ -564,7 +564,7 @@ def test_range_u8_start_gt_end : Result Unit := do
+   let (o, _) ←
+     core.iter.range.IteratorRange.next core.iter.range.StepU8
+       { start := 10#u8, «end» := 5#u8 }
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_u8_start_gt_end] -/
+@@ -577,7 +577,7 @@ def test_range_u8_start_eq_end : Result Unit := do
+   let (o, _) ←
+     core.iter.range.IteratorRange.next core.iter.range.StepU8
+       { start := 5#u8, «end» := 5#u8 }
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_u8_start_eq_end] -/
+@@ -602,7 +602,7 @@ def test_range_u16_boundary : Result Unit := do
+   massert (i2 = 2#u16)
+   let (o3, _) ←
+     core.iter.range.IteratorRange.next core.iter.range.StepU16 it2
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_u16_boundary] -/
+@@ -623,7 +623,7 @@ def test_range_u32_boundary : Result Unit := do
+   massert (i1 = 1#u32)
+   let (o2, _) ←
+     core.iter.range.IteratorRange.next core.iter.range.StepU32 it1
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_u32_boundary] -/
+@@ -648,7 +648,7 @@ def test_range_u64_boundary : Result Unit := do
+   massert (i2 = 102#u64)
+   let (o3, _) ←
+     core.iter.range.IteratorRange.next core.iter.range.StepU64 it2
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_u64_boundary] -/
+@@ -661,7 +661,7 @@ def test_range_usize_start_gt_end : Result Unit := do
+   let (o, _) ←
+     core.iter.range.IteratorRange.next core.iter.range.StepUsize
+       { start := 10#usize, «end» := 5#usize }
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_usize_start_gt_end] -/
+@@ -683,7 +683,7 @@ def test_step_by_larger_than_range : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorRange core.iter.range.StepU8) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_step_by_larger_than_range] -/
+@@ -705,7 +705,7 @@ def test_step_by_exact_range : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorRange core.iter.range.StepU8) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_step_by_exact_range] -/
+@@ -742,7 +742,7 @@ def test_step_by_one : Result Unit := do
+   let (o4, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorRange core.iter.range.StepU8) it4
+-  let b := core.option.Option.is_none o4
++  let b : Bool := core.option.Option.is_none o4
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_step_by_one] -/
+@@ -759,7 +759,7 @@ def test_step_by_empty : Result Unit := do
+   let (o, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorRange core.iter.range.StepU8) it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_step_by_empty] -/
+@@ -791,7 +791,7 @@ def test_step_by_odd_range : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorRange core.iter.range.StepU8) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_step_by_odd_range] -/
+@@ -823,7 +823,7 @@ def test_step_by_u8_near_max : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorRange core.iter.range.StepU8) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_step_by_u8_near_max] -/
+@@ -852,7 +852,7 @@ def test_range_inclusive_basic : Result Unit := do
+   let (o3, _) ←
+     core.ops.range.RangeInclusive.Insts.CoreIterTraitsIteratorIterator.next
+       core.iter.range.StepUsize it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_inclusive_basic] -/
+@@ -871,7 +871,7 @@ def test_range_inclusive_singleton : Result Unit := do
+   let (o1, _) ←
+     core.ops.range.RangeInclusive.Insts.CoreIterTraitsIteratorIterator.next
+       core.iter.range.StepUsize it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_inclusive_singleton] -/
+@@ -885,7 +885,7 @@ def test_range_inclusive_empty : Result Unit := do
+   let (o, _) ←
+     core.ops.range.RangeInclusive.Insts.CoreIterTraitsIteratorIterator.next
+       core.iter.range.StepUsize it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [iter_adapters::test_range_inclusive_empty] -/
+diff --git a/tests/lean/JoinDuplicate.lean b/tests/lean/JoinDuplicate.lean
+index 34988088..2b7f16f0 100644
+--- a/tests/lean/JoinDuplicate.lean
++++ b/tests/lean/JoinDuplicate.lean
+@@ -22,7 +22,7 @@ namespace join_duplicate
+ /-- [join_duplicate::join_nested_shared]:
+     Source: 'tests/src/join-duplicate.rs', lines 3:0-10:1 -/
+ def join_nested_shared (b : Bool) : Result Unit := do
+-  massert ((¬ b) || (1#i32 > 0#i32))
++  massert ((! b) || (1#i32 > 0#i32))
+   if b
+   then ok ()
+   else massert (2#i32 > 0#i32)
+diff --git a/tests/lean/Loops.lean b/tests/lean/Loops.lean
+index 929c3ead..dcef706e 100644
+--- a/tests/lean/Loops.lean
++++ b/tests/lean/Loops.lean
+@@ -782,7 +782,7 @@ def issue500_1.bar (_a : Bool) : Result Bool := do
+ @[rust_loop_body]
+ def issue500_1_loop.body (a : Bool) : Result (ControlFlow Bool Bool) := do
+   if 0#i32 < 0#i32
+-  then let a1 ← issue500_1.bar a
++  then let a1 : Bool ← issue500_1.bar a
+        ok (cont a1)
+   else ok (done a)
+ 
+@@ -963,7 +963,7 @@ def issue400_2_loop.body
+   let i1 := Slice.len conds
+   if i < i1
+   then
+-    let b ← Slice.index_usize conds i
++    let b : Bool ← Slice.index_usize conds i
+     let (y1, z1, back1) ←
+       if b
+       then let (a, b1, c) := back y z
+diff --git a/tests/lean/LoopsIssues.lean b/tests/lean/LoopsIssues.lean
+index 30aadb39..35b5b798 100644
+--- a/tests/lean/LoopsIssues.lean
++++ b/tests/lean/LoopsIssues.lean
+@@ -150,7 +150,7 @@ def mut_loop_len_loop.body
+   := do
+   let s ← lift (Array.to_slice buf)
+   let i := Slice.len s
+-  massert ((¬ b) || (0#usize <= i))
++  massert ((! b) || (0#usize <= i))
+   if b
+   then ok (cont ())
+   else ok (done ())
+diff --git a/tests/lean/LoopsRec.lean b/tests/lean/LoopsRec.lean
+index ca6f4fe2..1c170d6d 100644
+--- a/tests/lean/LoopsRec.lean
++++ b/tests/lean/LoopsRec.lean
+@@ -692,7 +692,7 @@ def issue500_1.bar (_a : Bool) : Result Bool := do
+ @[rust_loop]
+ def issue500_1_loop (a : Bool) : Result Bool := do
+   if 0#i32 < 0#i32
+-  then let a1 ← issue500_1.bar a
++  then let a1 : Bool ← issue500_1.bar a
+        issue500_1_loop a1
+   else ok a
+ partial_fixpoint
+@@ -826,7 +826,7 @@ def issue400_2_loop
+   let i1 := Slice.len conds
+   if i < i1
+   then
+-    let b ← Slice.index_usize conds i
++    let b : Bool ← Slice.index_usize conds i
+     let (y1, z1, back1) ←
+       if b
+       then let (a, b1, c) := back y z
+diff --git a/tests/lean/MultiTarget.lean b/tests/lean/MultiTarget.lean
+index 3e5a8308..d5b23e6a 100644
+--- a/tests/lean/MultiTarget.lean
++++ b/tests/lean/MultiTarget.lean
+@@ -91,7 +91,7 @@ def cpu_features_present (_mask : Std.U32) : Result Bool := do
+     Source: 'tests/src/multi-target.rs', lines 52:0-70:1 -/
+ def dispatch_add.«x86_64-apple-darwin»
+   (a : Std.U128) (b : Std.U128) : Result Std.U128 := do
+-  let b1 ← cpu_features_present 1#u32
++  let b1 : Bool ← cpu_features_present 1#u32
+   if b1
+   then add_vec x86.Sse2.Insts.Multi_targetSimdTraitU128 a b
+   else scalar_add a b
+@@ -100,7 +100,7 @@ def dispatch_add.«x86_64-apple-darwin»
+     Source: 'tests/src/multi-target.rs', lines 52:0-70:1 -/
+ def dispatch_add.«aarch64-apple-darwin»
+   (a : Std.U128) (b : Std.U128) : Result Std.U128 := do
+-  let b1 ← cpu_features_present 2#u32
++  let b1 : Bool ← cpu_features_present 2#u32
+   if b1
+   then add_vec arm.Neon.Insts.Multi_targetSimdTraitU128 a b
+   else scalar_add a b
+@@ -109,7 +109,8 @@ def dispatch_add.«aarch64-apple-darwin»
+     Source: 'tests/src/multi-target.rs', lines 52:0-70:1 -/
+ def dispatch_add (i : Std.U128) (i1 : Std.U128) : Result Std.U128 := do
+   let tgt ← get_target
+-  if tgt = (toStr "x86_64-apple-darwin")
++  if tgt = (toStr
++    "x86_64-apple-darwin" (by simp only [U32.max, U32.numBits]; decide))
+   then dispatch_add.«x86_64-apple-darwin» i i1
+   else dispatch_add.«aarch64-apple-darwin» i i1
+ 
+diff --git a/tests/lean/NoNestedBorrows.lean b/tests/lean/NoNestedBorrows.lean
+index fad803a2..9e3d6eba 100644
+--- a/tests/lean/NoNestedBorrows.lean
++++ b/tests/lean/NoNestedBorrows.lean
+@@ -168,19 +168,19 @@ def copy_int (x : Std.I32) : Result Std.I32 := do
+     Source: 'tests/src/no_nested_borrows.rs', lines 140:0-144:1
+     Visibility: public -/
+ def test_unreachable (b : Bool) : Result Unit := do
+-  massert (¬ b)
++  massert (! b)
+ 
+ /-- [no_nested_borrows::test_panic]:
+     Source: 'tests/src/no_nested_borrows.rs', lines 147:0-151:1
+     Visibility: public -/
+ def test_panic (b : Bool) : Result Unit := do
+-  massert (¬ b)
++  massert (! b)
+ 
+ /-- [no_nested_borrows::test_panic_msg]:
+     Source: 'tests/src/no_nested_borrows.rs', lines 155:0-159:1
+     Visibility: public -/
+ def test_panic_msg (b : Bool) : Result Unit := do
+-  massert (¬ b)
++  massert (! b)
+ 
+ /-- [no_nested_borrows::test_copy_int]:
+     Source: 'tests/src/no_nested_borrows.rs', lines 163:0-168:1
+@@ -204,7 +204,7 @@ def is_cons {T : Type} (l : List T) : Result Bool := do
+     Source: 'tests/src/no_nested_borrows.rs', lines 178:0-182:1
+     Visibility: public -/
+ def test_is_cons : Result Unit := do
+-  let b ← is_cons (List.Cons 0#i32 List.Nil)
++  let b : Bool ← is_cons (List.Cons 0#i32 List.Nil)
+   massert b
+ 
+ /- Unit test for [no_nested_borrows::test_is_cons] -/
+@@ -594,7 +594,7 @@ def create_id_type {T : Type} (x : T) : Result (IdType T) := do
+     Source: 'tests/src/no_nested_borrows.rs', lines 523:0-525:1
+     Visibility: public -/
+ def not_bool (x : Bool) : Result Bool := do
+-  ok (¬ x)
++  ok (! x)
+ 
+ /-- [no_nested_borrows::not_u32]:
+     Source: 'tests/src/no_nested_borrows.rs', lines 527:0-529:1
+diff --git a/tests/lean/Order.lean b/tests/lean/Order.lean
+index 1e39c9b8..8d3cfb15 100644
+--- a/tests/lean/Order.lean
++++ b/tests/lean/Order.lean
+@@ -137,18 +137,18 @@ def wrap_cmp (x : Wrap) (y : Wrap) : Result Ordering := do
+     Source: 'tests/src/order.rs', lines 39:0-43:1
+     Visibility: public -/
+ def test_wrap_lt : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       2#u64
+-  massert (¬ b1)
+-  let b2 ←
++  massert (! b1)
++  let b2 : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+-  massert (¬ b2)
++  massert (! b2)
+ 
+ /- Unit test for [order::test_wrap_lt] -/
+ #assert (test_wrap_lt).reducesTo ()
+@@ -157,18 +157,18 @@ def test_wrap_lt : Result Unit := do
+     Source: 'tests/src/order.rs', lines 46:0-50:1
+     Visibility: public -/
+ def test_wrap_le : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.PartialOrd.le.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.PartialOrd.le.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       2#u64
+   massert b1
+-  let b2 ←
++  let b2 : Bool ←
+     core.cmp.PartialOrd.le.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+-  massert (¬ b2)
++  massert (! b2)
+ 
+ /- Unit test for [order::test_wrap_le] -/
+ #assert (test_wrap_le).reducesTo ()
+@@ -177,18 +177,18 @@ def test_wrap_le : Result Unit := do
+     Source: 'tests/src/order.rs', lines 53:0-57:1
+     Visibility: public -/
+ def test_wrap_gt : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.PartialOrd.gt.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.PartialOrd.gt.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       2#u64
+-  massert (¬ b1)
+-  let b2 ←
++  massert (! b1)
++  let b2 : Bool ←
+     core.cmp.PartialOrd.gt.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+-  massert (¬ b2)
++  massert (! b2)
+ 
+ /- Unit test for [order::test_wrap_gt] -/
+ #assert (test_wrap_gt).reducesTo ()
+@@ -197,18 +197,18 @@ def test_wrap_gt : Result Unit := do
+     Source: 'tests/src/order.rs', lines 60:0-64:1
+     Visibility: public -/
+ def test_wrap_ge : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.PartialOrd.ge.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.PartialOrd.ge.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       2#u64
+   massert b1
+-  let b2 ←
++  let b2 : Bool ←
+     core.cmp.PartialOrd.ge.trait_default Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+-  massert (¬ b2)
++  massert (! b2)
+ 
+ /- Unit test for [order::test_wrap_ge] -/
+ #assert (test_wrap_ge).reducesTo ()
+@@ -218,13 +218,13 @@ def test_wrap_ge : Result Unit := do
+     Visibility: public -/
+ def test_wrap_max : Result Unit := do
+   let w ← core.cmp.Ord.max.trait_default Wrap.Insts.CoreCmpOrd 1#u64 2#u64
+-  let b ← Wrap.Insts.CoreCmpPartialEqWrap.eq w 2#u64
++  let b : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w 2#u64
+   massert b
+   let w1 ← core.cmp.Ord.max.trait_default Wrap.Insts.CoreCmpOrd 2#u64 1#u64
+-  let b1 ← Wrap.Insts.CoreCmpPartialEqWrap.eq w1 2#u64
++  let b1 : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w1 2#u64
+   massert b1
+   let w2 ← core.cmp.Ord.max.trait_default Wrap.Insts.CoreCmpOrd 2#u64 2#u64
+-  let b2 ← Wrap.Insts.CoreCmpPartialEqWrap.eq w2 2#u64
++  let b2 : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w2 2#u64
+   massert b2
+ 
+ /- Unit test for [order::test_wrap_max] -/
+@@ -235,13 +235,13 @@ def test_wrap_max : Result Unit := do
+     Visibility: public -/
+ def test_wrap_min : Result Unit := do
+   let w ← core.cmp.Ord.min.trait_default Wrap.Insts.CoreCmpOrd 1#u64 2#u64
+-  let b ← Wrap.Insts.CoreCmpPartialEqWrap.eq w 1#u64
++  let b : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w 1#u64
+   massert b
+   let w1 ← core.cmp.Ord.min.trait_default Wrap.Insts.CoreCmpOrd 2#u64 1#u64
+-  let b1 ← Wrap.Insts.CoreCmpPartialEqWrap.eq w1 1#u64
++  let b1 : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w1 1#u64
+   massert b1
+   let w2 ← core.cmp.Ord.min.trait_default Wrap.Insts.CoreCmpOrd 2#u64 2#u64
+-  let b2 ← Wrap.Insts.CoreCmpPartialEqWrap.eq w2 2#u64
++  let b2 : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w2 2#u64
+   massert b2
+ 
+ /- Unit test for [order::test_wrap_min] -/
+@@ -253,15 +253,15 @@ def test_wrap_min : Result Unit := do
+ def test_wrap_clamp : Result Unit := do
+   let w ←
+     core.cmp.Ord.clamp.trait_default Wrap.Insts.CoreCmpOrd 0#u64 1#u64 3#u64
+-  let b ← Wrap.Insts.CoreCmpPartialEqWrap.eq w 1#u64
++  let b : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w 1#u64
+   massert b
+   let w1 ←
+     core.cmp.Ord.clamp.trait_default Wrap.Insts.CoreCmpOrd 2#u64 1#u64 3#u64
+-  let b1 ← Wrap.Insts.CoreCmpPartialEqWrap.eq w1 2#u64
++  let b1 : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w1 2#u64
+   massert b1
+   let w2 ←
+     core.cmp.Ord.clamp.trait_default Wrap.Insts.CoreCmpOrd 4#u64 1#u64 3#u64
+-  let b2 ← Wrap.Insts.CoreCmpPartialEqWrap.eq w2 3#u64
++  let b2 : Bool ← Wrap.Insts.CoreCmpPartialEqWrap.eq w2 3#u64
+   massert b2
+ 
+ /- Unit test for [order::test_wrap_clamp] -/
+@@ -353,18 +353,18 @@ impl_def Rank.Insts.CoreCmpOrd : core.cmp.Ord Rank := {
+     Source: 'tests/src/order.rs', lines 95:0-99:1
+     Visibility: public -/
+ def test_rank_lt : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Rank.Insts.CoreCmpPartialOrdRank
+       Rank.Low Rank.High
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Rank.Insts.CoreCmpPartialOrdRank
+       Rank.Mid Rank.Mid
+-  massert (¬ b1)
+-  let b2 ←
++  massert (! b1)
++  let b2 : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Rank.Insts.CoreCmpPartialOrdRank
+       Rank.High Rank.Low
+-  massert (¬ b2)
++  massert (! b2)
+ 
+ /- Unit test for [order::test_rank_lt] -/
+ #assert (test_rank_lt).reducesTo ()
+@@ -424,26 +424,26 @@ impl_def Num.Insts.CoreCmpPartialOrdNum : core.cmp.PartialOrd Num Num := {
+     Source: 'tests/src/order.rs', lines 129:0-135:1
+     Visibility: public -/
+ def test_num_incomparable : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.PartialOrd.lt.trait_default Num.Insts.CoreCmpPartialOrdNum Num.Nan
+       (Num.Val 1#u8)
+-  massert (¬ b)
+-  let b1 ←
++  massert (! b)
++  let b1 : Bool ←
+     core.cmp.PartialOrd.le.trait_default Num.Insts.CoreCmpPartialOrdNum Num.Nan
+       (Num.Val 1#u8)
+-  massert (¬ b1)
+-  let b2 ←
++  massert (! b1)
++  let b2 : Bool ←
+     core.cmp.PartialOrd.gt.trait_default Num.Insts.CoreCmpPartialOrdNum Num.Nan
+       (Num.Val 1#u8)
+-  massert (¬ b2)
+-  let b3 ←
++  massert (! b2)
++  let b3 : Bool ←
+     core.cmp.PartialOrd.ge.trait_default Num.Insts.CoreCmpPartialOrdNum Num.Nan
+       (Num.Val 1#u8)
+-  massert (¬ b3)
+-  let b4 ←
++  massert (! b3)
++  let b4 : Bool ←
+     core.cmp.PartialOrd.le.trait_default Num.Insts.CoreCmpPartialOrdNum Num.Nan
+       Num.Nan
+-  massert (¬ b4)
++  massert (! b4)
+ 
+ /- Unit test for [order::test_num_incomparable] -/
+ #assert (test_num_incomparable).reducesTo ()
+@@ -452,14 +452,14 @@ def test_num_incomparable : Result Unit := do
+     Source: 'tests/src/order.rs', lines 142:0-147:1
+     Visibility: public -/
+ def test_wrap_ref_lt : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.impls.PartialOrdShared.lt Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.impls.PartialOrdShared.lt Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+-  massert (¬ b1)
++  massert (! b1)
+ 
+ /- Unit test for [order::test_wrap_ref_lt] -/
+ #assert (test_wrap_ref_lt).reducesTo ()
+@@ -468,14 +468,14 @@ def test_wrap_ref_lt : Result Unit := do
+     Source: 'tests/src/order.rs', lines 150:0-155:1
+     Visibility: public -/
+ def test_wrap_ref_le : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.impls.PartialOrdShared.le Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.impls.PartialOrdShared.le Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+-  massert (¬ b1)
++  massert (! b1)
+ 
+ /- Unit test for [order::test_wrap_ref_le] -/
+ #assert (test_wrap_ref_le).reducesTo ()
+@@ -484,14 +484,14 @@ def test_wrap_ref_le : Result Unit := do
+     Source: 'tests/src/order.rs', lines 158:0-163:1
+     Visibility: public -/
+ def test_wrap_ref_gt : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.impls.PartialOrdShared.gt Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.impls.PartialOrdShared.gt Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+-  massert (¬ b1)
++  massert (! b1)
+ 
+ /- Unit test for [order::test_wrap_ref_gt] -/
+ #assert (test_wrap_ref_gt).reducesTo ()
+@@ -500,14 +500,14 @@ def test_wrap_ref_gt : Result Unit := do
+     Source: 'tests/src/order.rs', lines 166:0-171:1
+     Visibility: public -/
+ def test_wrap_ref_ge : Result Unit := do
+-  let b ←
++  let b : Bool ←
+     core.cmp.impls.PartialOrdShared.ge Wrap.Insts.CoreCmpPartialOrdWrap 2#u64
+       1#u64
+   massert b
+-  let b1 ←
++  let b1 : Bool ←
+     core.cmp.impls.PartialOrdShared.ge Wrap.Insts.CoreCmpPartialOrdWrap 1#u64
+       2#u64
+-  massert (¬ b1)
++  massert (! b1)
+ 
+ /- Unit test for [order::test_wrap_ref_ge] -/
+ #assert (test_wrap_ref_ge).reducesTo ()
+@@ -519,7 +519,7 @@ def test_wrap_ref_partial_cmp : Result Unit := do
+   let o ←
+     core.cmp.impls.PartialOrdShared.partial_cmp
+       Wrap.Insts.CoreCmpPartialOrdWrap 1#u64 2#u64
+-  let b ←
++  let b : Bool ←
+     match o with
+     | none => ok false
+     | some o1 =>
+diff --git a/tests/lean/Print.lean b/tests/lean/Print.lean
+index 930271be..a0bb5db3 100644
+--- a/tests/lean/Print.lean
++++ b/tests/lean/Print.lean
+@@ -22,7 +22,9 @@ namespace print
+ /-- [print::call_println]:
+     Source: 'tests/src/print.rs', lines 4:0-6:1 -/
+ def call_println : Result Unit := do
+-  let a ← core.fmt.Arguments.from_str (toStr "Hello World!\n")
++  let a ←
++    core.fmt.Arguments.from_str (toStr
++      "Hello World!\n" (by simp only [U32.max, U32.numBits]; decide))
+   std.io.stdio._print a
+ 
+ end print
+diff --git a/tests/lean/RenameAttribute.lean b/tests/lean/RenameAttribute.lean
+index a55ea227..2af8b091 100644
+--- a/tests/lean/RenameAttribute.lean
++++ b/tests/lean/RenameAttribute.lean
+@@ -51,7 +51,7 @@ def BoolImpl : BoolTest Bool := {
+     Source: 'tests/src/rename_attribute.rs', lines 30:0-32:1
+     Visibility: public -/
+ def BoolFn (T : Type) (x : Bool) : Result Bool := do
+-  let b ← BoolImpl.getTest x
++  let b : Bool ← BoolImpl.getTest x
+   if b
+   then BoolTrait.retTest.default x
+   else ok false
+diff --git a/tests/lean/Scalars.lean b/tests/lean/Scalars.lean
+index 884387ac..80485bfc 100644
+--- a/tests/lean/Scalars.lean
++++ b/tests/lean/Scalars.lean
+@@ -188,7 +188,7 @@ def i32_use_bits : Result Std.U32 := do
+     Source: 'tests/src/scalars.rs', lines 137:0-139:1
+     Visibility: public -/
+ def test_is_multiple_of_true : Result Unit := do
+-  let b ← core.num.Usize.is_multiple_of 12#usize 4#usize
++  let b : Bool ← core.num.Usize.is_multiple_of 12#usize 4#usize
+   massert b
+ 
+ /- Unit test for [scalars::test_is_multiple_of_true] -/
+@@ -198,8 +198,8 @@ def test_is_multiple_of_true : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 142:0-144:1
+     Visibility: public -/
+ def test_is_multiple_of_false : Result Unit := do
+-  let b ← core.num.Usize.is_multiple_of 7#usize 3#usize
+-  massert (¬ b)
++  let b : Bool ← core.num.Usize.is_multiple_of 7#usize 3#usize
++  massert (! b)
+ 
+ /- Unit test for [scalars::test_is_multiple_of_false] -/
+ #assert (test_is_multiple_of_false).reducesTo ()
+@@ -208,10 +208,10 @@ def test_is_multiple_of_false : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 147:0-151:1
+     Visibility: public -/
+ def test_is_multiple_of_zero_divisor : Result Unit := do
+-  let b ← core.num.Usize.is_multiple_of 0#usize 0#usize
++  let b : Bool ← core.num.Usize.is_multiple_of 0#usize 0#usize
+   massert b
+-  let b1 ← core.num.Usize.is_multiple_of 5#usize 0#usize
+-  massert (¬ b1)
++  let b1 : Bool ← core.num.Usize.is_multiple_of 5#usize 0#usize
++  massert (! b1)
+ 
+ /- Unit test for [scalars::test_is_multiple_of_zero_divisor] -/
+ #assert (test_is_multiple_of_zero_divisor).reducesTo ()
+@@ -220,10 +220,10 @@ def test_is_multiple_of_zero_divisor : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 158:0-161:1
+     Visibility: public -/
+ def test_is_power_of_two_u8 : Result Unit := do
+-  let b ← core.num.U8.is_power_of_two 64#u8
++  let b : Bool ← core.num.U8.is_power_of_two 64#u8
+   massert b
+-  let b1 ← core.num.U8.is_power_of_two 65#u8
+-  massert (¬ b1)
++  let b1 : Bool ← core.num.U8.is_power_of_two 65#u8
++  massert (! b1)
+ 
+ /- Unit test for [scalars::test_is_power_of_two_u8] -/
+ #assert (test_is_power_of_two_u8).reducesTo ()
+@@ -232,10 +232,10 @@ def test_is_power_of_two_u8 : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 164:0-167:1
+     Visibility: public -/
+ def test_is_power_of_two_u16 : Result Unit := do
+-  let b ← core.num.U16.is_power_of_two 256#u16
++  let b : Bool ← core.num.U16.is_power_of_two 256#u16
+   massert b
+-  let b1 ← core.num.U16.is_power_of_two 255#u16
+-  massert (¬ b1)
++  let b1 : Bool ← core.num.U16.is_power_of_two 255#u16
++  massert (! b1)
+ 
+ /- Unit test for [scalars::test_is_power_of_two_u16] -/
+ #assert (test_is_power_of_two_u16).reducesTo ()
+@@ -244,12 +244,12 @@ def test_is_power_of_two_u16 : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 170:0-174:1
+     Visibility: public -/
+ def test_is_power_of_two_u32 : Result Unit := do
+-  let b ← core.num.U32.is_power_of_two 1#u32
++  let b : Bool ← core.num.U32.is_power_of_two 1#u32
+   massert b
+-  let b1 ← core.num.U32.is_power_of_two 1024#u32
++  let b1 : Bool ← core.num.U32.is_power_of_two 1024#u32
+   massert b1
+-  let b2 ← core.num.U32.is_power_of_two 1023#u32
+-  massert (¬ b2)
++  let b2 : Bool ← core.num.U32.is_power_of_two 1023#u32
++  massert (! b2)
+ 
+ /- Unit test for [scalars::test_is_power_of_two_u32] -/
+ #assert (test_is_power_of_two_u32).reducesTo ()
+@@ -258,10 +258,10 @@ def test_is_power_of_two_u32 : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 177:0-180:1
+     Visibility: public -/
+ def test_is_power_of_two_u64 : Result Unit := do
+-  let b ← core.num.U64.is_power_of_two 0#u64
+-  massert (¬ b)
+-  let b1 ← core.num.U64.is_power_of_two 3#u64
+-  massert (¬ b1)
++  let b : Bool ← core.num.U64.is_power_of_two 0#u64
++  massert (! b)
++  let b1 : Bool ← core.num.U64.is_power_of_two 3#u64
++  massert (! b1)
+ 
+ /- Unit test for [scalars::test_is_power_of_two_u64] -/
+ #assert (test_is_power_of_two_u64).reducesTo ()
+@@ -270,7 +270,7 @@ def test_is_power_of_two_u64 : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 183:0-185:1
+     Visibility: public -/
+ def test_is_power_of_two_u128 : Result Unit := do
+-  let b ← core.num.U128.is_power_of_two 2#u128
++  let b : Bool ← core.num.U128.is_power_of_two 2#u128
+   massert b
+ 
+ /- Unit test for [scalars::test_is_power_of_two_u128] -/
+@@ -280,10 +280,10 @@ def test_is_power_of_two_u128 : Result Unit := do
+     Source: 'tests/src/scalars.rs', lines 188:0-191:1
+     Visibility: public -/
+ def test_is_power_of_two_usize : Result Unit := do
+-  let b ← core.num.Usize.is_power_of_two 8#usize
++  let b : Bool ← core.num.Usize.is_power_of_two 8#usize
+   massert b
+-  let b1 ← core.num.Usize.is_power_of_two 0#usize
+-  massert (¬ b1)
++  let b1 : Bool ← core.num.Usize.is_power_of_two 0#usize
++  massert (! b1)
+ 
+ /- Unit test for [scalars::test_is_power_of_two_usize] -/
+ #assert (test_is_power_of_two_usize).reducesTo ()
+@@ -294,7 +294,7 @@ def test_is_power_of_two_usize : Result Unit := do
+ def test_try_from_usize_u32_ok : Result Unit := do
+   let r ←
+     core.convert.num.ptr_try_from_impls.TryFromU32Usize.try_from 5#usize
+-  let b ← core.result.Result.is_ok r
++  let b : Bool ← core.result.Result.is_ok r
+   massert b
+ 
+ /- Unit test for [scalars::test_try_from_usize_u32_ok] -/
+@@ -328,7 +328,7 @@ def use_question_mark
+     Visibility: public -/
+ def test_question_mark_ok : Result Unit := do
+   let r ← use_question_mark 10#u32 2#u32
+-  let b ← core.result.Result.is_ok r
++  let b : Bool ← core.result.Result.is_ok r
+   massert b
+   let i ← core.result.Result.unwrap core.fmt.DebugUnit r
+   massert (i = 6#u32)
+@@ -341,8 +341,8 @@ def test_question_mark_ok : Result Unit := do
+     Visibility: public -/
+ def test_question_mark_err : Result Unit := do
+   let r ← use_question_mark 10#u32 0#u32
+-  let b ← core.result.Result.is_ok r
+-  massert (¬ b)
++  let b : Bool ← core.result.Result.is_ok r
++  massert (! b)
+ 
+ /- Unit test for [scalars::test_question_mark_err] -/
+ #assert (test_question_mark_err).reducesTo ()
+diff --git a/tests/lean/StepBy.lean b/tests/lean/StepBy.lean
+index 977e4bc1..f457c080 100644
+--- a/tests/lean/StepBy.lean
++++ b/tests/lean/StepBy.lean
+@@ -58,7 +58,7 @@ def test_step_by_1 : Result Unit := do
+   let (o5, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it5
+-  let b := core.option.Option.is_none o5
++  let b : Bool := core.option.Option.is_none o5
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_1] -/
+@@ -93,7 +93,7 @@ def test_step_by_2 : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_2] -/
+@@ -128,7 +128,7 @@ def test_step_by_3 : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_3] -/
+@@ -151,7 +151,7 @@ def test_step_by_larger_than_len : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_larger_than_len] -/
+@@ -169,7 +169,7 @@ def test_step_by_empty : Result Unit := do
+   let (o, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it
+-  let b := core.option.Option.is_none o
++  let b : Bool := core.option.Option.is_none o
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_empty] -/
+@@ -192,7 +192,7 @@ def test_step_by_single : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_single] -/
+@@ -215,7 +215,7 @@ def test_step_by_single_step_2 : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_single_step_2] -/
+@@ -238,7 +238,7 @@ def test_step_by_eq_len : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_eq_len] -/
+@@ -266,7 +266,7 @@ def test_step_by_len_minus_1 : Result Unit := do
+   let (o2, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it2
+-  let b := core.option.Option.is_none o2
++  let b : Bool := core.option.Option.is_none o2
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_len_minus_1] -/
+@@ -289,7 +289,7 @@ def test_step_by_two_elements : Result Unit := do
+   let (o1, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it1
+-  let b := core.option.Option.is_none o1
++  let b : Bool := core.option.Option.is_none o1
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_two_elements] -/
+@@ -327,7 +327,7 @@ def test_step_by_4_on_longer : Result Unit := do
+   let (o3, _) ←
+     core.iter.adapters.step_by.IteratorStepBy.next
+       (core.iter.traits.iterator.IteratorSliceIter Std.U32) it3
+-  let b := core.option.Option.is_none o3
++  let b : Bool := core.option.Option.is_none o3
+   massert b
+ 
+ /- Unit test for [step_by::test_step_by_4_on_longer] -/
+diff --git a/tests/lean/StringChars.lean b/tests/lean/StringChars.lean
+index 543e7c5e..3ca42351 100644
+--- a/tests/lean/StringChars.lean
++++ b/tests/lean/StringChars.lean
+@@ -22,7 +22,9 @@ namespace string_chars
+ /-- [string_chars::collect]:
+     Source: 'tests/src/string-chars.rs', lines 3:0-6:1 -/
+ def collect : Result Unit := do
+-  let c ← core.str.Str.chars (toStr "hello")
++  let c ←
++    core.str.Str.chars (toStr
++      "hello" (by simp only [U32.max, U32.numBits]; decide))
+   let _ ←
+     core.iter.traits.iterator.Iterator.collect.default
+       core.iter.traits.iterator.IteratorChars
+diff --git a/tests/lean/TargetFeatures.lean b/tests/lean/TargetFeatures.lean
+index af632510..753e0646 100644
+--- a/tests/lean/TargetFeatures.lean
++++ b/tests/lean/TargetFeatures.lean
+@@ -26,15 +26,18 @@ namespace target_features
+     Source: 'tests/src/target-features.rs', lines 16:4-18:5
+     Visibility: public -/
+ def x86.add (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
+-  massert (target_feature_enabled (toStr "avx2"))
++  massert (target_feature_enabled (toStr
++    "avx2" (by simp only [U32.max, U32.numBits]; decide)))
+   ok (core.num.U32.wrapping_add x y)
+ 
+ /-- [target_features::x86::add_twice]:
+     Source: 'tests/src/target-features.rs', lines 22:4-24:5
+     Visibility: public -/
+ def x86.add_twice (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
+-  massert (target_feature_enabled (toStr "sse2"))
+-  massert (target_feature_enabled (toStr "avx2"))
++  massert (target_feature_enabled (toStr
++    "sse2" (by simp only [U32.max, U32.numBits]; decide)))
++  massert (target_feature_enabled (toStr
++    "avx2" (by simp only [U32.max, U32.numBits]; decide)))
+   let i ← lift (core.num.U32.wrapping_add x y)
+   ok (core.num.U32.wrapping_add i y)
+ 
+@@ -42,7 +45,8 @@ def x86.add_twice (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
+     Source: 'tests/src/target-features.rs', lines 28:4-30:5
+     Visibility: public -/
+ def x86.call_add (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
+-  massert (target_feature_enabled (toStr "avx2"))
++  massert (target_feature_enabled (toStr
++    "avx2" (by simp only [U32.max, U32.numBits]; decide)))
+   x86.add x y
+ 
+ /-- [target_features::x86::sum]: loop body 0:
+@@ -76,14 +80,16 @@ def x86.sum_loop
+     Source: 'tests/src/target-features.rs', lines 35:4-43:5
+     Visibility: public -/
+ def x86.sum (x : Slice Std.U32) : Result Std.U32 := do
+-  massert (target_feature_enabled (toStr "avx2"))
++  massert (target_feature_enabled (toStr
++    "avx2" (by simp only [U32.max, U32.numBits]; decide)))
+   x86.sum_loop x 0#u32 0#usize
+ 
+ /-- [target_features::arm::add]:
+     Source: 'tests/src/target-features.rs', lines 49:4-51:5
+     Visibility: public -/
+ def arm.add (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
+-  massert (target_feature_enabled (toStr "neon"))
++  massert (target_feature_enabled (toStr
++    "neon" (by simp only [U32.max, U32.numBits]; decide)))
+   ok (core.num.U32.wrapping_add x y)
+ 
+ /-- [target_features::add_plain]:
+@@ -111,7 +117,8 @@ def dispatch_add.«aarch64-apple-darwin»
+     Visibility: public -/
+ def dispatch_add (i : Std.U32) (i1 : Std.U32) : Result Std.U32 := do
+   let tgt ← get_target
+-  if tgt = (toStr "x86_64-apple-darwin")
++  if tgt = (toStr
++    "x86_64-apple-darwin" (by simp only [U32.max, U32.numBits]; decide))
+   then dispatch_add.«x86_64-apple-darwin» i i1
+   else dispatch_add.«aarch64-apple-darwin» i i1
+ 
+diff --git a/tests/lean/Traits.lean b/tests/lean/Traits.lean
+index 6d511640..9e250ed6 100644
+--- a/tests/lean/Traits.lean
++++ b/tests/lean/Traits.lean
+@@ -51,7 +51,7 @@ def Bool.Insts.TraitsBoolTrait : BoolTrait Bool := {
+     Source: 'tests/src/traits.rs', lines 19:0-21:1
+     Visibility: public -/
+ def test_bool_trait_bool (x : Bool) : Result Bool := do
+-  let b ← Bool.Insts.TraitsBoolTrait.get_bool x
++  let b : Bool ← Bool.Insts.TraitsBoolTrait.get_bool x
+   if b
+   then BoolTrait.ret_true.default x
+   else ok false
+@@ -78,7 +78,7 @@ def core.option.Option.Insts.TraitsBoolTrait (T : Type) : BoolTrait (Option T)
+     Source: 'tests/src/traits.rs', lines 33:0-35:1
+     Visibility: public -/
+ def test_bool_trait_option {T : Type} (x : Option T) : Result Bool := do
+-  let b ← core.option.Option.Insts.TraitsBoolTrait.get_bool x
++  let b : Bool ← core.option.Option.Insts.TraitsBoolTrait.get_bool x
+   if b
+   then BoolTrait.ret_true.default x
+   else ok false
+diff --git a/tests/src/mutually-recursive-traits.lean.out b/tests/src/mutually-recursive-traits.lean.out
+index 5b793029..3a4632de 100644
+--- a/tests/src/mutually-recursive-traits.lean.out
++++ b/tests/src/mutually-recursive-traits.lean.out
+@@ -3,5 +3,5 @@
+ Trait declaration: mutually_recursive_traits::Trait1
+ Source: Source: 'tests/src/mutually-recursive-traits.rs', lines 5:0-7:1
+ Source: 'tests/src/mutually-recursive-traits.rs', lines 5:0-7:1
+-Compiler source: symbolic/SymbolicToPure.ml, line 224
++Compiler source: symbolic/SymbolicToPure.ml, line 239
+ 

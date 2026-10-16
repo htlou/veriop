@@ -1,0 +1,194 @@
+diff --git a/src/engine/general_purpose/decode.rs b/src/engine/general_purpose/decode.rs
+index eb45cfc..e452571 100644
+--- a/src/engine/general_purpose/decode.rs
++++ b/src/engine/general_purpose/decode.rs
+@@ -118,39 +118,76 @@ fn decode_complete_quads(
+     let unrolled_loop_len = quads_len - quads_len % UNROLLED_INPUT_CHUNK_SIZE;
+     let input_unrolled_loop_end = input_index_start + unrolled_loop_len;
+ 
+-    // chunks of 32 bytes
+-    for (chunk_index, chunk) in input[input_index_start..input_unrolled_loop_end]
+-        .chunks_exact(UNROLLED_INPUT_CHUNK_SIZE)
+-        .enumerate()
+-    {
+-        let input_index = input_index_start + chunk_index * UNROLLED_INPUT_CHUNK_SIZE;
+-        let output_base = output_index_start + chunk_index * UNROLLED_OUTPUT_CHUNK_SIZE;
+-        let chunk_output = &mut output[output_base..output_base + UNROLLED_OUTPUT_CHUNK_SIZE];
+-
+-        decode_chunk_8(
+-            &chunk[0..8],
+-            input_index,
+-            decode_table,
+-            &mut chunk_output[0..6],
+-        )?;
+-        decode_chunk_8(
+-            &chunk[8..16],
+-            input_index + 8,
+-            decode_table,
+-            &mut chunk_output[6..12],
+-        )?;
+-        decode_chunk_8(
+-            &chunk[16..24],
+-            input_index + 16,
+-            decode_table,
+-            &mut chunk_output[12..18],
+-        )?;
+-        decode_chunk_8(
+-            &chunk[24..32],
+-            input_index + 24,
+-            decode_table,
+-            &mut chunk_output[18..24],
+-        )?;
++    if unrolled_loop_len > 0 && *decode_table == STANDARD_DECODE_TABLE {
++        // chunks of 32 bytes
++        for (chunk_index, chunk) in input[input_index_start..input_unrolled_loop_end]
++            .chunks_exact(UNROLLED_INPUT_CHUNK_SIZE)
++            .enumerate()
++        {
++            let input_index = input_index_start + chunk_index * UNROLLED_INPUT_CHUNK_SIZE;
++            let output_base = output_index_start + chunk_index * UNROLLED_OUTPUT_CHUNK_SIZE;
++            let chunk_output = &mut output[output_base..output_base + UNROLLED_OUTPUT_CHUNK_SIZE];
++
++            decode_chunk_8_pairs(
++                &chunk[0..8],
++                input_index,
++                decode_table,
++                &mut chunk_output[0..6],
++            )?;
++            decode_chunk_8_pairs(
++                &chunk[8..16],
++                input_index + 8,
++                decode_table,
++                &mut chunk_output[6..12],
++            )?;
++            decode_chunk_8_pairs(
++                &chunk[16..24],
++                input_index + 16,
++                decode_table,
++                &mut chunk_output[12..18],
++            )?;
++            decode_chunk_8_pairs(
++                &chunk[24..32],
++                input_index + 24,
++                decode_table,
++                &mut chunk_output[18..24],
++            )?;
++        }
++    } else {
++        // chunks of 32 bytes
++        for (chunk_index, chunk) in input[input_index_start..input_unrolled_loop_end]
++            .chunks_exact(UNROLLED_INPUT_CHUNK_SIZE)
++            .enumerate()
++        {
++            let input_index = input_index_start + chunk_index * UNROLLED_INPUT_CHUNK_SIZE;
++            let output_base = output_index_start + chunk_index * UNROLLED_OUTPUT_CHUNK_SIZE;
++            let chunk_output = &mut output[output_base..output_base + UNROLLED_OUTPUT_CHUNK_SIZE];
++
++            decode_chunk_8(
++                &chunk[0..8],
++                input_index,
++                decode_table,
++                &mut chunk_output[0..6],
++            )?;
++            decode_chunk_8(
++                &chunk[8..16],
++                input_index + 8,
++                decode_table,
++                &mut chunk_output[6..12],
++            )?;
++            decode_chunk_8(
++                &chunk[16..24],
++                input_index + 16,
++                decode_table,
++                &mut chunk_output[12..18],
++            )?;
++            decode_chunk_8(
++                &chunk[24..32],
++                input_index + 24,
++                decode_table,
++                &mut chunk_output[18..24],
++            )?;
++        }
+     }
+ 
+     // remaining quads, except for the last possibly partial one, as it may have padding
+@@ -216,6 +253,67 @@ pub(crate) fn complete_quads_len(
+     Ok(input_complete_nonterminal_quads_len)
+ }
+ 
++/// The decode table of the standard alphabet (checked against `decode_table(&STANDARD)` in tests).
++const STANDARD_DECODE_TABLE: [u8; 256] = [
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 62, 255, 255, 255, 63,
++    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 255, 255, 255, 255, 255, 255,
++    255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
++    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 255, 255, 255, 255, 255,
++    255, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
++    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
++];
++
++/// Two-symbol decode table for the standard alphabet, indexed by `first | second << 8`.
++/// Entries are `first_value << 6 | second_value` when both symbols decode to values below 64,
++/// and `0xFFFF` otherwise.
++static STANDARD_DECODE_PAIRS: [u16; 65536] = {
++    let mut pairs = [0_u16; 65536];
++    let mut i = 0;
++    while i < 65536 {
++        let first = STANDARD_DECODE_TABLE[i & 0xFF];
++        let second = STANDARD_DECODE_TABLE[i >> 8];
++        pairs[i] = if first < 64 && second < 64 {
++            (first as u16) << 6 | second as u16
++        } else {
++            0xFFFF
++        };
++        i += 1;
++    }
++    pairs
++};
++
++/// Decode 8 standard-alphabet symbols into 6 bytes with the two-symbol table, falling back to
++/// [`decode_chunk_8`] (and its error reporting) if any symbol is outside the alphabet.
++#[inline(always)]
++fn decode_chunk_8_pairs(
++    input: &[u8],
++    index_at_start_of_input: usize,
++    decode_table: &[u8; 256],
++    output: &mut [u8],
++) -> Result<(), DecodeError> {
++    let word = u64::from_le_bytes(input[..8].try_into().unwrap());
++    let p0 = STANDARD_DECODE_PAIRS[(word & 0xFFFF) as usize];
++    let p1 = STANDARD_DECODE_PAIRS[((word >> 16) & 0xFFFF) as usize];
++    let p2 = STANDARD_DECODE_PAIRS[((word >> 32) & 0xFFFF) as usize];
++    let p3 = STANDARD_DECODE_PAIRS[(word >> 48) as usize];
++    if (p0 | p1 | p2 | p3) >= 0x1000 {
++        return decode_chunk_8(input, index_at_start_of_input, decode_table, output);
++    }
++    let accum = u64::from(p0) << 52 | u64::from(p1) << 40 | u64::from(p2) << 28 | u64::from(p3) << 16;
++    output[..6].copy_from_slice(&accum.to_be_bytes()[..6]);
++    Ok(())
++}
++
+ /// Decode 8 bytes of input into 6 bytes of output.
+ ///
+ /// `input` is the 8 bytes to decode.
+@@ -357,6 +455,11 @@ mod tests {
+ 
+     use crate::engine::general_purpose::STANDARD;
+ 
++    #[test]
++    fn standard_decode_table_matches_alphabet() {
++        assert_eq!(STANDARD_DECODE_TABLE, STANDARD.decode_table);
++    }
++
+     #[test]
+     fn decode_chunk_8_writes_only_6_bytes() {
+         let input = b"Zm9vYmFy"; // "foobar"

@@ -1,0 +1,89 @@
+Running 39 benchmarks...
+note: Red-5 (racy): race-check benchmark (no optimized kernel) - no VC dump
+note: Red-6 (racy): race-check benchmark (no optimized kernel) - no VC dump
+note: Red-7 (racy): race-check benchmark (no optimized kernel) - no VC dump
+note: BucketPositions (pre-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: BucketPositions (post-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: ComputeRange (pre-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: ComputeRange (post-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: ReduceValue (pre-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: ReduceValue (post-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: LayerNorm (pre-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: LayerNorm (post-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: GradInput (pre-fix): race-check benchmark (no optimized kernel) - no VC dump
+note: GradInput (post-fix): race-check benchmark (no optimized kernel) - no VC dump
+Results written to ./results/1792036088-1660122-run-all.json
+
+Reduction (Table 1) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(Red-1, Red-1)                 EQUIV      0.00     0.000        1024           0         1
+(Red-1, Red-2)                 EQUIV      0.00     0.000        1024           0         1
+(Red-1, Red-3)                 EQUIV      0.00     0.000        1024           0         1
+(Red-1, Red-4)                 EQUIV      0.00     0.000         896           0         1
+Red-5 (racy)                    RACE      0.00     0.000           0           0         0
+Red-6 (racy)                    RACE      0.00     0.000           0           0         0
+Red-7 (racy)                    RACE      0.00     0.000           0           0         0
+
+Matrix Multiplication (Table 2) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(MatMul-1, MatMul-1)           EQUIV     34.78     0.415      524288           0    1/4096
+(MatMul-1, MatMul-2)           EQUIV     29.96     0.346      524288           0    1/4096
+(MatMul-1, MatMul-3)           EQUIV     31.68     0.502      131072           0    1/4096
+(MatMul-1, MatMul-4)           EQUIV     34.31     0.523      131072           0    1/4096
+(MatMul-1, MatMul-5)           EQUIV     32.19     0.355      131072           0    1/4096
+(MatMul-1, MatMul-6)           EQUIV     27.02     0.344      262144           0    1/4096
+(MatMul-1, MatMul-7)           EQUIV     26.80     0.343      262144           0    1/4096
+
+Attention (Table 3) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(Attention, Attention)         EQUIV      3.18     0.150           0           0    1/1024
+(Attention, FA1)               EQUIV      4.36     4.911      186880           0    1/1024
+(Attention, FA1-TC)            EQUIV      7.11     5.016      801280        6400    1/1024
+(Attention, FA2-TC)            EQUIV      2.88     5.205      210176         400    1/1024
+
+Causal Attention (Table 4) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(Causal-Attention-naive, Causal-Attention-fused)   EQUIV      3.04     0.019           0           0    1/1024
+(Causal-FA1-naive, Causal-FA1-fused)   EQUIV      5.73     0.014      186880           0    3/1056
+(Causal-FA1-TC-naive, Causal-FA1-TC-fused)   EQUIV      8.19     0.059      801280        6400    3/1056
+(Causal-FA2-TC-naive, Causal-FA2-TC-fused)   EQUIV      3.04     0.017      210176         400    1/1024
+
+Convolution (Section 6.2) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(Conv2D-ref, Conv2D-opt)       EQUIV     20.01     0.116        6400        3192   1/12288
+
+Agent-Generated GEMM (Table 5) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(MatMul-1-32x32, GEMM-1)       EQUIV     24.83     0.083      524288           0    1/1024
+(MatMul-1-32x32, GEMM-2)       EQUIV     27.22     0.084      262144           0    1/1024
+(MatMul-1-32x32, GEMM-3)       EQUIV     21.61     0.084      262656        3076    1/1024
+
+Compiler-Generated (TileLang) (Table 6) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+(TL-32x32x32-ref, TL-32x32x32-opt)   EQUIV      1.02     0.015        8192        1024    1/1024
+(TL-64x32x32-ref, TL-64x32x32-opt)   EQUIV      3.36     0.044       16384        3584    1/2048
+(TL-64x64x32-ref, TL-64x64x32-opt)   EQUIV     14.48     0.144       32768       12288    1/4096
+
+Data Race Detection (Table 7) [Gen/Solve (s): median of 1 iteration(s)]
+Benchmark                     Status   Gen (s) Solve (s)  #BlockSync   #WarpSync     Elems
+------------------------------------------------------------------------------------------
+BucketPositions (pre-fix)       RACE      0.00     0.000           0           0         0
+BucketPositions (post-fix)        OK      0.01     0.000       14336           0         0
+ComputeRange (pre-fix)          RACE      0.00     0.000           0           0         0
+ComputeRange (post-fix)           OK      0.00     0.000         960           0         0
+ReduceValue (pre-fix)           RACE      0.01     0.000           0           0         0
+ReduceValue (post-fix)            OK      0.03     0.000        6656           0         0
+LayerNorm (pre-fix)             RACE      0.00     0.000           0           0         0
+LayerNorm (post-fix)              OK      0.00     0.000          64          17         0
+GradInput (pre-fix)             RACE      0.00     0.000           0           0         0
+GradInput (post-fix)              OK      0.00     0.000         224           0         0
+
+39/39 benchmarks passed
+log: volta-logs/1792035657-1660122-run-all.log

@@ -1,0 +1,16 @@
+diff --git a/charon/src/ast/type_level/substitute.rs b/charon/src/ast/type_level/substitute.rs
+index 90e94b5e..69a6e053 100644
+--- a/charon/src/ast/type_level/substitute.rs
++++ b/charon/src/ast/type_level/substitute.rs
+@@ -117,6 +117,11 @@ impl VarsVisitor for SubstVisitor<'_> {
+         }
+     }
+     fn visit_self_clause(&mut self) -> Option<TraitRefKind> {
++        // When substituting only the explicit generics, the `Self` clause is
++        // not substituted: keep it as is.
++        if self.explicits_only && self.self_ref.is_none() {
++            return None;
++        }
+         Some(self.self_ref.cloned().expect(
+             "used `substitute` on an item coming from a trait; \
+             use `substitute_with_self` or `substitute_inner_binder` instead.",

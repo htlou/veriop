@@ -1,0 +1,352 @@
+[16:36:49.158] [31mWARN [0;39m [36mProofSettings[0;39m - No proof settings could be loaded, using defaults
+PROOF sel.BitmapSelect[sel.BitmapSelect::selectNew(int)].JML normal_behavior operation contract.1
+closed=false openGoals=2 nodes=1283 branches=11 autoMs=5042
+STATS Proof Statistics: Nodes: 1,283 Branches: 11 Interactive steps: 0 Symbolic execution steps: 75 Automode time: 4956ms Avg. time per step: 3.865ms Rule applications Quantifier instantiations: 4 One-step Simplifier apps: 124 SMT solver apps: 0 Dependency Contract apps: 0 Operation Contract apps: 2 Block/Loop Contract apps: 0 Loop invariant apps: 0 Merge Rule apps: 0 Total rule apps: 1,525
+---- open goal 1 (node 1282)
+    \if (self.cardinality >= 0)
+        \then (quotient_1 * -4294967296 + quotient_0)
+        \else (  -2147483648
+               + quotient_2 * -4294967296
+               + quotient_0)
+ >= j,
+ self.bitmap.$created = TRUE,
+ quotient_0 / 4294967296 = quotient_2,
+ quotient_1 >= quotient_2,
+ quotient_0 >= quotient_2 * 4294967296,
+ quotient_0 <= 4294967295 + quotient_2 * 4294967296,
+ (2147483648 + quotient_0) / 4294967296 = quotient_1,
+ quotient_1 <= 1 + quotient_2,
+ quotient_0 >= -2147483648 + quotient_1 * 4294967296,
+ quotient_0 <= 2147483647 + quotient_1 * 4294967296,
+ self.cardinality / 2 = quotient_0,
+ self.cardinality >= quotient_0 * 2,
+ self.cardinality <= 1 + quotient_0 * 2,
+ wellFormed(heap),
+ self.$created = TRUE,
+ exactInstance<[sel.BitmapSelect]>(self) = TRUE,
+ j <= 2147483647,
+ measuredByEmpty,
+ self.bitmap[k_0] >= -9223372036854775808,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | self.bitmap[i] >= -9223372036854775808),
+ self.bitmap[k_0] <= 9223372036854775807,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | self.bitmap[i] <= 9223372036854775807),
+ sel.PopCount::pc(self.bitmap[k_0]) >= 0,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | sel.PopCount::pc(self.bitmap[i]) >= 0),
+ sel.PopCount::pc(self.bitmap[k_0]) <= 64,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | sel.PopCount::pc(self.bitmap[i]) <= 64),
+ sel.PopCount::pc(0) = 0,
+ j >= 0,
+ k_0 >= 0,
+ self.bitmap.length >= 0,
+ self.bitmap.length <= 2147483647,
+ k_0 <= 2147483646,
+ self.bitmap.length >= 1 + k_0,
+    bsum{int t;}(0,
+                 k_0,
+                 sel.PopCount::pc(self.bitmap[t]))
+ >= 1
+  + j
+  + sel.PopCount::pc(self.bitmap[k_0]) * -1,
+ exc_0 = null,
+ l_0 <= 536870911,
+ l_0 >= 0,
+ self.bitmap.length >= l_0 * 4,
+ jdiv(l_0 * 4, 4) = l_0,
+ result_andM4 = l_0 * 4
+==>
+ self = null,
+ self.bitmap = null,
+ {heapAtPre:=heap
+  || exc:=null
+  || bitmap:=self.bitmap
+  || leftover:=j
+  || k:=0
+  || limit:=l_0 * 4}
+   \<{
+     try {
+       method-frame (
+         result->result_selectNew,
+         source=selectNew(int)@sel.BitmapSelect,
+         this=self
+       ) {
+         {
+           _label3:
+           {
+             while (k < limit) {
+               {
+                 int bits = sel.PopCount.bitCount(
+                                bitmap[k]
+                              ) +
+                              sel.PopCount.bitCount(
+                                bitmap[k + 1]
+                              ) +
+                              sel.PopCount.bitCount(
+                                bitmap[k + 2]
+                              ) +
+                              sel.PopCount.bitCount(
+                                bitmap[k + 3]
+                              );
+                 if (bits > leftover) {
+                   break _label3;
+                 }
+                 leftover -= bits;
+               }
+               k += 4;
+             }
+           }
+           for (; k < bitmap.length; ++k) {
+             int bits = sel.PopCount.bitCount(bitmap[k]);
+             if (bits > leftover) {
+               return
+               (char) (k * 64 +
+                         sel.sel.USel.select(
+                           bitmap[k],
+                           leftover
+                         ));
+             }
+             leftover -= bits;
+           }
+         }
+         throw
+         new IllegalArgumentException(
+           "Insufficient cardinality."
+         );
+       }
+     } catch (java.lang.Throwable e) {
+       exc = e;
+     }
+   }\> (  (\exists int k;
+             ((  k <= 2147483647
+               & k >= -2147483648
+               & ((  (((k >= 0
+                   & k <= -1 + self.bitmap.length)<<SC>>
+                   &    bsum{int t;}(0,
+                                     k,
+                                     sel.PopCount::pc(self.bitmap[t]))
+                     >= 1
+                      + j
+                      +   \if (k >= 0)
+                              \then (sel.PopCount::pc(self.bitmap[k]))
+                              \else (0)
+                        * -1)<<SC>>
+                   & \forall int i;
+                       (  i <= -1
+                        | k <= i
+                        | (  i >= 2147483648
+                           | i <= -2147483649)
+                        |    bsum{int t;}(0,
+                                          i,
+                                          sel.PopCount::pc(self.bitmap[t]))
+                          <= j
+                           +   \if (i >= 0)
+                                   \then (sel.PopCount::pc(self.bitmap[i]))
+                                   \else (0)
+                             * -1))<<SC>>
+                   &     (  k * 64
+                          + sel.USel::us(self.bitmap[k],
+                                           j
+                                         +   bsum{int t;}(0,
+                                                          k,
+                                                          sel.PopCount::pc(self.bitmap[t]))
+                                           * -1))
+                       % 65536
+                     = result_selectNew)<<SC>>))<<SC>>)
+        & self.$inv<<impl>>)<<SC>>
+        & (exc = null)<<impl>>
+        & \forall Field f;
+            \forall java.lang.Object o;
+              o.f@heapAtPre = o.f)
+---- open goal 2 (node 1074)
+ self.cardinality <= j,
+    \if (self.cardinality >= 0)
+        \then (quotient_1 * -4294967296 + quotient_0)
+        \else (  -2147483648
+               + quotient_2 * -4294967296
+               + quotient_0)
+ <= -1
+  + j,
+ self.bitmap.$created = TRUE,
+ quotient_0 / 4294967296 = quotient_2,
+ quotient_1 >= quotient_2,
+ quotient_2 <= 0,
+ quotient_0 >= quotient_2 * 4294967296,
+ quotient_0 <= 4294967295 + quotient_2 * 4294967296,
+ (2147483648 + quotient_0) / 4294967296 = quotient_1,
+ quotient_1 <= 1 + quotient_2,
+ quotient_1 <= 0,
+ quotient_0 >= -2147483648 + quotient_1 * 4294967296,
+ quotient_0 <= 2147483647 + quotient_1 * 4294967296,
+ self.cardinality / 2 = quotient_0,
+ quotient_0 <= 1073741823,
+ j >= quotient_0 * 2,
+ self.cardinality >= quotient_0 * 2,
+ self.cardinality <= 1 + quotient_0 * 2,
+ wellFormed(heap),
+ self.$created = TRUE,
+ exactInstance<[sel.BitmapSelect]>(self) = TRUE,
+ j <= 2147483647,
+ measuredByEmpty,
+ self.bitmap[k_0] >= -9223372036854775808,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | self.bitmap[i] >= -9223372036854775808),
+ self.bitmap[k_0] <= 9223372036854775807,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | self.bitmap[i] <= 9223372036854775807),
+ sel.PopCount::pc(self.bitmap[k_0]) >= 0,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | sel.PopCount::pc(self.bitmap[i]) >= 0),
+ sel.PopCount::pc(self.bitmap[k_0]) <= 64,
+ \forall int i;
+   (  i <= -1
+    | i >= 2147483648
+    | i >= self.bitmap.length
+    | sel.PopCount::pc(self.bitmap[i]) <= 64),
+ sel.PopCount::pc(0) = 0,
+ j >= 0,
+ k_0 >= 0,
+ self.bitmap.length >= 0,
+ self.bitmap.length <= 2147483647,
+ k_0 <= 2147483646,
+ self.bitmap.length >= 1 + k_0,
+    bsum{int t;}(0,
+                 k_0,
+                 sel.PopCount::pc(self.bitmap[t]))
+ >= 1
+  + j
+  + sel.PopCount::pc(self.bitmap[k_0]) * -1,
+ exc_0 = null,
+ l_0 <= 536870911,
+ l_0 >= 0,
+ self.bitmap.length >= l_0 * 4,
+ jdiv(l_0 * 4, 4) = l_0,
+ result_andM4 = l_0 * 4
+==>
+ self = null,
+ self.bitmap = null,
+ {heapAtPre:=heap
+  || exc:=null
+  || bitmap:=self.bitmap
+  || leftover:=j
+  || k:=0
+  || limit:=l_0 * 4}
+   \<{
+     try {
+       method-frame (
+         result->result_selectNew,
+         source=selectNew(int)@sel.BitmapSelect,
+         this=self
+       ) {
+         {
+           _label1:
+           {
+             while (k < limit) {
+               {
+                 int bits = sel.PopCount.bitCount(
+                                bitmap[k]
+                              ) +
+                              sel.PopCount.bitCount(
+                                bitmap[k + 1]
+                              ) +
+                              sel.PopCount.bitCount(
+                                bitmap[k + 2]
+                              ) +
+                              sel.PopCount.bitCount(
+                                bitmap[k + 3]
+                              );
+                 if (bits > leftover) {
+                   break _label1;
+                 }
+                 leftover -= bits;
+               }
+               k += 4;
+             }
+           }
+           for (; k < bitmap.length; ++k) {
+             int bits = sel.PopCount.bitCount(bitmap[k]);
+             if (bits > leftover) {
+               return
+               (char) (k * 64 +
+                         sel.sel.USel.select(
+                           bitmap[k],
+                           leftover
+                         ));
+             }
+             leftover -= bits;
+           }
+         }
+         throw
+         new IllegalArgumentException(
+           "Insufficient cardinality."
+         );
+       }
+     } catch (java.lang.Throwable e) {
+       exc = e;
+     }
+   }\> (  (\exists int k;
+             ((  k <= 2147483647
+               & k >= -2147483648
+               & ((  (((k >= 0
+                   & k <= -1 + self.bitmap.length)<<SC>>
+                   &    bsum{int t;}(0,
+                                     k,
+                                     sel.PopCount::pc(self.bitmap[t]))
+                     >= 1
+                      + j
+                      +   \if (k >= 0)
+                              \then (sel.PopCount::pc(self.bitmap[k]))
+                              \else (0)
+                        * -1)<<SC>>
+                   & \forall int i;
+                       (  i <= -1
+                        | k <= i
+                        | (  i >= 2147483648
+                           | i <= -2147483649)
+                        |    bsum{int t;}(0,
+                                          i,
+                                          sel.PopCount::pc(self.bitmap[t]))
+                          <= j
+                           +   \if (i >= 0)
+                                   \then (sel.PopCount::pc(self.bitmap[i]))
+                                   \else (0)
+                             * -1))<<SC>>
+                   &     (  k * 64
+                          + sel.USel::us(self.bitmap[k],
+                                           j
+                                         +   bsum{int t;}(0,
+                                                          k,
+                                                          sel.PopCount::pc(self.bitmap[t]))
+                                           * -1))
+                       % 65536
+                     = result_selectNew)<<SC>>))<<SC>>)
+        & self.$inv<<impl>>)<<SC>>
+        & (exc = null)<<impl>>
+        & \forall Field f;
+            \forall java.lang.Object o;
+              o.f@heapAtPre = o.f)
+saved /srv/home/hantaolou/code/veriop/heldout/java-key/final-verification/select/po_new_nF.open.proof
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "de.uka.ilkd.key.proof.Node.isClosed()" because "this.root" is null

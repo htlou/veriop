@@ -1,0 +1,53 @@
+{
+  "llama_cpp": {
+    "upstream": "ggml-org/llama.cpp",
+    "baseline_commit": "06cad0b9e77315bd2930bd4f70a6d7b37b2a01c1",
+    "candidate_commit": "1e07a9f1fd43c3267132fda2a681d90697dbb676",
+    "candidate_parent": "06cad0b9e77315bd2930bd4f70a6d7b37b2a01c1",
+    "pinned_in": "benchmarks/targets.tsv (06cad0b9e77315bd2930bd4f70a6d7b37b2a01c1)",
+    "changed_files": [
+      "ggml/src/ggml-cuda/conv2d-dw.cu | 110 +++++++++++++++++++++++++++++++++++-----",
+      " 1 file changed, 98 insertions(+), 12 deletions(-)"
+    ],
+    "patch": "conv2d-dw-fixed.patch",
+    "patch_sha256": "4d3fa103bbae643a7adc8bfbe330dbeca1dc8132c14874867a2d48e139f9fd0d",
+    "baseline_source_sha256": "bfa610bf40006c9c2c73fe305ddaa0543ac3e5ba8f3b98b450b7e6ff8e7a6848",
+    "candidate_source_sha256": "b621417788ba18b483a0a0a6ab97de313c1b1253dba8a50e70df3953ecb4a7f2",
+    "cmake_flags": "-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=80 -DCMAKE_BUILD_TYPE=Release -DLLAMA_BUILD_TESTS=ON -DLLAMA_BUILD_SERVER=OFF -DLLAMA_BUILD_TOOLS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_CURL=OFF -DGGML_CUDA_NCCL=OFF (+ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON)",
+    "build_target": "test-backend-ops, cmake --build -j32"
+  },
+  "binaries": {
+    "baseline/test-backend-ops": "5012d3bd23f15226894d97c1b9734f3003fa4b8250c50ae747422e5215630630",
+    "baseline/libggml-cuda.so.0.26.0": "d86977ba098592b2e67b05580f3bac6b4650da45fc3a1c69777580211c4b3dc5",
+    "candidate/test-backend-ops": "45202a2ba02c2b34dc445651f03f0d2558e4a38565620075331ed0691ebdb0a0",
+    "candidate/libggml-cuda.so.0.26.0": "bb8fb9e18f92a01d9e5ee43a4d7166be55b1ae6ca055dd0294ae8afaf84b58c6"
+  },
+  "ptx": {
+    "conv2d-dw-baseline.ptx": "18f9aa13ef0069a017d9f45206cc48fd4da3c4b1cc5a7a585b0784fba5c46294",
+    "conv2d-dw-candidate.ptx": "e88dd67e49f8d4800f703026ed4700d07c65588fe68a35a887ff1d75bbf736b6",
+    "volta/mutant/conv2d-dw-mutant-offbyone.ptx": "d2af830d77e1d435409ce0ede3b905663d57f346485afd582a54045794c67ee3",
+    "volta/mutant/conv2d-dw-mutant-reorder.ptx": "23367ebd85889d18223e990193f1327d7d14bf4e2224ee00e7a3421018dbf032"
+  },
+  "volta": {
+    "repo": "cuda/repos/volta",
+    "commit": "5d7530cc7fbef656c3fbeac22c6529441e4db70c",
+    "worktree_clean": true,
+    "binary_sha256": "e8796ad764415cdcc1dea9190975598f91ebf392fc4f3c2354917de213f3e5de"
+  },
+  "toolchain": {
+    "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+    "driver": "570.195.03",
+    "gpu": "NVIDIA H100 80GB HBM3, GPU-9ae3b5a3-000e-63ed-21c1-133429f707aa",
+    "host_compiler": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0"
+  },
+  "volta_cta": {
+    "dir": "volta-cta",
+    "base_commit": "5d7530cc7fbef656c3fbeac22c6529441e4db70c",
+    "patch": "volta-cta.patch",
+    "patch_sha256": "a84ff4cc4ed67eade72f66bb69e8d9ade418be35e3886109c384f916475e95b0",
+    "binary_sha256": "79c3b3568db1556e07cc7586a74feb6c48477d6392617fac3ba0fe36cafbe47a",
+    "toolchain": "rustc 1.99.0 (aeneas/env/rustup), cargo build --release",
+    "changes": "--cta x,y,z (sets %ctaid of the analyzed CTA; default 0,0,0); compare --syntactic (SYNTACTIC k/n + FOOTPRINT lines)",
+    "pristine_copy": "volta-pristine (git worktree of the copy at 5d7530c, used only for the test-suite baseline)"
+  }
+}

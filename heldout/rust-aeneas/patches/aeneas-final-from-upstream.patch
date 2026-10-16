@@ -1,0 +1,412 @@
+diff --git a/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean b/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean
+index cd82fa8e..6060e8d8 100644
+--- a/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean
++++ b/backends/lean/Aeneas/Tactic/Elab/TraitDefault/Init.lean
+@@ -2,6 +2,7 @@ module
+ public import Lean.Elab.PreDefinition.Basic
+ public meta import Lean.Elab.DefView
+ public meta import Lean.Elab.PreDefinition.Basic
++public meta import Lean.Meta.RecExt
+ public section
+ 
+ /-!
+@@ -58,8 +59,8 @@ command resolves this circularity at elaboration time by:
+ 
+ 1. Letting the body reference the name being defined (via a temporary local
+    variable, using `withAuxDecl`).
+-2. After elaboration, **unfolding** every `@[trait_default]`-marked function call,
+-   exposing the field projections (e.g., `self.N`).
++2. After elaboration, **unfolding** every `@[trait_default]`-marked function call
++   and non-recursive helpers receiving self, exposing field projections (e.g., `self.N`).
+ 3. **Substituting** those projections with the already-resolved field values.
+ 4. Repeating until every field is free of the self-reference.
+ 
+@@ -98,7 +99,8 @@ Given a structure with fields `f₁, …, fₙ` and a constructor application
+ 1. **Partition** fields into *resolved* (no self-reference) and *unresolved*.
+ 2. **Loop** (at most `n + 1` iterations):
+    a. For each unresolved field value `vᵢ`:
+-      - **Unfold** all `@[trait_default]` calls (`unfoldTraitDefaults`).
++      - **Unfold** all `@[trait_default]` calls and non-recursive helpers receiving self
++        (`unfoldTraitDefaults`).
+       - **Substitute** projections of the self-reference with resolved values
+         (`substituteProjections`).
+    b. If `vᵢ` no longer mentions the self-reference, mark it resolved.
+@@ -148,7 +150,8 @@ meta def exprContainsFVar (e : Expr) (fvarId : FVarId) : Bool :=
+     | _ => false
+ 
+ /-- Recursively unfold every `@[trait_default]`-marked constant application in `e`,
+-    beta-reducing after each unfolding step.
++    beta-reducing after each unfolding step. Also unfold non-recursive helpers
++    that receive the self-reference directly, exposing their field projections.
+ 
+     Uses `TransparencyMode.all` so that `@[irreducible]` definitions are also unfolded —
+     this is needed because some generated default implementations are marked as irreducible.
+@@ -159,16 +162,23 @@ meta def exprContainsFVar (e : Expr) (fvarId : FVarId) : Bool :=
+     Any `@[trait_default]` constant whose body is *not* available for unfolding — which,
+     under the module system, happens when the definition is not marked `@[expose]` — is
+     returned in the second component, so that callers can report an actionable error. -/
+-meta partial def unfoldTraitDefaults (e : Expr) : MetaM (Expr × Std.HashSet Name) := do
++meta partial def unfoldTraitDefaults (e : Expr) (selfFvarId : FVarId) :
++    MetaM (Expr × Std.HashSet Name) := do
+   let env ← getEnv
+   let go : StateT (Std.HashSet Name) MetaM Expr :=
+     Core.transform e (pre := fun e => do
+       let fn := e.getAppFn
+       if let .const name _ := fn then
+-        if traitDefaultAttr.hasTag env name then
++        let isDefault := traitDefaultAttr.hasTag env name
++        let receivesSelf := e.getAppArgs.any fun arg =>
++          let fn := arg.consumeMData.getAppFn
++          fn.isFVar && fn.fvarId! == selfFvarId
++        let isHelper := receivesSelf && (env.getProjectionFnInfo? name).isNone &&
++          !(← isRecursiveDefinition name)
++        if isDefault || isHelper then
+           if let some e' ← withTransparency .all <| unfoldDefinition? e then
+             return .visit e'.headBeta
+-          else
++          else if isDefault then
+             modify (·.insert name)
+       return .continue)
+   go.run ∅
+@@ -296,7 +306,7 @@ meta def resolveStructFields (value : Expr) (selfFvarId : FVarId) (type : Expr)
+     let mut stillUnresolved : Array Nat := #[]
+     for i in unresolved do
+       let fieldVal := fieldValues[i]!
+-      let (fieldVal', fieldBlocked) ← unfoldTraitDefaults fieldVal
++      let (fieldVal', fieldBlocked) ← unfoldTraitDefaults fieldVal selfFvarId
+       blocked := blocked.insertMany fieldBlocked
+       let fieldVal' ← substituteProjections fieldVal' selfFvarId structName resolved
+       if !exprContainsFVar fieldVal' selfFvarId then
+diff --git a/src/PrePasses.ml b/src/PrePasses.ml
+index 9ff51309..0bff838d 100644
+--- a/src/PrePasses.ml
++++ b/src/PrePasses.ml
+@@ -389,6 +389,153 @@ let update_array_default (crate : crate) : crate =
+     in
+     visitor#visit_crate None crate
+ 
++(** Remove the exits to outer loops ([break k] with [k] larger than the loop
++    depth of the statement), which [update_loops] and the symbolic interpreter
++    do not support, by duplicating continuations.
++
++    Charon produces such exits when a [?] inside a [for] loop is followed by a
++    second loop: the error epilogue is shared and placed after the first loop
++    [P], and the second loop [L] is placed inside the branch of [P] which
++    handles the end of the iteration:
++    {[
++      loop {                                 // P
++        match next(iter) {
++          None => {
++            ...;
++            loop { ... break 1; ... break 0; ... };   // L
++            K;
++            return
++          }
++          Some => { ...; break 0; ...; continue 0 }
++        }
++      };
++      E;
++      return
++    ]}
++    When the statements [K] following [L] and the statements [E] following [P]
++    are loop-free and end with a [return], every exit of [L] leads to the end of
++    the function. We then move the continuation of each exit inside [L]:
++    - the normal exits of [L] become [K; break];
++    - the exits to [P] become [E; break];
++    - [K; return] after [L] is replaced by [return]. The [return] (now at depth
++      one) and the remaining exits of [P] are then handled by [update_loops] as
++      usual. All the exits of [L] lead to states where the function is about to
++      return, as in [update_loops]. *)
++let lower_nested_loop_exits (_ : crate) (f : fun_decl) : fun_decl =
++  match f.body with
++  | StructuredBody body ->
++      let is_return (st : statement) = st.kind = Return in
++      let loop_free (sts : statement list) : bool =
++        let visitor =
++          object
++            inherit [_] iter_statement
++            method! visit_Loop _ _ = raise Found
++          end
++        in
++        try
++          List.iter (visitor#visit_statement ()) sts;
++          true
++        with Found -> false
++      in
++      (* Split a continuation into its statements before the final [return] *)
++      let returning_continuation (sts : statement list) : statement list option
++          =
++        match List.rev sts with
++        | last :: rev_init when is_return last && loop_free sts ->
++            Some (List.rev rev_init)
++        | _ -> None
++      in
++      (* Check that a loop body only exits to itself or to its parent loop, and
++         only through [break] *)
++      let exits_ok (loop_body : block) : bool =
++        let ok = ref true in
++        let rec visit_block depth (b : block) =
++          List.iter (visit_st depth) b.statements
++        and visit_st depth (st : statement) =
++          match st.kind with
++          | Break i -> if i > depth + 1 then ok := false
++          | Continue i -> if i > depth then ok := false
++          | Return -> ok := false
++          | Loop b -> visit_block (depth + 1) b
++          | Switch (_, branches) -> List.iter (visit_block depth) branches
++          | _ -> ()
++        in
++        visit_block 0 loop_body;
++        !ok
++      in
++      let has_outer_exit (loop_body : block) : bool =
++        let found = ref false in
++        let rec visit_block depth (b : block) =
++          List.iter (visit_st depth) b.statements
++        and visit_st depth (st : statement) =
++          match st.kind with
++          | Break i | Continue i -> if i > depth then found := true
++          | Loop b -> visit_block (depth + 1) b
++          | Switch (_, branches) -> List.iter (visit_block depth) branches
++          | _ -> ()
++        in
++        visit_block 0 loop_body;
++        !found
++      in
++      (* Rewrite the exits of [L] *)
++      let rewrite_exits (k_stmts : statement list) (e_stmts : statement list)
++          (loop_body : block) : block =
++        let rec visit_block depth (b : block) : block =
++          { b with statements = List.concat_map (visit_st depth) b.statements }
++        and visit_st depth (st : statement) : statement list =
++          match st.kind with
++          | Break i when i = depth -> k_stmts @ [ st ]
++          | Break i when i = depth + 1 ->
++              e_stmts @ [ { st with kind = Break depth } ]
++          | Loop b -> [ { st with kind = Loop (visit_block (depth + 1) b) } ]
++          | Switch (data, branches) ->
++              [
++                {
++                  st with
++                  kind = Switch (data, List.map (visit_block depth) branches);
++                };
++              ]
++          | _ -> [ st ]
++        in
++        visit_block 0 loop_body
++      in
++      (* [parent_cont]: the continuation of the innermost enclosing loop, if it
++         is loop-free and ends with a return *)
++      let rec visit_block (parent_cont : statement list option option)
++          (b : block) : block =
++        let rec go (sts : statement list) : statement list =
++          match sts with
++          | [] -> []
++          | ({ kind = Loop loop_body; _ } as st) :: rest -> (
++              let own_cont = returning_continuation rest in
++              (* Process the nested loops first, knowing our continuation *)
++              let loop_body = visit_block (Some own_cont) loop_body in
++              let st = { st with kind = Loop loop_body } in
++              match (parent_cont, own_cont) with
++              | Some (Some e_stmts), Some k_stmts
++                when has_outer_exit loop_body && exits_ok loop_body ->
++                  let loop_body = rewrite_exits k_stmts e_stmts loop_body in
++                  let ret = List.nth rest (List.length rest - 1) in
++                  [ { st with kind = Loop loop_body }; ret ]
++              | _ -> st :: go rest)
++          | st :: rest -> visit_st parent_cont st :: go rest
++        in
++        { b with statements = go b.statements }
++      and visit_st parent_cont (st : statement) : statement =
++        match st.kind with
++        | Switch (data, branches) ->
++            {
++              st with
++              kind = Switch (data, List.map (visit_block parent_cont) branches);
++            }
++        | _ -> st
++      in
++      {
++        f with
++        body = StructuredBody { body with body = visit_block None body.body };
++      }
++  | _ -> f
++
+ exception FoundStatement of statement
+ 
+ (** Check that loops:
+@@ -2355,6 +2502,7 @@ let apply_passes (crate : crate) : crate =
+       ("fix_closure_signature_regions", fix_closure_signature_regions);
+       ("erase_body_regions", erase_body_regions);
+       ("remove_unreachable", remove_unreachable);
++      ("lower_nested_loop_exits", lower_nested_loop_exits);
+       ("update_loop", update_loops);
+       ("remove_useless_joins", remove_useless_joins);
+       ( "remove_shallow_borrows_storage_live_dead",
+diff --git a/src/Translate.ml b/src/Translate.ml
+index 2b9c4b5f..9ff95b5a 100644
+--- a/src/Translate.ml
++++ b/src/Translate.ml
+@@ -1046,10 +1046,7 @@ let trait_decl_is_builtin (ctx : gen_ctx) (id : Pure.trait_decl_id) : bool =
+     [%silent_unwrap_opt_span] None
+       (TraitDeclId.Map.find_opt id ctx.trans_trait_decls)
+   in
+-  let open ExtractBuiltin in
+-  Option.is_some
+-    (match_name_find_opt ctx.trans_ctx trait_decl.item_meta.name
+-       (builtin_trait_decls_map ()))
++  Option.is_some trait_decl.builtin_info
+ 
+ let trait_impl_is_builtin (ctx : gen_ctx) (id : Pure.trait_impl_id) : bool =
+   let trait_impl =
+diff --git a/src/dune b/src/dune
+index d123693a..2d81ae93 100644
+--- a/src/dune
++++ b/src/dune
+@@ -113,6 +113,7 @@
+   StringUtils
+   Substitute
+   SymbolicAst
++  SpecializedFnOnce
+   SymbolicToPure
+   SymbolicToPureAbs
+   SymbolicToPureCore
+diff --git a/src/extract/ExtractBase.ml b/src/extract/ExtractBase.ml
+index 30ab2204..c7742fa7 100644
+--- a/src/extract/ExtractBase.ml
++++ b/src/extract/ExtractBase.ml
+@@ -1701,7 +1701,24 @@ let ctx_compute_trait_decl_name (ctx : extraction_ctx) (trait_decl : trait_decl)
+     opt_rename_llbc_name trait_decl.item_meta.attr_info
+       trait_decl.item_meta.name
+   in
+-  ctx_compute_type_name trait_decl.item_meta ctx llbc_name
++  match List.rev llbc_name with
++  | PeInstantiated _ :: _ -> (
++      (* Empty arguments erase partial specializations from name patterns. *)
++      let args =
++        Charon.TypesUtils.generic_args_of_params
++          (Some trait_decl.item_meta.span) trait_decl.llbc_generics
++      in
++      let name = opt_ctx_prepare_name trait_decl.item_meta ctx llbc_name in
++      let name =
++        flatten_name
++          (name_with_generics_to_simple_name ctx.trans_ctx name
++             trait_decl.llbc_generics args)
++      in
++      match backend () with
++      | FStar -> StringUtils.lowercase_first_letter (name ^ "_t")
++      | Coq | HOL4 -> name ^ "_t"
++      | Lean -> name)
++  | _ -> ctx_compute_type_name trait_decl.item_meta ctx llbc_name
+ 
+ let ctx_compute_trait_impl_name_raw (ctx : extraction_ctx)
+     (trait_impl_id : trait_impl_id) : string =
+@@ -1773,6 +1790,15 @@ let ctx_compute_trait_impl_name_raw (ctx : extraction_ctx)
+               args
+             |> add_blanket_suffix |> flatten_name
+           else
++            (* Instantiate a specialized trait name before removing Self: the
++               name's binder still expects the complete argument list. *)
++            let trait_name, args =
++              match List.rev trait_decl.item_meta.name with
++              | PeInstantiated binder :: rest ->
++                  ( List.rev rest,
++                    Charon.Substitute.instantiate_name_generics binder args )
++              | _ -> (trait_decl.item_meta.name, args)
++            in
+             (* Retrieve the self type *)
+             let self, args =
+               match args.types with
+@@ -1817,8 +1843,8 @@ let ctx_compute_trait_impl_name_raw (ctx : extraction_ctx)
+ 
+             (* Generate the name for the trait *)
+             let trait_name =
+-              name_with_generics_to_simple_name ctx.trans_ctx
+-                trait_decl.item_meta.name params args
++              name_with_generics_to_simple_name ctx.trans_ctx trait_name params
++                args
+               |> flatten_name_no_sep
+             in
+             [%ldebug "trait_name: " ^ trait_name];
+@@ -2107,6 +2133,17 @@ let basename_to_unique (ctx : extraction_ctx) (name : string) =
+        the backend allows such collisions *)
+     StringSet.mem s ctx.names_maps.names_map.names_set
+     || StringSet.mem s ctx.names_maps.strict_names_map.names_set
++    (* Lean resolves [x.f] as a field access when [x] is a local variable:
++       forbid local names which are the first component of a qualified
++       global name (for instance, a variable [engine] would shadow
++       [engine.Engine.decode_slice]). *)
++    || backend () = Lean
++       &&
++       let prefix = s ^ "." in
++       let len = String.length prefix in
++       StringSet.exists
++         (fun n -> String.length n > len && String.sub n 0 len = prefix)
++         ctx.names_maps.names_map.names_set
+   in
+   basename_to_unique_aux collision name_append_index name
+ 
+diff --git a/src/interp/InterpMatchCtxs.ml b/src/interp/InterpMatchCtxs.ml
+index a71f925e..4db1682e 100644
+--- a/src/interp/InterpMatchCtxs.ml
++++ b/src/interp/InterpMatchCtxs.ml
+@@ -579,6 +579,16 @@ module MakeMatcher (M : PrimMatcher) : Matcher = struct
+             let proj_ty = M.match_rtys ctx0 ctx1 proj0.proj_ty proj1.proj_ty in
+             M.match_aproj_loans match_rec ctx0 ctx1 v0.ty pm0 ploans0 v1.ty pm1
+               ploans1 ty proj_ty
++        | AEndedProjLoans e0, AEndedProjLoans e1
++          when e0.consumed = [] && e1.consumed = [] && e0.borrows = []
++               && e1.borrows = [] && pm0 = pm1 ->
++            (* Ended loan projectors which consumed nothing only carry meta
++               information (used for the synthesis): we keep the left one, as
++               is done for the ended ignored mutable borrows. *)
++            { v0 with ty }
++        | AEndedProjBorrows b0, AEndedProjBorrows b1
++          when b0.loans = [] && b1.loans = [] && pm0 = pm1 -> { v0 with ty }
++        | AEmpty, AEmpty when pm0 = pm1 -> { v0 with ty }
+         | _ -> [%craise_recover] M.recover M.span "Unreachable"
+       end
+     | _ ->
+diff --git a/src/symbolic/SpecializedFnOnce.ml b/src/symbolic/SpecializedFnOnce.ml
+new file mode 100644
+index 00000000..0bbb9c54
+--- /dev/null
++++ b/src/symbolic/SpecializedFnOnce.ml
+@@ -0,0 +1,22 @@
++(** Builtin information of a trait declaration.
++
++    Specialized [FnOnce] traits (produced by Charon's partial monomorphization
++    with mutable-borrow arguments) can return updated mutable arguments: we
++    generate their signatures instead of using the generic builtin model, whose
++    [Output] parameter does not include that state. (Logic of the pilot's
++    aeneas-specialized-fnonce patch, moved to its own module.) *)
++let builtin_trait_decl_info (ctx : Contexts.decls_ctx) (name : Types.name) :
++    Pure.builtin_trait_decl_info option =
++  let builtin_info =
++    TranslateCore.match_name_find_opt ctx name
++      (ExtractBuiltin.builtin_trait_decls_map ())
++  in
++  match builtin_info with
++  | Some info
++    when info.extract_name = "core.ops.function.FnOnce"
++         && List.exists
++              (function
++                | Types.PeInstantiated _ -> true
++                | _ -> false)
++              name -> None
++  | _ -> builtin_info
+diff --git a/src/symbolic/SymbolicToPure.ml b/src/symbolic/SymbolicToPure.ml
+index c96eaf86..7c42236e 100644
+--- a/src/symbolic/SymbolicToPure.ml
++++ b/src/symbolic/SymbolicToPure.ml
+@@ -216,8 +216,8 @@ let translate_trait_decl (ctx : Contexts.decls_ctx) (trait_decl : A.trait_decl)
+   in
+   (* Lookup the builtin information, if there is *)
+   let builtin_info =
+-    match_name_find_opt ctx trait_decl.item_meta.name
+-      (ExtractBuiltin.builtin_trait_decls_map ())
++    (* Specialized [FnOnce] traits: see [SpecializedFnOnce]. *)
++    SpecializedFnOnce.builtin_trait_decl_info ctx trait_decl.item_meta.name
+   in
+   if (not (T.AssocTypeId.Map.is_empty types)) && builtin_info = None then
+     (* Most associated types are removed by Charon's `--remove-associated-types`. *)

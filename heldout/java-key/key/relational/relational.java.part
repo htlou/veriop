@@ -1,0 +1,53 @@
+
+  /* ===== Direct relational obligations (product program over two containers) =====
+     Two distinct containers a and b in identical states: same words (modelled by sharing the
+     word array, which neither rank writes) and the same cached cardinality. OLD rank runs on a,
+     NEW rank on b, same argument. Claim: same result, same final cardinality, and nothing but
+     a.cardinality / b.cardinality may be written (identical heap effects). */
+  /*@ public normal_behavior
+    @ requires a != null && b != null && a != b && a.bitmap == b.bitmap;
+    @ requires a.bitmap != null && 1024 <= a.bitmap.length && a.bitmap.length <= 1048576;
+    @ requires (\forall int i; 0 <= i && i < a.bitmap.length; \dl_inLong(a.bitmap[i]));
+    @ requires a.cardinality == b.cardinality;
+    @ requires a.cardinality < 0 || a.cardinality == (\sum int i; 0 <= i && i < a.bitmap.length; PopCount.pc(a.bitmap[i]));
+    @ requires a.cardinality <= 65536;
+    @ requires x != 65535;
+    @ ensures \result;
+    @ ensures a.cardinality == b.cardinality;
+    @ assignable a.cardinality, b.cardinality;
+    @*/
+  public static boolean same(BitmapRank a, BitmapRank b, char x) {
+    int ra = a.rankOld(x);
+    int rb = b.rankNew(x);
+    return ra == rb;
+  }
+
+  /*@ public normal_behavior
+    @ requires a != null && b != null && a != b && a.bitmap == b.bitmap;
+    @ requires a.bitmap != null && 1024 <= a.bitmap.length && a.bitmap.length <= 1048576;
+    @ requires (\forall int i; 0 <= i && i < a.bitmap.length; \dl_inLong(a.bitmap[i]));
+    @ requires a.cardinality == b.cardinality;
+    @ requires a.cardinality < 0 || a.cardinality == (\sum int i; 0 <= i && i < a.bitmap.length; PopCount.pc(a.bitmap[i]));
+    @ requires a.cardinality <= 65536;
+    @ requires x == 65535;
+    @ ensures \result;
+    @ ensures a.cardinality == b.cardinality;
+    @ assignable a.cardinality, b.cardinality;
+    @*/
+  public static boolean sameMax(BitmapRank a, BitmapRank b, char x) {
+    int ra = a.rankOld(x);
+    int rb = b.rankNew(x);
+    return ra == rb;
+  }
+
+  /* validate() == true  ==>  INV (the cached-cardinality part). validate() is the library's own
+     definition of a well-formed BitmapContainer (javadoc: "Validate the content of the container.
+     Useful after deserialization."). Body extracted from the real source by gen_rel.py. */
+  /*@ public normal_behavior
+    @ requires bitmap != null && 1024 <= bitmap.length && bitmap.length <= 1048576;
+    @ requires (\forall int i; 0 <= i && i < bitmap.length; \dl_inLong(bitmap[i]));
+    @ ensures \result <==> (cardinality > 4096
+    @                       && cardinality == (\sum int i; 0 <= i && i < bitmap.length; PopCount.pc(bitmap[i])));
+    @ assignable \strictly_nothing;
+    @*/
+  // VALIDATE

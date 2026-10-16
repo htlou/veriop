@@ -1,0 +1,90 @@
+diff --git a/src/Translate.ml b/src/Translate.ml
+index 2b9c4b5f..9ff95b5a 100644
+--- a/src/Translate.ml
++++ b/src/Translate.ml
+@@ -1046,10 +1046,7 @@ let trait_decl_is_builtin (ctx : gen_ctx) (id : Pure.trait_decl_id) : bool =
+     [%silent_unwrap_opt_span] None
+       (TraitDeclId.Map.find_opt id ctx.trans_trait_decls)
+   in
+-  let open ExtractBuiltin in
+-  Option.is_some
+-    (match_name_find_opt ctx.trans_ctx trait_decl.item_meta.name
+-       (builtin_trait_decls_map ()))
++  Option.is_some trait_decl.builtin_info
+ 
+ let trait_impl_is_builtin (ctx : gen_ctx) (id : Pure.trait_impl_id) : bool =
+   let trait_impl =
+diff --git a/src/extract/ExtractBase.ml b/src/extract/ExtractBase.ml
+index 30ab2204..f9604c92 100644
+--- a/src/extract/ExtractBase.ml
++++ b/src/extract/ExtractBase.ml
+@@ -1701,7 +1701,24 @@ let ctx_compute_trait_decl_name (ctx : extraction_ctx) (trait_decl : trait_decl)
+     opt_rename_llbc_name trait_decl.item_meta.attr_info
+       trait_decl.item_meta.name
+   in
+-  ctx_compute_type_name trait_decl.item_meta ctx llbc_name
++  match List.rev llbc_name with
++  | PeInstantiated _ :: _ -> (
++      (* Empty arguments erase partial specializations from name patterns. *)
++      let args =
++        Charon.TypesUtils.generic_args_of_params
++          (Some trait_decl.item_meta.span) trait_decl.llbc_generics
++      in
++      let name = opt_ctx_prepare_name trait_decl.item_meta ctx llbc_name in
++      let name =
++        flatten_name
++          (name_with_generics_to_simple_name ctx.trans_ctx name
++             trait_decl.llbc_generics args)
++      in
++      match backend () with
++      | FStar -> StringUtils.lowercase_first_letter (name ^ "_t")
++      | Coq | HOL4 -> name ^ "_t"
++      | Lean -> name)
++  | _ -> ctx_compute_type_name trait_decl.item_meta ctx llbc_name
+ 
+ let ctx_compute_trait_impl_name_raw (ctx : extraction_ctx)
+     (trait_impl_id : trait_impl_id) : string =
+@@ -1773,6 +1790,15 @@ let ctx_compute_trait_impl_name_raw (ctx : extraction_ctx)
+               args
+             |> add_blanket_suffix |> flatten_name
+           else
++            (* Instantiate a specialized trait name before removing Self: the
++               name's binder still expects the complete argument list. *)
++            let trait_name, args =
++              match List.rev trait_decl.item_meta.name with
++              | PeInstantiated binder :: rest ->
++                  ( List.rev rest,
++                    Charon.Substitute.instantiate_name_generics binder args )
++              | _ -> (trait_decl.item_meta.name, args)
++            in
+             (* Retrieve the self type *)
+             let self, args =
+               match args.types with
+@@ -1817,8 +1843,8 @@ let ctx_compute_trait_impl_name_raw (ctx : extraction_ctx)
+ 
+             (* Generate the name for the trait *)
+             let trait_name =
+-              name_with_generics_to_simple_name ctx.trans_ctx
+-                trait_decl.item_meta.name params args
++              name_with_generics_to_simple_name ctx.trans_ctx trait_name params
++                args
+               |> flatten_name_no_sep
+             in
+             [%ldebug "trait_name: " ^ trait_name];
+diff --git a/src/symbolic/SymbolicToPure.ml b/src/symbolic/SymbolicToPure.ml
+index c96eaf86..7195ac74 100644
+--- a/src/symbolic/SymbolicToPure.ml
++++ b/src/symbolic/SymbolicToPure.ml
+@@ -215,9 +215,9 @@ let translate_trait_decl (ctx : Contexts.decls_ctx) (trait_decl : A.trait_decl)
+     List.map (translate_trait_clause opt_span) llbc_parent_clauses
+   in
+   (* Lookup the builtin information, if there is *)
+-  let builtin_info =
+-    match_name_find_opt ctx trait_decl.item_meta.name
+-      (ExtractBuiltin.builtin_trait_decls_map ())
++  let builtin_info = SpecializedFnOnce.filter_builtin_info trait_decl.item_meta.name
++    (match_name_find_opt ctx trait_decl.item_meta.name
++      (ExtractBuiltin.builtin_trait_decls_map ()))
+   in
+   if (not (T.AssocTypeId.Map.is_empty types)) && builtin_info = None then
+     (* Most associated types are removed by Charon's `--remove-associated-types`. *)

@@ -1,0 +1,154 @@
+diff --git a/crates/volta_analysis/src/eval/interp.rs b/crates/volta_analysis/src/eval/interp.rs
+index b2e695e..3d3528f 100644
+--- a/crates/volta_analysis/src/eval/interp.rs
++++ b/crates/volta_analysis/src/eval/interp.rs
+@@ -760,6 +760,52 @@ impl<'p> Interpreter<'p> {
+                 self.threads[t].regs.write(*dst, v);
+             }
+ 
++            LoweredInstr::Pack16 { dst, lo, hi } => {
++                // [veriop-ext] mov.b32 dst, {lo, hi}: concrete halves combine
++                // exactly (lo | hi << 16); otherwise the halves stay a packed
++                // pair, which stores/unpacks back to exactly (lo, hi).
++                let lo = self.scalar_operand(t, pc, lo)?;
++                let hi = self.scalar_operand(t, pc, hi)?;
++                // A mixed (concrete integer, symbolic) pair is rejected: a
++                // concrete bit pattern and a real-valued half have different
++                // value representations, which a later float store could
++                // conflate.
++                let v = match (self.arena.as_i64(lo), self.arena.as_i64(hi)) {
++                    (Some(a), Some(b)) => {
++                        let w = ((a as u64) & 0xffff) | (((b as u64) & 0xffff) << 16);
++                        Value::Scalar(self.arena.int(w as i64))
++                    }
++                    (None, None) => Value::Pair(lo, hi),
++                    _ => {
++                        return Err(EvalError::Unsupported {
++                            pc,
++                            what: "mov.b32 r, {lo, hi} mixing a concrete integer and a symbolic half".to_string(),
++                        });
++                    }
++                };
++                self.threads[t].regs.write(*dst, v);
++            }
++
++            LoweredInstr::Unpack16 { dst_lo, dst_hi, src } => {
++                // [veriop-ext] mov.b32 {lo, hi}, src. A packed pair (the
++                // representation of two 16-bit memory granules read as one
++                // 32-bit word) splits exactly; anything else is rejected.
++                let v = self.operand_value(t, pc, src)?;
++                // Only packed pairs are split; concrete or symbolic scalar
++                // words are rejected (no bit-level float model).
++                let (lo, hi) = match v {
++                    Value::Pair(lo, hi) => (lo, hi),
++                    Value::Scalar(_) => {
++                        return Err(EvalError::Unsupported {
++                            pc,
++                            what: "mov.b32 {lo, hi} of a non-pair symbolic word".to_string(),
++                        });
++                    }
++                };
++                self.threads[t].regs.write(*dst_lo, Value::Scalar(lo));
++                self.threads[t].regs.write(*dst_hi, Value::Scalar(hi));
++            }
++
+             LoweredInstr::BinOp {
+                 op,
+                 dst,
+diff --git a/crates/volta_analysis/src/lowered.rs b/crates/volta_analysis/src/lowered.rs
+index 49180a8..48fa50e 100644
+--- a/crates/volta_analysis/src/lowered.rs
++++ b/crates/volta_analysis/src/lowered.rs
+@@ -274,6 +274,22 @@ pub enum LoweredInstr {
+         ty: ScalarType,
+     },
+ 
++    /// [veriop-ext] Split a 32-bit word into its two 16-bit halves:
++    /// `mov.b32 {lo, hi}, src` (PTX ISA: lo = src[15:0], hi = src[31:16]).
++    Unpack16 {
++        dst_lo: RegId,
++        dst_hi: RegId,
++        src: Operand,
++    },
++
++    /// [veriop-ext] Pack two 16-bit values into a 32-bit word:
++    /// `mov.b32 dst, {lo, hi}` (dst = lo | hi << 16).
++    Pack16 {
++        dst: RegId,
++        lo: Operand,
++        hi: Operand,
++    },
++
+     /// Convert address to generic: dst = cvta.to.space(src)
+     Cvta {
+         dst: RegId,
+@@ -572,6 +588,8 @@ define_instr_kinds!(
+     Store,
+     StoreVec,
+     Mov,
++    Unpack16,
++    Pack16,
+     Cvta,
+     BinOp,
+     UnaryOp,
+@@ -633,6 +651,8 @@ impl LoweredInstr {
+             }
+             Self::Mov { src, .. } => from_op(src).into_iter().collect(),
+             Self::Cvta { src, .. } => from_op(src).into_iter().collect(),
++            Self::Unpack16 { src, .. } => from_op(src).into_iter().collect(),
++            Self::Pack16 { lo, hi, .. } => from_ops(&[*lo, *hi]),
+ 
+             // Arithmetic
+             Self::BinOp { src_a, src_b, .. } => from_ops(&[*src_a, *src_b]),
+@@ -743,6 +763,7 @@ impl LoweredInstr {
+             | Self::Load { dst, .. }
+             | Self::Mov { dst, .. }
+             | Self::Cvta { dst, .. }
++            | Self::Pack16 { dst, .. }
+             | Self::BinOp { dst, .. }
+             | Self::UnaryOp { dst, .. }
+             | Self::Fma { dst, .. }
+@@ -756,6 +777,8 @@ impl LoweredInstr {
+             | Self::Cvt { dst, .. }
+             | Self::Activemask { dst } => vec![*dst],
+ 
++            Self::Unpack16 { dst_lo, dst_hi, .. } => vec![*dst_lo, *dst_hi],
++
+             // Vector destinations
+             Self::LoadVec { dst, .. }
+             | Self::Ldmatrix { dst, .. }
+diff --git a/crates/volta_analysis/src/lowering.rs b/crates/volta_analysis/src/lowering.rs
+index ceb0d12..48c8a19 100644
+--- a/crates/volta_analysis/src/lowering.rs
++++ b/crates/volta_analysis/src/lowering.rs
+@@ -1404,6 +1404,30 @@ fn lower_parsed_instruction(
+         // Data Movement - Mov
+         // =========================================================================
+         ParsedInstruction::Mov(mov) => {
++            // [veriop-ext] Vector-destination unpack: mov.b32 {lo, hi}, src.
++            // Only the 32-bit -> 2 x 16-bit form is modeled; every other
++            // vector-destination mov keeps failing below.
++            if let AstOperand::Vector(elements) = &mov.dst {
++                if elements.len() == 2 && mov.ty.bits() == 32 {
++                    let dst_lo = ctx.resolve_dst(&elements[0])?;
++                    let dst_hi = ctx.resolve_dst(&elements[1])?;
++                    let src = ctx.resolve_operand(&mov.src)?;
++                    ctx.emit(LoweredInstr::Unpack16 { dst_lo, dst_hi, src }, predicate)?;
++                    return Ok(());
++                }
++            }
++            // [veriop-ext] 32-bit pack of two 16-bit halves keeps the halves
++            // as a packed pair (the same representation 2x16-bit memory
++            // granules read as one word have), instead of Shl/Or bit terms.
++            if let AstOperand::Vector(elements) = &mov.src {
++                if elements.len() == 2 && mov.ty.bits() == 32 {
++                    let dst = ctx.resolve_dst(&mov.dst)?;
++                    let lo = ctx.resolve_operand(&elements[0])?;
++                    let hi = ctx.resolve_operand(&elements[1])?;
++                    ctx.emit(LoweredInstr::Pack16 { dst, lo, hi }, predicate)?;
++                    return Ok(());
++                }
++            }
+             match &mov.src {
+                 AstOperand::Vector(elements) if elements.len() == 2 => {
+                     // Vector-to-scalar pack: mov.bN dst, {lo, hi}

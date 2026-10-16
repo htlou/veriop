@@ -1,0 +1,42 @@
+--- a/libdivide.h	2026-10-14 21:56:02.990986092 -0700
++++ b/libdivide.h	2026-10-14 21:56:03.022986704 -0700
+@@ -1538,13 +1538,12 @@
+         return q;
+     } else {
+         uint32_t uq = (uint32_t)libdivide_mullhi_s32(numer, magic);
+-        if (more & LIBDIVIDE_ADD_MARKER) {
+-            // must be arithmetic shift and then sign extend
+-            int32_t sign = (int8_t)more >> 7;
+-            // q += (more < 0 ? -numer : numer)
+-            // cast required to avoid UB
+-            uq += ((uint32_t)numer ^ sign) - sign;
+-        }
++        // must be arithmetic shift and then sign extend
++        int32_t sign = (int8_t)more >> 7;
++        // if (more & LIBDIVIDE_ADD_MARKER) q += (more < 0 ? -numer : numer)
++        // Selecting the addend instead of branching avoids a mispredicted
++        // branch when the divisor varies. Cast required to avoid UB.
++        uq += (more & LIBDIVIDE_ADD_MARKER) ? ((uint32_t)numer ^ sign) - sign : 0;
+         int32_t q = (int32_t)uq;
+         q >>= shift;
+         q += (q < 0);
+@@ -1712,13 +1711,12 @@
+         return q;
+     } else {
+         uint64_t uq = (uint64_t)libdivide_mullhi_s64(numer, magic);
+-        if (more & LIBDIVIDE_ADD_MARKER) {
+-            // must be arithmetic shift and then sign extend
+-            int64_t sign = (int8_t)more >> 7;
+-            // q += (more < 0 ? -numer : numer)
+-            // cast required to avoid UB
+-            uq += ((uint64_t)numer ^ sign) - sign;
+-        }
++        // must be arithmetic shift and then sign extend
++        int64_t sign = (int8_t)more >> 7;
++        // if (more & LIBDIVIDE_ADD_MARKER) q += (more < 0 ? -numer : numer)
++        // Selecting the addend instead of branching avoids a mispredicted
++        // branch when the divisor varies. Cast required to avoid UB.
++        uq += (more & LIBDIVIDE_ADD_MARKER) ? ((uint64_t)numer ^ sign) - sign : 0;
+         int64_t q = (int64_t)uq;
+         q >>= shift;
+         q += (q < 0);

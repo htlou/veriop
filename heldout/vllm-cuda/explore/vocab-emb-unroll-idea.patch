@@ -1,0 +1,86 @@
+diff --git a/csrc/libtorch_stable/vocab_parallel_embedding_kernels.cu b/csrc/libtorch_stable/vocab_parallel_embedding_kernels.cu
+index 863da3c..3c4e52b 100644
+--- a/csrc/libtorch_stable/vocab_parallel_embedding_kernels.cu
++++ b/csrc/libtorch_stable/vocab_parallel_embedding_kernels.cu
+@@ -24,6 +24,7 @@ constexpr int kBlockThreads = 256;
+ // Enough token-blocks to fill the device several times over; the token loop
+ // strides over the rest.
+ constexpr int kTokenWaves = 4;
++constexpr int kTokenUnroll = 4;
+ 
+ template <typename idx_t, typename vec_t>
+ __global__ void vocab_parallel_embedding_kernel(
+@@ -62,6 +63,64 @@ __global__ void vocab_parallel_embedding_kernel(
+   }
+ }
+ 
++// Same CTA-to-(token, vector) mapping as vocab_parallel_embedding_kernel, but
++// each CTA handles UNROLL of its tokens per iteration: all of their ids, then
++// all of their row vectors, are loaded before any of them is stored, instead
++// of one dependent id -> row -> store chain per token.
++template <typename idx_t, typename vec_t, int UNROLL>
++__global__ void vocab_parallel_embedding_unrolled_kernel(
++    vec_t* __restrict__ out,              // [num_tokens, vecs_per_row]
++    const idx_t* __restrict__ input_ids,  // [num_tokens]
++    const vec_t* __restrict__ weight,     // [num_rows, vecs_per_row]
++    const int64_t num_tokens, const int64_t vecs_per_row,
++    const int64_t org_vocab_start_index, const int64_t org_vocab_end_index,
++    const int64_t added_vocab_start_index, const int64_t added_vocab_end_index,
++    const int64_t added_row_offset) {
++  const int64_t vec_begin =
++      static_cast<int64_t>(blockIdx.x) * blockDim.x + threadIdx.x;
++  const int64_t vec_stride = static_cast<int64_t>(gridDim.x) * blockDim.x;
++  const int64_t token_stride = gridDim.y;
++
++  for (int64_t token0 = blockIdx.y; token0 < num_tokens;
++       token0 += UNROLL * token_stride) {
++    bool live[UNROLL];
++    bool owned[UNROLL];
++    int64_t row[UNROLL];
++#pragma unroll
++    for (int u = 0; u < UNROLL; ++u) {
++      const int64_t token = token0 + u * token_stride;
++      live[u] = token < num_tokens;
++      owned[u] = false;
++      row[u] = 0;
++      if (live[u]) {
++        const int64_t id = static_cast<int64_t>(input_ids[token]);
++        const bool in_org =
++            id >= org_vocab_start_index && id < org_vocab_end_index;
++        const bool in_added =
++            id >= added_vocab_start_index && id < added_vocab_end_index;
++        owned[u] = in_org || in_added;
++        row[u] = in_org ? id - org_vocab_start_index : id + added_row_offset;
++      }
++    }
++    for (int64_t v = vec_begin; v < vecs_per_row; v += vec_stride) {
++      vec_t val[UNROLL];
++#pragma unroll
++      for (int u = 0; u < UNROLL; ++u) {
++        if (live[u]) {
++          // Token owned by another rank's shard: contribute zeros.
++          val[u] = owned[u] ? weight[row[u] * vecs_per_row + v] : vec_t();
++        }
++      }
++#pragma unroll
++      for (int u = 0; u < UNROLL; ++u) {
++        if (live[u]) {
++          out[(token0 + u * token_stride) * vecs_per_row + v] = val[u];
++        }
++      }
++    }
++  }
++}
++
+ template <typename idx_t, typename vec_t>
+ void launch(torch::stable::Tensor& out, const torch::stable::Tensor& input_ids,
+             const torch::stable::Tensor& weight, int64_t org_vocab_start_index,
+@@ -76,7 +135,7 @@ void launch(torch::stable::Tensor& out, const torch::stable::Tensor& input_ids,
+       num_tokens, static_cast<int64_t>(kTokenWaves) *
+                       get_device_prop()->multiProcessorCount));
+ 
+-  vocab_parallel_embedding_kernel<idx_t, vec_t>
++  vocab_parallel_embedding_unrolled_kernel<idx_t, vec_t, kTokenUnroll>
+       <<<dim3(grid_x, grid_y), kBlockThreads, 0, stream>>>(
+           reinterpret_cast<vec_t*>(out.mutable_data_ptr()),
+           reinterpret_cast<const idx_t*>(input_ids.const_data_ptr()),

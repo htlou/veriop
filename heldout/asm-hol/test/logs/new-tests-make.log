@@ -1,0 +1,61 @@
+cc -Wall -std=gnu99 -o test test.c -L../x86 -ls2nbignum -lm
+test.c: In function ‘reference_mldsa_pointwise_acc_l5’:
+test.c:14175:19: warning: unused variable ‘MLDSA_Q’ [-Wunused-variable]
+14175 |     const int32_t MLDSA_Q = 8380417;
+      |                   ^~~~~~~
+At top level:
+test.c:17329:13: warning: ‘random_bytes’ defined but not used [-Wunused-function]
+17329 | static void random_bytes(uint8_t *buf, size_t n)
+      |             ^~~~~~~~~~~~
+In file included from test.c:17232:
+ref_aes_xts.c:381:13: warning: ‘ref_aes_xts_decrypt’ defined but not used [-Wunused-function]
+  381 | static void ref_aes_xts_decrypt(const uint8_t *in, uint8_t *out, size_t len,
+      |             ^~~~~~~~~~~~~~~~~~~
+ref_aes_xts.c:318:13: warning: ‘ref_aes_xts_encrypt’ defined but not used [-Wunused-function]
+  318 | static void ref_aes_xts_encrypt(const uint8_t *in, uint8_t *out, size_t len,
+      |             ^~~~~~~~~~~~~~~~~~~
+ref_aes_xts.c:165:13: warning: ‘ref_aes256_expand_decrypt_key’ defined but not used [-Wunused-function]
+  165 | static void ref_aes256_expand_decrypt_key(const uint8_t key[32],
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.c:14849:12: warning: ‘test_mldsa_polyz_unpack_impl’ defined but not used [-Wunused-function]
+14849 | static int test_mldsa_polyz_unpack_impl(const char *name,
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.c:14840:22: warning: ‘mldsa_polyz_unpack_19_indices’ defined but not used [-Wunused-const-variable=]
+14840 | static const uint8_t mldsa_polyz_unpack_19_indices[64] = {
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.c:14834:22: warning: ‘mldsa_polyz_unpack_17_indices’ defined but not used [-Wunused-const-variable=]
+14834 | static const uint8_t mldsa_polyz_unpack_17_indices[64] = {
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.c:1916:16: warning: ‘mldsa_intt_arm_z_123456’ defined but not used [-Wunused-variable]
+ 1916 | static int32_t mldsa_intt_arm_z_123456[160] = {
+      |                ^~~~~~~~~~~~~~~~~~~~~~~
+test.c:1847:16: warning: ‘mldsa_intt_arm_z_78’ defined but not used [-Wunused-variable]
+ 1847 | static int32_t mldsa_intt_arm_z_78[384] = {
+      |                ^~~~~~~~~~~~~~~~~~~
+test.c:1769:16: warning: ‘mldsa_ntt_arm_z_67’ defined but not used [-Wunused-variable]
+ 1769 | static int32_t mldsa_ntt_arm_z_67[384] = {
+      |                ^~~~~~~~~~~~~~~~~~
+test.c:1740:16: warning: ‘mldsa_ntt_arm_z_012345’ defined but not used [-Wunused-variable]
+ 1740 | static int32_t mldsa_ntt_arm_z_012345[144] = {
+      |                ^~~~~~~~~~~~~~~~~~~~~~
+test.c:548:16: warning: ‘mulcache_zetas_twisted’ defined but not used [-Wunused-variable]
+  548 | static int16_t mulcache_zetas_twisted[128] =
+      |                ^~~~~~~~~~~~~~~~~~~~~~
+test.c:532:16: warning: ‘mulcache_zetas’ defined but not used [-Wunused-variable]
+  532 | static int16_t mulcache_zetas[128] =
+      |                ^~~~~~~~~~~~~~
+test.c:485:16: warning: ‘intt_zetas_layer56’ defined but not used [-Wunused-variable]
+  485 | static int16_t intt_zetas_layer56[384] =
+      |                ^~~~~~~~~~~~~~~~~~
+test.c:473:16: warning: ‘intt_zetas_layer01234’ defined but not used [-Wunused-variable]
+  473 | static int16_t intt_zetas_layer01234[80] =
+      |                ^~~~~~~~~~~~~~~~~~~~~
+test.c:426:16: warning: ‘ntt_zetas_layer56’ defined but not used [-Wunused-variable]
+  426 | static int16_t ntt_zetas_layer56[384] =
+      |                ^~~~~~~~~~~~~~~~~
+test.c:414:16: warning: ‘ntt_zetas_layer01234’ defined but not used [-Wunused-variable]
+  414 | static int16_t ntt_zetas_layer01234[80] =
+      |                ^~~~~~~~~~~~~~~~~~~~
+rm -f ctCheck
+for f in `find ../x86/p* ../x86/secp* -name '*.o' | grep -v bignum_inv_p | grep -v bignum_montinv_p | grep -v _scalarmul | grep -v _montjscalarmul | grep -v _jscalarmul`; do trimmed=`echo $f | tr -d .`; objdump -d --no-show-raw-insn $f | grep '^[ \t]' | cut -f2 -d: -s | awk "{print \"$trimmed: \" \$1}" | grep -v -f ../non_ct_functions.txt |  grep -v -f ../x86/allowed_asm >> ctCheck && echo FAIL >> ctCheck; done || true
+! grep FAIL ctCheck

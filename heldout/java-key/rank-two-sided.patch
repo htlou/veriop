@@ -1,0 +1,27 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index cbad4737..ddd02f22 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -1164,9 +1164,19 @@ public final class BitmapContainer extends Container implements Cloneable {
+       return cardinality;
+     }
+     int leftover = (lowbits + 1) & 63;
+-    int answer = 0;
+-    for (int k = 0; k < (lowbits + 1) >>> 6; ++k) {
+-      answer += Long.bitCount(bitmap[k]);
++    int end = (lowbits + 1) >>> 6;
++    int answer;
++    if (end > 512 && cardinality >= 0) {
++      // the upper half is shorter: subtract the bits in words end.. from the cached cardinality
++      answer = cardinality;
++      for (int k = end; k < bitmap.length; ++k) {
++        answer -= Long.bitCount(bitmap[k]);
++      }
++    } else {
++      answer = 0;
++      for (int k = 0; k < end; ++k) {
++        answer += Long.bitCount(bitmap[k]);
++      }
+     }
+     if (leftover != 0) {
+       answer += Long.bitCount(bitmap[(lowbits + 1) >>> 6] << (64 - leftover));

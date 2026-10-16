@@ -1,0 +1,90 @@
+{
+ "verdicts": {
+  "rope": {
+   "verdict": "VERIFIED",
+   "configs": 32,
+   "ctas": 163200,
+   "ctas_passing": 163200,
+   "outputs_equivalent_and_identical": 417792000,
+   "positions": "all of [0, 8192) per CTA (symbolic, --index-range)"
+  },
+  "relu_fp32": {
+   "verdict": "VERIFIED",
+   "configs": 36,
+   "flat_configs": 12,
+   "unchanged_configs": 24,
+   "flat_baseline_ctas": 962,
+   "flat_candidate_ctas": 7755,
+   "flat_windows": 20683,
+   "flat_windows_passing": 20683,
+   "flat_outputs_equivalent_and_identical": 10589696,
+   "unchanged_baseline_ctas": 479713,
+   "unchanged_ptx_identical": true,
+   "all_pass": true
+  },
+  "relu_bf16": {
+   "verdict": "VERIFIED",
+   "depends_on": "volta-ext (Pack16/Unpack16)",
+   "configs": 36,
+   "flat_configs": 12,
+   "unchanged_configs": 24,
+   "flat_baseline_ctas": 962,
+   "flat_candidate_ctas": 6310,
+   "flat_windows": 10582,
+   "flat_windows_passing": 10582,
+   "flat_outputs_equivalent_and_identical": 10589696,
+   "unchanged_baseline_ctas": 479713,
+   "unchanged_ptx_identical": true,
+   "all_pass": true
+  }
+ },
+ "checker": {
+  "volta_final_sha256": "7d4a05d8e25ccb751bccfe1942b9d8c74e5bc5f845fc7c8e4df0240221dc32f3",
+  "base_commit": "5d7530cc7fbef656c3fbeac22c6529441e4db70c",
+  "layers": [
+   "llama-cuda/volta-cta.patch",
+   "vllm-cuda/volta-ext.patch",
+   "final-verification/volta-final-ranged-restrict.patch"
+  ],
+  "volta_final_patch_sha256": "f021987d76e058f000741c6fbe9f5c7206a2b27e0930ba2973a07a2a98a7667a",
+  "ranged_restrict_patch_sha256": "9cdb0aeb1a14d54f7fa23d782a3c4690852c69c51e458289c40a01677a6ac103",
+  "testsuite": "489 passed, 0 failed, 2 ignored; per-test outcomes identical to pristine 5d7530c",
+  "replay_cta0": {
+   "runs": 98,
+   "all_identical": true
+  }
+ },
+ "negative_controls": {
+  "rope": {
+   "cta37": true,
+   "cta31000": true,
+   "row-plus-1": true,
+   "row-stride16": true,
+   "pos-branch": true,
+   "pos-in-data": true,
+   "pos-narrow": true,
+   "pos-float-add": true,
+   "cache-write": true,
+   "pos-other-token": true,
+   "ieee-unfused": true,
+   "cache-write-concrete": true
+  },
+  "relu": {
+   "fp32-cta700": true,
+   "bf16-cta1055": true,
+   "fp32-stride": true
+  }
+ },
+ "ieee_audit": {
+  "all_conform": true,
+  "self_test": {
+   "intermediate_rounding_flagged": true,
+   "ftz_flagged": true,
+   "examples": [
+    "rounded value %rs1 used by cvt.f32.bf16",
+    "widened 16-bit value %rs1 defined by cvt.rn.bf16.f32",
+    "float op outside the audited list: mul.ftz.f32"
+   ]
+  }
+ }
+}

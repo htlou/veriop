@@ -1,0 +1,29 @@
+diff --git a/backends/lean/Aeneas/Std/String.lean b/backends/lean/Aeneas/Std/String.lean
+index 548ab2e0..d9f1059b 100644
+--- a/backends/lean/Aeneas/Std/String.lean
++++ b/backends/lean/Aeneas/Std/String.lean
+@@ -26,8 +26,22 @@ theorem ByteArray.length_toList (bs : ByteArray) :
+   rw [loop_length 0 [] (Nat.zero_le _)]
+   simp
+ 
+-/-- TODO: we shouldn't use `decide +native` but it seems we can't reduce it otherwise. -/
+-def toStr (s : String) (h : s.toByteArray.size ≤ U32.max := by decide +native) : Str :=
++/-- The UTF-8 byte size of a string is the sum of the UTF-8 sizes of its characters. -/
++theorem toStr_size_eq_sum_utf8Size (s : String) :
++    s.toByteArray.size = (s.toList.map Char.utf8Size).sum := by
++  have : s.toByteArray = s.toList.utf8Encode := by
++    rw [← String.toByteArray_ofList, String.ofList_toList]
++  rw [this, List.utf8Encode, List.size_toByteArray, List.length_flatMap]
++  simp only [String.length_utf8EncodeChar]
++
++/-- The size bound is first proved in the kernel (via `toStr_size_eq_sum_utf8Size`; `String.toList`
++    of a literal is computed by the `reduceToList` simproc), so that string literals in extracted
++    models do not depend on a `decide +native` axiom. `decide +native` remains as a fallback. -/
++def toStr (s : String) (h : s.toByteArray.size ≤ U32.max := by
++    first
++    | (rw [Aeneas.Std.toStr_size_eq_sum_utf8Size];
++       simp [Char.utf8Size, Aeneas.Std.U32.max, Aeneas.Std.U32.numBits]; done)
++    | decide +native) : Str :=
+   .from (s.toByteArray.toList.map
+     (fun x => ⟨ x.toNat, by cases x; simp only [UInt8.toNat_ofBitVec, UScalarTy.U8_numBits_eq, Nat.reducePow]; omega  ⟩))
+     (by

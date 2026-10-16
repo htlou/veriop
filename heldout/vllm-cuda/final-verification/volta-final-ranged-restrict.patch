@@ -1,0 +1,945 @@
+diff --git a/crates/volta_analysis/src/eval/config.rs b/crates/volta_analysis/src/eval/config.rs
+index 37b91aa..c14c846 100644
+--- a/crates/volta_analysis/src/eval/config.rs
++++ b/crates/volta_analysis/src/eval/config.rs
+@@ -82,6 +82,23 @@ pub struct AnalysisConfig {
+     pub dynamic_shared_bytes: u64,
+     /// Abort analysis after this many executed instructions
+     pub max_instructions: u64,
++    /// [veriop-ranged] `in` arrays of integers whose elements are unknown
++    /// values in a declared range (see `RangedInput`). Empty by default,
++    /// which leaves every analysis exactly as upstream.
++    pub ranged_inputs: Vec<RangedInput>,
++}
++
++/// [veriop-ranged] An `in` array of integers (element width 4 or 8) whose
++/// elements are unknown values in `[lo, hi)`, with `0 <= lo < hi <= 2^31`.
++/// Its elements stay symbolic and may be used *only* to form global-load
++/// addresses that are affine in one such element; the interpreter rejects
++/// every other use (stores, guards, narrow/float arithmetic, non-affine
++/// addresses). See `eval::ranged`.
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub struct RangedInput {
++    pub name: String,
++    pub lo: i64,
++    pub hi: i64,
+ }
+ 
+ impl AnalysisConfig {
+@@ -95,6 +112,7 @@ impl AnalysisConfig {
+             global_values: Vec::new(),
+             dynamic_shared_bytes: 0,
+             max_instructions: 2_000_000_000,
++            ranged_inputs: Vec::new(),
+         }
+     }
+ 
+@@ -134,6 +152,26 @@ impl AnalysisConfig {
+                 cx, cy, cz, gx, gy, gz
+             ));
+         }
++        for (i, r) in self.ranged_inputs.iter().enumerate() {
++            let Some(a) = self.array(&r.name) else {
++                return Err(format!("ranged input '{}' is not a declared array", r.name));
++            };
++            if a.kind != ArrayKind::Input {
++                return Err(format!("ranged input '{}' must be an `in` array", r.name));
++            }
++            if a.elem_width != 4 && a.elem_width != 8 {
++                return Err(format!("ranged input '{}' must have 4- or 8-byte elements", r.name));
++            }
++            if !(0 <= r.lo && r.lo < r.hi && r.hi <= (1i64 << 31)) {
++                return Err(format!(
++                    "ranged input '{}': need 0 <= lo < hi <= 2^31, got [{}, {})",
++                    r.name, r.lo, r.hi
++                ));
++            }
++            if self.ranged_inputs[..i].iter().any(|q| q.name == r.name) {
++                return Err(format!("ranged input '{}' given twice", r.name));
++            }
++        }
+         // Per-array checks first, so the pairwise pass below may safely
+         // form `base + size_bytes()` for every array.
+         for a in &self.arrays {
+diff --git a/crates/volta_analysis/src/eval/interp.rs b/crates/volta_analysis/src/eval/interp.rs
+index 9e31418..6ef811b 100644
+--- a/crates/volta_analysis/src/eval/interp.rs
++++ b/crates/volta_analysis/src/eval/interp.rs
+@@ -114,7 +114,7 @@ pub struct AnalysisOutput {
+ pub struct Interpreter<'p> {
+     pub(in crate::eval) program: &'p LoweredProgram,
+     pub(in crate::eval) arena: ExprArena,
+-    config: AnalysisConfig,
++    pub(in crate::eval) config: AnalysisConfig,
+     n_threads: u32,
+     /// Shared `Undefined` node returned for reads of never-written
+     /// registers (see `read_reg`).
+@@ -132,6 +132,8 @@ pub struct Interpreter<'p> {
+     /// instruction in `step`, the interpreter's innermost loop; `finish`
+     /// folds it into the `BTreeMap` shape `AnalysisOutput` exposes.
+     pub(in crate::eval) op_counts: [u64; crate::lowered::KIND_COUNT],
++    /// [veriop-ranged] bookkeeping; inert without ranged inputs.
++    pub(in crate::eval) ranged: crate::eval::ranged::RangedState,
+ }
+ 
+ impl<'p> Interpreter<'p> {
+@@ -336,6 +338,7 @@ impl<'p> Interpreter<'p> {
+             race: RaceTracker::new(n_threads as usize),
+             stats: Stats::default(),
+             op_counts: [0; crate::lowered::KIND_COUNT],
++            ranged: Default::default(),
+         })
+     }
+ 
+@@ -672,10 +675,19 @@ impl<'p> Interpreter<'p> {
+                 offset,
+                 ty,
+             } => {
+-                let addr = self.effective_addr(t, pc, base, *offset)?;
+-                let v = self.mem_read(t, pc, *space, addr, ty.size_bytes() as u64)?;
+-                let v = self.canon_loaded(t, pc, *ty, *dst, v)?;
+-                self.threads[t].regs.write(*dst, v);
++                // [veriop-ranged] data-dependent address (inert otherwise)
++                if let Some(vals) =
++                    self.try_ranged_load(t, pc, *space, base, *offset, ty.size_bytes() as u64, 1)?
++                {
++                    let v = self.canon_loaded(t, pc, *ty, *dst, Value::Scalar(vals[0]))?;
++                    self.threads[t].regs.write(*dst, v);
++                } else {
++                    let addr = self.effective_addr(t, pc, base, *offset)?;
++                    let v = self.mem_read(t, pc, *space, addr, ty.size_bytes() as u64)?;
++                    self.ranged_check_loaded(pc, ty.size_bytes() as u64, v)?;
++                    let v = self.canon_loaded(t, pc, *ty, *dst, v)?;
++                    self.threads[t].regs.write(*dst, v);
++                }
+             }
+ 
+             LoweredInstr::LoadVec {
+@@ -685,6 +697,23 @@ impl<'p> Interpreter<'p> {
+                 offset,
+                 ty,
+             } => {
++                // [veriop-ranged] data-dependent address (inert otherwise)
++                if let Some(vals) = self.try_ranged_load(
++                    t,
++                    pc,
++                    *space,
++                    base,
++                    *offset,
++                    ty.size_bytes() as u64,
++                    dst.len() as u64,
++                )? {
++                    for (k, reg) in dst.iter().enumerate() {
++                        let v = self.canon_loaded(t, pc, *ty, *reg, Value::Scalar(vals[k]))?;
++                        self.threads[t].regs.write(*reg, v);
++                    }
++                    self.threads[t].pc = next_pc;
++                    return Ok(());
++                }
+                 let addr = self.effective_addr(t, pc, base, *offset)?;
+                 let width = ty.size_bytes() as u64;
+                 // The access size of a vector load is the *total* number of
+@@ -698,6 +727,7 @@ impl<'p> Interpreter<'p> {
+                 self.check_alignment(t, pc, *space, addr, dst.len() as u64 * width)?;
+                 for (k, reg) in dst.iter().enumerate() {
+                     let v = self.mem_read(t, pc, *space, addr + k as u64 * width, width)?;
++                    self.ranged_check_loaded(pc, width, v)?;
+                     let v = self.canon_loaded(t, pc, *ty, *reg, v)?;
+                     self.threads[t].regs.write(*reg, v);
+                 }
+@@ -740,6 +770,13 @@ impl<'p> Interpreter<'p> {
+ 
+             LoweredInstr::Mov { dst, src, ty } => {
+                 let v = self.operand_value(t, pc, src)?;
++                if let Value::Scalar(e) = v
++                    && !ty.is_predicate()
++                {
++                    // A bit move is harmless at >= 32 bits (float or not);
++                    // only a narrower register could hide a truncation.
++                    self.ranged_guard(pc, Some(ty.bits()), &[e], "mov")?;
++                }
+                 // Rebind the value at the mov's own type: `mov.u32 %r, -1`
+                 // must leave the same canonical constant in `%r` as
+                 // `not.b32 %r, 0` (consumers see the type-canonical value,
+@@ -766,6 +803,7 @@ impl<'p> Interpreter<'p> {
+                 // pair, which stores/unpacks back to exactly (lo, hi).
+                 let lo = self.scalar_operand(t, pc, lo)?;
+                 let hi = self.scalar_operand(t, pc, hi)?;
++                self.ranged_guard(pc, Some(16), &[lo, hi], "pack")?;
+                 // A mixed (concrete integer, symbolic) pair is rejected: a
+                 // concrete bit pattern and a real-valued half have different
+                 // value representations, which a later float store could
+@@ -823,7 +861,19 @@ impl<'p> Interpreter<'p> {
+ 
+             LoweredInstr::UnaryOp { op, dst, src, ty } => {
+                 let a = self.scalar_operand(t, pc, src)?;
++                if !ty.is_predicate() {
++                    self.ranged_guard(
++                        pc,
++                        if ty.is_float() { None } else { Some(ty.bits()) },
++                        &[a],
++                        "unary op",
++                    )?;
++                }
++                let before = self.arena.node_count();
+                 let r = self.eval_unop(pc, *op, *ty, a)?;
++                if matches!(op, UnaryOp::Neg) && !ty.is_float() && !ty.is_predicate() {
++                    self.ranged_tag_int(before, ty.bits(), r);
++                }
+                 self.threads[t].regs.write(*dst, Value::Scalar(r));
+             }
+ 
+@@ -838,6 +888,7 @@ impl<'p> Interpreter<'p> {
+                 let a = self.scalar_operand(t, pc, src_a)?;
+                 let b = self.scalar_operand(t, pc, src_b)?;
+                 let c = self.scalar_operand(t, pc, src_c)?;
++                self.ranged_guard(pc, None, &[a, b, c], "fma")?;
+                 let r = self.arena.fma(a, b, c);
+                 let r = self.apply_clamp(*clamp, r);
+                 self.threads[t].regs.write(*dst, Value::Scalar(r));
+@@ -854,9 +905,22 @@ impl<'p> Interpreter<'p> {
+                 let a = self.scalar_operand(t, pc, src_a)?;
+                 let b = self.scalar_operand(t, pc, src_b)?;
+                 let c = self.scalar_operand(t, pc, src_c)?;
++                self.ranged_guard(
++                    pc,
++                    if ty.is_float() { None } else { Some(ty.bits()) },
++                    &[a, b, c],
++                    "mad",
++                )?;
++                let before = self.arena.node_count();
+                 let product = match mode {
+                     crate::lowered::MulMode::Lo => self.eval_binop(t, pc, BinOp::Mul, *ty, a, b)?,
+-                    crate::lowered::MulMode::Wide => self.mul_wide(*ty, a, b),
++                    crate::lowered::MulMode::Wide => {
++                        let p = self.mul_wide(*ty, a, b);
++                        if !ty.is_float() {
++                            self.ranged_tag_int(before, ty.bits(), p);
++                        }
++                        p
++                    }
+                     crate::lowered::MulMode::Hi => {
+                         // Same guard as MulHi: mul_hi composes `(a*b) >> bits`,
+                         // which cannot represent the high half above 32 bits.
+@@ -873,7 +937,14 @@ impl<'p> Interpreter<'p> {
+                     crate::lowered::MulMode::Lo => {
+                         self.eval_binop(t, pc, BinOp::Add, *ty, product, c)?
+                     }
+-                    _ => self.arena.add(product, c),
++                    _ => {
++                        let before = self.arena.node_count();
++                        let r = self.arena.add(product, c);
++                        if matches!(mode, crate::lowered::MulMode::Wide) && !ty.is_float() {
++                            self.ranged_tag_int(before, ty.bits(), r);
++                        }
++                        r
++                    }
+                 };
+                 self.threads[t].regs.write(*dst, Value::Scalar(r));
+             }
+@@ -886,7 +957,17 @@ impl<'p> Interpreter<'p> {
+             } => {
+                 let a = self.scalar_operand(t, pc, src_a)?;
+                 let b = self.scalar_operand(t, pc, src_b)?;
++                self.ranged_guard(
++                    pc,
++                    if src_ty.is_float() { None } else { Some(src_ty.bits()) },
++                    &[a, b],
++                    "mul.wide",
++                )?;
++                let before = self.arena.node_count();
+                 let r = self.mul_wide(*src_ty, a, b);
++                if !src_ty.is_float() {
++                    self.ranged_tag_int(before, src_ty.bits(), r);
++                }
+                 self.threads[t].regs.write(*dst, Value::Scalar(r));
+             }
+ 
+@@ -978,6 +1059,14 @@ impl<'p> Interpreter<'p> {
+                 clamp,
+             } => {
+                 let a = self.scalar_operand(t, pc, src)?;
++                if !dst_ty.is_predicate() && !src_ty.is_predicate() {
++                    let narrowest = if dst_ty.is_float() || src_ty.is_float() {
++                        None
++                    } else {
++                        Some(dst_ty.bits().min(src_ty.bits()))
++                    };
++                    self.ranged_guard(pc, narrowest, &[a], "cvt")?;
++                }
+                 let r = self.eval_cvt(pc, *dst_ty, *src_ty, a)?;
+                 let r = self.apply_clamp(*clamp, r);
+                 self.threads[t].regs.write(*dst, Value::Scalar(r));
+@@ -1485,6 +1574,7 @@ impl<'p> Interpreter<'p> {
+         width: u64,
+         value: Value,
+     ) -> EvalResult<()> {
++        self.ranged_write_check(pc, space, addr, width, value)?;
+         self.check_bounds(t, pc, space, addr, width)?;
+         // See `mem_read`: the write-side natural-alignment chokepoint.
+         self.check_alignment(t, pc, space, addr, width)?;
+@@ -1530,6 +1620,12 @@ impl<'p> Interpreter<'p> {
+         if ty.is_predicate() {
+             return self.eval_pred_binop(pc, op, a, b);
+         }
++        self.ranged_guard(
++            pc,
++            if ty.is_float() { None } else { Some(ty.bits()) },
++            &[a, b],
++            op.as_str(),
++        )?;
+ 
+         if !ty.is_float()
+             && let (Some(ca), Some(cb)) = (self.arena.as_i64(a), self.arena.as_i64(b))
+@@ -1546,7 +1642,17 @@ impl<'p> Interpreter<'p> {
+         let a = self.canon_operand(ty, a);
+         let b = self.canon_operand(ty, b);
+ 
+-        Ok(match op {
++        let before = self.arena.node_count();
++        let r = self.eval_binop_symbolic(op, ty, a, b);
++        // [veriop-ranged] exact integer ring ops may form ranged addresses
++        if !ty.is_float() && matches!(op, BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Shl) {
++            self.ranged_tag_int(before, ty.bits(), r);
++        }
++        Ok(r)
++    }
++
++    fn eval_binop_symbolic(&mut self, op: BinOp, ty: ScalarType, a: ExprId, b: ExprId) -> ExprId {
++        match op {
+             BinOp::Add => self.arena.add(a, b),
+             BinOp::Sub => self.arena.sub(a, b),
+             BinOp::Mul => self.arena.mul(a, b),
+@@ -1565,7 +1671,7 @@ impl<'p> Interpreter<'p> {
+             }
+             BinOp::Min => self.arena.min(a, b),
+             BinOp::Max => self.arena.max(a, b),
+-        })
++        }
+     }
+ 
+     /// Exact concrete integer semantics for `ty`.
+diff --git a/crates/volta_analysis/src/eval/mod.rs b/crates/volta_analysis/src/eval/mod.rs
+index 5c88e77..2797a31 100644
+--- a/crates/volta_analysis/src/eval/mod.rs
++++ b/crates/volta_analysis/src/eval/mod.rs
+@@ -11,6 +11,7 @@ pub mod error;
+ pub mod interp;
+ pub mod memory;
+ pub mod race;
++pub mod ranged;
+ pub mod value;
+ pub mod warp;
+ 
+@@ -30,7 +31,7 @@ impl std::fmt::Display for ThreadId {
+ /// Number of threads in a warp.
+ pub const WARP_SIZE: u32 = 32;
+ 
+-pub use config::{AnalysisConfig, ArrayDef, ArrayKind, ParamValue};
++pub use config::{AnalysisConfig, ArrayDef, ArrayKind, ParamValue, RangedInput};
+ pub use error::{AccessSite, EvalError, EvalResult};
+ pub use interp::{AnalysisOutput, Interpreter, Stats};
+ pub use value::Value;
+diff --git a/crates/volta_analysis/src/eval/ranged.rs b/crates/volta_analysis/src/eval/ranged.rs
+new file mode 100644
+index 0000000..a2fee07
+--- /dev/null
++++ b/crates/volta_analysis/src/eval/ranged.rs
+@@ -0,0 +1,435 @@
++//! [veriop-ranged] Data-dependent global-load addressing through *ranged
++//! integer inputs* (opt-in; inert unless `AnalysisConfig::ranged_inputs` is
++//! non-empty).
++//!
++//! Upstream Volta requires every address to be concrete. A kernel such as
++//! vLLM's rotary embedding reads `pos = positions[blockIdx.x]` and then loads
++//! `cos_sin_cache[pos * rot_dim + j]`, so its addresses depend on input data.
++//! With a ranged input, `positions` elements stay symbolic atoms `P` known
++//! only to lie in `[lo, hi)`, and one symbolic run covers every such value.
++//!
++//! Soundness argument (each point is enforced below or in `interp.rs`):
++//!
++//! 1. A ranged atom may influence the run only through global-load
++//!    addresses. Stores of any value depending on it are rejected
++//!    (`ranged_write_check`), guards and other control values must be
++//!    concrete (upstream), and every other address must be concrete
++//!    (upstream `effective_addr`). A value read through a ranged address is
++//!    input *data* (a `SymbolicRead` atom), not a ranged-derived value.
++//! 2. A ranged address must be `c0 + c1 * P` for one atom `P`, built only
++//!    from integer constants, the atom itself, and nodes *created* by
++//!    integer `add/sub/mul/shl(by constant)/neg` instructions of width >= 32
++//!    bits (`int_nodes`). Float arithmetic, bit operations, division, min/max,
++//!    selects and narrow (< 32-bit) arithmetic never qualify, and conversions
++//!    of ranged values involving a float or a < 32-bit type are rejected.
++//! 3. Every non-leaf node of that expression, and the atom range itself, lies
++//!    in `[0, 2^31)` for every `P` in the range. PTX `add/sub/mul.lo/shl/neg`
++//!    of any width w >= 32 are exact modulo 2^w (ring homomorphisms), and a
++//!    value in `[0, 2^31)` is unchanged by sign or zero extension and by
++//!    truncation to >= 32 bits; so the typeless node values equal the
++//!    register values the hardware computes, for every `P` in range.
++//! 4. For every `P` in range the access lies inside one declared `in` array
++//!    (affine, so the two end points suffice), is naturally aligned
++//!    (`c0`, `c1` multiples of the access size) and element aligned.
++//!    That array is never written during the run (checked in both orders),
++//!    so the loaded value is the initial content `array[k0 + k1*P]`, which
++//!    is exactly what the `SymbolicRead` node denotes; the equivalence
++//!    checker treats it as an uninterpreted read, equal only for
++//!    syntactically equal canonical indices (sound). No race can involve a
++//!    never-written array.
++
++use std::collections::{HashMap, HashSet};
++
++use crate::eval::ThreadId;
++use crate::eval::config::ArrayKind;
++use crate::eval::error::{EvalError, EvalResult};
++use crate::eval::interp::Interpreter;
++use crate::eval::value::Value;
++use crate::lowered::{InstrId, MemSpace, Operand};
++use crate::symbolic::{ExprId, ExprNode};
++
++/// Every non-leaf node of a ranged address must lie in `[0, 2^31)`.
++const AFFINE_BOUND: i128 = 1 << 31;
++
++/// Per-run bookkeeping for ranged inputs.
++#[derive(Default)]
++pub struct RangedState {
++    /// Memo for `contains_ranged`.
++    taint_memo: HashMap<ExprId, bool>,
++    /// Nodes freshly created by integer add/sub/mul/shl/neg of width >= 32.
++    int_nodes: HashSet<ExprId>,
++    /// Arrays (indices into `config.arrays`) read through a ranged address.
++    symread_arrays: HashSet<usize>,
++    /// Arrays written at least once.
++    written_arrays: HashSet<usize>,
++}
++
++/// `value = c0 + c1 * atom` (atom = None: the constant `c0`).
++#[derive(Clone, Copy)]
++struct Affine {
++    c0: i128,
++    c1: i128,
++    atom: Option<(ExprId, i64, i64)>,
++}
++
++fn unsupported(pc: InstrId, what: impl Into<String>) -> EvalError {
++    EvalError::Unsupported {
++        pc,
++        what: format!("[veriop-ranged] {}", what.into()),
++    }
++}
++
++impl<'p> Interpreter<'p> {
++    pub(in crate::eval) fn ranged_active(&self) -> bool {
++        !self.config.ranged_inputs.is_empty()
++    }
++
++    /// The `[lo, hi)` range if `e` is an element of a ranged input array.
++    fn ranged_bounds_of(&self, e: ExprId) -> Option<(i64, i64)> {
++        if let ExprNode::InputElement { array, .. } = self.arena.node(e) {
++            let name = self.arena.string(*array);
++            self.config
++                .ranged_inputs
++                .iter()
++                .find(|r| r.name == name)
++                .map(|r| (r.lo, r.hi))
++        } else {
++            None
++        }
++    }
++
++    /// Whether `e` depends on a ranged atom other than through the index of
++    /// a `SymbolicRead` (the value read there is input data).
++    pub(in crate::eval) fn contains_ranged(&mut self, e: ExprId) -> bool {
++        if let Some(&b) = self.ranged.taint_memo.get(&e) {
++            return b;
++        }
++        let mut stack = vec![(e, false)];
++        while let Some((x, expanded)) = stack.pop() {
++            if self.ranged.taint_memo.contains_key(&x) {
++                continue;
++            }
++            if matches!(self.arena.node(x), ExprNode::SymbolicRead { .. }) {
++                self.ranged.taint_memo.insert(x, false);
++                continue;
++            }
++            if self.ranged_bounds_of(x).is_some() {
++                self.ranged.taint_memo.insert(x, true);
++                continue;
++            }
++            let mut kids = Vec::new();
++            self.arena.node(x).for_each_child(|c| kids.push(c));
++            if expanded {
++                let b = kids.iter().any(|c| self.ranged.taint_memo[c]);
++                self.ranged.taint_memo.insert(x, b);
++            } else {
++                stack.push((x, true));
++                for c in kids {
++                    if !self.ranged.taint_memo.contains_key(&c) {
++                        stack.push((c, false));
++                    }
++                }
++            }
++        }
++        self.ranged.taint_memo[&e]
++    }
++
++    /// Reject a ranged-derived operand of an instruction whose type is a
++    /// float or narrower than 32 bits (`int_bits` = None for floats).
++    pub(in crate::eval) fn ranged_guard(
++        &mut self,
++        pc: InstrId,
++        int_bits: Option<u32>,
++        ops: &[ExprId],
++        what: &str,
++    ) -> EvalResult<()> {
++        if !self.ranged_active() || matches!(int_bits, Some(b) if b >= 32) {
++            return Ok(());
++        }
++        for &e in ops {
++            if self.contains_ranged(e) {
++                return Err(unsupported(
++                    pc,
++                    format!(
++                        "ranged-input-derived operand of a {} {}",
++                        match int_bits {
++                            Some(b) => format!("{}-bit integer", b),
++                            None => "float".to_string(),
++                        },
++                        what
++                    ),
++                ));
++            }
++        }
++        Ok(())
++    }
++
++    /// Record `r` as created by an integer add/sub/mul/shl/neg of width
++    /// `bits`, if it is a node pushed after `before` (a builder that
++    /// returns an existing operand node creates nothing new).
++    pub(in crate::eval) fn ranged_tag_int(&mut self, before: usize, bits: u32, r: ExprId) {
++        if self.ranged_active() && bits >= 32 && r.0 as usize >= before {
++            self.ranged.int_nodes.insert(r);
++        }
++    }
++
++    fn affine_of(&self, e: ExprId) -> Option<Affine> {
++        let node = self.arena.node(e);
++        if let ExprNode::IntConst(v) = node {
++            return Some(Affine { c0: *v as i128, c1: 0, atom: None });
++        }
++        let r = if let Some((lo, hi)) = self.ranged_bounds_of(e) {
++            Affine { c0: 0, c1: 1, atom: Some((e, lo, hi)) }
++        } else {
++            if !self.ranged.int_nodes.contains(&e) {
++                return None;
++            }
++            match node {
++                ExprNode::Add(a, b) | ExprNode::Sub(a, b) => {
++                    let (x, y) = (self.affine_of(*a)?, self.affine_of(*b)?);
++                    let atom = self.join_atoms(x.atom, y.atom)?;
++                    let (c0, c1) = if matches!(node, ExprNode::Add(..)) {
++                        (x.c0.checked_add(y.c0)?, x.c1.checked_add(y.c1)?)
++                    } else {
++                        (x.c0.checked_sub(y.c0)?, x.c1.checked_sub(y.c1)?)
++                    };
++                    Affine { c0, c1, atom }
++                }
++                ExprNode::Mul(a, b) => {
++                    let (x, y) = (self.affine_of(*a)?, self.affine_of(*b)?);
++                    let (k, v) = match (x.atom, y.atom) {
++                        (None, _) => (x.c0, y),
++                        (_, None) => (y.c0, x),
++                        _ => return None,
++                    };
++                    Affine { c0: v.c0.checked_mul(k)?, c1: v.c1.checked_mul(k)?, atom: v.atom }
++                }
++                ExprNode::Shl(a, b) => {
++                    let x = self.affine_of(*a)?;
++                    let k = self.arena.as_int_const(*b)?;
++                    if !(0..=62).contains(&k) {
++                        return None;
++                    }
++                    let m = 1i128 << k;
++                    Affine { c0: x.c0.checked_mul(m)?, c1: x.c1.checked_mul(m)?, atom: x.atom }
++                }
++                ExprNode::Neg(a) => {
++                    let x = self.affine_of(*a)?;
++                    Affine { c0: x.c0.checked_neg()?, c1: x.c1.checked_neg()?, atom: x.atom }
++                }
++                _ => return None,
++            }
++        };
++        // Non-leaf (and atom) value range must stay inside [0, 2^31).
++        let (vmin, vmax) = self.affine_range(&r)?;
++        if vmin < 0 || vmax >= AFFINE_BOUND {
++            return None;
++        }
++        Some(r)
++    }
++
++    fn join_atoms(
++        &self,
++        a: Option<(ExprId, i64, i64)>,
++        b: Option<(ExprId, i64, i64)>,
++    ) -> Option<Option<(ExprId, i64, i64)>> {
++        match (a, b) {
++            (None, x) | (x, None) => Some(x),
++            (Some(x), Some(y)) => {
++                // Same atom = same element of the same ranged array.
++                let key = |e: ExprId| match self.arena.node(e) {
++                    ExprNode::InputElement { array, index } => {
++                        Some((self.arena.string(*array).to_string(), *index))
++                    }
++                    _ => None,
++                };
++                if key(x.0)? == key(y.0)? { Some(Some(x)) } else { None }
++            }
++        }
++    }
++
++    fn affine_range(&self, r: &Affine) -> Option<(i128, i128)> {
++        match r.atom {
++            None => Some((r.c0, r.c0)),
++            Some((_, lo, hi)) => {
++                let a = r.c0.checked_add(r.c1.checked_mul(lo as i128)?)?;
++                let b = r.c0.checked_add(r.c1.checked_mul((hi - 1) as i128)?)?;
++                Some((a.min(b), a.max(b)))
++            }
++        }
++    }
++
++    /// A global load whose base is not concrete: if it is a ranged address
++    /// (see module docs), return the `count` loaded elements of width
++    /// `elem_w` each as `SymbolicRead` nodes; `Ok(None)` means the base is
++    /// concrete (or ranged inputs are off) and the normal path applies.
++    #[allow(clippy::too_many_arguments)]
++    pub(in crate::eval) fn try_ranged_load(
++        &mut self,
++        t: ThreadId,
++        pc: InstrId,
++        space: MemSpace,
++        base: &Operand,
++        offset: i64,
++        elem_w: u64,
++        count: u64,
++    ) -> EvalResult<Option<Vec<ExprId>>> {
++        if !self.ranged_active() {
++            return Ok(None);
++        }
++        let e = match self.operand_value(t, pc, base)? {
++            Value::Scalar(e) => e,
++            Value::Pair(..) => return Ok(None),
++        };
++        if self.arena.as_i64(e).is_some() {
++            return Ok(None);
++        }
++        if space != MemSpace::Global {
++            return Err(unsupported(pc, format!("symbolic {:?}-space address", space)));
++        }
++        let aff = self.affine_of(e).ok_or_else(|| {
++            unsupported(
++                pc,
++                "symbolic address is not an exact affine integer function of one ranged input",
++            )
++        })?;
++        let Some((atom, lo, hi)) = aff.atom else {
++            return Err(unsupported(pc, "symbolic address without a ranged atom"));
++        };
++        let c0 = aff.c0.checked_add(offset as i128).ok_or_else(|| unsupported(pc, "overflow"))?;
++        let c1 = aff.c1;
++        if c1 <= 0 {
++            return Err(unsupported(pc, "ranged address must increase with the ranged input"));
++        }
++        let total = (elem_w * count) as i128;
++        let amin = c0 + c1 * lo as i128;
++        let amax = c0 + c1 * (hi - 1) as i128;
++        let Some(ai) = self.config.arrays.iter().position(|a| {
++            (a.base as i128) <= amin && amax + total <= a.base as i128 + a.size_bytes() as i128
++        }) else {
++            return Err(unsupported(
++                pc,
++                format!(
++                    "ranged access [{:#x}+{}*P, P in [{}, {})) leaves every declared array \
++                     for some P (thread {})",
++                    c0, c1, lo, hi, t
++                ),
++            ));
++        };
++        let (name, base, ew, kind) = {
++            let a = &self.config.arrays[ai];
++            (a.name.clone(), a.base as i128, a.elem_width as i128, a.kind)
++        };
++        if kind != ArrayKind::Input {
++            return Err(unsupported(pc, format!("ranged read of non-`in` array '{}'", name)));
++        }
++        if ew != elem_w as i128 {
++            return Err(unsupported(
++                pc,
++                format!("ranged read of '{}' at width {} != element width {}", name, elem_w, ew),
++            ));
++        }
++        if c0 % total != 0 || c1 % total != 0 || (c0 - base) % ew != 0 || c1 % ew != 0 {
++            return Err(unsupported(pc, format!("ranged read of '{}' not aligned for every P", name)));
++        }
++        if self.ranged.written_arrays.contains(&ai) {
++            return Err(unsupported(pc, format!("ranged read of '{}', which this run writes", name)));
++        }
++        self.ranged.symread_arrays.insert(ai);
++        let (k0, k1) = ((c0 - base) / ew, c1 / ew);
++        let mut out = Vec::with_capacity(count as usize);
++        for j in 0..count as i128 {
++            let kc = self.arena.int((k0 + j) as i64);
++            let kk = self.arena.int(k1 as i64);
++            let m = self.arena.mul(kk, atom);
++            let ix = self.arena.add(kc, m);
++            out.push(self.arena.symbolic_read(&name, ix));
++        }
++        Ok(Some(out))
++    }
++
++    /// After a normal (concrete-address) load: a ranged element must be read
++    /// at exactly its element width.
++    pub(in crate::eval) fn ranged_check_loaded(
++        &mut self,
++        pc: InstrId,
++        width: u64,
++        v: Value,
++    ) -> EvalResult<()> {
++        if !self.ranged_active() {
++            return Ok(());
++        }
++        let parts = match v {
++            Value::Scalar(e) => vec![e],
++            Value::Pair(a, b) => vec![a, b],
++        };
++        for e in parts {
++            if self.contains_ranged(e) {
++                let full = matches!(v, Value::Scalar(_))
++                    && self.ranged_bounds_of(e).is_some()
++                    && self.ranged_elem_width(e) == Some(width);
++                if !full {
++                    return Err(unsupported(pc, "ranged element loaded at a width other than its own"));
++                }
++            }
++        }
++        Ok(())
++    }
++
++    fn ranged_elem_width(&self, e: ExprId) -> Option<u64> {
++        if let ExprNode::InputElement { array, .. } = self.arena.node(e) {
++            self.config.array(self.arena.string(*array)).map(|a| a.elem_width)
++        } else {
++            None
++        }
++    }
++
++    /// Before every memory write: no ranged-derived value may be stored, and
++    /// no array read through a ranged address (or a ranged array) may be
++    /// written.
++    pub(in crate::eval) fn ranged_write_check(
++        &mut self,
++        pc: InstrId,
++        space: MemSpace,
++        addr: u64,
++        width: u64,
++        value: Value,
++    ) -> EvalResult<()> {
++        if !self.ranged_active() {
++            return Ok(());
++        }
++        let parts = match value {
++            Value::Scalar(e) => vec![e],
++            Value::Pair(a, b) => vec![a, b],
++        };
++        for e in parts {
++            if self.contains_ranged(e) {
++                return Err(unsupported(pc, "a ranged-input-derived value is stored to memory"));
++            }
++        }
++        if space == MemSpace::Global {
++            let end = addr as u128 + width as u128;
++            let hits: Vec<usize> = self
++                .config
++                .arrays
++                .iter()
++                .enumerate()
++                .filter(|(_, a)| (a.base as u128) < end && (addr as u128) < a.base as u128 + a.size_bytes() as u128)
++                .map(|(i, _)| i)
++                .collect();
++            for i in hits {
++                let name = self.config.arrays[i].name.clone();
++                if self.ranged.symread_arrays.contains(&i)
++                    || self.config.ranged_inputs.iter().any(|r| r.name == name)
++                {
++                    return Err(unsupported(
++                        pc,
++                        format!("write to '{}', which is ranged or read through a ranged address", name),
++                    ));
++                }
++                self.ranged.written_arrays.insert(i);
++            }
++        }
++        Ok(())
++    }
++}
+diff --git a/crates/volta_cli/src/main.rs b/crates/volta_cli/src/main.rs
+index 3385019..b8b2623 100644
+--- a/crates/volta_cli/src/main.rs
++++ b/crates/volta_cli/src/main.rs
+@@ -18,7 +18,9 @@ use volta_analysis::driver::{
+     write_op_counts,
+ };
+ use volta_analysis::equiv::DEFAULT_RECYCLE_TERMS;
+-use volta_analysis::eval::{AnalysisConfig, AnalysisOutput, ArrayDef, ArrayKind, ParamValue};
++use volta_analysis::eval::{
++    AnalysisConfig, AnalysisOutput, ArrayDef, ArrayKind, ParamValue, RangedInput,
++};
+ use volta_common::run_log;
+ use volta_frontend::ascii::{AsAscii, AsciiChar};
+ use volta_frontend::ast::{Module, TopLevelItem};
+@@ -144,6 +146,12 @@ struct LaunchArgs {
+     /// missing components are 0). Default: block (0,0,0).
+     #[arg(long, default_value = "0,0,0")]
+     cta: String,
++
++    /// [veriop-ranged] Treat the `in` integer array NAME as unknown values
++    /// in [LO, HI): "NAME=LO:HI". Its elements may only form affine
++    /// global-load addresses; any other use is rejected. Repeatable.
++    #[arg(long = "index-range")]
++    index_ranges: Vec<String>,
+ }
+ 
+ #[derive(Args)]
+@@ -201,6 +209,23 @@ struct CompareArgs {
+     #[arg(long = "check-array", value_name = "NAME", required = true)]
+     check_arrays: Vec<String>,
+ 
++    /// [veriop] CTA index for the optimized kernel only, e.g. "3,0,0"
++    /// (default: the reference kernel's --cta).
++    #[arg(long)]
++    cta2: Option<String>,
++
++    /// [veriop] Kernel parameters for the optimized kernel only (same
++    /// syntax as --param; if given, replaces --param for that kernel).
++    #[arg(long = "param2")]
++    params2: Vec<String>,
++
++    /// [veriop] Compare only elements LO..=HI of check array NAME:
++    /// "NAME=LO:HI" (repeatable). Both kernels' full written footprints
++    /// are printed first (FOOTPRINT-RANGES); the restricted footprints
++    /// must then be identical, as without this flag.
++    #[arg(long = "restrict")]
++    restricts: Vec<String>,
++
+     /// Check at most this many common elements per array (0 = all)
+     #[arg(long, default_value_t = 0)]
+     sample: u64,
+@@ -391,6 +416,7 @@ struct ConfigInput<'a> {
+     globals: &'a [String],
+     dyn_shared: u64,
+     cta: &'a str,
++    index_ranges: &'a [String],
+ }
+ 
+ impl<'a> ConfigInput<'a> {
+@@ -406,6 +432,7 @@ impl<'a> ConfigInput<'a> {
+             globals: &launch.globals,
+             dyn_shared: launch.dyn_shared,
+             cta: &launch.cta,
++            index_ranges: &launch.index_ranges,
+         }
+     }
+ }
+@@ -415,6 +442,20 @@ fn build_config(input: ConfigInput) -> Result<AnalysisConfig, String> {
+     let mut config = AnalysisConfig::new(block_dim);
+     config.grid_dim = parse_dims(input.grid).map_err(|e| format!("invalid --grid: {}", e))?;
+     config.cta_id = parse_cta(input.cta).map_err(|e| format!("invalid --cta: {}", e))?;
++    for r in input.index_ranges {
++        let parse = || -> Option<RangedInput> {
++            let (name, range) = r.split_once('=')?;
++            let (lo, hi) = range.split_once(':')?;
++            Some(RangedInput {
++                name: name.to_string(),
++                lo: lo.trim().parse().ok()?,
++                hi: hi.trim().parse().ok()?,
++            })
++        };
++        config
++            .ranged_inputs
++            .push(parse().ok_or_else(|| format!("invalid --index-range '{}' (want NAME=LO:HI)", r))?);
++    }
+     config.dynamic_shared_bytes = input.dyn_shared;
+     for a in input.arrays {
+         config
+@@ -605,6 +646,8 @@ fn cmd_compare(args: CompareArgs, log: &mut run_log::RunLog) -> ExitCode {
+             let config2 = match build_config(ConfigInput {
+                 block: args.block2.as_deref().unwrap_or(&args.launch.block),
+                 grid: args.grid2.as_deref().unwrap_or(&args.launch.grid),
++                cta: args.cta2.as_deref().unwrap_or(&args.launch.cta),
++                params: if args.params2.is_empty() { &args.launch.params } else { &args.params2 },
+                 ..ConfigInput::from_launch(&args.launch)
+             }) {
+                 Ok(c) => c,
+@@ -693,6 +736,41 @@ fn cmd_compare(args: CompareArgs, log: &mut run_log::RunLog) -> ExitCode {
+     // order. `paired_elements` rejects any that both runs don't have.
+     let check_arrays: &[String] = &args.check_arrays;
+ 
++    // [veriop] --restrict: print both full footprints, then keep only the
++    // named index window of each restricted array on both sides.
++    let (mut reference, mut optimized) = (reference, optimized);
++    if !args.restricts.is_empty() {
++        for name in check_arrays {
++            for (side, out) in [("ref", &reference), ("opt", &optimized)] {
++                if let Some((_, elems)) = out.outputs.iter().find(|(n, _)| n == name) {
++                    println!("FOOTPRINT-RANGES: {} {} {}", side, name, index_ranges(elems));
++                }
++            }
++        }
++        for r in &args.restricts {
++            let parsed = r.split_once('=').and_then(|(n, w)| {
++                let (lo, hi) = w.split_once(':')?;
++                Some((n.to_string(), lo.parse::<u64>().ok()?, hi.parse::<u64>().ok()?))
++            });
++            let Some((name, lo, hi)) = parsed else {
++                eprintln!("error: invalid --restrict '{}' (want NAME=LO:HI)", r);
++                return ExitCode::FAILURE;
++            };
++            if !check_arrays.contains(&name) {
++                eprintln!("error: --restrict '{}' names no --check-array", name);
++                return ExitCode::FAILURE;
++            }
++            let mut counts = Vec::new();
++            for out in [&mut reference, &mut optimized] {
++                if let Some((_, elems)) = out.outputs.iter_mut().find(|(n, _)| *n == name) {
++                    elems.retain(|e| lo <= e.0 && e.0 <= hi);
++                    counts.push(elems.len());
++                }
++            }
++            println!("RESTRICT: {} [{}, {}] ref_n={:?} opt_n={:?}", name, lo, hi, counts.first(), counts.get(1));
++        }
++    }
++
+     match args.backend {
+         BackendArg::Decision => {
+             let options = EquivCheckOptions {
+@@ -1048,3 +1126,21 @@ mod tests {
+         );
+     }
+ }
++
++/// [veriop] Sorted element indices as inclusive runs "a-b,c-d" ("-" if empty).
++fn index_ranges(elems: &[(u64, volta_analysis::symbolic::ExprId)]) -> String {
++    let mut idx: Vec<u64> = elems.iter().map(|e| e.0).collect();
++    idx.sort_unstable();
++    idx.dedup();
++    let mut runs: Vec<String> = Vec::new();
++    let mut i = 0;
++    while i < idx.len() {
++        let mut j = i;
++        while j + 1 < idx.len() && idx[j + 1] == idx[j] + 1 {
++            j += 1;
++        }
++        runs.push(format!("{}-{}", idx[i], idx[j]));
++        i = j + 1;
++    }
++    if runs.is_empty() { "-".to_string() } else { runs.join(",") }
++}

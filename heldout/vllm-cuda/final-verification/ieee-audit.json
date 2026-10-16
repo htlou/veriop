@@ -1,0 +1,117 @@
+{
+ "all_conform": true,
+ "self_test": {
+  "intermediate_rounding_flagged": true,
+  "ftz_flagged": true,
+  "examples": [
+   "rounded value %rs1 used by cvt.f32.bf16",
+   "widened 16-bit value %rs1 defined by cvt.rn.bf16.f32",
+   "float op outside the audited list: mul.ftz.f32"
+  ]
+ },
+ "pairs": {
+  "rope-bf16": {
+   "baseline": {
+    "kernel": "_ZN4vllm23rotary_embedding_kernelIN3c108BFloat16ES2_Lb1EEEvPKlPT_S6_PKT0_illliiilb",
+    "ptx": "ptx/baseline/pos_encoding_kernels.ptx",
+    "float_ops": {
+     "cvt.f32.bf16": 16,
+     "mul.f32": 12,
+     "fma.rn.f32": 4,
+     "cvt.rn.bf16.f32": 8,
+     "sub.f32": 4
+    },
+    "problems": []
+   },
+   "candidate": {
+    "kernel": "_ZN4vllm33rotary_embedding_neox_vec4_kernelIN3c108BFloat16EEEvPKlPT_S6_PKS5_illliiilb",
+    "ptx": "ptx/candidate/pos_encoding_kernels.ptx",
+    "float_ops": {
+     "cvt.f32.bf16": 30,
+     "mul.f32": 24,
+     "fma.rn.f32": 8,
+     "cvt.rn.bf16.f32": 16,
+     "sub.f32": 8
+    },
+    "problems": []
+   },
+   "node_kind_to_opcode": {
+    "Mul": [
+     "mul.f32"
+    ],
+    "Fma": [
+     "fma.rn.f32"
+    ],
+    "Sub": [
+     "sub.f32"
+    ]
+   },
+   "one_opcode_per_node_kind": true,
+   "conforms": true
+  },
+  "relu-fp32": {
+   "baseline": {
+    "kernel": "_ZN4vllm17activation_kernelIfXadL_ZNS_19relu_squared_kernelIfEET_RKS2_EELb1ELb0EEEvPS2_PS3_i",
+    "ptx": "ptx/baseline/activation_kernels.ptx",
+    "float_ops": {
+     "max.f32": 4,
+     "mul.f32": 4
+    },
+    "problems": []
+   },
+   "candidate": {
+    "kernel": "_ZN4vllm26activation_flat_vec_kernelIfXadL_ZNS_19relu_squared_kernelIfEET_RKS2_EEEEvPS2_PS3_i",
+    "ptx": "ptx/cand-relu/activation_kernels.ptx",
+    "float_ops": {
+     "max.f32": 4,
+     "mul.f32": 4
+    },
+    "problems": []
+   },
+   "node_kind_to_opcode": {
+    "Max": [
+     "max.f32"
+    ],
+    "Mul": [
+     "mul.f32"
+    ]
+   },
+   "one_opcode_per_node_kind": true,
+   "conforms": true
+  },
+  "relu-bf16": {
+   "baseline": {
+    "kernel": "_ZN4vllm17activation_kernelIN3c108BFloat16EXadL_ZNS_19relu_squared_kernelIS2_EET_RKS4_EELb1ELb0EEEvPS4_PS5_i",
+    "ptx": "ptx/baseline/activation_kernels.ptx",
+    "float_ops": {
+     "cvt.f32.bf16": 8,
+     "max.f32": 8,
+     "mul.f32": 8,
+     "cvt.rn.bf16.f32": 8
+    },
+    "problems": []
+   },
+   "candidate": {
+    "kernel": "_ZN4vllm26activation_flat_vec_kernelIN3c108BFloat16EXadL_ZNS_19relu_squared_kernelIS2_EET_RKS4_EEEEvPS4_PS5_i",
+    "ptx": "ptx/cand-relu16/activation_kernels.ptx",
+    "float_ops": {
+     "cvt.f32.bf16": 8,
+     "max.f32": 8,
+     "mul.f32": 8,
+     "cvt.rn.bf16.f32": 8
+    },
+    "problems": []
+   },
+   "node_kind_to_opcode": {
+    "Max": [
+     "max.f32"
+    ],
+    "Mul": [
+     "mul.f32"
+    ]
+   },
+   "one_opcode_per_node_kind": true,
+   "conforms": true
+  }
+ }
+}

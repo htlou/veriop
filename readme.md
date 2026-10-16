@@ -13,6 +13,7 @@ benchmarks/ 25 pinned upstream targets: native benchmark gates and checker gates
 history-eq/ historical performance commits checked against each repo's checker
 cuda/       llama.cpp RMSNorm candidates checked with Volta (PTX)
 compcert/   CompCert layout (C1) and CFG-cloning (C2) experiments
+heldout/    held-out verified optimizations on 6 targets (see SUMMARY.md, OPTIMIZATION_REPORT.md)
 docs/       project proposal
 volta-logs/ Volta parse logs
 readme.md   this index
@@ -29,6 +30,18 @@ record how to re-fetch them.
 | xxHash short inputs | 1.34–1.36× one-byte official CLI throughput; full sweep median 1.006× | 20 exhaustive bidirectional length checks, scoped to short inputs |
 | Rust Base64 | 2.034× aggregate over 8 official encode_slice workloads, 4 rounds | Complete extracted public API equivalence via Aeneas and Lean |
 | Rust LZ4 | No repeatable 2× result | Copy-helper proof only; full block equivalence unfinished |
+
+**Held-out round** ([`heldout/SUMMARY.md`](heldout/SUMMARY.md), method write-up in [`heldout/OPTIMIZATION_REPORT.md`](heldout/OPTIMIZATION_REPORT.md)). Speedups are function/op-level entries of each project's official benchmark, not whole-suite scores. **Verified** means formal equivalence/refinement:
+
+| Target | Optimization | Official benchmark (affected entries) | Formally verified |
+|---|---|---|---|
+| s2n-bignum (x86 asm, HOL Light) | `bignum_normalize` O(k²)→O(k log k) | 5.58× | yes |
+| llama.cpp (CUDA, Volta) | `CONV_2D_DW` unrolled 3×3/5×5 kernel | 1.657× | yes, every CTA of the official shapes |
+| fast_float (C++, Alive2) | `from_chars<uint16_t>` SWAR fast path | 1.58× (checked-IR build) | yes |
+| rust-base64 (Rust, Aeneas/Lean) | pair-table decode | 1.59× (`decode_slice`) | yes (`decode_stream` not) |
+| libdivide (C, Alive2) | signed s32/s64 branch→select | 1.86× | yes (same trick as the trial task) |
+| vLLM (CUDA, Volta) | rope vec4, relu² flat path | 1.06–1.08× | yes |
+| RoaringBitmap (Java, KeY) | `rank` two-sided / `select` block skip | 1.77× / 1.42× | no |
 
 Start with the **[C submission guide](c/SUBMISSION.md)** or **[Rust/Aeneas submission guide](aeneas/SUBMISSION.md)** for direct links to previous code, optimized implementations, raw benchmark samples, exact proof inputs, checker logs, and reproduction commands. Performance claims are workload-specific; compiler pipelines are not formally certified. The fastest libdivide LLVM rewrite is distinct from the separately verified C header.
 

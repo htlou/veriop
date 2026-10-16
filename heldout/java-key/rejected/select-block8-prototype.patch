@@ -1,0 +1,67 @@
+diff --git a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+index cbad4737..c545212a 100644
+--- a/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
++++ b/roaringbitmap/src/main/java/org/roaringbitmap/BitmapContainer.java
+@@ -1255,10 +1255,28 @@ public final class BitmapContainer extends Container implements Cloneable {
+ 
+   @Override
+   public char select(int j) {
++    final long[] bitmap = this.bitmap;
+     if ( // cardinality != -1 && // omitted as (-1>>>1) > j as j < (1<<16)
+     cardinality >>> 1 < j && j < cardinality) {
+       int leftover = cardinality - j;
+-      for (int k = bitmap.length - 1; k >= 0; --k) {
++      int k = bitmap.length - 1;
++      // skip blocks of 8 words whose total popcount cannot reach leftover
++      for (; k >= 7; k -= 8) {
++        int bits =
++            Long.bitCount(bitmap[k])
++                + Long.bitCount(bitmap[k - 1])
++                + Long.bitCount(bitmap[k - 2])
++                + Long.bitCount(bitmap[k - 3])
++                + Long.bitCount(bitmap[k - 4])
++                + Long.bitCount(bitmap[k - 5])
++                + Long.bitCount(bitmap[k - 6])
++                + Long.bitCount(bitmap[k - 7]);
++        if (bits >= leftover) {
++          break;
++        }
++        leftover -= bits;
++      }
++      for (; k >= 0; --k) {
+         long w = bitmap[k];
+         if (w != 0) {
+           int bits = Long.bitCount(w);
+@@ -1270,12 +1288,29 @@ public final class BitmapContainer extends Container implements Cloneable {
+       }
+     } else {
+       int leftover = j;
+-      for (int k = 0; k < bitmap.length; ++k) {
++      int k = 0;
++      // skip blocks of 8 words whose total popcount does not exceed leftover
++      for (; k + 8 <= bitmap.length; k += 8) {
++        int bits =
++            Long.bitCount(bitmap[k])
++                + Long.bitCount(bitmap[k + 1])
++                + Long.bitCount(bitmap[k + 2])
++                + Long.bitCount(bitmap[k + 3])
++                + Long.bitCount(bitmap[k + 4])
++                + Long.bitCount(bitmap[k + 5])
++                + Long.bitCount(bitmap[k + 6])
++                + Long.bitCount(bitmap[k + 7]);
++        if (bits > leftover) {
++          break;
++        }
++        leftover -= bits;
++      }
++      for (; k < bitmap.length; ++k) {
+         long w = bitmap[k];
+         if (w != 0) {
+-          int bits = Long.bitCount(bitmap[k]);
++          int bits = Long.bitCount(w);
+           if (bits > leftover) {
+-            return (char) (k * 64 + Util.select(bitmap[k], leftover));
++            return (char) (k * 64 + Util.select(w, leftover));
+           }
+           leftover -= bits;
+         }

@@ -1,0 +1,96 @@
+--- /srv/home/hantaolou/code/veriop/alive2/repos/alive2/tools/transform.cpp	2026-10-01 22:02:33.624656536 -0700
++++ alive2-sinkcheck/tools/transform.cpp	2026-10-15 17:59:19.892177942 -0700
+@@ -528,7 +528,19 @@
+     axioms_expr = std::move(axioms)();
+   }
+ 
+-  if (check_expr(axioms_expr && fndom_a, "ub_src").isUnsat()) {
++  // [veriop patch] VERIOP_SKIP_SANITY=1 skips the three vacuity sanity
++  // queries below ("is src always UB?", "does src/tgt never return?");
++  // VERIOP_SKIP_RETURN=1 skips only the two "never returns" queries. They
++  // never affect a refinement verdict; they only guard against vacuous
++  // preconditions. The final-verification scripts use SKIP_SANITY only for
++  // the old=>new direction and SKIP_RETURN for new=>old, whose "is src always
++  // UB?" query (with --fail-src-ub) shows that the precondition admits a
++  // well-defined execution of the (loop-free) new function; with the
++  // sink-check below and refinement, that execution returns in both.
++  const bool skip_sanity = getenv("VERIOP_SKIP_SANITY");
++  const bool skip_return = skip_sanity || getenv("VERIOP_SKIP_RETURN");
++  if (!skip_sanity &&
++      check_expr(axioms_expr && fndom_a, "ub_src").isUnsat()) {
+     if (config::fail_if_src_is_ub) {
+       errs.add("Source function is always UB", false);
+       return;
+@@ -542,7 +554,7 @@
+ 
+   {
+     auto sink_src = src_state.sinkDomain(false);
+-    if (!sink_src.isFalse() &&
++    if (!skip_return && !sink_src.isFalse() &&
+         check_expr(axioms_expr && !sink_src, "return_src").isUnsat()) {
+       errs.add("The source program doesn't reach a return instruction.\n"
+                "Consider increasing the unroll factor if it has loops", false);
+@@ -550,7 +562,7 @@
+     }
+ 
+     if (auto sink_tgt = tgt_state.sinkDomain(false);
+-        !sink_src.eq(sink_tgt) &&
++        !skip_return && !sink_src.eq(sink_tgt) &&
+         !sink_tgt.isFalse() &&
+         check_expr(axioms_expr && (!sink_tgt || sink_src), "return_tgt").isUnsat()) {
+       errs.add("The target program doesn't reach a return instruction.\n"
+@@ -594,6 +606,39 @@
+   }
+   pre_src_forall &= tgt_state.getFnPre();
+ 
++  // [veriop sink-check patch] Bounded unrolling sends executions that exceed
++  // the unroll factor to a #sink block, and Alive2 then silently ignores them
++  // (src: treated as UB; tgt: excluded from every check). This extra query
++  // proves that no well-defined execution (of src or tgt) satisfying the
++  // precondition reaches #sink, i.e. that the unroll factor is sufficient.
++  // UNSAT is required; SAT or unknown is reported as an error.
++  {
++    expr sink_any = src_state.sinkDomain(true) || tgt_state.sinkDomain(true);
++    if (getenv("VERIOP_DIAG_NO_SINKCHECK")) { // diagnostics only; never used for verdicts
++      std::cerr << "[sink-check] SKIPPED (diagnostic run)\n";
++    } else if (sink_any.isFalse()) {
++      std::cerr << "[sink-check] UNSAT (no sink edge)\n";
++    } else {
++      auto r = check_expr(axioms_expr && pre && pre_src_forall && sink_any,
++                            "sink_check");
++      if (r.isUnsat()) {
++        std::cerr << "[sink-check] UNSAT\n";
++      } else {
++        std::cerr << "[sink-check] NOT PROVED ("
++                  << (r.isSat() ? "sat" : "unknown/timeout") << ")\n";
++        if (r.isSat() && getenv("SINKCHECK_MODEL")) {
++          auto &m = r.getModel();
++          std::cerr << "[sink-check] src sink reached: "
++                    << m[src_state.sinkDomain(true)] << "  tgt sink reached: "
++                    << m[tgt_state.sinkDomain(true)] << "\nModel:\n" << m
++                    << '\n';
++        }
++        errs.add("[sink-check] unroll bound not proved sufficient", false);
++        return;
++      }
++    }
++  }
++
+   auto mk_fml = [&](expr &&refines) -> expr {
+     // from the check above we already know that
+     // \exists v,v' . pre_tgt(v') && pre_src(v) is SAT (or timeout)
+--- /srv/home/hantaolou/code/veriop/alive2/repos/alive2/ir/instr.cpp	2026-10-01 22:02:33.612656313 -0700
++++ alive2-sinkcheck/ir/instr.cpp	2026-10-15 16:54:54.316049524 -0700
+@@ -4191,8 +4191,11 @@
+ StateValue Store::toSMT(State &s) const {
+   // skip large initializers. FIXME: this should be moved to memory so it can
+   // fold subsequent trivial loads
++  // [veriop patch] the limit is raised from 128 to 1024 bytes so that the
++  // 256/280-byte lookup tables read by fast_float are modelled exactly (with
++  // the stock limit they are dropped and their contents become arbitrary).
+   if (s.isInitializationPhase() &&
+-      Memory::getStoreByteSize(val->getType()) / (bits_byte / 8) > 128) {
++      Memory::getStoreByteSize(val->getType()) / (bits_byte / 8) > 1024) {
+     s.doesApproximation("Large constant initializer removed");
+     return {};
+   }

@@ -1,0 +1,93 @@
+diff --git a/csrc/libtorch_stable/pos_encoding_kernels.cu b/csrc/libtorch_stable/pos_encoding_kernels.cu
+index 74af743..23126e4 100644
+--- a/csrc/libtorch_stable/pos_encoding_kernels.cu
++++ b/csrc/libtorch_stable/pos_encoding_kernels.cu
+@@ -98,6 +98,71 @@ __global__ void rotary_embedding_kernel(
+       inverse);
+ }
+ 
++template <typename scalar_t, typename cache_t, bool IS_NEOX, int ITEMS>
++__global__ void rotary_embedding_mlp_kernel(
++    const int64_t* __restrict__ positions, scalar_t* __restrict__ query,
++    scalar_t* __restrict__ key, const cache_t* __restrict__ cos_sin_cache,
++    const int rot_dim, const int64_t query_stride, const int64_t key_stride,
++    const int64_t head_stride, const int num_heads, const int num_kv_heads,
++    const int head_size, const int64_t rope_dim_offset, const bool inverse) {
++  const int token_idx = blockIdx.x;
++  const int embed_dim = rot_dim / 2;
++  const int nq = num_heads * embed_dim;
++  const int n_total = nq + (key != nullptr ? num_kv_heads * embed_dim : 0);
++  for (int base = 0; base < n_total; base += ITEMS * blockDim.x) {
++    scalar_t* x_ptr[ITEMS];
++    scalar_t* y_ptr[ITEMS];
++    int c_idx[ITEMS];
++    float x_f[ITEMS];
++    float y_f[ITEMS];
++#pragma unroll
++    for (int j = 0; j < ITEMS; ++j) {
++      const int i = base + j * blockDim.x + threadIdx.x;
++      if (i < n_total) {
++        const bool is_q = i < nq;
++        const int ii = is_q ? i : i - nq;
++        const int head_idx = ii / embed_dim;
++        const int rot_offset = ii % embed_dim;
++        scalar_t* arr =
++            is_q ? query + (token_idx * query_stride + head_idx * head_stride +
++                            rope_dim_offset)
++                 : key + (token_idx * key_stride + head_idx * head_stride +
++                          rope_dim_offset);
++        int x_index, y_index;
++        if (IS_NEOX) {
++          x_index = rot_offset;
++          y_index = embed_dim + rot_offset;
++          c_idx[j] = x_index;
++        } else {
++          x_index = 2 * rot_offset;
++          y_index = 2 * rot_offset + 1;
++          c_idx[j] = x_index / 2;
++        }
++        x_ptr[j] = arr + x_index;
++        y_ptr[j] = arr + y_index;
++        x_f[j] = static_cast<float>(*x_ptr[j]);
++        y_f[j] = static_cast<float>(*y_ptr[j]);
++      }
++    }
++    const int64_t pos = positions[token_idx];
++    const cache_t* cos_ptr = cos_sin_cache + pos * rot_dim;
++    const cache_t* sin_ptr = cos_ptr + embed_dim;
++#pragma unroll
++    for (int j = 0; j < ITEMS; ++j) {
++      const int i = base + j * blockDim.x + threadIdx.x;
++      if (i < n_total) {
++        const float cos_f = static_cast<float>(VLLM_LDG(cos_ptr + c_idx[j]));
++        float sin_f = static_cast<float>(VLLM_LDG(sin_ptr + c_idx[j]));
++        if (inverse) {
++          sin_f = -sin_f;
++        }
++        *x_ptr[j] = static_cast<scalar_t>(x_f[j] * cos_f - y_f[j] * sin_f);
++        *y_ptr[j] = static_cast<scalar_t>(y_f[j] * cos_f + x_f[j] * sin_f);
++      }
++    }
++  }
++}
++
+ }  // namespace vllm
+ 
+ void rotary_embedding(
+@@ -176,8 +241,14 @@ void rotary_embedding(
+             cos_sin_cache.scalar_type(), "rotary_embedding_cache", [&] {
+               using cache_t = scalar_t;
+               if (is_neox) {
+-                vllm::rotary_embedding_kernel<query_t, cache_t, true>
+-                    <<<grid, block, 0, stream>>>(
++                constexpr int kMlpItems = 4;
++                const int64_t n_pairs =
++                    static_cast<int64_t>(num_heads + (key.has_value() ? num_kv_heads : 0)) *
++                    (rot_dim / 2);
++                dim3 mlp_block(std::min<int64_t>(
++                    ((n_pairs + kMlpItems - 1) / kMlpItems + 31) / 32 * 32, 512));
++                vllm::rotary_embedding_mlp_kernel<query_t, cache_t, true, kMlpItems>
++                    <<<grid, mlp_block, 0, stream>>>(
+                         positions.const_data_ptr<int64_t>(),
+                         query.mutable_data_ptr<query_t>(),
+                         key.has_value() ? key->mutable_data_ptr<query_t>()

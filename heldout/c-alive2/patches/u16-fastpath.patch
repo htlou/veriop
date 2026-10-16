@@ -1,0 +1,128 @@
+diff --git a/include/fast_float/ascii_number.h b/include/fast_float/ascii_number.h
+--- a/include/fast_float/ascii_number.h	2026-10-06 16:48:48.000000000 -0700
++++ b/include/fast_float/ascii_number.h	2026-10-14 21:13:29.898468137 -0700
+@@ -625,6 +625,50 @@
+                                                              store_spans);
+ }
+ 
++// Fast path for decimal uint16_t parsing from char when at least eight
++// bytes are readable. It handles the two common shapes -- exactly five or
++// exactly four decimal digits followed by a non-digit -- with one 8-byte load.
++// Any leading '0' is harmless here (it does not change the value and the
++// digits are consumed either way), and since the first byte is a digit no
++// white space, sign or base prefix can be present. Each shape returns a
++// constant pointer offset, so the caller's next parse does not depend on the
++// loaded bytes. Returns false, without touching `value` or `answer`,
++// whenever the general path must decide.
++fastfloat_really_inline bool
++try_parse_u16_fast(char const *p, char const *pend, uint16_t &value,
++                   from_chars_result_t<char> &answer) noexcept {
++  if (pend - p < 8) {
++    return false;
++  }
++  uint64_t const chunk = read8_to_u64(p);
++  // Bit 7 of byte k is set if byte k is not a digit; exact for the lowest
++  // non-digit byte (digits never generate a carry or borrow).
++  uint64_t const nondigit =
++      ((chunk + 0x4646464646464646) | (chunk - 0x3030303030303030)) &
++      0x8080808080808080;
++  uint32_t const four = parse_four_digits_unrolled(uint32_t(chunk));
++  if ((nondigit & 0x0000808080808080) == 0x0000800000000000) {
++    // d0 d1 d2 d3 d4 x
++    uint32_t const v = four * 10 + uint32_t((chunk >> 32) & 0xFF) - '0';
++    answer.ptr = p + 5;
++    if (v > 65535) {
++      answer.ec = std::errc::result_out_of_range;
++    } else {
++      value = uint16_t(v);
++      answer.ec = std::errc();
++    }
++    return true;
++  }
++  if ((nondigit & 0x0000008080808080) == 0x0000008000000000) {
++    // d0 d1 d2 d3 x
++    value = uint16_t(four);
++    answer.ptr = p + 4;
++    answer.ec = std::errc();
++    return true;
++  }
++  return false;
++}
++
+ template <typename T, typename UC>
+ fastfloat_really_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
+ parse_int_string(UC const *p, UC const *pend, T &value,
+diff --git a/include/fast_float/parse_number.h b/include/fast_float/parse_number.h
+--- a/include/fast_float/parse_number.h	2026-10-06 16:48:48.000000000 -0700
++++ b/include/fast_float/parse_number.h	2026-10-14 21:16:00.793239131 -0700
+@@ -564,10 +564,13 @@
+   return integer_times_pow10(static_cast<int64_t>(mantissa), decimal_exponent);
+ }
+ 
++// The general integer parser (unchanged). It is force-inlined into its two
++// callers below, so for every type other than uint16_t/char the code of
++// from_chars_int_advanced is exactly the same as before.
+ template <typename T, typename UC>
+-FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
+-from_chars_int_advanced(UC const *first, UC const *last, T &value,
+-                        parse_options_t<UC> options) noexcept {
++fastfloat_really_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_int_advanced_general(UC const *first, UC const *last, T &value,
++                                parse_options_t<UC> options) noexcept {
+ 
+   static_assert(is_supported_integer_type<T>::value,
+                 "only integer types are supported");
+@@ -592,6 +595,53 @@
+   return parse_int_string(first, last, value, options);
+ }
+ 
++// Out-of-line copy of the general parser, used as the slow path of the
++// uint16_t/char fast path so that the fast path stays small (no spills).
++template <typename T, typename UC>
++fastfloat_never_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_int_advanced_slow(UC const *first, UC const *last, T &value,
++                             parse_options_t<UC> options) noexcept {
++  return from_chars_int_advanced_general(first, last, value, options);
++}
++
++template <typename T, typename UC>
++fastfloat_really_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_int_advanced_rest(UC const *first, UC const *last, T &value,
++                             parse_options_t<UC> options,
++                             std::true_type /* uint16_t/char */) noexcept {
++  return from_chars_int_advanced_slow(first, last, value, options);
++}
++
++template <typename T, typename UC>
++fastfloat_really_inline FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_int_advanced_rest(UC const *first, UC const *last, T &value,
++                             parse_options_t<UC> options,
++                             std::false_type /* other types */) noexcept {
++  return from_chars_int_advanced_general(first, last, value, options);
++}
++
++template <typename T, typename UC>
++FASTFLOAT_CONSTEXPR20 from_chars_result_t<UC>
++from_chars_int_advanced(UC const *first, UC const *last, T &value,
++                        parse_options_t<UC> options) noexcept {
++  using is_u16_char =
++      std::integral_constant<bool, std::is_same<T, std::uint16_t>::value &&
++                                       std::is_same<UC, char>::value>;
++  FASTFLOAT_IF_CONSTEXPR17(is_u16_char::value) {
++    from_chars_result_t<UC> answer;
++    if (!cpp20_and_in_constexpr() && options.base == 10 &&
++        try_parse_u16_fast(
++            reinterpret_cast<char const *>(first),
++            reinterpret_cast<char const *>(last),
++            reinterpret_cast<uint16_t &>(value),
++            reinterpret_cast<from_chars_result_t<char> &>(answer))) {
++      return answer;
++    }
++  }
++  return from_chars_int_advanced_rest(first, last, value, options,
++                                      is_u16_char());
++}
++
+ template <size_t TypeIx> struct from_chars_advanced_caller {
+   static_assert(TypeIx > 0, "unsupported type");
+ };
